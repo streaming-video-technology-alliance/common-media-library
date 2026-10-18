@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Narrow the `@svta/cml-iso-bmff` and `@svta/cml-utils` peer dependency ranges from `>=` to `^`. The published package no longer accepts a later major version of either peer.
+
 ## [1.4.0] - 2026-10-10
 
 ### Security

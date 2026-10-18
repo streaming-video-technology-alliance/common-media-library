@@ -1,13 +1,17 @@
 // Precedence rules: https://semver.org/#spec-item-11
 // Pattern: https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-type ParsedVersion = {
+export type ParsedVersion = {
 	release: number[];
 	prerelease: string[];
 };
 
 const versionPattern = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
 
-function parseVersion(version: string): ParsedVersion {
+/**
+ * Parses one semantic version into its release numbers and prerelease identifiers.
+ * Throws when `version` is not a semantic version.
+ */
+export function parseVersion(version: string): ParsedVersion {
 	const match = versionPattern.exec(version)
 
 	if (!match) {
