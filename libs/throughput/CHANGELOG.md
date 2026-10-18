@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- `EwmaEstimator` no longer adds `defaultEstimate` to both averages as a sample with a weight of 1 second. The first valid estimate is the measured rate. Before, the estimate stayed near `defaultEstimate` for about 1 second of download time.
+
 ## [1.0.10] - 2026-10-12
 
 ### Changed
