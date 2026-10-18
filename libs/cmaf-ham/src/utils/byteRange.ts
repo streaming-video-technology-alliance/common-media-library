@@ -9,10 +9,10 @@ export type ByteRangeObject = {
 };
 
 /**
- * Parses a byteRange string in either HLS format (length@offset) or DASH format (start-end)
+ * Parses a byteRange string in either HLS format (`length@offset`) or DASH format (`start-end`)
  * and converts it to an object with start and end properties.
  *
- * @param byteRangeString - String in format "length@offset" or "start-end"
+ * @param byteRangeString - String in format `length@offset` or `start-end`
  * @returns Object with start and end properties, or undefined if input is invalid
  *
  * @example
@@ -61,10 +61,10 @@ export function parseByteRangeString(byteRangeString: string | undefined): ByteR
 }
 
 /**
- * Converts a ByteRangeObject to HLS format string (length@offset)
+ * Converts a ByteRangeObject to HLS format string (`length@offset`)
  *
  * @param byteRange - Object with start and end properties
- * @returns String in format "length@offset"
+ * @returns String in format `length@offset`
  *
  * @example
  * ```ts

@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Both overloads of `parsePsshList` now have a doc comment.
+
 ## [1.1.11] - 2026-09-15
 
 ### Changed

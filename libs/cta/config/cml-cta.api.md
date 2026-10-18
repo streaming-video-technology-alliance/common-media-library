@@ -11,8 +11,6 @@ import { ValueOf } from '@svta/cml-utils';
 // @public
 export type CmCustomKey = `${string}-${string}`;
 
-// Warning: (ae-internal-missing-underscore) The name "CmObjectType" should be prefixed with an underscore because the declaration is marked as @internal
-//
 // @internal
 export const CmObjectType: {
     readonly MANIFEST: "m";
@@ -29,8 +27,6 @@ export const CmObjectType: {
 // @internal
 export type CmObjectType = ValueOf<typeof CmObjectType>;
 
-// Warning: (ae-internal-missing-underscore) The name "CmStreamingFormat" should be prefixed with an underscore because the declaration is marked as @internal
-//
 // @internal
 export const CmStreamingFormat: {
     readonly DASH: "d";
@@ -42,8 +38,6 @@ export const CmStreamingFormat: {
 // @internal
 export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;
 
-// Warning: (ae-internal-missing-underscore) The name "CmStreamType" should be prefixed with an underscore because the declaration is marked as @internal
-//
 // @internal
 export const CmStreamType: {
     readonly VOD: "v";
@@ -53,20 +47,12 @@ export const CmStreamType: {
 // @internal
 export type CmStreamType = ValueOf<typeof CmStreamType>;
 
-// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmObjectType" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmStreamingFormat" which is marked as @internal
-// Warning: (ae-incompatible-release-tags) The symbol "CmValue" is marked as @public, but its signature references "CmStreamType" which is marked as @internal
-//
-// @public
+// @internal
 export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
-// Warning: (ae-internal-missing-underscore) The name "isTokenField" should be prefixed with an underscore because the declaration is marked as @internal
-//
 // @internal
 export function isTokenField(key: string): boolean;
 
-// Warning: (ae-internal-missing-underscore) The name "isValid" should be prefixed with an underscore because the declaration is marked as @internal
-//
 // @internal
 export function isValid(value: CmValue): boolean;
 

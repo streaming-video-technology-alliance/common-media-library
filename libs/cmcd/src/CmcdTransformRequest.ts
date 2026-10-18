@@ -28,7 +28,7 @@ import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
  * 	request?.customData?.requestType === 'segment' ? data : null
  * ```
  *
- * This type wraps `C` in {@link DeepReadonly}, so a nested `C` keeps both the
+ * This type wraps `C` in {@link @svta/cml-utils!DeepReadonly | DeepReadonly}, so a nested `C` keeps both the
  * read-only guarantee and typed reads.
  *
  * Two limits apply. A mutable body such as `FormData` or `URLSearchParams`
