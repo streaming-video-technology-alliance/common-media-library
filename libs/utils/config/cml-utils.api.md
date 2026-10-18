@@ -31,7 +31,7 @@ export type DecodeTextOptions = {
 };
 
 // @public
-export type DeepReadonly<T> = T extends ((...args: never[]) => unknown) ? T : T extends readonly (infer U)[] ? readonly DeepReadonly<U>[] : T extends object ? { readonly [P in keyof T]: DeepReadonly<T[P]> } : T;
+export type DeepReadonly<T> = T extends ((...args: never[]) => unknown) ? T : T extends readonly (infer U)[] ? readonly DeepReadonly<U>[] : T extends object ? { readonly [P in keyof T]: DeepReadonly<T[P]>; } : T;
 
 // @public
 export function encodeBase64(binary: Uint8Array): string;
@@ -51,7 +51,7 @@ export const Encoding: {
 export type Encoding = ValueOf<typeof Encoding>;
 
 // @public
-export type ExclusiveRecord<K extends PropertyKey, V> = { [P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, never>> extends infer O ? { [Q in keyof O]: O[Q] } : never }[K];
+export type ExclusiveRecord<K extends PropertyKey, V> = { [P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, never>> extends (infer O) ? { [Q in keyof O]: O[Q]; } : never; }[K];
 
 // @public
 export function getBandwidthBps(sample: ResourceTiming): number;

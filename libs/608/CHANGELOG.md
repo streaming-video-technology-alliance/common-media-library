@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `@svta/cml-utils` is now a declared peer dependency.
 - README: the prose is rewritten for readers who do not read English as a first language. The extractor table and the code examples are unchanged.
 - README: the extraction example is complete. The sample inputs are function parameters.
 

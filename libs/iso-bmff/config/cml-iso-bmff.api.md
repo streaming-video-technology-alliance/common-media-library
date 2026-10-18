@@ -22,8 +22,8 @@ export type AudioRenderingIndicationBox = FullBox & {
 };
 
 // @public
-export type AudioSampleEntryBox<T$1 extends IsoBoxType = AudioSampleEntryType> = SampleEntryBox & {
-    type: T$1;
+export type AudioSampleEntryBox<T extends IsoBoxType = AudioSampleEntryType> = SampleEntryBox & {
+    type: T;
     reserved2: number[];
     channelcount: number;
     samplesize: number;
@@ -40,8 +40,8 @@ export type AudioSampleEntryBoxChild = any;
 export type AudioSampleEntryType = "mp4a" | "enca";
 
 // @public
-export type Box<T$1 extends IsoBoxType = never> = {
-    type: T$1;
+export type Box<T extends IsoBoxType = never> = {
+    type: T;
 };
 
 // @public
@@ -86,13 +86,13 @@ export type CompositionTimeToSampleEntry = {
 export const CONTAINERS: string[];
 
 // @public
-export function createAudioSampleEntryReader<T$1 extends IsoBoxType>(type: T$1): (view: IsoBoxReadView) => AudioSampleEntryBox<T$1>;
+export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView) => AudioSampleEntryBox<T>;
 
 // @public
 export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
 
 // @public
-export function createVisualSampleEntryReader<T$1 extends IsoBoxType>(type: T$1): (view: IsoBoxReadView) => VisualSampleEntryBox<T$1>;
+export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView) => VisualSampleEntryBox<T>;
 
 // @public
 export const DATA: "data";
@@ -222,23 +222,23 @@ export type ExtendedLanguageBox = FullBox & {
 export type FileTypeBox = TypeBox<"ftyp">;
 
 // @public
-export function filterIsoBoxes<T$1, S extends T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => box is S, config?: TraverseIsoBoxesConfig): S[];
+export function filterIsoBoxes<T, S extends T>(boxes: Iterable<T>, callback: (box: T) => box is S, config?: TraverseIsoBoxesConfig): S[];
 
 // @public (undocumented)
-export function filterIsoBoxes<T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1[];
+export function filterIsoBoxes<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T[];
 
 // @public
-export function findIsoBox<T$1, S extends T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => box is S, config?: TraverseIsoBoxesConfig): S | null;
+export function findIsoBox<T, S extends T>(boxes: Iterable<T>, callback: (box: T) => box is S, config?: TraverseIsoBoxesConfig): S | null;
 
 // @public (undocumented)
-export function findIsoBox<T$1>(boxes: Iterable<T$1>, callback: (box: T$1) => boolean, config?: TraverseIsoBoxesConfig): T$1 | null;
+export function findIsoBox<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null;
 
 // @public
 export function fourCcToUint32(str: string): number;
 
 // @public
-export type FreeSpaceBox<T$1 extends "free" | "skip" = "free"> = {
-    type: T$1;
+export type FreeSpaceBox<T extends "free" | "skip" = "free"> = {
+    type: T;
     data: Uint8Array;
 };
 
@@ -292,13 +292,13 @@ export type IpmpInfoBox = FullBox & {
 };
 
 // @public
-export function isContainer<T$1 extends IsoBox | Box<IsoBox["type"]>>(box: T$1): box is T$1 & IsoBoxContainer;
+export function isContainer<T extends IsoBox | Box<IsoBox["type"]>>(box: T): box is T & IsoBoxContainer;
 
 // @public
 export function isFullBox(box: any): box is FullBox;
 
 // @public
-export function isIsoBoxType<T$1 extends keyof IsoBoxMap>(type: T$1, box: any): box is IsoBoxMap[T$1];
+export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: any): box is IsoBoxMap[T];
 
 // @public
 export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
@@ -457,13 +457,13 @@ export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
 }
 
 // @public
-export type IsoBoxReader<B = unknown, T$1 extends IsoBoxType = IsoBoxType> = (view: IsoBoxReadView, type: T$1) => B;
+export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view: IsoBoxReadView, type: T) => B;
 
 // @public
 export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
 
 // @public
-export type IsoBoxReaderReturn<T$1> = { [K in keyof T$1]: T$1[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never }[keyof T$1] | ParsedIsoBox;
+export type IsoBoxReaderReturn<T> = { [K in keyof T]: T[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never; }[keyof T] | ParsedIsoBox;
 
 // @public
 export class IsoBoxReadView {
@@ -541,7 +541,7 @@ export type IsoFieldTypeMap = {
 };
 
 // @public
-export type IsoTypedParsedBox<T$1 extends keyof IsoBoxMap> = ParsedBox<IsoBoxMap[T$1]>;
+export type IsoTypedParsedBox<T extends keyof IsoBoxMap> = ParsedBox<IsoBoxMap[T]>;
 
 // @public
 export type ItemExtent = {
@@ -745,7 +745,7 @@ export type OriginalFormatBox = {
 };
 
 // @public
-export type ParsedBox<T$1 = Box> = (T$1 extends IsoBox ? T$1 & Omit<Box, "type"> : T$1) & {
+export type ParsedBox<T = Box> = (T extends IsoBox ? T & Omit<Box, "type"> : T) & {
     view: IsoBoxReadView;
     size: number;
     largesize?: number;
@@ -808,7 +808,7 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntryBox<T$1 extends IsoBoxType>(type: T$1, view: IsoBoxReadView): AudioSampleEntryBox<T$1>;
+export function readAudioSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView): AudioSampleEntryBox<T>;
 
 // @public
 export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<"avc1">;
@@ -868,9 +868,9 @@ export function readIden(view: IsoBoxReadView): WebVttCueIdBox;
 export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox;
 
 // @public
-export function readIsoBoxes<const R$1 extends IsoBoxReaderMap>(raw: IsoBoxData, config: IsoBoxReadViewConfig & {
-    readers: R$1;
-}): IsoBoxReaderReturn<R$1>[];
+export function readIsoBoxes<const R extends IsoBoxReaderMap>(raw: IsoBoxData, config: IsoBoxReadViewConfig & {
+    readers: R;
+}): IsoBoxReaderReturn<R>[];
 
 // @public (undocumented)
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[];
@@ -984,7 +984,7 @@ export function readUrl(view: IsoBoxReadView): DataEntryUrlBox;
 export function readUrn(view: IsoBoxReadView): DataEntryUrnBox;
 
 // @public
-export function readVisualSampleEntryBox<T$1 extends IsoBoxType>(type: T$1, view: IsoBoxReadView): VisualSampleEntryBox<T$1>;
+export function readVisualSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView): VisualSampleEntryBox<T>;
 
 // @public
 export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox;
@@ -1038,8 +1038,8 @@ export type SampleEncryptionBox = FullBox & {
 };
 
 // @public
-export type SampleEntryBox<T$1 extends IsoBoxType = IsoBoxType, C = any> = {
-    type: T$1;
+export type SampleEntryBox<T extends IsoBoxType = IsoBoxType, C = any> = {
+    type: T;
     reserved1: number[];
     dataReferenceIndex: number;
     boxes: C[];
@@ -1384,7 +1384,7 @@ export type TrackRunSample = {
 };
 
 // @public
-export function traverseIsoBoxes<T$1>(boxes: Iterable<T$1>, config?: TraverseIsoBoxesConfig): Generator<T$1>;
+export function traverseIsoBoxes<T>(boxes: Iterable<T>, config?: TraverseIsoBoxesConfig): Generator<T>;
 
 // @public
 export type TraverseIsoBoxesConfig = {
@@ -1393,8 +1393,8 @@ export type TraverseIsoBoxesConfig = {
 };
 
 // @public
-export type TypeBox<T$1> = {
-    type: T$1;
+export type TypeBox<T> = {
+    type: T;
     majorBrand: string;
     minorVersion: number;
     compatibleBrands: string[];
@@ -1429,8 +1429,8 @@ export type VideoMediaHeaderBox = FullBox & {
 };
 
 // @public
-export type VisualSampleEntryBox<T$1 extends IsoBoxType = VisualSampleEntryType> = SampleEntryBox & {
-    type: T$1;
+export type VisualSampleEntryBox<T extends IsoBoxType = VisualSampleEntryType> = SampleEntryBox & {
+    type: T;
     preDefined1: number;
     reserved2: number;
     preDefined2: number[];
@@ -1500,7 +1500,7 @@ export type WebVttSourceLabelBox = {
 export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView;
 
 // @public
-export function writeAudioSampleEntryBox<T$1 extends AudioSampleEntryType = AudioSampleEntryType>(box: AudioSampleEntryBox<T$1>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+export function writeAudioSampleEntryBox<T extends AudioSampleEntryType = AudioSampleEntryType>(box: AudioSampleEntryBox<T>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeAvc1(box: VisualSampleEntryBox<"avc1">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
@@ -1683,7 +1683,7 @@ export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
 export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView;
 
 // @public
-export function writeVisualSampleEntryBox<T$1 extends VisualSampleEntryType = VisualSampleEntryType>(box: VisualSampleEntryBox<T$1>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = VisualSampleEntryType>(box: VisualSampleEntryBox<T>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView;
