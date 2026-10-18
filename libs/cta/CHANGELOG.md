@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - README: the description is rewritten for readers who do not read English as a first language. A typo is fixed.
+- `CmValue` is now marked `@internal`. The three types in the union were already `@internal`.
 
 ## [1.0.9] - 2026-09-15
 

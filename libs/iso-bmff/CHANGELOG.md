@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- Type parameter names in `dist/index.d.ts` now match the source, for example `T` instead of `T$1`.
 - README and the Reading Boxes, Writing Boxes, and Utilities guides: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
 
 ## [1.0.6] - 2026-09-15

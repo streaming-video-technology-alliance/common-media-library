@@ -365,6 +365,13 @@
 			"default": {
 				"logLevel": "warning"
 				// "addToApiReportFile": false
+			},
+			/**
+       * Internal exports keep their names. This repository does not use the underscore prefix convention.
+       */
+			"ae-internal-missing-underscore": {
+				"logLevel": "none",
+				"addToApiReportFile": false
 			}
 			// "ae-extra-release-tag": {
 			//   "logLevel": "warning",
@@ -384,6 +391,13 @@
 			"default": {
 				"logLevel": "warning"
 				// "addToApiReportFile": false
+			},
+			/**
+       * Cross-package links use the TypeDoc delimiter "!", as in "@svta/cml-utils!HttpRequest".
+       * The TSDoc parser expects "#" and reports this message for every such link.
+       */
+			"tsdoc-reference-missing-hash": {
+				"logLevel": "none"
 			}
 			// "tsdoc-link-tag-unescaped-text": {
 			//   "logLevel": "warning",

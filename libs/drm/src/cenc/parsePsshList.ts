@@ -15,6 +15,16 @@ import { isArrayBufferLike } from '@svta/cml-utils'
  * {@includeCode ../../test/cenc/parsePsshList.test.ts#example}
  */
 export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>
+/**
+ * Parses a list of PSSH boxes into keysystem-specific PSSH data.
+ *
+ * @param data - The concatenated list of PSSH boxes as a `Uint8Array`.
+ * @returns An object that has a property named according to each of
+ * the detected key system UUIDs and a `Uint8Array` (the entire PSSH box)
+ * as the property value
+ *
+ * @public
+ */
 export function parsePsshList(data: Uint8Array): Record<string, Uint8Array>
 export function parsePsshList(data: ArrayBufferLike | Uint8Array): Record<string, ArrayBufferLike | Uint8Array> {
 	if (!data) {

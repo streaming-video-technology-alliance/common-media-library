@@ -218,7 +218,7 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 // @public
 export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>;
 
-// @public (undocumented)
+// @public
 export function parsePsshList(data: Uint8Array): Record<string, Uint8Array>;
 
 // @public

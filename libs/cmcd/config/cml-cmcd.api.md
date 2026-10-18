@@ -624,7 +624,7 @@ export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
     convertToLatest: true;
 }): Cmcd;
 
-// @public (undocumented)
+// @public
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T;
 
 // @public
@@ -635,7 +635,7 @@ export function fromCmcdHeaders(headers: Record<string, string> | Headers, optio
     convertToLatest: true;
 }): Cmcd;
 
-// @public (undocumented)
+// @public
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData;
 
 // @public
@@ -643,7 +643,7 @@ export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDeco
     convertToLatest: true;
 }): Cmcd;
 
-// @public (undocumented)
+// @public
 export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData;
 
 // @public
@@ -651,7 +651,7 @@ export function fromCmcdUrl(url: string, options: CmcdDecodeOptions & {
     convertToLatest: true;
 }): Cmcd;
 
-// @public (undocumented)
+// @public
 export function fromCmcdUrl(url: string, options?: CmcdDecodeOptions): CmcdData;
 
 // @public
