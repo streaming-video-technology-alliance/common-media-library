@@ -1,8 +1,9 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { cmd } from './cmd.ts'
-import { exec } from './exec.ts'
+import { viewPublished, viewPublishedPeers } from './npmView.ts'
 import { projects } from './projects.ts'
+import { satisfiesRange } from './satisfiesRange.ts'
 
 type PackageJson = {
 	name: string;
@@ -15,6 +16,7 @@ type PackageInfo = {
 	name: string;
 	current: PackageJson;
 	published: string | undefined;
+	publishedPeers: Record<string, string>;
 };
 
 async function loadCurrentPackage(folder: string): Promise<PackageJson> {
@@ -22,21 +24,12 @@ async function loadCurrentPackage(folder: string): Promise<PackageJson> {
 	return JSON.parse(await readFile(file, 'utf8'))
 }
 
-async function loadPublishedVersion(name: string): Promise<string | undefined> {
-	try {
-		const version = await exec(`npm view ${name} version`)
-		return version.trim()
-	}
-	catch {
-		return undefined
-	}
-}
-
 async function loadPackages(): Promise<PackageInfo[]> {
 	return Promise.all(projects.map(async (folder) => {
 		const current = await loadCurrentPackage(folder)
-		const published = await loadPublishedVersion(current.name)
-		return { folder, name: current.name, current, published }
+		const published = await viewPublished(current.name, 'version')
+		const publishedPeers = published ? await viewPublishedPeers(current.name) : {}
+		return { folder, name: current.name, current, published, publishedPeers }
 	}))
 }
 
@@ -96,7 +89,7 @@ for (const name of changed) {
 	console.log(`  ${name}: ${pkg.published ?? 'new'} → ${pkg.current.version}`)
 }
 
-// Cascading patch loop
+// Cascading patch loop: a package needs a patch when its published peer range rejects a changed peer
 const patched: { name: string; from: string; to: string; changes: string[] }[] = []
 
 let bumped = true
@@ -111,19 +104,21 @@ while (bumped) {
 		const peers = pkg.current.peerDependencies ?? {}
 		const changes: string[] = []
 
-		for (const [dep] of Object.entries(peers)) {
-			if (!dep.startsWith('@svta/cml-')) {
-				continue
-			}
-
+		for (const dep of Object.keys(peers)) {
 			const depPkg = packagesByName.get(dep)
-			if (!depPkg) {
+
+			if (!depPkg || !changed.has(dep)) {
 				continue
 			}
 
-			if (changed.has(dep)) {
-				changes.push(`Update \`${dep}\` to ${depPkg.current.version}`)
+			const range = pkg.publishedPeers[dep]
+			const newVersion = depPkg.current.version
+
+			if (range && satisfiesRange(newVersion, range)) {
+				continue
 			}
+
+			changes.push(`Update \`${dep}\` to ${newVersion}`)
 		}
 
 		if (changes.length === 0) {
