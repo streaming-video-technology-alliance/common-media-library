@@ -11,6 +11,12 @@ and this project adheres to
 ### Changed
 
 - `EwmaEstimator` no longer adds `defaultEstimate` to both averages as a sample with a weight of 1 second. The first valid estimate is the measured rate. Before, the estimate stayed near `defaultEstimate` for about 1 second of download time.
+- README: a section on the samples the estimators ignore, with the browser rules for the body size of a cross-origin response.
+
+### Fixed
+
+- Every estimator now ignores a sample with an `encodedBodySize` of 0 or less, `NaN`, or `Infinity`. Before, a zero-byte sample counted as 0 bits per second and moved the estimate toward 0.
+- `ArithmeticMeanEstimator`, `HarmonicMeanEstimator`, and `ZlemaEstimator` now ignore a sample with a `duration` of 0 or less, `NaN`, or `Infinity`. Before, a zero duration made the estimate `Infinity` or `NaN`. `EwmaEstimator` already ignored that sample.
 
 ## [1.0.10] - 2026-10-12
 

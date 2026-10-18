@@ -1,5 +1,6 @@
 import type { ResourceTiming } from '@svta/cml-utils'
 import { getBandwidthBps } from '@svta/cml-utils'
+import { isValidSample } from './isValidSample.ts'
 import type { ThroughputEstimator } from './ThroughputEstimator.ts'
 
 /**
@@ -11,6 +12,10 @@ export class ZlemaEstimator implements ThroughputEstimator {
 	private samples: ResourceTiming[] = []
 
 	public sample(sample: ResourceTiming): void {
+		if (!isValidSample(sample)) {
+			return
+		}
+
 		this.samples.push(sample)
 	}
 
