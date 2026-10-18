@@ -65,7 +65,7 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 			const hasCurrent = Number.isFinite(currentBandwidth)
 			const current = hasCurrent ? findRung(ladder, currentBandwidth) : 0
 
-			if (!isPositiveFinite(throughput)) {
+			if (!Number.isFinite(throughput) || throughput < 0) {
 				return { index: current, delay: 0 }
 			}
 
