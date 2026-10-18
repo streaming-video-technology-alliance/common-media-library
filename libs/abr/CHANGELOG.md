@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-18
+
 ### Added
 
 - Initial implementation of the [bitrate selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/526)
@@ -15,4 +17,5 @@ and this project adheres to
 - `createThroughputSelector`, which creates a rate-based selector with a safety factor, an upgrade factor for the hysteresis, and a two-pass starvation guard
 - `DEFAULT_SAFETY_FACTOR` (0.9), `DEFAULT_UPGRADE_FACTOR` (0.7), and `DEFAULT_STARVATION_TOLERANCE` (4)
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/main...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.1.0...HEAD
+[0.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/abr-v0.1.0
