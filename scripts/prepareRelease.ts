@@ -4,6 +4,7 @@ import { cmd } from './cmd.ts'
 import { viewPublished, viewPublishedPeers } from './npmView.ts'
 import { projects } from './projects.ts'
 import { satisfiesRange } from './satisfiesRange.ts'
+import { unreleasedEntries } from './unreleasedEntries.ts'
 
 type PackageJson = {
 	name: string;
@@ -153,4 +154,26 @@ if (patched.length === 0) {
 }
 else {
 	console.log(`\n${patched.length} package(s) patched.`)
+}
+
+// Warn about packages that have unreleased changelog entries and no version change
+const unreleased: string[] = []
+
+for (const pkg of packages) {
+	if (changed.has(pkg.name)) {
+		continue
+	}
+
+	const changelog = await readFile(path.resolve(pkg.folder, 'CHANGELOG.md'), 'utf8')
+	const count = unreleasedEntries(changelog).length
+
+	if (count > 0) {
+		unreleased.push(`  ${pkg.name} (${count} ${count === 1 ? 'entry' : 'entries'})`)
+	}
+}
+
+if (unreleased.length > 0) {
+	console.warn(`\nWarning: ${unreleased.length} package(s) have unreleased changelog entries and no version change:`)
+	console.warn(unreleased.join('\n'))
+	console.warn('Run "npm run ver <package> <version>" for each package whose changes should ship.')
 }
