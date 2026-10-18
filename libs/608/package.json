@@ -52,5 +52,8 @@
 			"version": ">=24",
 			"onFail": "error"
 		}
+	},
+	"peerDependencies": {
+		"@svta/cml-utils": "*"
 	}
 }

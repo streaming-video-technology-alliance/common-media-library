@@ -10,7 +10,9 @@ and this project adheres to
 
 ### Changed
 
+- `@svta/cml-drm` is now a declared peer dependency.
 - README: a usage example replaces the empty code block. The examples in `src/README.md` import from `@svta/cml-cmaf-ham` and compile. The sample README gives the correct folder and run command.
+- The `parseByteRangeString` and `byteRangeToHlsString` docs now format `length@offset` as code.
 
 
 ### Fixed

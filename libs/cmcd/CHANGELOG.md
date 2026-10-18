@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Both overloads of `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl` now have a doc comment.
+- The `CmcdTransformRequest` doc now links to `DeepReadonly` in `@svta/cml-utils`.
+
 ## [2.8.2] - 2026-10-08
 
 ### Fixed

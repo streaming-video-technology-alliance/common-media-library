@@ -6,7 +6,7 @@ import type { CmStreamType } from './CmStreamType.ts'
 /**
  * A common media value.
  *
- * @public
+ * @internal
  */
 export type CmValue =
 	| CmObjectType
