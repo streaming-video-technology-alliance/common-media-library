@@ -7,7 +7,7 @@ status: draft
 | | |
 |---|---|
 | **Author** | Nicolas Caballero |
-| **Date** | 2026-10-05 (revised 2026-10-18) |
+| **Date** | 2026-10-05 (revised 2026-10-19) |
 | **Package** | `@svta/cml-abr` |
 | **Breaking change** | No (new exports) |
 
@@ -113,7 +113,7 @@ export type BolaDecision = BitrateDecision & {
 	readonly placeholder: number    // seconds of virtual buffer in the decision
 }
 
-export type BolaSelector = BitrateSelector & {
+export type BolaSelector = Omit<BitrateSelector, 'select'> & {
 	select(input: BitrateSelectorInput): BolaDecision
 }
 
@@ -123,6 +123,8 @@ export type BolaSelectorOptions = {
 
 export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector
 ```
+
+`BolaSelector` omits the `select` of `BitrateSelector` and adds a narrower one. A plain intersection of the two `select` signatures resolves to the first one, so its result would lose `state` and `placeholder`. Every `BolaSelector` is still a `BitrateSelector`.
 
 The package also exports `BOLA_DEFAULT_BUFFER_TARGET` (18 seconds). `safetyFactor` has the meaning and the bounds of the throughput selector option with the same name, and `DEFAULT_SAFETY_FACTOR` is its default. The threshold functions, the ladder validation, and the other helpers stay internal.
 
@@ -206,7 +208,20 @@ The implementation PR carries the full strategy. In short:
 - A seeded playback simulation that compares the selector with the throughput selector.
 - A manual comparison with the dash.js `BolaRule` on the same ladder and buffer inputs.
 
-The test fixtures are two ladders with a buffer target of 18 seconds. L1 is 300, 750, 1500, 3000, and 6000 kbps. L2 is 235, 375, 560, 750, 1050, 1750, 2350, 3000, 4300, and 5800 kbps. The [design record](./design.md) lists their reference values.
+The test fixtures are two ladders with a buffer target of 18 seconds. The bandwidths are in bits per second:
+
+```ts
+const L1: LadderRung[] = [
+	{ bandwidth: 300_000 }, { bandwidth: 750_000 }, { bandwidth: 1_500_000 }, { bandwidth: 3_000_000 }, { bandwidth: 6_000_000 },
+]
+
+const L2: LadderRung[] = [
+	{ bandwidth: 235_000 }, { bandwidth: 375_000 }, { bandwidth: 560_000 }, { bandwidth: 750_000 }, { bandwidth: 1_050_000 },
+	{ bandwidth: 1_750_000 }, { bandwidth: 2_350_000 }, { bandwidth: 3_000_000 }, { bandwidth: 4_300_000 }, { bandwidth: 5_800_000 },
+]
+```
+
+The [design record](./design.md) lists their reference values.
 
 ### Packaging
 
@@ -252,6 +267,7 @@ The selector joins `libs/abr`. It adds no package and no peer dependency. `Value
 
 - v1 (2026-10-05): initial draft.
 - v2 (2026-10-18): rebased on the accepted bitrate selector RFC. The selector is a factory, `createBolaSelector`, over the shared input, sample, and `LadderRung` types. Names are plain with the units in the TSDoc. The RFC states the stall rule, the wait accounting, and the L2 fixture. Questions 4 to 7 of v1 became decisions in Rationale and alternatives, and questions 8 to 10 are answered by the bitrate selector RFC. The analysis and the design record moved into this folder.
+- v3 (2026-10-19): `BolaSelector` omits the `select` of `BitrateSelector`, so the result type keeps `state` and `placeholder`. The L2 test fixture is listed as `LadderRung` objects.
 
 ## Final Decision
 
