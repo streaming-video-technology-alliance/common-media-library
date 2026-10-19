@@ -29,7 +29,7 @@ const { index } = selector.select({ ladder, bufferLevel: 0, throughput: 2_000_00
 
 ## Motivation
 
-A player picks a rung before every segment request. The throughput selector of `@svta/cml-abr` picks the rung that the throughput estimate sustains. The estimate is noisy and lags behind drops. The quality oscillates when the estimate sits between two rungs. hls.js and shaka-player select rungs this way.
+A player picks a rung before every segment request. The throughput selector of `@svta/cml-abr` picks the rung that the throughput estimate sustains. The estimate is noisy and reacts late to drops. The quality oscillates when the estimate sits between two rungs. hls.js and shaka-player select rungs this way.
 
 BOLA decides from the buffer level. A full buffer allows a high rung. A low buffer forces a low rung. It needs no accurate throughput estimate and it switches less often. The dash.js player ships BOLA and runs it above a buffer level, with the throughput rule below that level.
 
@@ -91,7 +91,7 @@ The values 10 seconds and 2 seconds per rung come from dash.js. For an effective
 score_i(Q) = (V * (v_i + gamma) - Q) / b_i
 ```
 
-A tie goes to the higher rung. The selector does not evaluate scores at run time. It precomputes one threshold for each rung and picks the highest rung with a threshold at or below `Q`:
+On a tie, the selector picks the higher rung. The selector does not evaluate scores at run time. It precomputes one threshold for each rung and picks the highest rung with a threshold at or below `Q`:
 
 ```
 threshold_0 = 0
@@ -99,6 +99,8 @@ threshold_i = max(0, V * (gamma + (b_i * v_(i-1) - b_(i-1) * v_i) / (b_i - b_(i-
 ```
 
 A unit test compares these thresholds with a direct search of the score function. The score of rung `i` reaches zero at `V * (v_i + gamma)`. This level is the maximum buffer of the rung.
+
+The formulas need two distinct bandwidths. For one distinct rung, `v_(M-1)` is 0, and the selector derives no values. The state machine states the decision for that case.
 
 ### Export surface
 
@@ -110,7 +112,7 @@ export type BolaState = ValueOf<typeof BolaState>
 
 export type BolaDecision = BitrateDecision & {
 	readonly state: BolaState
-	readonly placeholder: number    // seconds of virtual buffer in the decision
+	readonly placeholder: number    // placeholder buffer in seconds after the call
 }
 
 export type BolaSelector = Omit<BitrateSelector, 'select'> & {
@@ -134,10 +136,11 @@ The selector keeps a placeholder buffer. This is virtual buffer time that the se
 
 | Input | Effect |
 |---|---|
-| `select`, startup state | Picks the highest rung at or below `throughput * safetyFactor`. Picks rung 0 when the estimate is unknown. Sets the placeholder so that `Q` equals the threshold of that rung. Moves to the steady state when a segment was sampled and the buffer holds at least one segment. |
+| `select`, startup state | Picks the highest rung at or below `throughput * safetyFactor`. Picks rung 0 when the estimate is unknown. Sets the placeholder to `max(0, threshold - bufferLevel)` for that rung. Moves to the steady state after the first `sample` call, when the buffer holds at least one segment. |
 | `select`, steady state | Adds the wall-clock time since the last request end to the placeholder. If no request ended since the last call, it uses the time since the last call. Picks the rung for `Q`. Applies the oscillation guard. Computes the delay. |
+| `select`, one distinct rung | Returns the highest index of that rung with a delay of 0. The decision reports the startup state and a placeholder of 0. |
 | `sample` | Records the sampled bandwidth as the current rung. Multiplies the placeholder by 0.99. Caps it so that the effective buffer at request start stays at or below the maximum buffer of that rung. Adds `duration` when `isReplacement` is true. |
-| `sample` with `aborted` | Caps the placeholder at the threshold of the current rung, or at 10 seconds for rung 0. Does not change the current rung. |
+| `sample` with `aborted` | Caps the placeholder so that the effective buffer stays at or below the threshold of the current rung. For rung 0 the limit is 10 seconds. Does not change the current rung. |
 | `reset` | Returns to the startup state and clears all history. |
 
 The oscillation guard is the BOLA-O variant. Suppose the score picks a rung above both the current rung and the rung that the throughput sustains. Then the selector keeps the higher of the current rung and the sustained rung. The guard is skipped when the estimate is unknown.
@@ -193,6 +196,8 @@ The selector follows `BolaRule.js` in dash.js, with these deliberate changes:
 - An unknown throughput does not block upward switches in the steady state.
 - A stall is derived from the buffer level, and it clears the time bases of the placeholder.
 - The player injects the time. dash.js reads `Date.now()`.
+- An unknown throughput at startup picks rung 0. dash.js makes no decision until an estimate exists.
+- `M` counts the distinct bandwidths. dash.js counts the representations.
 
 ### Bundle and performance impact
 
@@ -225,7 +230,7 @@ The [design record](./design.md) lists their reference values.
 
 ### Packaging
 
-The selector joins `libs/abr`. It adds no package and no peer dependency. `ValueOf` for `BolaState` comes from `@svta/cml-utils` with `import type`. The exports carry the release tag of the package. The port derives from BSD-3 code, so `libs/abr/NOTICE.md` and the root `NOTICE` file get the dash.js attribution.
+The selector joins `libs/abr`. It adds no package and no peer dependency. `ValueOf` for `BolaState` comes from `@svta/cml-utils` with `import type`. The exports carry `@beta`, the release tag of the package. The bitrate selector RFC keeps `@beta` until a second selector ships. BOLA is that selector, so its release is the point where the maintainers decide on `@public`. The port derives from BSD-3 code, so `libs/abr/NOTICE.md` and the root `NOTICE` file get the dash.js attribution.
 
 ## Drawbacks
 
@@ -247,10 +252,11 @@ The selector joins `libs/abr`. It adds no package and no peer dependency. `Value
 
 - [dash.js `BolaRule.js`](https://github.com/Dash-Industry-Forum/dash.js/blob/ac9e3d18818f3ba9b99a87151b887d66aed12c56/src/streaming/rules/abr/BolaRule.js) is the reference implementation. It is tied to the dash.js event system and settings.
 - [BOLA: Near-Optimal Bitrate Adaptation for Online Videos](https://arxiv.org/abs/1601.06748) defines the algorithm and its variants.
-- dash.js combines BOLA with a throughput rule. It uses the throughput rule at low buffer levels and BOLA at high buffer levels.
 - hls.js and shaka-player select rungs with exponentially weighted throughput estimates. Neither ships BOLA.
 
 ## Unresolved questions
+
+The placeholder option is a decision in Rationale and alternatives, because the simulation answers it. Question 3 stays open, because the proposed answer is documentation only and needs agreement.
 
 1. **Real-buffer guard.** dash.js pairs BOLA with a separate rule that blocks high rungs when the real buffer is small. Should the selector offer this as an option, or should players own it?
 2. **Dense ladders.** The `10 + 2 * M` rule gives a large `B` for ladders with many rungs. Take a test ladder of 20 rungs from 300 kbps to 6 Mbps with equal bandwidth ratios. The buffer rule never selects its two lowest rungs. Should the 2 seconds per rung become an option?
@@ -266,8 +272,9 @@ The selector joins `libs/abr`. It adds no package and no peer dependency. `Value
 ## Revision history
 
 - v1 (2026-10-05): initial draft.
-- v2 (2026-10-18): rebased on the accepted bitrate selector RFC. The selector is a factory, `createBolaSelector`, over the shared input, sample, and `LadderRung` types. Names are plain with the units in the TSDoc. The RFC states the stall rule, the wait accounting, and the L2 fixture. Questions 4 to 7 of v1 became decisions in Rationale and alternatives, and questions 8 to 10 are answered by the bitrate selector RFC. The analysis and the design record moved into this folder.
+- v2 (2026-10-18): rebased on the bitrate selector RFC. The selector is a factory, `createBolaSelector`, over the shared input, sample, and `LadderRung` types. Names are plain with the units in the TSDoc. The RFC states the stall rule, the wait accounting, and the L2 fixture. Questions 2, 5, 6, and 7 of v1 became decisions in Rationale and alternatives. The bitrate selector RFC answers questions 8 to 10. The analysis and the design record moved into this folder.
 - v3 (2026-10-19): `BolaSelector` omits the `select` of `BitrateSelector`, so the result type keeps `state` and `placeholder`. The L2 test fixture is listed as `LadderRung` objects.
+- v4 (2026-10-19): states the abort cap as an effective buffer limit, adds the one-rung row to the state machine, and gives the startup placeholder formula. Lists two more differences from dash.js and the `@beta` tag. Corrects the v2 entry on the closed questions.
 
 ## Final Decision
 

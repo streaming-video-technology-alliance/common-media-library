@@ -6,9 +6,9 @@ This record supports the [RFC](./index.md). It explains BOLA, lists the benefits
 
 ### The problem
 
-A video has several rungs. Each rung is an encoding at one bitrate, and the set of rungs is the bitrate ladder. Before every segment request, the player picks one rung. A rung that is too high freezes playback. A rung that is too low looks bad.
+A video has several rungs. Each rung is an encoding at one bitrate, and the set of rungs is the bitrate ladder. Before every segment request, the player picks one rung. A rung that is too high stalls playback. A rung that is too low shows less quality than the network allows.
 
-Most players estimate the throughput from past downloads and pick the rung that fits. The estimate is noisy and lags behind sudden drops. The quality oscillates when the estimate sits between two rungs.
+Most players estimate the throughput from past downloads and pick the rung that fits. The estimate is noisy and reacts late to sudden drops. The quality oscillates when the estimate sits between two rungs.
 
 ### The idea
 
@@ -16,7 +16,7 @@ BOLA is the Buffer Occupancy based Lyapunov Algorithm. [Spiteri, Urgaonkar, and 
 
 The authors write the choice as an optimization. It maximizes utility and smoothness while it keeps the buffer from running empty. Lyapunov optimization solves it. The result is a set of buffer thresholds. Each threshold marks the buffer level where the next higher rung becomes the best choice.
 
-Two parameters control the thresholds. `V` sets the distance between them. `gamma` shifts all of them to the right. A larger `gamma` makes the player more careful, because it needs more buffer before each upward switch. The RFC derives both from the ladder and the buffer target.
+Two parameters control the thresholds. `V` sets the distance between them. `gamma` adds the same offset to all of them. A larger `gamma` makes the player more careful, because it needs more buffer before each upward switch. The RFC derives both from the ladder and the buffer target.
 
 ### Example
 
@@ -29,7 +29,7 @@ The example uses a ladder of 400, 800, 1600, and 3200 kbps. The table shows the 
 
 ### Parts that make BOLA usable
 
-Plain BOLA starts at the lowest rung and climbs slowly, because the buffer is empty. dash.js adds three parts:
+Plain BOLA starts at the lowest rung and reaches the upper rungs slowly, because the buffer is empty. dash.js adds three parts:
 
 - **Placeholder buffer.** This is virtual buffer time that BOLA adds to the real buffer level. At startup and after a seek, it lets BOLA begin at the rung that the throughput sustains. A follow-up paper on dash.js reports a median of 21.3 s to reach the top rung at startup without it. With it, the median is 9.3 s.
 - **Oscillation guard (BOLA-O).** This part limits upward switches to the rung that the throughput sustains. It never forces a downward switch.
@@ -96,9 +96,8 @@ These results come from a simplified model. The model has no packet-level effect
 
 - BOLA suits large buffers. In the follow-up paper, a throughput rule oscillates less than BOLA with a 10 s buffer. Low-latency streams often have such a small buffer. The dash.js player runs BOLA only above a buffer level and uses a throughput rule below it.
 - BOLA keeps state. The player calls `sample` for every download and `reset` after a seek, as the `BitrateSelector` type requires.
-- The pure core is small. Most of `BolaRule.js` handles player wiring. That part is where the tuning decisions and the defects live.
-- The behavior can drift from dash.js. The RFC lists the deliberate differences. A manual comparison with the real dash.js rule covers the rest.
-- The port derives from BSD-3 code. The package needs a `NOTICE.md` entry and an entry in the root `NOTICE` file.
+- The pure core is small. Most of `BolaRule.js` handles player wiring. That part contains the tuning decisions and the defects.
+- The port derives from BSD-3 code and needs attribution. The RFC names the files under Packaging.
 
 ## The dash.js reference
 
@@ -127,7 +126,7 @@ dash.js combines BOLA with a throughput rule. The default strategy runs the thro
 
 ### Defects found in the reference
 
-The first defect was verified with an independent script. The others come from reading the code.
+An independent script verified the first defect. A read of the code found the others.
 
 1. The minimum and maximum buffer helpers omit the utility offset that the score uses. They differ from the real switch points by exactly `V`. Take the ladder of 300 kbps, 750 kbps, 1.5 Mbps, 3 Mbps, and 6 Mbps with a target of 18 s. The real switch point to the second rung is 7.96 s. The helper reports 11.30 s. This skews the startup placeholder, the abandon cap, and the delay.
 2. The helpers index by the position in the unfiltered ladder. The state arrays use the position in the filtered ladder. A minimum bitrate or a DRM filter can produce an undefined value and a `NaN` delay.
@@ -143,16 +142,12 @@ The first defect was verified with an independent script. The others come from r
 |---|---|---|---|
 | Exponentially weighted throughput (hls.js, shaka-player, dash.js) | Past download timings | Yes | Noisy and slow to react to drops |
 | [BBA](https://dl.acm.org/doi/10.1145/2740070.2626296) | Buffer level | At startup only | Assumes a buffer of minutes |
-| BOLA | Buffer level, plus throughput at startup and as a cap | Not in the steady state | Slow startup and a poor fit for small buffers |
+| BOLA | Buffer level, plus throughput at startup and as a cap | Not in the steady state | Slow startup, and unsuitable for small buffers |
 | [MPC](https://dl.acm.org/doi/10.1145/2785956.2787486) | Predicted throughput, buffer level, and a search horizon | Yes, and accuracy matters | Sensitive to prediction errors |
 | [Pensieve](https://dl.acm.org/doi/10.1145/3098822.3098843) | A learned model | Implicit | Depends on its training data |
 
 ## Where ABR fits in CML
 
-`SCOPING.md` lists standards-based media player features and excludes a working media player. It does not mention ABR. The `@svta/cml-throughput` package already ships estimators, so the scope moved past that document. A pure selector with no player code stays inside the exclusion.
+`SCOPING.md` lists standards-based media player features and excludes a working media player. It does not mention ABR. The `@svta/cml-throughput` package already ships estimators, so the project scope is wider than that document states. A pure selector with no player code stays inside the exclusion.
 
-Issue 116 produced the throughput estimators. Issue 115, "Create a common ABR framework", was closed on 2026-09-29 with no linked pull request. Issue 358 asked for BOLA.
-
-## Testing
-
-The implementation PR holds the test strategy.
+Issue 116 produced the throughput estimators. Issue 115, "Create a common ABR framework", closed on 2026-09-29 with no linked pull request. Issue 358 asked for BOLA.

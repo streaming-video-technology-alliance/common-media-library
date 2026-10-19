@@ -115,19 +115,15 @@ The startup state maps these throughputs to these rungs:
 
 ### Why the conversion keeps the decision
 
-A rung switch point depends only on `theta` and on the two neighbouring bitrates. It does not depend on `V` or on the other rungs. A rebuild changes `V` and `ln(b_0)`. It does not change what `theta` means for a given pair of neighbours. Suppose the selector keeps `theta` and recomputes `Q`. Then the decision for the same situation stays the same, except where rungs were added or removed.
+A rung switch point depends only on `theta` and on the two neighbouring bitrates. It does not depend on `V` or on the other rungs. A rebuild changes `V` and `ln(b_0)`. It does not change what `theta` means for a given pair of neighbours. Suppose the selector keeps `theta` and recomputes `Q`. Then the decision for the same situation stays the same, except where the change added or removed rungs.
 
-```
-theta        = (Q_old - 10) / V_old + ln(b_0_old)
-Q_new        = 10 + V_new * (theta - ln(b_0_new))
-placeholder  = max(0, Q_new - bufferLevel)
-```
+The [RFC](./index.md) gives the conversion formulas under Ladder changes.
 
-The conversion is exact when `Q_new` is at least the real buffer level. If `Q_new` is lower, the placeholder floors at 0 and the real buffer decides.
+The conversion is exact when `Q_new` is at least the real buffer level. If `Q_new` is lower, the placeholder is 0 and the real buffer decides.
 
 ### Measured effect
 
-Take a change of the buffer target from 20 s to 40 s on L1. The selector can keep the placeholder unchanged. Then the decision changes for 62% of the buffer levels between 0 s and 30 s. With the conversion, no decision changes. The grid has 2,401 levels.
+Take a change of the buffer target from 18 s to 40 s on L1. The selector can keep the placeholder unchanged. Then the decision changes for 62% of the buffer levels between 0 s and 30 s. With the conversion, no decision changes. The grid has 2,401 levels.
 
 For a change of the ladder, the conversion changes decisions only where the added or removed rung lives:
 
@@ -152,7 +148,7 @@ A steady-state call with real buffer 7 s, placeholder 4 s, current rung 1.5 Mbps
 
 ### Why not reset
 
-dash.js resets all state when the minimum bitrate, the maximum bitrate, or the video size changes. The selector returns to startup and picks from the throughput. This discards what the buffer says. The conversion keeps it. A caller that prefers the dash.js behavior can call `reset`.
+dash.js resets all state when the minimum bitrate, the maximum bitrate, or the video size changes. The selector returns to startup and picks from the throughput. This discards the information in the buffer level. The conversion keeps it. A caller that prefers the dash.js behavior can call `reset`.
 
 ### Change of the number of distinct rungs
 
