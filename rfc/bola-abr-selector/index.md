@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: BOLA bitrate selector (`@svta/cml-abr`)
@@ -275,7 +275,15 @@ The placeholder option is a decision in Rationale and alternatives, because the 
 - v2 (2026-10-18): rebased on the bitrate selector RFC. The selector is a factory, `createBolaSelector`, over the shared input, sample, and `LadderRung` types. Names are plain with the units in the TSDoc. The RFC states the stall rule, the wait accounting, and the L2 fixture. Questions 2, 5, 6, and 7 of v1 became decisions in Rationale and alternatives. The bitrate selector RFC answers questions 8 to 10. The analysis and the design record moved into this folder.
 - v3 (2026-10-19): `BolaSelector` omits the `select` of `BitrateSelector`, so the result type keeps `state` and `placeholder`. The L2 test fixture is listed as `LadderRung` objects.
 - v4 (2026-10-19): states the abort cap as an effective buffer limit, adds the one-rung row to the state machine, and gives the startup placeholder formula. Lists two more differences from dash.js and the `@beta` tag. Corrects the v2 entry on the closed questions.
+- v5 (2026-10-19): status set to `accepted`.
 
 ## Final Decision
 
-Pending maintainer review.
+Accepted on 2026-10-19. The RFC PR #505 carries the export surface above as the contract. The implementation follows the draft on the open questions:
+
+- players own the real-buffer guard in v1
+- the 2 seconds per rung stay fixed, and the documentation states the floor for dense ladders
+- the documentation states the small buffer limit, and the selector does not warn
+- BOLA v1 ignores `playbackRate`
+
+The bitrate selector RFC #526 defines the type. BOLA is its second implementation.
