@@ -8,6 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The `validateCmcdEventReport` doc now renders the example code block. The docs build no longer warns about the `@example` tag.
+
+## [2.8.3] - 2026-10-18
+
+### Changed
+
+- Both overloads of `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl` now have a doc comment.
+- The `CmcdTransformRequest` doc now links to `DeepReadonly` in `@svta/cml-utils`.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
+
 ## [2.8.2] - 2026-10-08
 
 ### Fixed
@@ -331,7 +343,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.3...HEAD
+[2.8.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.2...cmcd-v2.8.3
 [2.8.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.1...cmcd-v2.8.2
 [2.8.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.0...cmcd-v2.8.1
 [2.8.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...cmcd-v2.8.0

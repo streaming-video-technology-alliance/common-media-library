@@ -1,5 +1,5 @@
 import { EwmaEstimator } from '@svta/cml-throughput'
-import { equal, ok } from 'node:assert'
+import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('EwmaEstimator', () => {
@@ -37,7 +37,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 1e6)
 	})
 
-	it('returns a positive estimate after one sample', async () => {
+	it('returns the measured rate after the first sample', async () => {
 		const estimator = new EwmaEstimator({
 			fastHalfLife: 3,
 			slowHalfLife: 9,
@@ -51,10 +51,7 @@ describe('EwmaEstimator', () => {
 			duration: 1000,
 		})
 
-		const estimate = estimator.getEstimate()
-
-		ok(estimate > 1e6, `expected an estimate above the default, received ${estimate}`)
-		ok(estimate < 6e6, `expected an estimate below the sample, received ${estimate}`)
+		equal(estimator.getEstimate(), 6e6)
 	})
 
 	it('ignores a sample with a zero duration', async () => {
@@ -116,6 +113,42 @@ describe('EwmaEstimator', () => {
 			startTime: 0,
 			encodedBodySize: 125,
 			duration: 0,
+		})
+
+		equal(estimator.getEstimate(), NaN)
+	})
+
+	it('ignores a sample with a body size of 0 or less', async () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		// 500 bps
+		estimator.sample({
+			startTime: 0,
+			encodedBodySize: 125,
+			duration: 2000,
+		})
+
+		// 250 bps
+		estimator.sample({
+			startTime: 2000,
+			encodedBodySize: 125,
+			duration: 4000,
+		})
+
+		for (const encodedBodySize of [0, -125, NaN, Infinity]) {
+			estimator.sample({ startTime: 6000, encodedBodySize, duration: 1000 })
+
+			equal(estimator.getEstimate(), 285, `expected the estimate to ignore a body size of ${encodedBodySize}`)
+		}
+	})
+
+	it('returns NaN when the only sample has a body size of 0', async () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		estimator.sample({
+			startTime: 0,
+			encodedBodySize: 0,
+			duration: 1000,
 		})
 
 		equal(estimator.getEstimate(), NaN)

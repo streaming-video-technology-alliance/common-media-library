@@ -7,7 +7,6 @@ export type EwmaEstimatorOptions = {
 	/**
 	 * The estimate, in bits per second, that `getEstimate` returns before the first sample.
 	 * `getEstimate` also returns this value while the sampled bytes are below `minTotalBytes`.
-	 * The estimator also adds this value to both averages as a prior sample with a weight of 1 second.
 	 *
 	 * @defaultValue `NaN`
 	 */
@@ -24,6 +23,7 @@ export type EwmaEstimatorOptions = {
 
 	/**
 	 * The smallest `encodedBodySize`, in bytes, that counts as a sample.
+	 * A sample with an `encodedBodySize` of 0 never counts.
 	 * The estimator ignores smaller responses, because the time to first byte dominates their duration.
 	 * shaka-player uses 16000.
 	 *

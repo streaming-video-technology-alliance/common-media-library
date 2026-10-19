@@ -8,10 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.24.8] - 2026-10-18
+
 ### Changed
 
+- `@svta/cml-drm` is now a declared peer dependency.
 - README: a usage example replaces the empty code block. The examples in `src/README.md` import from `@svta/cml-cmaf-ham` and compile. The sample README gives the correct folder and run command.
-
+- The `parseByteRangeString` and `byteRangeToHlsString` docs now format `length@offset` as code.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
 
 ### Fixed
 
@@ -85,7 +89,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.7...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.8...HEAD
+[0.24.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.7...cmaf-ham-v0.24.8
 [0.24.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.6...cmaf-ham-v0.24.7
 [0.24.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.5...cmaf-ham-v0.24.6
 [0.24.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.4...cmaf-ham-v0.24.5

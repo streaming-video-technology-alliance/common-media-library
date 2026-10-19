@@ -22,7 +22,7 @@ export type BitrateSelectorInput = {
 
 	/**
 	 * The throughput estimate, in bits per second.
-	 * A value that is not a positive finite number, such as `NaN`, counts as unknown.
+	 * A value that is not a finite number of 0 or more, such as `NaN`, counts as unknown.
 	 */
 	throughput: number;
 

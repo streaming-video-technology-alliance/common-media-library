@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.12] - 2026-10-18
+
+### Changed
+
+- Both overloads of `parsePsshList` now have a doc comment.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
+
 ## [1.1.11] - 2026-09-15
 
 ### Changed
@@ -115,7 +122,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.11...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.12...HEAD
+[1.1.12]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.11...drm-v1.1.12
 [1.1.11]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.10...drm-v1.1.11
 [1.1.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.9...drm-v1.1.10
 [1.1.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.8...drm-v1.1.9
