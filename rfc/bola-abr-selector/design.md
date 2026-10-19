@@ -1,6 +1,6 @@
 # BOLA selector design
 
-This record holds the design details behind the [RFC](../../rfc/bola-abr-selector.md). The RFC defines the public contract. This record explains the derivations, the internal structure, and the measured effect of the ladder change policy. The [analysis](analysis.md) holds the evidence for the choices.
+This record holds the design details behind the [RFC](./index.md). The RFC defines the public contract. This record explains the derivations, the internal structure, and the measured effect of the ladder change policy. The [analysis](analysis.md) holds the evidence for the choices.
 
 ## Goals and non-goals
 
@@ -20,7 +20,7 @@ Non-goals for v1:
 
 ## Structure
 
-The package has two layers. The internal functions are pure and carry the math. `BolaSelector` holds the state and calls them. One file holds one export or one internal function.
+The package has two layers. The internal functions are pure and carry the math. `createBolaSelector` holds the state in its closure and calls them. One file holds one export or one internal function.
 
 | File | Layer | Role |
 |---|---|---|
@@ -30,10 +30,10 @@ The package has two layers. The internal functions are pure and carry the math. 
 | `selectRungByBuffer.ts` | Internal | Returns the highest rung with a threshold at or below the effective buffer. |
 | `selectRungByThroughput.ts` | Internal | Returns the highest rung at or below a bitrate. |
 | `remapEffectiveBuffer.ts` | Internal | Converts the effective buffer between two parameter sets. |
-| `MINIMUM_BUFFER_S.ts`, `MINIMUM_BUFFER_PER_RUNG_S.ts`, `PLACEHOLDER_DECAY.ts` | Internal | Named constants, 10, 2, and 0.99. |
-| `BOLA_DEFAULT_BUFFER_TARGET_S.ts`, `BOLA_DEFAULT_THROUGHPUT_SAFETY_FACTOR.ts` | Public | Named defaults, 18 and 0.9. |
-| `BolaState.ts` and the four type files | Public | The state and the types in the RFC export surface. |
-| `BolaSelector.ts` | Public | The selector class. |
+| `MINIMUM_BUFFER.ts`, `MINIMUM_BUFFER_PER_RUNG.ts`, `PLACEHOLDER_DECAY.ts`, `STALL_THRESHOLD.ts` | Internal | Named constants, 10, 2, 0.99, and 0.3. |
+| `BOLA_DEFAULT_BUFFER_TARGET.ts` | Public | The named default, 18. The safety factor default is the shared `DEFAULT_SAFETY_FACTOR`. |
+| `BolaState.ts` and the three type files | Public | The state and the types in the RFC export surface. |
+| `createBolaSelector.ts` | Public | The selector factory. |
 
 Internal tests import from the source files. Public tests import from `@svta/cml-abr`.
 
@@ -57,7 +57,7 @@ The threshold of a rung can be negative for ladders with many rungs or with clos
 
 ### Startup handoff
 
-At startup the selector picks rung `q` from the throughput and sets the placeholder to `max(0, threshold_q - bufferLevelS)`. The effective buffer is then at least `threshold_q`. The first steady-state call selects rung `q` or higher, and the oscillation guard then limits the rise.
+At startup the selector picks rung `q` from the throughput and sets the placeholder to `max(0, threshold_q - bufferLevel)`. The effective buffer is then at least `threshold_q`. The first steady-state call selects rung `q` or higher, and the oscillation guard then limits the rise.
 
 ### Reference values
 
@@ -78,15 +78,15 @@ The selector keeps these fields:
 |---|---|
 | `state` | `startup` or `steady`. |
 | `placeholder` | The placeholder buffer in seconds. |
-| `currentBitrate` | The bitrate of the last rung loaded or selected. The selector stores a bitrate, not an index. |
-| `lastSegmentDurationS` | The duration of the last loaded segment. Unknown until the first segment. |
-| `lastSegmentEndMs`, `lastCallMs` | The time bases for the wall-clock part of the placeholder. |
+| `currentBandwidth` | The bandwidth of the last rung sampled or selected. The selector stores a bandwidth, not an index. |
+| `lastSegmentDuration` | The duration of the last loaded segment. Unknown until the first segment. |
+| `lastRequestEnd`, `lastCall` | The time bases for the wall-clock part of the placeholder. |
 | The ladder copy and the buffer target | The inputs of the last rebuild. |
 
 A call to `select` runs these steps:
 
 1. Compare the ladder and the buffer target with the stored copies. On a difference, validate and rebuild. See the next section.
-2. Sanitize `bufferLevelS` and `throughputBps`.
+2. Sanitize `bufferLevel` and `throughput`.
 3. If the ladder has one distinct rung, return its highest index with a delay of 0.
 4. In the startup state, pick the rung from the throughput, set the placeholder, and test the move to steady.
 5. In the steady state, add the elapsed time to the placeholder and select the rung for the effective buffer. Then apply the oscillation guard and compute the delay.
@@ -120,7 +120,7 @@ A rung switch point depends only on `theta` and on the two neighbouring bitrates
 ```
 theta        = (Q_old - 10) / V_old + ln(b_0_old)
 Q_new        = 10 + V_new * (theta - ln(b_0_new))
-placeholder  = max(0, Q_new - bufferLevelS)
+placeholder  = max(0, Q_new - bufferLevel)
 ```
 
 The conversion is exact when `Q_new` is at least the real buffer level. If `Q_new` is lower, the placeholder floors at 0 and the real buffer decides.
@@ -163,9 +163,9 @@ A ladder with one distinct rung makes no BOLA decision. When the ladder gains a 
 Validation runs on a rebuild only. Each message names the parameter, the expected value, and the received value. Examples:
 
 ```
-ladderBps[1] must be a positive finite number of bits per second, received NaN
-ladderBps must be in ascending order, but ladderBps[1] (300000) is lower than ladderBps[0] (750000)
-bufferTargetS must be a positive finite number of seconds, received -3
+Invalid ladder: expected a positive finite bandwidth at 1, received NaN
+Invalid ladder: expected ascending bandwidth, received 750000 at 0 and 300000 at 1
+Invalid bufferTarget: expected a positive finite number of seconds, received -3
 ```
 
 An error leaves the selector state unchanged. The selector validates and builds the new values before it replaces the old ones.
