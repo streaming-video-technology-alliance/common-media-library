@@ -19,7 +19,8 @@ import { validateCmcdEvents } from './validateCmcdEvents.ts'
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result including decoded data per event line.
  *
- * @example {@includeCode ../test/validateCmcdEventReport.test.ts#example}
+ * @example
+ * {@includeCode ../test/validateCmcdEventReport.test.ts#example}
  *
  * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event-mode | CTA-5004-B Event Mode}
  *
