@@ -106,6 +106,7 @@ library (https://github.com/Dash-Industry-Forum/dash.js/), from the file
 - libs/abr/src/BOLA_DEFAULT_BUFFER_TARGET.ts
 - libs/abr/src/computeDelay.ts
 - libs/abr/src/createBolaParams.ts
+- libs/abr/src/createBolaSelector.ts
 - libs/abr/src/limitUpwardSwitch.ts
 - libs/abr/src/placeholderAfterAbort.ts
 - libs/abr/src/placeholderAfterSample.ts

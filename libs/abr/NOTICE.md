@@ -10,6 +10,7 @@ The source is `src/streaming/rules/abr/BolaRule.js`.
 - src/BOLA_DEFAULT_BUFFER_TARGET.ts
 - src/computeDelay.ts
 - src/createBolaParams.ts
+- src/createBolaSelector.ts
 - src/limitUpwardSwitch.ts
 - src/placeholderAfterAbort.ts
 - src/placeholderAfterSample.ts
