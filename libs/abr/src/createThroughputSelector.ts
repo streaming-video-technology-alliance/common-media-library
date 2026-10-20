@@ -5,9 +5,11 @@ import { DEFAULT_SAFETY_FACTOR } from './DEFAULT_SAFETY_FACTOR.ts'
 import { DEFAULT_STARVATION_TOLERANCE } from './DEFAULT_STARVATION_TOLERANCE.ts'
 import { DEFAULT_UPGRADE_FACTOR } from './DEFAULT_UPGRADE_FACTOR.ts'
 import { findRung } from './findRung.ts'
+import { isPositiveFinite } from './isPositiveFinite.ts'
 import type { LadderRung } from './LadderRung.ts'
 import type { SegmentSample } from './SegmentSample.ts'
 import type { ThroughputSelectorOptions } from './ThroughputSelectorOptions.ts'
+import { validateFactor } from './validateFactor.ts'
 import { validateLadder } from './validateLadder.ts'
 
 /**
@@ -123,14 +125,4 @@ function guard(ladder: readonly LadderRung[], index: number, segmentDuration: nu
 
 function downloadTime(rung: LadderRung, segmentDuration: number, safeThroughput: number): number {
 	return rung.bandwidth * segmentDuration / safeThroughput
-}
-
-function isPositiveFinite(value: number | undefined): value is number {
-	return Number.isFinite(value) && (value as number) > 0
-}
-
-function validateFactor(name: string, value: number): void {
-	if (!isPositiveFinite(value) || value > 1) {
-		throw new RangeError(`Invalid ${name}: expected a finite number above 0 and at most 1, received ${value}`)
-	}
 }
