@@ -57,6 +57,16 @@ console.log(cmcdUrl);
 
 Read the [API documentation](https://streaming-video-technology-alliance.github.io/common-media-library/).
 
+## Coding agents
+
+The repository ships a skill that tells a coding agent which package covers a media playback task. Install the skill in a player project:
+
+```bash
+npx skills add streaming-video-technology-alliance/common-media-library
+```
+
+Agents that read documentation from the web can start at [llms.txt](https://streaming-video-technology-alliance.github.io/common-media-library/llms.txt).
+
 ## Community
 
 If you need help with the Common Media Library, or if you want to talk with other members:

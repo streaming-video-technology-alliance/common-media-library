@@ -58,6 +58,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 - For every change, add a note under the `## [Unreleased]` heading in the affected package's `CHANGELOG.md`.
 - Bump versions only in dedicated release-prep PRs, with `npm run ver` and then `npm run prepare-release` (see Build Commands).
 - Avoid breaking changes. If one is unavoidable, provide migration guidance in the changelog and the docs.
+- If a third-party dependency has a bug, open an issue in that project and work around the bug locally with a wrapper or a patch. Do not copy or reimplement the dependency's code.
 - Save plans and design-session artifacts in `plans/<feature-name>/`, where the folder name is the feature or issue. Save each part of the plan, such as steps or architecture, in its own file: `plans/<feature-name>/steps.md`. Do not use `docs/` for planning documents.
 - Plan files are working artifacts. They may exist on a feature branch while the work is in progress, and never on `main`. Delete them before the PR merges. Record unfinished work and follow-up items as GitHub issues. Record decisions that adopters need in the package docs.
 - Proposals that need community agreement are RFCs, not plans: public API changes, new packages, and significant architecture changes. Save an RFC as `rfc/<feature-name>.md` and follow the process in `rfc/README.md`.
@@ -65,6 +66,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 ## Documentation
 
 - Every package needs a `README.md` with description, install instructions, and a quick-start example.
+- Every package README needs a `## When to use` section: two to eight task bullets with their entry-point exports, then a closing paragraph. `scripts/agentDocs.ts` reads the section. The root build regenerates `skills/common-media-library` from it. Commit the result.
 - Use `{@includeCode ../test/<file>.test.ts#example}` in TSDoc to reference test examples.
 - Mark example regions in tests with `// #region example` and `// #endregion example`.
 - All code examples must be complete and runnable: no pseudocode and no missing imports.
