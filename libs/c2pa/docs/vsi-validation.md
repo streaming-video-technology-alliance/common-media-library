@@ -41,6 +41,8 @@ The returned `InitSegmentValidation` object contains:
 | `isValid` | `boolean` | All checks passed |
 | `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |
 
+C2PA section 19.2.3 requires a `c2pa.hash.bmff.v3` assertion in the init manifest. The content hash of that assertion must include the `moov` box. If the init segment does not conform, the result has `LiveVideoStatusCode.INIT_INVALID` and no `sessionKeys`.
+
 ### Accessing Session Keys
 
 `sessionKeys` includes only keys with a valid signer binding and an unexpired validity period:

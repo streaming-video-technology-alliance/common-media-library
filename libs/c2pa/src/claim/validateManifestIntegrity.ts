@@ -32,8 +32,6 @@ export type ManifestIntegrity = {
 	readonly certificate: Uint8Array | null
 	/** The assertions whose claim reference resolved to a single box with a matching hash. Read an assertion by label from this list, not from the raw store. The list is authenticated only when `codes` is empty. */
 	readonly verifiedAssertions: readonly InternalAssertionData[]
-	/** The number of hard binding assertions in the assertion store */
-	readonly hardBindingCount: number
 }
 
 type ClaimSignatureCheck = {
@@ -66,7 +64,7 @@ async function validateClaimSignature({ claimCborBytes, claimCode, signatureUriC
  * Runs these checks, in parallel where possible:
  * 1. Assertion reference resolution and hash verification (§8.4.1, §15.10.3.1)
  * 2. Undeclared assertion detection (§15.10.3.1)
- * 3. Hard binding count (§9.1, §15.10.1.2)
+ * 3. Hard binding count: exactly one (§9.1, §15.10.1.2)
  * 4. Action ingredient validation (§18.15.4.7)
  * 5. Claim signature verification (§15.7)
  *
@@ -96,9 +94,11 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 		codes.push(Code.ASSERTION_MULTIPLE_HARD_BINDINGS)
 	}
 
-	// §15.10.3.1: every assertion in the store must be referenced by the claim. This check needs a
-	// decodable claim, so a missing or malformed claim reports only its own code.
+	// §15.10.1.2 and §15.10.3.1: a manifest without a hard binding assertion is rejected, and every
+	// assertion in the store must be referenced by the claim. These checks need a decodable claim, so a
+	// missing or malformed claim reports only its own code.
 	if (internal.claimCborBytes && !internal.claimCode) {
+		if (hardBindingCount === 0) codes.push(Code.CLAIM_HARD_BINDINGS_MISSING)
 		const referencedLabels = new Set(internal.claimAssertionRefs.map(ref => extractLabelFromUrl(ref.url)))
 		if (internal.assertions.some(assertion => !referencedLabels.has(assertion.label))) {
 			codes.push(Code.ASSERTION_UNDECLARED)
@@ -112,5 +112,5 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 		codes.push(internal.claimCode)
 	}
 
-	return { codes: [...new Set(codes)], certificate: signature.certificate, verifiedAssertions: assertionHashes.verified, hardBindingCount }
+	return { codes: [...new Set(codes)], certificate: signature.certificate, verifiedAssertions: assertionHashes.verified }
 }

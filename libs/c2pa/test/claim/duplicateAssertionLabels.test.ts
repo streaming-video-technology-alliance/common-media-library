@@ -63,6 +63,11 @@ function buildBmffFlatBox(hash: Uint8Array): Uint8Array {
 	return buildJumb(BMFF_LABEL, buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })))
 }
 
+// A c2pa.hash.bmff.v3 box whose flat hash covers the ftyp and moov boxes of buildInitMediaBoxes (§19.2.3).
+async function buildInitBmffBox(): Promise<Uint8Array> {
+	return buildBmffFlatBox(await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 }))
+}
+
 function buildBmffMerkleBox(root: Uint8Array, initHash: Uint8Array): Uint8Array {
 	return buildJumb(BMFF_LABEL, buildBox('cbor', encodeCbor({
 		exclusions: [{ xpath: '/uuid' }],
@@ -249,7 +254,7 @@ describe('duplicate assertion labels (security)', () => {
 		const result = await validateC2paInitSegment(init)
 
 		strictEqual(result.isValid, false)
-		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_UNDECLARED))
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_UNDECLARED])
 		deepStrictEqual(result.sessionKeys.map(k => k.kid), [])
 	})
 
@@ -382,8 +387,12 @@ describe('duplicate assertion labels (security)', () => {
 	})
 
 	it('does not report SESSIONKEY_INVALID for valid session keys that another integrity check withholds', async () => {
+		const bmff = await buildInitBmffBox()
 		const sessionKeys = await buildSessionKeysBox(legitKey, signer.certificateDER)
-		const init = await assembleSegment(buildInitMediaBoxes(), [sessionKeys, undeclaredBox()], [{ label: SESSION_KEYS_LABEL, box: sessionKeys }], signer)
+		const init = await assembleSegment(buildInitMediaBoxes(), [bmff, sessionKeys, undeclaredBox()], [
+			{ label: BMFF_LABEL, box: bmff },
+			{ label: SESSION_KEYS_LABEL, box: sessionKeys },
+		], signer)
 
 		const result = await validateC2paInitSegment(init)
 
@@ -392,9 +401,11 @@ describe('duplicate assertion labels (security)', () => {
 	})
 
 	it('accepts a v1 claim that lists its references in the assertions field', async () => {
+		const bmff = await buildInitBmffBox()
 		const sessionKeys = await buildSessionKeysBox(legitKey, signer.certificateDER)
-		const { claim, signature } = await signedClaimBoxes([{ label: SESSION_KEYS_LABEL, box: sessionKeys }], signer, { refsField: 'assertions' })
-		const init = wrapManifest(buildInitMediaBoxes(), claim, buildJumb('c2pa.assertions', sessionKeys), signature)
+		const refs = [{ label: BMFF_LABEL, box: bmff }, { label: SESSION_KEYS_LABEL, box: sessionKeys }]
+		const { claim, signature } = await signedClaimBoxes(refs, signer, { refsField: 'assertions' })
+		const init = wrapManifest(buildInitMediaBoxes(), claim, buildJumb('c2pa.assertions', bmff, sessionKeys), signature)
 
 		const result = await validateC2paInitSegment(init)
 
