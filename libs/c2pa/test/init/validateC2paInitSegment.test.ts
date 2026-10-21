@@ -7,7 +7,7 @@ import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
 import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, buildVsiSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
+import { buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, buildVsiSegment, createTestSessionKey, encodeSignerBinding, type TestAssertion, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -806,14 +806,24 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 	})
 })
 
-describe('validateC2paInitSegment — assertion CBOR (§15.10.3.1)', () => {
+describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 	const NOW = Date.parse('2025-07-29T10:30:00Z')
+	const TEXT_ENCODER = new TextEncoder()
 
 	// RFC 8949 Appendix C: none of these byte sequences is well-formed CBOR
 	const ILL_FORMED_CBOR: readonly (readonly [string, Uint8Array])[] = [
 		['a map without its last value', Uint8Array.of(0xa1, 0x61, 0x61)],
 		['the reserved additional information 28', Uint8Array.of(0x1c)],
 		['a byte after the data item', Uint8Array.of(0xa0, 0x00)],
+	]
+
+	// RFC 8259: none of these byte sequences is a JSON text
+	const NONCONFORMING_JSON: readonly (readonly [string, Uint8Array])[] = [
+		['an object without its last value', TEXT_ENCODER.encode('{"a":')],
+		['a comma after the last member', TEXT_ENCODER.encode('{"a":1,}')],
+		['text after the value', TEXT_ENCODER.encode('{"a":1} x')],
+		// {"a":"<FF>"}: section 8.1 requires UTF-8, and the byte FF never occurs in UTF-8
+		['a string that is not UTF-8', Uint8Array.of(0x7b, 0x22, 0x61, 0x22, 0x3a, 0x22, 0xff, 0x22, 0x7d)],
 	]
 
 	let signer: TestSigner
@@ -824,15 +834,15 @@ describe('validateC2paInitSegment — assertion CBOR (§15.10.3.1)', () => {
 		key = await createTestSessionKey('key_001')
 	})
 
-	// A signed init with a valid session keys assertion and an assertion with the label `label` and the content `cbor`
-	async function buildInit(label: string, cbor: Uint8Array): Promise<Uint8Array> {
+	// A signed init with a valid session keys assertion and the given other assertion
+	async function buildInit(assertion: TestAssertion): Promise<Uint8Array> {
 		const entry = { key, minSequenceNumber: 0, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 }
-		return buildSignedInitSegment(signer, [await buildSessionKeysAssertion(signer, [entry]), { label, cbor }])
+		return buildSignedInitSegment(signer, [await buildSessionKeysAssertion(signer, [entry]), assertion])
 	}
 
 	for (const [description, cbor] of ILL_FORMED_CBOR) {
 		it(`fails with ASSERTION_CBOR_INVALID if an assertion has ${description}`, async (context) => {
-			const init = await buildInit('c2pa.actions.v2', cbor)
+			const init = await buildInit({ label: 'c2pa.actions.v2', cbor })
 			context.mock.timers.enable({ apis: ['Date'], now: NOW })
 
 			const result = await validateC2paInitSegment(init)
@@ -844,7 +854,7 @@ describe('validateC2paInitSegment — assertion CBOR (§15.10.3.1)', () => {
 	}
 
 	it('fails with ASSERTION_CBOR_INVALID if an assertion with a label outside the C2PA namespace is not well-formed CBOR', async (context) => {
-		const init = await buildInit('com.example.custom', Uint8Array.of(0xa1, 0x61, 0x61))
+		const init = await buildInit({ label: 'com.example.custom', cbor: Uint8Array.of(0xa1, 0x61, 0x61) })
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
 
 		const result = await validateC2paInitSegment(init)
@@ -855,7 +865,41 @@ describe('validateC2paInitSegment — assertion CBOR (§15.10.3.1)', () => {
 
 	it('accepts an assertion with CBOR that is well-formed but not deterministic', async (context) => {
 		// {_ "b": 1_0, "a": 2}: a map of indefinite length, keys out of order, and an integer in a longer form than necessary
-		const init = await buildInit('c2pa.actions.v2', Uint8Array.of(0xbf, 0x61, 0x62, 0x18, 0x01, 0x61, 0x61, 0x02, 0xff))
+		const init = await buildInit({ label: 'c2pa.actions.v2', cbor: Uint8Array.of(0xbf, 0x61, 0x62, 0x18, 0x01, 0x61, 0x61, 0x02, 0xff) })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(sessionKey => sessionKey.kid), [key.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	for (const [description, json] of NONCONFORMING_JSON) {
+		it(`fails with ASSERTION_JSON_INVALID if a JSON assertion has ${description}`, async (context) => {
+			const init = await buildInit({ label: 'c2pa.metadata', json })
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_JSON_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	it('fails with ASSERTION_JSON_INVALID if a JSON assertion with a label outside the C2PA namespace does not parse', async (context) => {
+		const init = await buildInit({ label: 'com.example.custom', json: TEXT_ENCODER.encode('{"a":') })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_JSON_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('accepts a JSON assertion', async (context) => {
+		const init = await buildInit({ label: 'c2pa.metadata', json: TEXT_ENCODER.encode('{ "@context": { "dc": "http://purl.org/dc/elements/1.1/" }, "dc:title": "Café" }') })
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
 
 		const result = await validateC2paInitSegment(init)

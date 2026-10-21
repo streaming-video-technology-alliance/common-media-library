@@ -1,4 +1,5 @@
-const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
+// RFC 8259 section 8.1: a JSON text is UTF-8, so bytes that are not UTF-8 throw
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder('utf-8', { fatal: true })
 
 import { readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { projectCborTags } from './cbor/projectCborTags.ts'
@@ -105,7 +106,12 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 				}
 			}
 			else if (contentBox.type === 'json') {
-				try { data = JSON.parse(TEXT_DECODER.decode(contentBox.data)) as unknown } catch { data = contentBox.data }
+				try {
+					data = JSON.parse(TEXT_DECODER.decode(contentBox.data)) as unknown
+				} catch {
+					data = contentBox.data
+					code = C2paStatusCode.ASSERTION_JSON_INVALID
+				}
 			}
 			else {
 				data = contentBox.data

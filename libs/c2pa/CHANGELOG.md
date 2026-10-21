@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Fixed
 
-- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now fail a segment if the CBOR of an assertion in the manifest does not decode. The result includes the new `C2paStatusCode.ASSERTION_CBOR_INVALID` (`assertion.cbor.invalid`).
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now fail a segment if the CBOR or JSON of an assertion does not decode. The result includes the new `C2paStatusCode.ASSERTION_CBOR_INVALID` or `C2paStatusCode.ASSERTION_JSON_INVALID`.
 
 ## [1.5.0] - 2026-10-21
 

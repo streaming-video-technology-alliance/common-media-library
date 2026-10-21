@@ -135,11 +135,10 @@ function encodeIndefiniteLengths(value: unknown): Uint8Array {
 	return Uint8Array.from(CBOR.encode(value))
 }
 
-/** One assertion of a test manifest: the JUMBF label and the CBOR content of the assertion. */
-export type TestAssertion = {
-	readonly label: string
-	readonly cbor: Uint8Array
-}
+/** One assertion of a test manifest: the JUMBF label and the CBOR or JSON content of the assertion. */
+export type TestAssertion =
+	| { readonly label: string; readonly cbor: Uint8Array }
+	| { readonly label: string; readonly json: Uint8Array }
 
 /** Builds an init segment with a manifest store that holds the given manifest JUMBF box */
 export function buildInitSegmentWithManifest(manifest: Uint8Array): Uint8Array {
@@ -150,11 +149,11 @@ export function buildInitSegmentWithManifest(manifest: Uint8Array): Uint8Array {
 }
 
 /**
- * Builds an init segment whose manifest has the given CBOR assertions.
+ * Builds an init segment whose manifest has the given CBOR and JSON assertions.
  * The claim references every assertion and is signed by `signer`.
  */
 export async function buildSignedInitSegment(signer: TestSigner, assertions: readonly TestAssertion[]): Promise<Uint8Array> {
-	const assertionBoxes = assertions.map(assertion => buildJumb(assertion.label, buildBox('cbor', assertion.cbor)))
+	const assertionBoxes = assertions.map(assertion => buildJumb(assertion.label, 'json' in assertion ? buildBox('json', assertion.json) : buildBox('cbor', assertion.cbor)))
 	const claimCborBytes = Uint8Array.from(CBOR.encode({
 		instanceID: MANIFEST_ID,
 		signature: signatureUri(MANIFEST_ID),
