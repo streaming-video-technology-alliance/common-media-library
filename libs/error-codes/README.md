@@ -4,6 +4,15 @@ SVTA2070 standardized streaming error codes.
 
 This package is the reference implementation of [SVTA2070: Standardized Error Codes](https://www.svta.org/product/svta2070/). The specification defines one error vocabulary for every video player. Each code is a short integer. The thousands digits identify the category, such as Playback or Network. The last three digits identify the specific error. HTTP response statuses and IAB VAST error codes embed into the scheme at their own values.
 
+## When to use
+
+- Report a playback, network, DRM, or ad error with an SVTA2070 code: `SVTA_BUFFER_APPEND_ERROR`, `SVTA_BAD_LICENSE_REQUEST`
+- Map an HTTP response status to an SVTA2070 code: `httpStatusToSvtaErrorCode`
+- Map an IAB VAST error code to an SVTA2070 code: `vastErrorToSvtaErrorCode`
+- Read the category or the index of a code: `getSvtaErrorCategory`, `getSvtaErrorIndex`
+
+Do not define your own error code list for a player or an analytics pipeline. Open an issue for a condition that the specification does not name.
+
 ## Installation
 
 ```bash

@@ -2,6 +2,15 @@
 
 Common Media Request and Response types.
 
+## When to use
+
+- Type a segment, manifest, or license request that a player passes through a plugin: `CommonMediaRequest`
+- Type the response that comes back, with timing and headers: `CommonMediaResponse`
+- Adapt fetch or XMLHttpRequest to the common request and response types: `Requester`
+- Hook into requests and responses, for example to add CMCD or to read CMSD: `RequestInterceptor`, `ResponseInterceptor`
+
+Do not define your own request and response types for a plugin interface. Open an issue for a field that is missing.
+
 ## Installation
 
 ```bash
