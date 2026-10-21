@@ -31,7 +31,7 @@ Do not write your own box parser, box walker, or box writer. Open an issue for a
 
 Rules for the section:
 
-- Three to eight bullets. Each bullet is one task, written as the phrase a developer types to an agent.
+- Two to eight bullets. Each bullet is one task, written as the phrase a developer types to an agent. Two packages, cta and request, have only two tasks.
 - The task phrase comes first and must not contain a colon. The entry points follow the colon, in backticks, separated by commas.
 - Backticks before the colon are free text, such as box names. Backticks after the colon are identifiers and must be exports of the package.
 - A closing paragraph follows the bullets. It names what the agent must not write itself and what to do about a gap.
@@ -58,7 +58,7 @@ Constants in the script:
 
 `node scripts/agentDocs.ts --skill` writes committed files under `skills/common-media-library/`. `scripts/buildAll.ts` calls the same function after the last package build, so every root build refreshes the files from fresh API reports.
 
-- `SKILL.md`: the script replaces the text between `<!-- packages:start -->` and `<!-- packages:end -->`. Each package gets an H3 heading with the package name, the description, the When to use bullets verbatim, and a line `Reference: references/<pkg>.md`. The rest of the file is hand-written and the script does not touch it.
+- `SKILL.md`: the script replaces the text between `<!-- packages:start -->` and `<!-- packages:end -->`. Each package gets an H3 heading with the package name, the description, the When to use section body verbatim, and a line `Reference: references/<pkg>.md`. The rest of the file is hand-written and the script does not touch it.
 - `references/<pkg>.md`: the README, each guide, and the API report, each verbatim and each preceded by an HTML comment with its repo path. Relative links point to the source base.
 
 SKILL.md stays under the 500-line limit of the Agent Skills specification. With 20 packages the index is near 180 lines and the rules near 80.
@@ -68,7 +68,7 @@ SKILL.md stays under the 500-line limit of the Agent Skills specification. With 
 `node scripts/agentDocs.ts --site <outDir>` writes into the docs output. The docs build becomes `typedoc && node ../scripts/agentDocs.ts --site dist`. TypeDoc cleans the directory, so the script runs second.
 
 - `llms.txt`: H1 `Common Media Library`, a blockquote summary, then four H2 sections. `Packages` has one link per package to its README copy with the description after a colon. `Guides` links every guide copy. `API reports` links every report copy. `Optional` links `llms-full.txt` and gives the skill install command.
-- `llms-full.txt`: the site copies of every package, concatenated in the order of `projects.ts`. Near 300 KB.
+- `llms-full.txt`: the site copies of every package, concatenated in alphabetical order of the package folder. Near 300 KB.
 - `llms/<pkg>/README.md`, `llms/<pkg>/docs/<guide>.md`, `llms/<pkg>/api.md`: copies with links rewritten.
 
 ### Link rewriting
