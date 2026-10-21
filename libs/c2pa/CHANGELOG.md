@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-21
+
 ### Security
 
 - `validateC2paManifestBoxSegment` now fails a segment whose manifest has no `c2pa.hash.bmff.v3` assertion. The result includes `LiveVideoStatusCode.SEGMENT_INVALID` ([#522](https://github.com/streaming-video-technology-alliance/common-media-library/issues/522)).
@@ -203,7 +205,8 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.5.0...HEAD
+[1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.1...c2pa-v1.5.0
 [1.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.0...c2pa-v1.4.1
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.3.0...c2pa-v1.4.0
 [1.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.2.0...c2pa-v1.3.0
