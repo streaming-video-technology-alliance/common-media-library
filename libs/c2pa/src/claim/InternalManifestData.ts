@@ -13,6 +13,8 @@ export type InternalAssertionData = {
 	readonly rawBoxPayload: Uint8Array
 	/** The CBOR of the assertion with its tags, absent for a JSON or binary assertion and for CBOR that does not decode */
 	readonly taggedData?: unknown
+	/** `ASSERTION_CBOR_INVALID` if the CBOR of the assertion does not decode, else absent */
+	readonly code?: typeof C2paStatusCode.ASSERTION_CBOR_INVALID
 }
 
 /**

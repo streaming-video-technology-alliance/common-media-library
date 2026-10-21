@@ -19,6 +19,8 @@ export const C2paStatusCode = {
 	ASSERTION_MULTIPLE_HARD_BINDINGS: 'assertion.multipleHardBindings',
 	/** The assertion store holds an assertion that the claim does not reference (§15.10.3.1) */
 	ASSERTION_UNDECLARED: 'assertion.undeclared',
+	/** An assertion box holds CBOR that does not decode (§15.10.3.1) */
+	ASSERTION_CBOR_INVALID: 'assertion.cbor.invalid',
 	/** An action requiring an ingredient reference does not have one (§18.15.4.7) */
 	ASSERTION_ACTION_INGREDIENT_MISMATCH: 'assertion.action.ingredientMismatch',
 	/** Claim signature verification failed, or the signature carries no certificate (§15.7) */

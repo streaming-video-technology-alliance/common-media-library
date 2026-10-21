@@ -93,6 +93,7 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 
 		let data: unknown = null
 		let taggedData: unknown
+		let code: InternalAssertionData['code']
 		if (contentBox) {
 			if (contentBox.type === 'cbor') {
 				try {
@@ -100,6 +101,7 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 					data = projectCborTags(taggedData)
 				} catch {
 					data = contentBox.data
+					code = C2paStatusCode.ASSERTION_CBOR_INVALID
 				}
 			}
 			else if (contentBox.type === 'json') {
@@ -110,7 +112,7 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 			}
 		}
 
-		assertions.push({ label, data, rawBoxPayload: box.data, taggedData })
+		assertions.push({ label, data, rawBoxPayload: box.data, taggedData, code })
 	}
 
 	return assertions

@@ -65,10 +65,11 @@ async function validateClaimSignature({ claimCborBytes, claimCode, signatureUriC
  *
  * Runs these checks, in parallel where possible:
  * 1. Assertion reference resolution and hash verification (§8.4.1, §15.10.3.1)
- * 2. Undeclared assertion detection (§15.10.3.1)
- * 3. Hard binding count (§9.1, §15.10.1.2)
- * 4. Action ingredient validation (§18.15.4.7)
- * 5. Claim signature verification (§15.7)
+ * 2. Assertion CBOR decoding (§15.10.3.1)
+ * 3. Undeclared assertion detection (§15.10.3.1)
+ * 4. Hard binding count (§9.1, §15.10.1.2)
+ * 5. Action ingredient validation (§18.15.4.7)
+ * 6. Claim signature verification (§15.7)
  *
  * The claim signature is verified with the end-entity certificate from the `x5chain`
  * header of the signature. The certificate is not checked against a trust list.
@@ -85,6 +86,11 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 	])
 
 	const codes: C2paStatusCode[] = [...assertionHashes.codes, ...validateActionIngredients(internal.assertions)]
+
+	// §15.10.3.1: an assertion with CBOR that is not well-formed (RFC 8949 Appendix C) fails the claim
+	for (const assertion of internal.assertions) {
+		if (assertion.code) codes.push(assertion.code)
+	}
 
 	// §9.1/§15.10.1.2: a manifest with more than one hard binding assertion is rejected. A numbered
 	// instance such as c2pa.hash.bmff.v3__1 counts the same as its base label (§6.4).

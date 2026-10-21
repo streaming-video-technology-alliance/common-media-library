@@ -661,7 +661,6 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	const NONCONFORMING_ASSERTIONS: readonly (readonly [string, Uint8Array])[] = [
 		['no session key', encodeCbor({ keys: [] })],
 		['a keys field that is not an array', encodeCbor({ keys: 'key_001' })],
-		['CBOR that does not decode', SESSION_KEYS_CBOR_WITHOUT_BREAK],
 	]
 
 	// A `c2pa.hash.bmff.v3` assertion with a merkle map. /uuid is excluded, so the initHash covers only ftyp + moov.
@@ -728,13 +727,13 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		})
 	}
 
-	it('fails with SESSIONKEY_INVALID if the session keys assertion has CBOR that does not decode', async () => {
+	it('fails with SESSIONKEY_INVALID and ASSERTION_CBOR_INVALID if the session keys assertion has CBOR that does not decode', async () => {
 		const init = await buildSignedInitSegment(signer, [{ label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK }])
 
 		const result = await validateC2paInitSegment(init)
 
 		deepStrictEqual(result.sessionKeys, [])
-		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.ASSERTION_CBOR_INVALID])
 		strictEqual(result.isValid, false)
 	})
 })
@@ -804,6 +803,66 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 
 		strictEqual(result.manifestId, null)
 		ok(!result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
+	})
+})
+
+describe('validateC2paInitSegment — assertion CBOR (§15.10.3.1)', () => {
+	const NOW = Date.parse('2025-07-29T10:30:00Z')
+
+	// RFC 8949 Appendix C: none of these byte sequences is well-formed CBOR
+	const ILL_FORMED_CBOR: readonly (readonly [string, Uint8Array])[] = [
+		['a map without its last value', Uint8Array.of(0xa1, 0x61, 0x61)],
+		['the reserved additional information 28', Uint8Array.of(0x1c)],
+		['a byte after the data item', Uint8Array.of(0xa0, 0x00)],
+	]
+
+	let signer: TestSigner
+	let key: TestSessionKey
+
+	before(async () => {
+		signer = await createTestSigner()
+		key = await createTestSessionKey('key_001')
+	})
+
+	// A signed init with a valid session keys assertion and an assertion with the label `label` and the content `cbor`
+	async function buildInit(label: string, cbor: Uint8Array): Promise<Uint8Array> {
+		const entry = { key, minSequenceNumber: 0, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 }
+		return buildSignedInitSegment(signer, [await buildSessionKeysAssertion(signer, [entry]), { label, cbor }])
+	}
+
+	for (const [description, cbor] of ILL_FORMED_CBOR) {
+		it(`fails with ASSERTION_CBOR_INVALID if an assertion has ${description}`, async (context) => {
+			const init = await buildInit('c2pa.actions.v2', cbor)
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_CBOR_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	it('fails with ASSERTION_CBOR_INVALID if an assertion with a label outside the C2PA namespace is not well-formed CBOR', async (context) => {
+		const init = await buildInit('com.example.custom', Uint8Array.of(0xa1, 0x61, 0x61))
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_CBOR_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('accepts an assertion with CBOR that is well-formed but not deterministic', async (context) => {
+		// {_ "b": 1_0, "a": 2}: a map of indefinite length, keys out of order, and an integer in a longer form than necessary
+		const init = await buildInit('c2pa.actions.v2', Uint8Array.of(0xbf, 0x61, 0x62, 0x18, 0x01, 0x61, 0x61, 0x02, 0xff))
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(sessionKey => sessionKey.kid), [key.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
 	})
 })
 
