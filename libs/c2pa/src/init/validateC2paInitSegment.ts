@@ -73,7 +73,8 @@ async function validateBmffHashAssertion(
 	if (!assertion) return null
 	if (assertion.data === null || typeof assertion.data !== 'object' || Array.isArray(assertion.data)) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	const data = assertion.data as Record<string, unknown>
-	// §15.12.2: only an init with Merkle maps may omit `hash`. validateMerkleMaps checks each map.
+	// §18.6.6.1 step 2: a Merkle initHash verifies the init, so only an init with Merkle maps may omit `hash`.
+	// validateMerkleMaps checks each map.
 	const rawHash = data['hash']
 	const merkle = data['merkle']
 	if (rawHash == null) return Array.isArray(merkle) && merkle.length > 0 ? null : C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
@@ -224,8 +225,9 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		verifiedAssertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
 	const bmffHashCode = await validateBmffHashAssertion(bytes, bmffHashAssertion)
 
-	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
-	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
+	const merkleCodes = new Set<LiveVideoStatusCode | C2paStatusCode>()
+	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, merkleCodes)
+	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>(merkleCodes)
 
 	const sessionKeysAssertion = verifiedAssertions.find(
 		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
@@ -234,9 +236,8 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		sessionKeysAssertion && certificate
 			? await validateSessionKeys(sessionKeysAssertion, certificate)
 			: { sessionKeys: [], hasInvalidSessionKey: false }
-	// The result exposes session keys and merkle maps only when every integrity check and every content hash
-	// check pass. At this point `codes` holds only the codes of validateMerkleMaps.
-	const integrityPassed = integrityCodes.length === 0 && bmffHashCode === null && codes.size === 0
+	// The result exposes session keys and merkle maps only when every integrity check and every content hash check pass.
+	const integrityPassed = integrityCodes.length === 0 && bmffHashCode === null && merkleCodes.size === 0
 	const sessionKeys = integrityPassed ? sessionKeysValidation.sessionKeys : []
 	const exposedMerkleMaps = integrityPassed ? (merkleMaps ?? []) : []
 
