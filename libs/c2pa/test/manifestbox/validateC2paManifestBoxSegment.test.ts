@@ -750,8 +750,11 @@ describe('validateC2paManifestBoxSegment — content binding (§19.3)', () => {
 			boxes.push(box)
 			refs.push(await claimRef(label, box))
 		}
-		const claimCborBytes = encodeCbor({ instanceID: 'urn:uuid:content-binding-test', created_assertions: refs })
-		return buildManifestBoxSegment('urn:uuid:content-binding-test',
+		const manifestLabel = 'urn:uuid:content-binding-test'
+		// The claim `signature` field: the absolute URI of the signature box, which names the manifest label.
+		const signature = `self#jumbf=/c2pa/${manifestLabel}/c2pa.signature`
+		const claimCborBytes = encodeCbor({ instanceID: manifestLabel, signature, created_assertions: refs })
+		return buildManifestBoxSegment(manifestLabel,
 			buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes)),
 			buildJumb('c2pa.assertions', ...boxes),
 			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
