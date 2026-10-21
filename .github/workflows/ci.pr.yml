@@ -38,7 +38,7 @@ jobs:
         run: npm test
 
       - name: Generated skill files are current
-        run: git diff --exit-code -- skills
+        run: git add -N skills && git diff --exit-code -- skills || { echo "skills/ is stale. Run npm run build and commit the skills/ directory."; exit 1; }
 
       # - name: Change Log
       #   uses: dangoslen/changelog-enforcer@v3

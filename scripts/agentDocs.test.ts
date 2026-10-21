@@ -246,5 +246,12 @@ describe('writeSkill', () => {
 			equal(skill.includes(`\nReference: references/${slug}.md\n`), true, `${slug} is missing from the index`)
 			equal(existsSync(path.join(repoRoot, skillDir, 'references', `${slug}.md`)), true, `references/${slug}.md is missing`)
 		}
+
+		const isoBmffPath = path.join(repoRoot, skillDir, 'references', 'iso-bmff.md')
+		const isoBmff = readFileSync(isoBmffPath, 'utf8')
+
+		writeSkill()
+		equal(readFileSync(path.join(repoRoot, skillDir, 'SKILL.md'), 'utf8'), skill, 'a second writeSkill call changed SKILL.md')
+		equal(readFileSync(isoBmffPath, 'utf8'), isoBmff, 'a second writeSkill call changed references/iso-bmff.md')
 	})
 })
