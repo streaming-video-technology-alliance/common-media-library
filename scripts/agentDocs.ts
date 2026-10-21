@@ -1,13 +1,20 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
+import { projects } from './projects.ts'
 
 export const siteBase = 'https://streaming-video-technology-alliance.github.io/common-media-library/'
 export const sourceBase = 'https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/'
 export const skillDir = 'skills/common-media-library'
+export const repoRoot: string = path.resolve(import.meta.dirname, '..')
+export const indexStart = '<!-- packages:start -->'
+export const indexEnd = '<!-- packages:end -->'
+const installCommand = 'npx skills add streaming-video-technology-alliance/common-media-library'
 
 const sectionHeading = '## When to use'
 const minBullets = 2
 const maxBullets = 8
 const exportLine = /^export (?:function|const|class|type) ([A-Za-z_$][\w$]*)/gm
+const exportList = /^export \{([^}]*)\}/gm
 const identifier = /`([^`]+)`/g
 const identifierShape = /^[A-Za-z_$][\w$]*$/
 
@@ -21,6 +28,25 @@ export type WhenToUse = {
 	bullets: Bullet[];
 	closing: string;
 	text: string;
+};
+
+export type Guide = {
+	path: string;
+	title: string;
+	description: string;
+	text: string;
+};
+
+export type PackageDocs = {
+	folder: string;
+	slug: string;
+	name: string;
+	description: string;
+	readme: string;
+	guides: Guide[];
+	apiReportPath: string;
+	apiReport: string;
+	whenToUse: WhenToUse;
 };
 
 function shape(file: string, problem: string): Error {
@@ -100,7 +126,19 @@ export function parseWhenToUse(readme: string, file: string): WhenToUse {
 
 /** Returns the names of every function, const, class, and type that an API report exports. */
 export function readExports(apiReport: string): Set<string> {
-	return new Set(Array.from(apiReport.matchAll(exportLine), m => m[1]))
+	const names = new Set(Array.from(apiReport.matchAll(exportLine), m => m[1]))
+
+	for (const list of apiReport.matchAll(exportList)) {
+		for (const item of list[1].split(',')) {
+			const name = item.trim().split(/\s+as\s+/).pop()
+
+			if (name) {
+				names.add(name)
+			}
+		}
+	}
+
+	return names
 }
 
 /** Throws when a bullet names an identifier that the package does not export. */
@@ -116,15 +154,18 @@ export function checkExports(section: WhenToUse, exports: Set<string>, file: str
 
 const link = /\]\(([^)\s]+)\)/g
 const notRelative = /^([a-z][a-z0-9+.-]*:|#|\/)/i
+const fenceLine = /^(```.*)$/m
 
 /**
  * Rewrites every relative markdown link in `markdown`. `sourcePath` is the repo path of the file
  * that holds the text. `toUrl` receives the repo path of the link target and returns the URL.
+ * The content of fenced code blocks stays unchanged.
  */
 export function rewriteLinks(markdown: string, sourcePath: string, toUrl: (repoPath: string) => string): string {
 	const dir = path.posix.dirname(sourcePath)
+	let fenced = false
 
-	return markdown.replace(link, (match, target: string) => {
+	const rewrite = (text: string): string => text.replace(link, (match, target: string) => {
 		if (notRelative.test(target)) {
 			return match
 		}
@@ -136,6 +177,15 @@ export function rewriteLinks(markdown: string, sourcePath: string, toUrl: (repoP
 
 		return `](${toUrl(repoPath)}${anchor})`
 	})
+
+	return markdown.split(fenceLine).map((part, i) => {
+		if (i % 2 === 1) {
+			fenced = !fenced
+			return part
+		}
+
+		return fenced ? part : rewrite(part)
+	}).join('')
 }
 
 /** The GitHub URL of a repo path. */
@@ -152,4 +202,136 @@ export function siteUrl(copies: Map<string, string>): (repoPath: string) => stri
 		const copy = copies.get(repoPath)
 		return copy === undefined ? sourceUrl(repoPath) : siteBase + copy
 	}
+}
+
+function readRepoFile(repoPath: string): string {
+	return readFileSync(path.join(repoRoot, repoPath), 'utf8')
+}
+
+function loadGuide(repoPath: string): Guide {
+	const text = readRepoFile(repoPath)
+	const front = text.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? ''
+	const field = (key: string): string => front.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))?.[1].trim() ?? ''
+
+	return {
+		path: repoPath,
+		title: field('title') || path.posix.basename(repoPath, '.md'),
+		description: field('description'),
+		text,
+	}
+}
+
+/** Reads one package and validates its When to use section against its API report. */
+export function loadPackageDocs(folder: string): PackageDocs {
+	const slug = path.posix.basename(folder)
+	const json = JSON.parse(readRepoFile(`${folder}/package.json`)) as { name: string; description: string }
+	const readmePath = `${folder}/README.md`
+	const readme = readRepoFile(readmePath)
+	const configDir = path.join(repoRoot, folder, 'config')
+	const reportFile = existsSync(configDir) ? readdirSync(configDir).find(f => f.endsWith('.api.md')) : undefined
+
+	if (reportFile === undefined) {
+		throw new Error(`${folder}: no API report under config/. Build the package first.`)
+	}
+
+	const apiReportPath = `${folder}/config/${reportFile}`
+	const apiReport = readRepoFile(apiReportPath)
+	const docsDir = path.join(repoRoot, folder, 'docs')
+	const guides = existsSync(docsDir)
+		? readdirSync(docsDir).filter(f => f.endsWith('.md')).sort().map(f => loadGuide(`${folder}/docs/${f}`))
+		: []
+	const whenToUse = parseWhenToUse(readme, readmePath)
+
+	checkExports(whenToUse, readExports(apiReport), readmePath)
+
+	return { folder, slug, name: json.name, description: json.description, readme, guides, apiReportPath, apiReport, whenToUse }
+}
+
+/** Reads every published package, ordered by folder name. */
+export function loadAllPackageDocs(): PackageDocs[] {
+	return projects.map(loadPackageDocs).sort((a, b) => a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0)
+}
+
+/** Maps the repo path of every file that the site copies to its path under the site root. */
+export function siteCopies(packages: PackageDocs[]): Map<string, string> {
+	const copies = new Map<string, string>()
+
+	for (const pkg of packages) {
+		copies.set(`${pkg.folder}/README.md`, `llms/${pkg.slug}/README.md`)
+		for (const guide of pkg.guides) {
+			copies.set(guide.path, `llms/${pkg.slug}/docs/${path.posix.basename(guide.path)}`)
+		}
+		copies.set(pkg.apiReportPath, `llms/${pkg.slug}/api.md`)
+	}
+
+	return copies
+}
+
+/** The package index that goes between the markers in SKILL.md. */
+export function renderIndex(packages: PackageDocs[]): string {
+	return packages.map(pkg => [
+		`### ${pkg.name}`,
+		'',
+		pkg.description,
+		'',
+		pkg.whenToUse.text,
+		'',
+		`Reference: references/${pkg.slug}.md`,
+	].join('\n')).join('\n\n')
+}
+
+/** The README, guides, and API report of one package in one markdown file. */
+export function renderReference(pkg: PackageDocs, toUrl: (repoPath: string) => string): string {
+	const sources: [string, string][] = [
+		[`${pkg.folder}/README.md`, pkg.readme],
+		...pkg.guides.map((guide): [string, string] => [guide.path, guide.text]),
+		[pkg.apiReportPath, pkg.apiReport],
+	]
+
+	return sources
+		.map(([repoPath, text]) => `<!-- ${repoPath} -->\n${rewriteLinks(text, repoPath, toUrl).trimEnd()}\n`)
+		.join('\n')
+}
+
+/** Replaces the package index between the markers in SKILL.md. */
+export function replaceIndex(skill: string, index: string): string {
+	const start = skill.indexOf(indexStart)
+	const end = skill.indexOf(indexEnd)
+
+	if (start === -1 || end === -1 || end < start) {
+		throw new Error(`${skillDir}/SKILL.md: the markers ${indexStart} and ${indexEnd} are missing or out of order.`)
+	}
+
+	return `${skill.slice(0, start + indexStart.length)}\n\n${index}\n\n${skill.slice(end)}`
+}
+
+/** The llms.txt index of the docs site. */
+export function renderLlmsTxt(packages: PackageDocs[]): string {
+	const skillUrl = `${sourceBase.replace('/blob/', '/tree/')}${skillDir}`
+
+	return [
+		'# Common Media Library',
+		'',
+		'> TypeScript libraries for web video players. Each package implements one media specification, such as CMCD, ID3, ISO BMFF, WebVTT, or DASH. Install only the packages that you need.',
+		'',
+		`Before you write code for a media specification in a player, check the package list below. The skill for coding agents installs with \`${installCommand}\`.`,
+		'',
+		'## Packages',
+		'',
+		...packages.map(pkg => `- [${pkg.name}](${siteBase}llms/${pkg.slug}/README.md): ${pkg.description}`),
+		'',
+		'## Guides',
+		'',
+		...packages.flatMap(pkg => pkg.guides.map(guide => `- [${guide.title}](${siteBase}llms/${pkg.slug}/docs/${path.posix.basename(guide.path)}): ${pkg.name}. ${guide.description}`)),
+		'',
+		'## API reports',
+		'',
+		...packages.map(pkg => `- [${pkg.name} API report](${siteBase}llms/${pkg.slug}/api.md): every public export of ${pkg.name} with its signature`),
+		'',
+		'## Optional',
+		'',
+		`- [llms-full.txt](${siteBase}llms-full.txt): every README, guide, and API report in one file`,
+		`- [Agent skill](${skillUrl}): the Agent Skills bundle, install with \`${installCommand}\``,
+		'',
+	].join('\n')
 }

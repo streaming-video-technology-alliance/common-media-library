@@ -77,7 +77,7 @@ A link is relative when its target has no scheme, does not start with `#`, and d
 
 ### Errors
 
-The section parser throws when the heading is missing, when the bullet count is outside three to eight, when a bullet has no colon, when the closing paragraph is missing, or when an identifier after the colon is not an export. The message names the file path, the bullet, and the expected shape. The test and the generator share the parser.
+The section parser throws when the heading is missing, when the bullet count is outside two to eight, when a bullet has no colon, when the closing paragraph is missing, or when an identifier after the colon is not an export. The message names the file path, the bullet, and the expected shape. The test and the generator share the parser.
 
 An export is any line of the API report that starts with `export`, then one of `function`, `const`, `class`, or `type`, then a name. The reports today contain only these four kinds.
 
