@@ -7,7 +7,7 @@ import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
 import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildInitSegmentWithManifest, buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
+import { buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -76,6 +76,20 @@ describe('validateC2paInitSegment', () => {
 			deepStrictEqual(result.sessionKeys.map(key => key.kid), ['ad0c9403ce98540f9569542619058da3'])
 			deepStrictEqual(result.errorCodes, [])
 		})
+
+		it('withholds the session keys of an init segment whose content hash does not match', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-09-21T00:00:00Z') })
+			const bytes = Buffer.from(readFileSync(new URL('../fixtures/vsi_init_with_signer_binding.mp4', import.meta.url)))
+			// Changes the creation time in the mvhd box, which the flat content hash covers.
+			const mvhd = bytes.indexOf('mvhd', 0, 'latin1')
+			ok(mvhd > 0)
+			bytes[mvhd + 8] ^= 0xff
+
+			const result = await validateC2paInitSegment(new Uint8Array(bytes))
+
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH])
+			deepStrictEqual(result.sessionKeys, [])
+		})
 	})
 })
 
@@ -93,9 +107,10 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('populates merkleMaps and skips SESSIONKEY_INVALID in VOD Merkle mode', async () => {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const init = await buildSignedMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
-			merkle: [merkleEntry()],
+			merkle: [merkleEntry({ initHash })],
 		}, signer)
 
 		const result = await validateC2paInitSegment(init)
@@ -198,6 +213,30 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
 	})
 
+	it('accepts a null hash with Merkle maps', async () => {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const init = await buildSignedMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			hash: null,
+			merkle: [merkleEntry({ initHash })],
+		}, signer)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.merkleMaps.length, 1)
+		deepStrictEqual(result.errorCodes, [])
+	})
+
+	it('rejects a null merkle field without a hash as malformed', async () => {
+		const init = await buildSignedMerkleInitSegment({ exclusions: [{ xpath: '/uuid' }], merkle: null }, signer)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
 	it('rejects an empty merkle array as malformed without flagging session keys', async () => {
 		const init = await buildMerkleInitSegment({ exclusions: [], merkle: [] })
 
@@ -256,7 +295,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 	// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
 	// so integrity checks skip signature verification. The claim declares the assertion by
 	// hash so it reaches the validator's claim-verified assertion set.
-	async function buildInitSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
+	async function buildInitSegment(assertionData: unknown): Promise<Uint8Array> {
 		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData)))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 		const claimData = {
@@ -295,7 +334,14 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 		const result = await validateC2paInitSegment(init)
 
 		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH))
 	})
+
+	// A structural defect of the assertion reports ASSERTION_BMFFHASH_MALFORMED (§15.12.2), not INIT_INVALID.
+	function assertMalformed(errorCodes: readonly string[]): void {
+		ok(errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+		strictEqual(errorCodes.includes(LiveVideoStatusCode.INIT_INVALID), false)
+	}
 
 	it('rejects a hash that is a CBOR array of integers', async () => {
 		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
@@ -303,7 +349,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 
 		const result = await validateC2paInitSegment(init)
 
-		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		assertMalformed(result.errorCodes)
 	})
 
 	it('rejects an exclusion constraint whose value is not a byte string', async () => {
@@ -313,8 +359,37 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 
 		const result = await validateC2paInitSegment(init)
 
-		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		assertMalformed(result.errorCodes)
 	})
+
+	for (const [name, hashField] of [['a missing hash', {}], ['a null hash', { hash: null }]] as const) {
+		it(`rejects ${name} with a matching value field`, async () => {
+			const value = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+			const init = await buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', ...hashField, value })
+
+			const result = await validateC2paInitSegment(init)
+
+			assertMalformed(result.errorCodes)
+		})
+	}
+
+	it('rejects an assertion without a hash and without merkle maps', async () => {
+		const init = await buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256' })
+
+		const result = await validateC2paInitSegment(init)
+
+		assertMalformed(result.errorCodes)
+	})
+
+	for (const [name, payload] of [['an array', [new Uint8Array(32)]], ['null', null]] as const) {
+		it(`rejects an assertion whose payload is ${name}`, async () => {
+			const init = await buildInitSegment(payload)
+
+			const result = await validateC2paInitSegment(init)
+
+			assertMalformed(result.errorCodes)
+		})
+	}
 
 	it('accepts the flat hash of a real signed init segment', async () => {
 		const bytes = new Uint8Array(
@@ -594,6 +669,47 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const merkle = [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash }]
 		return encodeCbor({ exclusions: [{ xpath: '/uuid' }], merkle })
+	}
+
+	// A `c2pa.hash.bmff.v3` assertion with the given merkle field and no flat hash.
+	function merkleOnlyCbor(merkle: unknown): Uint8Array {
+		return encodeCbor({ exclusions: [{ xpath: '/uuid' }], merkle })
+	}
+
+	it('returns the session keys and Merkle maps of an init with a matching Merkle initHash', async (context) => {
+		const init = await buildSignedInitSegment(signer, [
+			{ label: 'c2pa.hash.bmff.v3', cbor: await merkleAssertionCbor() },
+			await buildSessionKeysAssertion(signer, [activeEntry(key001)]),
+		])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		strictEqual(result.merkleMaps.length, 1)
+		deepStrictEqual(result.errorCodes, [])
+	})
+
+	const FAILING_MERKLE_FIELDS: readonly (readonly [string, unknown])[] = [
+		['a Merkle map that does not conform', [{}]],
+		['a Merkle initHash that does not match', [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash: new Uint8Array(32) }]],
+		['a merkle field that is null', null],
+	]
+
+	for (const [description, merkle] of FAILING_MERKLE_FIELDS) {
+		it(`withholds the session keys and Merkle maps of an init with ${description}`, async (context) => {
+			const init = await buildSignedInitSegment(signer, [
+				{ label: 'c2pa.hash.bmff.v3', cbor: merkleOnlyCbor(merkle) },
+				await buildSessionKeysAssertion(signer, [activeEntry(key001)]),
+			])
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.merkleMaps, [])
+			strictEqual(result.isValid, false)
+		})
 	}
 
 	for (const [description, sessionKeysCbor] of NONCONFORMING_ASSERTIONS) {

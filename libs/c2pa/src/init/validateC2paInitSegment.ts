@@ -1,7 +1,7 @@
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import { CborTag, decodeCbor } from '../cbor/readCborItem.ts'
 import type { C2paAssertion } from '../C2paAssertion.ts'
-import type { C2paStatusCode } from '../C2paStatusCode.ts'
+import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
@@ -63,22 +63,29 @@ function extractKeyArray(data: unknown): unknown[] {
 	return []
 }
 
+type BmffHashCode = typeof C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED | typeof C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH
+
+// Checks the flat content hash of the `c2pa.hash.bmff.v3` assertion. Returns the status code of the failure, or null.
 async function validateBmffHashAssertion(
 	bytes: Uint8Array,
 	assertion: C2paAssertion | null,
-): Promise<boolean> {
-	if (!assertion) return true
+): Promise<BmffHashCode | null> {
+	if (!assertion) return null
+	if (assertion.data === null || typeof assertion.data !== 'object' || Array.isArray(assertion.data)) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	const data = assertion.data as Record<string, unknown>
-	const rawHash = data['hash'] ?? data['value']
-	if (!rawHash) return true
-	if (!(rawHash instanceof Uint8Array)) return false
+	// §18.6.6.1 step 2: a Merkle initHash verifies the init, so only an init with Merkle maps may omit `hash`.
+	// validateMerkleMaps checks each map.
+	const rawHash = data['hash']
+	const merkle = data['merkle']
+	if (rawHash == null) return Array.isArray(merkle) && merkle.length > 0 ? null : C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
+	if (!(rawHash instanceof Uint8Array)) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = parseExclusions(data['exclusions'])
-	if (!exclusions) return false
+	if (!exclusions) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
 	// box; only Merkle tree hashes may omit the 8-byte offset prefix.
 	const computed = await computeBmffHash(bytes, { exclusions, alg, offsetPrefixSize: 8 })
-	return hashesEqual(computed, rawHash)
+	return hashesEqual(computed, rawHash) ? null : C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH
 }
 
 type SessionKeyFields = {
@@ -178,7 +185,8 @@ async function validateSessionKeys(
  *
  * Only session keys with a valid signer binding and an unexpired validity period
  * are included in the result. The result holds `sessionKeys` and `merkleMaps` only when
- * every manifest integrity check passes, so check `isValid` before you use either list.
+ * every manifest integrity check and every content hash check pass, so check `isValid`
+ * before you use either list.
  *
  * The result includes `LiveVideoStatusCode.SESSIONKEY_INVALID` if the function finds an invalid
  * session key (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
@@ -187,7 +195,7 @@ async function validateSessionKeys(
  * or with CBOR that does not decode, also causes `SESSIONKEY_INVALID`.
  *
  * @param bytes - Raw init segment bytes
- * @returns Structured validation result (with `INIT_INVALID` error code if `mdat` box is present)
+ * @returns Structured validation result. It has `INIT_INVALID` if the segment has an `mdat` box. A content hash that does not match adds `INIT_INVALID` and `ASSERTION_BMFFHASH_MISMATCH`. A `c2pa.hash.bmff.v3` assertion that does not conform to the `bmff-hash-map` adds `ASSERTION_BMFFHASH_MALFORMED`.
  * @throws If no C2PA UUID box is found
  *
  * @example
@@ -215,10 +223,11 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 
 	const bmffHashAssertion =
 		verifiedAssertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
-	const bmffHashValid = await validateBmffHashAssertion(bytes, bmffHashAssertion)
+	const bmffHashCode = await validateBmffHashAssertion(bytes, bmffHashAssertion)
 
-	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>()
-	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, codes)
+	const merkleCodes = new Set<LiveVideoStatusCode | C2paStatusCode>()
+	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, merkleCodes)
+	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>(merkleCodes)
 
 	const sessionKeysAssertion = verifiedAssertions.find(
 		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
@@ -227,12 +236,14 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 		sessionKeysAssertion && certificate
 			? await validateSessionKeys(sessionKeysAssertion, certificate)
 			: { sessionKeys: [], hasInvalidSessionKey: false }
-	// The result exposes session keys and merkle maps only when every integrity check passes.
-	const integrityPassed = integrityCodes.length === 0
+	// The result exposes session keys and merkle maps only when every integrity check and every content hash check pass.
+	const integrityPassed = integrityCodes.length === 0 && bmffHashCode === null && merkleCodes.size === 0
 	const sessionKeys = integrityPassed ? sessionKeysValidation.sessionKeys : []
 	const exposedMerkleMaps = integrityPassed ? (merkleMaps ?? []) : []
 
-	if (!bmffHashValid) codes.add(LiveVideoStatusCode.INIT_INVALID)
+	// A content hash that does not match fails the init segment. A malformed assertion reports only its own code.
+	if (bmffHashCode === C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH) codes.add(LiveVideoStatusCode.INIT_INVALID)
+	if (bmffHashCode) codes.add(bmffHashCode)
 	if (sessionKeysValidation.hasInvalidSessionKey) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
 	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
 	if (sessionKeysValidation.sessionKeys.length === 0 && merkleMaps === null) {
