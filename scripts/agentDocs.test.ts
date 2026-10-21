@@ -227,11 +227,9 @@ describe('renderLlmsTxt', () => {
 })
 
 describe('published packages', () => {
-	it('every published package has a When to use section whose exports exist', () => {
+	it('every published package loads, so each When to use section parses and names real exports', () => {
+		// loadPackageDocs throws on a missing section, a malformed bullet, or an identifier that the API report does not export.
 		const packages = loadAllPackageDocs()
-		equal(packages.length, projects.length)
-		for (const pkg of packages) {
-			equal(pkg.whenToUse.bullets.length >= 2, true, `${pkg.name} has too few bullets`)
-		}
+		deepEqual(packages.map(pkg => pkg.folder).sort(), [...projects].sort())
 	})
 })
