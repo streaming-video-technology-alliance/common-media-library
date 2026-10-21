@@ -5,7 +5,7 @@ import type { LadderRung } from './LadderRung.ts'
  *
  * The first pass keeps the highest rung, at or below the pick, whose download time is within `budget`.
  * If no rung passes, the second pass keeps the highest rung within `budget + tolerance`, or rung 0.
- * A tolerance of 0 makes the second pass fail too, so the guard has one pass and rung 0 is the fallback.
+ * A tolerance of 0 makes the second pass fail too. The guard then has one pass, and rung 0 is the fallback.
  * The guard never raises a pick.
  *
  * @param ladder - The rungs in ascending order of bandwidth
