@@ -18,6 +18,11 @@ and this project adheres to
 
 - `C2paStatusCode` now has `CLAIM_HARD_BINDINGS_MISSING` (`claim.hardBindings.missing`). `validateC2paManifestBoxSegment` reports it for a manifest without any hard binding assertion.
 
+### Fixed
+
+- `validateC2paSegment` no longer fails a segment after a gap in the sequence numbers. C2PA section 19.7.3 fails a sequence number only if it does not move forward or is below the `minSequenceNumber` of the session key. `result.sequenceResult` still reports `SequenceValidationReason.GAP_DETECTED` with `missingFrom` and `missingTo`. Before, the result had `isValid: false` and `LiveVideoStatusCode.ASSERTION_INVALID`. The next authentic segment after a tampered segment also failed, because it followed a gap ([#546](https://github.com/streaming-video-technology-alliance/common-media-library/issues/546)).
+- `validateC2paSegment` now reports `LiveVideoStatusCode.SEGMENT_INVALID` for a duplicate, out-of-order, or below-minimum sequence number, as C2PA section 19.7.3 requires. It reported `LiveVideoStatusCode.ASSERTION_INVALID` before. A below-minimum sequence number no longer reports both codes. If your application handles `livevideo.assertion.invalid` for VSI segments, handle `livevideo.segment.invalid` instead.
+
 ## [1.4.1] - 2026-10-18
 
 ### Changed

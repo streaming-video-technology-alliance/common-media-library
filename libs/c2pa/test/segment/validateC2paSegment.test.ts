@@ -243,16 +243,17 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		const below = await validateC2paSegment(await buildVsiSegment(minKey, 5), keys, state)
 
 		strictEqual(below?.result.sequenceResult.reason, SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM)
-		deepStrictEqual(below?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID, LiveVideoStatusCode.ASSERTION_INVALID])
+		deepStrictEqual(below?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
 		strictEqual(below?.nextSequenceState, state)
 	})
 
-	it('advances after an authentic gap', async () => {
+	it('accepts an authentic segment after a gap and reports the missing range', async () => {
 		const state1 = await afterFirstSegment()
 
 		const r3 = await validateC2paSegment(await buildVsiSegment(key, 3), sessionKeys, state1)
-		strictEqual(r3?.result.sequenceResult.reason, SequenceValidationReason.GAP_DETECTED)
-		deepStrictEqual(r3?.result.errorCodes, [LiveVideoStatusCode.ASSERTION_INVALID])
+		strictEqual(r3?.result.isValid, true)
+		deepStrictEqual(r3?.result.errorCodes, [])
+		deepStrictEqual(r3?.result.sequenceResult, { isValid: false, reason: SequenceValidationReason.GAP_DETECTED, missingFrom: 2, missingTo: 2 })
 		strictEqual(r3?.nextSequenceState.lastSequenceNumber, 3)
 
 		const r4 = await validateC2paSegment(await buildVsiSegment(key, 4), sessionKeys, r3?.nextSequenceState)
@@ -262,10 +263,12 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 	it('does not rewind the floor for an authentic segment that arrives late', async () => {
 		let state: SequenceState | undefined
 		const reasons = []
+		const errorCodes = []
 
 		for (const sequenceNumber of [1, 3, 2, 4]) {
 			const validated = await validateC2paSegment(await buildVsiSegment(key, sequenceNumber), sessionKeys, state)
 			reasons.push(validated?.result.sequenceResult.reason)
+			errorCodes.push(validated?.result.errorCodes)
 			state = validated?.nextSequenceState
 		}
 
@@ -275,5 +278,28 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 			SequenceValidationReason.OUT_OF_ORDER,
 			SequenceValidationReason.VALID,
 		])
+		deepStrictEqual(errorCodes, [[], [], [LiveVideoStatusCode.SEGMENT_INVALID], []])
+	})
+
+	it('reports SEGMENT_INVALID for a replayed segment', async () => {
+		const state1 = await afterFirstSegment()
+		const r2 = await validateC2paSegment(await buildVsiSegment(key, 2), sessionKeys, state1)
+
+		const replay = await validateC2paSegment(await buildVsiSegment(key, 2), sessionKeys, r2?.nextSequenceState)
+
+		strictEqual(replay?.result.sequenceResult.reason, SequenceValidationReason.DUPLICATE)
+		deepStrictEqual(replay?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+	})
+
+	it('accepts the next authentic segment after a tampered segment', async () => {
+		const state1 = await afterFirstSegment()
+		const tampered = await validateC2paSegment(tamperMedia(await buildVsiSegment(key, 2)), sessionKeys, state1)
+		strictEqual(tampered?.result.isValid, false)
+
+		// The tampered segment does not advance the state, so segment 3 follows a gap.
+		const r3 = await validateC2paSegment(await buildVsiSegment(key, 3), sessionKeys, tampered?.nextSequenceState)
+
+		strictEqual(r3?.result.sequenceResult.reason, SequenceValidationReason.GAP_DETECTED)
+		strictEqual(r3?.result.isValid, true)
 	})
 })

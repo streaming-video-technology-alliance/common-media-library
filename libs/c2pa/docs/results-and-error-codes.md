@@ -43,8 +43,8 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 |----------|-------|---------|
 | `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box or BMFF hash mismatch |
 | `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
-| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure (signature, hash, or key mismatch), a manifest box segment without a `c2pa.hash.bmff.v3` assertion, a session key outside its validity period, a broken `c2pa.manifestId` chain, or a failed custom continuity validator |
-| `ASSERTION_INVALID` | `livevideo.assertion.invalid` | sequenceNumber or streamId mismatch |
+| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure (signature, hash, or key mismatch), a manifest box segment without a `c2pa.hash.bmff.v3` assertion, a session key outside its validity period, a VSI sequence number that does not move forward or is below the minimum of the key, a broken `c2pa.manifestId` chain, or a failed custom continuity validator |
+| `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
 | `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the init segment has no valid session key (the keys are absent or expired) |
@@ -174,7 +174,7 @@ import { SequenceValidationReason } from '@svta/cml-c2pa'
 |----------|-------|-------|-------------------|-------------|
 | `VALID` | `valid` | `true` | none | Sequence number is the next expected value |
 | `DUPLICATE` | `duplicate` | `false` | none | Sequence number was already seen |
-| `GAP_DETECTED` | `gap_detected` | `false` | `missingFrom`, `missingTo` | One or more sequence numbers were skipped |
+| `GAP_DETECTED` | `gap_detected` | `false` | `missingFrom`, `missingTo` | One or more sequence numbers were skipped. The segment is not invalid for this reason. |
 | `OUT_OF_ORDER` | `out_of_order` | `false` | none | Sequence number is less than the last seen |
 | `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | none | Below the session key's `minSequenceNumber` |
 

@@ -3,6 +3,7 @@ import { decodeCoseSign1 } from '../cose/decodeCoseSign1.ts'
 import { extractVsiEmsgBox } from '../emsg/extractVsiEmsgBox.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { decodeVsiMap } from '../vsi/decodeVsiMap.ts'
+import { SequenceValidationReason } from '../vsi/SequenceState.ts'
 import type { SequenceState } from '../vsi/SequenceState.ts'
 import { createSequenceState } from '../vsi/createSequenceState.ts'
 import { validateSequenceNumber } from '../vsi/validateSequenceNumber.ts'
@@ -28,6 +29,10 @@ function findSessionKey(sessionKeys: readonly ValidatedSessionKey[], kidHex: str
  *
  * A segment whose signature, content hash, or key validity does not verify
  * returns the received `sequenceState` unchanged.
+ *
+ * A duplicate, out-of-order, or below-minimum `sequenceNumber` fails with
+ * `livevideo.segment.invalid`. A gap in the sequence numbers does not fail the
+ * segment. `result.sequenceResult` reports the gap with its missing range.
  *
  * @param segmentBytes - Raw segment bytes
  * @param sessionKeys - Available session keys from the init segment
@@ -110,7 +115,11 @@ export async function validateC2paSegment(
 
 	const codes = new Set<LiveVideoStatusCode>()
 	if (!authentic || !sequenceAboveMin) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
-	if (!sequenceResult.isValid) codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
+	// §19.7.3 fails a sequenceNumber that does not move forward or is below the minimum of the key.
+	// A gap is not a failure. sequenceResult still reports it, so the caller can detect missing segments.
+	if (!sequenceResult.isValid && sequenceResult.reason !== SequenceValidationReason.GAP_DETECTED) {
+		codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
+	}
 	const errorCodes = [...codes]
 
 	return {
