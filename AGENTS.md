@@ -32,7 +32,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 
 The Publish workflow uses npm trusted publishing. A trusted publisher is configured per package on npmjs.com. The workflow cannot publish a package that is not on npm yet. The first release of a new package needs these manual steps:
 
-1. Merge the release-prep PR. That PR sets the first version, adds the package to `scripts/projects.ts`, sets the RFC status to `implemented`, and adds the `## When to use` section to the README.
+1. Merge the release-prep PR. That PR sets the first version and adds the package to `scripts/projects.ts`. It also sets the RFC status to `implemented` and adds the `## When to use` section to the README.
 2. From a clean checkout of `main`, run `npm ci` and `npm run build`.
 3. Publish the package once manually: `npm publish --no-provenance --access public -w libs/<package>`. The package sets `publishConfig.provenance`, and npm can only generate provenance in CI.
 4. On npmjs.com, open the package settings and add a trusted publisher. Select GitHub Actions with organization `streaming-video-technology-alliance`, repository `common-media-library`, and workflow `publish.yml`.

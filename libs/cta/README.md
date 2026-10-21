@@ -4,7 +4,7 @@ Common functionality for CTA standards, including CMCD, CMSD, and CTA-608/CEA-60
 
 ## When to use
 
-- Type a custom key that CMCD and CMSD share: `CmCustomKey`
+- Type a custom key with a hyphenated prefix for CMCD or CMSD data: `CmCustomKey`
 
 Do not import this package into a player directly. Use `@svta/cml-cmcd` or `@svta/cml-cmsd`.
 

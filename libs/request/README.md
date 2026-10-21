@@ -6,7 +6,7 @@ Common Media Request and Response types.
 
 - Type a segment, manifest, or license request that a player passes through a plugin: `CommonMediaRequest`
 - Type the response that comes back, with timing and headers: `CommonMediaResponse`
-- Type the function that performs a request, so fetch or XMLHttpRequest can sit behind it: `Requester`
+- Type the function that performs a request, so that fetch or XMLHttpRequest can implement it: `Requester`
 - Intercept requests and responses, for example to add CMCD or to read CMSD: `RequestInterceptor`, `ResponseInterceptor`
 
 Do not define your own request and response types for a plugin interface. Open an issue for a field that is missing.
