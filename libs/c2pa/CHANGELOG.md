@@ -17,6 +17,10 @@ and this project adheres to
 
 - `validateC2paManifestBoxSegment` now reports a missing hard binding only for a manifest with a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` no longer also reports `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
 
+### Fixed
+
+- `validateC2paInitSegment` no longer reports `LiveVideoStatusCode.SESSIONKEY_INVALID` for an init segment without a `c2pa.session-keys` assertion. The C2PA Manifest Box method (C2PA 2.4 section 19.3) needs no session keys, so a valid init segment of a manifest-box stream failed. A `c2pa.session-keys` assertion with an invalid key, or with no key, still reports `SESSIONKEY_INVALID`.
+
 ## [1.5.0] - 2026-10-21
 
 ### Security

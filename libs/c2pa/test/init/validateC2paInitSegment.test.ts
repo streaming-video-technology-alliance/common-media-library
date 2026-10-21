@@ -127,7 +127,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		const result = await validateC2paInitSegment(init)
 
 		deepStrictEqual(result.merkleMaps, [])
-		ok(result.errorCodes.includes(LiveVideoStatusCode.SESSIONKEY_INVALID))
+		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.SESSIONKEY_INVALID), false)
 	})
 
 	it('accepts a matching initHash without additional error codes', async () => {
@@ -762,7 +762,7 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 
 		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
 
-		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.CLAIM_MALFORMED])
 		strictEqual(result.isValid, false)
 	})
 
@@ -923,6 +923,27 @@ describe('validateC2paInitSegment — content binding (§15.10.1.2, §19.2.3)', 
 		const result = await validateC2paInitSegment(initWithoutMoov)
 
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+		deepStrictEqual(result.sessionKeys, [])
+	})
+})
+
+describe('validateC2paInitSegment — manifest box method (§19.3)', () => {
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	it('accepts a signed init segment without a session keys assertion', async () => {
+		// The §19.3 method needs no session keys (§19.2.1), so their absence is not SESSIONKEY_INVALID.
+		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const bmffHash = { label: 'c2pa.hash.bmff.v3', cbor: encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash }) }
+		const init = await buildSignedInitSegment(signer, [bmffHash])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
 		deepStrictEqual(result.sessionKeys, [])
 	})
 })

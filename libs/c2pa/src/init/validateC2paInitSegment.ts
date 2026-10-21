@@ -208,7 +208,9 @@ async function validateSessionKeys(
  * session key (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2,
  * or if its signer binding fails verification. The function does not check every rule of section 18.25.2.
  * An expired session key does not count as invalid. A `c2pa.session-keys` assertion without a session key,
- * or with CBOR that does not decode, also causes `SESSIONKEY_INVALID`.
+ * or with CBOR that does not decode, also causes `SESSIONKEY_INVALID`. An init segment without a
+ * `c2pa.session-keys` assertion is not invalid: the C2PA Manifest Box method (section 19.3) and
+ * VOD Merkle streams carry no session keys.
  *
  * @param bytes - Raw init segment bytes
  * @returns Structured validation result. It has `INIT_INVALID` if the segment has an `mdat` box or no `c2pa.hash.bmff.v3` assertion. It also has `INIT_INVALID` if the content hash does not include the `moov` box (C2PA section 19.2.3). A manifest without a hard binding assertion also has `CLAIM_HARD_BINDINGS_MISSING`. A content hash that does not match adds `INIT_INVALID` and `ASSERTION_BMFFHASH_MISMATCH`. A `c2pa.hash.bmff.v3` assertion that does not conform to the `bmff-hash-map` adds `ASSERTION_BMFFHASH_MALFORMED`.
@@ -266,10 +268,6 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	if (bmffHashCode === C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH) codes.add(LiveVideoStatusCode.INIT_INVALID)
 	if (bmffHashCode) codes.add(bmffHashCode)
 	if (sessionKeysValidation.hasInvalidSessionKey) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
-	// VOD Merkle streams carry no session keys; only flag their absence in live mode.
-	if (sessionKeysValidation.sessionKeys.length === 0 && merkleMaps === null) {
-		codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
-	}
 	for (const code of integrityCodes) codes.add(code)
 	const errorCodes = [...codes]
 
