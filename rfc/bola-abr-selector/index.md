@@ -68,7 +68,7 @@ What BOLA adds to the shared rules:
 
 - `delay` is positive when the buffer is above the maximum level of the chosen rung. After the wait, call `select` again. The selector adds the wait to its placeholder buffer, and the second call returns a delay of 0. A player that ignores the delay fills the buffer with the selected rung until the real buffer passes the next threshold. The cost is lower quality, not a stall.
 - `bufferTarget` sets the buffer level at which BOLA reaches the top rung. The default is `BOLA_DEFAULT_BUFFER_TARGET`. Pass the field in every call or in none.
-- The starvation guard of the throughput selector runs on every pick when the input has a positive `segmentDuration`. The guard lowers the pick when the download of the next segment does not fit in the real buffer. The guard never raises a pick. A live player omits `segmentDuration` to skip the guard, as for the throughput selector.
+- The starvation guard runs on the pick when the input has a positive `segmentDuration`. The guard lowers the pick when the download of the next segment does not fit in the real buffer. The guard assumes `starvationSafetyFactor` of the throughput for that download. The guard never raises a pick, and it waits until two samples have finished. A live player omits `segmentDuration` to skip the guard, as for the throughput selector.
 - A stall needs no call. The selector derives it from `bufferLevel`. See Stalls.
 - `reset` returns the selector to the startup state. Call it after a seek or a source change.
 - A selector that never receives a `sample` stays in the startup state.
@@ -122,7 +122,7 @@ export type BolaSelector = Omit<BitrateSelector, 'select'> & {
 
 export type BolaSelectorOptions = {
 	safetyFactor?: number           // @defaultValue DEFAULT_SAFETY_FACTOR
-	starvationTolerance?: number    // seconds, @defaultValue DEFAULT_STARVATION_TOLERANCE
+	starvationSafetyFactor?: number // @defaultValue DEFAULT_STARVATION_SAFETY_FACTOR
 }
 
 export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector
@@ -130,7 +130,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector
 
 `BolaSelector` omits the `select` of `BitrateSelector` and adds a narrower one. A plain intersection of the two `select` signatures resolves to the first one, so its result would lose `state` and `placeholder`. Every `BolaSelector` is still a `BitrateSelector`.
 
-The package also exports `BOLA_DEFAULT_BUFFER_TARGET` (18 seconds). `safetyFactor` and `starvationTolerance` have the meaning and the bounds of the throughput selector options with the same names. `DEFAULT_SAFETY_FACTOR` and `DEFAULT_STARVATION_TOLERANCE` are their defaults. The threshold functions, the ladder validation, and the other helpers stay internal.
+The package also exports `BOLA_DEFAULT_BUFFER_TARGET` (18 seconds). `safetyFactor` has the meaning and the bounds of the throughput selector option with the same name, and `DEFAULT_SAFETY_FACTOR` is its default. `starvationSafetyFactor` is the fraction of the throughput that the starvation guard assumes for one download. It has the bounds of `safetyFactor`, and an invalid value throws the same `RangeError`. The package exports its default, `DEFAULT_STARVATION_SAFETY_FACTOR`, with the value 0.7 from dash.js. The threshold functions, the ladder validation, and the other helpers stay internal.
 
 ### State machine
 
@@ -138,7 +138,7 @@ The selector keeps a placeholder buffer. This is virtual buffer time that the se
 
 | Input | Effect |
 |---|---|
-| `select`, startup state | Picks the highest rung at or below `throughput * safetyFactor`. Picks rung 0 when the estimate is unknown. Applies the starvation guard. Sets the placeholder to `max(0, threshold - bufferLevel)` for that rung. Moves to the steady state after the first `sample` call, when the buffer holds at least one segment. |
+| `select`, startup state | Picks the highest rung at or below `throughput * safetyFactor`. Picks rung 0 when the estimate is unknown. Sets the placeholder to `max(0, threshold - bufferLevel)` for that rung. Moves to the steady state after the first `sample` call, when the buffer holds at least one segment. |
 | `select`, steady state | Adds the wall-clock time since the last request end to the placeholder. If no request ended since the last call, the selector uses the time since the last call. If the ladder or the buffer target changed, converts `Q`. See Ladder changes. Picks the rung for `Q`. Applies the oscillation guard. Applies the starvation guard. Computes the delay. |
 | `select`, one distinct rung | Returns the highest index of that rung with a delay of 0. The decision reports the startup state and a placeholder of 0. |
 | `sample` | Records the sampled bandwidth as the current rung. Multiplies the placeholder by 0.99. Caps it so that the effective buffer at request start stays at or below the maximum buffer of that rung. Adds `duration` when `isReplacement` is true. |
@@ -147,7 +147,7 @@ The selector keeps a placeholder buffer. This is virtual buffer time that the se
 
 The oscillation guard is the BOLA-O variant. Suppose the score picks a rung above both the current rung and the rung that the throughput sustains. Then the selector keeps the higher of the current rung and the sustained rung. The guard is skipped when the estimate is unknown.
 
-The starvation guard runs after the oscillation guard and before the delay, in both states. It runs when the input has a positive `segmentDuration` and the estimate is known. The formula and the two passes are those of the throughput selector in the [bitrate selector RFC](../bitrate-selector.md). The guard never raises the pick. A lowered pick becomes the current rung. When the guard lowers the pick, the selector skips the delay step.
+The starvation guard runs after the oscillation guard and before the delay. It runs when the input has a positive `segmentDuration`, the estimate is known, and two samples have finished since the last reset. The guard estimates the download time of a rung as `bandwidth * segmentDuration / (throughput * starvationSafetyFactor)`. It keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. Rung 0 always passes. The guard has one pass, so `starvationTolerance` of the [bitrate selector RFC](../bitrate-selector.md) does not apply. The guard never raises the pick. A lowered pick becomes the current rung. When the guard lowers the pick, the selector skips the delay step.
 
 The delay is `max(0, Q - maximumBuffer(rung))`. The selector drains the placeholder first. The remainder becomes `delay`. At the top rung the delay is always 0.
 
@@ -208,7 +208,7 @@ The selector follows `BolaRule.js` in dash.js, with these deliberate changes:
 - `M` counts the distinct bandwidths. dash.js counts the representations.
 - After an aborted download, the selector treats the next lower rung as the replacement. dash.js uses the rung that the abandon rule picks from the throughput. The selector input has no replacement rung. Both set the current rung to the replacement and cap the effective buffer at the threshold of that rung.
 - After a change of the buffer target, the selector adds the elapsed time and then converts the effective buffer. dash.js converts first and then adds the elapsed time.
-- The starvation guard is part of the selector. dash.js runs `InsufficientBufferRule` as a separate rule with the same cap, `safeThroughput * bufferLevel / segmentDuration`. After a buffer-empty event, that rule drops to rung 0. The selector empties the placeholder and runs the guard with its second pass.
+- The starvation guard is part of the selector. dash.js runs `InsufficientBufferRule` as a separate rule with the same cap, `safeThroughput * bufferLevel / segmentDuration`, the same factor of 0.7, and the same two-segment wait. dash.js disables that rule in low-latency mode, and a player of the selector omits `segmentDuration` instead. After a buffer-empty event, dash.js drops to rung 0. The selector empties the placeholder, and the guard at an empty buffer allows rung 0 only.
 
 ### Bundle and performance impact
 
@@ -223,8 +223,8 @@ The implementation PR carries the full strategy. In short:
 - One test for each row of the ladder change table.
 - A seeded playback simulation that compares the selector with the throughput selector.
 - A manual comparison with the dash.js `BolaRule` on the same ladder and buffer inputs.
-- Guard tests: the pick drops at a low buffer and stays at a healthy buffer. A call without `segmentDuration` skips the guard.
-- The seeded simulation with the guard on and off. The implementation PR reports the stall counts of both runs.
+- Guard tests: the pick drops at a low buffer and stays at a healthy buffer. A call without `segmentDuration` skips the guard, and so do the first two picks.
+- The seeded simulation with the guard off and with `starvationSafetyFactor` at 0.5, 0.7, and 0.9. The implementation PR reports the stall counts of each run.
 
 The test fixtures are two ladders with a buffer target of 18 seconds. The bandwidths are in bits per second:
 
@@ -256,7 +256,7 @@ The selector joins `libs/abr`. It adds no package and no peer dependency. `Value
 
 - **Omit the placeholder buffer and the oscillation guard.** This gives plain BOLA. The analysis shows that it starts slowly and reaches the top rungs late or never when the player buffer cap is below `B`.
 - **A placeholder option.** In the simplified simulation, the placeholder is required when the player buffer cap is below `B`. At or above `B`, it adds a small bitrate gain and some stalls. The simulation cannot measure the faster startup and seek, so v1 keeps the placeholder on.
-- **A real-buffer guard.** dash.js pairs BOLA with `InsufficientBufferRule`, on by default. That rule has the cap of the starvation guard of `createThroughputSelector`. The guard variant of the analysis ignores the placeholder below two segments. That variant removes at most a third of the stalls in the simplified simulation. The selector runs the shared starvation guard instead, with the trigger and the option of the throughput selector. A player cannot add the guard from outside without a second selector, and every player would repeat that code. The v5 decision left the guard to players. Revision v6 reverses that decision.
+- **A real-buffer guard.** dash.js pairs BOLA with `InsufficientBufferRule`, on by default. That rule has the cap of the starvation guard of `createThroughputSelector`. The guard variant of the analysis ignores the placeholder below two segments. That variant removes at most a third of the stalls in the simplified simulation. The selector runs the shared starvation guard instead, with the trigger of the throughput selector and the factor of dash.js. The guard has its own factor, `starvationSafetyFactor`. One download varies more than the smoothed estimate, so the guard needs a larger margin. The margin costs little, because the guard binds only at a low real buffer, while `safetyFactor` binds on every upward move. A player cannot add the guard from outside without a second selector, and every player would repeat that code. The v5 decision left the guard to players. Revision v6 reverses that decision.
 - **A paused flag.** The placeholder grows with wall-clock time, and a paused player also adds time. When the guard caps the rung, the delay drains the placeholder in one call. Otherwise `sample` caps the placeholder after one segment. The exposure is one segment at a rung the throughput already sustains, so there is no flag.
 - **One selector for both media types.** dash.js keeps one state per media type, and the type contract creates one selector per media type. The documentation states the rule.
 - **A multi-period reset.** dash.js wipes all state on a new period. The conversion keeps the buffer information, so the player passes the ladder of the next period and the selector adapts.
@@ -289,7 +289,7 @@ The placeholder option is a decision in Rationale and alternatives, because the 
 - v3 (2026-10-19): `BolaSelector` omits the `select` of `BitrateSelector`, so the result type keeps `state` and `placeholder`. The L2 test fixture is listed as `LadderRung` objects.
 - v4 (2026-10-19): states the abort cap as an effective buffer limit, adds the one-rung row to the state machine, and gives the startup placeholder formula. Lists two more differences from dash.js and the `@beta` tag. Corrects the v2 entry on the closed questions.
 - v5 (2026-10-19): status set to `accepted`.
-- v6 (2026-10-20): corrections after the review of the implementation PR. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. Before, a cap at the threshold of the current rung picked that rung again. The conversion after a ladder or buffer target change runs after the selector adds the elapsed time. The `bufferTarget` row states the negative placeholder exception. The drawbacks and the analysis state the stall comparison with `createThroughputSelector`. The selector runs the starvation guard of the throughput selector when the input has `segmentDuration`, and `BolaSelectorOptions` gains `starvationTolerance`. Three more differences from dash.js. The analysis attributes the 10 second oscillation finding to the original BOLA and corrects the comparison with MPC and Pensieve. The delay rule is named as a dash.js rule that differs from the pause rule of the paper.
+- v6 (2026-10-20): corrections after the review of the implementation PR. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. Before, a cap at the threshold of the current rung picked that rung again. The conversion after a ladder or buffer target change runs after the selector adds the elapsed time. The `bufferTarget` row states the negative placeholder exception. The drawbacks and the analysis state the stall comparison with `createThroughputSelector`. The selector runs the starvation guard when the input has `segmentDuration`, with one pass at `starvationSafetyFactor`, and `BolaSelectorOptions` gains that option. Three more differences from dash.js. The analysis attributes the 10 second oscillation finding to the original BOLA and corrects the comparison with MPC and Pensieve. The delay rule is named as a dash.js rule that differs from the pause rule of the paper.
 
 ## Final Decision
 
@@ -302,4 +302,4 @@ Accepted on 2026-10-19. The RFC PR #505 carries the export surface above as the 
 
 The bitrate selector RFC #526 defines the type. BOLA is its second implementation.
 
-Amended on 2026-10-20 (v6). The selector runs the starvation guard of the throughput selector when the input has `segmentDuration`. This replaces the first bullet above. The BOLA rules still ignore `playbackRate`, and the guard reads the field as in the throughput selector. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. The conversion runs after the selector adds the elapsed time. The package documentation states the stall comparison with `createThroughputSelector`.
+Amended on 2026-10-20 (v6). The selector runs the starvation guard when the input has `segmentDuration`, with one pass at `starvationSafetyFactor`. The default is 0.7, from dash.js. This replaces the first bullet above. The BOLA rules still ignore `playbackRate`, and the guard reads the field as in the throughput selector. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. The conversion runs after the selector adds the elapsed time. The package documentation states the stall comparison with `createThroughputSelector`.

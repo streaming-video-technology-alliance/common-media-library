@@ -106,12 +106,12 @@ The [implementation PR](https://github.com/streaming-video-technology-alliance/c
 | L2, cap 30 s | BOLA | 2.30 | 0.37 | 10.5 |
 | L2, cap 30 s | `createThroughputSelector` | 1.61 | 0.02 | 10.2 |
 
-The throughput selector has a starvation guard, and the simple baseline has none. Finding 3 applies to the simple baseline only. The real-buffer guard of this analysis removes at most a third of the stalls. The difference to the throughput selector is larger. The selector runs the starvation guard of the throughput selector for this reason. The implementation PR reports the stall counts with the guard on and off.
+The throughput selector has a starvation guard, and the simple baseline has none. Finding 3 applies to the simple baseline only. The real-buffer guard of this analysis removes at most a third of the stalls. The difference to the throughput selector is larger. The selector runs the starvation guard for this reason. The implementation PR reports the stall counts with the guard off and at three factors.
 
 ## Costs and risks
 
 - BOLA suits large buffers best. In the follow-up paper, a throughput rule oscillates less than the original BOLA with a 10 s buffer. Low-latency streams often have such a small buffer. The buffer expansion and the insufficient buffer rule of the paper reduce the oscillation, and the selector has both. The dash.js player still runs BOLA only above a buffer level and uses a throughput rule below it.
-- Without a guard, BOLA stalls more often than `createThroughputSelector` in the simulation of the implementation PR. The selector runs the starvation guard of that selector when the input has `segmentDuration`. A player that omits the field owns the stall risk.
+- Without a guard, BOLA stalls more often than `createThroughputSelector` in the simulation of the implementation PR. The selector runs the starvation guard when the input has `segmentDuration`. A player that omits the field owns the stall risk.
 - BOLA keeps state. The player calls `sample` for every download and `reset` after a seek, as the `BitrateSelector` type requires.
 - The pure core is small. Most of `BolaRule.js` handles player wiring. That part contains the tuning decisions and the defects.
 - The port derives from BSD-3 code and needs attribution. The RFC names the files under Packaging.
@@ -130,7 +130,7 @@ The rule keeps one state record for each stream and media type. The state is one
 
 The rule mutates its state when a segment loads or when a request metric arrives. It also mutates its state on a seek, a buffer-empty event, a quality change request, and an abandoned download. A change of the minimum bitrate, the maximum bitrate, or the video element size resets it.
 
-dash.js combines BOLA with a throughput rule. The default strategy runs the throughput rule first. It switches to BOLA when the buffer reaches a threshold. It switches back when the buffer falls below half of that threshold. The commit of the issue used the default buffer time as the threshold, which is 18 s. The `development` branch uses the new setting `hybridSwitchBufferTime`, which is 12 s by default. `InsufficientBufferRule` lowers the rung when the real buffer is small. The rule caps the bitrate at `safeThroughput * bufferLevel / segmentDuration`, and it drops to the lowest rung after a buffer-empty event. The rule is on by default.
+dash.js combines BOLA with a throughput rule. The default strategy runs the throughput rule first. It switches to BOLA when the buffer reaches a threshold. It switches back when the buffer falls below half of that threshold. The commit of the issue used the default buffer time as the threshold, which is 18 s. The `development` branch uses the new setting `hybridSwitchBufferTime`, which is 12 s by default. `InsufficientBufferRule` lowers the rung when the real buffer is small. The rule caps the bitrate at `safeThroughput * bufferLevel / segmentDuration`, and it drops to the lowest rung after a buffer-empty event. The safe throughput is 0.7 of the estimate. The rule waits for two segments after a start or a seek, and it is off in low-latency mode. The rule is on by default.
 
 ### What CML ports and what stays in the player
 
@@ -140,7 +140,7 @@ dash.js combines BOLA with a throughput rule. The default strategy runs the thro
 | The startup and steady state machine | Settings, metrics, and the rules context |
 | The placeholder buffer, BOLA-O, and the delay | Ladder filtering, CMSD limits, and DRM filtering |
 | The rescale after a buffer target change | The combination of BOLA with other rules |
-| The cap of `InsufficientBufferRule`, as the shared starvation guard | The drop to the lowest rung after a buffer-empty event |
+| The cap and the two-segment wait of `InsufficientBufferRule`, as the starvation guard | The low-latency switch of that rule. A player omits `segmentDuration` instead. |
 
 ### Defects found in the reference
 
