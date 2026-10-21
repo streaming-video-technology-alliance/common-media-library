@@ -33,7 +33,7 @@ export const C2paStatusCode = {
 	CLAIM_MALFORMED: 'claim.malformed',
 	/** The manifest has more than one claim box (§15.6.1) */
 	CLAIM_MULTIPLE: 'claim.multiple',
-	/** The manifest has no hard binding assertion (§15.10.3.1) */
+	/** The manifest has no hard binding assertion (§15.10.1.2) */
 	CLAIM_HARD_BINDINGS_MISSING: 'claim.hardBindings.missing',
 	/** BMFF hash assertion or Merkle structure is malformed (§15.2.2.3) */
 	ASSERTION_BMFFHASH_MALFORMED: 'assertion.bmffHash.malformed',

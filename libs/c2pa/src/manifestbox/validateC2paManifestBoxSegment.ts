@@ -78,11 +78,10 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const assertion = assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL)
 	if (!assertion) return EMPTY_BMFF_HASH
 
-	// §19.3: the assertion has a hash that covers the bytes of the segment. Without a hash, nothing binds the segment content.
+	// §19.3.1
 	const data = extractAssertionData(assertion.data)
 	if (!data) return { ...EMPTY_BMFF_HASH, malformed: true }
 
-	// The bmff-hash-map defines the content hash only as `hash`. A `value` field does not replace it.
 	const hashBytes = toUint8Array(data['hash'])
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
@@ -220,7 +219,7 @@ export async function validateC2paManifestBoxSegment(
 		state?.lastSequenceNumber == null ||
 		(sequenceNumber !== null && sequenceNumber > state.lastSequenceNumber)
 
-	// §19.3: the manifest of each segment has a c2pa.hash.bmff.v3 assertion. Without it, nothing binds the segment content.
+	// §19.3.1: the manifest of each segment has a c2pa.hash.bmff.v3 assertion. Without it, nothing binds the segment content.
 	const bmffHashMissing = internalData !== null && !internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
 	let bmffHashMatches = !bmffHashMissing
 	if (bmff.hashBytes !== null) {
@@ -248,7 +247,7 @@ export async function validateC2paManifestBoxSegment(
 
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
 	if (bmff.malformed) errorCodes.push(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
-	// §15.10.3.1: a manifest without any hard binding assertion is rejected.
+	// §15.10.1.2: a manifest without any hard binding assertion is rejected.
 	if (integrity?.hardBindingCount === 0) errorCodes.push(C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING)
 
 	// The continuity check does not gate the advance.

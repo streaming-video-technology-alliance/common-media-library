@@ -10,9 +10,9 @@ and this project adheres to
 
 ### Security
 
-- `validateC2paManifestBoxSegment` now fails a segment whose manifest has no `c2pa.hash.bmff.v3` assertion. The result includes `LiveVideoStatusCode.SEGMENT_INVALID`. Before, such a signed segment returned `isValid: true` and updated `nextManifestId` and `nextState`, although nothing bound the segment content to the manifest ([#522](https://github.com/streaming-video-technology-alliance/common-media-library/issues/522)).
-- `validateC2paManifestBoxSegment` now fails a segment whose `c2pa.hash.bmff.v3` assertion is not a map or has no `hash`. The result includes `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`. Before, the function skipped the content hash check for such an assertion.
-- `validateC2paManifestBoxSegment` no longer reads a `value` field of the `c2pa.hash.bmff.v3` assertion as the content hash. The `bmff-hash-map` of C2PA defines the content hash only as `hash`. An assertion with a `value` field and a missing or null `hash` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
+- `validateC2paManifestBoxSegment` now fails a segment whose manifest has no `c2pa.hash.bmff.v3` assertion. The result includes `LiveVideoStatusCode.SEGMENT_INVALID` ([#522](https://github.com/streaming-video-technology-alliance/common-media-library/issues/522)).
+- `validateC2paManifestBoxSegment` now fails a segment whose `c2pa.hash.bmff.v3` assertion is not a map or has no `hash`. The result includes `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
+- `validateC2paManifestBoxSegment` no longer reads a `value` field of the `c2pa.hash.bmff.v3` assertion as the content hash. An assertion with a `value` field and a missing or null `hash` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
 
 ### Added
 
