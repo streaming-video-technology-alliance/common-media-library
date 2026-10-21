@@ -2,6 +2,16 @@
 
 Common Media Client Data (CMCD) encoding and decoding.
 
+## When to use
+
+- Add a CMCD report to a segment request as a query string or as headers: `appendCmcdQuery`, `appendCmcdHeaders`, `toCmcdQuery`, `toCmcdHeaders`
+- Encode or decode CMCD key and value pairs: `encodeCmcd`, `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`
+- Report CMCD v2 events and time intervals to a collector: `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
+- Validate a CMCD payload against CTA-5004: `validateCmcd`, `validateCmcdEventReport`
+- Capture the CMCD that a player sends in a test: `CmcdReportRecorder`
+
+Do not write your own CMCD serializer, key sorter, header grouper, or event reporter. Open an issue for a key or a reporting mode that is missing.
+
 ## Installation
 
 ```bash

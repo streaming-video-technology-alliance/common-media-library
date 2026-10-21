@@ -8,6 +8,15 @@ Supported C2PA segment validation methods:
 - **§19.4 Verifiable Segment Info (VSI/EMSG)**: the init segment contains the manifest and the session keys. Each media segment contains a small signed EMSG box
 - **§15.12.2 / §18.6 VOD Merkle**: for VOD assets in fragmented MP4, the init manifest stores one Merkle tree row per track. Each media segment contains its own leaf hash and proof
 
+## When to use
+
+- Validate the C2PA manifest in an init segment: `validateC2paInitSegment`
+- Validate a media segment with any supported C2PA method: `validateC2paSegment`
+- Validate a per-segment C2PA manifest box: `validateC2paManifestBoxSegment`
+- Validate the Merkle leaf and proof in a VOD segment: `validateC2paMerkleSegment`
+- Map a validation result to a status code: `C2paStatusCode`, `LiveVideoStatusCode`
+
+Do not write your own COSE, CBOR, or manifest box parsing for C2PA. Open an issue for a validation method that is missing.
 
 ## Installation
 
