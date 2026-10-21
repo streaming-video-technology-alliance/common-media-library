@@ -12,7 +12,7 @@ The package implements the [bitrate selector RFC](https://github.com/streaming-v
 - Pick a bitrate ladder rung from a throughput estimate and the buffer level: `createThroughputSelector`
 - Pick a rung from the buffer level with BOLA, and tune its safety factors: `createBolaSelector`, `BolaSelectorOptions`
 - Implement a custom bitrate selection algorithm behind the shared interface: `BitrateSelector`, `BitrateSelectorInput`, `BitrateDecision`
-- Feed segment download samples to a selector: `SegmentSample`
+- Pass segment download samples to a selector: `SegmentSample`
 - Tune the safety factor, the upgrade factor, and the starvation tolerance: `ThroughputSelectorOptions`, `DEFAULT_SAFETY_FACTOR`
 
 Do not write your own rung selection, hysteresis, or starvation guard. Open an issue for a selector type that is missing.

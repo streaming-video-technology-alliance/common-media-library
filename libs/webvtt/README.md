@@ -6,7 +6,7 @@ WebVTT parsing and rendering functionality.
 
 - Parse a WebVTT file or segment into cues, regions, and styles: `parseWebVtt`, `WebVttParser`
 - Parse WebVTT chunks as the bytes arrive from a stream: `WebVttTransformStream`, `WebVttTransformer`
-- Read the X-TIMESTAMP-MAP header of an HLS WebVTT segment: `TimestampMap`, `WebVttTimestampMapResult`
+- Read the X-TIMESTAMP-MAP header of an HLS WebVTT segment: `WebVttParser`, `TimestampMap`
 - Create native VTTCue and VTTRegion objects from parsed cues: `toVttCue`, `toVttRegion`
 - Build cues and regions without a browser, for tests or servers: `createWebVttCue`, `createWebVttRegion`
 

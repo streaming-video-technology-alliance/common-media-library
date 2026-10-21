@@ -7,7 +7,7 @@ Common Media Server Data (CMSD) encoding and decoding.
 - Decode the CMSD-Static and CMSD-Dynamic response headers: `decodeCmsdStatic`, `decodeCmsdDynamic`
 - Encode CMSD headers on a server or an edge: `encodeCmsdStatic`, `encodeCmsdDynamic`
 - Type the CMSD keys and values that a player reads: `CmsdStatic`, `CmsdDynamic`, `CmsdObjectType`
-- Tell a custom key from a standard key: `isCmsdCustomKey`
+- Distinguish a custom key from a standard key: `isCmsdCustomKey`
 
 Do not write your own CMSD header parser or serializer. Open an issue for a key that is missing.
 

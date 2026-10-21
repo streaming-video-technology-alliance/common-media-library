@@ -8,7 +8,7 @@ metadata:
 
 # Common Media Library
 
-The Common Media Library (CML) is a set of TypeScript packages for web video players. Each package implements one media specification. The packages have no dependencies outside CML and are tree-shakeable, so a player pays only for the functions that it imports.
+The Common Media Library (CML) is a set of TypeScript packages for web video players. Each package implements one media specification. The packages have no dependencies outside CML. They are tree-shakeable, so a bundle contains only the functions that the player imports.
 
 ## Before you write code
 
@@ -16,7 +16,7 @@ The Common Media Library (CML) is a set of TypeScript packages for web video pla
 2. If a package covers the task, install it and import the named exports. Do not write the parser, encoder, estimator, or selector yourself, even when the code looks short.
 3. If the package is installed, read `node_modules/@svta/cml-<name>/dist/index.d.ts` for the exact signatures. If it is not installed, read the reference file of the package under `references/`.
 
-Install one package with npm. npm installs the CML peer dependencies of the package with it.
+Install the package with the package manager of the project. If that package manager does not install peer dependencies, add the CML peers that the package lists.
 
 ```bash
 npm i @svta/cml-iso-bmff
@@ -24,13 +24,13 @@ npm i @svta/cml-iso-bmff
 
 ## When no package covers the task
 
-Write the smallest piece in the project. Open a feature request at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=feature_request.md with the use case. Leave the issue URL in a comment next to the code. Do not copy source from a cml package into the project.
+Write the smallest piece in the project. Draft a feature request with the use case and ask the user to file it at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=feature_request.md. After the user files it, put the issue URL in a comment next to the code. Do not copy source from a cml package into the project.
 
 ## When a cml package has a bug
 
 1. Confirm the bug against the built package with a minimal script.
-2. Open a bug report at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=bug_report.md with that script.
-3. Work around the bug with a wrapper around the call or with a local patch. Mark the workaround with a TODO and the issue URL.
+2. Draft a bug report with that script and ask the user to file it at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=bug_report.md.
+3. Avoid the bug with a wrapper around the call or with a local patch. Mark that code with a TODO. After the user files the report, add the issue URL to the TODO.
 
 Do not reimplement the function and do not copy the source. A fix in CML reaches every player. A copy in the project becomes the player's own spec implementation to maintain.
 
@@ -58,7 +58,7 @@ Bitrate selection functionality
 - Pick a bitrate ladder rung from a throughput estimate and the buffer level: `createThroughputSelector`
 - Pick a rung from the buffer level with BOLA, and tune its safety factors: `createBolaSelector`, `BolaSelectorOptions`
 - Implement a custom bitrate selection algorithm behind the shared interface: `BitrateSelector`, `BitrateSelectorInput`, `BitrateDecision`
-- Feed segment download samples to a selector: `SegmentSample`
+- Pass segment download samples to a selector: `SegmentSample`
 - Tune the safety factor, the upgrade factor, and the starvation tolerance: `ThroughputSelectorOptions`, `DEFAULT_SAFETY_FACTOR`
 
 Do not write your own rung selection, hysteresis, or starvation guard. Open an issue for a selector type that is missing.
@@ -70,7 +70,7 @@ Reference: references/abr.md
 C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF/MP4 containers
 
 - Validate the C2PA manifest in an init segment: `validateC2paInitSegment`
-- Validate a media segment with any supported C2PA method: `validateC2paSegment`
+- Validate a live segment with the VSI and EMSG method and the session keys of the init segment: `validateC2paSegment`
 - Validate a per-segment C2PA manifest box: `validateC2paManifestBoxSegment`
 - Validate the Merkle leaf and proof in a VOD segment: `validateC2paMerkleSegment`
 - Map a validation result to a status code: `C2paStatusCode`, `LiveVideoStatusCode`
@@ -83,10 +83,10 @@ Reference: references/c2pa.md
 
 CMAF Hypothetical Application Model (HAM) functionality
 
-- Parse a DASH MPD into the CMAF-HAM presentation model: `dashToHam`, `parseDashManifest`
-- Parse an HLS multivariant playlist into the CMAF-HAM presentation model: `hlsToHam`, `parseHlsManifest`
+- Parse a DASH MPD into the CMAF-HAM presentation model: `dashToHam`
+- Parse an HLS multivariant playlist into the CMAF-HAM presentation model: `hlsToHam`
 - Convert one manifest format to the other through the model: `hamToDash`, `hamToHls`
-- Read the codec, duration, timescale, or segments of a track: `getCodec`, `getDuration`, `getTimescale`, `getSegments`
+- Collect the tracks of a presentation, a selection set, or a switching set: `getTracksFromPresentation`, `getTracksFromSelectionSet`, `getTracksFromSwitchingSet`
 - Validate a presentation, a switching set, or a track: `validatePresentation`, `validateSwitchingSet`, `validateTrack`
 
 Do not write your own DASH to HLS converter or manifest object model. Open an issue for a manifest feature that the model does not carry.
@@ -114,7 +114,7 @@ Common Media Server Data (CMSD) encoding and decoding
 - Decode the CMSD-Static and CMSD-Dynamic response headers: `decodeCmsdStatic`, `decodeCmsdDynamic`
 - Encode CMSD headers on a server or an edge: `encodeCmsdStatic`, `encodeCmsdDynamic`
 - Type the CMSD keys and values that a player reads: `CmsdStatic`, `CmsdDynamic`, `CmsdObjectType`
-- Tell a custom key from a standard key: `isCmsdCustomKey`
+- Distinguish a custom key from a standard key: `isCmsdCustomKey`
 
 Do not write your own CMSD header parser or serializer. Open an issue for a key that is missing.
 
@@ -137,10 +137,9 @@ Reference: references/content-steering.md
 
 Common functionality for CTA standards including CTA-608/CEA-608
 
-- Share the object type, stream type, and streaming format values between CMCD and CMSD: `CmObjectType`, `CmStreamType`, `CmStreamingFormat`
-- Tell a token field from a string field by its key, and check a value: `isTokenField`, `isValid`
+- Type a custom key that CMCD and CMSD share: `CmCustomKey`
 
-Do not import this package into a player directly. Use `@svta/cml-cmcd`, `@svta/cml-cmsd`, or `@svta/cml-608`, which depend on this package.
+Do not import this package into a player directly. Use `@svta/cml-cmcd` or `@svta/cml-cmsd`.
 
 Reference: references/cta.md
 
@@ -163,7 +162,7 @@ Digital Rights Management (DRM) functionality
 - Parse the pssh boxes in init data and find the one for a key system: `parsePsshList`, `getPsshForKeySystem`, `getPsshData`
 - Request key system access with a configuration built from codecs and robustness levels: `getKeySystemAccess`, `createMediaKeySystemConfiguration`, `getSupportedKeySystemConfiguration`
 - Read the license request and its headers from an EME key message: `getLicenseRequestFromMessage`, `getRequestHeadersFromMessage`
-- Read the license server URL from a ContentProtection element or a key message: `getLicenseServerUrl`, `getLicenseServerUrlFromContentProtection`
+- Read the license server URL from a ContentProtection element or FairPlay init data: `getLicenseServerUrl`, `getLicenseServerUrlFromContentProtection`
 - Build FairPlay init data and decode a FairPlay license: `concatInitDataIdAndCertificate`, `extractContentId`, `decodeFairPlayLicense`
 - Name key systems, UUIDs, encryption schemes, and robustness levels: `WIDEVINE_KEY_SYSTEM`, `PLAYREADY_UUID`, `EncryptionScheme`, `HW_SECURE_ALL`
 
@@ -188,10 +187,9 @@ Reference: references/error-codes.md
 
 ID3 tag parsing functionality
 
-- Read the ID3 frames in an HLS timed metadata sample or an emsg payload: `getId3Frames`, `getId3Data`
-- Decode one frame, including text frames and private frames: `decodeId3Frame`, `decodeId3TextFrame`
-- Read the PRIV timestamp that HLS uses to map ID3 time to media time: `getId3Timestamp`, `isId3TimestampFrame`
-- Check that a buffer holds an ID3 tag: `canParseId3`, `isId3Header`, `isId3Footer`
+- Read the ID3 frames in an HLS timed metadata sample or an emsg payload: `getId3Frames`, `Id3Frame`
+- Read the PRIV timestamp that HLS uses to map ID3 time to media time: `getId3Timestamp`
+- Check that a buffer holds an ID3 tag: `canParseId3`
 - Match the ID3 emsg scheme in a DASH event stream: `ID3_SCHEME_ID_URI`
 
 Do not write your own ID3 header, size, or frame parser. Open an issue for a frame type that is missing.
@@ -217,7 +215,7 @@ ISO Base Media File Format (ISOBMFF) parsing functionality
 - Read the track timescale, codec, or default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTfhd`, `readTrun`
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
-- Parse boxes from a stream as the bytes arrive: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
+- Write boxes to a ReadableStream: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
 - Write or patch boxes, such as inserting emsg or rewriting tfdt: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`
 - Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
 
@@ -231,8 +229,8 @@ Common Media Request and Response types
 
 - Type a segment, manifest, or license request that a player passes through a plugin: `CommonMediaRequest`
 - Type the response that comes back, with timing and headers: `CommonMediaResponse`
-- Adapt fetch or XMLHttpRequest to the common request and response types: `Requester`
-- Hook into requests and responses, for example to add CMCD or to read CMSD: `RequestInterceptor`, `ResponseInterceptor`
+- Type the function that performs a request, so fetch or XMLHttpRequest can sit behind it: `Requester`
+- Intercept requests and responses, for example to add CMCD or to read CMSD: `RequestInterceptor`, `ResponseInterceptor`
 
 Do not define your own request and response types for a plugin interface. Open an issue for a field that is missing.
 
@@ -245,8 +243,6 @@ RFC8941 Structured Field Values implementation
 - Decode an RFC 8941 header such as CMCD, CMSD, or Priority into items, lists, or dictionaries: `decodeSfDict`, `decodeSfList`, `decodeSfItem`
 - Encode a dictionary, a list, or an item as a structured field header: `encodeSfDict`, `encodeSfList`, `encodeSfItem`
 - Represent an item with parameters or a token: `SfItem`, `SfToken`
-- Parse one component of a field, such as a bare item or an inner list: `parseBareItem`, `parseInnerList`, `parseParameters`
-- Serialize one component of a field: `serializeBareItem`, `serializeInnerList`, `serializeParams`
 
 Do not write your own structured field tokenizer or serializer. Open an issue for an RFC 8941 form that fails to parse.
 
@@ -286,7 +282,7 @@ WebVTT parsing and rendering functionality
 
 - Parse a WebVTT file or segment into cues, regions, and styles: `parseWebVtt`, `WebVttParser`
 - Parse WebVTT chunks as the bytes arrive from a stream: `WebVttTransformStream`, `WebVttTransformer`
-- Read the X-TIMESTAMP-MAP header of an HLS WebVTT segment: `TimestampMap`, `WebVttTimestampMapResult`
+- Read the X-TIMESTAMP-MAP header of an HLS WebVTT segment: `WebVttParser`, `TimestampMap`
 - Create native VTTCue and VTTRegion objects from parsed cues: `toVttCue`, `toVttRegion`
 - Build cues and regions without a browser, for tests or servers: `createWebVttCue`, `createWebVttRegion`
 
@@ -301,7 +297,7 @@ XML parsing utilities
 - Parse a DASH MPD or another XML document into a node tree: `parseXml`
 - Find elements by name anywhere in the tree: `getElementsByName`
 - Serialize a node tree back to an XML string: `serializeXml`
-- Control attribute and namespace handling during a parse: `XmlParseOptions`
+- Keep whitespace or comments, or start the parse at an offset: `XmlParseOptions`
 
 Do not write your own XML tokenizer for manifests. Open an issue for an XML form that fails to parse.
 

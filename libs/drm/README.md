@@ -7,7 +7,7 @@ Digital Rights Management (DRM) functionality.
 - Parse the pssh boxes in init data and find the one for a key system: `parsePsshList`, `getPsshForKeySystem`, `getPsshData`
 - Request key system access with a configuration built from codecs and robustness levels: `getKeySystemAccess`, `createMediaKeySystemConfiguration`, `getSupportedKeySystemConfiguration`
 - Read the license request and its headers from an EME key message: `getLicenseRequestFromMessage`, `getRequestHeadersFromMessage`
-- Read the license server URL from a ContentProtection element or a key message: `getLicenseServerUrl`, `getLicenseServerUrlFromContentProtection`
+- Read the license server URL from a ContentProtection element or FairPlay init data: `getLicenseServerUrl`, `getLicenseServerUrlFromContentProtection`
 - Build FairPlay init data and decode a FairPlay license: `concatInitDataIdAndCertificate`, `extractContentId`, `decodeFairPlayLicense`
 - Name key systems, UUIDs, encryption schemes, and robustness levels: `WIDEVINE_KEY_SYSTEM`, `PLAYREADY_UUID`, `EncryptionScheme`, `HW_SECURE_ALL`
 

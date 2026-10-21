@@ -12,7 +12,7 @@ Supported C2PA segment validation methods:
 ## When to use
 
 - Validate the C2PA manifest in an init segment: `validateC2paInitSegment`
-- Validate a media segment with any supported C2PA method: `validateC2paSegment`
+- Validate a live segment with the VSI and EMSG method and the session keys of the init segment: `validateC2paSegment`
 - Validate a per-segment C2PA manifest box: `validateC2paManifestBoxSegment`
 - Validate the Merkle leaf and proof in a VOD segment: `validateC2paMerkleSegment`
 - Map a validation result to a status code: `C2paStatusCode`, `LiveVideoStatusCode`

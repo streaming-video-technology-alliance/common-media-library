@@ -8,7 +8,7 @@ ISO Base Media File Format (ISO BMFF) parsing.
 - Read the track timescale, codec, or default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTfhd`, `readTrun`
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
-- Parse boxes from a stream as the bytes arrive: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
+- Write boxes to a ReadableStream: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
 - Write or patch boxes, such as inserting emsg or rewriting tfdt: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`
 - Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
 

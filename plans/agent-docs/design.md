@@ -31,7 +31,7 @@ Do not write your own box parser, box walker, or box writer. Open an issue for a
 
 Rules for the section:
 
-- Two to eight bullets. Each bullet is one task, written as the phrase a developer types to an agent. Two packages, cta and request, have only two tasks.
+- One to eight bullets. Each bullet is one task, written as the phrase a developer types to an agent. Two packages, cta and request, have only two tasks.
 - The task phrase comes first and must not contain a colon. The entry points follow the colon, in backticks, separated by commas.
 - Backticks before the colon are free text, such as box names. Backticks after the colon are identifiers and must be exports of the package.
 - A closing paragraph follows the bullets. It names what the agent must not write itself and what to do about a gap.
@@ -77,7 +77,7 @@ A link is relative when its target has no scheme, does not start with `#`, and d
 
 ### Errors
 
-The section parser throws when the heading is missing, when the bullet count is outside two to eight, when a bullet has no colon, when the closing paragraph is missing, or when an identifier after the colon is not an export. The message names the file path, the bullet, and the expected shape. The test and the generator share the parser.
+The section parser throws when the heading is missing, when the bullet count is outside one to eight, when a bullet has no colon, when the closing paragraph is missing, or when an identifier after the colon is not an export. The message names the file path, the bullet, and the expected shape. The test and the generator share the parser. The parser also throws when a bullet names an export that the API report marks `@internal`.
 
 An export is any line of the API report that starts with `export`, then one of `function`, `const`, `class`, or `type`, then a name. The reports today contain only these four kinds.
 

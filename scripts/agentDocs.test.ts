@@ -61,7 +61,7 @@ describe('parseWhenToUse', () => {
 	})
 
 	it('throws when there are too few or too many bullets', () => {
-		throws(() => parseWhenToUse('## When to use\n\n- One: `a`\n\nClosing.\n', file), /the section has 1 bullets/)
+		throws(() => parseWhenToUse('## When to use\n\n## Installation\n', file), /the section has 0 bullets/)
 		const many = Array.from({ length: 9 }, (_, i) => `- Task ${i}: \`a\``).join('\n')
 		throws(() => parseWhenToUse(`## When to use\n\n${many}\n\nClosing.\n`, file), /the section has 9 bullets/)
 	})
@@ -72,29 +72,44 @@ describe('parseWhenToUse', () => {
 })
 
 describe('readExports', () => {
-	it('collects function, const, class, and type names', () => {
+	it('maps function, const, class, and type names to a release tag', () => {
 		const report = '```ts\n\nexport function readBoxes(): void;\n\nexport const DATA = 1;\n\nexport class Box {}\n\nexport type Emsg = {};\n\n// @public\nexport function readBoxes(a: number): void;\n```'
-		deepEqual([...readExports(report)].sort(), ['Box', 'DATA', 'Emsg', 'readBoxes'])
+		deepEqual([...readExports(report)].sort(), [['Box', 'public'], ['DATA', 'public'], ['Emsg', 'public'], ['readBoxes', 'public']])
 	})
 
-	it('collects the names inside an export list and takes the name after as', () => {
+	it('maps the names inside an export list to public and takes the name after as', () => {
 		const report = '```ts\n\nexport { Event_2 as Event }\n\nexport { XmlNode }\n```'
-		deepEqual([...readExports(report)].sort(), ['Event', 'XmlNode'])
+		deepEqual([...readExports(report)].sort(), [['Event', 'public'], ['XmlNode', 'public']])
+	})
+
+	it('maps a name to the release tag on the line above its declaration', () => {
+		const report = '```ts\n\n// @internal\nexport function hidden(): void;\n\n// @beta (undocumented)\nexport const LATER = 1;\n\n// @public\nexport function shown(): void;\n```'
+		deepEqual([...readExports(report)].sort(), [['LATER', 'beta'], ['hidden', 'internal'], ['shown', 'public']])
 	})
 })
 
 describe('checkExports', () => {
+	const all = new Map([['readBoxes', 'public'], ['findBox', 'public'], ['writeEmsg', 'public']])
+
 	it('throws for an identifier that is not an export and names the bullet', () => {
 		const section = parseWhenToUse(readme, file)
 		throws(
-			() => checkExports(section, new Set(['readBoxes', 'writeEmsg']), file),
+			() => checkExports(section, new Map([['readBoxes', 'public'], ['writeEmsg', 'public']]), file),
 			/libs\/example\/README\.md: "findBox" in the bullet "Parse boxes from a segment: `readBoxes`, `findBox`" is not an export/,
+		)
+	})
+
+	it('throws for an identifier that the API report marks as internal', () => {
+		const section = parseWhenToUse('## When to use\n\n- Hide a box: `hidden`\n\nClosing.\n', file)
+		throws(
+			() => checkExports(section, readExports('```ts\n\n// @internal\nexport function hidden(): void;\n```'), file),
+			/libs\/example\/README\.md: "hidden" in the bullet "Hide a box: `hidden`" is marked @internal\. Name a public entry point\./,
 		)
 	})
 
 	it('accepts a section whose identifiers are all exports', () => {
 		const section = parseWhenToUse(readme, file)
-		checkExports(section, new Set(['readBoxes', 'findBox', 'writeEmsg']), file)
+		checkExports(section, all, file)
 	})
 })
 

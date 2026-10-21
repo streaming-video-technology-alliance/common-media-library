@@ -12,9 +12,9 @@ export const indexEnd = '<!-- packages:end -->'
 const installCommand = 'npx skills add streaming-video-technology-alliance/common-media-library'
 
 const sectionHeading = '## When to use'
-const minBullets = 2
+const minBullets = 1
 const maxBullets = 8
-const exportLine = /^export (?:function|const|class|type) ([A-Za-z_$][\w$]*)/gm
+const exportLine = /^(?:\/\/ @(\w+).*\n)?export (?:function|const|class|type) ([A-Za-z_$][\w$]*)/gm
 const exportList = /^export \{([^}]*)\}/gm
 const identifier = /`([^`]+)`/g
 const identifierShape = /^[A-Za-z_$][\w$]*$/
@@ -125,29 +125,49 @@ export function parseWhenToUse(readme: string, file: string): WhenToUse {
 	return { bullets, closing: closing.join('\n'), text: body.join('\n').trim() }
 }
 
-/** Returns the names of every function, const, class, and type that an API report exports. */
-export function readExports(apiReport: string): Set<string> {
-	const names = new Set(Array.from(apiReport.matchAll(exportLine), m => m[1]))
+/**
+ * Returns the release tag of every function, const, class, and type that an API report exports.
+ * The tag is `'public'` when no tag line precedes the declaration. A name with several declarations
+ * has the tag `'internal'` only if every declaration is internal.
+ */
+export function readExports(apiReport: string): Map<string, string> {
+	const tags = new Map<string, string>()
+
+	const record = (name: string, tag: string): void => {
+		if (tags.get(name) === undefined || tags.get(name) === 'internal') {
+			tags.set(name, tag)
+		}
+	}
+
+	for (const m of apiReport.matchAll(exportLine)) {
+		record(m[2], m[1] ?? 'public')
+	}
 
 	for (const list of apiReport.matchAll(exportList)) {
 		for (const item of list[1].split(',')) {
 			const name = item.trim().split(/\s+as\s+/).pop()
 
 			if (name) {
-				names.add(name)
+				record(name, 'public')
 			}
 		}
 	}
 
-	return names
+	return tags
 }
 
-/** Throws when a bullet names an identifier that the package does not export. */
-export function checkExports(section: WhenToUse, exports: Set<string>, file: string): void {
+/** Throws when a bullet names an identifier that the package does not export or marks as internal. */
+export function checkExports(section: WhenToUse, exports: Map<string, string>, file: string): void {
 	for (const bullet of section.bullets) {
 		for (const name of bullet.exports) {
-			if (!exports.has(name)) {
+			const tag = exports.get(name)
+
+			if (tag === undefined) {
 				throw new Error(`${file}: "${name}" in the bullet "${bullet.text}" is not an export of the package. Check the API report under config/.`)
+			}
+
+			if (tag === 'internal') {
+				throw new Error(`${file}: "${name}" in the bullet "${bullet.text}" is marked @internal. Name a public entry point.`)
 			}
 		}
 	}
@@ -275,7 +295,7 @@ export function renderIndex(packages: PackageDocs[]): string {
 		'',
 		pkg.description,
 		'',
-		pkg.whenToUse.text,
+		rewriteLinks(pkg.whenToUse.text, `${pkg.folder}/README.md`, sourceUrl),
 		'',
 		`Reference: references/${pkg.slug}.md`,
 	].join('\n')).join('\n\n')
@@ -327,7 +347,7 @@ export function renderLlmsTxt(packages: PackageDocs[]): string {
 		'',
 		'## API reports',
 		'',
-		...packages.map(pkg => `- [${pkg.name} API report](${siteBase}llms/${pkg.slug}/api.md): every public export of ${pkg.name} with its signature`),
+		...packages.map(pkg => `- [${pkg.name} API report](${siteBase}llms/${pkg.slug}/api.md): every export of ${pkg.name} with its signature`),
 		'',
 		'## Optional',
 		'',
@@ -375,7 +395,7 @@ export function writeSite(outDir: string): void {
 	writeFileSync(path.join(outDir, 'llms-full.txt'), packages.map(pkg => renderReference(pkg, toUrl)).join('\n'))
 }
 
-if (import.meta.main) {
+if (process.argv[1] === import.meta.filename) {
 	const { values } = parseArgs({ options: { skill: { type: 'boolean' }, site: { type: 'string' } } })
 
 	if (!values.skill && values.site === undefined) {

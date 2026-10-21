@@ -65,7 +65,7 @@ The repository ships a skill that tells a coding agent which package covers a me
 npx skills add streaming-video-technology-alliance/common-media-library
 ```
 
-Agents that read documentation from the web can start at [llms.txt](https://streaming-video-technology-alliance.github.io/common-media-library/llms.txt).
+Agents that read documentation from the web can begin with [llms.txt](https://streaming-video-technology-alliance.github.io/common-media-library/llms.txt).
 
 ## Community
 
