@@ -31,7 +31,7 @@ Do not write your own box parser, box walker, or box writer. Open an issue for a
 
 Rules for the section:
 
-- One to eight bullets. Each bullet is one task, written as the phrase a developer types to an agent. Two packages, cta and request, have only two tasks.
+- One to eight bullets. Each bullet is one task, written as the phrase a developer types to an agent. The cta package has one task, because it has one public export.
 - The task phrase comes first and must not contain a colon. The entry points follow the colon, in backticks, separated by commas.
 - Backticks before the colon are free text, such as box names. Backticks after the colon are identifiers and must be exports of the package.
 - A closing paragraph follows the bullets. It names what the agent must not write itself and what to do about a gap.

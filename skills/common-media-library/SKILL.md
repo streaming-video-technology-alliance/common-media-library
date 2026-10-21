@@ -24,7 +24,7 @@ npm i @svta/cml-iso-bmff
 
 ## When no package covers the task
 
-Write the smallest piece in the project. Draft a feature request with the use case and ask the user to file it at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=feature_request.md. After the user files it, put the issue URL in a comment next to the code. Do not copy source from a cml package into the project.
+Write the smallest piece in the project. Draft a feature request with the use case and ask the user to file it at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=feature_request.md. After the user files it, put the issue URL in a comment next to the code. Do not copy source from a cml package into the project. Where the package index says to open an issue, draft it and ask the user to file it.
 
 ## When a cml package has a bug
 
