@@ -254,6 +254,11 @@ async function claimRef(label: string, assertionBox: Uint8Array): Promise<Record
 	return { url: `self#jumbf=c2pa.assertions/${label}`, hash: await sha256(assertionBox.subarray(8)), alg: 'sha256' }
 }
 
+// The claim `signature` field: the absolute URI of the signature box, which names the manifest label.
+function signatureUri(manifestLabel: string): string {
+	return `self#jumbf=/c2pa/${manifestLabel}/c2pa.signature`
+}
+
 // Wraps a manifest store in the C2PA `uuid` box and appends it to the media boxes.
 function buildManifestBoxSegment(manifestLabel: string, ...manifestContent: readonly Uint8Array[]): Uint8Array {
 	const manifestJumb = buildJumb(manifestLabel, ...manifestContent)
@@ -286,6 +291,7 @@ async function buildLiveSegment(
 	const assertionStore = buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion)
 	const claimCborBytes = claimOverride ?? encodeCbor({
 		instanceID: 'urn:uuid:live-segment-test-manifest',
+		signature: signatureUri('urn:uuid:live-segment-test-manifest'),
 		created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoAssertion), await claimRef('c2pa.hash.bmff.v3', bmffAssertion)],
 	})
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
@@ -305,7 +311,7 @@ describe('validateC2paManifestBoxSegment — BMFF hash assertion offset prefix (
 	async function buildSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
 		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData)))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
-		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', created_assertions: [await claimRef('c2pa.hash.bmff.v3', bmffAssertion)] }
+		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', signature: signatureUri('urn:uuid:bmff-hash-test-manifest'), created_assertions: [await claimRef('c2pa.hash.bmff.v3', bmffAssertion)] }
 		const claim = buildJumb('c2pa.claim', buildBox('cbor', encodeCbor(claimData)))
 		return buildManifestBoxSegment('urn:uuid:bmff-hash-test-manifest', claim, assertionStore)
 	}
@@ -404,6 +410,7 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 		const bmffBox = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData)))
 		const claimCborBytes = encodeCbor({
 			instanceID: 'urn:uuid:live-segment-test-manifest',
+			signature: signatureUri('urn:uuid:live-segment-test-manifest'),
 			created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoBox), await claimRef('c2pa.hash.bmff.v3', bmffBox)],
 		})
 		const segment = buildManifestBoxSegment('urn:uuid:live-segment-test-manifest',
@@ -422,6 +429,7 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 	// A claim that references an assertion the segment does not have. Only a decoded claim can report that.
 	const CLAIM_WITH_MISSING_ASSERTION = {
 		instanceID: 'urn:uuid:live-segment-test-manifest',
+		signature: signatureUri('urn:uuid:live-segment-test-manifest'),
 		created_assertions: [{ url: 'self#jumbf=c2pa.assertions/c2pa.session-keys', hash: new Uint8Array(32), alg: 'sha256' }],
 	}
 
@@ -547,7 +555,10 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 	})
 
 	type ChainedSegmentFields = {
-		readonly instanceId: string
+		/** The JUMBF label of the manifest. */
+		readonly manifestId: string
+		/** Replaces the claim instanceID, which by default differs from `manifestId`. */
+		readonly instanceId?: unknown
 		readonly sequenceNumber: number
 		readonly previousManifestId: string
 		readonly streamId?: string
@@ -564,8 +575,9 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 	}
 
 	// A manifest-box segment with a chained c2pa.livevideo.segment assertion and a flat hash. The claim
-	// declares every assertion in the store. Omit `sign` for an unsigned segment. The claim instanceID
-	// sets manifest.instanceId, which the validator returns as nextManifestId.
+	// declares every assertion in the store. Omit `sign` for an unsigned segment. The JUMBF label
+	// `manifestId` is the manifest identifier, which the validator returns as nextManifestId. The claim
+	// instanceID differs from it, so a validator that chains on the instanceID fails these tests.
 	async function buildChainedSegment(
 		fields: ChainedSegmentFields,
 		sign?: (claimCborBytes: Uint8Array) => Promise<Uint8Array>,
@@ -586,11 +598,12 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 			declaredAssertions.unshift(await declaredAssertion('c2pa.livevideo.segment', liveVideoAssertion))
 		}
 		const assertionStore = buildJumb('c2pa.assertions', ...assertions)
-		const claimCborBytes = encodeCbor({ instanceID: fields.instanceId, created_assertions: declaredAssertions })
+		const instanceID = 'instanceId' in fields ? fields.instanceId : `xmp.iid:${fields.manifestId}`
+		const claimCborBytes = encodeCbor({ instanceID, signature: signatureUri(fields.manifestId), created_assertions: declaredAssertions })
 		const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 		const manifestContent = [claim, assertionStore]
 		if (sign) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
-		return buildManifestBoxSegment(fields.instanceId, ...manifestContent)
+		return buildManifestBoxSegment(fields.manifestId, ...manifestContent)
 	}
 
 	function signed(fields: ChainedSegmentFields): Promise<Uint8Array> {
@@ -612,15 +625,15 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 
 	// Validates one signed segment at sequence number 5 as the first segment and returns its result.
 	async function firstSegmentAtFive() {
-		const r = await validateC2paManifestBoxSegment(await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 5, previousManifestId: INITIAL_MANIFEST_ID }), null)
+		const r = await validateC2paManifestBoxSegment(await signed({ manifestId: MANIFEST_ID_1, sequenceNumber: 5, previousManifestId: INITIAL_MANIFEST_ID }), null)
 		strictEqual(r.result.isValid, true)
 		return r
 	}
 
 	it('rejects a replayed segment instead of rewinding state on a failed segment', async () => {
-		const s1 = await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
-		const s2 = await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 2, previousManifestId: MANIFEST_ID_1 })
-		const s3 = await signed({ instanceId: MANIFEST_ID_3, sequenceNumber: 3, previousManifestId: MANIFEST_ID_2 })
+		const s1 = await signed({ manifestId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
+		const s2 = await signed({ manifestId: MANIFEST_ID_2, sequenceNumber: 2, previousManifestId: MANIFEST_ID_1 })
+		const s3 = await signed({ manifestId: MANIFEST_ID_3, sequenceNumber: 3, previousManifestId: MANIFEST_ID_2 })
 
 		// Normal forward playback advances the state.
 		const r1 = await validateC2paManifestBoxSegment(s1, null)
@@ -644,7 +657,7 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 
 	it('does not advance for an unsigned segment with a lower sequence number', async () => {
 		const r5 = await firstSegmentAtFive()
-		const rewind = await buildChainedSegment({ instanceId: INITIAL_MANIFEST_ID, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
+		const rewind = await buildChainedSegment({ manifestId: INITIAL_MANIFEST_ID, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
 
 		const rR = await validateC2paManifestBoxSegment(rewind, r5.nextManifestId, r5.nextState)
 
@@ -655,7 +668,7 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 
 	it('does not advance for an unsigned segment with a higher sequence number', async () => {
 		const r5 = await firstSegmentAtFive()
-		const forged = await buildChainedSegment({ instanceId: FORGED_MANIFEST_ID, sequenceNumber: HIGH_SEQUENCE_NUMBER, previousManifestId: MANIFEST_ID_1 })
+		const forged = await buildChainedSegment({ manifestId: FORGED_MANIFEST_ID, sequenceNumber: HIGH_SEQUENCE_NUMBER, previousManifestId: MANIFEST_ID_1 })
 
 		const rF = await validateC2paManifestBoxSegment(forged, r5.nextManifestId, r5.nextState)
 
@@ -666,7 +679,7 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 
 	it('does not advance for a signed segment whose media was tampered', async () => {
 		const r5 = await firstSegmentAtFive()
-		const tampered = tamperMedia(await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1 }))
+		const tampered = tamperMedia(await signed({ manifestId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1 }))
 
 		const rT = await validateC2paManifestBoxSegment(tampered, r5.nextManifestId, r5.nextState)
 
@@ -677,7 +690,7 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 
 	it('does not advance for a signed segment with a malformed content hash', async () => {
 		const r5 = await firstSegmentAtFive()
-		const malformed = await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1, bmffHash: 'not a byte string' })
+		const malformed = await signed({ manifestId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1, bmffHash: 'not a byte string' })
 
 		const rM = await validateC2paManifestBoxSegment(malformed, r5.nextManifestId, r5.nextState)
 
@@ -688,7 +701,7 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 
 	it('does not advance for an authentic segment on another stream', async () => {
 		const r5 = await firstSegmentAtFive()
-		const other = await signed({ instanceId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1, streamId: 'stream-other' })
+		const other = await signed({ manifestId: MANIFEST_ID_2, sequenceNumber: 6, previousManifestId: MANIFEST_ID_1, streamId: 'stream-other' })
 
 		const rO = await validateC2paManifestBoxSegment(other, r5.nextManifestId, r5.nextState)
 
@@ -698,7 +711,7 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 	})
 
 	it('does not update the state for a signed segment without a live video assertion', async () => {
-		const segment = await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID, omitLiveVideo: true })
+		const segment = await signed({ manifestId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID, omitLiveVideo: true })
 
 		const r = await validateC2paManifestBoxSegment(segment, null)
 
@@ -708,11 +721,11 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 	})
 
 	it('recovers after a missing segment through an authentic forward-moving segment', async () => {
-		const s1 = await signed({ instanceId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
+		const s1 = await signed({ manifestId: MANIFEST_ID_1, sequenceNumber: 1, previousManifestId: INITIAL_MANIFEST_ID })
 		// s2 is never delivered. s3 chains to it, so s3 fails only the continuity check.
-		const s3 = await signed({ instanceId: MANIFEST_ID_3, sequenceNumber: 3, previousManifestId: MANIFEST_ID_2 })
-		const s4 = await signed({ instanceId: MANIFEST_ID_4, sequenceNumber: 4, previousManifestId: MANIFEST_ID_3 })
-		const s5 = await signed({ instanceId: MANIFEST_ID_5, sequenceNumber: 5, previousManifestId: MANIFEST_ID_4 })
+		const s3 = await signed({ manifestId: MANIFEST_ID_3, sequenceNumber: 3, previousManifestId: MANIFEST_ID_2 })
+		const s4 = await signed({ manifestId: MANIFEST_ID_4, sequenceNumber: 4, previousManifestId: MANIFEST_ID_3 })
+		const s5 = await signed({ manifestId: MANIFEST_ID_5, sequenceNumber: 5, previousManifestId: MANIFEST_ID_4 })
 
 		const r1 = await validateC2paManifestBoxSegment(s1, null)
 		strictEqual(r1.result.isValid, true)
@@ -728,6 +741,160 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 		strictEqual(r4.result.isValid, true)
 		const r5 = await validateC2paManifestBoxSegment(s5, r4.nextManifestId, r4.nextState)
 		strictEqual(r5.result.isValid, true)
+	})
+})
+
+describe('validateC2paManifestBoxSegment — manifest identifier (§19.3)', () => {
+	const MANIFEST_ID_1 = 'urn:c2pa:1b3b77b7-552f-4a30-9ed5-8e1bf3410919'
+	const MANIFEST_ID_2 = 'urn:c2pa:2e52408b-4fbe-4557-8e84-e7e4a21a5107'
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	// A signed segment whose JUMBF label is `manifestId` and whose claim instanceID is `instanceId`.
+	// `signatureField` replaces the claim `signature` URI, which by default is the absolute form.
+	async function signedSegment(manifestId: string, instanceId: unknown, sequenceNumber: number, previousManifestId: string, signatureField: unknown = signatureUri(manifestId)): Promise<Uint8Array> {
+		const hash = await computeBmffHash(buildMediaBoxes(), { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const liveVideoData = { sequenceNumber, previousManifestId, streamId: 'stream-id', continuityMethod: 'c2pa.manifestId' }
+		const liveVideoAssertion = buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor(liveVideoData)))
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })))
+		const assertionStore = buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion)
+		const claimCborBytes = encodeCbor({
+			instanceID: instanceId,
+			signature: signatureField,
+			created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoAssertion), await claimRef('c2pa.hash.bmff.v3', bmffAssertion)],
+		})
+		const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
+		const signature = buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes)))
+		return buildManifestBoxSegment(manifestId, claim, assertionStore, signature)
+	}
+
+	it('chains previousManifestId to the JUMBF label of the previous manifest, not to its claim instanceID', async () => {
+		const s1 = await signedSegment(MANIFEST_ID_1, 'xmp.iid:0f84e6f5-e2ee-464c-8880-61f93a6f91b5', 1, 'urn:c2pa:initial')
+		const s2 = await signedSegment(MANIFEST_ID_2, 'xmp.iid:cae0ff34-2614-4fa8-bcd1-f754bddd9445', 2, MANIFEST_ID_1)
+
+		const r1 = await validateC2paManifestBoxSegment(s1, null)
+		strictEqual(r1.nextManifestId, MANIFEST_ID_1)
+		const r2 = await validateC2paManifestBoxSegment(s2, r1.nextManifestId, r1.nextState)
+
+		strictEqual(r2.result.isValid, true)
+		strictEqual(r2.nextManifestId, MANIFEST_ID_2)
+	})
+
+	// Replaces the first occurrence of `from` with `to`, which must have the same length. In a segment that
+	// signedSegment builds, the first occurrence of the manifest label is the JUMBF label, before the claim.
+	function relabel(segment: Uint8Array, from: string, to: string): Uint8Array {
+		const bytes = Buffer.from(segment)
+		const at = bytes.indexOf(from, 0, 'latin1')
+		ok(at >= 0 && from.length === to.length)
+		bytes.write(to, at, 'latin1')
+		return new Uint8Array(bytes)
+	}
+
+	it('does not take the identity of an omitted segment from a changed JUMBF label', async () => {
+		const MANIFEST_ID_3 = 'urn:c2pa:3000c55f-ac31-4e62-9cc3-7cb89c3509b6'
+		const s1 = await signedSegment(MANIFEST_ID_1, null, 1, 'urn:c2pa:initial')
+		// s2 is omitted. s3 chains to it.
+		const s3 = await signedSegment(MANIFEST_ID_3, null, 3, MANIFEST_ID_2)
+		// Only the label of s1 changes to the identifier of s2. Nothing is signed again.
+		const forged = relabel(s1, MANIFEST_ID_1, MANIFEST_ID_2)
+
+		const lastManifestId = 'urn:c2pa:initial'
+		const state = { lastStreamId: 'stream-id', lastSequenceNumber: 0 }
+		const r1 = await validateC2paManifestBoxSegment(forged, lastManifestId, state)
+		deepStrictEqual(r1.result.errorCodes, [C2paStatusCode.CLAIM_SIGNATURE_MISSING])
+		strictEqual(r1.nextManifestId, lastManifestId)
+		deepStrictEqual(r1.nextState, state)
+
+		const r3 = await validateC2paManifestBoxSegment(s3, MANIFEST_ID_1, { lastStreamId: 'stream-id', lastSequenceNumber: 1 })
+		deepStrictEqual(r3.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+	})
+
+	it('fails with CLAIM_SIGNATURE_MISSING if the claim has no signature field', async () => {
+		const hash = await computeBmffHash(buildMediaBoxes(), { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const liveVideoAssertion = buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor({ sequenceNumber: 1, previousManifestId: 'urn:c2pa:initial', streamId: 'stream-id', continuityMethod: 'c2pa.manifestId' })))
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })))
+		const claimCborBytes = encodeCbor({
+			created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoAssertion), await claimRef('c2pa.hash.bmff.v3', bmffAssertion)],
+		})
+		const segment = buildManifestBoxSegment(MANIFEST_ID_1,
+			buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes)),
+			buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
+		)
+
+		const { result, nextManifestId } = await validateC2paManifestBoxSegment(segment, null)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.CLAIM_SIGNATURE_MISSING])
+		strictEqual(nextManifestId, null)
+	})
+
+	// §8.4.2.1, §10.2.1: the relative form resolves to the signature box of the same manifest, so the claim signature
+	// is valid. The URI does not name the label, so the manifestId chain cannot be verified and the segment fails.
+	it('fails with SEGMENT_INVALID for a signature URI relative to the manifest without updating the state', async () => {
+		const s2 = await signedSegment(MANIFEST_ID_2, null, 2, MANIFEST_ID_1, 'self#jumbf=c2pa.signature')
+		const state = { lastStreamId: 'stream-id', lastSequenceNumber: 1 }
+
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(s2, MANIFEST_ID_1, state)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+		strictEqual(nextManifestId, MANIFEST_ID_1)
+		deepStrictEqual(nextState, state)
+	})
+
+	it('fails every segment of a stream with signature URIs relative to the manifest, from a null lastManifestId', async () => {
+		const s1 = await signedSegment(MANIFEST_ID_1, null, 1, 'urn:c2pa:initial', 'self#jumbf=c2pa.signature')
+		const s2 = await signedSegment(MANIFEST_ID_2, null, 2, MANIFEST_ID_1, 'self#jumbf=c2pa.signature')
+
+		const r1 = await validateC2paManifestBoxSegment(s1, null)
+		const r2 = await validateC2paManifestBoxSegment(s2, r1.nextManifestId, r1.nextState)
+		const replay = await validateC2paManifestBoxSegment(s1, r2.nextManifestId, r2.nextState)
+
+		for (const r of [r1, r2, replay]) {
+			deepStrictEqual(r.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+			strictEqual(r.nextManifestId, null)
+			deepStrictEqual(r.nextState, {})
+		}
+	})
+
+	for (const [name, signature] of [
+		['names another manifest', 'self#jumbf=/c2pa/urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83/c2pa.signature'],
+		['names another box', `self#jumbf=/c2pa/${MANIFEST_ID_1}/c2pa.claim`],
+		['names a child box of the manifest that does not exist', `self#jumbf=${MANIFEST_ID_1}/c2pa.signature`],
+		['is not a JUMBF URI', 'c2pa.signature'],
+		['is not a text string', 1],
+	] as const) {
+		it(`fails with CLAIM_SIGNATURE_MISSING if the signature URI ${name}`, async () => {
+			const s1 = await signedSegment(MANIFEST_ID_1, null, 1, 'urn:c2pa:initial', signature)
+
+			const { result, nextManifestId } = await validateC2paManifestBoxSegment(s1, null)
+
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.CLAIM_SIGNATURE_MISSING])
+			strictEqual(nextManifestId, null)
+		})
+	}
+
+	it('compares manifest identifiers exactly', async () => {
+		const s2 = await signedSegment(MANIFEST_ID_2, null, 2, MANIFEST_ID_1.toUpperCase())
+
+		const { result } = await validateC2paManifestBoxSegment(s2, MANIFEST_ID_1)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+	})
+
+	it('reads a claim instanceID that is not a text string as null and does not throw on the next call', async () => {
+		const s1 = await signedSegment(MANIFEST_ID_1, 12345, 1, 'urn:c2pa:initial')
+		const s2 = await signedSegment(MANIFEST_ID_2, 67890, 2, MANIFEST_ID_1)
+
+		const r1 = await validateC2paManifestBoxSegment(s1, null)
+		strictEqual(r1.result.isValid, true)
+		strictEqual(r1.result.manifest?.instanceId, null)
+		strictEqual(r1.nextManifestId, MANIFEST_ID_1)
+
+		const r2 = await validateC2paManifestBoxSegment(s2, r1.nextManifestId, r1.nextState)
+		strictEqual(r2.result.isValid, true)
 	})
 })
 

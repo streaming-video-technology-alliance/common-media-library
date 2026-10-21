@@ -93,6 +93,12 @@ export function asUnsignedInteger(value: unknown): number | null {
 	return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : null
 }
 
+// A CBOR text string, or null for a value of another type.
+/** @internal */
+export function asString(value: unknown): string | null {
+	return typeof value === 'string' ? value : null
+}
+
 function isC2paUuid(usertype: readonly number[]): boolean {
 	return matchesUuid(usertype, C2PA_MANIFEST_UUID) || matchesUuid(usertype, JUMBF_UUID)
 }

@@ -36,7 +36,7 @@ The returned `InitSegmentValidation` object contains:
 |-------|------|-------------|
 | `manifest` | `C2paManifest \| null` | Parsed manifest (label, assertions, signature info) |
 | `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate |
-| `manifestId` | `string \| null` | Manifest identifier |
+| `manifestId` | `string \| null` | Manifest identifier (`urn:c2pa:` URN), from the JUMBF label of the manifest. `null` if the claim `signature` URI does not name the label, as with a URI relative to the manifest. Compare it with the `manifestId` of each segment. |
 | `sessionKeys` | `readonly ValidatedSessionKey[]` | Session keys with valid signer binding |
 | `isValid` | `boolean` | All checks passed |
 | `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |

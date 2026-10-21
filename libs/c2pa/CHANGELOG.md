@@ -27,11 +27,19 @@ and this project adheres to
 - `validateC2paSegment` no longer fails a segment after a gap in the sequence numbers, so the authentic segment after a tampered segment passes ([#546](https://github.com/streaming-video-technology-alliance/common-media-library/issues/546)). C2PA 2.4 section 19.7.3 does not fail a segment for a gap. `result.sequenceResult` still reports `SequenceValidationReason.GAP_DETECTED` with `missingFrom` and `missingTo`.
 - `validateC2paSegment` now reports `LiveVideoStatusCode.SEGMENT_INVALID` instead of `LiveVideoStatusCode.ASSERTION_INVALID` for a duplicate, out-of-order, or below-minimum sequence number. A below-minimum sequence number no longer reports both codes. If your application handles `livevideo.assertion.invalid` for VSI segments, handle `livevideo.segment.invalid` instead.
 - The duplicate and out-of-order check for VSI sequence numbers is a library rule. C2PA 2.4 section 19.7.3 defines only the check against the `minSequenceNumber` of the session key. The C2PA 2.5 draft adds the order check with `livevideo.segment.invalid`, and the library uses that code.
+- `validateC2paManifestBoxSegment` now chains `previousManifestId` to the manifest identifier of the previous segment. The manifest identifier is the JUMBF label of the manifest, a `urn:c2pa:` URN, as C2PA section 19.3 requires ([#545](https://github.com/streaming-video-technology-alliance/common-media-library/issues/545)).
+- `validateC2paManifestBoxSegment` now compares manifest identifiers exactly. It no longer removes an `xmp:iid:` or `urn:uuid:` prefix or ignores case.
+- The JUMBF label is outside the signed claim. The label counts as the manifest identifier only if the claim `signature` URI names it. Only the absolute form, such as `self#jumbf=/c2pa/<label>/c2pa.signature`, names the label. A changed label therefore cannot take the identity of an omitted segment.
+- A claim without a `signature` URI now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. So does a URI that does not resolve to the signature box of the same manifest. `validateC2paInitSegment` and `validateC2paManifestBoxSegment` both report it.
+- A claim `signature` URI relative to the manifest, such as `self#jumbf=c2pa.signature`, does not name the label. `validateC2paManifestBoxSegment` then fails with `LiveVideoStatusCode.SEGMENT_INVALID`, because it cannot verify the manifest ID chain. `validateC2paInitSegment` returns a `null` `manifestId` without a code.
+- `validateC2paInitSegment` now returns the JUMBF label of the manifest as `manifestId`, not the claim `instanceID`. The `manifestId` of a Verifiable Segment Info now matches the `manifestId` of its init segment.
+- A claim `instanceID`, `claim_generator`, or `dc:title` that is not a text string now counts as absent. `C2paManifest.instanceId` is `null` for such an `instanceID` ([#521](https://github.com/streaming-video-technology-alliance/common-media-library/issues/521)).
 
 ### Changed
 
 - `validateC2paInitSegment` reports a `c2pa.hash.bmff.v3` assertion with a `hash` that is not a byte string with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` instead of `LiveVideoStatusCode.INIT_INVALID`. The same code replaces `INIT_INVALID` for exclusions that do not conform to C2PA section 18.6. Handle `ASSERTION_BMFFHASH_MALFORMED` where you handle `INIT_INVALID`.
 - A flat content hash that does not match now adds `C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH` next to `LiveVideoStatusCode.INIT_INVALID`.
+- `nextManifestId` and `InitSegmentValidation.manifestId` now hold a `urn:c2pa:` URN instead of the claim `instanceID`. If your application stores a `lastManifestId` between sessions, discard values that it stored with an earlier version.
 
 ## [1.4.1] - 2026-10-18
 

@@ -125,10 +125,18 @@ When `state` is omitted or `undefined`, the function skips the checks for a cons
 The `c2pa.livevideo.segment` assertion of each segment includes a `previousManifestId` field. That field must match the manifest ID of the previous segment, which creates a verifiable chain:
 
 ```
-Segment 1: manifestId = "abc-123", previousManifestId = "initial-manifest"
-Segment 2: manifestId = "def-456", previousManifestId = "abc-123"  // must match segment 1
-Segment 3: manifestId = "ghi-789", previousManifestId = "def-456"  // must match segment 2
+Segment 1: manifestId = "urn:c2pa:1b3b...", previousManifestId = "urn:c2pa:f916..."
+Segment 2: manifestId = "urn:c2pa:2e52...", previousManifestId = "urn:c2pa:1b3b..."  // must match segment 1
+Segment 3: manifestId = "urn:c2pa:3000...", previousManifestId = "urn:c2pa:2e52..."  // must match segment 2
 ```
+
+The manifest ID is the manifest identifier of C2PA, a `urn:c2pa:` URN. The manifest stores it as the JUMBF label of the manifest box. The claim `instanceID` is a different value and does not take part in the chain. The validator compares the two manifest IDs exactly, without normalization.
+
+The JUMBF label is outside the signed claim. The claim `signature` field is a JUMBF URI of the signature box (C2PA section 8.4.2.1). The validator uses the label as the manifest ID only if this signed URI names it:
+
+- An absolute URI, such as `self#jumbf=/c2pa/urn:c2pa:1b3b.../c2pa.signature`, names the label. Only a URI that starts with a slash names it.
+- A URI relative to the manifest, `self#jumbf=c2pa.signature`, resolves to the signature box but does not name the label. The validator cannot verify the manifest ID chain, so the segment fails with `LiveVideoStatusCode.SEGMENT_INVALID`, whatever `lastManifestId` you pass. The rule applies to every continuity method, including a custom one. The segment does not update `nextManifestId` or `nextState`.
+- A URI that does not resolve to the signature box of the same manifest fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The segment does not update the state.
 
 > [!NOTE]
 > Every segment must declare a `previousManifestId`, including the first one. The first segment usually references the initial static manifest.

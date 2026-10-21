@@ -1,13 +1,13 @@
-import { validateC2paInitSegment, C2paStatusCode, LiveVideoStatusCode } from '@svta/cml-c2pa'
+import { validateC2paInitSegment, validateC2paSegment, C2paStatusCode, LiveVideoStatusCode } from '@svta/cml-c2pa'
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
 import { encodeCbor } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
-import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
+import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
+import { buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, buildVsiSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -750,6 +750,7 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 		// The claim references an assertion that the manifest does not have. Only a decoded claim can report that.
 		const claimCbor = encodeCbor(new Tag({
 			instanceID: 'urn:uuid:claim-test-manifest',
+			signature: signatureUri('urn:uuid:claim-test-manifest'),
 			created_assertions: [{ url: 'self#jumbf=c2pa.assertions/c2pa.hash.bmff.v3', hash: new Uint8Array(32), alg: 'sha256' }],
 		}, 55799))
 		const manifest = buildJumb('urn:uuid:claim-test-manifest',
@@ -762,5 +763,63 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
 		strictEqual(result.isValid, false)
+	})
+
+	// A signed init manifest with the JUMBF label `label` and the claim `signature` URI `signature`.
+	async function initWithLabel(label: string, signature: string): Promise<Uint8Array> {
+		const claimCbor = encodeCbor({
+			instanceID: 'xmp.iid:5bd9bbf5-3e0e-4627-9d86-6299658b0d80',
+			signature,
+			created_assertions: [],
+		})
+		return buildInitSegmentWithManifest(buildJumb(label,
+			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+			buildJumb('c2pa.assertions'),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCbor))),
+		))
+	}
+
+	it('returns the JUMBF label of the manifest as manifestId, not the claim instanceID', async () => {
+		const label = 'urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83'
+
+		const result = await validateC2paInitSegment(await initWithLabel(label, signatureUri(label)))
+
+		strictEqual(result.manifestId, label)
+		strictEqual(result.manifest?.instanceId, 'xmp.iid:5bd9bbf5-3e0e-4627-9d86-6299658b0d80')
+	})
+
+	it('fails with CLAIM_SIGNATURE_MISSING if the claim signature URI names another manifest', async () => {
+		const result = await validateC2paInitSegment(await initWithLabel(
+			'urn:c2pa:2e52408b-4fbe-4557-8e84-e7e4a21a5107',
+			signatureUri('urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83'),
+		))
+
+		strictEqual(result.manifestId, null)
+		ok(result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
+		strictEqual(result.isValid, false)
+	})
+
+	it('returns a null manifestId without CLAIM_SIGNATURE_MISSING for a signature URI relative to the manifest', async () => {
+		const result = await validateC2paInitSegment(await initWithLabel('urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83', 'self#jumbf=c2pa.signature'))
+
+		strictEqual(result.manifestId, null)
+		ok(!result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
+	})
+})
+
+describe('validateC2paInitSegment — manifestId of a Verifiable Segment Info (§19.4)', () => {
+	it('returns the manifestId that the Verifiable Segment Info of each segment references', async () => {
+		const signer = await createTestSigner()
+		const key = await createTestSessionKey('key_001')
+		const init = await buildSessionKeysInitSegment(signer, [
+			{ key, minSequenceNumber: 1, createdAt: new Date(Date.now() - 60_000).toISOString(), validityPeriod: 3600 },
+		])
+
+		const { manifestId, sessionKeys } = await validateC2paInitSegment(init)
+		const validated = await validateC2paSegment(await buildVsiSegment(key, 1), sessionKeys)
+
+		ok(manifestId)
+		strictEqual(validated?.result.isValid, true)
+		strictEqual(validated?.result.manifestId, manifestId)
 	})
 })

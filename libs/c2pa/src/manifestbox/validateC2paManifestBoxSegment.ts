@@ -17,13 +17,7 @@ import type {
 
 const LIVE_VIDEO_ASSERTION_LABEL = 'c2pa.livevideo.segment'
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
-const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
-
-function normalizeManifestId(id: string | null): string | null {
-	if (!id) return null
-	return id.replace(MANIFEST_ID_PREFIX_PATTERN, '').toLowerCase()
-}
 
 function extractAssertionData(data: unknown): Record<string, unknown> | null {
 	if (data !== null && typeof data === 'object' && !Array.isArray(data)) {
@@ -146,7 +140,7 @@ async function validateContinuity(
 	if (method === CONTINUITY_METHOD_MANIFEST_ID) {
 		const prev = liveVideo?.previousManifestId ?? null
 		if (!prev) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
-		const broken = !!lastManifestId && normalizeManifestId(prev) !== normalizeManifestId(lastManifestId)
+		const broken = !!lastManifestId && prev !== lastManifestId
 		return broken ? [LiveVideoStatusCode.SEGMENT_INVALID] : []
 	}
 
@@ -179,7 +173,9 @@ async function validateContinuity(
  * between calls. A segment that fails verification, is on another stream, or
  * does not move the sequence number forward returns the received
  * `lastManifestId` and `state` unchanged. A segment that fails only the
- * continuity check still updates them.
+ * continuity check still updates them. A segment whose claim `signature` URI
+ * is relative to the manifest fails with `SEGMENT_INVALID` and does not update
+ * them, because that URI does not authenticate the manifest identifier.
  *
  * @param bytes - Raw segment bytes
  * @param lastManifestId - Manifest ID from the last segment that updated the state, or `null` for the first segment
@@ -250,10 +246,18 @@ export async function validateC2paManifestBoxSegment(
 	// §15.10.1.2: a manifest without any hard binding assertion is rejected.
 	if (integrity?.hardBindingCount === 0) errorCodes.push(C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING)
 
+	// §19.3: previousManifestId holds the manifest identifier, the JUMBF label of the manifest. Only a claim
+	// `signature` URI that names the label authenticates it (§15.7). Without it the manifestId chain cannot be
+	// verified, so a manifest that passes every integrity check fails, whatever lastManifestId the caller passes.
+	const currentManifestId = internalData?.manifestId ?? null
+	const manifestIdUnverified = integrity !== null && integrity.codes.length === 0 && currentManifestId === null
+	if (manifestIdUnverified && !errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID)) {
+		errorCodes.push(LiveVideoStatusCode.SEGMENT_INVALID)
+	}
+
 	// The continuity check does not gate the advance.
-	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed
+	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed && currentManifestId !== null
 	const advance = authentic && streamIdValid && sequenceNumberValid
-	const currentManifestId = manifest?.instanceId ?? null
 
 	return {
 		result: {
