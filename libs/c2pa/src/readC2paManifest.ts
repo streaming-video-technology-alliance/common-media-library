@@ -12,7 +12,7 @@ import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
 import type { JumbfBox } from './jumbf/JumbfBox.ts'
 import { parseJumbfBoxes } from './jumbf/parseJumbfBoxes.ts'
 import { parseJumbfLabel } from './jumbf/parseJumbfLabel.ts'
-import { findC2paUuidBox, stripJumbfUuidPrefix } from './utils.ts'
+import { asString, findC2paUuidBox, stripJumbfUuidPrefix } from './utils.ts'
 import { extractCertificateInfo } from './x509/extractCertificateInfo.ts'
 
 
@@ -252,12 +252,12 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 
 	const { issuer, certNotBefore } = parseSignatureInfo(signatureBytes)
 
-	const instanceId = (claimData?.['instanceID'] ?? claimData?.['instance_id'] ?? null) as string | null
-	const claimGenerator = (claimData?.['claim_generator'] ?? claimData?.['claimGenerator'] ?? null) as string | null
+	const instanceId = asString(claimData?.['instanceID'] ?? claimData?.['instance_id'])
+	const claimGenerator = asString(claimData?.['claim_generator'] ?? claimData?.['claimGenerator'])
 	const resolvedLabel =
 		manifestLabel ??
-		(claimData?.['dc:title'] as string | undefined) ??
-		(claimData?.['title'] as string | undefined) ??
+		asString(claimData?.['dc:title']) ??
+		asString(claimData?.['title']) ??
 		instanceId ??
 		'unknown'
 
@@ -275,6 +275,7 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 
 	return {
 		manifest,
+		manifestId: manifestLabel,
 		claimAssertionRefs,
 		claimCborBytes,
 		claimCode,

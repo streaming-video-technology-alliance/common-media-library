@@ -763,4 +763,18 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
 		strictEqual(result.isValid, false)
 	})
+
+	it('returns the JUMBF label of the manifest as manifestId, not the claim instanceID', async () => {
+		const claimCbor = encodeCbor({ instanceID: 'xmp.iid:5bd9bbf5-3e0e-4627-9d86-6299658b0d80', created_assertions: [] })
+		const manifest = buildJumb('urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83',
+			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+			buildJumb('c2pa.assertions'),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCbor))),
+		)
+
+		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
+
+		strictEqual(result.manifestId, 'urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83')
+		strictEqual(result.manifest?.instanceId, 'xmp.iid:5bd9bbf5-3e0e-4627-9d86-6299658b0d80')
+	})
 })

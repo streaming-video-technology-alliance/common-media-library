@@ -255,7 +255,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	return {
 		manifest,
 		certificate,
-		manifestId: manifest.instanceId,
+		manifestId: internalData.manifestId,
 		sessionKeys,
 		merkleMaps: exposedMerkleMaps,
 		isValid: errorCodes.length === 0,

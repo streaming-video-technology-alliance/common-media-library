@@ -125,10 +125,12 @@ When `state` is omitted or `undefined`, the function skips the checks for a cons
 The `c2pa.livevideo.segment` assertion of each segment includes a `previousManifestId` field. That field must match the manifest ID of the previous segment, which creates a verifiable chain:
 
 ```
-Segment 1: manifestId = "abc-123", previousManifestId = "initial-manifest"
-Segment 2: manifestId = "def-456", previousManifestId = "abc-123"  // must match segment 1
-Segment 3: manifestId = "ghi-789", previousManifestId = "def-456"  // must match segment 2
+Segment 1: manifestId = "urn:c2pa:1b3b...", previousManifestId = "urn:c2pa:f916..."
+Segment 2: manifestId = "urn:c2pa:2e52...", previousManifestId = "urn:c2pa:1b3b..."  // must match segment 1
+Segment 3: manifestId = "urn:c2pa:3000...", previousManifestId = "urn:c2pa:2e52..."  // must match segment 2
 ```
+
+The manifest ID is the manifest identifier of C2PA, a `urn:c2pa:` URN. The manifest stores it as the JUMBF label of the manifest box. The claim `instanceID` is a different value and does not take part in the chain. The validator compares the two manifest IDs exactly, without normalization.
 
 > [!NOTE]
 > Every segment must declare a `previousManifestId`, including the first one. The first segment usually references the initial static manifest.

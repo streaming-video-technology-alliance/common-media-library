@@ -25,6 +25,8 @@ export type InternalAssertionData = {
  */
 export type InternalManifestData = {
 	readonly manifest: C2paManifest
+	/** The JUMBF label of the manifest, which is its manifest identifier (C2PA URN), or null if the label is absent */
+	readonly manifestId: string | null
 	readonly claimAssertionRefs: readonly ClaimAssertionRef[]
 	readonly claimCborBytes: Uint8Array | null
 	/** `CLAIM_MULTIPLE` if the manifest has more than one claim box, `CLAIM_CBOR_INVALID` if the claim box CBOR does not decode, `CLAIM_MALFORMED` if it is not a map, else null */

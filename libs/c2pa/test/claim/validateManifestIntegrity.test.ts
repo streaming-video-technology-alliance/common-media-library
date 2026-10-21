@@ -25,6 +25,7 @@ function internalData(overrides: Partial<InternalManifestData>): InternalManifes
 			signatureInfo: { issuer: null, certNotBefore: null },
 			assertions: [],
 		},
+		manifestId: null,
 		claimAssertionRefs: [],
 		claimCborBytes: EMPTY_CLAIM_CBOR,
 		claimCode: null,

@@ -27,6 +27,14 @@ and this project adheres to
 - `validateC2paSegment` no longer fails a segment after a gap in the sequence numbers, so the authentic segment after a tampered segment passes ([#546](https://github.com/streaming-video-technology-alliance/common-media-library/issues/546)). C2PA 2.4 section 19.7.3 does not fail a segment for a gap. `result.sequenceResult` still reports `SequenceValidationReason.GAP_DETECTED` with `missingFrom` and `missingTo`.
 - `validateC2paSegment` now reports `LiveVideoStatusCode.SEGMENT_INVALID` instead of `LiveVideoStatusCode.ASSERTION_INVALID` for a duplicate, out-of-order, or below-minimum sequence number. A below-minimum sequence number no longer reports both codes. If your application handles `livevideo.assertion.invalid` for VSI segments, handle `livevideo.segment.invalid` instead.
 - The duplicate and out-of-order check for VSI sequence numbers is a library rule. C2PA 2.4 section 19.7.3 defines only the check against the `minSequenceNumber` of the session key. The C2PA 2.5 draft adds the order check with `livevideo.segment.invalid`, and the library uses that code.
+- `validateC2paManifestBoxSegment` now chains `previousManifestId` to the manifest identifier of the previous segment. The manifest identifier is the JUMBF label of the manifest, a `urn:c2pa:` URN, as C2PA section 19.3 requires. The function compared it with the claim `instanceID` before, so every segment after the first failed with `LiveVideoStatusCode.SEGMENT_INVALID` ([#545](https://github.com/streaming-video-technology-alliance/common-media-library/issues/545)).
+- `validateC2paManifestBoxSegment` now compares manifest identifiers exactly. It no longer removes an `xmp:iid:` or `urn:uuid:` prefix or ignores case.
+- `validateC2paInitSegment` now returns the JUMBF label of the manifest as `manifestId`, not the claim `instanceID`. The `manifestId` of a Verifiable Segment Info now matches the `manifestId` of its init segment.
+- A claim `instanceID`, `claim_generator`, or `dc:title` that is not a text string now counts as absent. `C2paManifest.instanceId` is `null` for such an `instanceID`. Before, a numeric `instanceID` made the next `validateC2paManifestBoxSegment` call throw a `TypeError` ([#521](https://github.com/streaming-video-technology-alliance/common-media-library/issues/521)).
+
+### Changed
+
+- `nextManifestId` and `InitSegmentValidation.manifestId` now hold a `urn:c2pa:` URN instead of the claim `instanceID`. If your application stores a `lastManifestId` between sessions, discard values that it stored with an earlier version.
 
 ### Changed
 

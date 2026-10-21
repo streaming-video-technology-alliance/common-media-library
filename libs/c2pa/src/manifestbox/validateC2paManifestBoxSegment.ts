@@ -17,13 +17,7 @@ import type {
 
 const LIVE_VIDEO_ASSERTION_LABEL = 'c2pa.livevideo.segment'
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
-const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
-
-function normalizeManifestId(id: string | null): string | null {
-	if (!id) return null
-	return id.replace(MANIFEST_ID_PREFIX_PATTERN, '').toLowerCase()
-}
 
 function extractAssertionData(data: unknown): Record<string, unknown> | null {
 	if (data !== null && typeof data === 'object' && !Array.isArray(data)) {
@@ -146,7 +140,7 @@ async function validateContinuity(
 	if (method === CONTINUITY_METHOD_MANIFEST_ID) {
 		const prev = liveVideo?.previousManifestId ?? null
 		if (!prev) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
-		const broken = !!lastManifestId && normalizeManifestId(prev) !== normalizeManifestId(lastManifestId)
+		const broken = !!lastManifestId && prev !== lastManifestId
 		return broken ? [LiveVideoStatusCode.SEGMENT_INVALID] : []
 	}
 
@@ -253,7 +247,8 @@ export async function validateC2paManifestBoxSegment(
 	// The continuity check does not gate the advance.
 	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed
 	const advance = authentic && streamIdValid && sequenceNumberValid
-	const currentManifestId = manifest?.instanceId ?? null
+	// §19.3: previousManifestId holds the manifest identifier, which is the JUMBF label of the manifest (C2PA URN).
+	const currentManifestId = internalData?.manifestId ?? null
 
 	return {
 		result: {
