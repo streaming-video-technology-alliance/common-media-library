@@ -76,6 +76,20 @@ describe('validateC2paInitSegment', () => {
 			deepStrictEqual(result.sessionKeys.map(key => key.kid), ['ad0c9403ce98540f9569542619058da3'])
 			deepStrictEqual(result.errorCodes, [])
 		})
+
+		it('withholds the session keys of an init segment whose content hash does not match', async (context) => {
+			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-09-21T00:00:00Z') })
+			const bytes = Buffer.from(readFileSync(new URL('../fixtures/vsi_init_with_signer_binding.mp4', import.meta.url)))
+			// Changes the creation time in the mvhd box, which the flat content hash covers.
+			const mvhd = bytes.indexOf('mvhd', 0, 'latin1')
+			ok(mvhd > 0)
+			bytes[mvhd + 8] ^= 0xff
+
+			const result = await validateC2paInitSegment(new Uint8Array(bytes))
+
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH])
+			deepStrictEqual(result.sessionKeys, [])
+		})
 	})
 })
 
@@ -198,6 +212,29 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
 	})
 
+	it('accepts a null hash with Merkle maps', async () => {
+		const init = await buildSignedMerkleInitSegment({
+			exclusions: [{ xpath: '/uuid' }],
+			hash: null,
+			merkle: [merkleEntry()],
+		}, signer)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.merkleMaps.length, 1)
+		strictEqual(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED), false)
+	})
+
+	it('rejects a null merkle field without a hash as malformed', async () => {
+		const init = await buildSignedMerkleInitSegment({ exclusions: [{ xpath: '/uuid' }], merkle: null }, signer)
+
+		const result = await validateC2paInitSegment(init)
+
+		strictEqual(result.isValid, false)
+		deepStrictEqual(result.merkleMaps, [])
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+	})
+
 	it('rejects an empty merkle array as malformed without flagging session keys', async () => {
 		const init = await buildMerkleInitSegment({ exclusions: [], merkle: [] })
 
@@ -295,7 +332,14 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 		const result = await validateC2paInitSegment(init)
 
 		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH))
 	})
+
+	// A structural defect of the assertion reports ASSERTION_BMFFHASH_MALFORMED (§15.12.2), not INIT_INVALID.
+	function assertMalformed(errorCodes: readonly string[]): void {
+		ok(errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+		strictEqual(errorCodes.includes(LiveVideoStatusCode.INIT_INVALID), false)
+	}
 
 	it('rejects a hash that is a CBOR array of integers', async () => {
 		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
@@ -303,7 +347,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 
 		const result = await validateC2paInitSegment(init)
 
-		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		assertMalformed(result.errorCodes)
 	})
 
 	it('rejects an exclusion constraint whose value is not a byte string', async () => {
@@ -313,7 +357,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 
 		const result = await validateC2paInitSegment(init)
 
-		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		assertMalformed(result.errorCodes)
 	})
 
 	for (const [name, hashField] of [['a missing hash', {}], ['a null hash', { hash: null }]] as const) {
@@ -323,7 +367,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 
 			const result = await validateC2paInitSegment(init)
 
-			ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+			assertMalformed(result.errorCodes)
 		})
 	}
 
@@ -332,16 +376,18 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 
 		const result = await validateC2paInitSegment(init)
 
-		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		assertMalformed(result.errorCodes)
 	})
 
-	it('rejects an assertion that is not a map', async () => {
-		const init = await buildInitSegment([await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })])
+	for (const [name, payload] of [['an array', [new Uint8Array(32)]], ['null', null]] as const) {
+		it(`rejects an assertion whose payload is ${name}`, async () => {
+			const init = await buildInitSegment(payload)
 
-		const result = await validateC2paInitSegment(init)
+			const result = await validateC2paInitSegment(init)
 
-		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
-	})
+			assertMalformed(result.errorCodes)
+		})
+	}
 
 	it('accepts the flat hash of a real signed init segment', async () => {
 		const bytes = new Uint8Array(

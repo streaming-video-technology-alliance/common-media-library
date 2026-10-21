@@ -13,8 +13,10 @@ and this project adheres to
 - `validateC2paManifestBoxSegment` now fails a segment whose manifest has no `c2pa.hash.bmff.v3` assertion. The result includes `LiveVideoStatusCode.SEGMENT_INVALID` ([#522](https://github.com/streaming-video-technology-alliance/common-media-library/issues/522)).
 - `validateC2paManifestBoxSegment` now fails a segment whose `c2pa.hash.bmff.v3` assertion is not a map or has no `hash`. The result includes `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
 - `validateC2paManifestBoxSegment` no longer reads a `value` field of the `c2pa.hash.bmff.v3` assertion as the content hash. An assertion with a `value` field and a missing or null `hash` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
-- `validateC2paInitSegment` no longer reads a `value` field of the `c2pa.hash.bmff.v3` assertion as the content hash. The `bmff-hash-map` of C2PA defines the content hash only as `hash`. An assertion with a missing or null `hash` now fails with `LiveVideoStatusCode.INIT_INVALID`, unless it has `merkle` maps for VOD Merkle validation. Before, such an assertion skipped the content hash check, or used `value` in place of `hash` ([#550](https://github.com/streaming-video-technology-alliance/common-media-library/issues/550)).
-- `validateC2paInitSegment` now fails with `LiveVideoStatusCode.INIT_INVALID` for a `c2pa.hash.bmff.v3` assertion that is not a map.
+- `validateC2paInitSegment` no longer reads a `value` field of the `c2pa.hash.bmff.v3` assertion as the content hash ([#550](https://github.com/streaming-video-technology-alliance/common-media-library/issues/550)).
+- `validateC2paInitSegment` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` for a `c2pa.hash.bmff.v3` assertion that has no `hash` and no Merkle maps.
+- `validateC2paInitSegment` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` for a `c2pa.hash.bmff.v3` assertion that is not a map.
+- `validateC2paInitSegment` no longer returns `sessionKeys` or `merkleMaps` for an init segment that fails the flat content hash check.
 
 ### Added
 
@@ -25,6 +27,11 @@ and this project adheres to
 - `validateC2paSegment` no longer fails a segment after a gap in the sequence numbers, so the authentic segment after a tampered segment passes ([#546](https://github.com/streaming-video-technology-alliance/common-media-library/issues/546)). C2PA 2.4 section 19.7.3 does not fail a segment for a gap. `result.sequenceResult` still reports `SequenceValidationReason.GAP_DETECTED` with `missingFrom` and `missingTo`.
 - `validateC2paSegment` now reports `LiveVideoStatusCode.SEGMENT_INVALID` instead of `LiveVideoStatusCode.ASSERTION_INVALID` for a duplicate, out-of-order, or below-minimum sequence number. A below-minimum sequence number no longer reports both codes. If your application handles `livevideo.assertion.invalid` for VSI segments, handle `livevideo.segment.invalid` instead.
 - The duplicate and out-of-order check for VSI sequence numbers is a library rule. C2PA 2.4 section 19.7.3 defines only the check against the `minSequenceNumber` of the session key. The C2PA 2.5 draft adds the order check with `livevideo.segment.invalid`, and the library uses that code.
+
+### Changed
+
+- `validateC2paInitSegment` reports a `c2pa.hash.bmff.v3` assertion with a `hash` that is not a byte string, or with exclusions that do not conform to C2PA section 18.6, with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` instead of `LiveVideoStatusCode.INIT_INVALID`.
+- A flat content hash that does not match now adds `C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH` next to `LiveVideoStatusCode.INIT_INVALID`.
 
 ## [1.4.1] - 2026-10-18
 
