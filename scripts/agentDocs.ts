@@ -359,6 +359,22 @@ export function writeSkill(): void {
 	}
 }
 
+/** Writes llms.txt, llms-full.txt, and markdown copies of every source into the docs output. */
+export function writeSite(outDir: string): void {
+	const packages = loadAllPackageDocs()
+	const copies = siteCopies(packages)
+	const toUrl = siteUrl(copies)
+
+	for (const [repoPath, copy] of copies) {
+		const target = path.join(outDir, copy)
+		mkdirSync(path.dirname(target), { recursive: true })
+		writeFileSync(target, rewriteLinks(readRepoFile(repoPath), repoPath, toUrl))
+	}
+
+	writeFileSync(path.join(outDir, 'llms.txt'), renderLlmsTxt(packages))
+	writeFileSync(path.join(outDir, 'llms-full.txt'), packages.map(pkg => renderReference(pkg, toUrl)).join('\n'))
+}
+
 if (import.meta.main) {
 	const { values } = parseArgs({ options: { skill: { type: 'boolean' }, site: { type: 'string' } } })
 
@@ -369,5 +385,11 @@ if (import.meta.main) {
 	if (values.skill) {
 		writeSkill()
 		console.log(`Wrote ${skillDir}`)
+	}
+
+	if (values.site !== undefined) {
+		const out = path.resolve(process.cwd(), values.site)
+		writeSite(out)
+		console.log(`Wrote llms.txt to ${out}`)
 	}
 }

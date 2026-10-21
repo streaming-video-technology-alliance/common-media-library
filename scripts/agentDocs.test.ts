@@ -1,8 +1,9 @@
 import { deepEqual, equal, throws } from 'node:assert/strict'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { describe, it } from 'node:test'
-import { checkExports, indexEnd, indexStart, loadAllPackageDocs, parseWhenToUse, readExports, renderIndex, renderLlmsTxt, renderReference, repoRoot, replaceIndex, rewriteLinks, siteBase, siteCopies, siteUrl, skillDir, sourceBase, sourceUrl, writeSkill, type PackageDocs } from './agentDocs.ts'
+import { checkExports, indexEnd, indexStart, loadAllPackageDocs, parseWhenToUse, readExports, renderIndex, renderLlmsTxt, renderReference, repoRoot, replaceIndex, rewriteLinks, siteBase, siteCopies, siteUrl, skillDir, sourceBase, sourceUrl, writeSite, writeSkill, type PackageDocs } from './agentDocs.ts'
 import { projects } from './projects.ts'
 
 const readme = `# @svta/cml-example
@@ -253,5 +254,22 @@ describe('writeSkill', () => {
 		writeSkill()
 		equal(readFileSync(path.join(repoRoot, skillDir, 'SKILL.md'), 'utf8'), skill, 'a second writeSkill call changed SKILL.md')
 		equal(readFileSync(isoBmffPath, 'utf8'), isoBmff, 'a second writeSkill call changed references/iso-bmff.md')
+	})
+})
+
+describe('writeSite', () => {
+	it('writes llms.txt, llms-full.txt, and a markdown copy of every source', () => {
+		const out = mkdtempSync(path.join(tmpdir(), 'agent-docs-'))
+		writeSite(out)
+		const index = readFileSync(path.join(out, 'llms.txt'), 'utf8')
+		const full = readFileSync(path.join(out, 'llms-full.txt'), 'utf8')
+		equal(index.includes(`- [@svta/cml-iso-bmff](${siteBase}llms/iso-bmff/README.md): `), true)
+		equal(existsSync(path.join(out, 'llms/iso-bmff/README.md')), true)
+		equal(existsSync(path.join(out, 'llms/iso-bmff/docs/reading-boxes.md')), true)
+		equal(existsSync(path.join(out, 'llms/iso-bmff/api.md')), true)
+		const readme = readFileSync(path.join(out, 'llms/iso-bmff/README.md'), 'utf8')
+		equal(readme.includes(`](${siteBase}llms/iso-bmff/docs/reading-boxes.md)`), true, 'README links point at the site copies')
+		equal(full.includes('<!-- libs/iso-bmff/README.md -->'), true)
+		equal(full.includes('<!-- libs/cmcd/docs/user-guide.md -->'), true)
 	})
 })
