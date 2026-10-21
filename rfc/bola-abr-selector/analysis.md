@@ -29,11 +29,12 @@ The example uses a ladder of 400, 800, 1600, and 3200 kbps. The table shows the 
 
 ### Parts that make BOLA usable
 
-Plain BOLA starts at the lowest rung and reaches the upper rungs slowly, because the buffer is empty. dash.js adds three parts:
+Plain BOLA starts at the lowest rung and reaches the upper rungs slowly, because the buffer is empty. dash.js adds four parts:
 
 - **Placeholder buffer.** This is virtual buffer time that BOLA adds to the real buffer level. At startup and after a seek, it lets BOLA begin at the rung that the throughput sustains. A follow-up paper on dash.js reports a median of 21.3 s to reach the top rung at startup without it. With it, the median is 9.3 s.
 - **Oscillation guard (BOLA-O).** This part limits upward switches to the rung that the throughput sustains. It never forces a downward switch.
 - **Download delay.** When the buffer is above the maximum level of the chosen rung, BOLA asks the player to wait. This avoids overfilling the buffer with low rungs.
+- **Buffer expansion.** The minimum buffer time of 10 s plus 2 s per rung stretches `V` and `gamma`. The thresholds move apart while the real segments stay within the player buffer. The follow-up paper designed this part for low-latency streams with a small buffer.
 
 The paper defines more variants: BOLA-BASIC, BOLA-FINITE, BOLA-U, and BOLA-O. dash.js implements the placeholder buffer from the follow-up paper and the BOLA-O logic.
 
@@ -43,9 +44,9 @@ The paper defines more variants: BOLA-BASIC, BOLA-FINITE, BOLA-U, and BOLA-O. da
 
 | Source | Finding |
 |---|---|
-| [BOLA paper](https://arxiv.org/abs/1601.06748) | BOLA reaches 84% to 95% of the offline optimal utility. It matches or beats ELASTIC, PANDA, MPC, and Pensieve on utility in the authors' tests. |
+| [BOLA paper](https://arxiv.org/abs/1601.06748) | BOLA reaches 84% to 95% of the offline optimal utility. BOLA-U has the highest utility of the six algorithms in the authors' tests. MPC sits between BOLA-O and BOLA-U. Pensieve sits between them on profiles 1 to 12 and below both on the 3G traces. The selector implements BOLA-O. |
 | [dash.js follow-up paper](https://people.cs.umass.edu/~ramesh/Site/PUBLICATIONS_files/abr-dashjs.pdf) | With a 25 s buffer on 40 4G traces, the median bitrate of BOLA is 19% above the throughput rule. It also oscillates less. |
-| The same paper | With a 10 s buffer, the throughput rule and the dynamic strategy beat BOLA on oscillation. |
+| The same paper | With a 10 s buffer, the throughput rule and the dynamic strategy beat the original BOLA on oscillation. BOLA-E, with buffer expansion and the insufficient buffer rule, has a median oscillation of 65 kbps at that size on 86 3G traces. The placeholder-only variant has 95 kbps. |
 
 BOLA does not need an accurate throughput estimate in the steady state. It also works where a player has no HTTP timings. A shaka-player feature request for MoQ streams says that bandwidth estimation does not apply to data delivered over QUIC.
 
@@ -109,7 +110,7 @@ The throughput selector has a starvation guard, and the simple baseline has none
 
 ## Costs and risks
 
-- BOLA suits large buffers. In the follow-up paper, a throughput rule oscillates less than BOLA with a 10 s buffer. Low-latency streams often have such a small buffer. The dash.js player runs BOLA only above a buffer level and uses a throughput rule below it.
+- BOLA suits large buffers best. In the follow-up paper, a throughput rule oscillates less than the original BOLA with a 10 s buffer. Low-latency streams often have such a small buffer. The buffer expansion and the insufficient buffer rule of the paper reduce the oscillation, and the selector has both. The dash.js player still runs BOLA only above a buffer level and uses a throughput rule below it.
 - Without a guard, BOLA stalls more often than `createThroughputSelector` in the simulation of the implementation PR. The selector runs the starvation guard of that selector when the input has `segmentDuration`. A player that omits the field owns the stall risk.
 - BOLA keeps state. The player calls `sample` for every download and `reset` after a seek, as the `BitrateSelector` type requires.
 - The pure core is small. Most of `BolaRule.js` handles player wiring. That part contains the tuning decisions and the defects.

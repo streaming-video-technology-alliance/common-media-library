@@ -86,7 +86,7 @@ V     = (B - 10) / v_(M-1)
 gamma = 10 / V
 ```
 
-The values 10 seconds and 2 seconds per rung come from dash.js. For an effective buffer `Q` in seconds, BOLA scores each rung and picks the best score:
+The values 10 seconds and 2 seconds per rung come from dash.js. The dash.js follow-up paper calls this buffer expansion. It stretches `V` and `gamma` so that the thresholds move apart while the real segments stay within the player buffer. In the example of the paper, the thresholds are at least 2 seconds apart. For an effective buffer `Q` in seconds, BOLA scores each rung and picks the best score:
 
 ```
 score_i(Q) = (V * (v_i + gamma) - Q) / b_i
@@ -246,7 +246,7 @@ The selector joins `libs/abr`. It adds no package and no peer dependency. `Value
 ## Drawbacks
 
 - The selector owns state. A player that forgets `sample` keeps the selector in the startup state.
-- BOLA alone suits large buffers. A small buffer target needs a rate-based rule at low buffer levels. The player must combine the two.
+- BOLA suits large buffers best. The 10 second oscillation finding of the dash.js follow-up paper is for the original BOLA. That variant has no placeholder and no insufficient buffer rule. The answer of the paper for small buffers is buffer expansion plus that rule, and the selector has both. dash.js still runs BOLA only above 10 seconds in its default strategy, so a small buffer target needs care. A player can combine the selector with a rate-based rule at low buffer levels.
 - The placeholder lets BOLA pick a rung that the real buffer alone would not sustain. In the simulation of the implementation PR, BOLA without a guard stalls more often than `createThroughputSelector` and picks higher rungs. The starvation guard limits that risk when the player passes `segmentDuration`. A player that omits the field owns the stall risk. See the [analysis](./analysis.md).
 - The behavior can drift from dash.js. The list of deliberate differences and the manual comparison limit that risk.
 
@@ -272,7 +272,7 @@ The placeholder option is a decision in Rationale and alternatives, because the 
 
 1. **Real-buffer guard.** dash.js pairs BOLA with a separate rule that blocks high rungs when the real buffer is small. Should the selector offer this as an option, or should players own it?
 2. **Dense ladders.** The `10 + 2 * M` rule gives a large `B` for ladders with many rungs. Take a test ladder of 20 rungs from 300 kbps to 6 Mbps with equal bandwidth ratios. The buffer rule never selects its two lowest rungs. Should the 2 seconds per rung become an option?
-3. **Small buffer targets.** In the dash.js follow-up paper, a throughput rule oscillates less than BOLA with a 10 second buffer, for example in low-latency streams. The selector documents the limit and does not warn. Is that enough?
+3. **Small buffer targets.** In the dash.js follow-up paper, a throughput rule oscillates less than the original BOLA with a 10 second buffer. That is the buffer size of a low-latency stream. BOLA-E, with buffer expansion and the insufficient buffer rule, oscillates less than the original BOLA at that size. The selector has both parts. It documents the limit and does not warn. Is that enough?
 4. **Playback rate.** The throughput selector divides the throughput by `playbackRate`. BOLA v1 ignores the field, as dash.js does. Should the startup pick and the oscillation guard divide by it?
 
 ## Future possibilities
@@ -287,7 +287,7 @@ The placeholder option is a decision in Rationale and alternatives, because the 
 - v3 (2026-10-19): `BolaSelector` omits the `select` of `BitrateSelector`, so the result type keeps `state` and `placeholder`. The L2 test fixture is listed as `LadderRung` objects.
 - v4 (2026-10-19): states the abort cap as an effective buffer limit, adds the one-rung row to the state machine, and gives the startup placeholder formula. Lists two more differences from dash.js and the `@beta` tag. Corrects the v2 entry on the closed questions.
 - v5 (2026-10-19): status set to `accepted`.
-- v6 (2026-10-20): corrections after the review of the implementation PR. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. Before, a cap at the threshold of the current rung picked that rung again. The conversion after a ladder or buffer target change runs after the selector adds the elapsed time. The `bufferTarget` row states the negative placeholder exception. The drawbacks and the analysis state the stall comparison with `createThroughputSelector`. The selector runs the starvation guard of the throughput selector when the input has `segmentDuration`, and `BolaSelectorOptions` gains `starvationTolerance`. Three more differences from dash.js.
+- v6 (2026-10-20): corrections after the review of the implementation PR. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. Before, a cap at the threshold of the current rung picked that rung again. The conversion after a ladder or buffer target change runs after the selector adds the elapsed time. The `bufferTarget` row states the negative placeholder exception. The drawbacks and the analysis state the stall comparison with `createThroughputSelector`. The selector runs the starvation guard of the throughput selector when the input has `segmentDuration`, and `BolaSelectorOptions` gains `starvationTolerance`. Three more differences from dash.js. The analysis attributes the 10 second oscillation finding to the original BOLA and corrects the comparison with MPC and Pensieve.
 
 ## Final Decision
 
