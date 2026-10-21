@@ -823,12 +823,15 @@ describe('createBolaSelector', () => {
 				closeTo(decision.placeholder, L1_THRESHOLDS[1] - ABORT_BUFFER_LEVEL, TOLERANCE)
 			})
 
-			it('empties the placeholder and picks the lowest rung after an abort of the second rung', () => {
-				const bufferLevel = LOW_BUFFER_LEVEL
-				const decision = decideAfterAbort(abortAt(1, bufferLevel), bufferLevel, NaN)
+			it('caps the placeholder at MINIMUM_BUFFER after an abort of the second rung', () => {
+				const decision = decideAfterAbort(abortAt(1, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, NaN)
 
-				equal(decision.placeholder, 0)
-				equal(decision.index, 0)
+				closeTo(decision.placeholder, MINIMUM_BUFFER - ABORT_BUFFER_LEVEL, TOLERANCE)
+			})
+
+			it('blocks a return to the second rung after its abort until the throughput sustains it', () => {
+				equal(decideAfterAbort(abortAt(1, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughputFor(0)).index, 0)
+				equal(decideAfterAbort(abortAt(1, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughputFor(1)).index, 1)
 			})
 
 			it('keeps the lowest rung and caps the placeholder at MINIMUM_BUFFER after an abort of the lowest rung', () => {

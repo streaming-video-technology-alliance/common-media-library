@@ -268,10 +268,10 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	// The lowest rung has no lower rung, so it stays the current rung.
 	function recordAbortedSample(segment: SegmentSample, bufferLevel: number): void {
 		if (params && params.rungs.length > 1) {
-			const abortedPosition = findRung(params.rungs, segment.bandwidth)
+			const replacementPosition = Math.max(0, findRung(params.rungs, segment.bandwidth) - 1)
 
-			currentBandwidth = params.rungs[Math.max(0, abortedPosition - 1)].bandwidth
-			placeholder = placeholderAfterAbort(params, abortedPosition, placeholder, bufferLevel)
+			currentBandwidth = params.rungs[replacementPosition].bandwidth
+			placeholder = placeholderAfterAbort(params, replacementPosition, placeholder, bufferLevel)
 		}
 
 		endRequest(segment, bufferLevel)
