@@ -64,7 +64,7 @@ describe('validateC2paManifestBoxSegment', () => {
 		strictEqual(result.errorCodes.includes('livevideo.continuityMethod.invalid'), true)
 	})
 
-	it('does not report SEGMENT_INVALID when no hash assertion is present', async () => {
+	it('does not report SEGMENT_INVALID when no manifest parses', async () => {
 		const { result } = await validateC2paManifestBoxSegment(
 			new Uint8Array(0),
 			null,
@@ -728,5 +728,112 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 		strictEqual(r4.result.isValid, true)
 		const r5 = await validateC2paManifestBoxSegment(s5, r4.nextManifestId, r4.nextState)
 		strictEqual(r5.result.isValid, true)
+	})
+})
+
+describe('validateC2paManifestBoxSegment — content binding (§19.3)', () => {
+	const LAST_MANIFEST_ID = 'urn:uuid:content-binding-previous'
+	const LAST_STATE = { lastStreamId: 'stream-1', lastSequenceNumber: 1 }
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	// A signed segment with a chained live video assertion and the given other assertions. The claim declares every assertion.
+	async function signedSegment(otherAssertions: readonly (readonly [string, unknown])[]): Promise<Uint8Array> {
+		const liveVideoData = { sequenceNumber: 2, previousManifestId: LAST_MANIFEST_ID, streamId: 'stream-1', continuityMethod: 'c2pa.manifestId' }
+		const boxes = [buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor(liveVideoData)))]
+		const refs = [await claimRef('c2pa.livevideo.segment', boxes[0])]
+		for (const [label, data] of otherAssertions) {
+			const box = buildJumb(label, buildBox('cbor', encodeCbor(data)))
+			boxes.push(box)
+			refs.push(await claimRef(label, box))
+		}
+		const manifestLabel = 'urn:uuid:content-binding-test'
+		// The claim `signature` field: the absolute URI of the signature box, which names the manifest label.
+		const signature = `self#jumbf=/c2pa/${manifestLabel}/c2pa.signature`
+		const claimCborBytes = encodeCbor({ instanceID: manifestLabel, signature, created_assertions: refs })
+		return buildManifestBoxSegment(manifestLabel,
+			buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes)),
+			buildJumb('c2pa.assertions', ...boxes),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
+		)
+	}
+
+	async function flatHash(): Promise<Uint8Array> {
+		return computeBmffHash(buildMediaBoxes(), { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+	}
+
+	it('accepts a signed segment whose c2pa.hash.bmff.v3 assertion matches', async () => {
+		const segment = await signedSegment([['c2pa.hash.bmff.v3', { exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: await flatHash() }]])
+
+		const { result } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+		strictEqual(result.isValid, true)
+	})
+
+	it('fails with SEGMENT_INVALID and CLAIM_HARD_BINDINGS_MISSING for a signed segment without a hard binding', async () => {
+		const segment = await signedSegment([])
+
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID, C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING])
+		strictEqual(nextManifestId, LAST_MANIFEST_ID)
+		deepStrictEqual(nextState, LAST_STATE)
+	})
+
+	it('fails with SEGMENT_INVALID for a signed segment with another hard binding instead of c2pa.hash.bmff.v3', async () => {
+		const segment = await signedSegment([['c2pa.hash.data', { exclusions: [], alg: 'sha256', hash: new Uint8Array(32) }]])
+
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+		strictEqual(nextManifestId, LAST_MANIFEST_ID)
+		deepStrictEqual(nextState, LAST_STATE)
+	})
+
+	// The deprecated c2pa.hash.bmff.v2 counts as a hard binding (§15.10.1.2), but §19.3.1 requires c2pa.hash.bmff.v3.
+	it('fails with SEGMENT_INVALID for a signed segment with a matching c2pa.hash.bmff.v2 hash instead of c2pa.hash.bmff.v3', async () => {
+		const segment = await signedSegment([['c2pa.hash.bmff.v2', { exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: await flatHash() }]])
+
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+		strictEqual(nextManifestId, LAST_MANIFEST_ID)
+		deepStrictEqual(nextState, LAST_STATE)
+	})
+
+	it('fails with ASSERTION_BMFFHASH_MALFORMED for a c2pa.hash.bmff.v3 assertion without a hash', async () => {
+		const segment = await signedSegment([['c2pa.hash.bmff.v3', { exclusions: [{ xpath: '/uuid' }], alg: 'sha256' }]])
+
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED])
+		strictEqual(nextManifestId, LAST_MANIFEST_ID)
+		deepStrictEqual(nextState, LAST_STATE)
+	})
+
+	for (const [name, hashField] of [['a missing hash', {}], ['a null hash', { hash: null }]] as const) {
+		it(`fails with ASSERTION_BMFFHASH_MALFORMED for ${name} and a matching value field`, async () => {
+			const segment = await signedSegment([['c2pa.hash.bmff.v3', { exclusions: [{ xpath: '/uuid' }], alg: 'sha256', ...hashField, value: await flatHash() }]])
+
+			const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED])
+			strictEqual(result.bmffHashHex, null)
+			strictEqual(nextManifestId, LAST_MANIFEST_ID)
+			deepStrictEqual(nextState, LAST_STATE)
+		})
+	}
+
+	it('fails with ASSERTION_BMFFHASH_MALFORMED for a c2pa.hash.bmff.v3 assertion that is not a map', async () => {
+		const segment = await signedSegment([['c2pa.hash.bmff.v3', [await flatHash()]]])
+
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED])
+		strictEqual(nextManifestId, LAST_MANIFEST_ID)
+		deepStrictEqual(nextState, LAST_STATE)
 	})
 })

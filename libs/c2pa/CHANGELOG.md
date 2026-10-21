@@ -8,6 +8,16 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Security
+
+- `validateC2paManifestBoxSegment` now fails a segment whose manifest has no `c2pa.hash.bmff.v3` assertion. The result includes `LiveVideoStatusCode.SEGMENT_INVALID` ([#522](https://github.com/streaming-video-technology-alliance/common-media-library/issues/522)).
+- `validateC2paManifestBoxSegment` now fails a segment whose `c2pa.hash.bmff.v3` assertion is not a map or has no `hash`. The result includes `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
+- `validateC2paManifestBoxSegment` no longer reads a `value` field of the `c2pa.hash.bmff.v3` assertion as the content hash. An assertion with a `value` field and a missing or null `hash` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
+
+### Added
+
+- `C2paStatusCode` now has `CLAIM_HARD_BINDINGS_MISSING` (`claim.hardBindings.missing`). `validateC2paManifestBoxSegment` reports it for a manifest without any hard binding assertion.
+
 ## [1.4.1] - 2026-10-18
 
 ### Changed

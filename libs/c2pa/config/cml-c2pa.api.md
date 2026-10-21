@@ -52,6 +52,7 @@ export const C2paStatusCode: {
     readonly CLAIM_CBOR_INVALID: "claim.cbor.invalid";
     readonly CLAIM_MALFORMED: "claim.malformed";
     readonly CLAIM_MULTIPLE: "claim.multiple";
+    readonly CLAIM_HARD_BINDINGS_MISSING: "claim.hardBindings.missing";
     readonly ASSERTION_BMFFHASH_MALFORMED: "assertion.bmffHash.malformed";
     readonly ASSERTION_BMFFHASH_MISMATCH: "assertion.bmffHash.mismatch";
 };
