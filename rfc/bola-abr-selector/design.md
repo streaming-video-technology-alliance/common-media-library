@@ -10,12 +10,13 @@ Goals:
 - The same decisions as dash.js where the dash.js rule is correct.
 - A defined behavior for every change of the ladder or the buffer target.
 - Every export carries TSDoc, and every public behavior has a test.
+- The starvation guard, shared with the throughput selector.
 
 Non-goals for v1:
 
 - Throughput estimation. The caller supplies a number.
 - A hybrid selector that switches between a rate-based rule and BOLA.
-- A real-buffer guard and an abandon-decision rule.
+- An abandon-decision rule.
 - Variable segment sizes. The selector uses the bitrate of a rung as its size.
 
 ## Structure
@@ -30,8 +31,10 @@ The package has two layers. The internal functions are pure and carry the math. 
 | `selectRungByBuffer.ts` | Internal | Returns the highest rung with a threshold at or below the effective buffer. |
 | `selectRungByThroughput.ts` | Internal | Returns the highest rung at or below a bitrate. |
 | `remapEffectiveBuffer.ts` | Internal | Converts the effective buffer between two parameter sets. |
+| The starvation guard function | Internal | Moved out of `createThroughputSelector.ts` and shared by both selectors. |
 | `MINIMUM_BUFFER.ts`, `MINIMUM_BUFFER_PER_RUNG.ts`, `PLACEHOLDER_DECAY.ts`, `STALL_THRESHOLD.ts` | Internal | Named constants, 10, 2, 0.99, and 0.3. |
 | `BOLA_DEFAULT_BUFFER_TARGET.ts` | Public | The named default, 18. The safety factor default is the shared `DEFAULT_SAFETY_FACTOR`. |
+| `DEFAULT_STARVATION_SAFETY_FACTOR.ts` | Public | The named default of the guard factor, 0.7, from dash.js. |
 | `BolaState.ts` and the three type files | Public | The state and the types in the RFC export surface. |
 | `createBolaSelector.ts` | Public | The selector factory. |
 
@@ -81,15 +84,18 @@ The selector keeps these fields:
 | `currentBandwidth` | The bandwidth of the last rung sampled or selected. The selector stores a bandwidth, not an index. |
 | `lastSegmentDuration` | The duration of the last loaded segment. Unknown until the first segment. |
 | `lastRequestEnd`, `lastCall` | The time bases for the wall-clock part of the placeholder. |
+| The finished sample count | The number of finished samples since the last reset, capped at 2. The starvation guard waits for 2. |
 | The ladder copy and the buffer target | The inputs of the last rebuild. |
 
 A call to `select` runs these steps:
 
-1. Compare the ladder and the buffer target with the stored copies. On a difference, validate and rebuild. See the next section.
+1. Compare the ladder and the buffer target with the stored copies. On a difference, validate and build the new values. See the next section.
 2. Sanitize `bufferLevel` and `throughput`.
 3. If the ladder has one distinct rung, return its highest index with a delay of 0.
 4. In the startup state, pick the rung from the throughput, set the placeholder, and test the move to steady.
-5. In the steady state, add the elapsed time to the placeholder and select the rung for the effective buffer. Then apply the oscillation guard and compute the delay.
+5. In the steady state, add the elapsed time to the placeholder. If step 1 built new values, convert the effective buffer to the new values. Apply the stall rule. Select the rung for the effective buffer. Then apply the oscillation guard, apply the starvation guard, and compute the delay.
+
+The conversion runs before the stall rule. When `V` shrinks, the conversion maps a buffer below 10 s to a higher buffer. The stall rule must still leave a placeholder of 0.
 
 The effective buffer is the real buffer plus the placeholder. The delay is `max(0, effective - maximumBuffer(rung))`. The selector removes the delay from the placeholder first. The remainder is the returned delay. At the top rung the returned delay is 0.
 
@@ -105,6 +111,32 @@ With ladder L1 and a target of 18 s, these inputs give these decisions:
 | The same, throughput 2 Mbps | Rung 2 and no delay. |
 | The same, throughput unknown | Rung 3. The oscillation guard is skipped. |
 
+### Abort cap
+
+After an aborted download, the selector treats the next lower rung as the replacement. The current rung moves to that rung. The cap keeps the effective buffer at or below the threshold of that rung. At a threshold, the tie rule picks the higher rung. A cap at the threshold of the aborted rung then picks that rung again. While the aborted rung is the current rung, a lower throughput estimate does not change that pick. The oscillation guard limits upward moves only. With the replacement as the current rung, a return to the aborted rung is an upward move. The guard allows that move only when the throughput sustains the aborted rung.
+
+Take L1, a current rung of 3 Mbps, and a real buffer of 7 s after the abort. A cap at the threshold of 3 Mbps gives 13.059 s, and the pick is 3 Mbps. A cap at the threshold of 1.5 Mbps gives 10.745 s, and the pick is 1.5 Mbps.
+
+The BOLA paper gives a download abandonment heuristic for BOLA-FINITE in section IV.D and Fig. 7. The player abandons a segment at level `m`. The player then downloads the segment at the level below `m` with the best score. The next decision compares with the bandwidth and the level of that download. The selector follows that order, so the replacement becomes the current rung. dash.js sets the current representation to the replacement rung and caps at the minimum buffer of that rung. The abandon rule of dash.js picks the replacement from the throughput. The selector input has no replacement rung, so the selector assumes the next lower rung. In the paper, that level wins while the effective buffer is at or above the threshold of that level.
+
+### Starvation guard
+
+The guard is the starvation guard of the throughput selector, applied to the BOLA pick with one pass. The download time of a rung is `bandwidth * segmentDuration / (throughput * starvationSafetyFactor)`. The budget is `bufferLevel / playbackRate`. The guard keeps the highest rung, at or below the pick, within the budget. Rung 0 always passes. There is no second pass. The startup state and the two-sample wait cover the empty buffer at startup and after a seek.
+
+The guard has its own factor. One download varies more than the smoothed estimate, from estimate error, segment size, and request latency. The guard binds only at a low real buffer, so a large margin costs little bitrate. `safetyFactor` binds on every upward move, so a large margin there costs bitrate for the whole session. The paper uses 0.5 and dash.js uses 0.7. The selector takes 0.7. The table shows the highest rung that each factor allows with 4 s segments, a 6 s real buffer, and an exact estimate.
+
+| Factor | Allowed rung | Download time | Buffer left after the download |
+|---|---|---|---|
+| 0.9 | 1.35 times the estimate | 5.4 s | 0.6 s |
+| 0.7 | 1.05 times the estimate | 4.2 s | 1.8 s |
+| 0.5 | 0.75 times the estimate | 3.0 s | 3.0 s |
+
+The guard runs after the oscillation guard, so a lowered pick is the current rung. When the guard lowers the pick, the selector skips the delay step. A wait would drain a buffer that the guard found too short for the download.
+
+The guard waits for two finished samples since the last reset. dash.js ignores its rule until two segments are in the buffer, with the setting `segmentIgnoreCount`. The wait keeps the startup and seek ramp of the placeholder. Without the wait, the second pick drops one rung whenever the startup rung is between 0.7 and 0.9 times the estimate.
+
+The cap of `InsufficientBufferRule` in dash.js is `bandwidth <= safeThroughput * bufferLevel / segmentDuration`, with a safety factor of 0.7. That inequality is the guard with a budget of `bufferLevel`. The paper states the rule with a factor of 0.5. dash.js runs the rule next to BOLA by default and disables it in low-latency mode. The smoke test of the implementation PR had the rule active in both players.
+
 The startup state maps these throughputs to these rungs:
 
 | Throughput | 250 kbps | 340 kbps | 850 kbps | 1 Mbps | 3.3 Mbps | 3.4 Mbps | 10 Mbps |
@@ -117,13 +149,15 @@ The startup state maps these throughputs to these rungs:
 
 A rung switch point depends only on `theta` and on the two neighbouring bitrates. It does not depend on `V` or on the other rungs. A rebuild changes `V` and `ln(b_0)`. It does not change what `theta` means for a given pair of neighbours. Suppose the selector keeps `theta` and recomputes `Q`. Then the decision for the same situation stays the same, except where the change added or removed rungs.
 
+The conversion runs after the selector adds the elapsed time, so `Q_old` includes the wait. A conversion before that step would scale the placeholder and not the wait. The pick could then change. For L1 and a target change from 18 s to 40 s, the error is twice the elapsed time.
+
 The [RFC](./index.md) gives the conversion formulas under Ladder changes.
 
 The conversion is exact when `Q_new` is at least the real buffer level. If `Q_new` is lower, the placeholder is 0 and the real buffer decides.
 
 ### Measured effect
 
-Take a change of the buffer target from 18 s to 40 s on L1. The selector can keep the placeholder unchanged. Then the decision changes for 62% of the buffer levels between 0 s and 30 s. With the conversion, no decision changes. The grid has 2,401 levels.
+Take a change of the buffer target from 18 s to 40 s on L1. The selector can keep the placeholder unchanged. Then the decision changes for 62% of the buffer levels between 0 s and 30 s. With the conversion, no decision changes. The grid has 2,401 levels and no elapsed time. The selector adds the elapsed time before the conversion, so the result applies to any wait.
 
 For a change of the ladder, the conversion changes decisions only where the added or removed rung lives:
 
