@@ -22,7 +22,7 @@ export type BolaSelector = Omit<BitrateSelector, 'select'> & {
 	 * When the buffer drained during the wait, the second call returns a delay of 0.
 	 * When the buffer did not drain, for example in a paused player, the second call returns the delay again.
 	 *
-	 * @param input - The ladder, the buffer level, the throughput estimate, and the optional buffer target and segment duration
+	 * @param input - The ladder, the buffer level, the throughput estimate, and the optional buffer target, segment duration, and playback rate
 	 * @returns The position of the chosen rung in `input.ladder`, the delay, the state, and the placeholder buffer
 	 * @throws RangeError when the ladder is empty or has a bandwidth that is not a positive finite number
 	 * @throws RangeError when the ladder is not in ascending order of bandwidth

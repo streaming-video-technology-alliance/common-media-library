@@ -164,7 +164,7 @@ The decision has the `index` and the `delay` of every selector. It also has the 
 
 - `delay` is positive when the buffer is above the maximum buffer of the chosen rung. The top rung never has a delay. Wait, and call `select` again. The selector adds the wait to its placeholder buffer. If the buffer drained during the wait, the second call returns a delay of 0. If it did not drain, for example in a paused player, the second call returns the delay again. A player that ignores the delay stays at the selected rung until the real buffer passes the next threshold. The cost is lower quality, not a stall.
 - `bufferTarget` is the buffer level, in seconds, that the player aims for. A larger value spreads the thresholds over a larger range of buffer levels. The default is `BOLA_DEFAULT_BUFFER_TARGET` (18). Pass the field in every call or in none.
-- `segmentDuration` switches on the starvation guard. The guard lowers the pick when the download of the next segment does not fit in the real buffer. A live player omits the field to skip the guard, as for the throughput selector.
+- `segmentDuration` enables the starvation guard. The guard lowers the pick when the download of the next segment does not fit in the real buffer. A live player omits the field to skip the guard, as for the throughput selector.
 - A stall needs no call. The selector treats a `bufferLevel` of 0.3 seconds or less as a stall in the steady state.
 - A selector that never receives a `sample` stays in the startup state. A `sample` without a positive finite `duration` has the same effect.
 - Create one selector for each media type, such as audio and video.
@@ -193,7 +193,7 @@ The guard estimates the download time of a rung as `bandwidth * segmentDuration 
 
 The guard has its own factor. One download varies more than the smoothed estimate, so the default is 0.7 and not 0.9. The guard binds only when the real buffer is low, so the larger margin costs little bitrate.
 
-With the ladder of the examples, a throughput of 4 Mbps, 4 second segments, and a pick of 6 Mbps, the guard gives these picks:
+Take the ladder of the examples, a throughput of 4 Mbps, and 4 second segments. For a pick of 6 Mbps, the guard gives these picks:
 
 | Buffer level | 8 s | 6 s | 3 s | 1.5 s | 0.5 s |
 |---|---|---|---|---|---|
@@ -212,7 +212,7 @@ The selector reads these fields of a `SegmentSample`:
 | `duration` | Moves the selector to the steady state, and sizes the growth for a replacement segment. A value that is not a positive finite number keeps the startup state. |
 | `bufferLevel` | Decays and caps the placeholder. In the steady state, 0.3 seconds or less is a stall. |
 | `isReplacement` | Adds `duration` to the placeholder. |
-| `aborted` | The next lower rung replaces the aborted rung. It becomes the current rung, and its threshold caps the placeholder. For rung 1 the cap is 0. For rung 0 the current rung stays, and the cap is 10 seconds. The stall rule applies. A finished sample counts for the starvation guard, and an aborted sample does not. |
+| `aborted` | The next lower rung replaces the aborted rung. It becomes the current rung, and its threshold caps the placeholder. When the replacement is rung 0, the cap is 10 seconds. For an abort of rung 0 the current rung stays. The stall rule applies. A finished sample counts for the starvation guard, and an aborted sample does not. |
 
 ### Ladder changes
 
@@ -239,7 +239,7 @@ A seeded simulation ran both selectors on 100 random throughput traces. Each ses
 | 10 rungs, 30 s | BOLA | 2.30 | 0.16 | 10.4 |
 | 10 rungs, 30 s | Throughput | 1.61 | 0.02 | 10.2 |
 
-BOLA picks higher rungs, and its average bitrate is 36% to 47% above the throughput selector. It also stalls more often, even with the starvation guard. Without the guard, BOLA stalls 0.23 to 0.96 times per session in the same runs. A lower `starvationSafetyFactor` trades bitrate for fewer stalls. The model is simple, so treat the numbers as a direction and not as a prediction.
+BOLA picks higher rungs, and its average bitrate is 36% to 47% above the throughput selector. It also stalls more often, even with the starvation guard. Without the guard, BOLA stalls 0.23 to 0.96 times per session in the same runs. A lower `starvationSafetyFactor` trades bitrate for fewer stalls. The model is simple. The numbers compare the selectors under one channel model, and they do not predict a real session.
 
 ### Limits
 
@@ -287,7 +287,7 @@ The selector follows `BolaRule.js` of dash.js, with these changes:
 - The selector derives a stall from the buffer level and clears the time bases of the placeholder.
 - The player passes the time. dash.js reads `Date.now()`.
 - A remainder of one millisecond or less is not a delay.
-- After an aborted download, the selector treats the next lower rung as the replacement. The dash.js player uses the rung that its abandon rule picks from the throughput. The selector input has no replacement rung. Both set the current rung to the replacement and cap the effective buffer at the threshold of that rung. One case differs. When the replacement is rung 0, the dash.js player caps the effective buffer at 10 seconds. The selector caps it at the threshold of rung 0, which is 0.
+- After an aborted download, the selector treats the next lower rung as the replacement. The dash.js player uses the rung that its abandon rule picks from the throughput. The selector input has no replacement rung. Both set the current rung to the replacement. Both cap the effective buffer at the threshold of that rung, or at 10 seconds when the replacement is rung 0.
 - After a change of the buffer target, the selector adds the elapsed time and then converts the effective buffer. The dash.js player converts first and then adds the elapsed time.
 - The starvation guard is part of the selector. The dash.js player runs `InsufficientBufferRule` as a separate rule. It has the same cap, `safeThroughput * bufferLevel / segmentDuration`, the same factor of 0.7, and the same wait of two segments. The dash.js player disables that rule in low-latency mode, and a player of the selector omits `segmentDuration` instead. After a buffer-empty event, the dash.js player drops to rung 0. The selector empties the placeholder, and the guard at an empty buffer allows rung 0 only.
 

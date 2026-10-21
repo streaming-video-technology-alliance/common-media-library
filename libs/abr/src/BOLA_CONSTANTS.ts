@@ -44,7 +44,7 @@ export const STARVATION_GUARD_SAMPLE_COUNT = 2
 /**
  * The seconds below a threshold at which the effective buffer still counts as at the threshold.
  * The effective buffer is a sum of two numbers. A value that equals a threshold in exact arithmetic can fall one rounding error below it.
- * An abort cap sets the effective buffer to a threshold on purpose, and the pick would depend on that error without this margin.
+ * An abort cap sets the effective buffer to a threshold on purpose. Without this margin, the pick would depend on that rounding error.
  * The margin is far above the rounding error and far below the buffer level that a player can measure.
  * dash.js has no such margin.
  *
