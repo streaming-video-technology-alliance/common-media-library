@@ -6,7 +6,7 @@ import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG, NEGLIGIBLE_DELAY, PLACEHOLDER_
 import { bolaMaximumBuffers, bolaThresholds, createBolaScoreModel } from './helpers/bolaScoreOracle.ts'
 import { closeTo } from './helpers/closeTo.ts'
 import { L1_GOLDEN, L2_GOLDEN } from './helpers/goldenRungs.ts'
-import { L1, L1_BANDWIDTHS, L2, rungs, withoutRung, withRung } from './helpers/ladders.ts'
+import { L1, L1_BANDWIDTHS, L2, L2_BANDWIDTHS, rungs, withoutRung, withRung } from './helpers/ladders.ts'
 import { MILLISECONDS_PER_SECOND } from './helpers/units.ts'
 
 const SEGMENT_DURATION = 4
@@ -33,6 +33,7 @@ const SWEEP_END = 30
 
 const L1_THRESHOLDS = bolaThresholds(L1_BANDWIDTHS, BOLA_DEFAULT_BUFFER_TARGET)
 const L1_MAXIMUM_BUFFERS = bolaMaximumBuffers(L1_BANDWIDTHS, BOLA_DEFAULT_BUFFER_TARGET)
+const L2_THRESHOLDS = bolaThresholds(L2_BANDWIDTHS, BOLA_DEFAULT_BUFFER_TARGET)
 
 // The oscillation guard scenario. The selector is at rung 1. The buffer picks rung 3, which is above the maximum buffer of rung 1.
 const GUARD_BUFFER_LEVEL = (L1_THRESHOLDS[3] + L1_THRESHOLDS[4]) / 2
@@ -63,6 +64,8 @@ const HIGH_BUFFER_LEVEL = 16
 const CONVERSION_ELAPSED_SECONDS = [0, 0.5, 1, 2, 3]
 const CONVERSION_SWEEP_START = 5
 const CONVERSION_SWEEP_STEP = 0.25
+// The number of buffer levels that the rounding test tries for each aborted rung.
+const ROUNDING_SAMPLE_COUNT = 400
 
 // A throughput for which the startup pick is the rung at `position` of L1.
 function throughputFor(position: number): number {
@@ -718,6 +721,30 @@ describe('createBolaSelector', () => {
 					const decision = decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughput)
 
 					equal(decision.index, 2, `throughput ${throughput}`)
+				}
+			})
+
+			// The cap sets the effective buffer to the threshold of the replacement. Rounding can put that sum just below the threshold.
+			// Some thresholds of L2 show the effect, so the test sweeps the buffer levels for every aborted rung of L2.
+			it('picks the replacement in the first call whatever the rounding of the buffer level', () => {
+				for (let abortedPosition = 2; abortedPosition < L2.length; abortedPosition++) {
+					const replacementThreshold = L2_THRESHOLDS[abortedPosition - 1]
+					const startupThroughput = L2_BANDWIDTHS[abortedPosition] / DEFAULT_SAFETY_FACTOR + 1
+					const { placeholder: startupPlaceholder } = reachSteadyState(createBolaSelector(), startupThroughput, L2)
+					// The cap binds from this buffer level on, and it applies below the threshold of the replacement.
+					const lowest = replacementThreshold - startupPlaceholder + SMALL_STEP
+					const highest = replacementThreshold - SMALL_STEP
+
+					for (let bufferLevel = lowest; bufferLevel <= highest; bufferLevel += (highest - lowest) / ROUNDING_SAMPLE_COUNT) {
+						const selector = createBolaSelector()
+
+						reachSteadyState(selector, startupThroughput, L2)
+						load(selector, L2_BANDWIDTHS[abortedPosition], bufferLevel, SECOND_REQUEST_START, { aborted: true })
+
+						const decision = selector.select({ ladder: L2, bufferLevel, throughput: NaN, now: requestEnd(SECOND_REQUEST_START) })
+
+						equal(decision.index, abortedPosition - 1, `aborted rung ${abortedPosition}, buffer ${bufferLevel}`)
+					}
 				}
 			})
 

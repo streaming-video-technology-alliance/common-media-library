@@ -42,6 +42,17 @@ export const STALL_THRESHOLD = 0.3
 export const STARVATION_GUARD_SAMPLE_COUNT = 2
 
 /**
+ * The seconds below a threshold at which the effective buffer still counts as at the threshold.
+ * The effective buffer is a sum of two numbers. A value that equals a threshold in exact arithmetic can fall one rounding error below it.
+ * An abort cap sets the effective buffer to a threshold on purpose, and the pick would depend on that error without this margin.
+ * The margin is far above the rounding error and far below the buffer level that a player can measure.
+ * dash.js has no such margin.
+ *
+ * @internal
+ */
+export const THRESHOLD_TOLERANCE = 1e-9
+
+/**
  * The delay, in seconds, at or below which a selector returns a delay of 0.
  * It is the resolution of a clock in milliseconds, so a player cannot wait for less.
  * It also absorbs the rounding error of the placeholder arithmetic.

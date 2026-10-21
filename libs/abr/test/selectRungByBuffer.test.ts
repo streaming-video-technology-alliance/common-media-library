@@ -1,5 +1,6 @@
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
+import { THRESHOLD_TOLERANCE } from '../src/BOLA_CONSTANTS.ts'
 import { BOLA_DEFAULT_BUFFER_TARGET } from '../src/BOLA_DEFAULT_BUFFER_TARGET.ts'
 import { createBolaParams } from '../src/createBolaParams.ts'
 import { selectRungByBuffer } from '../src/selectRungByBuffer.ts'
@@ -79,6 +80,15 @@ describe('selectRungByBuffer', () => {
 			equal(selectRungByBuffer(params, params.thresholds[i] - EDGE), i - 1)
 			equal(selectRungByBuffer(params, params.thresholds[i]), i)
 			equal(selectRungByBuffer(params, params.thresholds[i] + EDGE), i)
+		}
+	})
+
+	it('counts a buffer within the tolerance below a threshold as at the threshold', () => {
+		const params = createBolaParams(L2, BUFFER_TARGET)
+
+		for (let i = 1; i < params.thresholds.length; i++) {
+			equal(selectRungByBuffer(params, params.thresholds[i] - THRESHOLD_TOLERANCE / 2), i)
+			equal(selectRungByBuffer(params, params.thresholds[i] - THRESHOLD_TOLERANCE * 2), i - 1)
 		}
 	})
 
