@@ -16,7 +16,7 @@ and this project adheres to
 - `validateC2paInitSegment` no longer reads a `value` field of the `c2pa.hash.bmff.v3` assertion as the content hash ([#550](https://github.com/streaming-video-technology-alliance/common-media-library/issues/550)).
 - `validateC2paInitSegment` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` for a `c2pa.hash.bmff.v3` assertion that has no `hash` and no Merkle maps.
 - `validateC2paInitSegment` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` for a `c2pa.hash.bmff.v3` assertion that is not a map.
-- `validateC2paInitSegment` no longer returns `sessionKeys` or `merkleMaps` for an init segment that fails the flat content hash check.
+- `validateC2paInitSegment` no longer returns `sessionKeys` or `merkleMaps` for an init segment that fails a content hash check. This covers a flat hash or a Merkle `initHash` that does not match, and a Merkle map that does not conform.
 
 ### Added
 
@@ -30,7 +30,7 @@ and this project adheres to
 
 ### Changed
 
-- `validateC2paInitSegment` reports a `c2pa.hash.bmff.v3` assertion with a `hash` that is not a byte string, or with exclusions that do not conform to C2PA section 18.6, with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` instead of `LiveVideoStatusCode.INIT_INVALID`.
+- `validateC2paInitSegment` reports a `c2pa.hash.bmff.v3` assertion with a `hash` that is not a byte string with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` instead of `LiveVideoStatusCode.INIT_INVALID`. The same code replaces `INIT_INVALID` for exclusions that do not conform to C2PA section 18.6. Handle `ASSERTION_BMFFHASH_MALFORMED` where you handle `INIT_INVALID`.
 - A flat content hash that does not match now adds `C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH` next to `LiveVideoStatusCode.INIT_INVALID`.
 
 ## [1.4.1] - 2026-10-18

@@ -7,7 +7,7 @@ import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
 import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildInitSegmentWithManifest, buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
+import { buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, createTestSessionKey, encodeSignerBinding, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -107,9 +107,10 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('populates merkleMaps and skips SESSIONKEY_INVALID in VOD Merkle mode', async () => {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const init = await buildSignedMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
-			merkle: [merkleEntry()],
+			merkle: [merkleEntry({ initHash })],
 		}, signer)
 
 		const result = await validateC2paInitSegment(init)
@@ -213,16 +214,17 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 	})
 
 	it('accepts a null hash with Merkle maps', async () => {
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const init = await buildSignedMerkleInitSegment({
 			exclusions: [{ xpath: '/uuid' }],
 			hash: null,
-			merkle: [merkleEntry()],
+			merkle: [merkleEntry({ initHash })],
 		}, signer)
 
 		const result = await validateC2paInitSegment(init)
 
 		strictEqual(result.merkleMaps.length, 1)
-		strictEqual(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED), false)
+		deepStrictEqual(result.errorCodes, [])
 	})
 
 	it('rejects a null merkle field without a hash as malformed', async () => {
@@ -667,6 +669,47 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		const initHash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const merkle = [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash }]
 		return encodeCbor({ exclusions: [{ xpath: '/uuid' }], merkle })
+	}
+
+	// A `c2pa.hash.bmff.v3` assertion with the given merkle field and no flat hash.
+	function merkleOnlyCbor(merkle: unknown): Uint8Array {
+		return encodeCbor({ exclusions: [{ xpath: '/uuid' }], merkle })
+	}
+
+	it('returns the session keys and Merkle maps of an init with a matching Merkle initHash', async (context) => {
+		const init = await buildSignedInitSegment(signer, [
+			{ label: 'c2pa.hash.bmff.v3', cbor: await merkleAssertionCbor() },
+			await buildSessionKeysAssertion(signer, [activeEntry(key001)]),
+		])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		strictEqual(result.merkleMaps.length, 1)
+		deepStrictEqual(result.errorCodes, [])
+	})
+
+	const FAILING_MERKLE_FIELDS: readonly (readonly [string, unknown])[] = [
+		['a Merkle map that does not conform', [{}]],
+		['a Merkle initHash that does not match', [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash: new Uint8Array(32) }]],
+		['a merkle field that is null', null],
+	]
+
+	for (const [description, merkle] of FAILING_MERKLE_FIELDS) {
+		it(`withholds the session keys and Merkle maps of an init with ${description}`, async (context) => {
+			const init = await buildSignedInitSegment(signer, [
+				{ label: 'c2pa.hash.bmff.v3', cbor: merkleOnlyCbor(merkle) },
+				await buildSessionKeysAssertion(signer, [activeEntry(key001)]),
+			])
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.merkleMaps, [])
+			strictEqual(result.isValid, false)
+		})
 	}
 
 	for (const [description, sessionKeysCbor] of NONCONFORMING_ASSERTIONS) {
