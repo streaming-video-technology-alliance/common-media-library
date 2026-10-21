@@ -5,6 +5,7 @@
 ```ts
 
 import { ResourceTiming } from '@svta/cml-utils';
+import { ValueOf } from '@svta/cml-utils';
 
 // @beta
 export type BitrateDecision = {
@@ -31,10 +32,45 @@ export type BitrateSelectorInput = {
 };
 
 // @beta
+export const BOLA_DEFAULT_BUFFER_TARGET = 18;
+
+// @beta
+export type BolaDecision = BitrateDecision & {
+    readonly state: BolaState;
+    readonly placeholder: number;
+};
+
+// @beta
+export type BolaSelector = Omit<BitrateSelector, "select"> & {
+    select(input: BitrateSelectorInput): BolaDecision;
+};
+
+// @beta
+export type BolaSelectorOptions = {
+    safetyFactor?: number;
+    starvationSafetyFactor?: number;
+};
+
+// @beta
+export const BolaState: {
+    readonly STARTUP: "startup";
+    readonly STEADY: "steady";
+};
+
+// @beta (undocumented)
+export type BolaState = ValueOf<typeof BolaState>;
+
+// @beta
+export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector;
+
+// @beta
 export function createThroughputSelector(options?: ThroughputSelectorOptions): BitrateSelector;
 
 // @beta
 export const DEFAULT_SAFETY_FACTOR = .9;
+
+// @beta
+export const DEFAULT_STARVATION_SAFETY_FACTOR = .7;
 
 // @beta
 export const DEFAULT_STARVATION_TOLERANCE = 4;

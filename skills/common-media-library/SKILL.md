@@ -56,6 +56,7 @@ Reference: references/608.md
 Bitrate selection functionality
 
 - Pick a bitrate ladder rung from a throughput estimate and the buffer level: `createThroughputSelector`
+- Pick a rung from the buffer level with BOLA, and tune its safety factors: `createBolaSelector`, `BolaSelectorOptions`
 - Implement a custom bitrate selection algorithm behind the shared interface: `BitrateSelector`, `BitrateSelectorInput`, `BitrateDecision`
 - Feed segment download samples to a selector: `SegmentSample`
 - Tune the safety factor, the upgrade factor, and the starvation tolerance: `ThroughputSelectorOptions`, `DEFAULT_SAFETY_FACTOR`

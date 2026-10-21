@@ -19,3 +19,4 @@ Please add entries to the bottom of the list in the following format:
 - @N1Knight [Nicolás Caballero, Qualabs]
 - @valentinamgiusti [Valentina Giusti, Qualabs]
 - @tobbee [Torbjörn Einarsson, Eyevinn]
+- @mrappard [Matthew Rappard, Cognitive Proof]

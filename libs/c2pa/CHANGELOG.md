@@ -12,6 +12,34 @@ and this project adheres to
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
+## [1.5.0] - 2026-10-21
+
+### Security
+
+- `validateC2paManifestBoxSegment` now fails a segment whose manifest has no `c2pa.hash.bmff.v3` assertion. The result includes `LiveVideoStatusCode.SEGMENT_INVALID` ([#522](https://github.com/streaming-video-technology-alliance/common-media-library/issues/522)).
+- `validateC2paManifestBoxSegment` now fails a segment whose `c2pa.hash.bmff.v3` assertion is not a map, has no `hash`, or has only a `value` field. The result includes `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`.
+- `validateC2paInitSegment` now fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` for a malformed `c2pa.hash.bmff.v3` assertion ([#550](https://github.com/streaming-video-technology-alliance/common-media-library/issues/550)). Malformed means not a map, no `hash` and no Merkle maps, or only a `value` field.
+- `validateC2paInitSegment` no longer returns `sessionKeys` or `merkleMaps` for an init segment that fails a content hash check. This covers a flat hash or a Merkle `initHash` that does not match, and a Merkle map that does not conform.
+
+### Added
+
+- `C2paStatusCode` now has `CLAIM_HARD_BINDINGS_MISSING` (`claim.hardBindings.missing`). `validateC2paManifestBoxSegment` reports it for a manifest without any hard binding assertion.
+
+### Fixed
+
+- `validateC2paSegment` no longer fails a segment after a gap in the sequence numbers, so the authentic segment after a tampered segment passes ([#546](https://github.com/streaming-video-technology-alliance/common-media-library/issues/546)). `result.sequenceResult` still reports `SequenceValidationReason.GAP_DETECTED` with `missingFrom` and `missingTo`.
+- `validateC2paSegment` now reports `LiveVideoStatusCode.SEGMENT_INVALID` instead of `LiveVideoStatusCode.ASSERTION_INVALID` for a duplicate, out-of-order, or below-minimum sequence number. The order check is a library rule with the code of the C2PA 2.5 draft. If your application handles `livevideo.assertion.invalid` for VSI segments, handle `livevideo.segment.invalid` instead.
+- `validateC2paManifestBoxSegment` now chains `previousManifestId` to the manifest identifier of the previous segment, the `urn:c2pa:` JUMBF label, and compares the identifiers exactly ([#545](https://github.com/streaming-video-technology-alliance/common-media-library/issues/545)). It no longer removes an `xmp:iid:` or `urn:uuid:` prefix or ignores case.
+- The JUMBF label counts as the manifest identifier only if the claim `signature` URI names it, in the absolute form `self#jumbf=/c2pa/<label>/c2pa.signature`. For a URI relative to the manifest, such as `self#jumbf=c2pa.signature`, `validateC2paManifestBoxSegment` fails with `LiveVideoStatusCode.SEGMENT_INVALID` and `validateC2paInitSegment` returns a `null` `manifestId`. A changed label therefore cannot take the identity of an omitted segment.
+- A claim without a `signature` URI now fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. So does a URI that does not resolve to the signature box of the same manifest. `validateC2paInitSegment` and `validateC2paManifestBoxSegment` both report it.
+- A claim `instanceID`, `claim_generator`, or `dc:title` that is not a text string now counts as absent. `C2paManifest.instanceId` is `null` for such an `instanceID` ([#521](https://github.com/streaming-video-technology-alliance/common-media-library/issues/521)).
+
+### Changed
+
+- `nextManifestId` and `InitSegmentValidation.manifestId` now hold the `urn:c2pa:` URN of the manifest instead of the claim `instanceID`. The `manifestId` of a Verifiable Segment Info now matches the `manifestId` of its init segment. If your application stores a `lastManifestId` between sessions, discard values that it stored with an earlier version.
+- `validateC2paInitSegment` reports a `c2pa.hash.bmff.v3` assertion with a `hash` that is not a byte string with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` instead of `LiveVideoStatusCode.INIT_INVALID`. The same code replaces `INIT_INVALID` for exclusions that do not conform to C2PA section 18.6. Handle `ASSERTION_BMFFHASH_MALFORMED` where you handle `INIT_INVALID`.
+- A flat content hash that does not match now adds `C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH` next to `LiveVideoStatusCode.INIT_INVALID`.
+
 ## [1.4.1] - 2026-10-18
 
 ### Changed
@@ -174,7 +202,8 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.5.0...HEAD
+[1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.1...c2pa-v1.5.0
 [1.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.0...c2pa-v1.4.1
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.3.0...c2pa-v1.4.0
 [1.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.2.0...c2pa-v1.3.0

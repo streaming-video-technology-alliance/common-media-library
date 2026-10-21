@@ -36,7 +36,7 @@ The returned `InitSegmentValidation` object contains:
 |-------|------|-------------|
 | `manifest` | `C2paManifest \| null` | Parsed manifest (label, assertions, signature info) |
 | `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate |
-| `manifestId` | `string \| null` | Manifest identifier |
+| `manifestId` | `string \| null` | Manifest identifier (`urn:c2pa:` URN), from the JUMBF label of the manifest. `null` if the claim `signature` URI does not name the label, as with a URI relative to the manifest. Compare it with the `manifestId` of each segment. |
 | `sessionKeys` | `readonly ValidatedSessionKey[]` | Session keys with valid signer binding |
 | `isValid` | `boolean` | All checks passed |
 | `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |
@@ -111,11 +111,11 @@ The `SegmentValidationResult` contains:
 | `bmffHashHex` | `string \| null` | Hex-encoded BMFF content hash |
 | `kidHex` | `string \| null` | Hex-encoded key ID used for verification |
 | `sequenceResult` | `SequenceValidationResult` | Sequence number validation outcome |
-| `isValid` | `boolean` | All crypto and sequence checks passed |
+| `isValid` | `boolean` | All checks passed. A gap does not fail the segment. |
 | `errorCodes` | `readonly LiveVideoStatusCode[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments. A segment whose signature or content hash does not verify leaves `nextSequenceState` equal to the `sequenceState` that the function received. The same applies to a segment whose session key is missing, not yet active, or expired. After a seek or an encoder restart, pass `undefined` to start a new state.
+> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments. A duplicate, out-of-order, or below-minimum sequence number fails the segment with `LiveVideoStatusCode.SEGMENT_INVALID`. C2PA 2.4 section 19.7.3 defines only the below-minimum check. The duplicate and out-of-order check is a library rule with the code of the C2PA 2.5 draft. A gap does not fail the segment. `sequenceResult` reports the gap and its missing range. A segment whose signature or content hash does not verify leaves `nextSequenceState` equal to the `sequenceState` that the function received. The same applies to a segment whose session key is missing, not yet active, or expired. After a seek or an encoder restart, pass `undefined` to start a new state.
 
 ## Complete Example
 
@@ -124,7 +124,6 @@ import {
   validateC2paInitSegment,
   validateC2paSegment,
   SequenceValidationReason,
-  LiveVideoStatusCode,
 } from '@svta/cml-c2pa'
 import type { SequenceState } from '@svta/cml-c2pa'
 
@@ -166,9 +165,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
       console.error(`Segment ${result.sequenceNumber}: failed`, result.errorCodes)
     }
 
-    // Check sequence continuity. A gap is meaningful only for a segment whose signature and hash verify.
-    const verified = !result.errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID)
-    if (verified && result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
+    // A gap does not fail the segment. Report the missing segments before a valid segment.
+    if (result.isValid && result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
       console.warn(
         `Missing segments ${result.sequenceResult.missingFrom}` +
         ` through ${result.sequenceResult.missingTo}`,
@@ -228,7 +226,7 @@ import { SequenceValidationReason } from '@svta/cml-c2pa'
 |----------|-------|-------|-------------|
 | `VALID` | `valid` | `true` | Sequence number is the next expected value |
 | `DUPLICATE` | `duplicate` | `false` | Sequence number was already seen |
-| `GAP_DETECTED` | `gap_detected` | `false` | One or more sequence numbers were skipped |
+| `GAP_DETECTED` | `gap_detected` | `false` | One or more sequence numbers were skipped. The segment is not invalid for this reason. |
 | `OUT_OF_ORDER` | `out_of_order` | `false` | Sequence number is less than the last seen |
 | `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | Below the session key's `minSequenceNumber` |
 

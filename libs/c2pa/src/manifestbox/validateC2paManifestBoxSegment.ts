@@ -17,13 +17,7 @@ import type {
 
 const LIVE_VIDEO_ASSERTION_LABEL = 'c2pa.livevideo.segment'
 const BMFF_HASH_ASSERTION_LABEL = 'c2pa.hash.bmff.v3'
-const MANIFEST_ID_PREFIX_PATTERN = /^(xmp:iid:|urn:uuid:)/i
 const CONTINUITY_METHOD_MANIFEST_ID = 'c2pa.manifestId'
-
-function normalizeManifestId(id: string | null): string | null {
-	if (!id) return null
-	return id.replace(MANIFEST_ID_PREFIX_PATTERN, '').toLowerCase()
-}
 
 function extractAssertionData(data: unknown): Record<string, unknown> | null {
 	if (data !== null && typeof data === 'object' && !Array.isArray(data)) {
@@ -78,15 +72,15 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const assertion = assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL)
 	if (!assertion) return EMPTY_BMFF_HASH
 
+	// §19.3.1
 	const data = extractAssertionData(assertion.data)
-	if (!data) return EMPTY_BMFF_HASH
+	if (!data) return { ...EMPTY_BMFF_HASH, malformed: true }
 
-	const rawHash = data['hash'] ?? data['value']
-	const hashBytes = toUint8Array(rawHash)
+	const hashBytes = toUint8Array(data['hash'])
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
 	const alg = typeof data['alg'] === 'string' ? normalizeAlgorithmName(data['alg']) : null
-	return { hashBytes, hashHex, exclusions: exclusions ?? [], alg, malformed: (rawHash != null && hashBytes === null) || exclusions === null }
+	return { hashBytes, hashHex, exclusions: exclusions ?? [], alg, malformed: hashBytes === null || exclusions === null }
 }
 
 // --- Manifest parsing ---
@@ -146,7 +140,7 @@ async function validateContinuity(
 	if (method === CONTINUITY_METHOD_MANIFEST_ID) {
 		const prev = liveVideo?.previousManifestId ?? null
 		if (!prev) return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID]
-		const broken = !!lastManifestId && normalizeManifestId(prev) !== normalizeManifestId(lastManifestId)
+		const broken = !!lastManifestId && prev !== lastManifestId
 		return broken ? [LiveVideoStatusCode.SEGMENT_INVALID] : []
 	}
 
@@ -166,7 +160,8 @@ async function validateContinuity(
  *
  * Parses the C2PA manifest embedded in the segment and validates per §19.7.1 and §19.7.2.
  * Recomputes the `c2pa.hash.bmff.v3` content hash from the raw segment bytes and compares
- * it against the expected hash in the manifest assertion. Checks live-video assertions
+ * it against the expected hash in the manifest assertion. A manifest without a
+ * `c2pa.hash.bmff.v3` assertion, or with one that has no hash, fails. Checks live-video assertions
  * (sequenceNumber, streamId, continuityMethod) and manifest-ID chain continuity.
  * The live-video and BMFF hash fields of the result come only from assertions whose
  * hash matches a claim reference. Check `isValid` before you use any field.
@@ -178,7 +173,9 @@ async function validateContinuity(
  * between calls. A segment that fails verification, is on another stream, or
  * does not move the sequence number forward returns the received
  * `lastManifestId` and `state` unchanged. A segment that fails only the
- * continuity check still updates them.
+ * continuity check still updates them. A segment whose claim `signature` URI
+ * is relative to the manifest fails with `SEGMENT_INVALID` and does not update
+ * them, because that URI does not authenticate the manifest identifier.
  *
  * @param bytes - Raw segment bytes
  * @param lastManifestId - Manifest ID from the last segment that updated the state, or `null` for the first segment
@@ -218,7 +215,9 @@ export async function validateC2paManifestBoxSegment(
 		state?.lastSequenceNumber == null ||
 		(sequenceNumber !== null && sequenceNumber > state.lastSequenceNumber)
 
-	let bmffHashMatches = true
+	// §19.3.1: the manifest of each segment has a c2pa.hash.bmff.v3 assertion. Without it, nothing binds the segment content.
+	const bmffHashMissing = internalData !== null && !internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
+	let bmffHashMatches = !bmffHashMissing
 	if (bmff.hashBytes !== null) {
 		// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
 		// box; only Merkle tree hashes may omit the 8-byte offset prefix.
@@ -244,11 +243,21 @@ export async function validateC2paManifestBoxSegment(
 
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
 	if (bmff.malformed) errorCodes.push(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
+	// §15.10.1.2: a manifest without any hard binding assertion is rejected.
+	if (integrity?.hardBindingCount === 0) errorCodes.push(C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING)
+
+	// §19.3: previousManifestId holds the manifest identifier, the JUMBF label of the manifest. Only a claim
+	// `signature` URI that names the label authenticates it (§15.7). Without it the manifestId chain cannot be
+	// verified, so a manifest that passes every integrity check fails, whatever lastManifestId the caller passes.
+	const currentManifestId = internalData?.manifestId ?? null
+	const manifestIdUnverified = integrity !== null && integrity.codes.length === 0 && currentManifestId === null
+	if (manifestIdUnverified && !errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID)) {
+		errorCodes.push(LiveVideoStatusCode.SEGMENT_INVALID)
+	}
 
 	// The continuity check does not gate the advance.
-	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed
+	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed && currentManifestId !== null
 	const advance = authentic && streamIdValid && sequenceNumberValid
-	const currentManifestId = manifest?.instanceId ?? null
 
 	return {
 		result: {

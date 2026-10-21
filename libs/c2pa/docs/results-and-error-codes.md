@@ -27,7 +27,7 @@ The `errorCodes` array may contain several codes when several checks fail. When 
 
 Before you present content as authentic, compare the signer with your own trust anchors. `InitSegmentValidation.certificate` and `ManifestBoxValidationResult.certificate` hold the DER-encoded end-entity certificate from the claim signature. The value is `null` when the signature is absent or carries no certificate.
 
-A manifest without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate, or that does not verify over the claim, fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`.
+A manifest without a `c2pa.signature` box, or with a claim `signature` URI that does not resolve to that box, fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate, or that does not verify over the claim, fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`.
 
 A claim box whose CBOR does not decode fails with `C2paStatusCode.CLAIM_CBOR_INVALID`. A claim box whose CBOR is not a map, for example a map inside a CBOR tag, fails with `C2paStatusCode.CLAIM_MALFORMED`. The library does not check the fields of the claim.
 
@@ -41,10 +41,10 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 
 | Constant | Value | Meaning |
 |----------|-------|---------|
-| `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box or BMFF hash mismatch |
+| `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box, or its BMFF content hash does not match (with `ASSERTION_BMFFHASH_MISMATCH`) |
 | `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
-| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure (signature, hash, or key mismatch), a session key outside its validity period, a broken `c2pa.manifestId` chain, or a failed custom continuity validator |
-| `ASSERTION_INVALID` | `livevideo.assertion.invalid` | sequenceNumber or streamId mismatch |
+| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Signature, hash, or key failure. Key outside the validity period. Manifest box segment without a `c2pa.hash.bmff.v3` assertion. VSI sequence number not moving forward or below the key minimum. Broken `c2pa.manifestId` chain. Manifest box claim `signature` URI that does not name the manifest label. Failed custom continuity validator. |
+| `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
 | `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the init segment has no valid session key (the keys are absent or expired) |
@@ -59,13 +59,13 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 for (const code of result.errorCodes) {
   switch (code) {
     case LiveVideoStatusCode.SEGMENT_INVALID:
-      // Signature, hash, or session key check failed
+      // Signature, hash, key, or VSI sequence failure
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
       // Init segment has an invalid session key or no valid session key
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
-      // Sequence number or stream ID problem
+      // Sequence number or stream ID problem (manifest box method)
       break
     case LiveVideoStatusCode.CONTINUITY_METHOD_INVALID:
       // Manifest ID chain is broken
@@ -108,11 +108,12 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_UNDECLARED` | `assertion.undeclared` | The assertion store holds an assertion that the claim does not reference |
 | `ASSERTION_ACTION_INGREDIENT_MISMATCH` | `assertion.action.ingredientMismatch` | Action requires an ingredient reference but none is present |
 | `CLAIM_SIGNATURE_MISMATCH` | `claimSignature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
-| `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box |
+| `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box, or the claim `signature` URI does not resolve to it |
 | `CLAIM_MISSING` | `claim.missing` | The manifest has no claim box |
 | `CLAIM_CBOR_INVALID` | `claim.cbor.invalid` | The claim box holds CBOR that does not decode |
 | `CLAIM_MALFORMED` | `claim.malformed` | The claim box holds CBOR that is not a map |
 | `CLAIM_MULTIPLE` | `claim.multiple` | The manifest has more than one claim box |
+| `CLAIM_HARD_BINDINGS_MISSING` | `claim.hardBindings.missing` | The manifest of a manifest box segment has no hard binding assertion |
 | `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 
@@ -173,7 +174,7 @@ import { SequenceValidationReason } from '@svta/cml-c2pa'
 |----------|-------|-------|-------------------|-------------|
 | `VALID` | `valid` | `true` | none | Sequence number is the next expected value |
 | `DUPLICATE` | `duplicate` | `false` | none | Sequence number was already seen |
-| `GAP_DETECTED` | `gap_detected` | `false` | `missingFrom`, `missingTo` | One or more sequence numbers were skipped |
+| `GAP_DETECTED` | `gap_detected` | `false` | `missingFrom`, `missingTo` | One or more sequence numbers were skipped. The segment is not invalid for this reason. |
 | `OUT_OF_ORDER` | `out_of_order` | `false` | none | Sequence number is less than the last seen |
 | `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | none | Below the session key's `minSequenceNumber` |
 

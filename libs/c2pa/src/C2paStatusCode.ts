@@ -23,7 +23,7 @@ export const C2paStatusCode = {
 	ASSERTION_ACTION_INGREDIENT_MISMATCH: 'assertion.action.ingredientMismatch',
 	/** Claim signature verification failed, or the signature carries no certificate (§15.7) */
 	CLAIM_SIGNATURE_MISMATCH: 'claimSignature.mismatch',
-	/** The manifest has no `c2pa.signature` box, so the claim signature cannot be found (§15.7) */
+	/** The manifest has no `c2pa.signature` box, or the claim `signature` URI does not resolve to it, for example because it names another manifest (§15.7) */
 	CLAIM_SIGNATURE_MISSING: 'claimSignature.missing',
 	/** The manifest has no claim box (§15.6.1) */
 	CLAIM_MISSING: 'claim.missing',
@@ -33,6 +33,8 @@ export const C2paStatusCode = {
 	CLAIM_MALFORMED: 'claim.malformed',
 	/** The manifest has more than one claim box (§15.6.1) */
 	CLAIM_MULTIPLE: 'claim.multiple',
+	/** The manifest has no hard binding assertion (§15.10.1.2) */
+	CLAIM_HARD_BINDINGS_MISSING: 'claim.hardBindings.missing',
 	/** BMFF hash assertion or Merkle structure is malformed (§15.2.2.3) */
 	ASSERTION_BMFFHASH_MALFORMED: 'assertion.bmffHash.malformed',
 	/** BMFF content hash does not match the committed value (§15.2.2.3) */
