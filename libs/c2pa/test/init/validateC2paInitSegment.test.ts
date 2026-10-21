@@ -127,7 +127,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		const result = await validateC2paInitSegment(init)
 
 		deepStrictEqual(result.merkleMaps, [])
-		strictEqual(result.errorCodes.includes(LiveVideoStatusCode.SESSIONKEY_INVALID), false)
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED, C2paStatusCode.CLAIM_SIGNATURE_MISSING])
 	})
 
 	it('accepts a matching initHash without additional error codes', async () => {
@@ -500,6 +500,17 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		const result = await validateC2paInitSegment(init)
 
 		deepStrictEqual(result.sessionKeys.map(key => key.kid), [key001.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('returns no session keys and no SESSIONKEY_INVALID if every session key has expired', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [expiredEntry(key001), expiredEntry(key002)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys, [])
 		deepStrictEqual(result.errorCodes, [])
 		strictEqual(result.isValid, true)
 	})

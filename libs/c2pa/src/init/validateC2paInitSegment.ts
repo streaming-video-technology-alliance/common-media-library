@@ -209,8 +209,8 @@ async function validateSessionKeys(
  * or if its signer binding fails verification. The function does not check every rule of section 18.25.2.
  * An expired session key does not count as invalid. A `c2pa.session-keys` assertion without a session key,
  * or with CBOR that does not decode, also causes `SESSIONKEY_INVALID`. An init segment without a
- * `c2pa.session-keys` assertion is not invalid: the C2PA Manifest Box method (section 19.3) and
- * VOD Merkle streams carry no session keys.
+ * `c2pa.session-keys` assertion does not cause `SESSIONKEY_INVALID`. In a section 19.4 stream, an empty
+ * `sessionKeys` list makes each VSI segment fail with `SEGMENT_INVALID`.
  *
  * @param bytes - Raw init segment bytes
  * @returns Structured validation result. It has `INIT_INVALID` if the segment has an `mdat` box or no `c2pa.hash.bmff.v3` assertion. It also has `INIT_INVALID` if the content hash does not include the `moov` box (C2PA section 19.2.3). A manifest without a hard binding assertion also has `CLAIM_HARD_BINDINGS_MISSING`. A content hash that does not match adds `INIT_INVALID` and `ASSERTION_BMFFHASH_MISMATCH`. A `c2pa.hash.bmff.v3` assertion that does not conform to the `bmff-hash-map` adds `ASSERTION_BMFFHASH_MALFORMED`.
