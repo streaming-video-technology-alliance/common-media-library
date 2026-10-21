@@ -132,6 +132,8 @@ Segment 3: manifestId = "urn:c2pa:3000...", previousManifestId = "urn:c2pa:2e52.
 
 The manifest ID is the manifest identifier of C2PA, a `urn:c2pa:` URN. The manifest stores it as the JUMBF label of the manifest box. The claim `instanceID` is a different value and does not take part in the chain. The validator compares the two manifest IDs exactly, without normalization.
 
+The JUMBF label is outside the signed claim. The claim `signature` field holds the absolute URI of the signature box, such as `self#jumbf=/c2pa/urn:c2pa:1b3b.../c2pa.signature`, and that URI names the label. The validator uses the label as the manifest ID only if this signed URI names it. Otherwise the result includes `C2paStatusCode.CLAIM_SIGNATURE_MISSING`, and the segment does not update `nextManifestId` or `nextState`.
+
 > [!NOTE]
 > Every segment must declare a `previousManifestId`, including the first one. The first segment usually references the initial static manifest.
 

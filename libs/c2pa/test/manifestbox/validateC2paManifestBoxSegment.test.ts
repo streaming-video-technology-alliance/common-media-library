@@ -254,6 +254,11 @@ async function claimRef(label: string, assertionBox: Uint8Array): Promise<Record
 	return { url: `self#jumbf=c2pa.assertions/${label}`, hash: await sha256(assertionBox.subarray(8)), alg: 'sha256' }
 }
 
+// The claim `signature` field: the absolute URI of the signature box, which names the manifest label.
+function signatureUri(manifestLabel: string): string {
+	return `self#jumbf=/c2pa/${manifestLabel}/c2pa.signature`
+}
+
 // Wraps a manifest store in the C2PA `uuid` box and appends it to the media boxes.
 function buildManifestBoxSegment(manifestLabel: string, ...manifestContent: readonly Uint8Array[]): Uint8Array {
 	const manifestJumb = buildJumb(manifestLabel, ...manifestContent)
@@ -286,6 +291,7 @@ async function buildLiveSegment(
 	const assertionStore = buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion)
 	const claimCborBytes = claimOverride ?? encodeCbor({
 		instanceID: 'urn:uuid:live-segment-test-manifest',
+		signature: signatureUri('urn:uuid:live-segment-test-manifest'),
 		created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoAssertion), await claimRef('c2pa.hash.bmff.v3', bmffAssertion)],
 	})
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
@@ -305,7 +311,7 @@ describe('validateC2paManifestBoxSegment — BMFF hash assertion offset prefix (
 	async function buildSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
 		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData)))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
-		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', created_assertions: [await claimRef('c2pa.hash.bmff.v3', bmffAssertion)] }
+		const claimData = { instanceID: 'urn:uuid:bmff-hash-test-manifest', signature: signatureUri('urn:uuid:bmff-hash-test-manifest'), created_assertions: [await claimRef('c2pa.hash.bmff.v3', bmffAssertion)] }
 		const claim = buildJumb('c2pa.claim', buildBox('cbor', encodeCbor(claimData)))
 		return buildManifestBoxSegment('urn:uuid:bmff-hash-test-manifest', claim, assertionStore)
 	}
@@ -404,6 +410,7 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 		const bmffBox = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData)))
 		const claimCborBytes = encodeCbor({
 			instanceID: 'urn:uuid:live-segment-test-manifest',
+			signature: signatureUri('urn:uuid:live-segment-test-manifest'),
 			created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoBox), await claimRef('c2pa.hash.bmff.v3', bmffBox)],
 		})
 		const segment = buildManifestBoxSegment('urn:uuid:live-segment-test-manifest',
@@ -422,6 +429,7 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 	// A claim that references an assertion the segment does not have. Only a decoded claim can report that.
 	const CLAIM_WITH_MISSING_ASSERTION = {
 		instanceID: 'urn:uuid:live-segment-test-manifest',
+		signature: signatureUri('urn:uuid:live-segment-test-manifest'),
 		created_assertions: [{ url: 'self#jumbf=c2pa.assertions/c2pa.session-keys', hash: new Uint8Array(32), alg: 'sha256' }],
 	}
 
@@ -591,7 +599,7 @@ describe('validateC2paManifestBoxSegment — state advances only from authentic 
 		}
 		const assertionStore = buildJumb('c2pa.assertions', ...assertions)
 		const instanceID = 'instanceId' in fields ? fields.instanceId : `xmp.iid:${fields.manifestId}`
-		const claimCborBytes = encodeCbor({ instanceID, created_assertions: declaredAssertions })
+		const claimCborBytes = encodeCbor({ instanceID, signature: signatureUri(fields.manifestId), created_assertions: declaredAssertions })
 		const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 		const manifestContent = [claim, assertionStore]
 		if (sign) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
@@ -754,6 +762,7 @@ describe('validateC2paManifestBoxSegment — manifest identifier (§19.3)', () =
 		const assertionStore = buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion)
 		const claimCborBytes = encodeCbor({
 			instanceID: instanceId,
+			signature: signatureUri(manifestId),
 			created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoAssertion), await claimRef('c2pa.hash.bmff.v3', bmffAssertion)],
 		})
 		const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
@@ -771,6 +780,51 @@ describe('validateC2paManifestBoxSegment — manifest identifier (§19.3)', () =
 
 		strictEqual(r2.result.isValid, true)
 		strictEqual(r2.nextManifestId, MANIFEST_ID_2)
+	})
+
+	// Replaces the first occurrence of `from` with `to`, which must have the same length. In a segment that
+	// signedSegment builds, the first occurrence of the manifest label is the JUMBF label, before the claim.
+	function relabel(segment: Uint8Array, from: string, to: string): Uint8Array {
+		const bytes = Buffer.from(segment)
+		const at = bytes.indexOf(from, 0, 'latin1')
+		ok(at >= 0 && from.length === to.length)
+		bytes.write(to, at, 'latin1')
+		return new Uint8Array(bytes)
+	}
+
+	it('does not take the identity of an omitted segment from a changed JUMBF label', async () => {
+		const MANIFEST_ID_3 = 'urn:c2pa:3000c55f-ac31-4e62-9cc3-7cb89c3509b6'
+		const s1 = await signedSegment(MANIFEST_ID_1, null, 1, 'urn:c2pa:initial')
+		// s2 is omitted. s3 chains to it.
+		const s3 = await signedSegment(MANIFEST_ID_3, null, 3, MANIFEST_ID_2)
+		// Only the label of s1 changes to the identifier of s2. Nothing is signed again.
+		const forged = relabel(s1, MANIFEST_ID_1, MANIFEST_ID_2)
+
+		const r1 = await validateC2paManifestBoxSegment(forged, null)
+		deepStrictEqual(r1.result.errorCodes, [C2paStatusCode.CLAIM_SIGNATURE_MISSING])
+		strictEqual(r1.nextManifestId, null)
+
+		const r3 = await validateC2paManifestBoxSegment(s3, MANIFEST_ID_1, { lastStreamId: 'stream-id', lastSequenceNumber: 1 })
+		deepStrictEqual(r3.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+	})
+
+	it('fails with CLAIM_SIGNATURE_MISSING if the claim has no signature field', async () => {
+		const hash = await computeBmffHash(buildMediaBoxes(), { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const liveVideoAssertion = buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor({ sequenceNumber: 1, previousManifestId: 'urn:c2pa:initial', streamId: 'stream-id', continuityMethod: 'c2pa.manifestId' })))
+		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })))
+		const claimCborBytes = encodeCbor({
+			created_assertions: [await claimRef('c2pa.livevideo.segment', liveVideoAssertion), await claimRef('c2pa.hash.bmff.v3', bmffAssertion)],
+		})
+		const segment = buildManifestBoxSegment(MANIFEST_ID_1,
+			buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes)),
+			buildJumb('c2pa.assertions', liveVideoAssertion, bmffAssertion),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
+		)
+
+		const { result, nextManifestId } = await validateC2paManifestBoxSegment(segment, null)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.CLAIM_SIGNATURE_MISSING])
+		strictEqual(nextManifestId, null)
 	})
 
 	it('compares manifest identifiers exactly', async () => {

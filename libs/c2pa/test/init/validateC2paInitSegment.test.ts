@@ -764,17 +764,35 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 		strictEqual(result.isValid, false)
 	})
 
-	it('returns the JUMBF label of the manifest as manifestId, not the claim instanceID', async () => {
-		const claimCbor = encodeCbor({ instanceID: 'xmp.iid:5bd9bbf5-3e0e-4627-9d86-6299658b0d80', created_assertions: [] })
-		const manifest = buildJumb('urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83',
+	// A signed init manifest with the JUMBF label `label`, whose claim `signature` URI names `signatureLabel`.
+	async function initWithLabel(label: string, signatureLabel: string): Promise<Uint8Array> {
+		const claimCbor = encodeCbor({
+			instanceID: 'xmp.iid:5bd9bbf5-3e0e-4627-9d86-6299658b0d80',
+			signature: `self#jumbf=/c2pa/${signatureLabel}/c2pa.signature`,
+			created_assertions: [],
+		})
+		return buildInitSegmentWithManifest(buildJumb(label,
 			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
 			buildJumb('c2pa.assertions'),
 			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCbor))),
-		)
+		))
+	}
 
-		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
+	it('returns the JUMBF label of the manifest as manifestId, not the claim instanceID', async () => {
+		const label = 'urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83'
 
-		strictEqual(result.manifestId, 'urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83')
+		const result = await validateC2paInitSegment(await initWithLabel(label, label))
+
+		strictEqual(result.manifestId, label)
 		strictEqual(result.manifest?.instanceId, 'xmp.iid:5bd9bbf5-3e0e-4627-9d86-6299658b0d80')
+	})
+
+	it('returns a null manifestId if the claim signature URI does not name the JUMBF label', async () => {
+		const result = await validateC2paInitSegment(await initWithLabel(
+			'urn:c2pa:2e52408b-4fbe-4557-8e84-e7e4a21a5107',
+			'urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83',
+		))
+
+		strictEqual(result.manifestId, null)
 	})
 })

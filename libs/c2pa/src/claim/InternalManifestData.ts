@@ -25,7 +25,7 @@ export type InternalAssertionData = {
  */
 export type InternalManifestData = {
 	readonly manifest: C2paManifest
-	/** The JUMBF label of the manifest, which is its manifest identifier (C2PA URN), or null if the label is absent */
+	/** The JUMBF label of the manifest, which is its manifest identifier (C2PA URN). Null if the label is absent or the claim `signature` URI does not name it. */
 	readonly manifestId: string | null
 	readonly claimAssertionRefs: readonly ClaimAssertionRef[]
 	readonly claimCborBytes: Uint8Array | null

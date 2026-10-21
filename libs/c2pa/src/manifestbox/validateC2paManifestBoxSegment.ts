@@ -244,11 +244,18 @@ export async function validateC2paManifestBoxSegment(
 	// §15.10.1.2: a manifest without any hard binding assertion is rejected.
 	if (integrity?.hardBindingCount === 0) errorCodes.push(C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING)
 
-	// The continuity check does not gate the advance.
-	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed
-	const advance = authentic && streamIdValid && sequenceNumberValid
 	// §19.3: previousManifestId holds the manifest identifier, which is the JUMBF label of the manifest (C2PA URN).
+	// The label is authenticated only through the claim `signature` URI. If that URI does not name the label,
+	// it does not resolve to the signature in the same manifest, which fails with claimSignature.missing.
 	const currentManifestId = internalData?.manifestId ?? null
+	const claimDecoded = internalData !== null && internalData.claimCborBytes !== null && internalData.claimCode === null
+	if (claimDecoded && currentManifestId === null && !errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING)) {
+		errorCodes.push(C2paStatusCode.CLAIM_SIGNATURE_MISSING)
+	}
+
+	// The continuity check does not gate the advance.
+	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed && currentManifestId !== null
+	const advance = authentic && streamIdValid && sequenceNumberValid
 
 	return {
 		result: {
