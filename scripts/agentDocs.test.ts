@@ -1,6 +1,6 @@
 import { deepEqual, equal, throws } from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { checkExports, parseWhenToUse, readExports } from './agentDocs.ts'
+import { checkExports, parseWhenToUse, readExports, rewriteLinks, siteBase, siteUrl, sourceBase, sourceUrl } from './agentDocs.ts'
 
 const readme = `# @svta/cml-example
 
@@ -86,5 +86,44 @@ describe('checkExports', () => {
 	it('accepts a section whose identifiers are all exports', () => {
 		const section = parseWhenToUse(readme, file)
 		checkExports(section, new Set(['readBoxes', 'findBox', 'writeEmsg']), file)
+	})
+})
+
+describe('rewriteLinks', () => {
+	const toUrl = (repoPath: string): string => `https://example.test/${repoPath}`
+
+	it('resolves a README link to a guide against the package folder', () => {
+		equal(rewriteLinks('[Reading](docs/reading-boxes.md)', 'libs/iso-bmff/README.md', toUrl), '[Reading](https://example.test/libs/iso-bmff/docs/reading-boxes.md)')
+	})
+
+	it('resolves a guide link to a sibling guide and keeps the anchor', () => {
+		equal(rewriteLinks('[Keys](./user-guide.md#custom-keys)', 'libs/cmcd/docs/validation-guide.md', toUrl), '[Keys](https://example.test/libs/cmcd/docs/user-guide.md#custom-keys)')
+	})
+
+	it('resolves a link that leaves the package', () => {
+		equal(rewriteLinks('[Root](../../README.md)', 'libs/cmcd/README.md', toUrl), '[Root](https://example.test/README.md)')
+	})
+
+	it('leaves absolute links, anchors, and root-relative links alone', () => {
+		const text = '[a](https://x.y/z) [b](#top) [c](/abs.md) [d](mailto:x@y.z)'
+		equal(rewriteLinks(text, 'libs/cmcd/README.md', toUrl), text)
+	})
+
+	it('rewrites every link in a document', () => {
+		equal(rewriteLinks('[a](a.md) and [b](b.md)', 'libs/x/README.md', toUrl), '[a](https://example.test/libs/x/a.md) and [b](https://example.test/libs/x/b.md)')
+	})
+})
+
+describe('sourceUrl', () => {
+	it('prefixes the source base', () => {
+		equal(sourceUrl('libs/cmcd/README.md'), `${sourceBase}libs/cmcd/README.md`)
+	})
+})
+
+describe('siteUrl', () => {
+	it('points a copied file at the site and any other file at the source', () => {
+		const toUrl = siteUrl(new Map([['libs/iso-bmff/docs/reading-boxes.md', 'llms/iso-bmff/docs/reading-boxes.md']]))
+		equal(toUrl('libs/iso-bmff/docs/reading-boxes.md'), `${siteBase}llms/iso-bmff/docs/reading-boxes.md`)
+		equal(toUrl('libs/iso-bmff/src/index.ts'), `${sourceBase}libs/iso-bmff/src/index.ts`)
 	})
 })

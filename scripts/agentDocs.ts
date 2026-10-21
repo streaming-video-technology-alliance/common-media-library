@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 export const siteBase = 'https://streaming-video-technology-alliance.github.io/common-media-library/'
 export const sourceBase = 'https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/'
 export const skillDir = 'skills/common-media-library'
@@ -109,5 +111,45 @@ export function checkExports(section: WhenToUse, exports: Set<string>, file: str
 				throw new Error(`${file}: "${name}" in the bullet "${bullet.text}" is not an export of the package. Check the API report under config/.`)
 			}
 		}
+	}
+}
+
+const link = /\]\(([^)\s]+)\)/g
+const notRelative = /^([a-z][a-z0-9+.-]*:|#|\/)/i
+
+/**
+ * Rewrites every relative markdown link in `markdown`. `sourcePath` is the repo path of the file
+ * that holds the text. `toUrl` receives the repo path of the link target and returns the URL.
+ */
+export function rewriteLinks(markdown: string, sourcePath: string, toUrl: (repoPath: string) => string): string {
+	const dir = path.posix.dirname(sourcePath)
+
+	return markdown.replace(link, (match, target: string) => {
+		if (notRelative.test(target)) {
+			return match
+		}
+
+		const hash = target.indexOf('#')
+		const file = hash === -1 ? target : target.slice(0, hash)
+		const anchor = hash === -1 ? '' : target.slice(hash)
+		const repoPath = path.posix.normalize(path.posix.join(dir, file))
+
+		return `](${toUrl(repoPath)}${anchor})`
+	})
+}
+
+/** The GitHub URL of a repo path. */
+export function sourceUrl(repoPath: string): string {
+	return sourceBase + repoPath
+}
+
+/**
+ * Returns a `toUrl` for the docs site. `copies` maps a repo path to the path of its copy under the
+ * site root. A target without a copy points at GitHub.
+ */
+export function siteUrl(copies: Map<string, string>): (repoPath: string) => string {
+	return (repoPath) => {
+		const copy = copies.get(repoPath)
+		return copy === undefined ? sourceUrl(repoPath) : siteBase + copy
 	}
 }
