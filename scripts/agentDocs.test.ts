@@ -1,6 +1,8 @@
 import { deepEqual, equal, throws } from 'node:assert/strict'
+import { existsSync, readFileSync } from 'node:fs'
+import path from 'node:path'
 import { describe, it } from 'node:test'
-import { checkExports, indexEnd, indexStart, loadAllPackageDocs, parseWhenToUse, readExports, renderIndex, renderLlmsTxt, renderReference, replaceIndex, rewriteLinks, siteBase, siteCopies, siteUrl, sourceBase, sourceUrl, type PackageDocs } from './agentDocs.ts'
+import { checkExports, indexEnd, indexStart, loadAllPackageDocs, parseWhenToUse, readExports, renderIndex, renderLlmsTxt, renderReference, repoRoot, replaceIndex, rewriteLinks, siteBase, siteCopies, siteUrl, skillDir, sourceBase, sourceUrl, writeSkill, type PackageDocs } from './agentDocs.ts'
 import { projects } from './projects.ts'
 
 const readme = `# @svta/cml-example
@@ -231,5 +233,18 @@ describe('published packages', () => {
 		// loadPackageDocs throws on a missing section, a malformed bullet, or an identifier that the API report does not export.
 		const packages = loadAllPackageDocs()
 		deepEqual(packages.map(pkg => pkg.folder).sort(), [...projects].sort())
+	})
+})
+
+describe('writeSkill', () => {
+	it('writes an index for every package and a reference file per package, under 500 lines', () => {
+		writeSkill()
+		const skill = readFileSync(path.join(repoRoot, skillDir, 'SKILL.md'), 'utf8')
+		equal(skill.split('\n').length < 500, true, 'SKILL.md has 500 lines or more')
+		for (const folder of projects) {
+			const slug = path.posix.basename(folder)
+			equal(skill.includes(`\nReference: references/${slug}.md\n`), true, `${slug} is missing from the index`)
+			equal(existsSync(path.join(repoRoot, skillDir, 'references', `${slug}.md`)), true, `references/${slug}.md is missing`)
+		}
 	})
 })

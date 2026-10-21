@@ -37,5 +37,8 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Generated skill files are current
+        run: git diff --exit-code -- skills
+
       # - name: Change Log
       #   uses: dangoslen/changelog-enforcer@v3

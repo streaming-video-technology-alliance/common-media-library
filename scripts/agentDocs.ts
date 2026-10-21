@@ -1,5 +1,6 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { parseArgs } from 'node:util'
 import { projects } from './projects.ts'
 
 export const siteBase = 'https://streaming-video-technology-alliance.github.io/common-media-library/'
@@ -334,4 +335,39 @@ export function renderLlmsTxt(packages: PackageDocs[]): string {
 		`- [Agent skill](${skillUrl}): the Agent Skills bundle, install with \`${installCommand}\``,
 		'',
 	].join('\n')
+}
+
+/** Regenerates the package index in SKILL.md and one reference file per published package. */
+export function writeSkill(): void {
+	const packages = loadAllPackageDocs()
+	const dir = path.join(repoRoot, skillDir)
+	const skillPath = path.join(dir, 'SKILL.md')
+	const refs = path.join(dir, 'references')
+	const slugs = new Set(packages.map(pkg => `${pkg.slug}.md`))
+
+	mkdirSync(refs, { recursive: true })
+	writeFileSync(skillPath, replaceIndex(readFileSync(skillPath, 'utf8'), renderIndex(packages)))
+
+	for (const file of readdirSync(refs)) {
+		if (!slugs.has(file)) {
+			rmSync(path.join(refs, file))
+		}
+	}
+
+	for (const pkg of packages) {
+		writeFileSync(path.join(refs, `${pkg.slug}.md`), renderReference(pkg, sourceUrl))
+	}
+}
+
+if (import.meta.main) {
+	const { values } = parseArgs({ options: { skill: { type: 'boolean' }, site: { type: 'string' } } })
+
+	if (!values.skill && values.site === undefined) {
+		throw new Error('Pass --skill, --site <dir>, or both.')
+	}
+
+	if (values.skill) {
+		writeSkill()
+		console.log(`Wrote ${skillDir}`)
+	}
 }
