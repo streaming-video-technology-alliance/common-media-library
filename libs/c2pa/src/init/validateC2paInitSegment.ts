@@ -68,9 +68,12 @@ async function validateBmffHashAssertion(
 	assertion: C2paAssertion | null,
 ): Promise<boolean> {
 	if (!assertion) return true
+	if (assertion.data === null || typeof assertion.data !== 'object' || Array.isArray(assertion.data)) return false
 	const data = assertion.data as Record<string, unknown>
-	const rawHash = data['hash'] ?? data['value']
-	if (!rawHash) return true
+	// The bmff-hash-map defines the content hash only as `hash`. A `value` field does not replace it.
+	// Only a VOD Merkle init has no flat hash, because its `merkle` maps bind the content.
+	const rawHash = data['hash']
+	if (rawHash == null) return data['merkle'] !== undefined
 	if (!(rawHash instanceof Uint8Array)) return false
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	const exclusions = parseExclusions(data['exclusions'])

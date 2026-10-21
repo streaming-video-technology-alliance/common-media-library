@@ -256,7 +256,7 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 	// Unsigned init segment with a `c2pa.hash.bmff.v3` assertion; no signature box,
 	// so integrity checks skip signature verification. The claim declares the assertion by
 	// hash so it reaches the validator's claim-verified assertion set.
-	async function buildInitSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
+	async function buildInitSegment(assertionData: unknown): Promise<Uint8Array> {
 		const bmffAssertion = buildJumb('c2pa.hash.bmff.v3', buildBox('cbor', encodeCbor(assertionData)))
 		const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 		const claimData = {
@@ -310,6 +310,33 @@ describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.
 		// The constraint never matches the empty moov box, so the hash is the flat hash of ftyp + moov.
 		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
 		const init = await buildInitSegment({ exclusions: [{ xpath: '/uuid' }, { xpath: '/moov', data: [{ offset: 8, value: [0] }] }], alg: 'sha256', hash })
+
+		const result = await validateC2paInitSegment(init)
+
+		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+	})
+
+	for (const [name, hashField] of [['a missing hash', {}], ['a null hash', { hash: null }]] as const) {
+		it(`rejects ${name} with a matching value field`, async () => {
+			const value = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+			const init = await buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', ...hashField, value })
+
+			const result = await validateC2paInitSegment(init)
+
+			ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+		})
+	}
+
+	it('rejects an assertion without a hash and without merkle maps', async () => {
+		const init = await buildInitSegment({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256' })
+
+		const result = await validateC2paInitSegment(init)
+
+		ok(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID))
+	})
+
+	it('rejects an assertion that is not a map', async () => {
+		const init = await buildInitSegment([await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })])
 
 		const result = await validateC2paInitSegment(init)
 
