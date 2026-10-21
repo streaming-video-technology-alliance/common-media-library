@@ -111,11 +111,11 @@ The `SegmentValidationResult` contains:
 | `bmffHashHex` | `string \| null` | Hex-encoded BMFF content hash |
 | `kidHex` | `string \| null` | Hex-encoded key ID used for verification |
 | `sequenceResult` | `SequenceValidationResult` | Sequence number validation outcome |
-| `isValid` | `boolean` | All crypto and sequence checks passed |
+| `isValid` | `boolean` | All checks passed. A gap does not fail the segment. |
 | `errorCodes` | `readonly LiveVideoStatusCode[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments. A duplicate, out-of-order, or below-minimum sequence number fails the segment with `LiveVideoStatusCode.SEGMENT_INVALID`, as C2PA section 19.7.3 requires. A gap does not fail the segment. `sequenceResult` reports the gap and its missing range. A segment whose signature or content hash does not verify leaves `nextSequenceState` equal to the `sequenceState` that the function received. The same applies to a segment whose session key is missing, not yet active, or expired. After a seek or an encoder restart, pass `undefined` to start a new state.
+> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments. A duplicate, out-of-order, or below-minimum sequence number fails the segment with `LiveVideoStatusCode.SEGMENT_INVALID`. C2PA 2.4 section 19.7.3 defines only the below-minimum check. The duplicate and out-of-order check is a library rule with the code of the C2PA 2.5 draft. A gap does not fail the segment. `sequenceResult` reports the gap and its missing range. A segment whose signature or content hash does not verify leaves `nextSequenceState` equal to the `sequenceState` that the function received. The same applies to a segment whose session key is missing, not yet active, or expired. After a seek or an encoder restart, pass `undefined` to start a new state.
 
 ## Complete Example
 

@@ -43,7 +43,7 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 |----------|-------|---------|
 | `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box or BMFF hash mismatch |
 | `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
-| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Crypto failure (signature, hash, or key mismatch), a manifest box segment without a `c2pa.hash.bmff.v3` assertion, a session key outside its validity period, a VSI sequence number that does not move forward or is below the minimum of the key, a broken `c2pa.manifestId` chain, or a failed custom continuity validator |
+| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Signature, hash, or key failure. Key outside the validity period. Manifest box segment without a `c2pa.hash.bmff.v3` assertion. VSI sequence number not moving forward or below the key minimum. Broken `c2pa.manifestId` chain. Failed custom continuity validator. |
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
@@ -59,13 +59,13 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 for (const code of result.errorCodes) {
   switch (code) {
     case LiveVideoStatusCode.SEGMENT_INVALID:
-      // Signature, hash, or session key check failed
+      // Signature, hash, key, or VSI sequence failure
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
       // Init segment has an invalid session key or no valid session key
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
-      // Sequence number or stream ID problem
+      // Sequence number or stream ID problem (manifest box method)
       break
     case LiveVideoStatusCode.CONTINUITY_METHOD_INVALID:
       // Manifest ID chain is broken

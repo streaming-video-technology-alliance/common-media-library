@@ -115,7 +115,7 @@ export async function validateC2paSegment(
 
 	const codes = new Set<LiveVideoStatusCode>()
 	if (!authentic || !sequenceAboveMin) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
-	// §19.7.3 fails a sequenceNumber that does not move forward or is below the minimum of the key.
+	// C2PA 2.4 §19.7.3 defines only the minSequenceNumber check. The order check is a library rule with the 2.5 draft code.
 	// A gap is not a failure. sequenceResult still reports it, so the caller can detect missing segments.
 	if (!sequenceResult.isValid && sequenceResult.reason !== SequenceValidationReason.GAP_DETECTED) {
 		codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
