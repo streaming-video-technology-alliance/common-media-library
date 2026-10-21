@@ -7,7 +7,7 @@ status: accepted
 | | |
 |---|---|
 | **Author** | Nicolas Caballero |
-| **Date** | 2026-10-05 (revised 2026-10-20) |
+| **Date** | 2026-10-05 (revised 2026-10-21) |
 | **Package** | `@svta/cml-abr` |
 | **Breaking change** | No (new exports) |
 
@@ -66,7 +66,7 @@ const second = selector.select({ ladder, bufferLevel: 4, throughput: estimator.g
 
 What BOLA adds to the shared rules:
 
-- `delay` is positive when the buffer is above the maximum level of the chosen rung. After the wait, call `select` again. The selector adds the wait to its placeholder buffer, and the second call returns a delay of 0. A player that ignores the delay fills the buffer with the selected rung until the real buffer passes the next threshold. The cost is lower quality, not a stall.
+- `delay` is positive when the buffer is above the maximum buffer of the chosen rung. After the wait, call `select` again. The selector adds the wait to its placeholder buffer, and the second call returns a delay of 0. A player that ignores the delay fills the buffer with the selected rung until the real buffer passes the next threshold. The cost is lower quality, not a stall.
 - `bufferTarget` sets the buffer level at which BOLA reaches the top rung. The default is `BOLA_DEFAULT_BUFFER_TARGET`. Pass the field in every call or in none.
 - The starvation guard runs on the pick when the input has a positive `segmentDuration`. The guard lowers the pick when the download of the next segment does not fit in the real buffer. The guard assumes `starvationSafetyFactor` of the throughput for that download. The guard never raises a pick, and it waits until two samples have finished. A live player omits `segmentDuration` to skip the guard, as for the throughput selector.
 - A stall needs no call. The selector derives it from `bufferLevel`. See Stalls.
@@ -92,7 +92,7 @@ The values 10 seconds and 2 seconds per rung come from dash.js. The dash.js foll
 score_i(Q) = (V * (v_i + gamma) - Q) / b_i
 ```
 
-On a tie, the selector picks the higher rung. The selector does not evaluate scores at run time. It precomputes one threshold for each rung and picks the highest rung with a threshold at or below `Q`:
+On a tie, the selector picks the higher rung. An effective buffer within one nanosecond below a threshold counts as a tie, so rounding does not change a pick. The selector does not evaluate scores at run time. It precomputes one threshold for each rung and picks the highest rung with a threshold at or below `Q`:
 
 ```
 threshold_0 = 0
@@ -138,18 +138,18 @@ The selector keeps a placeholder buffer. This is virtual buffer time that the se
 
 | Input | Effect |
 |---|---|
-| `select`, startup state | Picks the highest rung at or below `throughput * safetyFactor`. Picks rung 0 when the estimate is unknown. Sets the placeholder to `max(0, threshold - bufferLevel)` for that rung. Moves to the steady state after the first `sample` call, when the buffer holds at least one segment. |
+| `select`, startup state | Picks the highest rung at or below `throughput * safetyFactor`. Picks rung 0 when the estimate is unknown. Sets the placeholder to `max(0, threshold - bufferLevel)` for that rung. Moves to the steady state in the first call after a `sample`, when the buffer holds at least one segment. That call still picks from the throughput. |
 | `select`, steady state | Adds the wall-clock time since the last request end to the placeholder. If no request ended since the last call, the selector uses the time since the last call. If the ladder or the buffer target changed, converts `Q`. See Ladder changes. Picks the rung for `Q`. Applies the oscillation guard. Applies the starvation guard. Computes the delay. |
 | `select`, one distinct rung | Returns the highest index of that rung with a delay of 0. The decision reports the startup state and a placeholder of 0. |
 | `sample` | Records the sampled bandwidth as the current rung. Multiplies the placeholder by 0.99. Caps it so that the effective buffer at request start stays at or below the maximum buffer of that rung. Adds `duration` when `isReplacement` is true. |
-| `sample` with `aborted` | Treats the next lower rung as the replacement. Sets the current rung to that rung. Caps the placeholder so that the effective buffer stays at or below the threshold of that rung. A `select` directly after the abort picks the replacement rung when the cap applies. The oscillation guard then blocks a return to the aborted rung until the throughput sustains it. For rung 1 the limit is 0, because `threshold_0` is 0. For rung 0 the current rung stays, and the limit is 10 seconds. |
+| `sample` with `aborted` | Treats the next lower rung as the replacement. Sets the current rung to that rung. Caps the placeholder so that the effective buffer stays at or below the threshold of that rung. A `select` directly after the abort picks the replacement rung when the cap applies. The oscillation guard then blocks a return to the aborted rung until the throughput sustains it. For rung 1 the limit is 0, because `threshold_0` is 0. For rung 0 the current rung stays, and the limit is 10 seconds. The abort is the request end for the clock of the placeholder. |
 | `reset` | Returns to the startup state and clears all history. |
 
 The oscillation guard is the BOLA-O variant. Suppose the score picks a rung above both the current rung and the rung that the throughput sustains. Then the selector keeps the higher of the current rung and the sustained rung. The guard is skipped when the estimate is unknown.
 
 The starvation guard runs after the oscillation guard and before the delay. It runs when the input has a positive `segmentDuration`, the estimate is known, and two samples have finished since the last reset. The guard estimates the download time of a rung as `bandwidth * segmentDuration / (throughput * starvationSafetyFactor)`. It keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. Rung 0 always passes. The guard has one pass, so `starvationTolerance` of the [bitrate selector RFC](../bitrate-selector.md) does not apply. The guard never raises the pick. A lowered pick becomes the current rung. When the guard lowers the pick, the selector skips the delay step.
 
-The delay is `max(0, Q - maximumBuffer(rung))`. The selector drains the placeholder first. The remainder becomes `delay`. At the top rung the delay is always 0.
+The delay is `max(0, Q - maximumBuffer(rung))`. The selector drains the placeholder first. The remainder becomes `delay`. A remainder of one millisecond or less is 0. At the top rung the delay is always 0.
 
 After a delay, the player calls `select` again. The second call adds the wait to the placeholder, and the real buffer is lower by the same amount, so `Q` is unchanged. The delay computation then drains the placeholder, and the call returns 0. A repeated delay is not a defect of the implementation.
 
@@ -181,7 +181,7 @@ placeholder  = max(0, Q_new - bufferLevel)
 | The player changes the minimum or maximum bitrate, or the video size | The player filters the ladder. This is the same case as the previous row. |
 | `bufferTarget` changes | Rebuild and apply the conversion. The decision for the same buffer level stays the same, unless the conversion needs a negative placeholder. Then the placeholder is 0 and the real buffer decides. |
 | Seek or new source | The player calls `reset`. |
-| The ladder gains or loses its second distinct rung | Return to the startup state. |
+| The ladder gains or loses its second distinct rung | Return to the startup state. The selector also forgets the duration of the last segment, so it stays in that state until the next sample. |
 
 The [design record](./design.md) has the measured effect of the conversion on each case.
 
@@ -204,9 +204,10 @@ The selector follows `BolaRule.js` in dash.js, with these deliberate changes:
 - An unknown throughput does not block upward switches in the steady state.
 - A stall is derived from the buffer level, and it clears the time bases of the placeholder.
 - The player injects the time. dash.js reads `Date.now()`.
+- A remainder of one millisecond or less is not a delay, so the call after a wait returns 0. The remainder is a rounding error, and a clock in milliseconds cannot wait for it.
 - An unknown throughput at startup picks rung 0. dash.js makes no decision until an estimate exists.
 - `M` counts the distinct bandwidths. dash.js counts the representations.
-- After an aborted download, the selector treats the next lower rung as the replacement. dash.js uses the rung that the abandon rule picks from the throughput. The selector input has no replacement rung. Both set the current rung to the replacement and cap the effective buffer at the threshold of that rung.
+- After an aborted download, the selector treats the next lower rung as the replacement. dash.js uses the rung that the abandon rule picks from the throughput. The selector input has no replacement rung. Both set the current rung to the replacement and cap the effective buffer at the threshold of that rung. One case differs. When the replacement is rung 0, dash.js caps the effective buffer at 10 seconds. The selector caps it at `threshold_0`, which is 0.
 - After a change of the buffer target, the selector adds the elapsed time and then converts the effective buffer. dash.js converts first and then adds the elapsed time.
 - The starvation guard is part of the selector. dash.js runs `InsufficientBufferRule` as a separate rule with the same cap, `safeThroughput * bufferLevel / segmentDuration`, the same factor of 0.7, and the same two-segment wait. dash.js disables that rule in low-latency mode, and a player of the selector omits `segmentDuration` instead. After a buffer-empty event, dash.js drops to rung 0. The selector empties the placeholder, and the guard at an empty buffer allows rung 0 only.
 
@@ -290,6 +291,7 @@ The placeholder option is a decision in Rationale and alternatives, because the 
 - v4 (2026-10-19): states the abort cap as an effective buffer limit, adds the one-rung row to the state machine, and gives the startup placeholder formula. Lists two more differences from dash.js and the `@beta` tag. Corrects the v2 entry on the closed questions.
 - v5 (2026-10-19): status set to `accepted`.
 - v6 (2026-10-20): corrections after the review of the implementation PR. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. Before, a cap at the threshold of the current rung picked that rung again. The conversion after a ladder or buffer target change runs after the selector adds the elapsed time. The `bufferTarget` row states the negative placeholder exception. The drawbacks and the analysis state the stall comparison with `createThroughputSelector`. The selector runs the starvation guard when the input has `segmentDuration`, with one pass at `starvationSafetyFactor`, and `BolaSelectorOptions` gains that option. Three more differences from dash.js. The analysis attributes the 10 second oscillation finding to the original BOLA and corrects the comparison with MPC and Pensieve. The delay rule is named as a dash.js rule that differs from the pause rule of the paper.
+- v7 (2026-10-21): implementation notes after the review. A remainder of one millisecond or less is not a delay. An effective buffer within one nanosecond below a threshold counts as a tie. A restart for a change of the distinct rungs also forgets the duration of the last segment. The move to the steady state happens in the first call after a sample, and that call still picks from the throughput. An aborted request ends at the abort for the clock of the placeholder. The cap after an abort of the second rung differs from dash.js. The design record has the new file table, the clamped thresholds, the comparison with dash.js, and the final stall counts. The analysis merges the comparison with the throughput selector.
 
 ## Final Decision
 

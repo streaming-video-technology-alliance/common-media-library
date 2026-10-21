@@ -21,18 +21,24 @@ Non-goals for v1:
 
 ## Structure
 
-The package has two layers. The internal functions are pure and carry the math. `createBolaSelector` holds the state in its closure and calls them. One file holds one export or one internal function.
+The package has two layers. The internal functions are pure and hold the math. `createBolaSelector` holds the state in its closure and calls them. One file holds one export, one internal function, or one group of related constants.
 
 | File | Layer | Role |
 |---|---|---|
+| `BolaParams.ts` | Internal | The type of the values that BOLA derives from a ladder and a buffer target. |
 | `createBolaParams.ts` | Internal | Turns a ladder and a buffer target into the thresholds, the maximum buffers, and `V`. |
-| `validateLadder.ts` | Internal | Throws a `RangeError` for an invalid ladder. |
 | `isSameLadder.ts` | Internal | Compares a ladder with a stored copy, with no allocation. |
 | `selectRungByBuffer.ts` | Internal | Returns the highest rung with a threshold at or below the effective buffer. |
-| `selectRungByThroughput.ts` | Internal | Returns the highest rung at or below a bitrate. |
 | `remapEffectiveBuffer.ts` | Internal | Converts the effective buffer between two parameter sets. |
-| The starvation guard function | Internal | Moved out of `createThroughputSelector.ts` and shared by both selectors. |
-| `MINIMUM_BUFFER.ts`, `MINIMUM_BUFFER_PER_RUNG.ts`, `PLACEHOLDER_DECAY.ts`, `STALL_THRESHOLD.ts` | Internal | Named constants, 10, 2, 0.99, and 0.3. |
+| `limitUpwardSwitch.ts` | Internal | Applies the oscillation guard to a pick. |
+| `applyStarvationGuard.ts` | Internal | Applies the starvation guard to a pick. It moved out of `createThroughputSelector.ts`, and both selectors share it. |
+| `computeDelay.ts` | Internal | Returns the delay that remains after the placeholder absorbs part of an excess buffer. |
+| `validateBufferTarget.ts` | Internal | Throws a `RangeError` for an invalid buffer target. |
+| `placeholderAfterSample.ts` | Internal | Returns the placeholder after a finished download: decay, cap, and replacement growth. |
+| `placeholderAfterAbort.ts` | Internal | Returns the placeholder after an aborted download. |
+| `BOLA_CONSTANTS.ts` | Internal | The named constants: 10, 2, 0.99, 0.3, the negligible delay of 0.001, the threshold tolerance of 1e-9, and the 2 finished samples that the guard waits for. |
+| `MILLISECONDS_PER_SECOND.ts` | Internal | The unit constant 1000. |
+| `validateLadder.ts`, `findRung.ts`, `isPositiveFinite.ts`, `validateFactor.ts` | Internal | Shared with the throughput selector. |
 | `BOLA_DEFAULT_BUFFER_TARGET.ts` | Public | The named default, 18. The safety factor default is the shared `DEFAULT_SAFETY_FACTOR`. |
 | `DEFAULT_STARVATION_SAFETY_FACTOR.ts` | Public | The named default of the guard factor, 0.7, from dash.js. |
 | `BolaState.ts` and the three type files | Public | The state and the types in the RFC export surface. |
@@ -56,7 +62,15 @@ The RFC formula for `threshold_i` is this switch point converted back to a buffe
 
 ### Clamping
 
-The threshold of a rung can be negative for ladders with many rungs or with close bitrates. The selector clamps it to 0. Then the lowest rungs cannot be selected from the buffer level. The RFC lists this as an open question.
+The threshold of a rung can be negative. The selector clamps it to 0. Then the buffer rule never picks a rung below the highest rung with a threshold of 0.
+
+The second threshold shows the three causes. It equals `max(0, 10 - (B - 10) * (v_1 / v_max) / (b_1 / b_0 - 1))`. It is 0 when `(B - 10) * v_1 / v_max` is at least `10 * (b_1 / b_0 - 1)`:
+
+- A ladder with many rungs makes `B` large and `v_1 / v_max` small.
+- A large buffer target makes `B` large.
+- Two lowest rungs with close bandwidths make `b_1 / b_0 - 1` small.
+
+A ladder of two rungs with the default target has `B` of 18 and `v_1 / v_max` of 1. Its second threshold is 0 for a bandwidth ratio of 1.8 or less. The RFC lists the dense ladder case as an open question.
 
 ### Startup handoff
 
@@ -117,6 +131,8 @@ After an aborted download, the selector treats the next lower rung as the replac
 
 Take L1, a current rung of 3 Mbps, and a real buffer of 7 s after the abort. A cap at the threshold of 3 Mbps gives 13.059 s, and the pick is 3 Mbps. A cap at the threshold of 1.5 Mbps gives 10.745 s, and the pick is 1.5 Mbps.
 
+The cap sets the effective buffer to a threshold on purpose, and the effective buffer is the sum of two numbers. Rounding can put that sum one error below the threshold. Some thresholds of L2 show this for a few percent of the buffer levels. The tie rule would then not apply, and the pick would be the rung below the replacement. `selectRungByBuffer` therefore counts an effective buffer within one nanosecond below a threshold as at the threshold.
+
 The BOLA paper gives a download abandonment heuristic for BOLA-FINITE in section IV.D and Fig. 7. The player abandons a segment at level `m`. The player then downloads the segment at the level below `m` with the best score. The next decision compares with the bandwidth and the level of that download. The selector follows that order, so the replacement becomes the current rung. dash.js sets the current representation to the replacement rung and caps at the minimum buffer of that rung. The abandon rule of dash.js picks the replacement from the throughput. The selector input has no replacement rung, so the selector assumes the next lower rung. In the paper, that level wins while the effective buffer is at or above the threshold of that level.
 
 ### Starvation guard
@@ -147,17 +163,17 @@ The startup state maps these throughputs to these rungs:
 
 ### Why the conversion keeps the decision
 
-A rung switch point depends only on `theta` and on the two neighbouring bitrates. It does not depend on `V` or on the other rungs. A rebuild changes `V` and `ln(b_0)`. It does not change what `theta` means for a given pair of neighbours. Suppose the selector keeps `theta` and recomputes `Q`. Then the decision for the same situation stays the same, except where the change added or removed rungs.
+A rung switch point depends only on `theta` and on the two neighbouring bitrates. It does not depend on `V` or on the other rungs. A rebuild changes `V` and `ln(b_0)`. It does not change what `theta` means for a given pair of neighbours. Suppose the selector keeps `theta` and recomputes `Q`. Then the decision for the same situation stays the same. There are two exceptions: the rungs that the change added or removed, and the floor on the placeholder, described below.
 
 The conversion runs after the selector adds the elapsed time, so `Q_old` includes the wait. A conversion before that step would scale the placeholder and not the wait. The pick could then change. For L1 and a target change from 18 s to 40 s, the error is twice the elapsed time.
 
 The [RFC](./index.md) gives the conversion formulas under Ladder changes.
 
-The conversion is exact when `Q_new` is at least the real buffer level. If `Q_new` is lower, the placeholder is 0 and the real buffer decides.
+The conversion is exact when `Q_new` is at least the real buffer level. The placeholder cannot be negative. If `Q_new` is lower, the placeholder is 0 and the effective buffer is the real buffer, which is above `Q_new`. The pick can then be higher than before. Take L1 with an empty placeholder and a real buffer of 6 s. A change of the target from 18 s to 40 s moves the pick from 300 kbps to 750 kbps.
 
 ### Measured effect
 
-Take a change of the buffer target from 18 s to 40 s on L1. The selector can keep the placeholder unchanged. Then the decision changes for 62% of the buffer levels between 0 s and 30 s. With the conversion, no decision changes. The grid has 2,401 levels and no elapsed time. The selector adds the elapsed time before the conversion, so the result applies to any wait.
+Take a change of the buffer target from 18 s to 40 s on L1. The selector can keep the placeholder unchanged. Then the decision changes for 62% of the effective buffer levels between 0 s and 30 s. With the conversion of the effective buffer, no decision changes. The grid has 2,401 levels and no elapsed time. The selector adds the elapsed time before the conversion, so the result applies to any wait.
 
 For a change of the ladder, the conversion changes decisions only where the added or removed rung lives:
 
@@ -186,7 +202,20 @@ dash.js resets all state when the minimum bitrate, the maximum bitrate, or the v
 
 ### Change of the number of distinct rungs
 
-A ladder with one distinct rung makes no BOLA decision. When the ladder gains a second distinct rung, or loses all but one, the selector returns to the startup state with no placeholder. This case has no buffer-based decision to preserve.
+A ladder with one distinct rung makes no BOLA decision. When the ladder gains a second distinct rung, or loses all but one, the selector returns to the startup state with no placeholder. This case has no buffer-based decision to preserve. The selector also forgets the duration of the last segment, so it stays in the startup state until the next sample.
+
+## Comparison with dash.js
+
+The implementation PR ran a comparison outside the repository. A script feeds the same events to the `BolaRule` of dash.js and to the selector, and it compares every decision. The events are selections, finished segments, replacement segments, aborted downloads, waits, and seeks. Random sequences covered both test ladders and two buffer targets.
+
+The script corrects the two buffer helpers of dash.js first, as the RFC lists under the differences. It passes the next lower rung as the replacement of an aborted download. Then it found no difference except these:
+
+- An unknown throughput. In the steady state, dash.js blocks upward switches and the selector does not. The script always passes a throughput.
+- A stall. dash.js reacts to an event, and the selector derives the stall from the buffer level. The script ends a sequence at the first stall.
+- The cap after an abort of the second rung. When the replacement is rung 0, dash.js caps the effective buffer at 10 seconds. The selector caps it at `threshold_0`, which is 0, as the RFC states. The script does not abort the second rung.
+- A tie. After a cap, the effective buffer equals a threshold in exact arithmetic. dash.js scores the rungs, so rounding decides its pick. The selector counts a buffer within one nanosecond below a threshold as at the threshold. The script accepts a difference of one rung within a microsecond of a threshold.
+- A change of the buffer target. dash.js converts first and then adds the elapsed time. The script keeps the buffer target fixed in each sequence.
+- A stale timing. After an aborted request in the startup state, dash.js can apply the timing of the previous request to the next segment. The selector uses the timing of each sample. The script does not abort requests in the startup state.
 
 ## Validation messages
 
