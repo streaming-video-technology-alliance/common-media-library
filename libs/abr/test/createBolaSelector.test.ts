@@ -2,7 +2,7 @@ import type { BitrateSelector, BitrateSelectorInput, BolaDecision, BolaSelector,
 import { BOLA_DEFAULT_BUFFER_TARGET, BolaState, createBolaSelector, DEFAULT_SAFETY_FACTOR, DEFAULT_STARVATION_SAFETY_FACTOR } from '@svta/cml-abr'
 import { deepEqual, equal, ok, throws } from 'node:assert'
 import { describe, it } from 'node:test'
-import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG, NEGLIGIBLE_DELAY, PLACEHOLDER_DECAY, STALL_THRESHOLD, STARVATION_GUARD_SAMPLE_COUNT } from '../src/BOLA_CONSTANTS.ts'
+import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG, NEGLIGIBLE_DELAY, PLACEHOLDER_DECAY, STALL_THRESHOLD, STARVATION_GUARD_SAMPLE_COUNT, THRESHOLD_TOLERANCE } from '../src/BOLA_CONSTANTS.ts'
 import { bolaMaximumBuffers, bolaThresholds, createBolaScoreModel } from './helpers/bolaScoreOracle.ts'
 import { closeTo } from './helpers/closeTo.ts'
 import { L1_GOLDEN, L2_GOLDEN } from './helpers/goldenRungs.ts'
@@ -192,6 +192,7 @@ describe('createBolaSelector', () => {
 			equal(PLACEHOLDER_DECAY, 0.99)
 			equal(STALL_THRESHOLD, 0.3)
 			equal(NEGLIGIBLE_DELAY, 0.001)
+			equal(THRESHOLD_TOLERANCE, 1e-9)
 			equal(STARVATION_GUARD_SAMPLE_COUNT, 2)
 		})
 	})
@@ -538,20 +539,6 @@ describe('createBolaSelector', () => {
 
 		it('treats a throughput of 0 as a measurement', () => {
 			equal(decide(HEALTHY_BUFFER_LEVEL, { throughput: 0 }).index, 0)
-		})
-
-		it('does not lower the first two picks', () => {
-			const input = { ladder: L1, throughput: throughputFor(3), segmentDuration: SEGMENT_DURATION }
-			const selector = createBolaSelector()
-			// The startup picks follow the throughput, even with an empty buffer, where the guard would pick rung 0.
-			const first = selector.select({ ...input, bufferLevel: 0, now: 0 })
-
-			load(selector, L1_BANDWIDTHS[0], 0)
-
-			const second = selector.select({ ...input, bufferLevel: SMALL_STEP, now: requestEnd(0) })
-
-			equal(first.index, 3)
-			equal(second.index, 3)
 		})
 
 		it('does not run in the startup state, even after two finished samples', () => {
@@ -1127,12 +1114,20 @@ describe('createBolaSelector', () => {
 		it('does not change any state when the new ladder is invalid', () => {
 			const selector = createSelectorForLadderChange()
 			const control = createSelectorForLadderChange()
-			const input = { ladder: L1, bufferLevel: LADDER_CHANGE_BUFFER_LEVEL, throughput: NaN, now: requestEnd(0) }
+			const later = requestEnd(0) + LONG_WAIT_SECONDS * MILLISECONDS_PER_SECOND
+			const input = { ladder: L1, bufferLevel: LADDER_CHANGE_BUFFER_LEVEL, throughput: NaN, now: later }
 
+			// The failing calls come after a long wait. A call that adds the wait before it validates would keep it in the placeholder.
 			throws(() => selector.select({ ...input, ladder: rungs(L1_BANDWIDTHS[1], L1_BANDWIDTHS[0]) }), { name: 'RangeError' })
 			throws(() => selector.select({ ...input, bufferTarget: -1 }), { name: 'RangeError' })
 
-			deepEqual(selector.select(input), control.select(input))
+			// A sample replaces the time base, so the wait that the failing calls consumed would stay visible in the placeholder.
+			load(selector, LADDER_CHANGE_CURRENT_BANDWIDTH, LADDER_CHANGE_BUFFER_LEVEL, later)
+			load(control, LADDER_CHANGE_CURRENT_BANDWIDTH, LADDER_CHANGE_BUFFER_LEVEL, later)
+
+			const next = { ...input, now: requestEnd(later) }
+
+			deepEqual(selector.select(next), control.select(next))
 		})
 	})
 

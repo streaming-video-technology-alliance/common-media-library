@@ -4,6 +4,7 @@ import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { L1, L2, rungs, withoutRung, withRung } from './helpers/ladders.ts'
 import { createSeededRandom } from './helpers/seededRandom.ts'
+import { MILLISECONDS_PER_SECOND } from './helpers/units.ts'
 
 const SEQUENCE_COUNT = 200
 const EVENTS_PER_SEQUENCE = 300
@@ -141,7 +142,7 @@ function playSequence(seed: number): void {
 		previousState = decision.state
 		previousDistinctCount = distinctCount
 
-		clock += decision.delay * 1000
+		clock += decision.delay * MILLISECONDS_PER_SECOND
 
 		if (random() < WAIT_PROBABILITY) {
 			clock += random() * MAXIMUM_WAIT
