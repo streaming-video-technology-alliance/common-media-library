@@ -32,6 +32,8 @@ export type ManifestIntegrity = {
 	readonly certificate: Uint8Array | null
 	/** The assertions whose claim reference resolved to a single box with a matching hash. Read an assertion by label from this list, not from the raw store. The list is authenticated only when `codes` is empty. */
 	readonly verifiedAssertions: readonly InternalAssertionData[]
+	/** The number of hard binding assertions in the assertion store */
+	readonly hardBindingCount: number
 }
 
 type ClaimSignatureCheck = {
@@ -109,5 +111,5 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 		codes.push(internal.claimCode)
 	}
 
-	return { codes: [...new Set(codes)], certificate: signature.certificate, verifiedAssertions: assertionHashes.verified }
+	return { codes: [...new Set(codes)], certificate: signature.certificate, verifiedAssertions: assertionHashes.verified, hardBindingCount }
 }

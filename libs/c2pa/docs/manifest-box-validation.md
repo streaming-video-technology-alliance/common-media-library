@@ -179,4 +179,6 @@ The `ManifestBoxValidationResult` contains:
 >
 > A segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The claim signature is verified with the certificate inside the segment. The library does not check that certificate against a trust list. See [Signer Trust](results-and-error-codes.md#signer-trust).
 >
-> A `c2pa.hash.bmff.v3` assertion whose `hash` is not a byte string fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`. An assertion with an exclusion that does not conform to C2PA section 18.6 fails with the same code. Each `data` constraint of an exclusion needs an unsigned integer `offset` and a byte string `value`.
+> C2PA section 19.3 requires a `c2pa.hash.bmff.v3` assertion in the manifest of each segment. A segment without that assertion fails with `LiveVideoStatusCode.SEGMENT_INVALID`. If the manifest also has no other hard binding assertion, the result also includes `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING`.
+>
+> A `c2pa.hash.bmff.v3` assertion that is not a map, has no `hash`, or has a `hash` that is not a byte string fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`. An assertion with an exclusion that does not conform to C2PA section 18.6 fails with the same code. Each `data` constraint of an exclusion needs an unsigned integer `offset` and a byte string `value`.

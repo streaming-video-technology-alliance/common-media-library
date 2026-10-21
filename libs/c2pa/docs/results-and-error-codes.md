@@ -113,6 +113,7 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `CLAIM_CBOR_INVALID` | `claim.cbor.invalid` | The claim box holds CBOR that does not decode |
 | `CLAIM_MALFORMED` | `claim.malformed` | The claim box holds CBOR that is not a map |
 | `CLAIM_MULTIPLE` | `claim.multiple` | The manifest has more than one claim box |
+| `CLAIM_HARD_BINDINGS_MISSING` | `claim.hardBindings.missing` | The manifest of a manifest box segment has no hard binding assertion |
 | `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 
