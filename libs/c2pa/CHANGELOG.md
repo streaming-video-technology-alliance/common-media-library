@@ -37,12 +37,9 @@ and this project adheres to
 
 ### Changed
 
-- `nextManifestId` and `InitSegmentValidation.manifestId` now hold a `urn:c2pa:` URN instead of the claim `instanceID`. If your application stores a `lastManifestId` between sessions, discard values that it stored with an earlier version.
-
-### Changed
-
 - `validateC2paInitSegment` reports a `c2pa.hash.bmff.v3` assertion with a `hash` that is not a byte string with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` instead of `LiveVideoStatusCode.INIT_INVALID`. The same code replaces `INIT_INVALID` for exclusions that do not conform to C2PA section 18.6. Handle `ASSERTION_BMFFHASH_MALFORMED` where you handle `INIT_INVALID`.
 - A flat content hash that does not match now adds `C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH` next to `LiveVideoStatusCode.INIT_INVALID`.
+- `nextManifestId` and `InitSegmentValidation.manifestId` now hold a `urn:c2pa:` URN instead of the claim `instanceID`. If your application stores a `lastManifestId` between sessions, discard values that it stored with an earlier version.
 
 ## [1.4.1] - 2026-10-18
 

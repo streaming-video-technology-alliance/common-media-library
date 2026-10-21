@@ -43,7 +43,7 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 |----------|-------|---------|
 | `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box, or its BMFF content hash does not match (with `ASSERTION_BMFFHASH_MISMATCH`) |
 | `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
-| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Signature, hash, or key failure. Key outside the validity period. Manifest box segment without a `c2pa.hash.bmff.v3` assertion. VSI sequence number not moving forward or below the key minimum. Broken `c2pa.manifestId` chain. Failed custom continuity validator. |
+| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Signature, hash, or key failure. Key outside the validity period. Manifest box segment without a `c2pa.hash.bmff.v3` assertion. VSI sequence number not moving forward or below the key minimum. Broken `c2pa.manifestId` chain. Manifest box claim `signature` URI that does not name the manifest label. Failed custom continuity validator. |
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
