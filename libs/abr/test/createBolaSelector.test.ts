@@ -45,6 +45,11 @@ const NEW_TOP_BANDWIDTH = 12_000_000
 const NEW_MIDDLE_BANDWIDTH = 2_200_000
 // A buffer high enough to pick above rung 1 in L1 without its middle rung.
 const HIGH_BUFFER_LEVEL = 16
+// The waits, in seconds, and the real buffer levels of the sweep that checks the conversion.
+// From `CONVERSION_SWEEP_START` on, the conversion never needs a negative placeholder for these waits.
+const CONVERSION_ELAPSED_SECONDS = [0, 0.5, 1, 2, 3]
+const CONVERSION_SWEEP_START = 5
+const CONVERSION_SWEEP_STEP = 0.25
 
 // A throughput for which the startup pick is the rung at `position` of L1.
 function throughputFor(position: number): number {
@@ -461,7 +466,7 @@ describe('createBolaSelector', () => {
 			ok(above.select({ ladder: L1, bufferLevel: STALL_THRESHOLD + SMALL_STEP, throughput: NaN, now: requestEnd(0) }).placeholder > 0)
 		})
 
-		it('adds no elapsed time in the call that finds the stall', () => {
+		it('clears the elapsed time of a long wait in the call that finds the stall', () => {
 			const selector = createBolaSelector()
 
 			reachSteadyState(selector, throughputFor(1))
@@ -743,6 +748,20 @@ describe('createBolaSelector', () => {
 
 			equal(result.bandwidth, LADDER_CHANGE_CURRENT_BANDWIDTH)
 			closeTo(result.placeholder, 6, REFERENCE_TOLERANCE)
+		})
+
+		it('keeps the pick for any wait when the buffer target changes', () => {
+			for (const elapsed of CONVERSION_ELAPSED_SECONDS) {
+				const now = requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND
+
+				for (let bufferLevel = CONVERSION_SWEEP_START; bufferLevel <= SWEEP_END; bufferLevel += CONVERSION_SWEEP_STEP) {
+					const input = { ladder: L1, bufferLevel, throughput: NaN, now }
+					const control = createSelectorForLadderChange().select(input)
+					const changed = createSelectorForLadderChange().select({ ...input, bufferTarget: LARGE_BUFFER_TARGET })
+
+					equal(changed.index, control.index, `wait ${elapsed} s, buffer ${bufferLevel} s`)
+				}
+			}
 		})
 
 		it('picks by the real buffer alone when the conversion would need a negative placeholder', () => {

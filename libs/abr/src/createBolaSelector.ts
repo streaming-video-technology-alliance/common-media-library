@@ -103,9 +103,9 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		lastCall = NaN
 	}
 
-	// Returns the values for the ladder and the buffer target of the call. It rebuilds them when either changed, and then it adapts the state.
+	// Returns the values for the ladder and the buffer target of the call. It rebuilds them when either changed.
 	// Validation runs only on a rebuild. It throws before the selector changes any state.
-	function syncParams(ladder: readonly LadderRung[], target: number, bufferLevel: number): BolaParams {
+	function syncParams(ladder: readonly LadderRung[], target: number): BolaParams {
 		if (params && bufferTarget === target && isSameLadder(ladder, bandwidths)) {
 			return params
 		}
@@ -116,7 +116,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		const next = createBolaParams(ladder, target)
 
 		if (params) {
-			adaptToParams(params, next, bufferLevel)
+			restartOnSingleRungChange(params, next)
 		}
 
 		params = next
@@ -126,20 +126,20 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		return next
 	}
 
-	// Converts the placeholder after a rebuild. A ladder that gains or loses its second distinct rung restarts.
-	function adaptToParams(previous: BolaParams, next: BolaParams, bufferLevel: number): void {
-		const wasSingle = previous.rungs.length === 1
-		const isSingle = next.rungs.length === 1
-
-		if (wasSingle !== isSingle) {
+	// A ladder that gains or loses its second distinct rung has no buffer-based decision to keep, so the selector restarts.
+	function restartOnSingleRungChange(previous: BolaParams, next: BolaParams): void {
+		if ((previous.rungs.length === 1) !== (next.rungs.length === 1)) {
 			state = BolaState.STARTUP
 			placeholder = 0
 			lastSegmentDuration = NaN
-		} else if (!isSingle && state === BolaState.STEADY) {
-			const effectiveBuffer = remapEffectiveBuffer(previous, next, bufferLevel + placeholder)
-
-			placeholder = Math.max(0, effectiveBuffer - bufferLevel)
 		}
+	}
+
+	// Converts the placeholder to the values of a rebuild, so that the pick for the same situation stays the same.
+	function convertPlaceholder(previous: BolaParams, next: BolaParams, bufferLevel: number): void {
+		const effectiveBuffer = remapEffectiveBuffer(previous, next, bufferLevel + placeholder)
+
+		placeholder = Math.max(0, effectiveBuffer - bufferLevel)
 	}
 
 	function currentPosition(rungParams: BolaParams): number {
@@ -165,12 +165,17 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		return commitDecision(rungParams, position, 0)
 	}
 
-	function selectInSteadyState(rungParams: BolaParams, bufferLevel: number, safeThroughput: number, now: number): BolaDecision {
+	// The conversion of a rebuild needs the elapsed time in the placeholder, so the call adds the time first.
+	function selectInSteadyState(rungParams: BolaParams, previousParams: BolaParams | undefined, bufferLevel: number, safeThroughput: number, now: number): BolaDecision {
+		consumeElapsedTime(now)
+
+		if (previousParams && previousParams !== rungParams) {
+			convertPlaceholder(previousParams, rungParams, bufferLevel)
+		}
+
 		if (bufferLevel <= STALL_THRESHOLD) {
 			emptyPlaceholder()
 		}
-
-		consumeElapsedTime(now)
 
 		const effectiveBuffer = bufferLevel + placeholder
 		let position = selectRungByBuffer(rungParams, effectiveBuffer)
@@ -247,7 +252,8 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		select(input: BitrateSelectorInput): BolaDecision {
 			const target = input.bufferTarget ?? BOLA_DEFAULT_BUFFER_TARGET
 			const bufferLevel = isPositiveFinite(input.bufferLevel) ? input.bufferLevel : 0
-			const rungParams = syncParams(input.ladder, target, bufferLevel)
+			const previousParams = params
+			const rungParams = syncParams(input.ladder, target)
 
 			if (rungParams.rungs.length === 1) {
 				return { index: rungParams.positions[0], delay: 0, state: BolaState.STARTUP, placeholder: 0 }
@@ -259,7 +265,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 
 			return state === BolaState.STARTUP
 				? selectInStartup(rungParams, bufferLevel, safeThroughput)
-				: selectInSteadyState(rungParams, bufferLevel, safeThroughput, input.now)
+				: selectInSteadyState(rungParams, previousParams, bufferLevel, safeThroughput, input.now)
 		},
 
 		sample(segment: SegmentSample): void {
