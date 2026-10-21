@@ -1,3 +1,5 @@
+// Derived from dash.js BolaRule.js, Copyright (c) 2016, Dash Industry Forum, BSD-3-Clause. See NOTICE.md.
+
 import { applyStarvationGuard } from './applyStarvationGuard.ts'
 import type { BitrateSelectorInput } from './BitrateSelectorInput.ts'
 import { STALL_THRESHOLD, STARVATION_GUARD_SAMPLE_COUNT } from './BOLA_CONSTANTS.ts'

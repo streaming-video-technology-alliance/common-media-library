@@ -1,3 +1,5 @@
+// Derived from dash.js BolaRule.js, Copyright (c) 2016, Dash Industry Forum, BSD-3-Clause. See NOTICE.md.
+
 /**
  * The buffer level, in seconds, at which the score of the lowest rung reaches zero.
  * BOLA waits for a buffer above this level before it picks a higher rung.

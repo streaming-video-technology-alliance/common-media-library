@@ -4,7 +4,8 @@ Streaming Video Technology Alliance
 ---
 
 Contains code derived from the `dash.js` library (https://github.com/Dash-Industry-Forum/dash.js/)
-The source is `src/streaming/rules/abr/BolaRule.js`.
+The source is `src/streaming/rules/abr/BolaRule.js` at commit `ac9e3d18818f3ba9b99a87151b887d66aed12c56`:
+https://github.com/Dash-Industry-Forum/dash.js/blob/ac9e3d18818f3ba9b99a87151b887d66aed12c56/src/streaming/rules/abr/BolaRule.js
 
 - src/BOLA_CONSTANTS.ts
 - src/BOLA_DEFAULT_BUFFER_TARGET.ts

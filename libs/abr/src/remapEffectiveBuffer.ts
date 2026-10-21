@@ -1,3 +1,5 @@
+// Derived from dash.js BolaRule.js, Copyright (c) 2016, Dash Industry Forum, BSD-3-Clause. See NOTICE.md.
+
 import type { BolaParams } from './BolaParams.ts'
 import { MINIMUM_BUFFER } from './BOLA_CONSTANTS.ts'
 

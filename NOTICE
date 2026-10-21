@@ -100,7 +100,8 @@ The copyright in this software is being made available under the BSD License, in
 
 The following implementations in this project are derived from the `dash.js`
 library (https://github.com/Dash-Industry-Forum/dash.js/), from the file
-`src/streaming/rules/abr/BolaRule.js`
+`src/streaming/rules/abr/BolaRule.js` at commit `ac9e3d18818f3ba9b99a87151b887d66aed12c56`
+(https://github.com/Dash-Industry-Forum/dash.js/blob/ac9e3d18818f3ba9b99a87151b887d66aed12c56/src/streaming/rules/abr/BolaRule.js)
 
 - libs/abr/src/BOLA_CONSTANTS.ts
 - libs/abr/src/BOLA_DEFAULT_BUFFER_TARGET.ts

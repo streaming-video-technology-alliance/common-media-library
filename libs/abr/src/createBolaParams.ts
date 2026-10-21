@@ -1,3 +1,5 @@
+// Derived from dash.js BolaRule.js, Copyright (c) 2016, Dash Industry Forum, BSD-3-Clause. See NOTICE.md.
+
 import type { BolaParams } from './BolaParams.ts'
 import type { LadderRung } from './LadderRung.ts'
 import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG } from './BOLA_CONSTANTS.ts'

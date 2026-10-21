@@ -1,3 +1,5 @@
+// Derived from dash.js BolaRule.js, Copyright (c) 2016, Dash Industry Forum, BSD-3-Clause. See NOTICE.md.
+
 import { PLACEHOLDER_DECAY } from './BOLA_CONSTANTS.ts'
 import type { BolaParams } from './BolaParams.ts'
 import { findRung } from './findRung.ts'
