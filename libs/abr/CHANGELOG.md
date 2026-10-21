@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-21
+
 ### Added
 
 - `createBolaSelector`, which creates a buffer-based selector that implements BOLA, as the [BOLA selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/rfc/bola-abr-selector/index.md) defines ([#358](https://github.com/streaming-video-technology-alliance/common-media-library/issues/358))
@@ -33,6 +35,7 @@ and this project adheres to
 - `createThroughputSelector`, which creates a rate-based selector with a safety factor, an upgrade factor for the hysteresis, and a two-pass starvation guard
 - `DEFAULT_SAFETY_FACTOR` (0.9), `DEFAULT_UPGRADE_FACTOR` (0.7), and `DEFAULT_STARVATION_TOLERANCE` (4)
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.1.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.2.0...HEAD
+[0.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.1.1...abr-v0.2.0
 [0.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.1.0...abr-v0.1.1
 [0.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/abr-v0.1.0

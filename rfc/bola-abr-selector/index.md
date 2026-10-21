@@ -1,5 +1,7 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-abr@0.2.0
+implementation-pr: https://github.com/streaming-video-technology-alliance/common-media-library/pull/543
 ---
 
 # RFC: BOLA bitrate selector (`@svta/cml-abr`)
