@@ -831,31 +831,38 @@ describe('validateC2paManifestBoxSegment — manifest identifier (§19.3)', () =
 		strictEqual(nextManifestId, null)
 	})
 
-	it('accepts a signature URI relative to the manifest store and chains on the label it names', async () => {
-		const s1 = await signedSegment(MANIFEST_ID_1, null, 1, 'urn:c2pa:initial', `self#jumbf=${MANIFEST_ID_1}/c2pa.signature`)
-
-		const { result, nextManifestId } = await validateC2paManifestBoxSegment(s1, null)
-
-		strictEqual(result.isValid, true)
-		strictEqual(nextManifestId, MANIFEST_ID_1)
-	})
-
-	// §8.4.2.1, §10.2.1: the relative form resolves to the signature box of the same manifest, so the manifest is valid.
-	// The URI does not name the label, so the claim signature does not cover it and the segment does not update the state.
-	it('accepts a signature URI relative to the manifest without updating the state', async () => {
+	// §8.4.2.1, §10.2.1: the relative form resolves to the signature box of the same manifest, so the claim signature
+	// is valid. The URI does not name the label, so the manifestId chain cannot be verified and the segment fails.
+	it('fails with SEGMENT_INVALID for a signature URI relative to the manifest without updating the state', async () => {
 		const s2 = await signedSegment(MANIFEST_ID_2, null, 2, MANIFEST_ID_1, 'self#jumbf=c2pa.signature')
 		const state = { lastStreamId: 'stream-id', lastSequenceNumber: 1 }
 
 		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(s2, MANIFEST_ID_1, state)
 
-		strictEqual(result.isValid, true)
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
 		strictEqual(nextManifestId, MANIFEST_ID_1)
 		deepStrictEqual(nextState, state)
+	})
+
+	it('fails every segment of a stream with signature URIs relative to the manifest, from a null lastManifestId', async () => {
+		const s1 = await signedSegment(MANIFEST_ID_1, null, 1, 'urn:c2pa:initial', 'self#jumbf=c2pa.signature')
+		const s2 = await signedSegment(MANIFEST_ID_2, null, 2, MANIFEST_ID_1, 'self#jumbf=c2pa.signature')
+
+		const r1 = await validateC2paManifestBoxSegment(s1, null)
+		const r2 = await validateC2paManifestBoxSegment(s2, r1.nextManifestId, r1.nextState)
+		const replay = await validateC2paManifestBoxSegment(s1, r2.nextManifestId, r2.nextState)
+
+		for (const r of [r1, r2, replay]) {
+			deepStrictEqual(r.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+			strictEqual(r.nextManifestId, null)
+			deepStrictEqual(r.nextState, {})
+		}
 	})
 
 	for (const [name, signature] of [
 		['names another manifest', 'self#jumbf=/c2pa/urn:c2pa:ddfdd88d-cd2c-4a60-94ac-ec069d9f3a83/c2pa.signature'],
 		['names another box', `self#jumbf=/c2pa/${MANIFEST_ID_1}/c2pa.claim`],
+		['names a child box of the manifest that does not exist', `self#jumbf=${MANIFEST_ID_1}/c2pa.signature`],
 		['is not a JUMBF URI', 'c2pa.signature'],
 		['is not a text string', 1],
 	] as const) {

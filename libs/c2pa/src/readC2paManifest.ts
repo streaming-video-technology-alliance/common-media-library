@@ -45,14 +45,14 @@ type SignatureReference = {
 	readonly namesLabel: boolean
 }
 
-// §8.4.2.1: the claim `signature` field is a JUMBF URI. It is absolute, relative to the manifest store,
-// or relative to the current manifest. The first two forms name the JUMBF label of the manifest.
+// §8.4.2.1: the claim `signature` field is a JUMBF URI. A URI that starts with a slash is relative to the
+// manifest store and names the JUMBF label of the manifest. Any other URI is relative to the current manifest.
 function resolveSignatureReference(label: string | null, claimData: Record<string, unknown>): SignatureReference {
 	const uri = asString(claimData['signature'])
 	if (!uri?.startsWith(JUMBF_URI_PREFIX)) return { resolves: false, namesLabel: false }
 	const path = uri.slice(JUMBF_URI_PREFIX.length)
 	if (path === SIGNATURE_BOX_LABEL) return { resolves: true, namesLabel: false }
-	const namesLabel = label !== null && (path === `/c2pa/${label}/${SIGNATURE_BOX_LABEL}` || path === `${label}/${SIGNATURE_BOX_LABEL}`)
+	const namesLabel = label !== null && path === `/c2pa/${label}/${SIGNATURE_BOX_LABEL}`
 	return { resolves: namesLabel, namesLabel }
 }
 

@@ -134,8 +134,8 @@ The manifest ID is the manifest identifier of C2PA, a `urn:c2pa:` URN. The manif
 
 The JUMBF label is outside the signed claim. The claim `signature` field is a JUMBF URI of the signature box (C2PA section 8.4.2.1). The validator uses the label as the manifest ID only if this signed URI names it:
 
-- An absolute URI, such as `self#jumbf=/c2pa/urn:c2pa:1b3b.../c2pa.signature`, names the label. So does a URI relative to the manifest store.
-- A URI relative to the manifest, `self#jumbf=c2pa.signature`, is valid but does not name the label. The segment does not update `nextManifestId` or `nextState`, so the next segment fails the continuity check.
+- An absolute URI, such as `self#jumbf=/c2pa/urn:c2pa:1b3b.../c2pa.signature`, names the label. Only a URI that starts with a slash names it.
+- A URI relative to the manifest, `self#jumbf=c2pa.signature`, resolves to the signature box but does not name the label. The validator cannot verify the manifest ID chain, so the segment fails with `LiveVideoStatusCode.SEGMENT_INVALID`, whatever `lastManifestId` you pass. The segment does not update `nextManifestId` or `nextState`.
 - A URI that does not resolve to the signature box of the same manifest fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The segment does not update the state.
 
 > [!NOTE]

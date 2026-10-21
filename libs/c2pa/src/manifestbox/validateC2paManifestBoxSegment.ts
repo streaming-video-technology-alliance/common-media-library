@@ -172,10 +172,10 @@ async function validateContinuity(
  * caller is responsible for persisting `nextManifestId` and `nextState`
  * between calls. A segment that fails verification, is on another stream, or
  * does not move the sequence number forward returns the received
- * `lastManifestId` and `state` unchanged. So does a segment whose claim
- * `signature` URI is relative to the manifest, because that URI does not
- * authenticate the manifest identifier. A segment that fails only the
- * continuity check still updates them.
+ * `lastManifestId` and `state` unchanged. A segment that fails only the
+ * continuity check still updates them. A segment whose claim `signature` URI
+ * is relative to the manifest fails with `SEGMENT_INVALID` and does not update
+ * them, because that URI does not authenticate the manifest identifier.
  *
  * @param bytes - Raw segment bytes
  * @param lastManifestId - Manifest ID from the last segment that updated the state, or `null` for the first segment
@@ -247,9 +247,13 @@ export async function validateC2paManifestBoxSegment(
 	if (integrity?.hardBindingCount === 0) errorCodes.push(C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING)
 
 	// §19.3: previousManifestId holds the manifest identifier, the JUMBF label of the manifest. Only a claim
-	// `signature` URI that names the label authenticates it (§15.7). A URI relative to the manifest does not,
-	// so the segment does not update the state.
+	// `signature` URI that names the label authenticates it (§15.7). Without it the manifestId chain cannot be
+	// verified, so a manifest that passes every integrity check fails, whatever lastManifestId the caller passes.
 	const currentManifestId = internalData?.manifestId ?? null
+	const manifestIdUnverified = integrity !== null && integrity.codes.length === 0 && currentManifestId === null
+	if (manifestIdUnverified && !errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID)) {
+		errorCodes.push(LiveVideoStatusCode.SEGMENT_INVALID)
+	}
 
 	// The continuity check does not gate the advance.
 	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed && currentManifestId !== null
