@@ -36,7 +36,7 @@ Plain BOLA starts at the lowest rung and reaches the upper rungs slowly, because
 - **Download delay.** When the buffer is above the maximum level of the chosen rung, BOLA asks the player to wait. This avoids overfilling the buffer with low rungs.
 - **Buffer expansion.** The minimum buffer time of 10 s plus 2 s per rung stretches `V` and `gamma`. The thresholds move apart while the real segments stay within the player buffer. The follow-up paper designed this part for low-latency streams with a small buffer.
 
-The paper defines more variants: BOLA-BASIC, BOLA-FINITE, BOLA-U, and BOLA-O. dash.js implements the placeholder buffer from the follow-up paper and the BOLA-O logic.
+The paper defines more variants: BOLA-BASIC, BOLA-FINITE, BOLA-U, and BOLA-O. dash.js implements the placeholder buffer from the follow-up paper and the bitrate cap of BOLA-O. The pause rule differs. BOLA-O in the paper pauses until the score of the capped rung is at least the score of the next rung. dash.js delays only above the maximum buffer of the chosen rung, and it drains the placeholder first.
 
 ## Benefits
 

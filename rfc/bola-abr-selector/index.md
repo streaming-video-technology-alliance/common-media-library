@@ -153,6 +153,8 @@ The delay is `max(0, Q - maximumBuffer(rung))`. The selector drains the placehol
 
 After a delay, the player calls `select` again. The second call adds the wait to the placeholder, and the real buffer is lower by the same amount, so `Q` is unchanged. The delay computation then drains the placeholder, and the call returns 0. A repeated delay is not a defect of the implementation.
 
+The delay rule comes from dash.js. BOLA-O in the paper pauses until the score of the capped rung is at least the score of the next rung, so the buffer drains to the threshold of that rung. The dash.js rule holds more real buffer at the cap, and the selector keeps it.
+
 ### Stalls
 
 The `BitrateSelector` type has no stall notification. In the steady state, the selector treats a `bufferLevel` at or below 0.3 seconds as a stall, in `select` and in `sample`. A stall sets the placeholder to 0 and clears the time bases. The value is the default `stallThreshold` of the dash.js `BufferController`, and it is an internal constant. The startup state ignores stalls, as dash.js ignores a buffer-empty event at time 0.
@@ -287,7 +289,7 @@ The placeholder option is a decision in Rationale and alternatives, because the 
 - v3 (2026-10-19): `BolaSelector` omits the `select` of `BitrateSelector`, so the result type keeps `state` and `placeholder`. The L2 test fixture is listed as `LadderRung` objects.
 - v4 (2026-10-19): states the abort cap as an effective buffer limit, adds the one-rung row to the state machine, and gives the startup placeholder formula. Lists two more differences from dash.js and the `@beta` tag. Corrects the v2 entry on the closed questions.
 - v5 (2026-10-19): status set to `accepted`.
-- v6 (2026-10-20): corrections after the review of the implementation PR. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. Before, a cap at the threshold of the current rung picked that rung again. The conversion after a ladder or buffer target change runs after the selector adds the elapsed time. The `bufferTarget` row states the negative placeholder exception. The drawbacks and the analysis state the stall comparison with `createThroughputSelector`. The selector runs the starvation guard of the throughput selector when the input has `segmentDuration`, and `BolaSelectorOptions` gains `starvationTolerance`. Three more differences from dash.js. The analysis attributes the 10 second oscillation finding to the original BOLA and corrects the comparison with MPC and Pensieve.
+- v6 (2026-10-20): corrections after the review of the implementation PR. An aborted sample treats the next lower rung as the replacement, for the current rung and for the cap. Before, a cap at the threshold of the current rung picked that rung again. The conversion after a ladder or buffer target change runs after the selector adds the elapsed time. The `bufferTarget` row states the negative placeholder exception. The drawbacks and the analysis state the stall comparison with `createThroughputSelector`. The selector runs the starvation guard of the throughput selector when the input has `segmentDuration`, and `BolaSelectorOptions` gains `starvationTolerance`. Three more differences from dash.js. The analysis attributes the 10 second oscillation finding to the original BOLA and corrects the comparison with MPC and Pensieve. The delay rule is named as a dash.js rule that differs from the pause rule of the paper.
 
 ## Final Decision
 
