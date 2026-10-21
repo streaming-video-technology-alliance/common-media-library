@@ -75,7 +75,7 @@ The simulation uses two ladders. L1 has 5 rungs from 300 kbps to 6 Mbps. L2 has 
 | L2, cap 30 s | BOLA without placeholder | 2.74 | 0.00 | 16.3 |
 | L2, cap 30 s | BOLA with real-buffer guard | 2.83 | 1.00 | 17.0 |
 
-The real-buffer guard ignores the placeholder while the real buffer is below two segments.
+The real-buffer guard ignores the placeholder while the real buffer is below two segments. This variant is not the dash.js rule. The dash.js reference section names that rule.
 
 A second, harsher channel gave the same direction for findings 1 and 2. That channel picks a new level between 0.6 Mbps and 9 Mbps every 5 s to 20 s. In that channel, BOLA stalls 51% to 78% less than the baseline. Its average bitrate is 3% to 17% lower.
 
@@ -83,7 +83,7 @@ The simulation supports three findings:
 
 1. **The placeholder buffer is required when the player cap is below `B`.** Without it, the average bitrate falls by 29% for L1 and by 65% for L2 at a cap of 18 s. The real buffer never reaches the thresholds of the upper rungs.
 2. **The oscillation guard (BOLA-O) cuts switches by 1.6 to 3 times.** It costs 4% to 14% of the average bitrate.
-3. **BOLA with the oscillation guard and the placeholder stalls less than the baseline in every setup of both channels.** The advantage in the average bitrate depends on the channel.
+3. **BOLA with the oscillation guard and the placeholder stalls less than the baseline in every setup of both channels.** The advantage in the average bitrate depends on the channel. The baseline has no starvation guard, and `createThroughputSelector` has one. The next section shows the comparison with that selector.
 
 The simulation also shows two limits:
 
@@ -92,9 +92,25 @@ The simulation also shows two limits:
 
 These results come from a simplified model. The model has no packet-level effects, no variable segment sizes, and a simple baseline. The stall comparison depends on the channel and on the baseline. The literature above is the stronger evidence. The implementation will include a seeded simulation test that asserts only the invariants and the structural findings.
 
+### Comparison with the throughput selector
+
+The [implementation PR](https://github.com/streaming-video-technology-alliance/common-media-library/pull/543) reports a run of the same channel model against `createThroughputSelector`. The run used 100 seeded sessions of 75 segments of 4 s. BOLA picked higher rungs. BOLA also stalled more often and switched more often.
+
+| Ladder and buffer cap | Selector | Average Mbps | Stalls per session | Switches per session |
+|---|---|---|---|---|
+| L1, cap 18 s | BOLA | 1.88 | 0.23 | 5.5 |
+| L1, cap 18 s | `createThroughputSelector` | 1.28 | 0.03 | 5.3 |
+| L2, cap 18 s | BOLA | 2.23 | 0.96 | 12.3 |
+| L2, cap 18 s | `createThroughputSelector` | 1.62 | 0.02 | 10.5 |
+| L2, cap 30 s | BOLA | 2.30 | 0.37 | 10.5 |
+| L2, cap 30 s | `createThroughputSelector` | 1.61 | 0.02 | 10.2 |
+
+The throughput selector has a starvation guard, and the simple baseline has none. Finding 3 applies to the simple baseline only. The real-buffer guard of this analysis removes at most a third of the stalls. The difference to the throughput selector is larger. The selector runs the starvation guard of the throughput selector for this reason. The implementation PR reports the stall counts with the guard on and off.
+
 ## Costs and risks
 
 - BOLA suits large buffers. In the follow-up paper, a throughput rule oscillates less than BOLA with a 10 s buffer. Low-latency streams often have such a small buffer. The dash.js player runs BOLA only above a buffer level and uses a throughput rule below it.
+- Without a guard, BOLA stalls more often than `createThroughputSelector` in the simulation of the implementation PR. The selector runs the starvation guard of that selector when the input has `segmentDuration`. A player that omits the field owns the stall risk.
 - BOLA keeps state. The player calls `sample` for every download and `reset` after a seek, as the `BitrateSelector` type requires.
 - The pure core is small. Most of `BolaRule.js` handles player wiring. That part contains the tuning decisions and the defects.
 - The port derives from BSD-3 code and needs attribution. The RFC names the files under Packaging.
@@ -113,7 +129,7 @@ The rule keeps one state record for each stream and media type. The state is one
 
 The rule mutates its state when a segment loads or when a request metric arrives. It also mutates its state on a seek, a buffer-empty event, a quality change request, and an abandoned download. A change of the minimum bitrate, the maximum bitrate, or the video element size resets it.
 
-dash.js combines BOLA with a throughput rule. The default strategy runs the throughput rule first. It switches to BOLA when the buffer reaches a threshold. It switches back when the buffer falls below half of that threshold. The commit of the issue used the default buffer time as the threshold, which is 18 s. The `development` branch uses the new setting `hybridSwitchBufferTime`, which is 12 s by default. A separate rule lowers the rung when the real buffer is small.
+dash.js combines BOLA with a throughput rule. The default strategy runs the throughput rule first. It switches to BOLA when the buffer reaches a threshold. It switches back when the buffer falls below half of that threshold. The commit of the issue used the default buffer time as the threshold, which is 18 s. The `development` branch uses the new setting `hybridSwitchBufferTime`, which is 12 s by default. `InsufficientBufferRule` lowers the rung when the real buffer is small. The rule caps the bitrate at `safeThroughput * bufferLevel / segmentDuration`, and it drops to the lowest rung after a buffer-empty event. The rule is on by default.
 
 ### What CML ports and what stays in the player
 
@@ -123,6 +139,7 @@ dash.js combines BOLA with a throughput rule. The default strategy runs the thro
 | The startup and steady state machine | Settings, metrics, and the rules context |
 | The placeholder buffer, BOLA-O, and the delay | Ladder filtering, CMSD limits, and DRM filtering |
 | The rescale after a buffer target change | The combination of BOLA with other rules |
+| The cap of `InsufficientBufferRule`, as the shared starvation guard | The drop to the lowest rung after a buffer-empty event |
 
 ### Defects found in the reference
 
