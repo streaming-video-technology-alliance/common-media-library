@@ -82,7 +82,8 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const data = extractAssertionData(assertion.data)
 	if (!data) return { ...EMPTY_BMFF_HASH, malformed: true }
 
-	const hashBytes = toUint8Array(data['hash'] ?? data['value'])
+	// The bmff-hash-map defines the content hash only as `hash`. A `value` field does not replace it.
+	const hashBytes = toUint8Array(data['hash'])
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
 	const alg = typeof data['alg'] === 'string' ? normalizeAlgorithmName(data['alg']) : null

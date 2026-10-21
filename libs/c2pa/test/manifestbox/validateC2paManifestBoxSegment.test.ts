@@ -798,6 +798,19 @@ describe('validateC2paManifestBoxSegment — content binding (§19.3)', () => {
 		strictEqual(nextManifestId, LAST_MANIFEST_ID)
 	})
 
+	for (const [name, hashField] of [['a missing hash', {}], ['a null hash', { hash: null }]] as const) {
+		it(`fails with ASSERTION_BMFFHASH_MALFORMED for ${name} and a matching value field`, async () => {
+			const segment = await signedSegment([['c2pa.hash.bmff.v3', { exclusions: [{ xpath: '/uuid' }], alg: 'sha256', ...hashField, value: await flatHash() }]])
+
+			const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED])
+			strictEqual(result.bmffHashHex, null)
+			strictEqual(nextManifestId, LAST_MANIFEST_ID)
+			deepStrictEqual(nextState, LAST_STATE)
+		})
+	}
+
 	it('fails with ASSERTION_BMFFHASH_MALFORMED for a c2pa.hash.bmff.v3 assertion that is not a map', async () => {
 		const segment = await signedSegment([['c2pa.hash.bmff.v3', [await flatHash()]]])
 
