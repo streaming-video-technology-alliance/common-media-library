@@ -1,6 +1,7 @@
 import { deepEqual, equal, throws } from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { checkExports, indexEnd, indexStart, parseWhenToUse, readExports, renderIndex, renderLlmsTxt, renderReference, replaceIndex, rewriteLinks, siteBase, siteCopies, siteUrl, sourceBase, sourceUrl, type PackageDocs } from './agentDocs.ts'
+import { checkExports, indexEnd, indexStart, loadAllPackageDocs, parseWhenToUse, readExports, renderIndex, renderLlmsTxt, renderReference, replaceIndex, rewriteLinks, siteBase, siteCopies, siteUrl, sourceBase, sourceUrl, type PackageDocs } from './agentDocs.ts'
+import { projects } from './projects.ts'
 
 const readme = `# @svta/cml-example
 
@@ -222,5 +223,15 @@ describe('renderLlmsTxt', () => {
 		equal(text.includes(`\n## API reports\n\n- [@svta/cml-example API report](${siteBase}llms/example/api.md): `), true)
 		equal(text.includes(`\n## Optional\n\n- [llms-full.txt](${siteBase}llms-full.txt): `), true)
 		equal(text.includes('npx skills add streaming-video-technology-alliance/common-media-library'), true)
+	})
+})
+
+describe('published packages', () => {
+	it('every published package has a When to use section whose exports exist', () => {
+		const packages = loadAllPackageDocs()
+		equal(packages.length, projects.length)
+		for (const pkg of packages) {
+			equal(pkg.whenToUse.bullets.length >= 2, true, `${pkg.name} has too few bullets`)
+		}
 	})
 })
