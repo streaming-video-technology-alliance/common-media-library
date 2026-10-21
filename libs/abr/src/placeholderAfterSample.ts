@@ -1,7 +1,8 @@
-import { MILLISECONDS_PER_SECOND, PLACEHOLDER_DECAY } from './BOLA_CONSTANTS.ts'
+import { PLACEHOLDER_DECAY } from './BOLA_CONSTANTS.ts'
 import type { BolaParams } from './BolaParams.ts'
 import { findRung } from './findRung.ts'
 import { isPositiveFinite } from './isPositiveFinite.ts'
+import { MILLISECONDS_PER_SECOND } from './MILLISECONDS_PER_SECOND.ts'
 import type { SegmentSample } from './SegmentSample.ts'
 
 /**
