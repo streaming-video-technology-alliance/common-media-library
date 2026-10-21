@@ -1,5 +1,5 @@
-import type { BitrateSelector, BolaDecision, BolaSelector, LadderRung, SegmentSample } from '@svta/cml-abr'
-import { BOLA_DEFAULT_BUFFER_TARGET, BolaState, createBolaSelector, DEFAULT_SAFETY_FACTOR } from '@svta/cml-abr'
+import type { BitrateSelector, BitrateSelectorInput, BolaDecision, BolaSelector, BolaSelectorOptions, LadderRung, SegmentSample } from '@svta/cml-abr'
+import { BOLA_DEFAULT_BUFFER_TARGET, BolaState, createBolaSelector, DEFAULT_SAFETY_FACTOR, DEFAULT_STARVATION_SAFETY_FACTOR } from '@svta/cml-abr'
 import { deepEqual, equal, ok, throws } from 'node:assert'
 import { describe, it } from 'node:test'
 import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG, PLACEHOLDER_DECAY, STALL_THRESHOLD } from '../src/BOLA_CONSTANTS.ts'
@@ -36,6 +36,19 @@ const L1_MAXIMUM_BUFFERS = bolaMaximumBuffers(L1_BANDWIDTHS, BOLA_DEFAULT_BUFFER
 
 // The oscillation guard scenario. The selector is at rung 1. The buffer picks rung 3, which is above the maximum buffer of rung 1.
 const GUARD_BUFFER_LEVEL = (L1_THRESHOLDS[3] + L1_THRESHOLDS[4]) / 2
+
+// The starvation guard scenario. The effective buffer is `GUARD_BUFFER_LEVEL`, so the buffer alone picks rung 3, which is the current rung.
+// The throughput sustains rung 3. At the default factor, rung 3 needs 5.1 s to download one segment.
+const HEALTHY_BUFFER_LEVEL = 6
+const STARVING_BUFFER_LEVEL = 3
+const SHORT_BUFFER_LEVEL = 1.5
+// Above the stall threshold, and below the download time of rung 0.
+const VERY_SHORT_BUFFER_LEVEL = 0.5
+const RECOVERED_BUFFER_LEVEL = 10
+const STRICT_STARVATION_FACTOR = 0.5
+const RELAXED_STARVATION_FACTOR = 0.9
+const FAST_PLAYBACK_RATE = 2
+const INVALID_PLAYBACK_RATES = [0, -1, NaN, Infinity]
 
 // The ladder change scenario. The selector is at rung 2 of L1. The real buffer is 7 s and the placeholder is 4 s.
 const LADDER_CHANGE_BUFFER_LEVEL = 7
@@ -87,8 +100,8 @@ function reachSteadyState(selector: BolaSelector, throughput: number, ladder: La
 }
 
 // Returns a selector in the steady state with an empty placeholder, so that the real buffer alone decides.
-function createEmptyPlaceholderSelector(ladder: LadderRung[] = L1): BolaSelector {
-	const selector = createBolaSelector()
+function createEmptyPlaceholderSelector(ladder: LadderRung[] = L1, options?: BolaSelectorOptions): BolaSelector {
+	const selector = createBolaSelector(options)
 
 	reachSteadyState(selector, throughputFor(1), ladder)
 	selector.select({ ladder, bufferLevel: 0, throughput: NaN, now: requestEnd(0) })
@@ -97,9 +110,9 @@ function createEmptyPlaceholderSelector(ladder: LadderRung[] = L1): BolaSelector
 }
 
 // Returns a selector in the steady state whose current rung is `bandwidth` and whose placeholder is empty.
-// The next call at `requestEnd(0)` adds no elapsed time.
-function createSteadySelectorAt(bandwidth: number, bufferLevel: number): BolaSelector {
-	const selector = createEmptyPlaceholderSelector()
+// Two samples finished, so the starvation guard is ready. The next call at `requestEnd(0)` adds no elapsed time.
+function createSteadySelectorAt(bandwidth: number, bufferLevel: number, options?: BolaSelectorOptions): BolaSelector {
+	const selector = createEmptyPlaceholderSelector(L1, options)
 
 	load(selector, bandwidth, bufferLevel)
 
@@ -142,6 +155,19 @@ describe('createBolaSelector', () => {
 				throws(() => createBolaSelector({ safetyFactor }), {
 					name: 'RangeError',
 					message: `Invalid safetyFactor: expected a finite number above 0 and at most 1, received ${safetyFactor}`,
+				})
+			}
+		})
+
+		it('exports the default starvation safety factor', () => {
+			equal(DEFAULT_STARVATION_SAFETY_FACTOR, 0.7)
+		})
+
+		it('throws when starvationSafetyFactor is not a finite number above 0 and at most 1', () => {
+			for (const starvationSafetyFactor of [0, -0.5, 1.5, NaN, Infinity]) {
+				throws(() => createBolaSelector({ starvationSafetyFactor }), {
+					name: 'RangeError',
+					message: `Invalid starvationSafetyFactor: expected a finite number above 0 and at most 1, received ${starvationSafetyFactor}`,
 				})
 			}
 		})
@@ -451,6 +477,120 @@ describe('createBolaSelector', () => {
 			const later = selector.select({ ...input, now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND })
 
 			closeTo(later.placeholder, elapsed, TOLERANCE)
+		})
+	})
+
+	describe('starvation guard', () => {
+		// Decides in the scenario with a real buffer of `bufferLevel`. The placeholder holds the rest of the effective buffer.
+		function decide(bufferLevel: number, input: Partial<BitrateSelectorInput> = {}, options?: BolaSelectorOptions): BolaDecision {
+			const selector = createSteadySelectorAt(L1_BANDWIDTHS[3], bufferLevel, options)
+			const elapsed = GUARD_BUFFER_LEVEL - bufferLevel
+
+			return selector.select({
+				ladder: L1,
+				bufferLevel,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+				...input,
+			})
+		}
+
+		it('lowers the pick when the download of the next segment does not fit in the real buffer', () => {
+			equal(decide(STARVING_BUFFER_LEVEL).index, 2)
+		})
+
+		it('keeps the pick when the download fits in the real buffer', () => {
+			const decision = decide(HEALTHY_BUFFER_LEVEL)
+
+			equal(decision.index, 3)
+			equal(decision.delay, 0)
+		})
+
+		it('falls back to rung 0 when no rung downloads in time', () => {
+			equal(decide(VERY_SHORT_BUFFER_LEVEL).index, 0)
+		})
+
+		it('skips the guard when segmentDuration is missing or is not a positive finite number', () => {
+			for (const segmentDuration of [undefined, ...INVALID_DURATIONS]) {
+				equal(decide(STARVING_BUFFER_LEVEL, { segmentDuration }).index, 3, `segmentDuration ${segmentDuration}`)
+			}
+		})
+
+		it('skips the guard when the throughput is unknown', () => {
+			equal(decide(STARVING_BUFFER_LEVEL, { throughput: NaN }).index, 3)
+		})
+
+		it('treats a throughput of 0 as a measurement', () => {
+			equal(decide(HEALTHY_BUFFER_LEVEL, { throughput: 0 }).index, 0)
+		})
+
+		it('waits for two finished samples before it runs', () => {
+			const input = { ladder: L1, bufferLevel: 1, throughput: throughputFor(3), now: requestEnd(0), segmentDuration: SEGMENT_DURATION }
+			const waiting = createBolaSelector()
+			const ready = createBolaSelector()
+
+			reachSteadyState(waiting, throughputFor(3))
+			reachSteadyState(ready, throughputFor(3))
+			load(ready, L1_BANDWIDTHS[3], SEGMENT_DURATION)
+
+			equal(waiting.select(input).index, 1)
+			equal(ready.select(input).index, 0)
+		})
+
+		it('does not count an aborted sample', () => {
+			const input = { ladder: L1, bufferLevel: 1, throughput: throughputFor(3), now: requestEnd(0), segmentDuration: SEGMENT_DURATION }
+			const selector = createBolaSelector()
+
+			reachSteadyState(selector, throughputFor(3))
+			// The abort of rung 4 leaves the placeholder and the current rung of this scenario unchanged.
+			load(selector, L1_BANDWIDTHS[4], SEGMENT_DURATION, 0, { aborted: true })
+
+			equal(selector.select(input).index, 1)
+		})
+
+		it('waits again after a reset', () => {
+			const selector = createSteadySelectorAt(L1_BANDWIDTHS[3], STARVING_BUFFER_LEVEL)
+
+			selector.reset()
+			reachSteadyState(selector, throughputFor(3))
+
+			equal(selector.select({ ladder: L1, bufferLevel: 1, throughput: throughputFor(3), now: requestEnd(0), segmentDuration: SEGMENT_DURATION }).index, 1)
+		})
+
+		it('divides the real buffer by the playback rate', () => {
+			equal(decide(HEALTHY_BUFFER_LEVEL, { playbackRate: FAST_PLAYBACK_RATE }).index, 2)
+		})
+
+		it('counts a playback rate that is not a positive finite number as 1', () => {
+			for (const playbackRate of INVALID_PLAYBACK_RATES) {
+				equal(decide(HEALTHY_BUFFER_LEVEL, { playbackRate }).index, 3, `playback rate ${playbackRate}`)
+			}
+		})
+
+		it('uses starvationSafetyFactor for the download time', () => {
+			equal(decide(HEALTHY_BUFFER_LEVEL, {}, { starvationSafetyFactor: STRICT_STARVATION_FACTOR }).index, 2)
+			equal(decide(HEALTHY_BUFFER_LEVEL, {}, { starvationSafetyFactor: RELAXED_STARVATION_FACTOR }).index, 3)
+		})
+
+		it('skips the delay step when it lowers the pick', () => {
+			const decision = decide(SHORT_BUFFER_LEVEL)
+
+			equal(decision.index, 1)
+			equal(decision.delay, 0)
+			closeTo(decision.placeholder, GUARD_BUFFER_LEVEL - SHORT_BUFFER_LEVEL, TOLERANCE)
+		})
+
+		it('makes a lowered pick the current rung', () => {
+			const selector = createSteadySelectorAt(L1_BANDWIDTHS[3], STARVING_BUFFER_LEVEL)
+			const now = requestEnd(0) + (GUARD_BUFFER_LEVEL - STARVING_BUFFER_LEVEL) * MILLISECONDS_PER_SECOND
+			const input = { ladder: L1, now, segmentDuration: SEGMENT_DURATION }
+			const lowered = selector.select({ ...input, bufferLevel: STARVING_BUFFER_LEVEL, throughput: throughputFor(3) })
+			// The buffer now picks rung 4. The throughput sustains rung 2 only, so the oscillation guard keeps the current rung.
+			const next = selector.select({ ...input, bufferLevel: RECOVERED_BUFFER_LEVEL, throughput: throughputBetween(2) })
+
+			equal(lowered.index, 2)
+			equal(next.index, 2)
 		})
 	})
 

@@ -32,6 +32,14 @@ export const PLACEHOLDER_DECAY = 0.99
 export const STALL_THRESHOLD = 0.3
 
 /**
+ * The number of finished samples, since the last reset, that the starvation guard waits for.
+ * dash.js uses 2 as the default `segmentIgnoreCount` of its insufficient buffer rule.
+ *
+ * @internal
+ */
+export const STARVATION_GUARD_SAMPLE_COUNT = 2
+
+/**
  * The delay, in seconds, at or below which a selector returns a delay of 0.
  * It is the resolution of a clock in milliseconds, so a player cannot wait for less.
  * It also absorbs the rounding error of the placeholder arithmetic.

@@ -1,7 +1,7 @@
 /**
  * The options of `createBolaSelector`.
  *
- * `safetyFactor` must be a finite number above 0 and at most 1.
+ * Both factors must be finite numbers above 0 and at most 1.
  * `createBolaSelector` throws a `RangeError` for an invalid option.
  *
  * @beta
@@ -16,4 +16,14 @@ export type BolaSelectorOptions = {
 	 * @defaultValue `DEFAULT_SAFETY_FACTOR`
 	 */
 	safetyFactor?: number;
+
+	/**
+	 * The fraction of the throughput that the starvation guard assumes for the download of the next segment.
+	 * The guard runs when the player passes `segmentDuration`.
+	 * It lowers the pick when that download does not fit in the real buffer.
+	 * One download varies more than the smoothed estimate, so the default is lower than the default of `safetyFactor`.
+	 *
+	 * @defaultValue `DEFAULT_STARVATION_SAFETY_FACTOR`
+	 */
+	starvationSafetyFactor?: number;
 };

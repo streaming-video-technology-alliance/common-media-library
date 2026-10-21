@@ -24,6 +24,8 @@ type SimulationOptions = {
 	segmentCount: number
 	/** The media duration of each segment in seconds. */
 	segmentDuration: number
+	/** When true, the player does not pass `segmentDuration` to `select`, so a selector skips its starvation guard. */
+	omitSegmentDuration?: boolean
 }
 
 export type SimulationResult = {
@@ -130,7 +132,7 @@ function createThroughputEstimate(): { sample(seconds: number, bandwidth: number
  * The player starts to play after the first segment, and a stall is time with an empty buffer.
  */
 export function simulatePlayback(selector: BitrateSelector, options: SimulationOptions): SimulationResult {
-	const { ladder, trace, bufferCap, segmentCount, segmentDuration } = options
+	const { ladder, trace, bufferCap, segmentCount, segmentDuration, omitSegmentDuration } = options
 	const estimate = createThroughputEstimate()
 	const result: SimulationResult = { bandwidths: [], delays: [], repeatedDelays: 0, stallCount: 0 }
 
@@ -145,7 +147,7 @@ export function simulatePlayback(selector: BitrateSelector, options: SimulationO
 	}
 
 	function select(): BitrateDecision {
-		return selector.select({ ladder, bufferLevel: buffer, throughput: estimate.get(), now: time * MILLISECONDS_PER_SECOND, bufferTarget: bufferCap, segmentDuration })
+		return selector.select({ ladder, bufferLevel: buffer, throughput: estimate.get(), now: time * MILLISECONDS_PER_SECOND, bufferTarget: bufferCap, segmentDuration: omitSegmentDuration ? undefined : segmentDuration })
 	}
 
 	// Asks for a rung. A decision with a delay makes the player wait and ask again, as the contract says.

@@ -35,13 +35,14 @@ const SELECTORS: [string, () => BitrateSelector][] = [
 	['the throughput selector', createThroughput],
 ]
 
-function play(createSelector: () => BitrateSelector, setup: Setup, seed: number): SimulationResult {
+function play(createSelector: () => BitrateSelector, setup: Setup, seed: number, omitSegmentDuration = false): SimulationResult {
 	return simulatePlayback(createSelector(), {
 		ladder: setup.ladder,
 		trace: createRandomWalkTrace(seed, MINIMUM_BANDWIDTH, MAXIMUM_BANDWIDTH),
 		bufferCap: setup.bufferCap,
 		segmentCount: SEGMENT_COUNT,
 		segmentDuration: SEGMENT_DURATION,
+		omitSegmentDuration,
 	})
 }
 
@@ -57,6 +58,11 @@ function playOnLink(setup: Setup, bandwidth: number): SimulationResult {
 
 function average(values: readonly number[]): number {
 	return values.reduce((sum, value) => sum + value, 0) / values.length
+}
+
+// The stalls of all the seeds. A player that omits `segmentDuration` makes a selector skip its starvation guard.
+function totalStalls(createSelector: () => BitrateSelector, setup: Setup, omitSegmentDuration = false): number {
+	return Array.from({ length: SEED_COUNT }, (_, index) => play(createSelector, setup, index + 1, omitSegmentDuration).stallCount).reduce((sum, count) => sum + count, 0)
 }
 
 // The mean bandwidth of the rungs that a selector used, averaged over the seeds.
@@ -91,10 +97,16 @@ describe('playback simulation', () => {
 		}
 	})
 
-	// The higher bitrate comes with more stalls. The analysis of the RFC lists both numbers.
+	// The higher bitrate comes with more stalls, even with the starvation guard. The analysis of the RFC lists both numbers.
 	it('picks a higher average rung than the throughput selector on the same traces', () => {
 		for (const setup of SETUPS) {
 			ok(averageBandwidth(createBola, setup) > averageBandwidth(createThroughput, setup), setup.name)
+		}
+	})
+
+	it('stalls less with the starvation guard than without it on the same traces', () => {
+		for (const setup of SETUPS) {
+			ok(totalStalls(createBola, setup) < totalStalls(createBola, setup, true), setup.name)
 		}
 	})
 

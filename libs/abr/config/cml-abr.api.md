@@ -48,6 +48,7 @@ export type BolaSelector = Omit<BitrateSelector, "select"> & {
 // @beta
 export type BolaSelectorOptions = {
     safetyFactor?: number;
+    starvationSafetyFactor?: number;
 };
 
 // @beta
@@ -67,6 +68,9 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 
 // @beta
 export const DEFAULT_SAFETY_FACTOR = .9;
+
+// @beta
+export const DEFAULT_STARVATION_SAFETY_FACTOR = .7;
 
 // @beta
 export const DEFAULT_STARVATION_TOLERANCE = 4;
