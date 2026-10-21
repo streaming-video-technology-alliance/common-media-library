@@ -153,7 +153,7 @@ The delay is `max(0, Q - maximumBuffer(rung))`. The selector drains the placehol
 
 After a delay, the player calls `select` again. The second call adds the wait to the placeholder, and the real buffer is lower by the same amount, so `Q` is unchanged. The delay computation then drains the placeholder, and the call returns 0. A repeated delay is not a defect of the implementation.
 
-The delay rule comes from dash.js. BOLA-O in the paper pauses until the score of the capped rung is at least the score of the next rung, so the buffer drains to the threshold of that rung. The dash.js rule holds more real buffer at the cap, and the selector keeps it.
+The delay rule comes from dash.js. BOLA-O in the paper pauses until the score of the capped rung is at least the score of the next rung. The buffer then drains to the threshold of the next rung. The dash.js rule holds more real buffer at the cap, and the selector keeps it.
 
 ### Stalls
 
