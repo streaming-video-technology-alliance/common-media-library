@@ -540,6 +540,35 @@ describe('createBolaSelector', () => {
 			equal(decide(HEALTHY_BUFFER_LEVEL, { throughput: 0 }).index, 0)
 		})
 
+		it('does not lower the first two picks', () => {
+			const input = { ladder: L1, throughput: throughputFor(3), segmentDuration: SEGMENT_DURATION }
+			const selector = createBolaSelector()
+			// The startup picks follow the throughput, even with an empty buffer, where the guard would pick rung 0.
+			const first = selector.select({ ...input, bufferLevel: 0, now: 0 })
+
+			load(selector, L1_BANDWIDTHS[0], 0)
+
+			const second = selector.select({ ...input, bufferLevel: SMALL_STEP, now: requestEnd(0) })
+
+			equal(first.index, 3)
+			equal(second.index, 3)
+		})
+
+		it('does not run in the startup state, even after two finished samples', () => {
+			const input = { ladder: L1, throughput: throughputFor(3), segmentDuration: SEGMENT_DURATION }
+			const selector = createBolaSelector()
+
+			selector.select({ ...input, bufferLevel: 0, now: 0 })
+			// A sample without a valid duration keeps the startup state. Two of them finish.
+			load(selector, L1_BANDWIDTHS[0], 0, 0, { duration: NaN })
+			load(selector, L1_BANDWIDTHS[0], 0, 0, { duration: NaN })
+
+			const decision = selector.select({ ...input, bufferLevel: SMALL_STEP, now: requestEnd(0) })
+
+			equal(decision.state, BolaState.STARTUP)
+			equal(decision.index, 3)
+		})
+
 		it('waits for two finished samples before it runs', () => {
 			const input = { ladder: L1, bufferLevel: 1, throughput: throughputFor(3), now: requestEnd(0), segmentDuration: SEGMENT_DURATION }
 			const waiting = createBolaSelector()
@@ -579,7 +608,7 @@ describe('createBolaSelector', () => {
 
 		it('counts a playback rate that is not a positive finite number as 1', () => {
 			for (const playbackRate of INVALID_PLAYBACK_RATES) {
-				equal(decide(HEALTHY_BUFFER_LEVEL, { playbackRate }).index, 3, `playback rate ${playbackRate}`)
+				equal(decide(STARVING_BUFFER_LEVEL, { playbackRate }).index, decide(STARVING_BUFFER_LEVEL).index, `playback rate ${playbackRate}`)
 			}
 		})
 
@@ -631,6 +660,19 @@ describe('createBolaSelector', () => {
 			equal(decision.placeholder, 0)
 		})
 
+		it('clears the time of the call that finds the stall, so a later call adds no wait', () => {
+			const selector = createBolaSelector()
+			const input = { ladder: L1, throughput: NaN }
+
+			reachSteadyState(selector, throughputFor(1))
+			// The stall comes at the first steady call. No sample follows, and the next call comes 3 s later.
+			selector.select({ ...input, bufferLevel: STALL_THRESHOLD, now: requestEnd(0) })
+
+			const later = selector.select({ ...input, bufferLevel: LOW_BUFFER_LEVEL, now: requestEnd(0) + 3 * MILLISECONDS_PER_SECOND })
+
+			equal(later.placeholder, 0)
+		})
+
 		it('clears the placeholder in sample when the buffer is at or below the stall threshold', () => {
 			const stalled = createBolaSelector()
 			const control = createBolaSelector()
@@ -644,6 +686,21 @@ describe('createBolaSelector', () => {
 			equal(stalled.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later }).placeholder, 0)
 			ok(control.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later }).placeholder > 0)
 		})
+	})
+
+	describe('stalls in a sample', () => {
+		for (const [outcome, extra] of [['finished', {}], ['aborted', { aborted: true }]] as const) {
+			it(`clears the time bases when a ${outcome} sample finds a stall`, () => {
+				const selector = createBolaSelector()
+
+				reachSteadyState(selector, throughputFor(3))
+				load(selector, L1_BANDWIDTHS[3], STALL_THRESHOLD, SECOND_REQUEST_START, extra)
+
+				const later = requestEnd(SECOND_REQUEST_START) + LONG_WAIT_SECONDS * MILLISECONDS_PER_SECOND
+
+				equal(selector.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later }).placeholder, 0)
+			})
+		}
 	})
 
 	describe('sample', () => {
@@ -751,6 +808,19 @@ describe('createBolaSelector', () => {
 			it('blocks a return to the aborted rung until the throughput sustains it', () => {
 				equal(decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), RETURN_BUFFER_LEVEL, throughputBetween(2)).index, 2)
 				equal(decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), RETURN_BUFFER_LEVEL, throughputFor(3)).index, 3)
+			})
+
+			it('locates the aborted rung with the bandwidth of the sample', () => {
+				// The selector asked for rung 3. The player requested rung 2 and aborted it, so rung 1 is the replacement.
+				const selector = createBolaSelector()
+
+				reachSteadyState(selector, throughputFor(3))
+				load(selector, L1_BANDWIDTHS[2], ABORT_BUFFER_LEVEL, SECOND_REQUEST_START, { aborted: true })
+
+				const decision = decideAfterAbort(selector, ABORT_BUFFER_LEVEL, NaN)
+
+				equal(decision.index, 1)
+				closeTo(decision.placeholder, L1_THRESHOLDS[1] - ABORT_BUFFER_LEVEL, TOLERANCE)
 			})
 
 			it('empties the placeholder and picks the lowest rung after an abort of the second rung', () => {
@@ -975,6 +1045,21 @@ describe('createBolaSelector', () => {
 
 			equal(result.bandwidth, LADDER_CHANGE_CURRENT_BANDWIDTH)
 			closeTo(result.placeholder, 6, REFERENCE_TOLERANCE)
+		})
+
+		it('leaves a placeholder of 0 when a smaller buffer target meets a stall', () => {
+			// A smaller target shrinks V, so the conversion would turn a buffer below 10 s into a higher one. The stall rule runs after it.
+			const selector = createBolaSelector()
+			const input = { ladder: L1, throughput: NaN, now: requestEnd(0) }
+
+			selector.select({ ...input, bufferLevel: 0, bufferTarget: LARGE_BUFFER_TARGET, now: 0 })
+			load(selector, L1_BANDWIDTHS[0], 0)
+			selector.select({ ...input, bufferLevel: SEGMENT_DURATION, bufferTarget: LARGE_BUFFER_TARGET })
+
+			const decision = selector.select({ ...input, bufferLevel: STALL_THRESHOLD, bufferTarget: BOLA_DEFAULT_BUFFER_TARGET })
+
+			equal(decision.state, BolaState.STEADY)
+			equal(decision.placeholder, 0)
 		})
 
 		it('keeps the pick for any wait when the buffer target changes', () => {
