@@ -533,28 +533,84 @@ describe('createBolaSelector', () => {
 			closeTo(decision.placeholder, placeholder * PLACEHOLDER_DECAY + SEGMENT_DURATION, TOLERANCE)
 		})
 
-		it('caps the placeholder at the threshold of the current rung for an aborted segment', () => {
-			const selector = createBolaSelector()
-			const bufferLevel = 5
+		describe('after an aborted download', () => {
+			// The abort leaves the effective buffer at the threshold of the next lower rung.
+			const ABORT_BUFFER_LEVEL = 7
+			const CAPPED_PLACEHOLDER = L1_THRESHOLDS[2] - ABORT_BUFFER_LEVEL
+			// A buffer at which the capped placeholder gives an effective buffer that picks rung 3.
+			const RETURN_BUFFER_LEVEL = GUARD_BUFFER_LEVEL - CAPPED_PLACEHOLDER
 
-			reachSteadyState(selector, throughputFor(2))
-			load(selector, L1_BANDWIDTHS[4], bufferLevel, SECOND_REQUEST_START, { aborted: true })
+			// A selector in the steady state that asked for the rung at `position` and aborted the download.
+			// The call of the startup state gave it a placeholder above the cap of the abort.
+			function abortAt(position: number, bufferLevel: number): BolaSelector {
+				const selector = createBolaSelector()
 
-			const decision = selector.select({ ladder: L1, bufferLevel, throughput: NaN, now: requestEnd(0) })
+				reachSteadyState(selector, throughputFor(position))
+				load(selector, L1_BANDWIDTHS[position], bufferLevel, SECOND_REQUEST_START, { aborted: true })
 
-			closeTo(decision.placeholder, L1_THRESHOLDS[2] - bufferLevel, TOLERANCE)
-		})
+				return selector
+			}
 
-		it('caps the placeholder so that the effective buffer stays at MINIMUM_BUFFER for an aborted segment at rung 0', () => {
-			const selector = createSteadySelectorAt(L1_BANDWIDTHS[0], SEGMENT_DURATION)
-			const bufferLevel = 8
+			function decideAfterAbort(selector: BolaSelector, bufferLevel: number, throughput: number): BolaDecision {
+				return selector.select({ ladder: L1, bufferLevel, throughput, now: requestEnd(SECOND_REQUEST_START) })
+			}
 
-			load(selector, L1_BANDWIDTHS[0], bufferLevel, SECOND_REQUEST_START, { isReplacement: true })
-			load(selector, L1_BANDWIDTHS[4], bufferLevel, SECOND_REQUEST_START, { aborted: true })
+			it('caps the placeholder at the threshold of the next lower rung', () => {
+				const decision = decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, NaN)
 
-			const decision = selector.select({ ladder: L1, bufferLevel, throughput: NaN, now: requestEnd(SECOND_REQUEST_START) })
+				closeTo(decision.placeholder, CAPPED_PLACEHOLDER, TOLERANCE)
+			})
 
-			closeTo(decision.placeholder, MINIMUM_BUFFER - bufferLevel, TOLERANCE)
+			it('picks the next lower rung in the first call, even when the estimate collapsed', () => {
+				for (const throughput of [NaN, throughputFor(0)]) {
+					const decision = decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughput)
+
+					equal(decision.index, 2, `throughput ${throughput}`)
+				}
+			})
+
+			it('blocks a return to the aborted rung until the throughput sustains it', () => {
+				equal(decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), RETURN_BUFFER_LEVEL, throughputBetween(2)).index, 2)
+				equal(decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), RETURN_BUFFER_LEVEL, throughputFor(3)).index, 3)
+			})
+
+			it('empties the placeholder and picks the lowest rung after an abort of the second rung', () => {
+				const bufferLevel = LOW_BUFFER_LEVEL
+				const decision = decideAfterAbort(abortAt(1, bufferLevel), bufferLevel, NaN)
+
+				equal(decision.placeholder, 0)
+				equal(decision.index, 0)
+			})
+
+			it('keeps the lowest rung and caps the placeholder at MINIMUM_BUFFER after an abort of the lowest rung', () => {
+				const selector = createSteadySelectorAt(L1_BANDWIDTHS[0], SEGMENT_DURATION)
+				const bufferLevel = 8
+
+				load(selector, L1_BANDWIDTHS[0], bufferLevel, SECOND_REQUEST_START, { isReplacement: true })
+				load(selector, L1_BANDWIDTHS[0], bufferLevel, SECOND_REQUEST_START, { aborted: true })
+
+				// The buffer picks rung 1. The throughput sustains rung 0 only, so the guard keeps the current rung, which is rung 0.
+				const decision = decideAfterAbort(selector, bufferLevel, throughputFor(0))
+
+				closeTo(decision.placeholder, MINIMUM_BUFFER - bufferLevel, TOLERANCE)
+				equal(decision.index, 0)
+			})
+
+			it('applies the stall rule to the sample', () => {
+				const stalled = abortAt(3, STALL_THRESHOLD)
+				const control = abortAt(3, SEGMENT_DURATION)
+
+				equal(decideAfterAbort(stalled, SEGMENT_DURATION, NaN).placeholder, 0)
+				ok(decideAfterAbort(control, SEGMENT_DURATION, NaN).placeholder > 0)
+			})
+
+			it('accepts an aborted sample before the first call to select', () => {
+				const selector = createBolaSelector()
+
+				load(selector, L1_BANDWIDTHS[2], 0, 0, { aborted: true })
+
+				deepEqual(selector.select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: 0 }), createBolaSelector().select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: 0 }))
+			})
 		})
 
 		describe('after a long request', () => {
@@ -587,14 +643,6 @@ describe('createBolaSelector', () => {
 					closeTo(decision.placeholder, elapsed, TOLERANCE)
 				})
 			}
-		})
-
-		it('does not change the current rung for an aborted segment', () => {
-			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
-
-			load(selector, L1_BANDWIDTHS[4], GUARD_BUFFER_LEVEL, SECOND_REQUEST_START, { aborted: true })
-
-			equal(selector.select({ ladder: L1, bufferLevel: GUARD_BUFFER_LEVEL, throughput: throughputBetween(1), now: requestEnd(0) }).index, 1)
 		})
 
 		it('takes the bandwidth of a sample as the current rung', () => {

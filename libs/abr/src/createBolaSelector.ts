@@ -218,14 +218,17 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		lastCall = now
 	}
 
-	// An aborted download caps the placeholder. It does not change the current rung.
-	// The abort ends the request, so the clock of the placeholder starts at the abort and skips the download time.
+	// The next lower rung replaces the aborted rung. The replacement becomes the current rung, and it caps the placeholder.
+	// The lowest rung has no lower rung, so it stays the current rung.
 	function recordAbortedSample(segment: SegmentSample, bufferLevel: number): void {
 		if (params && params.rungs.length > 1) {
-			placeholder = placeholderAfterAbort(params, currentPosition(params), placeholder, bufferLevel)
+			const abortedPosition = findRung(params.rungs, segment.bandwidth)
+
+			currentBandwidth = params.rungs[Math.max(0, abortedPosition - 1)].bandwidth
+			placeholder = placeholderAfterAbort(params, abortedPosition, placeholder, bufferLevel)
 		}
 
-		lastRequestEnd = getRequestEnd(segment)
+		endRequest(segment, bufferLevel)
 	}
 
 	function recordFinishedSample(segment: SegmentSample, bufferLevel: number): void {
@@ -235,17 +238,21 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 			lastSegmentDuration = segment.duration
 		}
 
-		if (state === BolaState.STEADY && bufferLevel <= STALL_THRESHOLD) {
-			emptyPlaceholder()
-
-			return
-		}
-
 		if (params && params.rungs.length > 1) {
 			placeholder = placeholderAfterSample(params, placeholder, segment, bufferLevel)
 		}
 
-		lastRequestEnd = getRequestEnd(segment)
+		endRequest(segment, bufferLevel)
+	}
+
+	// A stall empties the placeholder and the time bases. Otherwise the end of the request starts the clock of the placeholder.
+	// An aborted request ends at the abort, so its clock skips the download time too.
+	function endRequest(segment: SegmentSample, bufferLevel: number): void {
+		if (state === BolaState.STEADY && bufferLevel <= STALL_THRESHOLD) {
+			emptyPlaceholder()
+		} else {
+			lastRequestEnd = getRequestEnd(segment)
+		}
 	}
 
 	return {
