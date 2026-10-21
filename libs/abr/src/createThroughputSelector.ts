@@ -1,3 +1,4 @@
+import { applyStarvationGuard } from './applyStarvationGuard.ts'
 import type { BitrateDecision } from './BitrateDecision.ts'
 import type { BitrateSelector } from './BitrateSelector.ts'
 import type { BitrateSelectorInput } from './BitrateSelectorInput.ts'
@@ -5,9 +6,10 @@ import { DEFAULT_SAFETY_FACTOR } from './DEFAULT_SAFETY_FACTOR.ts'
 import { DEFAULT_STARVATION_TOLERANCE } from './DEFAULT_STARVATION_TOLERANCE.ts'
 import { DEFAULT_UPGRADE_FACTOR } from './DEFAULT_UPGRADE_FACTOR.ts'
 import { findRung } from './findRung.ts'
-import type { LadderRung } from './LadderRung.ts'
+import { isPositiveFinite } from './isPositiveFinite.ts'
 import type { SegmentSample } from './SegmentSample.ts'
 import type { ThroughputSelectorOptions } from './ThroughputSelectorOptions.ts'
+import { validateFactor } from './validateFactor.ts'
 import { validateLadder } from './validateLadder.ts'
 
 /**
@@ -83,7 +85,7 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 				const budget = bufferLevel / playbackRate
 				const tolerance = Math.min(segmentDuration, starvationTolerance)
 
-				index = guard(ladder, index, segmentDuration, throughput * safetyFactor, budget, tolerance)
+				index = applyStarvationGuard(ladder, index, segmentDuration, throughput * safetyFactor, budget, tolerance)
 			}
 
 			return { index, delay: 0 }
@@ -100,37 +102,5 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 		reset(): void {
 			currentBandwidth = NaN
 		},
-	}
-}
-
-// Returns the highest position at or below `index` whose download time is within `budget`.
-// When no position qualifies, returns the highest position within `budget + tolerance`, or 0.
-function guard(ladder: readonly LadderRung[], index: number, segmentDuration: number, safeThroughput: number, budget: number, tolerance: number): number {
-	for (let i = index; i >= 0; i--) {
-		if (downloadTime(ladder[i], segmentDuration, safeThroughput) <= budget) {
-			return i
-		}
-	}
-
-	for (let i = index; i > 0; i--) {
-		if (downloadTime(ladder[i], segmentDuration, safeThroughput) <= budget + tolerance) {
-			return i
-		}
-	}
-
-	return 0
-}
-
-function downloadTime(rung: LadderRung, segmentDuration: number, safeThroughput: number): number {
-	return rung.bandwidth * segmentDuration / safeThroughput
-}
-
-function isPositiveFinite(value: number | undefined): value is number {
-	return Number.isFinite(value) && (value as number) > 0
-}
-
-function validateFactor(name: string, value: number): void {
-	if (!isPositiveFinite(value) || value > 1) {
-		throw new RangeError(`Invalid ${name}: expected a finite number above 0 and at most 1, received ${value}`)
 	}
 }

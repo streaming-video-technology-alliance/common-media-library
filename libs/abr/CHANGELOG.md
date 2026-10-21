@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `createBolaSelector`, which creates a buffer-based selector that implements BOLA, as the [BOLA selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/rfc/bola-abr-selector/index.md) defines ([#358](https://github.com/streaming-video-technology-alliance/common-media-library/issues/358))
+- `BolaSelector`, `BolaDecision`, `BolaSelectorOptions`, `BolaState`, and `BOLA_DEFAULT_BUFFER_TARGET` (18)
+- The `starvationSafetyFactor` option of `createBolaSelector`, and `DEFAULT_STARVATION_SAFETY_FACTOR` (0.7). The BOLA selector runs the starvation guard when the input has `segmentDuration`.
+
 ## [0.1.1] - 2026-10-18
 
 ### Changed

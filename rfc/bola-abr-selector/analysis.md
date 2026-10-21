@@ -33,7 +33,7 @@ Plain BOLA starts at the lowest rung and reaches the upper rungs slowly, because
 
 - **Placeholder buffer.** This is virtual buffer time that BOLA adds to the real buffer level. At startup and after a seek, it lets BOLA begin at the rung that the throughput sustains. A follow-up paper on dash.js reports a median of 21.3 s to reach the top rung at startup without it. With it, the median is 9.3 s.
 - **Oscillation guard (BOLA-O).** This part limits upward switches to the rung that the throughput sustains. It never forces a downward switch.
-- **Download delay.** When the buffer is above the maximum level of the chosen rung, BOLA asks the player to wait. This avoids overfilling the buffer with low rungs.
+- **Download delay.** When the buffer is above the maximum buffer of the chosen rung, BOLA asks the player to wait. This avoids overfilling the buffer with low rungs.
 - **Buffer expansion.** The minimum buffer time of 10 s plus 2 s per rung stretches `V` and `gamma`. The thresholds move apart while the real segments stay within the player buffer. The follow-up paper designed this part for low-latency streams with a small buffer.
 
 The paper defines more variants: BOLA-BASIC, BOLA-FINITE, BOLA-U, and BOLA-O. dash.js implements the placeholder buffer from the follow-up paper and the bitrate cap of BOLA-O. The pause rule differs. BOLA-O in the paper pauses until the score of the capped rung is at least the score of the next rung. dash.js delays only above the maximum buffer of the chosen rung, and it drains the placeholder first.
@@ -91,27 +91,46 @@ The simulation also shows two limits:
 - When the cap is at or above `B`, the placeholder adds about 4% of bitrate and about one stall per session. Its value there is a faster startup and seek, which this model does not measure.
 - The real-buffer guard reduces stalls by 26% to 34% in the L2 cap 18 s setup. It costs under 4% of the bitrate.
 
-These results come from a simplified model. The model has no packet-level effects, no variable segment sizes, and a simple baseline. The stall comparison depends on the channel and on the baseline. The literature above is the stronger evidence. The implementation will include a seeded simulation test that asserts only the invariants and the structural findings.
+These results come from a simplified model. The model has no packet-level effects, no variable segment sizes, and a simple baseline. The stall comparison depends on the channel and on the baseline. The literature above is the stronger evidence. The implementation includes a seeded simulation test. It asserts the contract and three scenarios on constant links. It asserts a higher average rung than the throughput selector. It also asserts fewer stalls with the starvation guard than without it. It does not assert exact numbers.
 
 ### Comparison with the throughput selector
 
-The [implementation PR](https://github.com/streaming-video-technology-alliance/common-media-library/pull/543) reports a run of the same channel model against `createThroughputSelector`. The run used 100 seeded sessions of 75 segments of 4 s. BOLA picked higher rungs. BOLA also stalled more often and switched more often.
+The [implementation PR](https://github.com/streaming-video-technology-alliance/common-media-library/pull/543) reports a run of the same channel model against `createThroughputSelector`. The run used 100 seeded sessions of 75 segments of 4 s. The table shows BOLA with the starvation guard off and at three factors.
 
 | Ladder and buffer cap | Selector | Average Mbps | Stalls per session | Switches per session |
 |---|---|---|---|---|
-| L1, cap 18 s | BOLA | 1.88 | 0.23 | 5.5 |
+| L1, cap 18 s | BOLA, guard off | 1.88 | 0.23 | 5.5 |
+| L1, cap 18 s | BOLA, guard at 0.5 | 1.84 | 0.05 | 6.9 |
+| L1, cap 18 s | BOLA, guard at 0.7 | 1.87 | 0.13 | 5.7 |
+| L1, cap 18 s | BOLA, guard at 0.9 | 1.88 | 0.19 | 5.5 |
 | L1, cap 18 s | `createThroughputSelector` | 1.28 | 0.03 | 5.3 |
-| L2, cap 18 s | BOLA | 2.23 | 0.96 | 12.3 |
+| L2, cap 18 s | BOLA, guard off | 2.23 | 0.96 | 12.3 |
+| L2, cap 18 s | BOLA, guard at 0.5 | 2.17 | 0.05 | 12.8 |
+| L2, cap 18 s | BOLA, guard at 0.7 | 2.21 | 0.29 | 11.5 |
+| L2, cap 18 s | BOLA, guard at 0.9 | 2.23 | 0.74 | 11.9 |
 | L2, cap 18 s | `createThroughputSelector` | 1.62 | 0.02 | 10.5 |
-| L2, cap 30 s | BOLA | 2.30 | 0.37 | 10.5 |
+| L2, cap 30 s | BOLA, guard off | 2.30 | 0.37 | 10.5 |
+| L2, cap 30 s | BOLA, guard at 0.5 | 2.29 | 0.06 | 11.2 |
+| L2, cap 30 s | BOLA, guard at 0.7 | 2.30 | 0.16 | 10.4 |
+| L2, cap 30 s | BOLA, guard at 0.9 | 2.30 | 0.31 | 10.4 |
 | L2, cap 30 s | `createThroughputSelector` | 1.61 | 0.02 | 10.2 |
 
-The throughput selector has a starvation guard, and the simple baseline has none. Finding 3 applies to the simple baseline only. The real-buffer guard of this analysis removes at most a third of the stalls. The difference to the throughput selector is larger. The selector runs the starvation guard for this reason. The implementation PR reports the stall counts with the guard off and at three factors.
+BOLA picks higher rungs. At the default factor of 0.7, its average bitrate is 36% to 47% above the throughput selector. Without the guard, BOLA stalls 0.23 to 0.96 times per session, and the throughput selector stalls 0.02 to 0.03 times. The throughput selector has a starvation guard, and the simple baseline has none. Finding 3 applies to the simple baseline only.
+
+The guard removes stalls at a small cost in bitrate:
+
+| Factor | Stalls against no guard | Average bitrate against no guard |
+|---|---|---|
+| 0.9 | 16% to 23% fewer | 0.1% lower or less |
+| 0.7 | 43% to 70% fewer | 0.3% to 0.8% lower |
+| 0.5 | 78% to 95% fewer | 0.7% to 3.0% lower |
+
+At 0.7, BOLA still stalls 0.13 to 0.29 times per session, more often than the throughput selector. At 0.5, it stalls 0.05 to 0.06 times. The real-buffer guard of this analysis removes at most a third of the stalls. The starvation guard removes more, so the selector runs it.
 
 ## Costs and risks
 
 - BOLA suits large buffers best. In the follow-up paper, a throughput rule oscillates less than the original BOLA with a 10 s buffer. Low-latency streams often have such a small buffer. The buffer expansion and the insufficient buffer rule of the paper reduce the oscillation, and the selector has both. The dash.js player still runs BOLA only above a buffer level and uses a throughput rule below it.
-- Without a guard, BOLA stalls more often than `createThroughputSelector` in the simulation of the implementation PR. The selector runs the starvation guard when the input has `segmentDuration`. A player that omits the field owns the stall risk.
+- Without a guard, BOLA stalls more often than `createThroughputSelector` in the simulation of the implementation PR. The selector runs the starvation guard when the input has `segmentDuration`. At the default factor, the guard removes 43% to 70% of the stalls, and BOLA still stalls more often than the throughput selector. A player that omits the field owns the stall risk.
 - BOLA keeps state. The player calls `sample` for every download and `reset` after a seek, as the `BitrateSelector` type requires.
 - The pure core is small. Most of `BolaRule.js` handles player wiring. That part contains the tuning decisions and the defects.
 - The port derives from BSD-3 code and needs attribution. The RFC names the files under Packaging.
