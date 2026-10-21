@@ -132,7 +132,11 @@ Segment 3: manifestId = "urn:c2pa:3000...", previousManifestId = "urn:c2pa:2e52.
 
 The manifest ID is the manifest identifier of C2PA, a `urn:c2pa:` URN. The manifest stores it as the JUMBF label of the manifest box. The claim `instanceID` is a different value and does not take part in the chain. The validator compares the two manifest IDs exactly, without normalization.
 
-The JUMBF label is outside the signed claim. The claim `signature` field holds the absolute URI of the signature box, such as `self#jumbf=/c2pa/urn:c2pa:1b3b.../c2pa.signature`, and that URI names the label. The validator uses the label as the manifest ID only if this signed URI names it. Otherwise the result includes `C2paStatusCode.CLAIM_SIGNATURE_MISSING`, and the segment does not update `nextManifestId` or `nextState`.
+The JUMBF label is outside the signed claim. The claim `signature` field is a JUMBF URI of the signature box (C2PA section 8.4.2.1). The validator uses the label as the manifest ID only if this signed URI names it:
+
+- An absolute URI, such as `self#jumbf=/c2pa/urn:c2pa:1b3b.../c2pa.signature`, names the label. So does a URI relative to the manifest store.
+- A URI relative to the manifest, `self#jumbf=c2pa.signature`, is valid but does not name the label. The segment does not update `nextManifestId` or `nextState`, so the next segment fails the continuity check.
+- A URI that does not resolve to the signature box of the same manifest fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The segment does not update the state.
 
 > [!NOTE]
 > Every segment must declare a `previousManifestId`, including the first one. The first segment usually references the initial static manifest.

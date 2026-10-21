@@ -13,6 +13,7 @@ import {
 	buildUuidBox,
 	concatBytes,
 	sha256,
+	signatureUri,
 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
 import { createTestSessionKey, encodeSignerBinding, type TestSessionKey } from '../vsi/vsiTestUtils.ts'
@@ -108,7 +109,7 @@ async function signedClaimBoxes(
 		hash: await sha256(ref.box.subarray(8)),
 		alg: 'sha256',
 	})))
-	const claimBytes = encodeCbor({ instanceID: options.instanceId ?? MANIFEST_ID, [options.refsField ?? 'created_assertions']: refs })
+	const claimBytes = encodeCbor({ instanceID: options.instanceId ?? MANIFEST_ID, signature: signatureUri(MANIFEST_ID), [options.refsField ?? 'created_assertions']: refs })
 	return {
 		claim: buildJumb(options.claimLabel ?? 'c2pa.claim', buildBox('cbor', claimBytes)),
 		signature: buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimBytes))),

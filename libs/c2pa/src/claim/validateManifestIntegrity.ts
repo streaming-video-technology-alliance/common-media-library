@@ -43,16 +43,17 @@ type ClaimSignatureCheck = {
 
 /**
  * Checks the claim signature per §15.7 and fails closed: a manifest without a claim box,
- * without a `c2pa.signature` box, or with a signature that carries no certificate or does
- * not verify over the claim bytes, is reported as a failure. A manifest with more than one
- * claim box reports `CLAIM_MULTIPLE` through `claimCode` (§15.6.1), so no signature check runs.
+ * without a `c2pa.signature` box, with a claim `signature` URI that does not resolve to that
+ * box, or with a signature that carries no certificate or does not verify over the claim bytes,
+ * is reported as a failure. A manifest with more than one claim box reports `CLAIM_MULTIPLE`
+ * through `claimCode` (§15.6.1), so no signature check runs.
  */
-async function validateClaimSignature({ claimCborBytes, claimCode, signatureBytes }: InternalManifestData): Promise<ClaimSignatureCheck> {
+async function validateClaimSignature({ claimCborBytes, claimCode, signatureUriCode, signatureBytes }: InternalManifestData): Promise<ClaimSignatureCheck> {
 	const certificate = signatureBytes ? extractCertificateFromSignatureBytes(signatureBytes) : null
 
 	if (claimCode === Code.CLAIM_MULTIPLE) return { code: null, certificate }
 	if (!claimCborBytes) return { code: Code.CLAIM_MISSING, certificate }
-	if (!signatureBytes) return { code: Code.CLAIM_SIGNATURE_MISSING, certificate }
+	if (!signatureBytes || signatureUriCode) return { code: Code.CLAIM_SIGNATURE_MISSING, certificate }
 	if (!certificate) return { code: Code.CLAIM_SIGNATURE_MISMATCH, certificate }
 
 	const signatureValid = await verifyClaimSignature(signatureBytes, claimCborBytes, certificate)

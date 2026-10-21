@@ -172,7 +172,9 @@ async function validateContinuity(
  * caller is responsible for persisting `nextManifestId` and `nextState`
  * between calls. A segment that fails verification, is on another stream, or
  * does not move the sequence number forward returns the received
- * `lastManifestId` and `state` unchanged. A segment that fails only the
+ * `lastManifestId` and `state` unchanged. So does a segment whose claim
+ * `signature` URI is relative to the manifest, because that URI does not
+ * authenticate the manifest identifier. A segment that fails only the
  * continuity check still updates them.
  *
  * @param bytes - Raw segment bytes
@@ -244,14 +246,10 @@ export async function validateC2paManifestBoxSegment(
 	// §15.10.1.2: a manifest without any hard binding assertion is rejected.
 	if (integrity?.hardBindingCount === 0) errorCodes.push(C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING)
 
-	// §19.3: previousManifestId holds the manifest identifier, which is the JUMBF label of the manifest (C2PA URN).
-	// The label is authenticated only through the claim `signature` URI. If that URI does not name the label,
-	// it does not resolve to the signature in the same manifest, which fails with claimSignature.missing.
+	// §19.3: previousManifestId holds the manifest identifier, the JUMBF label of the manifest. Only a claim
+	// `signature` URI that names the label authenticates it (§15.7). A URI relative to the manifest does not,
+	// so the segment does not update the state.
 	const currentManifestId = internalData?.manifestId ?? null
-	const claimDecoded = internalData !== null && internalData.claimCborBytes !== null && internalData.claimCode === null
-	if (claimDecoded && currentManifestId === null && !errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING)) {
-		errorCodes.push(C2paStatusCode.CLAIM_SIGNATURE_MISSING)
-	}
 
 	// The continuity check does not gate the advance.
 	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed && currentManifestId !== null

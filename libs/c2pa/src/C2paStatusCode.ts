@@ -23,7 +23,7 @@ export const C2paStatusCode = {
 	ASSERTION_ACTION_INGREDIENT_MISMATCH: 'assertion.action.ingredientMismatch',
 	/** Claim signature verification failed, or the signature carries no certificate (§15.7) */
 	CLAIM_SIGNATURE_MISMATCH: 'claimSignature.mismatch',
-	/** The manifest has no `c2pa.signature` box, so the claim signature cannot be found (§15.7) */
+	/** The manifest has no `c2pa.signature` box, or the claim `signature` URI does not resolve to it, for example because it names another manifest (§15.7) */
 	CLAIM_SIGNATURE_MISSING: 'claimSignature.missing',
 	/** The manifest has no claim box (§15.6.1) */
 	CLAIM_MISSING: 'claim.missing',

@@ -134,6 +134,11 @@ export function buildJumb(label: string, ...content: readonly Uint8Array[]): Uin
 	return buildBox('jumb', concatBytes(buildJumd(label), ...content))
 }
 
+// The claim `signature` field: the absolute URI of the signature box, which names the manifest label (§8.4.2.1).
+export function signatureUri(manifestLabel: string): string {
+	return `self#jumbf=/c2pa/${manifestLabel}/c2pa.signature`
+}
+
 export function buildInitMediaBoxes(): Uint8Array {
 	return concatBytes(buildBox('ftyp', TEXT_ENCODER.encode('isom')), buildBox('moov'))
 }
@@ -148,6 +153,7 @@ async function assembleMerkleInitSegment(assertionData: Record<string, unknown>,
 	const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 	const claimCborBytes = encodeCbor({
 		instanceID: MERKLE_MANIFEST_ID,
+		signature: signatureUri(MERKLE_MANIFEST_ID),
 		created_assertions: [{ url: `self#jumbf=c2pa.assertions/${BMFF_HASH_LABEL}`, hash: await sha256(bmffAssertion.subarray(8)), alg: 'sha256' }],
 	})
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))

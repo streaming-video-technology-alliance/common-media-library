@@ -4,7 +4,7 @@ import { Encoder } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { buildSigStructure } from '../../src/cose/buildSigStructure.ts'
 import { bytesToHex, JUMBF_UUID } from '../../src/utils.ts'
-import { buildBox, buildInitMediaBoxes, buildJumb, buildMediaContent, buildUuidBox, concatBytes, sha256 } from '../merkle/merkleTestUtils.ts'
+import { buildBox, buildInitMediaBoxes, buildJumb, buildMediaContent, buildUuidBox, concatBytes, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
 import type { TestSigner } from '../testSigner.ts'
 
 const TEXT_ENCODER = new TextEncoder()
@@ -157,6 +157,7 @@ export async function buildSignedInitSegment(signer: TestSigner, assertions: rea
 	const assertionBoxes = assertions.map(assertion => buildJumb(assertion.label, buildBox('cbor', assertion.cbor)))
 	const claimCborBytes = Uint8Array.from(CBOR.encode({
 		instanceID: MANIFEST_ID,
+		signature: signatureUri(MANIFEST_ID),
 		created_assertions: await Promise.all(assertionBoxes.map(async (box, index) => ({
 			url: `self#jumbf=c2pa.assertions/${assertions[index].label}`,
 			hash: await sha256(box.subarray(8)),

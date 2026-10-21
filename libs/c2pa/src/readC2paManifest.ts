@@ -35,12 +35,25 @@ function resolveManifestBoxes(jumbfBoxes: JumbfBox[], depth = 0): JumbfBox[] {
 	return jumbfBoxes
 }
 
-// The JUMBF label of the manifest is outside the signed claim. The claim `signature` field holds the absolute
-// URI of the signature box in the same manifest, and that URI includes the label. The label counts as the
-// manifest identifier only when the signed URI names it, so a changed label cannot take the identity of another manifest.
-function authenticatedManifestId(label: string | null, claimData: Record<string, unknown> | null): string | null {
-	if (!label) return null
-	return asString(claimData?.['signature']) === `self#jumbf=/c2pa/${label}/c2pa.signature` ? label : null
+const JUMBF_URI_PREFIX = 'self#jumbf='
+const SIGNATURE_BOX_LABEL = 'c2pa.signature'
+
+type SignatureReference = {
+	/** The claim `signature` URI resolves to the signature box of this manifest (§15.7) */
+	readonly resolves: boolean
+	/** The URI names the JUMBF label of this manifest, so the claim signature covers the label */
+	readonly namesLabel: boolean
+}
+
+// §8.4.2.1: the claim `signature` field is a JUMBF URI. It is absolute, relative to the manifest store,
+// or relative to the current manifest. The first two forms name the JUMBF label of the manifest.
+function resolveSignatureReference(label: string | null, claimData: Record<string, unknown>): SignatureReference {
+	const uri = asString(claimData['signature'])
+	if (!uri?.startsWith(JUMBF_URI_PREFIX)) return { resolves: false, namesLabel: false }
+	const path = uri.slice(JUMBF_URI_PREFIX.length)
+	if (path === SIGNATURE_BOX_LABEL) return { resolves: true, namesLabel: false }
+	const namesLabel = label !== null && (path === `/c2pa/${label}/${SIGNATURE_BOX_LABEL}` || path === `${label}/${SIGNATURE_BOX_LABEL}`)
+	return { resolves: namesLabel, namesLabel }
 }
 
 function extractManifestLabel(jumbfBoxes: JumbfBox[]): string | null {
@@ -273,6 +286,10 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 
 	const assertions: C2paAssertion[] = internalAssertions.map(a => ({ label: a.label, data: a.data }))
 
+	// The JUMBF label is outside the signed claim. The label counts as the manifest identifier only when the
+	// signed `signature` URI names it, so a changed label cannot take the identity of another manifest.
+	const signatureReference = claimData ? resolveSignatureReference(manifestLabel, claimData) : null
+
 	const manifest: C2paManifest = {
 		label: resolvedLabel,
 		instanceId,
@@ -283,10 +300,11 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 
 	return {
 		manifest,
-		manifestId: authenticatedManifestId(manifestLabel, claimData),
+		manifestId: signatureReference?.namesLabel ? manifestLabel : null,
 		claimAssertionRefs,
 		claimCborBytes,
 		claimCode,
+		signatureUriCode: signatureReference && !signatureReference.resolves ? C2paStatusCode.CLAIM_SIGNATURE_MISSING : null,
 		signatureBytes,
 		assertions: internalAssertions,
 	}
