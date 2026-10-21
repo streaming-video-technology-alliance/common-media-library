@@ -2,7 +2,8 @@ import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG } from '../../src/BOLA_CONSTANT
 
 /**
  * An independent model of the BOLA score, written from the formula of the RFC.
- * It shares no code with `createBolaParams`, so it can check the thresholds of that function.
+ * It shares no formula code with `createBolaParams`, so it can check the thresholds of that function.
+ * It imports the two named constants of the formula, and nothing else from the source.
  * The model works on distinct bandwidths in ascending order.
  */
 type BolaScoreModel = {

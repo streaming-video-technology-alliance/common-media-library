@@ -2,7 +2,7 @@ import type { BitrateSelector, BitrateSelectorInput, BolaDecision, BolaSelector,
 import { BOLA_DEFAULT_BUFFER_TARGET, BolaState, createBolaSelector, DEFAULT_SAFETY_FACTOR, DEFAULT_STARVATION_SAFETY_FACTOR } from '@svta/cml-abr'
 import { deepEqual, equal, ok, throws } from 'node:assert'
 import { describe, it } from 'node:test'
-import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG, PLACEHOLDER_DECAY, STALL_THRESHOLD } from '../src/BOLA_CONSTANTS.ts'
+import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG, NEGLIGIBLE_DELAY, PLACEHOLDER_DECAY, STALL_THRESHOLD, STARVATION_GUARD_SAMPLE_COUNT } from '../src/BOLA_CONSTANTS.ts'
 import { bolaMaximumBuffers, bolaThresholds, createBolaScoreModel } from './helpers/bolaScoreOracle.ts'
 import { closeTo } from './helpers/closeTo.ts'
 import { L1_GOLDEN, L2_GOLDEN } from './helpers/goldenRungs.ts'
@@ -178,6 +178,18 @@ describe('createBolaSelector', () => {
 
 			equal(createBolaSelector().select(input).index, 1)
 			equal(createBolaSelector({ safetyFactor: 1 }).select(input).index, 2)
+		})
+	})
+
+	describe('constants', () => {
+		// The other tests import these values by name, so only this test notices a change of a value. Each value changes the decisions.
+		it('pins the values of the tuning constants', () => {
+			equal(MINIMUM_BUFFER, 10)
+			equal(MINIMUM_BUFFER_PER_RUNG, 2)
+			equal(PLACEHOLDER_DECAY, 0.99)
+			equal(STALL_THRESHOLD, 0.3)
+			equal(NEGLIGIBLE_DELAY, 0.001)
+			equal(STARVATION_GUARD_SAMPLE_COUNT, 2)
 		})
 	})
 
