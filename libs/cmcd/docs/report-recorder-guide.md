@@ -59,6 +59,9 @@ The recorder classifies each report by URL extension and HTTP method:
 Recorded entries have one structure:
 
 ```typescript
+import type { CmcdRecordedReportMode, CmcdRecordedRequestType } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
+
 type CmcdRecordedReport = {
     readonly request: HttpRequest;            // normalized; headers lowercase, body as string
     readonly type: CmcdRecordedRequestType;
@@ -110,6 +113,8 @@ Each method takes one `CmcdReportRecorderWaitOptions` object with two optional f
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
 
+declare function startPlayer(): void;
+
 const recorder = new CmcdReportRecorder();
 recorder.attach();
 
@@ -128,6 +133,10 @@ recorder.detach();
 Shorten the timeout per call or for the whole recorder:
 
 ```typescript
+import { CmcdReportRecorder } from "@svta/cml-cmcd";
+
+declare const recorder: CmcdReportRecorder;
+
 // Per call: fail in 2 seconds rather than the recorder default
 await recorder.waitForManifest({ timeout: 2000 });
 
@@ -166,6 +175,19 @@ recorder.attach({
 The callback receives the same object reference that `getReports()` returns. So one panel can subscribe to all reports and branch on `report.type` or `report.reportingMode` to send each report to its own view:
 
 ```typescript
+import {
+    CmcdReportRecorder,
+    CmcdRecordedRequestType,
+    type CmcdRecordedReport,
+} from "@svta/cml-cmcd";
+
+type Panel = { append(report: CmcdRecordedReport): void };
+
+declare const recorder: CmcdReportRecorder;
+declare const manifestPanel: Panel;
+declare const segmentPanel: Panel;
+declare const eventPanel: Panel;
+
 recorder.attach({
     onReport: (report) => {
         switch (report.type) {
@@ -191,6 +213,8 @@ CMCD v2 event reports are POSTed to a configured target URL. In tests, you usual
 
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
+
+declare function startPlayer(): void;
 
 const recorder = new CmcdReportRecorder();
 recorder.attach({
@@ -220,6 +244,8 @@ import {
     validateCmcdRequest,
 } from "@svta/cml-cmcd";
 
+declare function startPlayer(): void;
+
 const recorder = new CmcdReportRecorder();
 recorder.attach();
 
@@ -243,6 +269,8 @@ import {
     CmcdReportRecorder,
     validateCmcdEventReport,
 } from "@svta/cml-cmcd";
+
+declare function startPlayer(): void;
 
 const recorder = new CmcdReportRecorder();
 recorder.attach({ eventTargetUrls: ["https://events.example.com"] });
@@ -272,6 +300,11 @@ import {
 } from "@svta/cml-cmcd";
 import type { HttpRequest } from "@svta/cml-utils";
 
+type MyRequest = { url: string; method: string; headers: Record<string, string>; body?: string };
+
+declare const myClient: { send(req: MyRequest): Promise<Response> };
+declare function normalize(req: MyRequest): HttpRequest;
+
 function createMyClientTransport(): CmcdTransportAdapter {
     return {
         attach(deliver: CmcdRequestDeliver): () => void {
@@ -281,7 +314,7 @@ function createMyClientTransport(): CmcdTransportAdapter {
                 const stub = deliver(httpRequest);
                 if (stub) {
                     // Event-target match: return the synthetic 204 response
-                    return stub;
+                    return Promise.resolve(stub);
                 }
                 return original.call(myClient, req);
             };

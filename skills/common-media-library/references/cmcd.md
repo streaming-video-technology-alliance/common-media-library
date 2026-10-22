@@ -124,6 +124,9 @@ The recorder classifies each report by URL extension and HTTP method:
 Recorded entries have one structure:
 
 ```typescript
+import type { CmcdRecordedReportMode, CmcdRecordedRequestType } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
+
 type CmcdRecordedReport = {
     readonly request: HttpRequest;            // normalized; headers lowercase, body as string
     readonly type: CmcdRecordedRequestType;
@@ -175,6 +178,8 @@ Each method takes one `CmcdReportRecorderWaitOptions` object with two optional f
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
 
+declare function startPlayer(): void;
+
 const recorder = new CmcdReportRecorder();
 recorder.attach();
 
@@ -193,6 +198,10 @@ recorder.detach();
 Shorten the timeout per call or for the whole recorder:
 
 ```typescript
+import { CmcdReportRecorder } from "@svta/cml-cmcd";
+
+declare const recorder: CmcdReportRecorder;
+
 // Per call: fail in 2 seconds rather than the recorder default
 await recorder.waitForManifest({ timeout: 2000 });
 
@@ -231,6 +240,19 @@ recorder.attach({
 The callback receives the same object reference that `getReports()` returns. So one panel can subscribe to all reports and branch on `report.type` or `report.reportingMode` to send each report to its own view:
 
 ```typescript
+import {
+    CmcdReportRecorder,
+    CmcdRecordedRequestType,
+    type CmcdRecordedReport,
+} from "@svta/cml-cmcd";
+
+type Panel = { append(report: CmcdRecordedReport): void };
+
+declare const recorder: CmcdReportRecorder;
+declare const manifestPanel: Panel;
+declare const segmentPanel: Panel;
+declare const eventPanel: Panel;
+
 recorder.attach({
     onReport: (report) => {
         switch (report.type) {
@@ -256,6 +278,8 @@ CMCD v2 event reports are POSTed to a configured target URL. In tests, you usual
 
 ```typescript
 import { CmcdReportRecorder } from "@svta/cml-cmcd";
+
+declare function startPlayer(): void;
 
 const recorder = new CmcdReportRecorder();
 recorder.attach({
@@ -285,6 +309,8 @@ import {
     validateCmcdRequest,
 } from "@svta/cml-cmcd";
 
+declare function startPlayer(): void;
+
 const recorder = new CmcdReportRecorder();
 recorder.attach();
 
@@ -308,6 +334,8 @@ import {
     CmcdReportRecorder,
     validateCmcdEventReport,
 } from "@svta/cml-cmcd";
+
+declare function startPlayer(): void;
 
 const recorder = new CmcdReportRecorder();
 recorder.attach({ eventTargetUrls: ["https://events.example.com"] });
@@ -337,6 +365,11 @@ import {
 } from "@svta/cml-cmcd";
 import type { HttpRequest } from "@svta/cml-utils";
 
+type MyRequest = { url: string; method: string; headers: Record<string, string>; body?: string };
+
+declare const myClient: { send(req: MyRequest): Promise<Response> };
+declare function normalize(req: MyRequest): HttpRequest;
+
 function createMyClientTransport(): CmcdTransportAdapter {
     return {
         attach(deliver: CmcdRequestDeliver): () => void {
@@ -346,7 +379,7 @@ function createMyClientTransport(): CmcdTransportAdapter {
                 const stub = deliver(httpRequest);
                 if (stub) {
                     // Event-target match: return the synthetic 204 response
-                    return stub;
+                    return Promise.resolve(stub);
                 }
                 return original.call(myClient, req);
             };
@@ -468,6 +501,10 @@ const reporter = new CmcdReporter({
 Use the `update()` method to set or change CMCD data. The reporter keeps the values in its data store and applies them to all later requests and events.
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 // Update multiple fields at once
 reporter.update({
 	br: [5000], // Encoded bitrate (kbps)
@@ -501,6 +538,10 @@ CTA-5004 and CTA-5004-B define every numeric key as an integer, except `pr`. `Cm
 For example, pass the exact buffer length in milliseconds and the exact bitrate in kbps:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.update({ bl: [25432], br: [2500.7] }); // sent as bl=(25400) and br=(2501)
 ```
 
@@ -553,6 +594,10 @@ The `toCmcdValue` utility accepts two arguments:
 2. **params** - An object of key-value pairs for the parameters
 
 ```typescript
+import { CmcdReporter, toCmcdValue } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.update({
 	nor: [
 		toCmcdValue("seg1.m4s", { r: "0-5000" }),
@@ -566,6 +611,10 @@ reporter.update({
 Many keys accept a list of numeric values, each with an object type given as a boolean parameter.
 
 ```typescript
+import { CmcdReporter, toCmcdValue } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.update({
 	br: [toCmcdValue(5000, { v: true }), toCmcdValue(3000, { a: true })],
 });
@@ -592,6 +641,10 @@ console.log(validateCmcd(data).valid); // true
 The CMCD specification defines `nor` (next object request) as a path relative to the current request URL. `CmcdReporter` also accepts absolute URLs and converts them. It emits same-origin URLs as relative paths. It passes cross-origin values, and values that are already relative, through unchanged.
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 // When the current request URL is:
 //   https://cdn.example.com/streams/video/segment_001.m4s
 // either form below produces the same encoded output.
@@ -697,7 +750,9 @@ key's value differs from the last reported value. Use `update()` as the
 one entry point for these events.
 
 ```typescript
-import { CmcdEventType } from "@svta/cml-cmcd";
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
 
 reporter.update({ sta: "p" });        // → fires PLAY_STATE
 reporter.update({ pr: 1.5 });         // → fires PLAYBACK_RATE
@@ -737,6 +792,10 @@ moment. To attach snapshot context, either combine the continuous
 metrics with the state key in one `update()` call:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.update({ sta: "p", bl: [3000], mtp: [8500], pt: 12500 });
 // → fires PLAY_STATE with sta="p", bl=[3000], mtp=[8500], pt=12500
 ```
@@ -745,6 +804,10 @@ Or set the metrics with earlier `update()` calls, so they are already
 in the data store when the state key changes:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 // Keep metrics fresh as the player computes them
 reporter.update({ bl: [3000], mtp: [8500], pt: 12500 });
 
@@ -763,6 +826,10 @@ continuous metrics current with `update()`.
 Dedup drops the payload of the second call:
 
 ```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.update({ sta: "p" });                              // auto-fires PLAY_STATE
 reporter.recordEvent(CmcdEventType.PLAY_STATE, {            // suppressed:
   sta: "p",                                                 //   sta unchanged
@@ -778,6 +845,10 @@ Use the single-call form shown above instead.
 itself. These events do not represent a stored state transition:
 
 ```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 // Custom event: the name and any payload only make sense for this call.
 // See "Custom Events" below for the required target configuration.
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "ad-quartile" });
@@ -864,6 +935,14 @@ The method accepts a `CommonMediaResponse` object and derives the following keys
 | `ttlb` | Time to last byte (ms)           | `response.resourceTiming.duration`                 |
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
+const decoratedRequest = reporter.createRequestReport({
+	url: "https://cdn.example.com/segment.mp4",
+});
+
 // After receiving a response
 const response = {
 	status: 200,
@@ -872,6 +951,7 @@ const response = {
 		startTime: performance.now(),
 		responseStart: performance.now() + 50,
 		duration: 150,
+		encodedBodySize: 512000,
 	},
 };
 
@@ -883,14 +963,29 @@ reporter.recordResponseReceived(response);
 For full request and response tracking, call `createRequestReport()` before the request and `recordResponseReceived()` after the response. The response event includes the CMCD data from the original request:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+import type { CmcdObjectType } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+declare const player: {
+	getBufferLength(): number;
+	getMeasuredThroughput(): number;
+};
+
+type SegmentInfo = {
+	bitrate: number;
+	duration: number;
+	type: CmcdObjectType;
+};
+
 async function fetchSegment(
 	url: string,
 	segmentInfo: SegmentInfo,
 ): Promise<ArrayBuffer> {
 	// Update player state
 	reporter.update({
-		bl: [this.getBufferLength()],
-		mtp: [this.getMeasuredThroughput()],
+		bl: [player.getBufferLength()],
+		mtp: [player.getMeasuredThroughput()],
 	});
 
 	// Decorate the request with CMCD data
@@ -918,6 +1013,7 @@ async function fetchSegment(
 			startTime,
 			responseStart,
 			duration,
+			encodedBodySize: buffer.byteLength,
 		},
 	});
 
@@ -930,6 +1026,15 @@ async function fetchSegment(
 You can supply CMCD keys that the method cannot derive. The keys `cmsdd`, `cmsds`, and `smrt` are strings. Each one holds a Base64 copy of the data in a header:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
+const response = {
+	status: 200,
+	request: reporter.createRequestReport({ url: "https://cdn.example.com/segment.mp4" }),
+};
+
 reporter.recordResponseReceived(response, {
 	ttfbb: 25, // Time to first body byte (player-measured)
 	cmsdd: "ImNkbi1hIjtldHA9OTY7cnR0PTg=", // Base64 copy of the CMSD-Dynamic response header
@@ -1014,6 +1119,10 @@ const decoratedRequest = reporter.createRequestReport(request, { ot: "v" });
 Call `start()` to begin automatic `TIME_INTERVAL` event reporting:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.start();
 ```
 
@@ -1024,6 +1133,10 @@ The timer fires at the configured interval.
 Call `stop()` to stop automatic reporting:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.stop();
 ```
 
@@ -1032,6 +1145,10 @@ reporter.stop();
 Call `flush()` to send all queued events now, regardless of the batch size:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 // Send all pending events (useful when playback ends)
 reporter.flush();
 ```
@@ -1041,6 +1158,10 @@ reporter.flush();
 Changing the session ID starts a new session. Sequence numbers restart, the media start delay (`msd`) gate re-arms, state-change dedup baselines clear, and targets disposed by an HTTP 410 are active again. The data store is kept, so `cid`, `br`, custom keys, and the rest survive the change.
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
 reporter.update({ sid: "next-session" });
 ```
 
@@ -1062,7 +1183,13 @@ The `sid` itself is the session identity. CTA-5004-B expects it to be unique per
 Spread and `Object.assign` keep the record in ordinary request clones. `JSON.stringify` and structured clone drop symbol-keyed properties. A request that crosses such a boundary, such as a worker or a JSON cache, needs the record stored next to it and restored afterwards:
 
 ```typescript
-import { CMCD_REQUEST_PROVENANCE } from "@svta/cml-cmcd";
+import { CmcdReporter, CMCD_REQUEST_PROVENANCE } from "@svta/cml-cmcd";
+
+declare const reporter: CmcdReporter;
+
+const request = reporter.createRequestReport({
+	url: "https://cdn.example.com/segment.mp4",
+});
 
 // Symbol keys do not survive JSON, so carry the record explicitly. The
 // record itself is JSON-safe.
@@ -1081,6 +1208,12 @@ reporter.recordResponseReceived({ status: 200, request: payload.request });
 The record is the only key that selects an ended session. A response whose request has no record reports under the current session, as in version 2.4.0. The request-time data then comes from `customData.cmcd`. A per-call `data.sid` is no substitute. The reporter accepts any record whose `sid` resolves, so you can also construct one. A hand-built request, or a request decorated by another reporter configured with the same session, attributes by naming the `sid`:
 
 ```typescript
+import { CmcdReporter, CMCD_REQUEST_PROVENANCE } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
+
+declare const reporter: CmcdReporter;
+declare const request: HttpRequest & { customData: Record<symbol, unknown> };
+
 // The request was never decorated, so the player names the session.
 request.customData[CMCD_REQUEST_PROVENANCE] = { sid: "previous-session" };
 reporter.recordResponseReceived({ status: 200, request });
@@ -1089,6 +1222,8 @@ reporter.recordResponseReceived({ status: 200, request });
 A response attributed to a session that is no longer retained is dropped, not relabeled with the current session ID. A session change sends the unsent event reports of an ended session before eviction can discard them. Each report keeps the `sid` and sequence number of its own session. A failed batch that is re-queued into an evicted session is discarded with the session.
 
 ```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
 const reporter = new CmcdReporter({
 	cid: "video-123",
 	eventTargets: [
@@ -1124,9 +1259,17 @@ function onPlayerDestroy() {
 By default, `CmcdReporter` uses the native `fetch` API to send event reports. You can provide a custom requester function:
 
 ```typescript
-import { CmcdReporter } from "@svta/cml-cmcd";
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
 
-const customRequester = async (request) => {
+declare function axios(config: {
+	url: string;
+	method?: string;
+	headers?: Record<string, string>;
+	data?: unknown;
+}): Promise<{ status: number }>;
+
+const customRequester = async (request: HttpRequest) => {
 	// Use your preferred HTTP client
 	const response = await axios({
 		url: request.url,
@@ -1156,7 +1299,7 @@ const reporter = new CmcdReporter(
 The `enabledKeys` option limits which CMCD keys the reports include:
 
 ```typescript
-import { CmcdReporter, CMCD_KEYS } from "@svta/cml-cmcd";
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
 
 const reporter = new CmcdReporter({
 	cid: "video-123",
@@ -1229,6 +1372,8 @@ To combine several concerns at one placement, compose the functions yourself:
 import type { Cmcd } from "@svta/cml-cmcd";
 import type { HttpRequest } from "@svta/cml-utils";
 
+declare function sampleIntervals(data: Cmcd): Cmcd | null;
+
 const scrubPii = (data: Cmcd, request: HttpRequest | undefined): Cmcd | null =>
 	request?.url.includes("/private/") ? null : { ...data, cid: undefined };
 
@@ -1284,9 +1429,16 @@ const reporter = new CmcdReporter({
 Once a reporter has a type, `createRequestReport()` and `recordResponseReceived()` require the requests you pass to satisfy it. A typo, or a request from a different code path, is a compile error at the call site. Without the type, the transform would read `undefined` and cancel the report without an error:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+type PlayerData = { requestType: "segment" | "manifest" | "license" };
+
+declare const reporter: CmcdReporter<PlayerData>;
+
 // Error: 'requestTypo' does not exist in type 'PlayerData'
 reporter.createRequestReport({
 	url: "https://cdn.example.com/segment.mp4",
+	// @ts-expect-error
 	customData: { requestTypo: "segment" },
 });
 ```
@@ -1294,12 +1446,15 @@ reporter.createRequestReport({
 `customData` is readonly at every depth, not only at the top level. Describing a nested type does not cost you the [read-only guarantee](#the-associated-request):
 
 ```typescript
+import type { CmcdEventReportTransform } from "@svta/cml-cmcd";
+
 type PlayerData = { timing: { start: number } };
 
 const transform: CmcdEventReportTransform<PlayerData> = (data, request) => {
 	const customData = request?.customData;
 
 	// Error: cannot assign to 'start' because it is a read-only property
+	// @ts-expect-error
 	if (customData) customData.timing.start = 0;
 
 	return data;
@@ -1381,6 +1536,8 @@ There are four main validation functions, each for a different aspect of CMCD co
 All validators return a `CmcdValidationResult`:
 
 ```typescript
+import type { CmcdValidationSeverity } from "@svta/cml-cmcd";
+
 type CmcdValidationResult = {
 	valid: boolean; // true if zero errors (warnings are OK)
 	issues: CmcdValidationIssue[];
