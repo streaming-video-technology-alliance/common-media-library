@@ -29,8 +29,8 @@ const SAME_VALUE = [
 	'20', '38 18', '3b 001fffffffffffff', '3b 0020000000000000', '3b ffffffffffffffff',
 	// byte and text strings, with a leading U+FEFF and a text string above the ASCII fast path of the reader
 	'40', '42 0102', '60', '63 616263', '62 ffff', '64 efbbbf61', '78 28 ' + '61'.repeat(40), 'a1 62 c3a9 01',
-	// arrays and maps, with integer, float, boolean, and null keys, and a duplicate key
-	'80', '84 f4 f5 f6 f7', '9f 01 02 ff', 'a0', 'a2 01 02 03 04', 'a1 20 02', 'a2 61 61 01 61 61 02', 'a1 f9 3e00 02', 'a1 f5 02', 'a1 f6 02', 'bf 61 61 01 ff',
+	// arrays and maps, with integer, float, boolean, and null keys
+	'80', '84 f4 f5 f6 f7', '9f 01 02 ff', 'a0', 'a2 01 02 03 04', 'a1 20 02', 'a1 f9 3e00 02', 'a1 f5 02', 'a1 f6 02', 'bf 61 61 01 ff',
 	// floats, with a subnormal half float, negative zero, NaN, and Infinity
 	'f9 3e00', 'f9 0001', 'f9 8000', 'f9 7e00', 'fa 3fc00000', 'fa 7f800000', 'fb 3ff8000000000000',
 	// tag 0 with text and tag 1 with an integer or a float
@@ -209,6 +209,10 @@ describe('readCborItem equivalence with cbor-x', () => {
 		// a1 69 5f5f70726f746f5f5f 01: the key __proto__. cbor-x does not keep the key as an own property.
 		deepStrictEqual(Object.keys(decodeCbor(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object), ['__proto__'])
 		strictEqual(Object.prototype.hasOwnProperty.call(decodeWithCborX(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object, '__proto__'), false)
+
+		// a2 61 61 01 61 61 02: the key "a" twice. cbor-x keeps the last value.
+		throws(() => decodeCbor(toBytes('a2 61 61 01 61 61 02')), RangeError)
+		deepStrictEqual(decodeWithCborX(toBytes('a2 61 61 01 61 61 02')), { a: 2 })
 
 		// 129 nested arrays. cbor-x decodes them.
 		throws(() => decodeCbor(nestedArrays(129)), RangeError)

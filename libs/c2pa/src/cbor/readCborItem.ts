@@ -160,9 +160,12 @@ function readArray(reader: Reader, count: number | bigint): unknown[] {
 	return items
 }
 
+// RFC 8949 section 5.6 and RFC 9052 section 3: a map with a duplicate key is rejected. Keys with the same
+// name as a string, such as 1 and "1", count as duplicates.
 function setEntry(map: Record<string, unknown>, key: unknown, value: unknown): void {
 	if (key !== null && typeof key === 'object') throw new RangeError('Unsupported CBOR map key')
 	const name = String(key)
+	if (Object.prototype.hasOwnProperty.call(map, name)) throw new RangeError('Duplicate CBOR map key')
 	if (name === '__proto__') Object.defineProperty(map, name, { value, enumerable: true, writable: true, configurable: true })
 	else map[name] = value
 }
@@ -218,14 +221,15 @@ function readItem(reader: Reader): unknown {
  * Reads the CBOR data item that starts at `offset` (RFC 8949 section 3).
  *
  * Integers with a magnitude up to `Number.MAX_SAFE_INTEGER` are numbers, larger ones are BigInts.
- * Byte strings are views of the input. Maps are plain objects with string keys. Every tag is a
+ * Byte strings are views of the input. Maps are plain objects with string keys. The function rejects a map with
+ * two keys that have the same name as a string, for example `1` and `"1"`. Every tag is a
  * {@link CborTag}. The work and the memory are bounded by the length of the input: no container is
  * allocated from a declared length, and the nesting of arrays, maps, and tags stops at 128 levels.
  *
  * @param bytes - CBOR bytes
  * @param offset - Offset of the first byte of the data item
  * @returns The decoded value and the offset after the last byte of the data item
- * @throws RangeError If the data item is malformed, incomplete, or nested too deep
+ * @throws RangeError If the data item is malformed, incomplete, nested too deep, or has a map with a duplicate key
  *
  * @internal
  */
@@ -240,7 +244,7 @@ export function readCborItem(bytes: Uint8Array, offset: number = 0): CborItem {
  *
  * @param bytes - CBOR bytes of one data item
  * @returns The decoded value, see {@link readCborItem}
- * @throws RangeError If the data item is malformed, incomplete, nested too deep, or followed by trailing bytes
+ * @throws RangeError If the data item is malformed, incomplete, nested too deep, has a map with a duplicate key, or is followed by trailing bytes
  *
  * @internal
  */

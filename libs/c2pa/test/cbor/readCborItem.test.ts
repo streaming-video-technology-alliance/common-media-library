@@ -114,8 +114,23 @@ describe('decodeCbor', () => {
 			deepStrictEqual(decodeCbor(toBytes('a2 01 02 20 01')), { 1: 2, '-1': 1 })
 		})
 
-		it('keeps the last value of a duplicate key', () => {
-			deepStrictEqual(decodeCbor(toBytes('a2 6161 01 6161 02')), { a: 2 })
+		it('rejects a map with a duplicate key', () => {
+			// {"a": 1, "a": 2}, {1: 1, 1: 2}, and the first map with an indefinite length
+			for (const hex of ['a2 6161 01 6161 02', 'a2 01 01 01 02', 'bf 6161 01 6161 02 ff']) {
+				throws(() => decodeCbor(toBytes(hex)), { name: 'RangeError', message: 'Duplicate CBOR map key' }, hex)
+			}
+		})
+
+		it('rejects a map with two keys that have the same string name', () => {
+			// {1: 1, "1": 2}, {-1: 1, "-1": 2}, {true: 1, "true": 2}, {1.0: 1, 1: 2}, and {"__proto__": 1, "__proto__": 2}
+			for (const hex of ['a2 01 01 6131 02', 'a2 20 01 622d31 02', 'a2 f5 01 6474727565 02', 'a2 f93c00 01 01 02', 'a2 695f5f70726f746f5f5f 01 695f5f70726f746f5f5f 02']) {
+				throws(() => decodeCbor(toBytes(hex)), { name: 'RangeError', message: 'Duplicate CBOR map key' }, hex)
+			}
+		})
+
+		it('rejects a duplicate key in a nested map', () => {
+			// {"a": {"b": 1, "b": 2}}
+			throws(() => decodeCbor(toBytes('a1 6161 a2 6162 01 6162 02')), { name: 'RangeError', message: 'Duplicate CBOR map key' })
 		})
 
 		it('stores a __proto__ key as an own property and keeps the prototype', () => {
