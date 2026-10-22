@@ -1,4 +1,4 @@
-import { findIsoBox, readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
+import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
 import { CborTag, decodeCbor } from '../cbor/readCborItem.ts'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
@@ -7,6 +7,7 @@ import { readC2paManifest } from '../readC2paManifest.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import { parseExclusions } from '../bmff/parseExclusions.ts'
+import { readRootBoxes } from '../bmff/readRootBoxes.ts'
 import { shouldExcludeBox } from '../bmff/shouldExcludeBox.ts'
 import type { InternalAssertionData } from '../claim/InternalManifestData.ts'
 import { validateManifestIntegrity } from '../claim/validateManifestIntegrity.ts'
@@ -70,17 +71,15 @@ type BmffHashCode =
 	| typeof C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	| typeof C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH
 
-function hashIncludesMoov(boxes: readonly ParsedIsoBox[], exclusions: readonly BmffHashExclusion[]): boolean {
-	const moov = boxes.find(box => box.type === 'moov')
-	if (!moov) return false
-	const { view } = moov
-	return !shouldExcludeBox('moov', new Uint8Array(view.buffer, view.byteOffset, view.byteLength), exclusions)
+// hashIncludesMoov must see the same root boxes as computeBmffHash.
+function hashIncludesMoov(bytes: Uint8Array, exclusions: readonly BmffHashExclusion[]): boolean {
+	const moov = readRootBoxes(bytes).find(box => box.type === 'moov')
+	return moov !== undefined && !shouldExcludeBox(moov.type, moov.bytes, exclusions)
 }
 
 // Checks the `c2pa.hash.bmff.v3` assertion and its flat content hash. Returns the status code of the failure, or null.
 async function validateBmffHashAssertion(
 	bytes: Uint8Array,
-	boxes: readonly ParsedIsoBox[],
 	assertion: C2paAssertion | null,
 ): Promise<BmffHashCode | null> {
 	if (!assertion) return null
@@ -95,7 +94,7 @@ async function validateBmffHashAssertion(
 	const exclusions = parseExclusions(data['exclusions'])
 	if (!exclusions) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	// §19.2.3: the bmff-hash-map of an init segment includes the moov box
-	if (!hashIncludesMoov(boxes, exclusions)) return LiveVideoStatusCode.INIT_INVALID
+	if (!hashIncludesMoov(bytes, exclusions)) return LiveVideoStatusCode.INIT_INVALID
 	if (!hash) return null
 	const alg = normalizeAlgorithmName(data['alg'] as string | undefined)
 	// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
@@ -246,7 +245,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const bmffHashMissing = !internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
 	const bmffHashCode = bmffHashMissing
 		? LiveVideoStatusCode.INIT_INVALID
-		: await validateBmffHashAssertion(bytes, boxes, bmffHashAssertion)
+		: await validateBmffHashAssertion(bytes, bmffHashAssertion)
 
 	const merkleCodes = new Set<LiveVideoStatusCode | C2paStatusCode>()
 	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, merkleCodes)

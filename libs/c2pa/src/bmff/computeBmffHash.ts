@@ -1,8 +1,7 @@
 import type { BmffHashExclusion } from './BmffHashExclusion.ts'
+import { readRootBoxes, type RootBox } from './readRootBoxes.ts'
 import { shouldExcludeBox } from './shouldExcludeBox.ts'
 
-const MINIMUM_BOX_SIZE = 8 // size(4) + type(4)
-const BOX_TYPE_OFFSET = 4
 const DEFAULT_HASH_ALG = 'SHA-256'
 
 /**
@@ -17,14 +16,6 @@ export type BmffHashOptions = {
 	readonly offsetPrefixSize?: number
 }
 
-function readBoxType(bytes: Uint8Array, offset: number): string {
-	return String.fromCharCode(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3])
-}
-
-function writeUint64BigEndian(bytes: Uint8Array, value: number): void {
-	new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).setBigUint64(0, BigInt(value), false)
-}
-
 function buildHashInput(
 	bytes: Uint8Array,
 	exclusions: readonly BmffHashExclusion[],
@@ -34,40 +25,26 @@ function buildHashInput(
 		throw new Error(`offsetPrefixSize must be 0 or 8, got ${offsetPrefixSize}`)
 	}
 
-	const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-
-	// First pass: calculate total size
+	// First pass: select the boxes and calculate the total size
+	const included: RootBox[] = []
 	let totalLength = 0
-	let offset = 0
-	while (offset + MINIMUM_BOX_SIZE <= bytes.length) {
-		const boxSize = view.getUint32(offset, false)
-		if (boxSize < MINIMUM_BOX_SIZE || offset + boxSize > bytes.length) break
-		const boxType = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
-		const boxData = bytes.subarray(offset, offset + boxSize)
-		if (!shouldExcludeBox(boxType, boxData, exclusions)) {
-			totalLength += offsetPrefixSize + boxSize
-		}
-		offset += boxSize
+	for (const box of readRootBoxes(bytes)) {
+		if (shouldExcludeBox(box.type, box.bytes, exclusions)) continue
+		included.push(box)
+		totalLength += offsetPrefixSize + box.bytes.length
 	}
 
 	// Second pass: write directly into pre-sized buffer
 	const hashInput = new Uint8Array(totalLength)
+	const view = new DataView(hashInput.buffer)
 	let writeOffset = 0
-	offset = 0
-	while (offset + MINIMUM_BOX_SIZE <= bytes.length) {
-		const boxSize = view.getUint32(offset, false)
-		if (boxSize < MINIMUM_BOX_SIZE || offset + boxSize > bytes.length) break
-		const boxType = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
-		const boxData = bytes.subarray(offset, offset + boxSize)
-		if (!shouldExcludeBox(boxType, boxData, exclusions)) {
-			if (offsetPrefixSize > 0) {
-				writeUint64BigEndian(hashInput.subarray(writeOffset, writeOffset + offsetPrefixSize), offset)
-				writeOffset += offsetPrefixSize
-			}
-			hashInput.set(boxData, writeOffset)
-			writeOffset += boxSize
+	for (const box of included) {
+		if (offsetPrefixSize > 0) {
+			view.setBigUint64(writeOffset, BigInt(box.offset), false)
+			writeOffset += offsetPrefixSize
 		}
-		offset += boxSize
+		hashInput.set(box.bytes, writeOffset)
+		writeOffset += box.bytes.length
 	}
 
 	return hashInput

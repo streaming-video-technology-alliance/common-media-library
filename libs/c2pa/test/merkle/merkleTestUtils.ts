@@ -30,6 +30,27 @@ export function buildUuidBox(usertype: readonly number[], payload: Uint8Array): 
 	return buildBox('uuid', concatBytes(new Uint8Array(usertype), payload))
 }
 
+/**
+ * Builds a box with a 64-bit `largesize` header (ISO/IEC 14496-12 section 4.2): a size field of 1,
+ * the type, and the 8-byte largesize. `largesize` defaults to the box length.
+ */
+export function buildLargesizeBox(type: string, payload: Uint8Array = new Uint8Array(0), largesize: number = 16 + payload.length): Uint8Array {
+	const box = new Uint8Array(16 + payload.length)
+	const view = new DataView(box.buffer)
+	view.setUint32(0, 1, false)
+	for (let i = 0; i < 4; i++) box[4 + i] = type.charCodeAt(i)
+	view.setBigUint64(8, BigInt(largesize), false)
+	box.set(payload, 16)
+	return box
+}
+
+/** The 8-byte big-endian box offset that prefixes each root box in the §18.6.2 hash input. */
+export function encodeBoxOffset(offset: number): Uint8Array {
+	const bytes = new Uint8Array(8)
+	new DataView(bytes.buffer).setBigUint64(0, BigInt(offset), false)
+	return bytes
+}
+
 // --- Merkle tree construction (mirrors §15.12.2 balanced binary tree) ---
 
 export async function sha256(bytes: Uint8Array): Promise<Uint8Array> {

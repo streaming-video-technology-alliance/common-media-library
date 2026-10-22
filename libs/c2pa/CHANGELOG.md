@@ -8,6 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `validateC2paInitSegment`, `validateC2paSegment`, `validateC2paManifestBoxSegment`, and `validateC2paMerkleSegment` now hash a root box with a `largesize` header or a size of 0. The content hash also covers every root box after such a box ([#566](https://github.com/streaming-video-technology-alliance/common-media-library/issues/566)).
+
+### Changed
+
+- The manifest box guide states that `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` appears only for a manifest with a claim that decodes.
+
 ## [1.6.0] - 2026-10-21
 
 ### Security
