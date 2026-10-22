@@ -76,9 +76,6 @@
 		"typedoc-vitepress-theme": "1.1.4",
 		"typescript": "5.8.2",
 		"typescript-eslint": "8.72.0",
-		"vitepress": "1.6.4"
-	},
-	"overrides": {
-		"vite": "^6.4.4"
+		"vitepress": "2.0.0-alpha.20"
 	}
 }

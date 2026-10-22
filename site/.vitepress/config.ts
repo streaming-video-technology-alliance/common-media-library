@@ -52,7 +52,7 @@ const sidebar: DefaultTheme.SidebarMulti = {
 }
 
 // VitePress picks the longest matching key, so package paths win over the section paths.
-// VitePress inlines every sidebar entry into every page, so the API tree appears under one key only.
+// Every sidebar entry ships in the shared site data, so the API tree appears under one key only.
 for (const pkg of packages) {
 	sidebar[`/packages/${pkg.folder}/`] = packageSidebar(pkg, false)
 	sidebar[`/api/${pkg.folder}/`] = packageSidebar(pkg, true)
@@ -87,12 +87,12 @@ export default defineConfig({
 		search: {
 			provider: 'local',
 			options: {
-				_render(src, env, md) {
+				async _render(src, env, md) {
 					if (env.relativePath.startsWith('api/')) {
-						return md.render(searchExcerpt(src))
+						return md.renderAsync(searchExcerpt(src))
 					}
 
-					const html = md.render(src, env)
+					const html = await md.renderAsync(src, env)
 					return env.frontmatter?.['search'] === false ? '' : html
 				},
 			},
