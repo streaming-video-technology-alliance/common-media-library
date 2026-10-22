@@ -6,6 +6,16 @@ The package defines `BitrateSelector`, the type that every bitrate selection alg
 
 The package implements the [bitrate selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/526) and the [BOLA selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/rfc/bola-abr-selector/index.md). Every export is marked `@beta`.
 
+## When to use
+
+- Pick a bitrate ladder rung from a throughput estimate and the buffer level: `createThroughputSelector`
+- Pick a rung from the buffer level with BOLA, and tune its safety factors: `createBolaSelector`, `BolaSelectorOptions`
+- Implement a custom bitrate selection algorithm behind the shared interface: `BitrateSelector`, `BitrateSelectorInput`, `BitrateDecision`
+- Pass segment download samples to a selector: `SegmentSample`
+- Tune the safety factor, the upgrade factor, and the starvation tolerance: `ThroughputSelectorOptions`, `DEFAULT_SAFETY_FACTOR`
+
+Do not rewrite the rate-based or BOLA selectors. For a different algorithm, implement `BitrateSelector`. Open an issue for a selector type that is missing.
+
 ## Installation
 
 ```bash
