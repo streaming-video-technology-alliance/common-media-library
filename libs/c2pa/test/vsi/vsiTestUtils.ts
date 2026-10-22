@@ -35,6 +35,7 @@ const ES256_PROTECTED_HEADER = Uint8Array.from(CBOR.encode(new Map([[COSE_HEADER
 
 const MANIFEST_ID = 'urn:uuid:vsi-test-manifest'
 const SESSION_KEYS_LABEL = 'c2pa.session-keys'
+const BMFF_HASH_LABEL = 'c2pa.hash.bmff.v3'
 const VSI_SCHEME_ID_URI = 'urn:c2pa:verifiable-segment-info'
 const VSI_EXCLUSIONS = [{ xpath: '/emsg' }]
 
@@ -172,12 +173,22 @@ export async function buildSignedInitSegment(signer: TestSigner, assertions: rea
 }
 
 /**
+ * Builds a `c2pa.hash.bmff.v3` assertion (§19.2.3) whose flat hash covers the ftyp and moov boxes
+ * of an init segment from {@link buildInitSegmentWithManifest}.
+ */
+export async function buildInitBmffHashAssertion(): Promise<TestAssertion> {
+	const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+	return { label: BMFF_HASH_LABEL, cbor: Uint8Array.from(CBOR.encode({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })) }
+}
+
+/**
  * Builds an init segment whose manifest has a `c2pa.session-keys` assertion (§18.25) with the given keys.
- * The claim references the assertion and is signed by `signer`. If `indefiniteLengths` is `true`, the assertion
- * encodes its maps and arrays with indefinite lengths. The COSE keys and signer bindings keep definite lengths.
+ * The manifest also has the assertion from {@link buildInitBmffHashAssertion}. The claim references
+ * both assertions and is signed by `signer`. If `indefiniteLengths` is `true`, the session keys
+ * assertion encodes its maps and arrays with indefinite lengths. The COSE keys and signer bindings keep definite lengths.
  */
 export async function buildSessionKeysInitSegment(signer: TestSigner, entries: readonly TestSessionKeyEntry[], indefiniteLengths: boolean = false): Promise<Uint8Array> {
-	return buildSignedInitSegment(signer, [await buildSessionKeysAssertion(signer, entries, indefiniteLengths)])
+	return buildSignedInitSegment(signer, [await buildInitBmffHashAssertion(), await buildSessionKeysAssertion(signer, entries, indefiniteLengths)])
 }
 
 /** Builds a `c2pa.session-keys` assertion (§18.25) with the given keys, bound to the certificate of `signer`. */

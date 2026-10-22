@@ -5,9 +5,10 @@ import { before, describe, it } from 'node:test'
 import { encodeCbor } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
-import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
+import type { BmffHashExclusion } from '../../src/bmff/BmffHashExclusion.ts'
+import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, concatBytes, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, buildVsiSegment, createTestSessionKey, encodeSignerBinding, type TestAssertion, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
+import { buildInitBmffHashAssertion, buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, buildVsiSegment, createTestSessionKey, encodeSignerBinding, type TestAssertion, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -728,7 +729,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	}
 
 	it('fails with SESSIONKEY_INVALID and ASSERTION_CBOR_INVALID if the session keys assertion has CBOR that does not decode', async () => {
-		const init = await buildSignedInitSegment(signer, [{ label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK }])
+		const init = await buildSignedInitSegment(signer, [await buildInitBmffHashAssertion(), { label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK }])
 
 		const result = await validateC2paInitSegment(init)
 
@@ -760,7 +761,7 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 
 		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
 
-		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
 		strictEqual(result.isValid, false)
 	})
 
@@ -834,10 +835,10 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		key = await createTestSessionKey('key_001')
 	})
 
-	// A signed init with a valid session keys assertion and the given other assertion
+	// A signed init with a matching BMFF hash assertion, a valid session keys assertion, and the given other assertion
 	async function buildInit(assertion: TestAssertion): Promise<Uint8Array> {
 		const entry = { key, minSequenceNumber: 0, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 }
-		return buildSignedInitSegment(signer, [await buildSessionKeysAssertion(signer, [entry]), assertion])
+		return buildSignedInitSegment(signer, [await buildInitBmffHashAssertion(), await buildSessionKeysAssertion(signer, [entry]), assertion])
 	}
 
 	for (const [description, cbor] of ILL_FORMED_CBOR) {
@@ -924,5 +925,107 @@ describe('validateC2paInitSegment — manifestId of a Verifiable Segment Info (�
 		ok(manifestId)
 		strictEqual(validated?.result.isValid, true)
 		strictEqual(validated?.result.manifestId, manifestId)
+	})
+})
+
+describe('validateC2paInitSegment — content binding (§15.10.1.2, §19.2.3)', () => {
+	const TEXT_ENCODER = new TextEncoder()
+	const UUID_EXCLUSION = { xpath: '/uuid' }
+
+	let signer: TestSigner
+	let sessionKeys: TestAssertion
+
+	before(async () => {
+		signer = await createTestSigner()
+		const key = await createTestSessionKey('key_001')
+		sessionKeys = await buildSessionKeysAssertion(signer, [
+			{ key, minSequenceNumber: 0, createdAt: new Date(Date.now() - 60_000).toISOString(), validityPeriod: 3600 },
+		])
+	})
+
+	// A hard binding assertion with a flat hash over `mediaBoxes`, the boxes of the init before the manifest.
+	async function flatHashAssertion(label: string, exclusions: readonly BmffHashExclusion[], mediaBoxes: Uint8Array = buildInitMediaBoxes()): Promise<TestAssertion> {
+		const hash = await computeBmffHash(mediaBoxes, { exclusions, offsetPrefixSize: 8 })
+		return { label, cbor: encodeCbor({ exclusions: [UUID_EXCLUSION, ...exclusions], alg: 'sha256', hash }) }
+	}
+
+	it('returns the session keys of an init whose c2pa.hash.bmff.v3 hash covers the moov box', async () => {
+		const init = await buildSignedInitSegment(signer, [await flatHashAssertion('c2pa.hash.bmff.v3', []), sessionKeys])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.sessionKeys.length, 1)
+	})
+
+	it('fails with INIT_INVALID and CLAIM_HARD_BINDINGS_MISSING for an init without a hard binding', async () => {
+		const init = await buildSignedInitSegment(signer, [sessionKeys])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING])
+		deepStrictEqual(result.sessionKeys, [])
+	})
+
+	// Each label is a hard binding (§15.10.1.2), but §19.2.3 requires the bmff-hash-map of c2pa.hash.bmff.v3.
+	for (const label of ['c2pa.hash.data', 'c2pa.hash.bmff.v2']) {
+		it(`fails with INIT_INVALID for an init with a matching ${label} hash instead of c2pa.hash.bmff.v3`, async () => {
+			const init = await buildSignedInitSegment(signer, [await flatHashAssertion(label, []), sessionKeys])
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+			deepStrictEqual(result.sessionKeys, [])
+		})
+	}
+
+	const MOOV_TYPE = TEXT_ENCODER.encode('moov')
+
+	for (const [description, exclusion] of [
+		['the moov box', { xpath: '/moov' }],
+		['the moov box with a data constraint that matches', { xpath: '/moov', data: [{ offset: 4, value: MOOV_TYPE }] }],
+	] as const) {
+		it(`fails with INIT_INVALID for a c2pa.hash.bmff.v3 hash that excludes ${description}`, async () => {
+			const init = await buildSignedInitSegment(signer, [await flatHashAssertion('c2pa.hash.bmff.v3', [exclusion]), sessionKeys])
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+			deepStrictEqual(result.sessionKeys, [])
+		})
+	}
+
+	it('returns the session keys of an init whose moov exclusion has a data constraint that does not match', async () => {
+		const exclusion = { xpath: '/moov', data: [{ offset: 4, value: TEXT_ENCODER.encode('free') }] }
+		const init = await buildSignedInitSegment(signer, [await flatHashAssertion('c2pa.hash.bmff.v3', [exclusion]), sessionKeys])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.sessionKeys.length, 1)
+	})
+
+	it('fails with INIT_INVALID for a Merkle initHash that excludes the moov box', async () => {
+		const exclusions = [UUID_EXCLUSION, { xpath: '/moov' }]
+		const initHash = await computeBmffHash(buildInitMediaBoxes(), { exclusions, offsetPrefixSize: 8 })
+		const merkle = [{ uniqueId: 1, localId: 1, count: 4, hashes: [new Uint8Array(32).fill(3)], alg: 'SHA-256', initHash }]
+		const init = await buildSignedInitSegment(signer, [{ label: 'c2pa.hash.bmff.v3', cbor: encodeCbor({ exclusions, merkle }) }])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+		deepStrictEqual(result.merkleMaps, [])
+	})
+
+	it('fails with INIT_INVALID for an init without a moov box', async () => {
+		const ftyp = buildBox('ftyp', TEXT_ENCODER.encode('isom'))
+		const init = await buildSignedInitSegment(signer, [await flatHashAssertion('c2pa.hash.bmff.v3', [], ftyp), sessionKeys])
+		// The init starts with the ftyp box and the empty moov box of buildInitMediaBoxes.
+		const initWithoutMoov = concatBytes(ftyp, init.subarray(ftyp.length + 8))
+
+		const result = await validateC2paInitSegment(initWithoutMoov)
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+		deepStrictEqual(result.sessionKeys, [])
 	})
 })

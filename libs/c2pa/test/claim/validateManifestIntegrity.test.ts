@@ -36,6 +36,17 @@ function internalData(overrides: Partial<InternalManifestData>): InternalManifes
 	}
 }
 
+const BMFF_V3_LABEL = 'c2pa.hash.bmff.v3'
+
+// A hard binding assertion (§15.10.1.2) and the claim reference that resolves to it.
+async function hardBinding(): Promise<Partial<InternalManifestData>> {
+	const rawBoxPayload = new Uint8Array(0)
+	return {
+		assertions: [{ label: BMFF_V3_LABEL, data: {}, rawBoxPayload }],
+		claimAssertionRefs: [{ url: `self#jumbf=c2pa.assertions/${BMFF_V3_LABEL}`, hash: await sha256(rawBoxPayload), alg: 'sha256' }],
+	}
+}
+
 describe('validateManifestIntegrity', () => {
 	let signer: TestSigner
 
@@ -44,15 +55,23 @@ describe('validateManifestIntegrity', () => {
 	})
 
 	// #region example
-	it('returns no codes for a signed manifest with no claim refs', async () => {
+	it('returns no codes for a signed manifest with one hard binding assertion', async () => {
 		const signatureBytes = await signer.sign(EMPTY_CLAIM_CBOR)
 
-		const { codes, certificate } = await validateManifestIntegrity(internalData({ signatureBytes }))
+		const { codes, certificate } = await validateManifestIntegrity(internalData({ ...await hardBinding(), signatureBytes }))
 
 		strictEqual(codes.length, 0)
 		deepStrictEqual(certificate, signer.certificateDER)
 	})
 	// #endregion example
+
+	it('reports CLAIM_HARD_BINDINGS_MISSING for a signed manifest without a hard binding assertion', async () => {
+		const signatureBytes = await signer.sign(EMPTY_CLAIM_CBOR)
+
+		const { codes } = await validateManifestIntegrity(internalData({ signatureBytes }))
+
+		deepStrictEqual(codes, [C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING])
+	})
 
 	it('reports errors from real init segment fixture', async () => {
 		const initBytes = loadFixture('init_signed_with_session_keys.m4s')
@@ -111,22 +130,26 @@ describe('validateManifestIntegrity', () => {
 	it('reports CLAIM_SIGNATURE_MISSING if the claim signature URI does not resolve to the signature box', async () => {
 		const signatureBytes = await signer.sign(EMPTY_CLAIM_CBOR)
 
-		const { codes } = await validateManifestIntegrity(internalData({ signatureBytes, signatureUriCode: C2paStatusCode.CLAIM_SIGNATURE_MISSING }))
+		const { codes } = await validateManifestIntegrity(internalData({ ...await hardBinding(), signatureBytes, signatureUriCode: C2paStatusCode.CLAIM_SIGNATURE_MISSING }))
 
 		deepStrictEqual(codes, [C2paStatusCode.CLAIM_SIGNATURE_MISSING])
 	})
 
 	it('reports ASSERTION_HASHEDURI_MISMATCH for a claim hash that is a CBOR array of integers', async () => {
 		const assertionBox = buildJumb('com.example.cbor', buildBox('cbor', Uint8Array.of(0xa0)))
+		const hardBindingBox = buildJumb(BMFF_V3_LABEL, buildBox('cbor', Uint8Array.of(0xa0)))
 		// hashed-uri-map CDDL: hash is a byte string. This claim encodes the correct hash as an array.
 		const claim = encodeCbor({
 			instanceID: 'urn:uuid:test-manifest',
 			signature: signatureUri('urn:uuid:test-manifest'),
-			created_assertions: [{ url: 'self#jumbf=c2pa.assertions/com.example.cbor', hash: Array.from(await sha256(assertionBox.subarray(8))), alg: 'sha256' }],
+			created_assertions: [
+				{ url: 'self#jumbf=c2pa.assertions/com.example.cbor', hash: Array.from(await sha256(assertionBox.subarray(8))), alg: 'sha256' },
+				{ url: `self#jumbf=c2pa.assertions/${BMFF_V3_LABEL}`, hash: await sha256(hardBindingBox.subarray(8)), alg: 'sha256' },
+			],
 		})
 		const manifest = buildJumb('urn:uuid:test-manifest',
 			buildJumb('c2pa.claim', buildBox('cbor', claim)),
-			buildJumb('c2pa.assertions', assertionBox),
+			buildJumb('c2pa.assertions', assertionBox, hardBindingBox),
 			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claim))),
 		)
 
