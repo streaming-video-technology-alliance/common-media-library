@@ -31,4 +31,12 @@ describe('searchExcerpt', () => {
 	it('returns the input when there is no title', () => {
 		equal(searchExcerpt('Just text\n'), 'Just text\n')
 	})
+
+	it('skips a release tag before the description', () => {
+		equal(searchExcerpt('# Function: createBolaSelector()\n\n**`Beta`**\n\nSelects a bitrate.\n'), '# Function: createBolaSelector()\n\nSelects a bitrate.\n')
+	})
+
+	it('keeps only the title when a release tag is the only paragraph', () => {
+		equal(searchExcerpt('# Function: createBolaSelector()\n\n**`Alpha`**\n'), '# Function: createBolaSelector()\n')
+	})
 })

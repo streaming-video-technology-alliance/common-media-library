@@ -11,8 +11,8 @@ const repo = 'https://github.com/streaming-video-technology-alliance/common-medi
 const packages: PackageInfo[] = JSON.parse(readFileSync(new URL('../packages/packages.json', import.meta.url), 'utf8'))
 const apiSidebar: DefaultTheme.SidebarItem[] = JSON.parse(readFileSync(new URL('../api/typedoc-sidebar.json', import.meta.url), 'utf8'))
 
-function packageSidebar(pkg: PackageInfo): DefaultTheme.SidebarItem[] {
-	const api = apiSidebar.find(item => item.link === `/api/${pkg.folder}/`)
+function packageSidebar(pkg: PackageInfo, withApi: boolean): DefaultTheme.SidebarItem[] {
+	const api = withApi ? apiSidebar.find(item => item.link === `/api/${pkg.folder}/`) : undefined
 	const items: DefaultTheme.SidebarItem[] = [
 		{ text: 'Overview', link: `/packages/${pkg.folder}/` },
 	]
@@ -25,7 +25,9 @@ function packageSidebar(pkg: PackageInfo): DefaultTheme.SidebarItem[] {
 	}
 
 	items.push(
-		{ text: 'API', link: `/api/${pkg.folder}/`, collapsed: true, items: api?.items ?? [] },
+		withApi
+			? { text: 'API', link: `/api/${pkg.folder}/`, collapsed: true, items: api?.items ?? [] }
+			: { text: 'API', link: `/api/${pkg.folder}/` },
 		{ text: 'Changelog', link: `/packages/${pkg.folder}/changelog` },
 	)
 
@@ -48,9 +50,10 @@ const sidebar: DefaultTheme.SidebarMulti = {
 }
 
 // VitePress picks the longest matching key, so package paths win over the section paths.
+// VitePress inlines every sidebar entry into every page, so the API tree appears under one key only.
 for (const pkg of packages) {
-	sidebar[`/packages/${pkg.folder}/`] = packageSidebar(pkg)
-	sidebar[`/api/${pkg.folder}/`] = packageSidebar(pkg)
+	sidebar[`/packages/${pkg.folder}/`] = packageSidebar(pkg, false)
+	sidebar[`/api/${pkg.folder}/`] = packageSidebar(pkg, true)
 }
 
 export default defineConfig({
