@@ -27,6 +27,6 @@ SVTA DNS change, custom domain in the repository settings, `SITE_BASE` set to `/
 
 ## Risks
 
-- The full build has not run for all 20 packages yet. The extrapolation from the spike is about 45 s for TypeDoc and 40 s for VitePress. Task 9 of `steps.md` measures the real numbers.
-- Each HTML page embeds its sidebar. With the largest package sidebar, iso-bmff with about 330 entries, a page is about 150 KB before compression. GitHub Pages serves compressed HTML, so this is acceptable for now.
+- The full build of all 20 packages takes 106 s. TypeDoc takes 81 s and VitePress takes 22 s. The search index is 603 KB. The `site/dist` folder is 292 MB and holds 1,128 HTML pages.
+- Each HTML page embeds its sidebar. VitePress inlines the hash map and the API sidebar data into every page. A package page is about 200 KB before compression and 33 KB after gzip. The largest page is 387 KB before compression. GitHub Pages serves compressed HTML, so this is acceptable for now.
 - The markdown renderer has no hierarchy pages. The old `hierarchy.html` redirects to the API index.
