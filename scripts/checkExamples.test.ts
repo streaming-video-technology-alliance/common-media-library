@@ -1,7 +1,7 @@
-import { deepEqual, ok } from 'node:assert/strict'
+import { deepEqual, equal, ok } from 'node:assert/strict'
 import path from 'node:path'
 import { describe, it } from 'node:test'
-import { extractExampleBlocks, listExampleFiles } from './checkExamples.ts'
+import { checkExamples, extractExampleBlocks, formatDiagnostic, listExampleFiles, type ExampleBlock } from './checkExamples.ts'
 
 const repoRoot = path.resolve(import.meta.dirname, '..')
 
@@ -32,5 +32,33 @@ describe('listExampleFiles', () => {
 		ok(files.includes('libs/cmcd/README.md'))
 		ok(files.includes('libs/cmcd/docs/user-guide.md'))
 		ok(!files.some(file => file.includes('node_modules') || file.includes('/dist/')))
+	})
+})
+
+describe('checkExamples', () => {
+	it('reports a type error at the markdown line', () => {
+		const block: ExampleBlock = { file: 'libs/x/docs/guide.md', line: 10, code: 'const n: number = 1\nconst s: number = "a"\nconsole.log(n, s)\n' }
+		const diagnostics = checkExamples([block], repoRoot)
+		equal(diagnostics.length, 1)
+		equal(diagnostics[0].code, 2322)
+		equal(diagnostics[0].file, 'libs/x/docs/guide.md')
+		equal(diagnostics[0].line, 12)
+		equal(formatDiagnostic(diagnostics[0]), 'libs/x/docs/guide.md:12 TS2322: Type \'string\' is not assignable to type \'number\'.')
+	})
+
+	it('resolves package imports to the built packages', () => {
+		const block: ExampleBlock = { file: 'libs/x/README.md', line: 1, code: 'import { appendCmcdQuery } from "@svta/cml-cmcd";\nconsole.log(appendCmcdQuery("https://cdn.example.com/a.m4s", { br: [1000] }));\n' }
+		deepEqual(checkExamples([block], repoRoot), [])
+	})
+
+	it('accepts top-level await and the same declare in two blocks', () => {
+		const code = 'declare const url: string\nconst response = await fetch(url)\nconsole.log(response.status)\n'
+		const blocks: ExampleBlock[] = [{ file: 'a.md', line: 1, code }, { file: 'b.md', line: 1, code }]
+		deepEqual(checkExamples(blocks, repoRoot), [])
+	})
+
+	it('fails when an expected error does not occur', () => {
+		const block: ExampleBlock = { file: 'f.md', line: 1, code: '// @ts-expect-error\nconst n: number = 1\nconsole.log(n)\n' }
+		equal(checkExamples([block], repoRoot)[0]?.code, 2578)
 	})
 })
