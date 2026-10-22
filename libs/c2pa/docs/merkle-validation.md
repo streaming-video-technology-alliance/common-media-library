@@ -23,6 +23,8 @@ A stream is in VOD Merkle mode only when `merkleMaps` is not empty. Otherwise it
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
+declare const initUrl: string
+
 const initResponse = await fetch(initUrl)
 const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
@@ -42,7 +44,10 @@ If the `exclusions` of the `c2pa.hash.bmff.v3` assertion exclude the whole `moov
 
 ```typescript
 import { validateC2paMerkleSegment } from '@svta/cml-c2pa'
-import type { MerkleSegmentState } from '@svta/cml-c2pa'
+import type { InitSegmentValidation, MerkleSegmentState } from '@svta/cml-c2pa'
+
+declare const init: InitSegmentValidation
+declare const segmentUrls: string[]
 
 let state: MerkleSegmentState | undefined
 

@@ -137,6 +137,8 @@ Two pieces of state pass from one call to the next:
 import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
 import type { ManifestBoxValidationState } from '@svta/cml-c2pa'
 
+declare const segmentUrls: string[]
+
 let lastManifestId: string | null = null
 let state: ManifestBoxValidationState | undefined
 
@@ -265,6 +267,14 @@ The specification allows implementers to define their own continuity methods (§
 To validate a custom method, register a validator for its label in the `options` parameter. A stream uses one continuity method, so one validator is registered at a time:
 
 ```ts
+import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
+import type { ManifestBoxValidationState } from '@svta/cml-c2pa'
+
+declare const bytes: Uint8Array
+declare const lastManifestId: string | null
+declare const state: ManifestBoxValidationState | undefined
+declare function verifyAnchorChain(anchorToken: unknown, instanceId: string | null): boolean
+
 const { result } = await validateC2paManifestBoxSegment(bytes, lastManifestId, state, {
   continuityValidator: {
     method: 'com.example.anchor-chain',
@@ -330,6 +340,8 @@ A stream is in VOD Merkle mode only when `merkleMaps` is not empty. Otherwise it
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
+declare const initUrl: string
+
 const initResponse = await fetch(initUrl)
 const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
@@ -349,7 +361,10 @@ If the `exclusions` of the `c2pa.hash.bmff.v3` assertion exclude the whole `moov
 
 ```typescript
 import { validateC2paMerkleSegment } from '@svta/cml-c2pa'
-import type { MerkleSegmentState } from '@svta/cml-c2pa'
+import type { InitSegmentValidation, MerkleSegmentState } from '@svta/cml-c2pa'
+
+declare const init: InitSegmentValidation
+declare const segmentUrls: string[]
 
 let state: MerkleSegmentState | undefined
 
@@ -468,6 +483,10 @@ All validation functions in `@svta/cml-c2pa` return structured results with an `
 Every result follows the same pattern:
 
 ```typescript
+import type { SegmentValidationResult } from '@svta/cml-c2pa'
+
+declare const result: SegmentValidationResult
+
 if (!result.isValid) {
   for (const code of result.errorCodes) {
     console.error(`Validation failure: ${code}`)
@@ -521,6 +540,9 @@ Example of handling specific error codes:
 
 ```typescript
 import { LiveVideoStatusCode } from '@svta/cml-c2pa'
+import type { SegmentValidationResult } from '@svta/cml-c2pa'
+
+declare const result: SegmentValidationResult
 
 for (const code of result.errorCodes) {
   switch (code) {
@@ -612,6 +634,10 @@ The `signatureInfo` object contains:
 | `certNotBefore` | `string \| null` | Certificate validity start (ISO 8601) |
 
 ```typescript
+import type { InitSegmentValidation } from '@svta/cml-c2pa'
+
+declare const init: InitSegmentValidation
+
 const { isValid, manifest } = init // or result for the Manifest Box method
 
 // The assertions list is the raw assertion store, so read it only when isValid is true.
@@ -650,6 +676,9 @@ Narrow the type to access the `GAP_DETECTED` fields:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'
+import type { SegmentValidationResult } from '@svta/cml-c2pa'
+
+declare const result: SegmentValidationResult
 
 if (result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
   console.warn(
@@ -704,6 +733,8 @@ A `SequenceState` object passes from each media segment call to the next and tra
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
+declare const initUrl: string
+
 const initResponse = await fetch(initUrl)
 const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
@@ -731,6 +762,10 @@ C2PA section 19.2.3 requires a `c2pa.hash.bmff.v3` assertion in the init manifes
 `sessionKeys` includes only keys with a valid signer binding and an unexpired validity period:
 
 ```typescript
+import type { InitSegmentValidation } from '@svta/cml-c2pa'
+
+declare const init: InitSegmentValidation
+
 for (const key of init.sessionKeys) {
   console.log('Key ID:', key.kid)
   console.log('Curve:', key.jwk.crv)
@@ -756,7 +791,10 @@ Each `ValidatedSessionKey` contains:
 
 ```typescript
 import { validateC2paSegment } from '@svta/cml-c2pa'
-import type { SequenceState } from '@svta/cml-c2pa'
+import type { InitSegmentValidation, SequenceState } from '@svta/cml-c2pa'
+
+declare const init: InitSegmentValidation
+declare const segmentUrls: string[]
 
 // undefined on first call — the function creates a fresh state internally
 let sequenceState: SequenceState | undefined
@@ -919,6 +957,9 @@ Narrow the type to access additional fields:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'
+import type { SegmentValidationResult } from '@svta/cml-c2pa'
+
+declare const result: SegmentValidationResult
 
 const { sequenceResult } = result
 

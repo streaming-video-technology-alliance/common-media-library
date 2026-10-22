@@ -17,6 +17,10 @@ and this project adheres to
 
 ### Changed
 
+- Every code example in the guides now typechecks on its own. Values that the player provides are declared with `declare const` ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+
+### Changed
+
 - The manifest box guide states that `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` appears only for a manifest with a claim that decodes.
 
 ## [1.6.0] - 2026-10-21

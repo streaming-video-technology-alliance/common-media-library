@@ -24,6 +24,8 @@ Two pieces of state pass from one call to the next:
 import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
 import type { ManifestBoxValidationState } from '@svta/cml-c2pa'
 
+declare const segmentUrls: string[]
+
 let lastManifestId: string | null = null
 let state: ManifestBoxValidationState | undefined
 
@@ -152,6 +154,14 @@ The specification allows implementers to define their own continuity methods (§
 To validate a custom method, register a validator for its label in the `options` parameter. A stream uses one continuity method, so one validator is registered at a time:
 
 ```ts
+import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
+import type { ManifestBoxValidationState } from '@svta/cml-c2pa'
+
+declare const bytes: Uint8Array
+declare const lastManifestId: string | null
+declare const state: ManifestBoxValidationState | undefined
+declare function verifyAnchorChain(anchorToken: unknown, instanceId: string | null): boolean
+
 const { result } = await validateC2paManifestBoxSegment(bytes, lastManifestId, state, {
   continuityValidator: {
     method: 'com.example.anchor-chain',
