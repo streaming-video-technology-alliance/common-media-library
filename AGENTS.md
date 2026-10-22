@@ -25,6 +25,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies.
 - `npm test`: Full validation at the root. It runs lint, build all, typecheck, then every package's tests. The PR checks run this command.
 - `npm run format`: Run the linter with auto-fix
+- `npm run docs`: Start the website dev server. `npm run build -w site` builds the website into `site/dist`. The build fails on dead links in any README or guide.
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
 - `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the dependent packages. A dependent needs the bump when the peer range in the published package rejects the new version. Packages declare workspace peers as `*`. The Publish workflow rewrites `*` to a caret range of the current peer version. A cascade therefore happens when the new peer version falls outside that caret range, such as a major bump. The command also warns about packages that have unreleased changelog entries and no version change.
 
@@ -71,6 +72,8 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Mark example regions in tests with `// #region example` and `// #endregion example`.
 - All code examples must be complete and runnable: no pseudocode and no missing imports.
 - The package build regenerates the public API report `libs/<package>/config/cml-<package>.api.md`. Review its diff to confirm that every API change is intentional.
+- The website copies every published package's `README.md`, `docs/*.md`, and `CHANGELOG.md` at build time. Link to a guide from a README as `docs/<file>.md`. Link between guides as sibling files, for example `other-guide.md#anchor`.
+- Every package needs an entry in `site/scripts/groups.ts`. The site build fails without one.
 
 ## Writing Style
 

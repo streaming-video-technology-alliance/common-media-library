@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The documentation site is now a VitePress site in the `site` workspace. It serves the landing page, package guides, API reference, and releases feed. Old TypeDoc URLs redirect to the new pages.
+
 ## [0.18.1] - 2025-10-01
 
 ### Fixed
