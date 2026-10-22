@@ -9,7 +9,7 @@ const config: Linter.Config[] = defineConfig(
 	tseslint.configs.strict,
 	tseslint.configs.stylistic,
 	{
-		ignores: ['**/dist'],
+		ignores: ['**/dist', '**/.vitepress/cache'],
 	},
 	{
 		plugins: {

@@ -1,11 +1,10 @@
 {
-	"name": "@svta/common-media-library-docs",
+	"name": "@svta/common-media-library-site",
 	"private": true,
-	"version": "1.0.1",
+	"version": "1.0.0",
 	"license": "Apache-2.0",
 	"type": "module",
 	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library",
-	"authors": "Casey Occhialini <1508707+littlespex@users.noreply.github.com>",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"
@@ -14,7 +13,9 @@
 		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
 	},
 	"scripts": {
-		"build": "typedoc && cd .. && node scripts/agentDocs.ts --site docs/dist",
-		"start": "npm run build && npx -y http-server dist --cors -p 3627"
+		"build": "node scripts/prepare.ts && typedoc && vitepress build && node scripts/writeRedirects.ts && node scripts/check.ts",
+		"dev": "node scripts/prepare.ts && typedoc && vitepress dev",
+		"start": "npm run dev",
+		"test": "node --no-warnings --test scripts/*.test.ts"
 	}
 }
