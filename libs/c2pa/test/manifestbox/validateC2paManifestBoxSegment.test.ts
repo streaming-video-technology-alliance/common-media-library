@@ -908,12 +908,13 @@ describe('validateC2paManifestBoxSegment — content binding (§19.3)', () => {
 	})
 
 	// A signed segment with a chained live video assertion and the given other assertions. The claim declares every assertion.
+	// If the data of an assertion is a Uint8Array, the bytes are the CBOR content of the assertion.
 	async function signedSegment(otherAssertions: readonly (readonly [string, unknown])[]): Promise<Uint8Array> {
 		const liveVideoData = { sequenceNumber: 2, previousManifestId: LAST_MANIFEST_ID, streamId: 'stream-1', continuityMethod: 'c2pa.manifestId' }
 		const boxes = [buildJumb('c2pa.livevideo.segment', buildBox('cbor', encodeCbor(liveVideoData)))]
 		const refs = [await claimRef('c2pa.livevideo.segment', boxes[0])]
 		for (const [label, data] of otherAssertions) {
-			const box = buildJumb(label, buildBox('cbor', encodeCbor(data)))
+			const box = buildJumb(label, buildBox('cbor', data instanceof Uint8Array ? data : encodeCbor(data)))
 			boxes.push(box)
 			refs.push(await claimRef(label, box))
 		}
@@ -1000,6 +1001,21 @@ describe('validateC2paManifestBoxSegment — content binding (§19.3)', () => {
 		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
 
 		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED])
+		strictEqual(nextManifestId, LAST_MANIFEST_ID)
+		deepStrictEqual(nextState, LAST_STATE)
+	})
+
+	it('fails with ASSERTION_CBOR_INVALID for a signed segment with an assertion that is not well-formed CBOR (§15.10.3.1)', async () => {
+		const segment = await signedSegment([
+			['c2pa.hash.bmff.v3', { exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash: await flatHash() }],
+			// RFC 8949 Appendix C: the map has no value for its key
+			['c2pa.actions.v2', Uint8Array.of(0xa1, 0x61, 0x61)],
+		])
+
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, LAST_MANIFEST_ID, LAST_STATE)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_CBOR_INVALID])
+		strictEqual(result.isValid, false)
 		strictEqual(nextManifestId, LAST_MANIFEST_ID)
 		deepStrictEqual(nextState, LAST_STATE)
 	})

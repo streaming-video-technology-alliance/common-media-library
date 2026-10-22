@@ -13,6 +13,10 @@ and this project adheres to
 - `validateC2paInitSegment` now fails an init segment without a `c2pa.hash.bmff.v3` assertion with `LiveVideoStatusCode.INIT_INVALID`. The result for a manifest without any hard binding assertion also includes `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
 - `validateC2paInitSegment` now fails with `LiveVideoStatusCode.INIT_INVALID` if the init content hash does not include the `moov` box ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
 
+### Fixed
+
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now fail a segment if the CBOR or JSON of an assertion does not decode. The result includes the new `C2paStatusCode.ASSERTION_CBOR_INVALID` or `C2paStatusCode.ASSERTION_JSON_INVALID`.
+
 ### Changed
 
 - `validateC2paManifestBoxSegment` now reports a missing hard binding only for a manifest with a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` no longer also reports `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
