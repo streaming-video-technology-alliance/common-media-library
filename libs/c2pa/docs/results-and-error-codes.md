@@ -23,7 +23,7 @@ The `errorCodes` array may contain several codes when several checks fail. When 
 
 ## Signer Trust
 
-`isValid` is `true` when the manifest is well formed and the claim signature verifies. Every store assertion must be referenced by the claim and match its hash. The manifest must have at most one hard binding. The signature is verified with the end-entity certificate that the manifest carries in its `x5chain` header. The library does not check that certificate against a trust list. Any party with a certificate can produce a manifest that validates.
+`isValid` is `true` when the manifest is well formed and the claim signature verifies. Every store assertion must be referenced by the claim and match its hash. The manifest must have exactly one hard binding. The signature is verified with the end-entity certificate that the manifest carries in its `x5chain` header. The library does not check that certificate against a trust list. Any party with a certificate can produce a manifest that validates.
 
 Before you present content as authentic, compare the signer with your own trust anchors. `InitSegmentValidation.certificate` and `ManifestBoxValidationResult.certificate` hold the DER-encoded end-entity certificate from the claim signature. The value is `null` when the signature is absent or carries no certificate.
 
@@ -41,7 +41,7 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 
 | Constant | Value | Meaning |
 |----------|-------|---------|
-| `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box, or its BMFF content hash does not match (with `ASSERTION_BMFFHASH_MISMATCH`) |
+| `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box. Init manifest without a `c2pa.hash.bmff.v3` assertion. Init content hash that does not include the `moov` box, or that does not match (with `ASSERTION_BMFFHASH_MISMATCH`). |
 | `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
 | `SEGMENT_INVALID` | `livevideo.segment.invalid` | Signature, hash, or key failure. Key outside the validity period. Manifest box segment without a `c2pa.hash.bmff.v3` assertion. VSI sequence number not moving forward or below the key minimum. Broken `c2pa.manifestId` chain. Manifest box claim `signature` URI that does not name the manifest label. Failed custom continuity validator. |
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
@@ -113,7 +113,7 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `CLAIM_CBOR_INVALID` | `claim.cbor.invalid` | The claim box holds CBOR that does not decode |
 | `CLAIM_MALFORMED` | `claim.malformed` | The claim box holds CBOR that is not a map |
 | `CLAIM_MULTIPLE` | `claim.multiple` | The manifest has more than one claim box |
-| `CLAIM_HARD_BINDINGS_MISSING` | `claim.hardBindings.missing` | The manifest of a manifest box segment has no hard binding assertion |
+| `CLAIM_HARD_BINDINGS_MISSING` | `claim.hardBindings.missing` | The manifest has no hard binding assertion |
 | `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
 | `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
 
