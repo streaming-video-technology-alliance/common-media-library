@@ -33,6 +33,13 @@ A claim box whose CBOR does not decode fails with `C2paStatusCode.CLAIM_CBOR_INV
 
 An assertion whose CBOR does not decode fails with `C2paStatusCode.ASSERTION_CBOR_INVALID` (C2PA section 15.10.3.1). An assertion whose JSON is not UTF-8 or does not parse fails with `C2paStatusCode.ASSERTION_JSON_INVALID`. These checks apply to every assertion, whatever the label. CBOR that is not deterministic still passes, for example a map with unsorted keys.
 
+The CBOR decoder also rejects some CBOR that is well-formed. An assertion with such CBOR reports `ASSERTION_CBOR_INVALID`, and a claim with such CBOR reports `CLAIM_CBOR_INVALID`. The rejected forms are:
+
+- a map key that is not a text string or an integer
+- an unassigned simple value
+- a tag number above 2^53
+- nesting deeper than 128 levels
+
 ## Live Video Error Codes
 
 The `LiveVideoStatusCode` constants are the live video validation failures that C2PA specification section 19.7 defines.

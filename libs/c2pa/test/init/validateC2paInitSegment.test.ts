@@ -739,6 +739,20 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		})
 	}
 
+	it('fails with SESSIONKEY_INVALID and ASSERTION_CBOR_INVALID in VOD Merkle mode if the session keys assertion has CBOR that does not decode', async () => {
+		const init = await buildSignedInitSegment(signer, [
+			{ label: 'c2pa.hash.bmff.v3', cbor: await merkleAssertionCbor() },
+			{ label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK },
+		])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.merkleMaps, [])
+		deepStrictEqual(result.sessionKeys, [])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.ASSERTION_CBOR_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
 	it('fails with SESSIONKEY_INVALID and ASSERTION_CBOR_INVALID if the session keys assertion has CBOR that does not decode', async () => {
 		const init = await buildSignedInitSegment(signer, [await buildInitBmffHashAssertion(), { label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK }])
 
@@ -917,6 +931,17 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		const result = await validateC2paInitSegment(init)
 
 		deepStrictEqual(result.sessionKeys.map(sessionKey => sessionKey.kid), [key.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('accepts a JSON assertion with a leading byte order mark', async (context) => {
+		// RFC 8259 section 8.1: a parser may ignore a byte order mark
+		const init = await buildInit({ label: 'c2pa.metadata', json: Uint8Array.of(0xef, 0xbb, 0xbf, ...TEXT_ENCODER.encode('{ "dc:title": "Café" }')) })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
 		deepStrictEqual(result.errorCodes, [])
 		strictEqual(result.isValid, true)
 	})
