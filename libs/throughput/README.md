@@ -2,6 +2,15 @@
 
 Throughput estimation functionality.
 
+## When to use
+
+- Estimate throughput from segment downloads with an exponentially weighted moving average: `EwmaEstimator`
+- Estimate throughput with a harmonic mean, an arithmetic mean, or a zero-lag EWMA: `HarmonicMeanEstimator`, `ArithmeticMeanEstimator`, `ZlemaEstimator`
+- Implement a custom estimator behind the shared interface: `ThroughputEstimator`
+- Tune the fast and slow half-lives of the EWMA: `EwmaEstimatorOptions`
+
+Do not write your own EWMA or harmonic mean for bandwidth estimation. Open an issue for an estimator type that is missing.
+
 ## Installation
 
 ```bash

@@ -37,6 +37,7 @@ and this project adheres to
 ### Changed
 
 - `validateC2paManifestBoxSegment` now reports a missing hard binding only for a manifest with a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` no longer also reports `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.5.0] - 2026-10-21
 

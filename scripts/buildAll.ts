@@ -2,6 +2,7 @@ import type { ChildProcess } from 'node:child_process'
 import { availableParallelism } from 'node:os'
 import path from 'node:path'
 import { parseArgs } from 'node:util'
+import { skillDir, writeSkill } from './agentDocs.ts'
 import { killTree, spawnTree } from './processTree.ts'
 import { loadWorkspaces, runWorkspaces, type Workspace } from './workspaces.ts'
 
@@ -79,6 +80,8 @@ const started = performance.now()
 try {
 	await runWorkspaces(workspaces, limit, buildWorkspace)
 	console.log(`Built ${workspaces.length} packages in ${((performance.now() - started) / 1000).toFixed(1)}s with concurrency ${limit}`)
+	writeSkill()
+	console.log(`Wrote ${skillDir}`)
 }
 catch (error) {
 	cancelAll()

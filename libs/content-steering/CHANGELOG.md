@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+
 ## [0.23.1] - 2025-12-22
 
 ### Fixed
