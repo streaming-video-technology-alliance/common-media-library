@@ -29,11 +29,13 @@ jobs:
       - name: Build Packages
         run: npm run build
 
-      - name: Build Docs
-        run: npm run build -w docs
+      - name: Build Site
+        run: npm run build -w site
+        env:
+          SITE_BASE: /common-media-library/
 
-      - name: Deploy Docs
+      - name: Deploy Site
         uses: peaceiris/actions-gh-pages@v4
         with:
-          publish_dir: ./docs/dist/
+          publish_dir: ./site/dist/
           personal_token: ${{ secrets.GH_ACTIONS }}
