@@ -64,7 +64,6 @@
 	"devDependencies": {
 		"@eslint/js": "9.37.0",
 		"@microsoft/api-extractor": "7.58.12",
-		"@stylistic/eslint-plugin": "5.4.0",
 		"@types/node": "24.7.0",
 		"eslint": "9.37.0",
 		"eslint-plugin-tsdoc": "0.5.2",
