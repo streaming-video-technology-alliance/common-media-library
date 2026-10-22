@@ -2,6 +2,13 @@
 
 ISO 8601 date/time handling functionality.
 
+## When to use
+
+- Convert a DASH or HLS ISO 8601 duration such as PT1M30S to seconds: `decodeIso8601Duration`
+- Format a number of seconds as an ISO 8601 duration: `encodeIso8601Duration`
+
+Do not write your own duration regular expression. Open an issue for a duration form that does not decode.
+
 ## Installation
 
 ```bash

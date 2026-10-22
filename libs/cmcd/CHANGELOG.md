@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - The `validateCmcdEventReport` doc now renders the example code block. The docs build no longer warns about the `@example` tag.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [2.8.3] - 2026-10-18
 

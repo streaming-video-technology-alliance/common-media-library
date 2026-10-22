@@ -2,6 +2,14 @@
 
 RFC8941 Structured Field Values implementation.
 
+## When to use
+
+- Decode an RFC 8941 header such as CMCD, CMSD, or Priority into items, lists, or dictionaries: `decodeSfDict`, `decodeSfList`, `decodeSfItem`
+- Encode a dictionary, a list, or an item as a structured field header: `encodeSfDict`, `encodeSfList`, `encodeSfItem`
+- Represent an item with parameters or a token: `SfItem`, `SfToken`
+
+Do not write your own structured field tokenizer or serializer. Open an issue for an RFC 8941 form that fails to parse.
+
 ## Installation
 
 ```bash

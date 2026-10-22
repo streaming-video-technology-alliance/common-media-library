@@ -14,7 +14,7 @@
 		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
 	},
 	"scripts": {
-		"build": "typedoc",
+		"build": "typedoc && cd .. && node scripts/agentDocs.ts --site docs/dist",
 		"start": "npm run build && npx -y http-server dist --cors -p 3627"
 	}
 }

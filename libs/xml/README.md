@@ -2,6 +2,15 @@
 
 XML parsing utilities.
 
+## When to use
+
+- Parse a DASH MPD or another XML document into a node tree: `parseXml`
+- Find elements by name anywhere in the tree: `getElementsByName`
+- Serialize a node tree back to an XML string: `serializeXml`
+- Keep whitespace or comments, or start the parse at an offset: `XmlParseOptions`
+
+Do not write your own XML tokenizer for manifests. Open an issue for an XML form that fails to parse.
+
 ## Installation
 
 ```bash
