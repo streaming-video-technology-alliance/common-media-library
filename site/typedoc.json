@@ -21,6 +21,7 @@
 	"excludeInternal": true,
 	"excludePrivate": true,
 	"hideGenerator": true,
+	"treatWarningsAsErrors": true,
 	"jsDocCompatibility": false,
 	"hideBreadcrumbs": true,
 	"useCodeBlocks": true,
