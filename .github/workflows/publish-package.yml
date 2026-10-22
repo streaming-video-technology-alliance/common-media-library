@@ -49,4 +49,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           publish_dir: ./site/dist/
+          force_orphan: true
           personal_token: ${{ secrets.GH_ACTIONS }}

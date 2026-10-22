@@ -1,12 +1,13 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { siteBase } from './base.ts'
 import type { PackageInfo } from './packages.ts'
 import { redirectHtml, redirectsFor } from './redirects.ts'
 
 const siteDir = path.resolve(import.meta.dirname, '..')
 const apiDir = path.join(siteDir, 'api')
 const distDir = path.join(siteDir, 'dist')
-const base = process.env['SITE_BASE'] ?? '/'
+const base = siteBase()
 
 if (!existsSync(distDir)) {
 	throw new Error(`${distDir} does not exist. Run "vitepress build" first.`)

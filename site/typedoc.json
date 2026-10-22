@@ -6,7 +6,7 @@
 		"typedoc-vitepress-theme",
 		"./scripts/typedocModuleNames.ts"
 	],
-	"name": "CML",
+	"name": "API reference",
 	"entryPointStrategy": "packages",
 	"packageOptions": {
 		"entryPoints": ["src/index.ts"],

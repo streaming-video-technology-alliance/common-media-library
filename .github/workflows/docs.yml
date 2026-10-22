@@ -26,9 +26,6 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Build Packages
-        run: npm run build
-
       - name: Build Site
         run: npm run build -w site
         env:
@@ -38,4 +35,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           publish_dir: ./site/dist/
+          force_orphan: true
           personal_token: ${{ secrets.GH_ACTIONS }}
