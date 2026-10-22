@@ -211,7 +211,7 @@ async function validateSessionKeys(
  * or with CBOR that does not decode, also causes `SESSIONKEY_INVALID`.
  *
  * @param bytes - Raw init segment bytes
- * @returns Structured validation result. It has `INIT_INVALID` if the segment has an `mdat` box or no `c2pa.hash.bmff.v3` assertion, or if the content hash does not include the `moov` box (C2PA section 19.2.3). A manifest without a hard binding assertion also has `CLAIM_HARD_BINDINGS_MISSING`. A content hash that does not match adds `INIT_INVALID` and `ASSERTION_BMFFHASH_MISMATCH`. A `c2pa.hash.bmff.v3` assertion that does not conform to the `bmff-hash-map` adds `ASSERTION_BMFFHASH_MALFORMED`.
+ * @returns Structured validation result. It has `INIT_INVALID` if the segment has an `mdat` box or no `c2pa.hash.bmff.v3` assertion. It also has `INIT_INVALID` if the content hash does not include the `moov` box (C2PA section 19.2.3). A manifest without a hard binding assertion also has `CLAIM_HARD_BINDINGS_MISSING`. A content hash that does not match adds `INIT_INVALID` and `ASSERTION_BMFFHASH_MISMATCH`. A `c2pa.hash.bmff.v3` assertion that does not conform to the `bmff-hash-map` adds `ASSERTION_BMFFHASH_MALFORMED`.
  * @throws If no C2PA UUID box is found
  *
  * @example
