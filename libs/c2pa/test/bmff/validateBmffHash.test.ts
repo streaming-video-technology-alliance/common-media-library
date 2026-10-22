@@ -2,6 +2,7 @@ import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { validateBmffHash } from '../../src/bmff/validateBmffHash.ts'
 import { ok, strictEqual } from 'node:assert'
 import { describe, it } from 'node:test'
+import { buildBox, concatBytes, encodeBoxOffset, sha256 } from '../merkle/merkleTestUtils.ts'
 
 function buildMinimalBox(type: string): Uint8Array {
 	const box = new Uint8Array(8)
@@ -48,5 +49,17 @@ describe('validateBmffHash', () => {
 		const options = { exclusions: [{ xpath: '/emsg' }] }
 		const expected = await computeBmffHash(segment, { ...options, offsetPrefixSize: 0 })
 		ok(await validateBmffHash(segment, expected, options))
+	})
+
+	// §18.6.2: /moov/udta excludes the udta box inside moov. The moov box keeps its offset and its other bytes.
+	it('validates a hash with a nested exclusion', async () => {
+		const mvhd = buildBox('mvhd', Uint8Array.of(1, 2, 3))
+		const udta = buildBox('udta', Uint8Array.of(4, 5, 6))
+		const moov = buildBox('moov', concatBytes(mvhd, udta))
+		const mdat = buildBox('mdat', Uint8Array.of(7, 8, 9))
+		const segment = concatBytes(moov, mdat)
+		const expected = await sha256(concatBytes(encodeBoxOffset(0), moov.subarray(0, 8), mvhd, encodeBoxOffset(moov.length), mdat))
+
+		ok(await validateBmffHash(segment, expected, { exclusions: [{ xpath: '/moov/udta' }] }))
 	})
 })

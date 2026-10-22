@@ -39,7 +39,7 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 	if (!(hash instanceof Uint8Array)) throw new Error('VSI map bmffHash.hash must be a Uint8Array')
 
 	const exclusions = parseExclusions(bmffHashRaw['exclusions'])
-	if (!exclusions) throw new Error('VSI map bmffHash.exclusions must be an array of maps with an xpath text string, and data constraints with an unsigned integer offset and a byte string value')
+	if (!exclusions) throw new Error('VSI map bmffHash.exclusions must be an array of maps with an xpath in the grammar of C2PA section 18.6.2 and fields of the exclusions-map CDDL types')
 
 	const manifestId = raw['manifestId']
 	if (typeof manifestId !== 'string') throw new Error('VSI map missing or invalid manifestId')

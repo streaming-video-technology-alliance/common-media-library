@@ -1,6 +1,6 @@
 import type { BmffHashExclusion } from './BmffHashExclusion.ts'
-import { readRootBoxes, type RootBox } from './readRootBoxes.ts'
-import { shouldExcludeBox } from './shouldExcludeBox.ts'
+import { type ByteRange, compileExclusions, findExcludedRanges } from './findExcludedRanges.ts'
+import { type BmffBox, readRootBoxes } from './readRootBoxes.ts'
 
 const DEFAULT_HASH_ALG = 'SHA-256'
 
@@ -16,6 +16,29 @@ export type BmffHashOptions = {
 	readonly offsetPrefixSize?: number
 }
 
+function excludedLength(ranges: readonly ByteRange[]): number {
+	let length = 0
+	for (const range of ranges) length += range.end - range.start
+	return length
+}
+
+// Writes the box bytes outside `ranges` to `target` at `offset` and returns the number of bytes written.
+function writeKeptBytes(target: Uint8Array, offset: number, bytes: Uint8Array, ranges: readonly ByteRange[]): number {
+	if (ranges.length === 0) {
+		target.set(bytes, offset)
+		return bytes.length
+	}
+	let written = 0
+	let start = 0
+	for (const range of ranges) {
+		target.set(bytes.subarray(start, range.start), offset + written)
+		written += range.start - start
+		start = range.end
+	}
+	target.set(bytes.subarray(start), offset + written)
+	return written + bytes.length - start
+}
+
 function buildHashInput(
 	bytes: Uint8Array,
 	exclusions: readonly BmffHashExclusion[],
@@ -24,27 +47,31 @@ function buildHashInput(
 	if (offsetPrefixSize !== 0 && offsetPrefixSize !== 8) {
 		throw new Error(`offsetPrefixSize must be 0 or 8, got ${offsetPrefixSize}`)
 	}
+	const compiled = compileExclusions(exclusions)
 
-	// First pass: select the boxes and calculate the total size
-	const included: RootBox[] = []
+	// First pass: select the boxes, find their excluded ranges, and calculate the total size
+	const included: BmffBox[] = []
+	const excluded: (readonly ByteRange[])[] = []
 	let totalLength = 0
 	for (const box of readRootBoxes(bytes)) {
-		if (shouldExcludeBox(box.type, box.bytes, exclusions)) continue
+		const ranges = findExcludedRanges(box, compiled)
+		if (ranges === null) continue
 		included.push(box)
-		totalLength += offsetPrefixSize + box.bytes.length
+		excluded.push(ranges)
+		totalLength += offsetPrefixSize + box.bytes.length - excludedLength(ranges)
 	}
 
 	// Second pass: write directly into pre-sized buffer
 	const hashInput = new Uint8Array(totalLength)
 	const view = new DataView(hashInput.buffer)
 	let writeOffset = 0
-	for (const box of included) {
+	for (let i = 0; i < included.length; i++) {
+		const box = included[i]
 		if (offsetPrefixSize > 0) {
 			view.setBigUint64(writeOffset, BigInt(box.offset), false)
 			writeOffset += offsetPrefixSize
 		}
-		hashInput.set(box.bytes, writeOffset)
-		writeOffset += box.bytes.length
+		writeOffset += writeKeptBytes(hashInput, writeOffset, box.bytes, excluded[i])
 	}
 
 	return hashInput
@@ -53,9 +80,11 @@ function buildHashInput(
 /**
  * Computes the C2PA BMFF content hash (`c2pa.hash.bmff.v3`) for a DASH segment.
  *
- * Iterates through top-level BMFF boxes, excludes those matching the exclusion list,
- * concatenates the remaining box bytes (optionally prefixed with each box's file offset),
- * and returns the WebCrypto digest.
+ * Iterates through the root BMFF boxes and drops each box that an exclusion excludes in its
+ * entirety. Inside the other root boxes, the function drops the byte ranges of nested
+ * exclusions and `subset` exclusions (C2PA section 18.6.2). It concatenates the remaining
+ * bytes of each root box, optionally prefixed with the file offset of the box, and returns
+ * the WebCrypto digest.
  *
  * @param segmentBytes - Raw segment bytes to hash
  * @param options - Hash options (exclusions, algorithm, offset prefix size)

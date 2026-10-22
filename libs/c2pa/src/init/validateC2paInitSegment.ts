@@ -74,7 +74,7 @@ type BmffHashCode =
 // hashIncludesMoov must see the same root boxes as computeBmffHash.
 function hashIncludesMoov(bytes: Uint8Array, exclusions: readonly BmffHashExclusion[]): boolean {
 	const moov = readRootBoxes(bytes).find(box => box.type === 'moov')
-	return moov !== undefined && !shouldExcludeBox(moov.type, moov.bytes, exclusions)
+	return moov !== undefined && !shouldExcludeBox(moov, exclusions)
 }
 
 // Checks the `c2pa.hash.bmff.v3` assertion and its flat content hash. Returns the status code of the failure, or null.

@@ -1134,6 +1134,73 @@ describe('validateC2paInitSegment — content binding (§15.10.1.2, §19.2.3)', 
 			deepStrictEqual(result.sessionKeys, [])
 		})
 	})
+
+	// §18.6.2: an xpath names the box at that path. A nested xpath or a subset under moov keeps the moov box in the hash.
+	describe('nested and subset exclusions (§18.6.2)', () => {
+		const BOX_HEADER_SIZE = 8
+		const ftyp = buildBox('ftyp', TEXT_ENCODER.encode('isom'))
+		const mvhd = buildBox('mvhd', TEXT_ENCODER.encode('mvhd payload'))
+		const udta = buildBox('udta', TEXT_ENCODER.encode('udta payload'))
+		const moov = buildBox('moov', concatBytes(mvhd, udta))
+		const mediaBoxes = concatBytes(ftyp, moov)
+
+		// The hash input of the init: the 8-byte offset of each root box followed by the kept bytes. The uuid box is excluded.
+		function hashAssertion(exclusions: readonly BmffHashExclusion[], hash: Uint8Array): TestAssertion {
+			return { label: 'c2pa.hash.bmff.v3', cbor: encodeCbor({ exclusions: [UUID_EXCLUSION, ...exclusions], alg: 'sha256', hash }) }
+		}
+
+		it('returns the session keys of an init whose hash excludes a box inside the moov box', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov.subarray(0, BOX_HEADER_SIZE), mvhd))
+			const init = await buildSignedInitSegment(signer, [hashAssertion([{ xpath: '/moov/udta' }], hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [])
+			strictEqual(result.sessionKeys.length, 1)
+		})
+
+		it('returns the session keys of an init whose hash excludes a subset of the moov box', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov.subarray(0, BOX_HEADER_SIZE), udta))
+			const exclusion = { xpath: '/moov', subset: [{ offset: BOX_HEADER_SIZE, length: mvhd.length }] }
+			const init = await buildSignedInitSegment(signer, [hashAssertion([exclusion], hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [])
+			strictEqual(result.sessionKeys.length, 1)
+		})
+
+		it('fails with INIT_INVALID for a hash that excludes the moov box by its index', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp))
+			const init = await buildSignedInitSegment(signer, [hashAssertion([{ xpath: '/moov[1]' }], hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+			deepStrictEqual(result.sessionKeys, [])
+		})
+
+		it('returns the session keys of an init whose exclusion names a second moov box', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov))
+			const init = await buildSignedInitSegment(signer, [hashAssertion([{ xpath: '/moov[2]' }], hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [])
+			strictEqual(result.sessionKeys.length, 1)
+		})
+
+		it('fails with ASSERTION_BMFFHASH_MALFORMED for an xpath without a leading slash', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov))
+			const init = await buildSignedInitSegment(signer, [hashAssertion([{ xpath: 'moov' }], hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED))
+			strictEqual(result.errorCodes.includes(LiveVideoStatusCode.INIT_INVALID), false)
+			deepStrictEqual(result.sessionKeys, [])
+		})
+	})
 })
 
 describe('validateC2paInitSegment — manifest box method (§19.3)', () => {

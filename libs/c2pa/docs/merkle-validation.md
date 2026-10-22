@@ -36,7 +36,7 @@ if (init.isValid && init.merkleMaps.length > 0) {
 
 Check `isValid` before you use `merkleMaps`. The init manifest must carry a claim signature that verifies. An init segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`, and its `merkleMaps` must not be trusted. The signature is verified with the certificate inside the manifest. The library does not check that certificate against a trust list. See [Signer Trust](results-and-error-codes.md#signer-trust).
 
-If the `exclusions` of the `c2pa.hash.bmff.v3` assertion remove the `moov` box, the init segment fails with `LiveVideoStatusCode.INIT_INVALID`. The library applies this rule of C2PA section 19.2.3 to VOD Merkle init segments too.
+If the `exclusions` of the `c2pa.hash.bmff.v3` assertion exclude the whole `moov` box, the init segment fails with `LiveVideoStatusCode.INIT_INVALID`. The library applies this rule of C2PA section 19.2.3 to VOD Merkle init segments too. A nested exclusion such as `/moov/udta`, or a `subset` exclusion of the `moov` box, keeps the init segment valid.
 
 ## Validating Media Segments
 
