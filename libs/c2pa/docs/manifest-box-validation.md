@@ -11,7 +11,7 @@ Manifest ID chaining verifies the continuity between segments. See Manifest ID C
 
 ## Overview
 
-Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method needs no separate init segment validation step. One function, `validateC2paManifestBoxSegment`, does everything: manifest parsing, signature verification, BMFF hash validation, and continuity checks.
+Unlike the [VSI/EMSG method](vsi-validation.md), the Manifest Box method needs no separate init segment validation step. If you validate the init segment of a section 19.3 stream with `validateC2paInitSegment`, the function accepts it without a `c2pa.session-keys` assertion. One function, `validateC2paManifestBoxSegment`, does everything: manifest parsing, signature verification, BMFF hash validation, and continuity checks.
 
 Two pieces of state pass from one call to the next:
 

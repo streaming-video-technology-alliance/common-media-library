@@ -2,7 +2,7 @@ import { validateC2paInitSegment, validateC2paSegment, C2paStatusCode, LiveVideo
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
-import { encodeCbor } from '../cborTestUtils.ts'
+import { encodeCbor, encodeCborMapWithEntry } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
 import type { BmffHashExclusion } from '../../src/bmff/BmffHashExclusion.ts'
@@ -127,7 +127,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 		const result = await validateC2paInitSegment(init)
 
 		deepStrictEqual(result.merkleMaps, [])
-		ok(result.errorCodes.includes(LiveVideoStatusCode.SESSIONKEY_INVALID))
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED, C2paStatusCode.CLAIM_SIGNATURE_MISSING])
 	})
 
 	it('accepts a matching initHash without additional error codes', async () => {
@@ -504,6 +504,17 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
+	it('returns no session keys and no SESSIONKEY_INVALID if every session key has expired', async (context) => {
+		const init = await buildSessionKeysInitSegment(signer, [expiredEntry(key001), expiredEntry(key002)])
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys, [])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
 	it('treats a session key with a validityPeriod of 0 as expired, without SESSIONKEY_INVALID', async (context) => {
 		const init = await buildSessionKeysInitSegment(signer, [activeEntry(key001), { ...activeEntry(key002), validityPeriod: 0 }])
 		context.mock.timers.enable({ apis: ['Date'], now: NOW })
@@ -662,7 +673,6 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	const NONCONFORMING_ASSERTIONS: readonly (readonly [string, Uint8Array])[] = [
 		['no session key', encodeCbor({ keys: [] })],
 		['a keys field that is not an array', encodeCbor({ keys: 'key_001' })],
-		['CBOR that does not decode', SESSION_KEYS_CBOR_WITHOUT_BREAK],
 	]
 
 	// A `c2pa.hash.bmff.v3` assertion with a merkle map. /uuid is excluded, so the initHash covers only ftyp + moov.
@@ -729,13 +739,27 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		})
 	}
 
-	it('fails with SESSIONKEY_INVALID if the session keys assertion has CBOR that does not decode', async () => {
+	it('fails with SESSIONKEY_INVALID and ASSERTION_CBOR_INVALID in VOD Merkle mode if the session keys assertion has CBOR that does not decode', async () => {
+		const init = await buildSignedInitSegment(signer, [
+			{ label: 'c2pa.hash.bmff.v3', cbor: await merkleAssertionCbor() },
+			{ label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK },
+		])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.merkleMaps, [])
+		deepStrictEqual(result.sessionKeys, [])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.ASSERTION_CBOR_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with SESSIONKEY_INVALID and ASSERTION_CBOR_INVALID if the session keys assertion has CBOR that does not decode', async () => {
 		const init = await buildSignedInitSegment(signer, [await buildInitBmffHashAssertion(), { label: 'c2pa.session-keys', cbor: SESSION_KEYS_CBOR_WITHOUT_BREAK }])
 
 		const result = await validateC2paInitSegment(init)
 
 		deepStrictEqual(result.sessionKeys, [])
-		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.ASSERTION_CBOR_INVALID])
 		strictEqual(result.isValid, false)
 	})
 })
@@ -762,7 +786,26 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 
 		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
 
-		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, LiveVideoStatusCode.SESSIONKEY_INVALID, C2paStatusCode.CLAIM_MALFORMED])
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.CLAIM_MALFORMED])
+		strictEqual(result.isValid, false)
+	})
+
+	it('fails with CLAIM_CBOR_INVALID if the signed claim box holds a map with a duplicate key', async () => {
+		// RFC 8949 section 5.6: the claim map has a second instanceID key
+		const claimCbor = encodeCborMapWithEntry({
+			instanceID: 'urn:uuid:claim-test-manifest',
+			signature: signatureUri('urn:uuid:claim-test-manifest'),
+			created_assertions: [],
+		}, 'instanceID', 'urn:uuid:other-manifest')
+		const manifest = buildJumb('urn:uuid:claim-test-manifest',
+			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+			buildJumb('c2pa.assertions'),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCbor))),
+		)
+
+		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.CLAIM_CBOR_INVALID])
 		strictEqual(result.isValid, false)
 	})
 
@@ -805,6 +848,140 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 
 		strictEqual(result.manifestId, null)
 		ok(!result.errorCodes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
+	})
+})
+
+describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
+	const NOW = Date.parse('2025-07-29T10:30:00Z')
+	const TEXT_ENCODER = new TextEncoder()
+
+	// RFC 8949 Appendix C: none of these byte sequences is well-formed CBOR
+	const ILL_FORMED_CBOR: readonly (readonly [string, Uint8Array])[] = [
+		['a map without its last value', Uint8Array.of(0xa1, 0x61, 0x61)],
+		['the reserved additional information 28', Uint8Array.of(0x1c)],
+		['a byte after the data item', Uint8Array.of(0xa0, 0x00)],
+	]
+
+	// RFC 8949 section 5.6: well-formed maps that the reader rejects, because two keys have the same name as a string
+	const DUPLICATE_KEYS: readonly (readonly [string, Uint8Array])[] = [
+		['a duplicate key', Uint8Array.of(0xa2, 0x61, 0x61, 0x01, 0x61, 0x61, 0x02)],
+		['the keys 1 and "1"', Uint8Array.of(0xa2, 0x01, 0x01, 0x61, 0x31, 0x02)],
+	]
+
+	// RFC 8259: none of these byte sequences is a JSON text
+	const NONCONFORMING_JSON: readonly (readonly [string, Uint8Array])[] = [
+		['an object without its last value', TEXT_ENCODER.encode('{"a":')],
+		['a comma after the last member', TEXT_ENCODER.encode('{"a":1,}')],
+		['text after the value', TEXT_ENCODER.encode('{"a":1} x')],
+		// {"a":"<FF>"}: section 8.1 requires UTF-8, and the byte FF never occurs in UTF-8
+		['a string that is not UTF-8', Uint8Array.of(0x7b, 0x22, 0x61, 0x22, 0x3a, 0x22, 0xff, 0x22, 0x7d)],
+	]
+
+	let signer: TestSigner
+	let key: TestSessionKey
+
+	before(async () => {
+		signer = await createTestSigner()
+		key = await createTestSessionKey('key_001')
+	})
+
+	// A signed init with a matching BMFF hash assertion, a valid session keys assertion, and the given other assertion
+	async function buildInit(assertion: TestAssertion): Promise<Uint8Array> {
+		const entry = { key, minSequenceNumber: 0, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3600 }
+		return buildSignedInitSegment(signer, [await buildInitBmffHashAssertion(), await buildSessionKeysAssertion(signer, [entry]), assertion])
+	}
+
+	for (const [description, cbor] of ILL_FORMED_CBOR) {
+		it(`fails with ASSERTION_CBOR_INVALID if an assertion has ${description}`, async (context) => {
+			const init = await buildInit({ label: 'c2pa.actions.v2', cbor })
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_CBOR_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	for (const [description, cbor] of DUPLICATE_KEYS) {
+		it(`fails with ASSERTION_CBOR_INVALID if an assertion map has ${description}`, async (context) => {
+			const init = await buildInit({ label: 'c2pa.actions.v2', cbor })
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_CBOR_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	it('fails with ASSERTION_CBOR_INVALID if an assertion with a label outside the C2PA namespace is not well-formed CBOR', async (context) => {
+		const init = await buildInit({ label: 'com.example.custom', cbor: Uint8Array.of(0xa1, 0x61, 0x61) })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_CBOR_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('accepts an assertion with CBOR that is well-formed but not deterministic', async (context) => {
+		// {_ "b": 1_0, "a": 2}: a map of indefinite length, keys out of order, and an integer in a longer form than necessary
+		const init = await buildInit({ label: 'c2pa.actions.v2', cbor: Uint8Array.of(0xbf, 0x61, 0x62, 0x18, 0x01, 0x61, 0x61, 0x02, 0xff) })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(sessionKey => sessionKey.kid), [key.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	for (const [description, json] of NONCONFORMING_JSON) {
+		it(`fails with ASSERTION_JSON_INVALID if a JSON assertion has ${description}`, async (context) => {
+			const init = await buildInit({ label: 'c2pa.metadata', json })
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_JSON_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	it('fails with ASSERTION_JSON_INVALID if a JSON assertion with a label outside the C2PA namespace does not parse', async (context) => {
+		const init = await buildInit({ label: 'com.example.custom', json: TEXT_ENCODER.encode('{"a":') })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_JSON_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
+	it('accepts a JSON assertion', async (context) => {
+		const init = await buildInit({ label: 'c2pa.metadata', json: TEXT_ENCODER.encode('{ "@context": { "dc": "http://purl.org/dc/elements/1.1/" }, "dc:title": "Café" }') })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.sessionKeys.map(sessionKey => sessionKey.kid), [key.kidHex])
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
+	})
+
+	it('accepts a JSON assertion with a leading byte order mark', async (context) => {
+		// RFC 8259 section 8.1: a parser may ignore a byte order mark
+		const init = await buildInit({ label: 'c2pa.metadata', json: Uint8Array.of(0xef, 0xbb, 0xbf, ...TEXT_ENCODER.encode('{ "dc:title": "Café" }')) })
+		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
 	})
 })
 
@@ -923,6 +1100,27 @@ describe('validateC2paInitSegment — content binding (§15.10.1.2, §19.2.3)', 
 		const result = await validateC2paInitSegment(initWithoutMoov)
 
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+		deepStrictEqual(result.sessionKeys, [])
+	})
+})
+
+describe('validateC2paInitSegment — manifest box method (§19.3)', () => {
+	let signer: TestSigner
+
+	before(async () => {
+		signer = await createTestSigner()
+	})
+
+	it('accepts a signed init segment without a session keys assertion', async () => {
+		// The §19.3 method needs no session keys (§19.2.1), so their absence is not SESSIONKEY_INVALID.
+		const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
+		const bmffHash = { label: 'c2pa.hash.bmff.v3', cbor: encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash }) }
+		const init = await buildSignedInitSegment(signer, [bmffHash])
+
+		const result = await validateC2paInitSegment(init)
+
+		deepStrictEqual(result.errorCodes, [])
+		strictEqual(result.isValid, true)
 		deepStrictEqual(result.sessionKeys, [])
 	})
 })

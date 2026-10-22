@@ -31,6 +31,16 @@ A manifest without a `c2pa.signature` box, or with a claim `signature` URI that 
 
 A claim box whose CBOR does not decode fails with `C2paStatusCode.CLAIM_CBOR_INVALID`. A claim box whose CBOR is not a map, for example a map inside a CBOR tag, fails with `C2paStatusCode.CLAIM_MALFORMED`. The library does not check the fields of the claim.
 
+An assertion whose CBOR does not decode fails with `C2paStatusCode.ASSERTION_CBOR_INVALID` (C2PA section 15.10.3.1). An assertion whose JSON is not UTF-8 or does not parse fails with `C2paStatusCode.ASSERTION_JSON_INVALID`. These checks apply to every assertion, whatever the label. CBOR that is not deterministic still passes, for example a map with unsorted keys.
+
+The CBOR decoder also rejects some CBOR that is well-formed. An assertion with such CBOR reports `ASSERTION_CBOR_INVALID`, and a claim with such CBOR reports `CLAIM_CBOR_INVALID`. The rejected forms are:
+
+- a map key that is an array, a map, a byte string, or a tag
+- a map with a duplicate key, where keys with the same name as a string count as duplicates, for example `1` and `"1"`
+- an unassigned simple value
+- a tag number above 2^53
+- nesting deeper than 128 levels
+
 ## Live Video Error Codes
 
 The `LiveVideoStatusCode` constants are the live video validation failures that C2PA specification section 19.7 defines.
@@ -47,7 +57,7 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
-| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the init segment has no valid session key (the keys are absent or expired) |
+| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the `c2pa.session-keys` assertion has no session key or does not decode |
 
 Versions 1.3.0 and earlier report `SESSIONKEY_INVALID` from `validateC2paSegment` for a session key that expired after init segment validation. That code does not match C2PA section 19.7.3. To check the validity period of a session key, see [Session Key Lifecycle](vsi-validation.md#session-key-lifecycle).
 
@@ -62,7 +72,7 @@ for (const code of result.errorCodes) {
       // Signature, hash, key, or VSI sequence failure
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
-      // Init segment has an invalid session key or no valid session key
+      // Init segment has an invalid session key
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
       // Sequence number or stream ID problem (manifest box method)
@@ -88,7 +98,7 @@ The COSE key must include a `kid` (label 2). `minSequenceNumber` and `validityPe
 
 An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
 
-The assertion must contain at least one session key (section 18.25.2). `validateC2paInitSegment` reports `SESSIONKEY_INVALID` if the assertion has no session key, or if its CBOR does not decode. This rule also applies in VOD Merkle mode.
+The assertion must contain at least one session key (section 18.25.2). `validateC2paInitSegment` reports `SESSIONKEY_INVALID` if the assertion has no session key, or if its CBOR does not decode. This rule also applies in VOD Merkle mode. If the CBOR does not decode, the result also includes `C2paStatusCode.ASSERTION_CBOR_INVALID`.
 
 Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions also accept a `kid` outside the COSE key. They throw an error if the library cannot verify a session key, for example a key type that it does not support. They also throw an error if the CBOR of the `c2pa.session-keys` assertion does not decode. If your code catches these errors, check `errorCodes` instead.
 
@@ -106,6 +116,8 @@ import { C2paStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_MISSING` | `assertion.missing` | The store has no box for a claim reference, or more than one box for its label |
 | `ASSERTION_MULTIPLE_HARD_BINDINGS` | `assertion.multipleHardBindings` | The manifest has more than one hard binding assertion |
 | `ASSERTION_UNDECLARED` | `assertion.undeclared` | The assertion store holds an assertion that the claim does not reference |
+| `ASSERTION_CBOR_INVALID` | `assertion.cbor.invalid` | An assertion box holds CBOR that does not decode |
+| `ASSERTION_JSON_INVALID` | `assertion.json.invalid` | An assertion box holds JSON that is not UTF-8 or does not parse |
 | `ASSERTION_ACTION_INGREDIENT_MISMATCH` | `assertion.action.ingredientMismatch` | Action requires an ingredient reference but none is present |
 | `CLAIM_SIGNATURE_MISMATCH` | `claimSignature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
 | `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box, or the claim `signature` URI does not resolve to it |
@@ -122,7 +134,7 @@ Versions 1.2.0 and earlier report `claim.signature.mismatch` for `CLAIM_SIGNATUR
 > [!NOTE]
 > `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes`, which check manifest integrity. They do not appear in `SegmentValidationResult.errorCodes`: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only `LiveVideoStatusCode`.
 >
-> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. VOD Merkle segments do not use session keys. When `merkleMaps` is not empty, the result does not report `LiveVideoStatusCode.SESSIONKEY_INVALID` for missing or expired session keys. An invalid session key still causes `SESSIONKEY_INVALID`. See [Invalid Session Keys](#invalid-session-keys).
+> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. VOD Merkle segments do not use session keys. An invalid session key still causes `SESSIONKEY_INVALID`. See [Invalid Session Keys](#invalid-session-keys).
 
 ## Working with Manifest Data
 
@@ -160,7 +172,7 @@ if (isValid && manifest) {
 }
 ```
 
-`data` is the decoded content of the assertion. For a CBOR assertion, a map is a plain object with string keys, a byte string is a `Uint8Array`, and an unsigned integer up to `Number.MAX_SAFE_INTEGER` (2^53 - 1) is a number. A larger integer is a BigInt. CBOR tag 0 and tag 1 are a `Date`. Every other tag is a `{ tag, value }` object. For a JSON assertion, `data` is the parsed JSON. For other content, or for CBOR that does not decode, `data` is the raw bytes of the content box.
+`data` is the decoded content of the assertion. For a CBOR assertion, a map is a plain object with string keys, a byte string is a `Uint8Array`, and an unsigned integer up to `Number.MAX_SAFE_INTEGER` (2^53 - 1) is a number. A larger integer is a BigInt. CBOR tag 0 and tag 1 are a `Date`. Every other tag is a `{ tag, value }` object. For a JSON assertion, `data` is the parsed JSON. For other content, `data` is the raw bytes of the content box. `data` is also the raw bytes for CBOR that does not decode or JSON that does not parse.
 
 ## Sequence Validation Reasons
 

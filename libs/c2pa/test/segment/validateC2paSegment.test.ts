@@ -303,3 +303,15 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		strictEqual(r3?.result.isValid, true)
 	})
 })
+
+describe('validateC2paSegment — no session keys (§19.7.3)', () => {
+	it('fails with SEGMENT_INVALID if the init segment returned no session keys', async () => {
+		const key = await createTestSessionKey('key_001')
+		const segment = await buildVsiSegment(key, 1)
+
+		const validated = await validateC2paSegment(segment, [])
+
+		strictEqual(validated?.result.isValid, false)
+		deepStrictEqual(validated?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
+	})
+})

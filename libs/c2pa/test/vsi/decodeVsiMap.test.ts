@@ -1,7 +1,7 @@
 import { decodeVsiMap } from '../../src/vsi/decodeVsiMap.ts'
 import { deepStrictEqual, strictEqual, throws } from 'node:assert'
 import { describe, it } from 'node:test'
-import { encodeCbor } from '../cborTestUtils.ts'
+import { encodeCbor, encodeCborMapWithEntry } from '../cborTestUtils.ts'
 
 describe('decodeVsiMap', () => {
 	// #region example
@@ -79,6 +79,15 @@ describe('decodeVsiMap', () => {
 
 	it('throws for invalid CBOR input', () => {
 		throws(() => decodeVsiMap(new Uint8Array([0xff, 0xff])))
+	})
+
+	it('throws for a VSI map with a second sequenceNumber key', () => {
+		const vsiCbor = encodeCborMapWithEntry({
+			sequenceNumber: 1,
+			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
+			manifestId: 'urn:c2pa:12345',
+		}, 'sequenceNumber', 2)
+		throws(() => decodeVsiMap(vsiCbor), { name: 'RangeError', message: 'Duplicate CBOR map key' })
 	})
 
 	it('throws when manifestId is not a string', () => {
