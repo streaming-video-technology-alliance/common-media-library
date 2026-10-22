@@ -35,7 +35,8 @@ An assertion whose CBOR does not decode fails with `C2paStatusCode.ASSERTION_CBO
 
 The CBOR decoder also rejects some CBOR that is well-formed. An assertion with such CBOR reports `ASSERTION_CBOR_INVALID`, and a claim with such CBOR reports `CLAIM_CBOR_INVALID`. The rejected forms are:
 
-- a map key that is not a text string or an integer
+- a map key that is an array, a map, a byte string, or a tag
+- a map with a duplicate key, where keys with the same name as a string count as duplicates, for example `1` and `"1"`
 - an unassigned simple value
 - a tag number above 2^53
 - nesting deeper than 128 levels

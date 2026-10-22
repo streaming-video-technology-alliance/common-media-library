@@ -38,6 +38,7 @@ function findSessionKey(sessionKeys: readonly ValidatedSessionKey[], kidHex: str
  * @param sessionKeys - Available session keys from the init segment
  * @param sequenceState - Current sequence state for this stream
  * @returns Validation result and the sequence state for the next call, or `null` if no C2PA EMSG box
+ * @throws Error If the VSI EMSG box does not hold a `COSE_Sign1` structure with a valid VSI map as its payload
  *
  * @example
  * {@includeCode ../../test/segment/validateC2paSegment.test.ts#example}
