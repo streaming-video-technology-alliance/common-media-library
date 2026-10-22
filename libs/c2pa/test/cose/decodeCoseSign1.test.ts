@@ -53,4 +53,17 @@ describe('decodeCoseSign1', () => {
 		const withArrayPayload = Uint8Array.of(0xd2, 0x84, 0x40, 0xa0, 0x80, 0x40)
 		throws(() => decodeCoseSign1(withArrayPayload), /Failed to decode COSE_Sign1/)
 	})
+
+	// RFC 9052 section 3: a message with a label that appears twice in a header map is malformed
+	it('throws on a protected header with a duplicate label', () => {
+		// 18([<<{1: -7, 1: -7}>>, {}, nil, ""]): 0x45 = a byte string of 5 bytes around the protected header map
+		const withDuplicateAlg = Uint8Array.of(0xd2, 0x84, 0x45, 0xa2, 0x01, 0x26, 0x01, 0x26, 0xa0, 0xf6, 0x40)
+		throws(() => decodeCoseSign1(withDuplicateAlg), /Duplicate CBOR map key/)
+	})
+
+	it('throws on an unprotected header with a duplicate label', () => {
+		// 18([h'', {4: h'01', 4: h'02'}, nil, ""]): two kid labels
+		const withDuplicateKid = Uint8Array.of(0xd2, 0x84, 0x40, 0xa2, 0x04, 0x41, 0x01, 0x04, 0x41, 0x02, 0xf6, 0x40)
+		throws(() => decodeCoseSign1(withDuplicateKid), /Duplicate CBOR map key/)
+	})
 })

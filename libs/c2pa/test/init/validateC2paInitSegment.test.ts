@@ -2,7 +2,7 @@ import { validateC2paInitSegment, validateC2paSegment, C2paStatusCode, LiveVideo
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { before, describe, it } from 'node:test'
-import { encodeCbor } from '../cborTestUtils.ts'
+import { encodeCbor, encodeCborMapWithEntry } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
 import type { BmffHashExclusion } from '../../src/bmff/BmffHashExclusion.ts'
@@ -790,6 +790,25 @@ describe('validateC2paInitSegment — claim box (§15.6.2)', () => {
 		strictEqual(result.isValid, false)
 	})
 
+	it('fails with CLAIM_CBOR_INVALID if the signed claim box holds a map with a duplicate key', async () => {
+		// RFC 8949 section 5.6: the claim map has a second instanceID key
+		const claimCbor = encodeCborMapWithEntry({
+			instanceID: 'urn:uuid:claim-test-manifest',
+			signature: signatureUri('urn:uuid:claim-test-manifest'),
+			created_assertions: [],
+		}, 'instanceID', 'urn:uuid:other-manifest')
+		const manifest = buildJumb('urn:uuid:claim-test-manifest',
+			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+			buildJumb('c2pa.assertions'),
+			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCbor))),
+		)
+
+		const result = await validateC2paInitSegment(buildInitSegmentWithManifest(manifest))
+
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.CLAIM_CBOR_INVALID])
+		strictEqual(result.isValid, false)
+	})
+
 	// A signed init manifest with the JUMBF label `label` and the claim `signature` URI `signature`.
 	async function initWithLabel(label: string, signature: string): Promise<Uint8Array> {
 		const claimCbor = encodeCbor({
@@ -843,6 +862,12 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		['a byte after the data item', Uint8Array.of(0xa0, 0x00)],
 	]
 
+	// RFC 8949 section 5.6: well-formed maps that the reader rejects, because two keys have the same name as a string
+	const DUPLICATE_KEYS: readonly (readonly [string, Uint8Array])[] = [
+		['a duplicate key', Uint8Array.of(0xa2, 0x61, 0x61, 0x01, 0x61, 0x61, 0x02)],
+		['the keys 1 and "1"', Uint8Array.of(0xa2, 0x01, 0x01, 0x61, 0x31, 0x02)],
+	]
+
 	// RFC 8259: none of these byte sequences is a JSON text
 	const NONCONFORMING_JSON: readonly (readonly [string, Uint8Array])[] = [
 		['an object without its last value', TEXT_ENCODER.encode('{"a":')],
@@ -868,6 +893,19 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 
 	for (const [description, cbor] of ILL_FORMED_CBOR) {
 		it(`fails with ASSERTION_CBOR_INVALID if an assertion has ${description}`, async (context) => {
+			const init = await buildInit({ label: 'c2pa.actions.v2', cbor })
+			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.sessionKeys, [])
+			deepStrictEqual(result.errorCodes, [C2paStatusCode.ASSERTION_CBOR_INVALID])
+			strictEqual(result.isValid, false)
+		})
+	}
+
+	for (const [description, cbor] of DUPLICATE_KEYS) {
+		it(`fails with ASSERTION_CBOR_INVALID if an assertion map has ${description}`, async (context) => {
 			const init = await buildInit({ label: 'c2pa.actions.v2', cbor })
 			context.mock.timers.enable({ apis: ['Date'], now: NOW })
 
