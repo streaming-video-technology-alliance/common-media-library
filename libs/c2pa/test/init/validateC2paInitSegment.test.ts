@@ -6,7 +6,7 @@ import { encodeCbor, encodeCborMapWithEntry } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
 import type { BmffHashExclusion } from '../../src/bmff/BmffHashExclusion.ts'
-import { buildBox, buildInitMediaBoxes, buildJumb, buildMerkleInitSegment, buildSignedMerkleInitSegment, concatBytes, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
+import { buildBox, buildInitMediaBoxes, buildJumb, buildLargesizeBox, buildMerkleInitSegment, buildSignedMerkleInitSegment, concatBytes, encodeBoxOffset, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
 import { buildInitBmffHashAssertion, buildInitSegmentWithManifest, buildSessionKeysAssertion, buildSessionKeysInitSegment, buildSignedInitSegment, buildVsiSegment, createTestSessionKey, encodeSignerBinding, type TestAssertion, type TestSessionKey, type TestSessionKeyEntry } from '../vsi/vsiTestUtils.ts'
 
@@ -1101,6 +1101,38 @@ describe('validateC2paInitSegment — content binding (§15.10.1.2, §19.2.3)', 
 
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
 		deepStrictEqual(result.sessionKeys, [])
+	})
+
+	// ISO/IEC 14496-12 section 4.2: a size field of 1 marks a box with a 64-bit largesize header.
+	describe('moov box with a largesize header', () => {
+		const ftyp = buildBox('ftyp', TEXT_ENCODER.encode('isom'))
+		const moov = buildLargesizeBox('moov')
+		const mediaBoxes = concatBytes(ftyp, moov)
+
+		// The §18.6.2 hash input of the init: the 8-byte offset of each root box followed by the box bytes. The uuid box is excluded.
+		function hashAssertion(hash: Uint8Array): TestAssertion {
+			return { label: 'c2pa.hash.bmff.v3', cbor: encodeCbor({ exclusions: [UUID_EXCLUSION], alg: 'sha256', hash }) }
+		}
+
+		it('returns the session keys of an init whose hash covers the ftyp box and the largesize moov box', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov))
+			const init = await buildSignedInitSegment(signer, [hashAssertion(hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [])
+			strictEqual(result.sessionKeys.length, 1)
+		})
+
+		it('fails with INIT_INVALID and ASSERTION_BMFFHASH_MISMATCH for a hash that stops before the largesize moov box', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp))
+			const init = await buildSignedInitSegment(signer, [hashAssertion(hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID, C2paStatusCode.ASSERTION_BMFFHASH_MISMATCH])
+			deepStrictEqual(result.sessionKeys, [])
+		})
 	})
 })
 

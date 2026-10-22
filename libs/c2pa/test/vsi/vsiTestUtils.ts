@@ -141,19 +141,23 @@ export type TestAssertion =
 	| { readonly label: string; readonly cbor: Uint8Array }
 	| { readonly label: string; readonly json: Uint8Array }
 
-/** Builds an init segment with a manifest store that holds the given manifest JUMBF box */
-export function buildInitSegmentWithManifest(manifest: Uint8Array): Uint8Array {
+/**
+ * Builds an init segment with a manifest store that holds the given manifest JUMBF box.
+ * `mediaBoxes` are the boxes before the manifest store.
+ */
+export function buildInitSegmentWithManifest(manifest: Uint8Array, mediaBoxes: Uint8Array = buildInitMediaBoxes()): Uint8Array {
 	const purpose = TEXT_ENCODER.encode('manifest')
 	const prefix = new Uint8Array(4 + purpose.length + 1 + 8) // fullbox header + purpose\0 + aux offset
 	prefix.set(purpose, 4)
-	return concatBytes(buildInitMediaBoxes(), buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))))
+	return concatBytes(mediaBoxes, buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))))
 }
 
 /**
  * Builds an init segment whose manifest has the given CBOR and JSON assertions.
  * The claim references every assertion and is signed by `signer`.
+ * `mediaBoxes` are the boxes before the manifest store.
  */
-export async function buildSignedInitSegment(signer: TestSigner, assertions: readonly TestAssertion[]): Promise<Uint8Array> {
+export async function buildSignedInitSegment(signer: TestSigner, assertions: readonly TestAssertion[], mediaBoxes: Uint8Array = buildInitMediaBoxes()): Promise<Uint8Array> {
 	const assertionBoxes = assertions.map(assertion => buildJumb(assertion.label, 'json' in assertion ? buildBox('json', assertion.json) : buildBox('cbor', assertion.cbor)))
 	const claimCborBytes = Uint8Array.from(CBOR.encode({
 		instanceID: MANIFEST_ID,
@@ -169,7 +173,7 @@ export async function buildSignedInitSegment(signer: TestSigner, assertions: rea
 		buildJumb('c2pa.assertions', ...assertionBoxes),
 		buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
 	)
-	return buildInitSegmentWithManifest(manifest)
+	return buildInitSegmentWithManifest(manifest, mediaBoxes)
 }
 
 /**
