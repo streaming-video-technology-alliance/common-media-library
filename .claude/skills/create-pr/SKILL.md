@@ -88,7 +88,7 @@ If the command fails, report the error and stop.
 Build the documentation to catch TSDoc errors, broken `{@includeCode}` references, and missing documentation:
 
 ```bash
-npm run build -w docs
+npm run build -w site
 ```
 
 Review the output for warnings and errors. If there are documentation errors related to the changed packages, report them and stop.

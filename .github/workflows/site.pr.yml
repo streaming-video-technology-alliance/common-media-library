@@ -4,10 +4,17 @@ on:
   pull_request:
     paths:
       - "site/**"
-      - "libs/*/README.md"
+      - "libs/*/src/**"
+      - "libs/*/test/**"
       - "libs/*/docs/**"
+      - "libs/*/README.md"
       - "libs/*/CHANGELOG.md"
+      - "libs/*/package.json"
       - "scripts/projects.ts"
+      - "scripts/workspaces.ts"
+      - "tsconfig.typedoc.json"
+      - "package.json"
+      - "package-lock.json"
       - ".github/workflows/site.pr.yml"
 
 permissions:

@@ -73,7 +73,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 - All code examples must be complete and runnable: no pseudocode and no missing imports.
 - The package build regenerates the public API report `libs/<package>/config/cml-<package>.api.md`. Review its diff to confirm that every API change is intentional.
 - The website copies every published package's `README.md`, `docs/*.md`, and `CHANGELOG.md` at build time. Link to a guide from a README as `docs/<file>.md`. Link between guides as sibling files, for example `other-guide.md#anchor`.
-- Every package needs an entry in `site/scripts/groups.ts`. The site build fails without one.
+- Every published package needs an entry in `site/scripts/groups.ts`. The site build fails without one.
 
 ## Writing Style
 
