@@ -1,7 +1,7 @@
 import { deepEqual, equal, ok } from 'node:assert/strict'
 import path from 'node:path'
 import { describe, it } from 'node:test'
-import { checkExamples, extractExampleBlocks, formatDiagnostic, listExampleFiles, type ExampleBlock } from './checkExamples.ts'
+import { checkExamples, extractExampleBlocks, formatDiagnostic, listExampleFiles, readExampleBlocks, type ExampleBlock } from './checkExamples.ts'
 
 const repoRoot = path.resolve(import.meta.dirname, '..')
 
@@ -60,5 +60,16 @@ describe('checkExamples', () => {
 	it('fails when an expected error does not occur', () => {
 		const block: ExampleBlock = { file: 'f.md', line: 1, code: '// @ts-expect-error\nconst n: number = 1\nconsole.log(n)\n' }
 		equal(checkExamples([block], repoRoot)[0]?.code, 2578)
+	})
+})
+
+describe('example blocks', () => {
+	it('every block in the READMEs and guides typechecks on its own', () => {
+		const diagnostics = checkExamples(readExampleBlocks(repoRoot), repoRoot)
+		const report = [
+			`${diagnostics.length} example block errors. Run \`npm run build\` first when the errors are TS2307.`,
+			...diagnostics.map(formatDiagnostic),
+		].join('\n')
+		equal(diagnostics.length, 0, report)
 	})
 })
