@@ -243,8 +243,6 @@ export async function validateC2paManifestBoxSegment(
 
 	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
 	if (bmff.malformed) errorCodes.push(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
-	// §15.10.1.2: a manifest without any hard binding assertion is rejected.
-	if (integrity?.hardBindingCount === 0) errorCodes.push(C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING)
 
 	// §19.3: previousManifestId holds the manifest identifier, the JUMBF label of the manifest. Only a claim
 	// `signature` URI that names the label authenticates it (§15.7). Without it the manifestId chain cannot be
