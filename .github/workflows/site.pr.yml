@@ -10,6 +10,8 @@ on:
       - "libs/*/README.md"
       - "libs/*/CHANGELOG.md"
       - "libs/*/package.json"
+      - "libs/*/config/**"
+      - "scripts/agentDocs.ts"
       - "scripts/projects.ts"
       - "scripts/workspaces.ts"
       - "tsconfig.typedoc.json"

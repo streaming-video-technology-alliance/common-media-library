@@ -13,7 +13,7 @@
 		"url": "https://github.com/streaming-video-technology-alliance/common-media-library/issues"
 	},
 	"scripts": {
-		"build": "node scripts/prepare.ts && typedoc && vitepress build && node scripts/writeRedirects.ts && node scripts/check.ts",
+		"build": "node scripts/prepare.ts && typedoc && vitepress build && node scripts/writeRedirects.ts && (cd .. && node scripts/agentDocs.ts --site site/dist) && node scripts/check.ts",
 		"dev": "node scripts/prepare.ts && typedoc && vitepress dev",
 		"start": "npm run dev",
 		"test": "node --no-warnings --test scripts/*.test.ts"

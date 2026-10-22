@@ -7,6 +7,7 @@ const limit = 2 * 1024 * 1024
 const required = [
 	'index.html',
 	'404.html',
+	'llms.txt',
 	'guide/getting-started.html',
 	'packages/index.html',
 	'packages/cmcd/index.html',

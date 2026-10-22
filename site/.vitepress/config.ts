@@ -73,6 +73,7 @@ export default defineConfig({
 			{ text: 'Guide', link: '/guide/getting-started' },
 			{ text: 'Packages', link: '/packages/', activeMatch: '^/(packages|api)/' },
 			{ text: 'Releases', link: '/releases/' },
+			{ text: 'LLMs', link: `${base}llms.txt`, target: '_self' },
 		],
 		sidebar,
 		socialLinks: [
