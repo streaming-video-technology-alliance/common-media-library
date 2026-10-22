@@ -49,7 +49,7 @@ import { LiveVideoStatusCode } from '@svta/cml-c2pa'
 | `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
 | `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
 | `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
-| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the init segment has no valid session key (the keys are absent or expired) |
+| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the `c2pa.session-keys` assertion has no session key or does not decode |
 
 Versions 1.3.0 and earlier report `SESSIONKEY_INVALID` from `validateC2paSegment` for a session key that expired after init segment validation. That code does not match C2PA section 19.7.3. To check the validity period of a session key, see [Session Key Lifecycle](vsi-validation.md#session-key-lifecycle).
 
@@ -64,7 +64,7 @@ for (const code of result.errorCodes) {
       // Signature, hash, key, or VSI sequence failure
       break
     case LiveVideoStatusCode.SESSIONKEY_INVALID:
-      // Init segment has an invalid session key or no valid session key
+      // Init segment has an invalid session key
       break
     case LiveVideoStatusCode.ASSERTION_INVALID:
       // Sequence number or stream ID problem (manifest box method)
@@ -126,7 +126,7 @@ Versions 1.2.0 and earlier report `claim.signature.mismatch` for `CLAIM_SIGNATUR
 > [!NOTE]
 > `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes`, which check manifest integrity. They do not appear in `SegmentValidationResult.errorCodes`: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only `LiveVideoStatusCode`.
 >
-> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. VOD Merkle segments do not use session keys. When `merkleMaps` is not empty, the result does not report `LiveVideoStatusCode.SESSIONKEY_INVALID` for missing or expired session keys. An invalid session key still causes `SESSIONKEY_INVALID`. See [Invalid Session Keys](#invalid-session-keys).
+> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. VOD Merkle segments do not use session keys. An invalid session key still causes `SESSIONKEY_INVALID`. See [Invalid Session Keys](#invalid-session-keys).
 
 ## Working with Manifest Data
 
