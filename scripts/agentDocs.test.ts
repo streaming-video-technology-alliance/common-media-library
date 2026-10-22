@@ -236,7 +236,7 @@ describe('renderLlmsTxt', () => {
 	it('lists packages, guides, API reports, and the optional files', () => {
 		const text = renderLlmsTxt([fixture()])
 		equal(text.startsWith('# Common Media Library\n\n> '), true)
-		equal(text.includes(`\n## Packages\n\n- [@svta/cml-example](${siteBase}llms/example/README.md): Example package.\n`), true)
+		equal(text.includes(`\n## Packages\n\n- [@svta/cml-example](${siteBase}llms/example/README.md): Example package.\n  - Parse boxes from a segment: \`readBoxes\`, \`findBox\`\n  - Write \`emsg\` boxes: \`writeEmsg\`\n\n## Guides`), true)
 		equal(text.includes(`\n## Guides\n\n- [Guide](${siteBase}llms/example/docs/guide.md): @svta/cml-example. A guide\n`), true)
 		equal(text.includes(`\n## API reports\n\n- [@svta/cml-example API report](${siteBase}llms/example/api.md): `), true)
 		equal(text.includes(`\n## Optional\n\n- [llms-full.txt](${siteBase}llms-full.txt): `), true)

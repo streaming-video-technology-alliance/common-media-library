@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
 
 ## [1.0.7] - 2026-10-18
 

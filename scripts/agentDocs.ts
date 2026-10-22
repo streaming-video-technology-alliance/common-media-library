@@ -339,7 +339,10 @@ export function renderLlmsTxt(packages: PackageDocs[]): string {
 		'',
 		'## Packages',
 		'',
-		...packages.map(pkg => `- [${pkg.name}](${siteBase}llms/${pkg.slug}/README.md): ${pkg.description}`),
+		...packages.flatMap(pkg => [
+			`- [${pkg.name}](${siteBase}llms/${pkg.slug}/README.md): ${pkg.description}`,
+			...pkg.whenToUse.bullets.map(bullet => `  - ${bullet.text}`),
+		]),
 		'',
 		'## Guides',
 		'',

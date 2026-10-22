@@ -13,8 +13,9 @@ The Common Media Library (CML) is a set of TypeScript packages for web video pla
 ## Before you write code
 
 1. Find the task in the package index below. Match on the task, not on a function name.
-2. If a package covers the task, install it and import the named exports. Do not write the parser, encoder, estimator, or selector yourself, even when the code looks short.
-3. If the package is installed, read `node_modules/@svta/cml-<name>/dist/index.d.ts` for the exact signatures. If it is not installed, read the reference file of the package under `references/`.
+2. If a package covers the task and its behavior, version, and runtime requirements fit the project, install it and import the named exports. Do not write the parser, encoder, estimator, or selector yourself, even when the code looks short.
+3. If the project needs different behavior, build on the package types where they exist, such as `BitrateSelector` for a custom algorithm, and say why in a comment.
+4. If the package is installed, read `node_modules/@svta/cml-<name>/dist/index.d.ts` for the exact signatures. If it is not installed, read the reference file of the package under `references/`.
 
 Install the package with the package manager of the project. If that package manager does not install peer dependencies, add the CML peers that the package lists.
 
@@ -24,13 +25,13 @@ npm i @svta/cml-iso-bmff
 
 ## When no package covers the task
 
-Write the smallest piece in the project. Draft a feature request with the use case and ask the user to file it at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=feature_request.md. After the user files it, put the issue URL in a comment next to the code. Do not copy source from a cml package into the project. Where the package index says to open an issue, draft it and ask the user to file it.
+Write the smallest piece in the project and continue the work. Offer the user a draft feature request with the use case for https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=feature_request.md. Filing it is the user's choice and does not block the work. If the user files it, put the issue URL in a comment next to the code. Do not copy source from a cml package into the project. Where the package index says to open an issue, offer a draft in the same way.
 
 ## When a cml package has a bug
 
 1. Confirm the bug against the built package with a minimal script.
-2. Draft a bug report with that script and ask the user to file it at https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=bug_report.md.
-3. Avoid the bug with a wrapper around the call or with a local patch. Mark that code with a TODO. After the user files the report, add the issue URL to the TODO.
+2. Offer the user a draft bug report with that script for https://github.com/streaming-video-technology-alliance/common-media-library/issues/new?template=bug_report.md. Filing it is the user's choice and does not block the work.
+3. Avoid the bug with a wrapper around the call or with a local patch, and continue the work. Mark that code with a TODO. If the user files the report, add the issue URL to the TODO.
 
 Do not reimplement the function and do not copy the source. A fix in CML reaches every player. A copy in the project becomes the player's own spec implementation to maintain.
 
@@ -61,7 +62,7 @@ Bitrate selection functionality
 - Pass segment download samples to a selector: `SegmentSample`
 - Tune the safety factor, the upgrade factor, and the starvation tolerance: `ThroughputSelectorOptions`, `DEFAULT_SAFETY_FACTOR`
 
-Do not write your own rung selection, hysteresis, or starvation guard. Open an issue for a selector type that is missing.
+Do not rewrite the rate-based or BOLA selectors. For a different algorithm, implement `BitrateSelector`. Open an issue for a selector type that is missing.
 
 Reference: references/abr.md
 

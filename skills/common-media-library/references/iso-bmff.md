@@ -100,7 +100,7 @@ The library provides type guards that check whether a box is a container box or 
 import { isContainer } from "@svta/cml-iso-bmff";
 
 const box = { type: "meta", boxes: [] };
-const isContainer = isContainer(box);
+const container = isContainer(box);
 ```
 
 `isFullBox` checks whether a box is a full box.
@@ -109,7 +109,7 @@ const isContainer = isContainer(box);
 import { isFullBox } from "@svta/cml-iso-bmff";
 
 const box = { type: "meta", version: 1, flags: 0 };
-const isFullBox = isFullBox(box);
+const fullBox = isFullBox(box);
 ```
 
 <!-- libs/iso-bmff/docs/writing-boxes.md -->
