@@ -28,8 +28,8 @@ SVTA DNS change, custom domain in the repository settings, `SITE_BASE` set to `/
 
 ## Dependencies
 
-- The agent-docs branch `claude/agents-duplicating-cml-features-c9de36` writes `llms.txt` into `docs/dist` and has no pull request yet. Whichever lands second updates the output path to `site/dist`. The cheaper order is agent-docs first, because the change there is one path.
-- Phase 2 removes `docs/`, so any open branch that touches `docs/typedoc.json` conflicts. Today only the agent-docs branch does.
+- Pull request #557 (branch `claude/agents-duplicating-cml-features-c9de36`) adds `scripts/agentDocs.ts` and writes `llms.txt` into `docs/dist` through `docs/package.json`. It is open and mergeable. Whichever lands second updates the output path to `site/dist`. The cheaper order is #557 first, because the change there is one path.
+- Phase 2 removes `docs/`, so any open branch that touches `docs/typedoc.json` conflicts. Today only #557 touches `docs/`.
 
 ## Risks
 
