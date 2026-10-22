@@ -38,6 +38,20 @@ describe('shouldExcludeBox', () => {
 		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 8, length: 0 }] }]), false)
 	})
 
+	// §19.2.3: a subset that covers every byte of the box leaves nothing of the box in the hash.
+	it('returns true for subset ranges that cover the whole box', () => {
+		const [moov] = readRootBoxes(buildBox('moov', buildBox('free')))
+		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 0 }] }]), true)
+		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 8 }, { offset: 8, length: 100 }] }]), true)
+		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 8 }] }, { xpath: '/moov/free' }]), true)
+	})
+
+	it('returns false for subset ranges that leave a byte of the box', () => {
+		const [moov] = readRootBoxes(buildBox('moov', new Uint8Array(16)))
+		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 1, length: 0 }] }]), false)
+		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 23 }] }]), false)
+	})
+
 	describe('xpath index', () => {
 		const [first, , second] = readRootBoxes(concatBytes(buildBox('uuid', Uint8Array.of(1)), buildBox('free'), buildBox('uuid', Uint8Array.of(2))))
 

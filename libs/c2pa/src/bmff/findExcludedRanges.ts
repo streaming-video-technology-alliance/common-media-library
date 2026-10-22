@@ -88,6 +88,11 @@ function bytesMatchAt(bytes: Uint8Array, offset: number, expected: Uint8Array | 
 	return true
 }
 
+// A uuid box puts its 16-byte usertype after the box header (ISO/IEC 14496-12 section 4.2).
+function payloadOffset(box: BmffBox): number {
+	return box.headerSize + (box.type === 'uuid' ? UUID_USERTYPE_SIZE : 0)
+}
+
 function readUint24(bytes: Uint8Array | readonly number[], offset: number): number {
 	return (bytes[offset] << 16) | (bytes[offset + 1] << 8) | bytes[offset + 2]
 }
@@ -97,8 +102,8 @@ function constraintsMatch(box: BmffBox, exclusion: BmffHashExclusion): boolean {
 	const { length, version, flags, data } = exclusion
 	if (length !== undefined && box.bytes.length !== length) return false
 	if (version !== undefined || flags !== undefined) {
-		// A FullBox puts the version and flags after the box header. A uuid box puts its usertype first.
-		const at = box.headerSize + (box.type === 'uuid' ? UUID_USERTYPE_SIZE : 0)
+		// A FullBox puts the version and flags at the start of its payload.
+		const at = payloadOffset(box)
 		if (at + FULLBOX_HEADER_SIZE > box.bytes.length) return false
 		if (version !== undefined && box.bytes[at] !== version) return false
 		if (flags !== undefined) {
@@ -145,7 +150,7 @@ function appendChildRanges(root: Uint8Array, start: number, end: number, depth: 
 				appendMatch(ranges, child, compiled.exclusion)
 			}
 		}
-		if (nested) appendChildRanges(root, child.offset + child.headerSize, child.offset + child.bytes.length, depth + 1, nested, ranges)
+		if (nested) appendChildRanges(root, child.offset + payloadOffset(child), child.offset + child.bytes.length, depth + 1, nested, ranges)
 	}
 }
 
@@ -188,6 +193,6 @@ export function findExcludedRanges(box: BmffBox, exclusions: readonly CompiledEx
 		if (!compiled.exclusion.subset) return null
 		appendSubset(ranges ??= [], 0, box.bytes.length, compiled.exclusion.subset)
 	}
-	if (nested) appendChildRanges(box.bytes, box.headerSize, box.bytes.length, 1, nested, ranges ??= [])
+	if (nested) appendChildRanges(box.bytes, payloadOffset(box), box.bytes.length, 1, nested, ranges ??= [])
 	return ranges ? mergeRanges(ranges) : NO_RANGES
 }

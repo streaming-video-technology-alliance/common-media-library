@@ -25,13 +25,6 @@ function readBoxType(bytes: Uint8Array, offset: number): string {
 	return String.fromCharCode(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3])
 }
 
-function nextIndex(boxes: readonly BmffBox[], type: string): number {
-	for (let i = boxes.length - 1; i >= 0; i--) {
-		if (boxes[i].type === type) return boxes[i].index + 1
-	}
-	return 1
-}
-
 /**
  * Reads the boxes between `start` and `end` of a BMFF byte array in order.
  *
@@ -49,6 +42,7 @@ function nextIndex(boxes: readonly BmffBox[], type: string): number {
 export function readBoxes(bytes: Uint8Array, start: number, end: number): BmffBox[] {
 	const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
 	const boxes: BmffBox[] = []
+	const counts = new Map<string, number>()
 	let offset = start
 	while (offset + BOX_HEADER_SIZE <= end) {
 		let size = view.getUint32(offset, false)
@@ -65,7 +59,9 @@ export function readBoxes(bytes: Uint8Array, start: number, end: number): BmffBo
 		}
 		if (size < headerSize || offset + size > end) break
 		const type = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
-		boxes.push({ type, offset, headerSize, index: nextIndex(boxes, type), bytes: bytes.subarray(offset, offset + size) })
+		const index = (counts.get(type) ?? 0) + 1
+		counts.set(type, index)
+		boxes.push({ type, offset, headerSize, index, bytes: bytes.subarray(offset, offset + size) })
 		offset += size
 	}
 	return boxes

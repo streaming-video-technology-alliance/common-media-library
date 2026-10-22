@@ -230,6 +230,22 @@ describe('computeBmffHash', () => {
 			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), mdat))
 		})
 
+		// A uuid box puts a 16-byte usertype before its children (ISO/IEC 14496-12 section 4.2).
+		it('skips the usertype of a uuid container when it descends into the box', async () => {
+			const usertype = Uint8Array.from({ length: 16 }, (_, i) => 0x10 + i)
+			const cncv = buildBox('CNCV', TEXT_ENCODER.encode('CanonCNCV'))
+			const cndm = buildBox('CNDM', TEXT_ENCODER.encode('CNDM'))
+			const uuid = buildBox('uuid', concatBytes(usertype, cncv, cndm))
+			const uuidHeader = uuid.subarray(0, BOX_HEADER_SIZE + usertype.length)
+			const moov = buildBox('moov', concatBytes(mvhd, uuid))
+
+			const nested = await computeBmffHash(concatBytes(ftyp, moov), { exclusions: [{ xpath: '/moov/uuid/CNCV' }], offsetPrefixSize: 8 })
+			deepStrictEqual(nested, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov.subarray(0, BOX_HEADER_SIZE), mvhd, uuidHeader, cndm))
+
+			const root = await computeBmffHash(concatBytes(ftyp, uuid), { exclusions: [{ xpath: '/uuid/CNCV' }], offsetPrefixSize: 8 })
+			deepStrictEqual(root, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), uuidHeader, cndm))
+		})
+
 		it('finds a nested box with a largesize header', async () => {
 			const largesizeUdta = buildLargesizeBox('udta', TEXT_ENCODER.encode('udta payload'))
 			const free = buildBox('free')

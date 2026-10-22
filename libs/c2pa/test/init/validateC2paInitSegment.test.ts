@@ -1190,6 +1190,18 @@ describe('validateC2paInitSegment — content binding (§15.10.1.2, §19.2.3)', 
 			strictEqual(result.sessionKeys.length, 1)
 		})
 
+		// §19.2.3: subset ranges that cover the whole moov box leave nothing of the box in the hash.
+		it('fails with INIT_INVALID for subset ranges that cover the whole moov box', async () => {
+			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length)))
+			const exclusion = { xpath: '/moov', subset: [{ offset: 0, length: 0 }] }
+			const init = await buildSignedInitSegment(signer, [hashAssertion([exclusion], hash), sessionKeys], mediaBoxes)
+
+			const result = await validateC2paInitSegment(init)
+
+			deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+			deepStrictEqual(result.sessionKeys, [])
+		})
+
 		it('fails with ASSERTION_BMFFHASH_MALFORMED for an xpath without a leading slash', async () => {
 			const hash = await sha256(concatBytes(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov))
 			const init = await buildSignedInitSegment(signer, [hashAssertion([{ xpath: 'moov' }], hash), sessionKeys], mediaBoxes)
