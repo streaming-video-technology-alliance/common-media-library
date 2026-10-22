@@ -11,6 +11,9 @@ and this project adheres to
 ### Fixed
 
 - `validateC2paInitSegment`, `validateC2paSegment`, `validateC2paManifestBoxSegment`, and `validateC2paMerkleSegment` now hash a root box with a `largesize` header or a size of 0. The content hash also covers every root box after such a box ([#566](https://github.com/streaming-video-technology-alliance/common-media-library/issues/566)).
+- `validateC2paInitSegment`, `validateC2paSegment`, `validateC2paManifestBoxSegment`, and `validateC2paMerkleSegment` now exclude only the nested box for an xpath such as `/moov/udta`. The content hash keeps the other bytes of the root box ([#567](https://github.com/streaming-video-technology-alliance/common-media-library/issues/567)).
+- `BmffHashExclusion` now has the `length`, `subset`, `version`, `flags`, and `exact` fields of C2PA section 18.6.2. The `length`, `version`, `flags`, and `exact` fields narrow the match to a box with those values. The `subset` field excludes only the listed byte ranges of the box ([#567](https://github.com/streaming-video-technology-alliance/common-media-library/issues/567)).
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now fail with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED` for a malformed exclusion. Malformed means an xpath outside the grammar of C2PA section 18.6.2, or a field of the wrong type ([#567](https://github.com/streaming-video-technology-alliance/common-media-library/issues/567)).
 
 ### Changed
 

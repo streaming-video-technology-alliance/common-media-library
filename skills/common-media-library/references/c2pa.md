@@ -300,9 +300,9 @@ The `ManifestBoxValidationResult` contains:
 >
 > A segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The claim signature is verified with the certificate inside the segment. The library does not check that certificate against a trust list. See [Signer Trust](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/results-and-error-codes.md#signer-trust).
 >
-> C2PA section 19.3 requires a `c2pa.hash.bmff.v3` assertion in the manifest of each segment. A segment without that assertion fails with `LiveVideoStatusCode.SEGMENT_INVALID`. If the manifest also has no other hard binding assertion, the result also includes `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING`.
+> C2PA section 19.3 requires a `c2pa.hash.bmff.v3` assertion in the manifest of each segment. A segment without that assertion fails with `LiveVideoStatusCode.SEGMENT_INVALID`. If the manifest also has no other hard binding assertion, the result also includes `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING`. The library adds that code only for a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` does not also report `CLAIM_HARD_BINDINGS_MISSING`.
 >
-> A `c2pa.hash.bmff.v3` assertion that is not a map, has no `hash`, or has a `hash` that is not a byte string fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`. The validator does not read a `value` field in place of `hash`. An assertion with an exclusion that does not conform to C2PA section 18.6 fails with the same code. Each `data` constraint of an exclusion needs an unsigned integer `offset` and a byte string `value`.
+> A `c2pa.hash.bmff.v3` assertion that is not a map, has no `hash`, or has a `hash` that is not a byte string fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`. The validator does not read a `value` field in place of `hash`. An assertion with an exclusion that does not conform to C2PA section 18.6 fails with the same code. Each `data` constraint of an exclusion needs an unsigned integer `offset` and a byte string `value`. The `xpath` of an exclusion must follow the grammar of section 18.6.2. Each node is a `/`, a four-character box type, and an optional index such as `[2]`. The validator also checks the `length`, `subset`, `version`, `flags`, and `exact` fields against the CDDL of section 18.6.2.
 
 <!-- libs/c2pa/docs/merkle-validation.md -->
 ---
@@ -343,7 +343,7 @@ if (init.isValid && init.merkleMaps.length > 0) {
 
 Check `isValid` before you use `merkleMaps`. The init manifest must carry a claim signature that verifies. An init segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`, and its `merkleMaps` must not be trusted. The signature is verified with the certificate inside the manifest. The library does not check that certificate against a trust list. See [Signer Trust](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/c2pa/docs/results-and-error-codes.md#signer-trust).
 
-If the `exclusions` of the `c2pa.hash.bmff.v3` assertion remove the `moov` box, the init segment fails with `LiveVideoStatusCode.INIT_INVALID`. The library applies this rule of C2PA section 19.2.3 to VOD Merkle init segments too.
+If the `exclusions` of the `c2pa.hash.bmff.v3` assertion exclude the whole `moov` box, the init segment fails with `LiveVideoStatusCode.INIT_INVALID`. The library applies this rule of C2PA section 19.2.3 to VOD Merkle init segments too. A nested exclusion such as `/moov/udta` keeps the init segment valid. A `subset` exclusion of the `moov` box also keeps the init segment valid, unless the ranges cover the whole box.
 
 ## Validating Media Segments
 
@@ -961,7 +961,18 @@ export type BmffHashConstraint = {
 // @public
 export type BmffHashExclusion = {
     readonly xpath: string;
+    readonly length?: number;
     readonly data?: readonly BmffHashConstraint[];
+    readonly subset?: readonly BmffHashSubset[];
+    readonly version?: number;
+    readonly flags?: Uint8Array | readonly number[];
+    readonly exact?: boolean;
+};
+
+// @public
+export type BmffHashSubset = {
+    readonly offset: number;
+    readonly length: number;
 };
 
 // @public

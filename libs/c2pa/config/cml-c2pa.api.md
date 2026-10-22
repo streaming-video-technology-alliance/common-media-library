@@ -15,7 +15,18 @@ export type BmffHashConstraint = {
 // @public
 export type BmffHashExclusion = {
     readonly xpath: string;
+    readonly length?: number;
     readonly data?: readonly BmffHashConstraint[];
+    readonly subset?: readonly BmffHashSubset[];
+    readonly version?: number;
+    readonly flags?: Uint8Array | readonly number[];
+    readonly exact?: boolean;
+};
+
+// @public
+export type BmffHashSubset = {
+    readonly offset: number;
+    readonly length: number;
 };
 
 // @public

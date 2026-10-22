@@ -1,47 +1,26 @@
-import type { BmffHashConstraint, BmffHashExclusion } from './BmffHashExclusion.ts'
-
-function bytesMatchAt(boxData: Uint8Array, offset: number, expected: Uint8Array | readonly number[]): boolean {
-	const bytes = expected instanceof Uint8Array ? expected : new Uint8Array(expected as number[])
-	if (offset + bytes.length > boxData.length) return false
-	for (let i = 0; i < bytes.length; i++) {
-		if (boxData[offset + i] !== bytes[i]) return false
-	}
-	return true
-}
-
-function constraintMatches(boxData: Uint8Array, constraint: BmffHashConstraint): boolean {
-	return bytesMatchAt(boxData, constraint.offset, constraint.value)
-}
+import type { BmffHashExclusion } from './BmffHashExclusion.ts'
+import { compileExclusions, findExcludedRanges } from './findExcludedRanges.ts'
+import type { BmffBox } from './readRootBoxes.ts'
 
 /**
- * Returns `true` if the given BMFF box should be excluded from the
- * C2PA content hash, based on the provided exclusion list.
+ * Returns `true` if no byte of the root box reaches the C2PA content hash (C2PA section 18.6.2).
  *
- * Exclusions use C2PA xpath notation (e.g. `/emsg`, `/moof/traf`).
- * Optional `data` constraints narrow the match to specific box content by byte offset.
+ * An exclusion without a `subset` that matches the box excludes the box in its entirety.
+ * Subset ranges and nested exclusions that together cover every byte of the box also count.
+ * A nested xpath such as `/moov/udta` or a `subset` that leaves bytes of the box returns `false`.
  *
- * @param boxType - Four-character box type code (e.g. `'emsg'`, `'moof'`)
- * @param boxData - Full box bytes including the 8-byte size+type header
+ * @param box - A root box with its 1-based index among the root boxes of the same type
  * @param exclusions - Exclusion list from the C2PA `c2pa.hash.bmff.v3` assertion
- * @returns `true` if the box should be excluded from the hash input
+ * @returns `true` if none of the box bytes are hashed
  *
  * @example
  * {@includeCode ../../test/bmff/shouldExcludeBox.test.ts#example}
  *
- * @public
+ * @internal
  */
-export function shouldExcludeBox(
-	boxType: string,
-	boxData: Uint8Array,
-	exclusions: readonly BmffHashExclusion[],
-): boolean {
-	for (const exclusion of exclusions) {
-		if (!exclusion.xpath) continue
-		const xpathMatchesType = exclusion.xpath === `/${boxType}` || exclusion.xpath.startsWith(`/${boxType}/`)
-		if (!xpathMatchesType) continue
-		const { data } = exclusion
-		if (!data || data.length === 0) return true
-		if (data.every(constraint => constraintMatches(boxData, constraint))) return true
-	}
-	return false
+export function shouldExcludeBox(box: BmffBox, exclusions: readonly BmffHashExclusion[]): boolean {
+	const ranges = findExcludedRanges(box, compileExclusions(exclusions))
+	if (ranges === null) return true
+	// The ranges are merged, so one range that spans the box means full coverage.
+	return ranges.length === 1 && ranges[0].start === 0 && ranges[0].end === box.bytes.length
 }
