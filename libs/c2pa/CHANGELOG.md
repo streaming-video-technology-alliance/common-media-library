@@ -8,22 +8,24 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-21
+
 ### Security
 
 - `validateC2paInitSegment` now fails an init segment without a `c2pa.hash.bmff.v3` assertion with `LiveVideoStatusCode.INIT_INVALID`. The result for a manifest without any hard binding assertion also includes `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
 - `validateC2paInitSegment` now fails with `LiveVideoStatusCode.INIT_INVALID` if the init content hash does not include the `moov` box ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
 
-### Changed
-
-- `validateC2paManifestBoxSegment` now reports a missing hard binding only for a manifest with a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` no longer also reports `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
-
 ### Fixed
 
+- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now fail a segment if the CBOR or JSON of an assertion does not decode. The result includes the new `C2paStatusCode.ASSERTION_CBOR_INVALID` or `C2paStatusCode.ASSERTION_JSON_INVALID`.
+- The validation functions now reject a CBOR map with a duplicate key. A claim or an assertion with such a map fails with `C2paStatusCode.CLAIM_CBOR_INVALID` or `C2paStatusCode.ASSERTION_CBOR_INVALID`. Keys such as `1` and `"1"` count as duplicates ([#516](https://github.com/streaming-video-technology-alliance/common-media-library/issues/516)).
 - `validateC2paInitSegment` no longer reports `LiveVideoStatusCode.SESSIONKEY_INVALID` for an init segment without a `c2pa.session-keys` assertion ([#555](https://github.com/streaming-video-technology-alliance/common-media-library/issues/555)). The C2PA Manifest Box method of C2PA 2.4 section 19.3 needs no session keys. A `c2pa.session-keys` assertion with an invalid key, or with no key, still reports `SESSIONKEY_INVALID`.
 - `validateC2paInitSegment` no longer reports `SESSIONKEY_INVALID` for an init segment whose session keys have all expired. The result has an empty `sessionKeys` list, and each VSI segment then fails with `LiveVideoStatusCode.SEGMENT_INVALID`, as C2PA 2.4 section 19.7.3 requires.
 - `SESSIONKEY_INVALID` no longer means that the init segment has no valid session key. To detect that case, check `sessionKeys.length === 0` on the result of `validateC2paInitSegment`.
-- `validateC2paInitSegment` and `validateC2paManifestBoxSegment` now fail a segment if the CBOR or JSON of an assertion does not decode. The result includes the new `C2paStatusCode.ASSERTION_CBOR_INVALID` or `C2paStatusCode.ASSERTION_JSON_INVALID`.
-- The validation functions now reject a CBOR map with a duplicate key. A claim or an assertion with such a map fails with `C2paStatusCode.CLAIM_CBOR_INVALID` or `C2paStatusCode.ASSERTION_CBOR_INVALID`. Keys such as `1` and `"1"` count as duplicates ([#516](https://github.com/streaming-video-technology-alliance/common-media-library/issues/516)).
+
+### Changed
+
+- `validateC2paManifestBoxSegment` now reports a missing hard binding only for a manifest with a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` no longer also reports `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
 
 ## [1.5.0] - 2026-10-21
 
@@ -215,7 +217,8 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.5.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.6.0...HEAD
+[1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.5.0...c2pa-v1.6.0
 [1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.1...c2pa-v1.5.0
 [1.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.0...c2pa-v1.4.1
 [1.4.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.3.0...c2pa-v1.4.0
