@@ -59,6 +59,9 @@ The recorder classifies each report by URL extension and HTTP method:
 Recorded entries have one structure:
 
 ```typescript
+import type { CmcdRecordedReportMode, CmcdRecordedRequestType } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
+
 type CmcdRecordedReport = {
     readonly request: HttpRequest;            // normalized; headers lowercase, body as string
     readonly type: CmcdRecordedRequestType;
@@ -128,6 +131,8 @@ recorder.detach();
 Shorten the timeout per call or for the whole recorder:
 
 ```typescript
+import { CmcdReportRecorder } from "@svta/cml-cmcd";
+
 // Per call: fail in 2 seconds rather than the recorder default
 await recorder.waitForManifest({ timeout: 2000 });
 
@@ -166,6 +171,8 @@ recorder.attach({
 The callback receives the same object reference that `getReports()` returns. So one panel can subscribe to all reports and branch on `report.type` or `report.reportingMode` to send each report to its own view:
 
 ```typescript
+import { CmcdRecordedRequestType } from "@svta/cml-cmcd";
+
 recorder.attach({
     onReport: (report) => {
         switch (report.type) {

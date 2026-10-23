@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+
 ## [1.7.0] - 2026-10-22
 
 ### Fixed

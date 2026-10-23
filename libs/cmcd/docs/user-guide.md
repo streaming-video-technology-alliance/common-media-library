@@ -166,6 +166,8 @@ The `toCmcdValue` utility accepts two arguments:
 2. **params** - An object of key-value pairs for the parameters
 
 ```typescript
+import { toCmcdValue } from "@svta/cml-cmcd";
+
 reporter.update({
 	nor: [
 		toCmcdValue("seg1.m4s", { r: "0-5000" }),
@@ -179,6 +181,8 @@ reporter.update({
 Many keys accept a list of numeric values, each with an object type given as a boolean parameter.
 
 ```typescript
+import { toCmcdValue } from "@svta/cml-cmcd";
+
 reporter.update({
 	br: [toCmcdValue(5000, { v: true }), toCmcdValue(3000, { a: true })],
 });
@@ -376,6 +380,8 @@ continuous metrics current with `update()`.
 Dedup drops the payload of the second call:
 
 ```typescript
+import { CmcdEventType } from "@svta/cml-cmcd";
+
 reporter.update({ sta: "p" });                              // auto-fires PLAY_STATE
 reporter.recordEvent(CmcdEventType.PLAY_STATE, {            // suppressed:
   sta: "p",                                                 //   sta unchanged
@@ -391,6 +397,8 @@ Use the single-call form shown above instead.
 itself. These events do not represent a stored state transition:
 
 ```typescript
+import { CmcdEventType } from "@svta/cml-cmcd";
+
 // Custom event: the name and any payload only make sense for this call.
 // See "Custom Events" below for the required target configuration.
 reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: "ad-quartile" });
@@ -485,6 +493,7 @@ const response = {
 		startTime: performance.now(),
 		responseStart: performance.now() + 50,
 		duration: 150,
+		encodedBodySize: 512000,
 	},
 };
 
@@ -502,8 +511,8 @@ async function fetchSegment(
 ): Promise<ArrayBuffer> {
 	// Update player state
 	reporter.update({
-		bl: [this.getBufferLength()],
-		mtp: [this.getMeasuredThroughput()],
+		bl: [player.getBufferLength()],
+		mtp: [player.getMeasuredThroughput()],
 	});
 
 	// Decorate the request with CMCD data
@@ -531,6 +540,7 @@ async function fetchSegment(
 			startTime,
 			responseStart,
 			duration,
+			encodedBodySize: buffer.byteLength,
 		},
 	});
 
@@ -694,6 +704,8 @@ reporter.recordResponseReceived({ status: 200, request: payload.request });
 The record is the only key that selects an ended session. A response whose request has no record reports under the current session, as in version 2.4.0. The request-time data then comes from `customData.cmcd`. A per-call `data.sid` is no substitute. The reporter accepts any record whose `sid` resolves, so you can also construct one. A hand-built request, or a request decorated by another reporter configured with the same session, attributes by naming the `sid`:
 
 ```typescript
+import { CMCD_REQUEST_PROVENANCE } from "@svta/cml-cmcd";
+
 // The request was never decorated, so the player names the session.
 request.customData[CMCD_REQUEST_PROVENANCE] = { sid: "previous-session" };
 reporter.recordResponseReceived({ status: 200, request });
@@ -702,6 +714,8 @@ reporter.recordResponseReceived({ status: 200, request });
 A response attributed to a session that is no longer retained is dropped, not relabeled with the current session ID. A session change sends the unsent event reports of an ended session before eviction can discard them. Each report keeps the `sid` and sequence number of its own session. A failed batch that is re-queued into an evicted session is discarded with the session.
 
 ```typescript
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+
 const reporter = new CmcdReporter({
 	cid: "video-123",
 	eventTargets: [
@@ -737,9 +751,10 @@ function onPlayerDestroy() {
 By default, `CmcdReporter` uses the native `fetch` API to send event reports. You can provide a custom requester function:
 
 ```typescript
-import { CmcdReporter } from "@svta/cml-cmcd";
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
+import type { HttpRequest } from "@svta/cml-utils";
 
-const customRequester = async (request) => {
+const customRequester = async (request: HttpRequest) => {
 	// Use your preferred HTTP client
 	const response = await axios({
 		url: request.url,
@@ -769,7 +784,7 @@ const reporter = new CmcdReporter(
 The `enabledKeys` option limits which CMCD keys the reports include:
 
 ```typescript
-import { CmcdReporter, CMCD_KEYS } from "@svta/cml-cmcd";
+import { CmcdEventType, CmcdReporter } from "@svta/cml-cmcd";
 
 const reporter = new CmcdReporter({
 	cid: "video-123",
@@ -897,9 +912,16 @@ const reporter = new CmcdReporter({
 Once a reporter has a type, `createRequestReport()` and `recordResponseReceived()` require the requests you pass to satisfy it. A typo, or a request from a different code path, is a compile error at the call site. Without the type, the transform would read `undefined` and cancel the report without an error:
 
 ```typescript
+import { CmcdReporter } from "@svta/cml-cmcd";
+
+type PlayerData = { requestType: "segment" | "manifest" | "license" };
+
+const reporter = new CmcdReporter<PlayerData>({ cid: "video-123" });
+
 // Error: 'requestTypo' does not exist in type 'PlayerData'
 reporter.createRequestReport({
 	url: "https://cdn.example.com/segment.mp4",
+	// @ts-expect-error
 	customData: { requestTypo: "segment" },
 });
 ```
@@ -907,12 +929,15 @@ reporter.createRequestReport({
 `customData` is readonly at every depth, not only at the top level. Describing a nested type does not cost you the [read-only guarantee](#the-associated-request):
 
 ```typescript
+import type { CmcdEventReportTransform } from "@svta/cml-cmcd";
+
 type PlayerData = { timing: { start: number } };
 
 const transform: CmcdEventReportTransform<PlayerData> = (data, request) => {
 	const customData = request?.customData;
 
 	// Error: cannot assign to 'start' because it is a read-only property
+	// @ts-expect-error
 	if (customData) customData.timing.start = 0;
 
 	return data;
