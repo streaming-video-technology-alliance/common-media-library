@@ -10,6 +10,6 @@
  * @example
  * {@includeCode ../test/encodeText.test.ts#example}
  */
-export function encodeText(data: string): Uint8Array {
+export function encodeText(data: string): Uint8Array<ArrayBuffer> {
 	return new TextEncoder().encode(data)
 }

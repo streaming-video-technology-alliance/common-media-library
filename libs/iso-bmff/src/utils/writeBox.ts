@@ -12,7 +12,10 @@ import { writeContainerBox } from './writeContainerBox.ts'
  *
  * @internal
  */
-export function writeBox(box: IsoBoxStreamable, config: IsoBoxWriteViewConfig): Uint8Array {
+export function writeBox(
+	box: IsoBoxStreamable,
+	config: IsoBoxWriteViewConfig,
+): Uint8Array<ArrayBuffer> {
 	let view: ArrayBufferView | null = null
 
 	if ('type' in box) {
@@ -41,5 +44,5 @@ export function writeBox(box: IsoBoxStreamable, config: IsoBoxWriteViewConfig): 
 		throw new Error('Invalid box')
 	}
 
-	return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
+	return new Uint8Array(view.buffer as ArrayBuffer, view.byteOffset, view.byteLength)
 }

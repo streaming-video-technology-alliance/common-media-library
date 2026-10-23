@@ -12,6 +12,6 @@ import { decodeBase64 } from '@svta/cml-utils'
  * {@includeCode ../../test/fairplay/decodeFairPlayLicense.test.ts#example}
  */
 
-export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array {
+export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array<ArrayBuffer> {
 	return typeof response === 'string' ? decodeBase64(response) : new Uint8Array(response)
 }

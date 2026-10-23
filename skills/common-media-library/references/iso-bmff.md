@@ -1840,10 +1840,10 @@ export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
 export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 
 // @public
-export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteViewConfig): Uint8Array;
+export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): Uint8Array[];
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>[];
 
 // @public
 export function writeKind(box: TrackKindBox): IsoBoxWriteView;
