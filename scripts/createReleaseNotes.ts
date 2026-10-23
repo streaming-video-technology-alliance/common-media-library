@@ -8,7 +8,7 @@ function release(pkg: string, version: string, changes: string) {
 ${changes}
 
 ## Documentation
-- API Docs: https://streaming-video-technology-alliance.github.io/common-media-library/
+- API Docs: https://cml.svta.org/
 
 ## NPM Package
 \`\`\`sh

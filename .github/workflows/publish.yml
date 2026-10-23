@@ -38,8 +38,6 @@ jobs:
 
       - name: Build Site
         run: npm run build -w site
-        env:
-          SITE_BASE: /common-media-library/
 
       - name: Deploy Site
         uses: peaceiris/actions-gh-pages@v4
