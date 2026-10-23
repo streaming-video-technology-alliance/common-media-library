@@ -376,7 +376,7 @@ export function mapSegmentTemplate(representation: Representation, duration: num
 export type MediaGroups = {
     AUDIO: Record<string, Record<string, {
         language: string;
-        uri: string;
+        uri?: string;
     }>>;
     SUBTITLES: Record<string, Record<string, {
         language: string;
@@ -569,7 +569,8 @@ type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
 // @alpha
-export type Track = Ham & Base & Duration & AddressableObject & {
+export type Track = Ham & Base & Duration & Omit<AddressableObject, "url"> & {
+    url?: string;
     type: TrackType;
     codecs: string[];
     mimeType: string;
