@@ -11,7 +11,7 @@ export function renderPeers(pkg: PackageInfo): string {
 	return `
 ## Peer dependencies
 
-This package declares these CML packages as peer dependencies. npm 7 and later installs them with the package.
+npm 7 and later installs peer dependencies with the package.
 
 ${links.join('\n')}
 `
