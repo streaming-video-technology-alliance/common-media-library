@@ -1,13 +1,13 @@
 import type { CoseSign1 } from './CoseSign1.ts'
 import { buildSigStructure } from './buildSigStructure.ts'
 import {
-	CURVE_P384, 
+	CURVE_P384,
 	CURVE_P521,
-	ECDSA_ALGORITHM, 
-	ED25519_ALGORITHM, 
+	ECDSA_ALGORITHM,
+	ED25519_ALGORITHM,
 	RSA_PSS_ALGORITHM,
-	HASH_SHA256, 
-	HASH_SHA384, 
+	HASH_SHA256,
+	HASH_SHA384,
 	HASH_SHA512,
 } from './constants.ts'
 
@@ -51,10 +51,7 @@ function parseDerLength(der: Uint8Array, offset: number): { length: number; next
 	return { length, nextOffset: offset + 1 + numBytes }
 }
 
-function extractDerInteger(
-	der: Uint8Array,
-	offset: number,
-): { value: Uint8Array; nextOffset: number } {
+function extractDerInteger(der: Uint8Array, offset: number): { value: Uint8Array; nextOffset: number } {
 	if (der[offset] !== DER_INTEGER_TAG) throw new Error('DER signature: expected INTEGER tag')
 	const { length, nextOffset: valueStart } = parseDerLength(der, offset + 1)
 	let start = valueStart

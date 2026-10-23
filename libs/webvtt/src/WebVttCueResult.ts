@@ -6,4 +6,4 @@ import type { WebVttCue } from './WebVttCue.ts'
  *
  * @public
  */
-export type WebVttCueResult = TypedResult<'cue', WebVttCue>;
+export type WebVttCueResult = TypedResult<'cue', WebVttCue>

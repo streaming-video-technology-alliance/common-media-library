@@ -13,4 +13,4 @@ export const CmsdObjectType = CmObjectType as typeof CmObjectType
 /**
  * @public
  */
-export type CmsdObjectType = CmObjectType;
+export type CmsdObjectType = CmObjectType

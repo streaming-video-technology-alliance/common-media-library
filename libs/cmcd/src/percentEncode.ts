@@ -27,8 +27,7 @@ export function percentEncode(value: string): string {
 
 	try {
 		encoded = encodeURIComponent(value)
-	}
-	catch {
+	} catch {
 		encoded = encodeURIComponent(value.replace(SURROGATE_REGEX, replaceUnpaired))
 	}
 

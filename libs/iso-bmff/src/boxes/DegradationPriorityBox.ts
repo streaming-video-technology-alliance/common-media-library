@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type DegradationPriorityBox = FullBox & {
-	type: 'stdp';
-	priority: number[];
-};
+	type: 'stdp'
+	priority: number[]
+}

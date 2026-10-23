@@ -16,9 +16,7 @@ describe('WebVttTransformStream examples', () => {
 	it('provides a valid example', async () => {
 		//#region example
 		const response = await fetch('./test/test.vtt')
-		const stream = response.body
-			.pipeThrough(new TextDecoderStream())
-			.pipeThrough(new WebVttTransformStream())
+		const stream = response.body.pipeThrough(new TextDecoderStream()).pipeThrough(new WebVttTransformStream())
 
 		const results: any[] = []
 

@@ -3,4 +3,4 @@
  *
  * @public
  */
-export type ValueOrArray<T> = T | T[];
+export type ValueOrArray<T> = T | T[]

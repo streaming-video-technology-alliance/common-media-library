@@ -5,12 +5,16 @@ export function getSeiData(raw: DataView, startPos: number, endPos: number): Dat
 	const data: number[] = []
 
 	for (let cursor = startPos; cursor < endPos; cursor++) {
-		if (cursor + 2 < endPos && raw.getUint8(cursor) === 0x00 && raw.getUint8(cursor + 1) === 0x00 && raw.getUint8(cursor + 2) === 0x03) {
+		if (
+			cursor + 2 < endPos &&
+			raw.getUint8(cursor) === 0x00 &&
+			raw.getUint8(cursor + 1) === 0x00 &&
+			raw.getUint8(cursor + 2) === 0x03
+		) {
 			data.push(0x00)
 			data.push(0x00)
 			cursor += 2
-		} 
-		else {
+		} else {
 			data.push(raw.getUint8(cursor))
 		}
 	}
@@ -60,11 +64,13 @@ const H266_SUFFIX_SEI_TYPE = 24
  * @returns true if the unit type is an SEI NAL unit type for any supported codec
  */
 export function isSeiNalUnitType(unitType: number): boolean {
-	return unitType === H264_SEI_TYPE ||
+	return (
+		unitType === H264_SEI_TYPE ||
 		unitType === H265_PREFIX_SEI_TYPE ||
 		unitType === H265_SUFFIX_SEI_TYPE ||
 		unitType === H266_PREFIX_SEI_TYPE ||
 		unitType === H266_SUFFIX_SEI_TYPE
+	)
 }
 
 /**
@@ -84,13 +90,13 @@ export function extractNalUnitType(raw: DataView, pos: number): { nalType: numbe
 	const byte0 = raw.getUint8(pos)
 
 	// H.264: 1-byte header, type in bits 0-4
-	const h264Type = byte0 & 0x1F
+	const h264Type = byte0 & 0x1f
 	if (h264Type === H264_SEI_TYPE) {
 		return { nalType: h264Type, headerSize: 1 }
 	}
 
 	// H.265: 2-byte header, type in bits 1-6 of byte 0
-	const h265Type = (byte0 >> 1) & 0x3F
+	const h265Type = (byte0 >> 1) & 0x3f
 	if (h265Type === H265_PREFIX_SEI_TYPE || h265Type === H265_SUFFIX_SEI_TYPE) {
 		return { nalType: h265Type, headerSize: 2 }
 	}
@@ -100,7 +106,7 @@ export function extractNalUnitType(raw: DataView, pos: number): { nalType: numbe
 		return null
 	}
 	const byte1 = raw.getUint8(pos + 1)
-	const h266Type = (byte1 >> 3) & 0x1F
+	const h266Type = (byte1 >> 3) & 0x1f
 	if (h266Type === H266_PREFIX_SEI_TYPE || h266Type === H266_SUFFIX_SEI_TYPE) {
 		return { nalType: h266Type, headerSize: 2 }
 	}
@@ -118,10 +124,10 @@ export function parseCta608DataFromSei(sei: DataView, fieldData: number[][]): vo
 
 		do {
 			payloadType += now = sei.getUint8(cursor++)
-		} while (now === 0xFF)
+		} while (now === 0xff)
 		do {
 			payloadSize += now = sei.getUint8(cursor++)
-		} while (now === 0xFF)
+		} while (now === 0xff)
 
 		if (isCea608Sei(payloadType, payloadSize, sei, cursor)) {
 			// Skip the 8-byte A/53 identifier to reach cc_data(). The read is bounded by this

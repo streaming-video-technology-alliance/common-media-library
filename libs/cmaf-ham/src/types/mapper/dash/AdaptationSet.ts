@@ -12,30 +12,30 @@ import type { SegmentTemplate } from './SegmentTemplate.ts'
  */
 export type AdaptationSet = {
 	$: {
-		audioSamplingRate?: string;
-		codecs?: string;
-		contentType?: string;
-		frameRate?: string;
-		group?: string;
-		id?: string;
-		lang?: string;
-		maxBandwidth?: string;
-		maxFrameRate?: string;
-		maxHeight?: string;
-		maxWidth?: string;
-		mimeType?: string;
-		minBandwidth?: string;
-		par?: string;
-		sar?: string;
-		segmentAlignment: string;
-		startWithSAP?: string;
-		subsegmentAlignment?: string;
-		subsegmentStartsWithSAP?: string;
-	};
-	AudioChannelConfiguration?: AudioChannelConfiguration[];
-	ContentComponent?: ContentComponent[];
-	Role?: Role[];
-	Representation: Representation[];
-	SegmentTemplate?: SegmentTemplate[];
-	SegmentList?: SegmentList[];
-};
+		audioSamplingRate?: string
+		codecs?: string
+		contentType?: string
+		frameRate?: string
+		group?: string
+		id?: string
+		lang?: string
+		maxBandwidth?: string
+		maxFrameRate?: string
+		maxHeight?: string
+		maxWidth?: string
+		mimeType?: string
+		minBandwidth?: string
+		par?: string
+		sar?: string
+		segmentAlignment: string
+		startWithSAP?: string
+		subsegmentAlignment?: string
+		subsegmentStartsWithSAP?: string
+	}
+	AudioChannelConfiguration?: AudioChannelConfiguration[]
+	ContentComponent?: ContentComponent[]
+	Role?: Role[]
+	Representation: Representation[]
+	SegmentTemplate?: SegmentTemplate[]
+	SegmentList?: SegmentList[]
+}

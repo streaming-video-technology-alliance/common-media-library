@@ -34,4 +34,4 @@ export const CmcdStreamingFormat = {
 /**
  * @public
  */
-export type CmcdStreamingFormat = ValueOf<typeof CmcdStreamingFormat>;
+export type CmcdStreamingFormat = ValueOf<typeof CmcdStreamingFormat>

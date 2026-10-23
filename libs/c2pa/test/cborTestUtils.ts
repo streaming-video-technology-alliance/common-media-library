@@ -14,5 +14,10 @@ export function encodeCborMapWithEntry(value: Record<string, unknown>, key: unkn
 	// cbor-x writes the length of an object map in two bytes (0xb9), so the header is replaced
 	const info = map[0] & 0x1f
 	const headerLength = info < 24 ? 1 : 1 + (1 << (info - 24))
-	return Uint8Array.of(0xa0 + Object.keys(value).length + 1, ...map.subarray(headerLength), ...encodeCbor(key), ...encodeCbor(entry))
+	return Uint8Array.of(
+		0xa0 + Object.keys(value).length + 1,
+		...map.subarray(headerLength),
+		...encodeCbor(key),
+		...encodeCbor(entry),
+	)
 }

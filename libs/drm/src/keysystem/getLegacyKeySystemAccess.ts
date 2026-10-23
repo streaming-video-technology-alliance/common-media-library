@@ -10,9 +10,7 @@ import { getSupportedKeySystemConfiguration } from './getSupportedKeySystemConfi
  *
  * @public
  */
-export function getLegacyKeySystemAccess(
-	requests: MediaKeySystemAccessRequest[],
-): MediaKeySystemAccessRequest | null {
+export function getLegacyKeySystemAccess(requests: MediaKeySystemAccessRequest[]): MediaKeySystemAccessRequest | null {
 	for (const { keySystem, configurations } of requests) {
 		const supportedConfig = getSupportedKeySystemConfiguration(keySystem, configurations)
 		if (supportedConfig) {

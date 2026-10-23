@@ -9,7 +9,10 @@ import { hashesEqual } from '../utils.ts'
 // §18.25.2 defines a detached payload. The §18.25.3 example has an empty payload. Some signers embed the payload.
 async function verifyPayload(coseSign1: CoseSign1, payload: Uint8Array, publicKey: CryptoKey): Promise<boolean> {
 	const embeddedPayload = coseSign1.payload
-	return (!embeddedPayload?.length || hashesEqual(embeddedPayload, payload)) && verifyCoseSign1(coseSign1, payload, publicKey)
+	return (
+		(!embeddedPayload?.length || hashesEqual(embeddedPayload, payload)) &&
+		verifyCoseSign1(coseSign1, payload, publicKey)
+	)
 }
 
 /**
@@ -40,7 +43,9 @@ export async function verifySignerBinding(
 ): Promise<boolean> {
 	const coseSign1 = decodeCoseSign1(signerBindingBytes)
 	const jwk = convertCoseKeyToJwk(sessionCoseKey)
-	const publicKey = await crypto.subtle.importKey('jwk', jwk as JsonWebKey, resolveImportAlgorithm(jwk), false, ['verify'])
+	const publicKey = await crypto.subtle.importKey('jwk', jwk as JsonWebKey, resolveImportAlgorithm(jwk), false, [
+		'verify',
+	])
 	if (await verifyPayload(coseSign1, signerCertBytes, publicKey)) return true
 	return verifyPayload(coseSign1, encodeCborByteString(signerCertBytes), publicKey)
 }

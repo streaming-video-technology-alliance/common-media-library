@@ -7,7 +7,7 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SampleEncryptionBox = FullBox & {
-	type: 'senc';
-	sampleCount: number;
-	samples: EncryptedSample[];
-};
+	type: 'senc'
+	sampleCount: number
+	samples: EncryptedSample[]
+}

@@ -29,17 +29,22 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * @public
  */
-export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdEventsValidationResult {
+export function validateCmcdEvents(
+	cmcd: string,
+	options?: Omit<CmcdValidationOptions, 'reportingMode'>,
+): CmcdEventsValidationResult {
 	const opts = { ...options, reportingMode: CMCD_EVENT_MODE } as const
 	const lines = cmcd.split(/\r?\n/).filter(line => line.length > 0)
 
 	if (lines.length === 0) {
 		return {
 			valid: false,
-			issues: [{
-				message: 'Empty event mode payload. At least one event line is required.',
-				severity: CMCD_VALIDATION_SEVERITY_ERROR,
-			}],
+			issues: [
+				{
+					message: 'Empty event mode payload. At least one event line is required.',
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
+				},
+			],
 			data: [],
 		}
 	}
@@ -64,10 +69,12 @@ export function validateCmcdEvents(cmcd: string, options?: Omit<CmcdValidationOp
 			decodedLines.push({} as CmcdData)
 			lineResults.push({
 				valid: false,
-				issues: [{
-					message: `Failed to decode event line ${i + 1}: invalid structured field syntax.`,
-					severity: CMCD_VALIDATION_SEVERITY_ERROR,
-				}],
+				issues: [
+					{
+						message: `Failed to decode event line ${i + 1}: invalid structured field syntax.`,
+						severity: CMCD_VALIDATION_SEVERITY_ERROR,
+					},
+				],
 			})
 		}
 	}

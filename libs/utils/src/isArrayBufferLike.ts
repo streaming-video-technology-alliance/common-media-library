@@ -14,6 +14,7 @@
  * {@includeCode ../test/isArrayBufferLike.test.ts#example}
  */
 export function isArrayBufferLike(value: unknown): value is ArrayBufferLike {
-	return value instanceof ArrayBuffer
-		|| (typeof SharedArrayBuffer !== 'undefined' && value instanceof SharedArrayBuffer)
+	return (
+		value instanceof ArrayBuffer || (typeof SharedArrayBuffer !== 'undefined' && value instanceof SharedArrayBuffer)
+	)
 }

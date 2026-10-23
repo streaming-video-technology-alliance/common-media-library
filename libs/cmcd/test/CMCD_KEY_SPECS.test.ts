@@ -1,5 +1,13 @@
 import type { CmcdFormatterOptions } from '@svta/cml-cmcd'
-import { CMCD_EVENT_KEYS, CMCD_FORMATTER_MAP, CMCD_KEYS, CMCD_REQUEST_KEYS, CMCD_RESPONSE_KEYS, CMCD_V1_KEYS, CmcdReportingMode } from '@svta/cml-cmcd'
+import {
+	CMCD_EVENT_KEYS,
+	CMCD_FORMATTER_MAP,
+	CMCD_KEYS,
+	CMCD_REQUEST_KEYS,
+	CMCD_RESPONSE_KEYS,
+	CMCD_V1_KEYS,
+	CmcdReportingMode,
+} from '@svta/cml-cmcd'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { CMCD_KEY_SPECS } from '../src/CMCD_KEY_SPECS.ts'

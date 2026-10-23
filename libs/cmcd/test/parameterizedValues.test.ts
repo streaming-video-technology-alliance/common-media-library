@@ -5,7 +5,22 @@ import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 
-const NUMERIC_LIST_KEYS = ['ab', 'bl', 'br', 'bsa', 'bsd', 'bsda', 'lab', 'lb', 'mtp', 'pb', 'tab', 'tb', 'tbl', 'tpb'] as const
+const NUMERIC_LIST_KEYS = [
+	'ab',
+	'bl',
+	'br',
+	'bsa',
+	'bsd',
+	'bsda',
+	'lab',
+	'lb',
+	'mtp',
+	'pb',
+	'tab',
+	'tb',
+	'tbl',
+	'tpb',
+] as const
 const VERSION_1_KEYS: readonly string[] = ['bl', 'br', 'mtp', 'tb']
 
 function decodeToRecord(input: string, options?: CmcdDecodeOptions): Record<string, unknown> {
@@ -13,8 +28,8 @@ function decodeToRecord(input: string, options?: CmcdDecodeOptions): Record<stri
 }
 
 function errorsOf(input: string): string[] {
-	return validateCmcd(decodeToRecord(input)).issues
-		.filter(issue => issue.severity === 'error')
+	return validateCmcd(decodeToRecord(input))
+		.issues.filter(issue => issue.severity === 'error')
 		.map(issue => issue.message)
 }
 
@@ -26,7 +41,7 @@ function bareList(value: unknown): unknown[] {
 	ok(value instanceof SfItem, 'expected an SfItem that wraps a list')
 	const list = value.value as unknown
 	ok(Array.isArray(list), 'expected a list inside the SfItem')
-	return list.map(item => item instanceof SfItem ? item.value : item)
+	return list.map(item => (item instanceof SfItem ? item.value : item))
 }
 
 function decodedBr(input: string): Cmcd['br'] {
@@ -36,7 +51,7 @@ function decodedBr(input: string): Cmcd['br'] {
 function createMockRequester() {
 	const requests: HttpRequest[] = []
 
-	const requester = async (request: HttpRequest): Promise<{ status: number; }> => {
+	const requester = async (request: HttpRequest): Promise<{ status: number }> => {
 		requests.push(request)
 		return { status: 200 }
 	}
@@ -163,16 +178,21 @@ describe('values with parameters', () => {
 
 		it('fires one BITRATE_CHANGE event for two equal br lists with parameters', async () => {
 			const { requester, requests } = createMockRequester()
-			const reporter = new CmcdReporter({
-				sid: 'test-session',
-				enabledKeys: [...REPORT_KEYS],
-				eventTargets: [{
-					url: 'https://example.com/cmcd',
-					events: [CmcdEventType.BITRATE_CHANGE],
+			const reporter = new CmcdReporter(
+				{
+					sid: 'test-session',
 					enabledKeys: [...REPORT_KEYS],
-					batchSize: 1,
-				}],
-			}, requester)
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.BITRATE_CHANGE],
+							enabledKeys: [...REPORT_KEYS],
+							batchSize: 1,
+						},
+					],
+				},
+				requester,
+			)
 
 			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
 			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
@@ -185,16 +205,21 @@ describe('values with parameters', () => {
 
 		it('fires no BITRATE_CHANGE event when only the list parameters change', async () => {
 			const { requester, requests } = createMockRequester()
-			const reporter = new CmcdReporter({
-				sid: 'test-session',
-				enabledKeys: [...REPORT_KEYS],
-				eventTargets: [{
-					url: 'https://example.com/cmcd',
-					events: [CmcdEventType.BITRATE_CHANGE],
+			const reporter = new CmcdReporter(
+				{
+					sid: 'test-session',
 					enabledKeys: [...REPORT_KEYS],
-					batchSize: 1,
-				}],
-			}, requester)
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.BITRATE_CHANGE],
+							enabledKeys: [...REPORT_KEYS],
+							batchSize: 1,
+						},
+					],
+				},
+				requester,
+			)
 
 			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
 			reporter.update({ br: decodedBr('br=(3000 6000);p=3') })
@@ -210,23 +235,28 @@ describe('values with parameters', () => {
 
 		it('keeps the stored br list when a transform changes the list in its report', async () => {
 			const { requester, requests } = createMockRequester()
-			const reporter = new CmcdReporter({
-				sid: 'test-session',
-				enabledKeys: [...REPORT_KEYS],
-				eventTargets: [{
-					url: 'https://example.com/cmcd',
-					events: [CmcdEventType.ERROR],
+			const reporter = new CmcdReporter(
+				{
+					sid: 'test-session',
 					enabledKeys: [...REPORT_KEYS],
-					batchSize: 1,
-					transform: (data) => {
-						const br = data.br as unknown
-						if (br instanceof SfItem) {
-							(br.value as unknown as SfItem[]).push(new SfItem(9900))
-						}
-						return data
-					},
-				}],
-			}, requester)
+					eventTargets: [
+						{
+							url: 'https://example.com/cmcd',
+							events: [CmcdEventType.ERROR],
+							enabledKeys: [...REPORT_KEYS],
+							batchSize: 1,
+							transform: data => {
+								const br = data.br as unknown
+								if (br instanceof SfItem) {
+									;(br.value as unknown as SfItem[]).push(new SfItem(9900))
+								}
+								return data
+							},
+						},
+					],
+				},
+				requester,
+			)
 
 			reporter.update({ br: decodedBr('br=(3000 6000);p=2') })
 			reporter.recordEvent(CmcdEventType.ERROR)

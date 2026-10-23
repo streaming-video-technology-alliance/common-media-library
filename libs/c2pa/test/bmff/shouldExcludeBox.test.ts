@@ -42,8 +42,22 @@ describe('shouldExcludeBox', () => {
 	it('returns true for subset ranges that cover the whole box', () => {
 		const [moov] = readRootBoxes(buildBox('moov', buildBox('free')))
 		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 0 }] }]), true)
-		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 8 }, { offset: 8, length: 100 }] }]), true)
-		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 8 }] }, { xpath: '/moov/free' }]), true)
+		strictEqual(
+			shouldExcludeBox(moov, [
+				{
+					xpath: '/moov',
+					subset: [
+						{ offset: 0, length: 8 },
+						{ offset: 8, length: 100 },
+					],
+				},
+			]),
+			true,
+		)
+		strictEqual(
+			shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 8 }] }, { xpath: '/moov/free' }]),
+			true,
+		)
 	})
 
 	it('returns false for subset ranges that leave a byte of the box', () => {
@@ -53,7 +67,9 @@ describe('shouldExcludeBox', () => {
 	})
 
 	describe('xpath index', () => {
-		const [first, , second] = readRootBoxes(concatBytes(buildBox('uuid', Uint8Array.of(1)), buildBox('free'), buildBox('uuid', Uint8Array.of(2))))
+		const [first, , second] = readRootBoxes(
+			concatBytes(buildBox('uuid', Uint8Array.of(1)), buildBox('free'), buildBox('uuid', Uint8Array.of(2))),
+		)
 
 		it('matches [1] against the first box of the type', () => {
 			strictEqual(shouldExcludeBox(first, [{ xpath: '/uuid[1]' }]), true)
@@ -129,11 +145,17 @@ describe('shouldExcludeBox', () => {
 		const [uuid] = readRootBoxes(buildBox('uuid', payload))
 
 		it('matches the box bytes at the offset from the box start', () => {
-			strictEqual(shouldExcludeBox(uuid, [{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xca, 0xfe) }] }]), true)
+			strictEqual(
+				shouldExcludeBox(uuid, [{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xca, 0xfe) }] }]),
+				true,
+			)
 		})
 
 		it('does not match other bytes', () => {
-			strictEqual(shouldExcludeBox(uuid, [{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xaa, 0xbb) }] }]), false)
+			strictEqual(
+				shouldExcludeBox(uuid, [{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xaa, 0xbb) }] }]),
+				false,
+			)
 		})
 
 		it('does not match a value that runs past the end of the box', () => {

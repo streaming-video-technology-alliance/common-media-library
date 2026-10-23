@@ -80,7 +80,7 @@ export class CmcdReportRecorder {
 	private readonly deliver = (request: HttpRequest): Response | undefined => {
 		const url = request.url
 		const method = (request.method ?? 'GET').toUpperCase()
-		const isEventTarget = method === 'POST' && this.eventTargetUrls.some((t) => url.startsWith(t))
+		const isEventTarget = method === 'POST' && this.eventTargetUrls.some(t => url.startsWith(t))
 
 		const reportingMode = detectReportingMode(url, request.headers, isEventTarget)
 		if (reportingMode === null) {
@@ -107,9 +107,7 @@ export class CmcdReportRecorder {
 	}
 
 	private getMatching(type: CmcdRecordedRequestType | undefined): CmcdRecordedReport[] {
-		return type === undefined
-			? [...this.reports]
-			: this.reports.filter((r) => r.type === type)
+		return type === undefined ? [...this.reports] : this.reports.filter(r => r.type === type)
 	}
 
 	private notifyWaiters(): void {
@@ -139,9 +137,11 @@ export class CmcdReportRecorder {
 			const timer = setTimeout(() => {
 				this.waiters.delete(timer)
 				const current = this.getMatching(type)
-				reject(new Error(
-					`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.reports.length}.`,
-				))
+				reject(
+					new Error(
+						`Timeout waiting for ${count} ${type ?? 'any'} CMCD report(s). Got ${current.length}. Total recorded: ${this.reports.length}.`,
+					),
+				)
 			}, timeout)
 
 			this.waiters.set(timer, { type, count, resolve, reject })

@@ -1,4 +1,13 @@
-import { assert, describe, filterBoxes, it, readStsd, type AudioSampleEntryBox, type VisualSampleEntryBox, type VisualSampleEntryType } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	filterBoxes,
+	it,
+	readStsd,
+	type AudioSampleEntryBox,
+	type VisualSampleEntryBox,
+	type VisualSampleEntryType,
+} from '../util/box.ts'
 
 describe('readStsd', function () {
 	it('should correctly parse the box', function () {

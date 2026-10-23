@@ -10,4 +10,3 @@ export type * from './EwmaEstimatorOptions.ts'
 export * from './HarmonicMeanEstimator.ts'
 export type * from './ThroughputEstimator.ts'
 export * from './ZlemaEstimator.ts'
-

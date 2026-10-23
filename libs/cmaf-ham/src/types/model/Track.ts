@@ -12,14 +12,17 @@ import type { TrackType } from './TrackType.ts'
  */
 // TODO: Tracks should have generics to allow for media specific fields, i.e VideoTrack, AudioTrack, TextTrack, ImageTrack, etc.
 // TODO: Duration is just for convenience. The duration should match the presentation duration.
-export type Track = Ham & Base & Duration & AddressableObject & {
-	type: TrackType;
-	codecs: string[];
-	mimeType: string;
-	language?: string;
-	bandwidth: number;
-	initialization: AddressableObject;
-	segments: Segment[];
-	segmentIndex?: AddressableObject & { timescale: number };
-	presentationTimeOffset?: number;
-}
+export type Track = Ham &
+	Base &
+	Duration &
+	AddressableObject & {
+		type: TrackType
+		codecs: string[]
+		mimeType: string
+		language?: string
+		bandwidth: number
+		initialization: AddressableObject
+		segments: Segment[]
+		segmentIndex?: AddressableObject & { timescale: number }
+		presentationTimeOffset?: number
+	}

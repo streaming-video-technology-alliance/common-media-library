@@ -12,15 +12,13 @@ export function getHlsCodec(type: string, codecs?: string): string {
 		// Using codec mp4a.40.2 for now, we should retrieve it by finding
 		// the video playlist that is related to this audio group.
 		return 'mp4a.40.2'
-	}
-	else if (type === 'video') {
+	} else if (type === 'video') {
 		// CODECS could be a comma separated value
 		// where it has video and audio codec. Using
 		// position zero for now.
 		// TODO: Get the correct video codec.
 		return codecs?.split(',').at(0) ?? ''
-	}
-	else {
+	} else {
 		// if (type === 'text')
 		return ''
 	}

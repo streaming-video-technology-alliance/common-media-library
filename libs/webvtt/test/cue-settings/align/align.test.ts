@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cue-settings/align tests', () => {
-
 	it('bad-align.vtt', async () => {
 		await expectCuesEqualAll('test/cue-settings/align/bad-align.vtt', 'test/cue-settings/align/bad-align.json')
 	})
@@ -28,7 +27,10 @@ describe('cue-settings/align tests', () => {
 	})
 
 	it('keyword-middle.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/keyword-middle.vtt', 'test/cue-settings/align/keyword-middle.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/keyword-middle.vtt',
+			'test/cue-settings/align/keyword-middle.json',
+		)
 	})
 
 	it('keyword-right.vtt', async () => {
@@ -44,11 +46,16 @@ describe('cue-settings/align tests', () => {
 	})
 
 	it('space-after-delimiter.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/space-after-delimiter.vtt', 'test/cue-settings/align/bad-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/space-after-delimiter.vtt',
+			'test/cue-settings/align/bad-align.json',
+		)
 	})
 
 	it('space-before-delimiter.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/space-before-delimiter.vtt', 'test/cue-settings/align/bad-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/space-before-delimiter.vtt',
+			'test/cue-settings/align/bad-align.json',
+		)
 	})
-
 })

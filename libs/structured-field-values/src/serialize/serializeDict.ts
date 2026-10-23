@@ -53,8 +53,7 @@ export function serializeDict(dict: Record<string, any> | Map<string, any>, opti
 
 	if (dict instanceof Map) {
 		dict.forEach((member, key) => parts.push(serializeDictMember(key, member)))
-	}
-	else {
+	} else {
 		for (const key of Object.keys(dict)) {
 			parts.push(serializeDictMember(key, dict[key]))
 		}

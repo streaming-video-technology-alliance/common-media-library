@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../utils/expectCuesEqualAll.ts'
 
 describe('file-layout tests', function () {
-
 	it('blank-file-with-bom.vtt', async () => {
 		await expectCuesEqualAll('test/file-layout/blank-file-with-bom.vtt', 'test/file-layout/no-output.json')
 	})
@@ -42,7 +41,10 @@ describe('file-layout tests', function () {
 	})
 
 	it('no-space-cue-times-cue-settings.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/no-space-cue-times-cue-settings.vtt', 'test/file-layout/no-space-cue-times-cue-settings.json')
+		await expectCuesEqualAll(
+			'test/file-layout/no-space-cue-times-cue-settings.vtt',
+			'test/file-layout/no-space-cue-times-cue-settings.json',
+		)
 	})
 
 	it('tab-after-bom-before-header.vtt', async () => {
@@ -68,5 +70,4 @@ describe('file-layout tests', function () {
 	it('bad-double-webvtt.vtt', async () => {
 		await expectCuesEqualAll('test/file-layout/bad-double-webvtt.vtt', 'test/file-layout/no-output.json')
 	})
-
 })

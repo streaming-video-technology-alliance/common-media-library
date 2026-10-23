@@ -26,6 +26,6 @@ export function readAudioSampleEntryBox<T extends IsoBoxType>(type: T, view: Iso
 		preDefined: readUint(2),
 		reserved3: readUint(2),
 		samplerate: readTemplate(4),
-		boxes: readBoxes<AudioSampleEntryBoxChild>()
+		boxes: readBoxes<AudioSampleEntryBoxChild>(),
 	}
-};
+}

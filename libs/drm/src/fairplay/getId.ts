@@ -19,8 +19,7 @@ export function getId(licenseServerUrl: string, initData: ArrayBufferLike, query
 		const url = new URL(licenseServerUrl)
 		const params = new URLSearchParams(url.search)
 		return params.get(queryParam) || extractContentId(initData)
-	}
-	catch {
+	} catch {
 		// in case if URL parsing fails,
 		// fallback to extracting from initData
 		return extractContentId(initData)

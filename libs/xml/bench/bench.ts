@@ -22,24 +22,24 @@ import { generateMpd } from './generate.ts'
 type ParseFunction = (input: string) => unknown
 
 type Variant = {
-	name: string;
-	load: () => Promise<ParseFunction>;
+	name: string
+	load: () => Promise<ParseFunction>
 }
 
 type Input = {
-	name: string;
-	make: () => string;
-	iterations: number;
+	name: string
+	make: () => string
+	iterations: number
 }
 
 type Stats = {
-	median: number;
-	p95: number;
+	median: number
+	p95: number
 }
 
 type WorkerResult = {
-	length: number;
-	stats: Stats;
+	length: number
+	stats: Stats
 }
 
 const WARM_UP_CALLS = 4
@@ -71,9 +71,21 @@ if (baseline !== undefined) {
 const inputs: Input[] = [
 	{ name: 'pretty />, 100k S', make: () => generateMpd({ pretty: true }), iterations: forceGc ? 20 : 60 },
 	{ name: 'minified />, 100k S', make: () => generateMpd({ pretty: false }), iterations: forceGc ? 20 : 60 },
-	{ name: 'pretty </S>, 100k S', make: () => generateMpd({ pretty: true, closed: true }), iterations: forceGc ? 20 : 60 },
-	{ name: 'livesim2 real, 5402 S', make: () => readFileSync(resolve(FIXTURES, 'livesim2_tsbd21600.mpd'), 'utf8'), iterations: 300 },
-	{ name: 'livesim2-scale 60x2x20 </S>', make: () => generateMpd({ periods: 60, adaptationSets: 2, segments: 20, closed: true }), iterations: 300 },
+	{
+		name: 'pretty </S>, 100k S',
+		make: () => generateMpd({ pretty: true, closed: true }),
+		iterations: forceGc ? 20 : 60,
+	},
+	{
+		name: 'livesim2 real, 5402 S',
+		make: () => readFileSync(resolve(FIXTURES, 'livesim2_tsbd21600.mpd'), 'utf8'),
+		iterations: 300,
+	},
+	{
+		name: 'livesim2-scale 60x2x20 </S>',
+		make: () => generateMpd({ periods: 60, adaptationSets: 2, segments: 20, closed: true }),
+		iterations: 300,
+	},
 	{ name: 'bbb_30fps.mpd', make: () => readFileSync(resolve(FIXTURES, 'bbb_30fps.mpd'), 'utf8'), iterations: 3000 },
 ].filter(input => only === undefined || input.name.includes(only))
 
@@ -134,11 +146,19 @@ async function measure(variant: Variant, input: Input): Promise<void> {
 function drive(): void {
 	const self = resolve(import.meta.filename)
 
-	console.log(`Node ${process.version}, ${process.arch}, ${forceGc ? 'full GC before each call' : 'natural GC'}, one process per variant and input, ${WARM_UP_CALLS} warm-up calls\n`)
+	console.log(
+		`Node ${process.version}, ${process.arch}, ${forceGc ? 'full GC before each call' : 'natural GC'}, one process per variant and input, ${WARM_UP_CALLS} warm-up calls\n`,
+	)
 
 	inputs.forEach((input, inputIndex) => {
 		const results: WorkerResult[] = variants.map((_, variantIndex) => {
-			const nodeArgs = [...(forceGc ? ['--expose-gc'] : []), '--no-warnings', self, `--run=${variantIndex},${inputIndex}`, ...args]
+			const nodeArgs = [
+				...(forceGc ? ['--expose-gc'] : []),
+				'--no-warnings',
+				self,
+				`--run=${variantIndex},${inputIndex}`,
+				...args,
+			]
 			const proc = spawnSync(process.execPath, nodeArgs, { encoding: 'utf8' })
 			if (proc.status !== 0) {
 				throw new Error(proc.stderr)
@@ -147,11 +167,15 @@ function drive(): void {
 			return JSON.parse(lines[lines.length - 1])
 		})
 
-		console.log(`### ${input.name} (${results[0].length.toLocaleString('en-US')} chars, ${input.iterations} iterations)\n`)
+		console.log(
+			`### ${input.name} (${results[0].length.toLocaleString('en-US')} chars, ${input.iterations} iterations)\n`,
+		)
 		console.log('| Variant | Median | p95 | vs baseline |')
 		console.log('| --- | ---: | ---: | ---: |')
 		results.forEach((result, variantIndex) => {
-			console.log(`| ${variants[variantIndex].name} | ${formatMs(result.stats.median)} | ${formatMs(result.stats.p95)} | ${formatDelta(result.stats.median, results[0].stats.median)} |`)
+			console.log(
+				`| ${variants[variantIndex].name} | ${formatMs(result.stats.median)} | ${formatMs(result.stats.p95)} | ${formatDelta(result.stats.median, results[0].stats.median)} |`,
+			)
 		})
 		console.log('')
 	})
@@ -160,8 +184,7 @@ function drive(): void {
 if (run !== undefined) {
 	const [variantIndex, inputIndex] = run.split(',').map(Number)
 	await measure(variants[variantIndex], inputs[inputIndex])
-}
-else {
+} else {
 	drive()
 }
 

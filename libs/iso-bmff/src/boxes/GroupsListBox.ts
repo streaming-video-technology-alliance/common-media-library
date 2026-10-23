@@ -1,10 +1,9 @@
-
 /**
  * Child boxes of Groups List Box
  *
  * @public
  */
-export type GroupsListBoxChild = any;
+export type GroupsListBoxChild = any
 
 /**
  * Groups List Box - 'grpl' - Container
@@ -13,5 +12,5 @@ export type GroupsListBoxChild = any;
  */
 export type GroupsListBox = {
 	type: 'grpl'
-	boxes: GroupsListBoxChild[];
+	boxes: GroupsListBoxChild[]
 }

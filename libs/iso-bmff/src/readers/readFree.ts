@@ -15,4 +15,4 @@ export function readFree(view: IsoBoxReadView): FreeSpaceBox {
 		type: 'free',
 		data: view.readData(-1),
 	}
-};
+}

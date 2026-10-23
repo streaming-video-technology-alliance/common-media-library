@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cuetext/ruby tests', () => {
-
 	it('basic.vtt', async () => {
 		await expectCuesEqualAll('test/cuetext/ruby/basic.vtt', 'test/cuetext/ruby/basic.json')
 	})
@@ -34,5 +33,4 @@ describe('cuetext/ruby tests', () => {
 	it('with-two-subclasses.vtt', async () => {
 		await expectCuesEqualAll('test/cuetext/ruby/with-two-subclasses.vtt', 'test/cuetext/ruby/with-two-subclasses.json')
 	})
-
 })

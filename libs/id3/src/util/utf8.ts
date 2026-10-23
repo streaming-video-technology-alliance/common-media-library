@@ -3,11 +3,7 @@ import { isArrayBufferLike } from '@svta/cml-utils'
 /**
  * @internal
  */
-export function toUint8(
-	data: BufferSource,
-	offset: number = 0,
-	length: number = Infinity,
-): Uint8Array {
+export function toUint8(data: BufferSource, offset: number = 0, length: number = Infinity): Uint8Array {
 	return view(data, offset, length, Uint8Array)
 }
 
@@ -24,9 +20,9 @@ function view<T extends ArrayBufferView>(
 	}
 	// Absolute end of the |data| view within |buffer|.
 	const dataOffset = isArrayBufferView(data) ? data.byteOffset : 0
-	const dataEnd = ((dataOffset) + data.byteLength) / bytesPerElement
+	const dataEnd = (dataOffset + data.byteLength) / bytesPerElement
 	// Absolute start of the result within |buffer|.
-	const rawStart = ((dataOffset) + offset) / bytesPerElement
+	const rawStart = (dataOffset + offset) / bytesPerElement
 	const start = Math.floor(Math.max(0, Math.min(rawStart, dataEnd)))
 	// Absolute end of the result within |buffer|.
 	const end = Math.floor(Math.min(start + Math.max(length, 0), dataEnd))
@@ -36,8 +32,7 @@ function view<T extends ArrayBufferView>(
 function unsafeGetArrayBuffer(view: BufferSource) {
 	if (isArrayBufferLike(view)) {
 		return view
-	}
-	else {
+	} else {
 		return view.buffer
 	}
 }

@@ -3,9 +3,7 @@ import assert from 'node:assert'
 import test from 'node:test'
 
 test('parseDictionary', () => {
-	assert.deepStrictEqual(parseDict(
-		`int=1, dec=1.23, token=a, str="a", bool=?1, bin=:AQID:, date=@1659578233`,
-	), {
+	assert.deepStrictEqual(parseDict(`int=1, dec=1.23, token=a, str="a", bool=?1, bin=:AQID:, date=@1659578233`), {
 		value: {
 			'int': new SfItem(1),
 			'dec': new SfItem(1.23),

@@ -31,7 +31,7 @@ const headSuffix = '...HEAD'
 const linkBreak = '\n'
 const last = sections.length - 1
 const links = sections[last].split(linkBreak)
-const index = links.findIndex((link) => link.endsWith(headSuffix) && link.includes(tagPrefix))
+const index = links.findIndex(link => link.endsWith(headSuffix) && link.includes(tagPrefix))
 
 if (index < 0) {
 	throw new Error(`Missing ${tagPrefix}<version>${headSuffix} compare link in ${folder}/CHANGELOG.md`)
@@ -41,7 +41,11 @@ const unreleased = links[index]
 const tagStart = unreleased.lastIndexOf(tagPrefix)
 const previous = unreleased.slice(tagStart + tagPrefix.length, unreleased.length - headSuffix.length)
 links[index] = unreleased.slice(0, tagStart) + version + headSuffix
-links.splice(index + 1, 0, `[${ver}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/${tagPrefix}${previous}...${version}`)
+links.splice(
+	index + 1,
+	0,
+	`[${ver}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/${tagPrefix}${previous}...${version}`,
+)
 sections[last] = links.join(linkBreak)
 
 await writeFile(`${folder}/CHANGELOG.md`, sections.join('## '))

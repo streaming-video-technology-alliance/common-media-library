@@ -10,9 +10,12 @@ test('decodeSfItem', () => {
 	assert.deepStrictEqual(decodeSfItem(`:AQID:`), new SfItem(new Uint8Array([1, 2, 3])))
 	assert.deepStrictEqual(decodeSfItem(`@1659578233`), new SfItem(new Date(1659578233 * 1000)))
 
-	assert.throws(() => decodeSfItem(`1;`), (error: any) => {
-		assert.deepStrictEqual(error.message, `failed to parse "1;" as Item`)
-		assert.deepStrictEqual(error.cause.message, `failed to parse "" as Key`)
-		return true
-	})
+	assert.throws(
+		() => decodeSfItem(`1;`),
+		(error: any) => {
+			assert.deepStrictEqual(error.message, `failed to parse "1;" as Item`)
+			assert.deepStrictEqual(error.cause.message, `failed to parse "" as Key`)
+			return true
+		},
+	)
 })

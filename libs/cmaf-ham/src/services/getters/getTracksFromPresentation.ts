@@ -12,12 +12,7 @@ import { getTracksFromSelectionSet } from './getTracksFromSelectionSet.ts'
  *
  * @alpha
  */
-export function getTracksFromPresentation(
-	presentation: Presentation,
-	predicate?: (track: Track) => boolean,
-): Track[] {
-	const tracks = presentation.selectionSets.flatMap((selectionSet) =>
-		getTracksFromSelectionSet(selectionSet),
-	)
+export function getTracksFromPresentation(presentation: Presentation, predicate?: (track: Track) => boolean): Track[] {
+	const tracks = presentation.selectionSets.flatMap(selectionSet => getTracksFromSelectionSet(selectionSet))
 	return predicate ? tracks.filter(predicate) : tracks
 }

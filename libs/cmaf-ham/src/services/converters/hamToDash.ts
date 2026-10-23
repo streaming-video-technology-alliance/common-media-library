@@ -26,4 +26,3 @@ export function hamToDash(presentation: Presentation[]): ManifestFile {
 	mapperContext.setStrategy(new DashMapper())
 	return mapperContext.getManifestFormat(presentation)
 }
-

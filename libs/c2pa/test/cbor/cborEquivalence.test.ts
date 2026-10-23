@@ -9,7 +9,8 @@ import { parseJumbfBoxes } from '../../src/jumbf/parseJumbfBoxes.ts'
 import { readC2paManifest } from '../../src/readC2paManifest.ts'
 
 const toBytes = (hex: string): Uint8Array => Uint8Array.from(Buffer.from(hex.replace(/ /g, ''), 'hex'))
-const loadFixture = (name: string): Uint8Array => new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
+const loadFixture = (name: string): Uint8Array =>
+	new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
 const nestedArrays = (levels: number): Uint8Array => Uint8Array.from([...Array(levels - 1).fill(0x81), 0x80])
 
 const MAX_SAFE_INTEGER = BigInt(Number.MAX_SAFE_INTEGER)
@@ -24,30 +25,89 @@ const FIXTURES = [
 // Inputs that both decoders accept with the same value
 const SAME_VALUE = [
 	// unsigned integers
-	'00', '17', '18 18', '19 0100', '1a ffffffff', '1b 0000000100000000', '1b 001fffffffffffff', '1b 0020000000000000', '1b ffffffffffffffff',
+	'00',
+	'17',
+	'18 18',
+	'19 0100',
+	'1a ffffffff',
+	'1b 0000000100000000',
+	'1b 001fffffffffffff',
+	'1b 0020000000000000',
+	'1b ffffffffffffffff',
 	// negative integers
-	'20', '38 18', '3b 001fffffffffffff', '3b 0020000000000000', '3b ffffffffffffffff',
+	'20',
+	'38 18',
+	'3b 001fffffffffffff',
+	'3b 0020000000000000',
+	'3b ffffffffffffffff',
 	// byte and text strings, with a leading U+FEFF and a text string above the ASCII fast path of the reader
-	'40', '42 0102', '60', '63 616263', '62 ffff', '64 efbbbf61', '78 28 ' + '61'.repeat(40), 'a1 62 c3a9 01',
+	'40',
+	'42 0102',
+	'60',
+	'63 616263',
+	'62 ffff',
+	'64 efbbbf61',
+	'78 28 ' + '61'.repeat(40),
+	'a1 62 c3a9 01',
 	// arrays and maps, with integer, float, boolean, and null keys
-	'80', '84 f4 f5 f6 f7', '9f 01 02 ff', 'a0', 'a2 01 02 03 04', 'a1 20 02', 'a1 f9 3e00 02', 'a1 f5 02', 'a1 f6 02', 'bf 61 61 01 ff',
+	'80',
+	'84 f4 f5 f6 f7',
+	'9f 01 02 ff',
+	'a0',
+	'a2 01 02 03 04',
+	'a1 20 02',
+	'a1 f9 3e00 02',
+	'a1 f5 02',
+	'a1 f6 02',
+	'bf 61 61 01 ff',
 	// floats, with a subnormal half float, negative zero, NaN, and Infinity
-	'f9 3e00', 'f9 0001', 'f9 8000', 'f9 7e00', 'fa 3fc00000', 'fa 7f800000', 'fb 3ff8000000000000',
+	'f9 3e00',
+	'f9 0001',
+	'f9 8000',
+	'f9 7e00',
+	'fa 3fc00000',
+	'fa 7f800000',
+	'fb 3ff8000000000000',
 	// tag 0 with text and tag 1 with an integer or a float
-	'c0 74 323032352d30372d32395431303a30303a30305a', '81 c0 74 323032352d30372d32395431303a30303a30305a', 'c1 1a 5f5e0ff0', 'c1 fb 41d7c2a35b8ccccd',
+	'c0 74 323032352d30372d32395431303a30303a30305a',
+	'81 c0 74 323032352d30372d32395431303a30303a30305a',
+	'c1 1a 5f5e0ff0',
+	'c1 fb 41d7c2a35b8ccccd',
 	// tag 18 around a COSE_Sign1 array, tag 24, tag 32, and tag 999
-	'd2 84 40 a0 f6 40', 'd8 18 42 0102', 'd8 20 61 61', 'd9 03e7 01',
+	'd2 84 40 a0 f6 40',
+	'd8 18 42 0102',
+	'd8 20 61 61',
+	'd9 03e7 01',
 ]
 
 // Inputs that both decoders reject. cbor-x allocates the declared length of an array before it reads the items,
 // so the two preallocation cases of the reader tests stay out of this list.
 const BOTH_REJECT = [
 	// empty and incomplete items
-	'', '82 01', '43 0102', '19 03', 'a1 6161', 'a5 00',
+	'',
+	'82 01',
+	'43 0102',
+	'19 03',
+	'a1 6161',
+	'a5 00',
 	// additional information 28 to 30, an indefinite integer, negative integer, or tag, and a break in value position
-	'1c', '1d', '1e', 'fc', '3f', 'df', 'bf 00 ff',
+	'1c',
+	'1d',
+	'1e',
+	'fc',
+	'3f',
+	'df',
+	'bf 00 ff',
 	// indefinite strings, trailing bytes, reserved simple values, container keys, and a tag number above 2^64 - 1
-	'5f 41 01 41 02 ff', '7f 61 61 61 62 ff', '01 01', 'f0', 'f8 18', 'f8 20', 'a1 41 01 02', 'a1 80 02', 'db ffffffffffffffff 01',
+	'5f 41 01 41 02 ff',
+	'7f 61 61 61 62 ff',
+	'01 01',
+	'f0',
+	'f8 18',
+	'f8 20',
+	'a1 41 01 02',
+	'a1 80 02',
+	'db ffffffffffffffff 01',
 ]
 
 // The cbor-x value in the public shape of the reader. A BigInt up to 2^53 - 1 becomes a number. A Tag becomes { tag, value }.
@@ -67,9 +127,21 @@ function decodeWithBoth(bytes: Uint8Array, path: string): Decoded {
 	let fromReader: unknown
 	let cborXAccepts = true
 	let readerAccepts = true
-	try { fromCborX = decodeWithCborX(bytes) } catch { cborXAccepts = false }
-	try { fromReader = decodeCbor(bytes) } catch { readerAccepts = false }
-	strictEqual(readerAccepts, cborXAccepts, `${path}: the reader ${readerAccepts ? 'accepts' : 'rejects'}, cbor-x ${cborXAccepts ? 'accepts' : 'rejects'}`)
+	try {
+		fromCborX = decodeWithCborX(bytes)
+	} catch {
+		cborXAccepts = false
+	}
+	try {
+		fromReader = decodeCbor(bytes)
+	} catch {
+		readerAccepts = false
+	}
+	strictEqual(
+		readerAccepts,
+		cborXAccepts,
+		`${path}: the reader ${readerAccepts ? 'accepts' : 'rejects'}, cbor-x ${cborXAccepts ? 'accepts' : 'rejects'}`,
+	)
 	if (!readerAccepts) return { accepted: false }
 	deepStrictEqual(projectCborTags(fromReader), normalize(fromCborX), path)
 	return { accepted: true, value: fromReader }
@@ -80,14 +152,22 @@ function decodeWithBoth(bytes: Uint8Array, path: string): Decoded {
 function compareNested(value: unknown, path: string): number {
 	if (value instanceof Uint8Array) {
 		let nested: unknown
-		try { nested = decodeCbor(value) } catch { return 0 }
+		try {
+			nested = decodeCbor(value)
+		} catch {
+			return 0
+		}
 		deepStrictEqual(projectCborTags(nested), normalize(decodeWithCborX(value)), `${path}/bstr`)
 		return 1 + compareNested(nested, `${path}/bstr`)
 	}
 	if (value instanceof CborTag) return compareNested(value.value, `${path}/tag${value.tag}`)
-	if (Array.isArray(value)) return value.reduce<number>((count, item, index) => count + compareNested(item, `${path}[${index}]`), 0)
+	if (Array.isArray(value))
+		return value.reduce<number>((count, item, index) => count + compareNested(item, `${path}[${index}]`), 0)
 	if (value !== null && typeof value === 'object') {
-		return Object.entries(value).reduce<number>((count, [key, item]) => count + compareNested(item, `${path}.${key}`), 0)
+		return Object.entries(value).reduce<number>(
+			(count, [key, item]) => count + compareNested(item, `${path}.${key}`),
+			0,
+		)
 	}
 	return 0
 }
@@ -130,7 +210,7 @@ describe('projectCborTags', () => {
 
 describe('readCborItem equivalence with cbor-x', () => {
 	for (const { name, items } of FIXTURES) {
-		it(`decodes every CBOR item of ${name} like cbor-x`, (t) => {
+		it(`decodes every CBOR item of ${name} like cbor-x`, t => {
 			const manifest = readC2paManifest(loadFixture(name))
 			ok(manifest.claimCborBytes, 'claim box')
 			ok(manifest.signatureBytes, 'signature box')
@@ -176,12 +256,18 @@ describe('readCborItem equivalence with cbor-x', () => {
 		ok(Number.isNaN((decodeWithCborX(toBytes('c1 61 61')) as Date).getTime()))
 
 		// c1 1b 0020000000000000: tag 1 with an integer above 2^53 - 1. cbor-x throws.
-		deepStrictEqual(projectCborTags(decodeCbor(toBytes('c1 1b 0020000000000000'))), { tag: 1, value: BigInt(2) ** BigInt(53) })
+		deepStrictEqual(projectCborTags(decodeCbor(toBytes('c1 1b 0020000000000000'))), {
+			tag: 1,
+			value: BigInt(2) ** BigInt(53),
+		})
 		throws(() => decodeWithCborX(toBytes('c1 1b 0020000000000000')), TypeError)
 
 		// c2 49 01 00..00, d8 41 42 0102, d9 0102 82 01 02, d9 d9f7 01: tags 2, 65, 258, and 55799.
 		// cbor-x returns a BigInt, a Uint16Array, a Set, and the content.
-		deepStrictEqual(projectCborTags(decodeCbor(toBytes('c2 49 010000000000000000'))), { tag: 2, value: toBytes('010000000000000000') })
+		deepStrictEqual(projectCborTags(decodeCbor(toBytes('c2 49 010000000000000000'))), {
+			tag: 2,
+			value: toBytes('010000000000000000'),
+		})
 		strictEqual(decodeWithCborX(toBytes('c2 49 010000000000000000')), BigInt(2) ** BigInt(64))
 		deepStrictEqual(projectCborTags(decodeCbor(toBytes('d8 41 42 0102'))), { tag: 65, value: Uint8Array.of(1, 2) })
 		ok(decodeWithCborX(toBytes('d8 41 42 0102')) instanceof Uint16Array)
@@ -192,7 +278,12 @@ describe('readCborItem equivalence with cbor-x', () => {
 
 		// d8 1c 80, d8 33 80, d9 0103 80, d9 dff9 80: tags 28, 51, 259, and 0xdff9, which drive the decoding logic of cbor-x.
 		// cbor-x returns the content of tags 28 and 259 and throws on tags 51 and 0xdff9.
-		for (const [hex, tag] of [['d8 1c 80', 28], ['d8 33 80', 51], ['d9 0103 80', 259], ['d9 dff9 80', 0xdff9]] as const) {
+		for (const [hex, tag] of [
+			['d8 1c 80', 28],
+			['d8 33 80', 51],
+			['d9 0103 80', 259],
+			['d9 dff9 80', 0xdff9],
+		] as const) {
 			deepStrictEqual(projectCborTags(decodeCbor(toBytes(hex))), { tag, value: [] }, hex)
 		}
 		deepStrictEqual(decodeWithCborX(toBytes('d8 1c 80')), [])
@@ -208,7 +299,13 @@ describe('readCborItem equivalence with cbor-x', () => {
 
 		// a1 69 5f5f70726f746f5f5f 01: the key __proto__. cbor-x does not keep the key as an own property.
 		deepStrictEqual(Object.keys(decodeCbor(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object), ['__proto__'])
-		strictEqual(Object.prototype.hasOwnProperty.call(decodeWithCborX(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object, '__proto__'), false)
+		strictEqual(
+			Object.prototype.hasOwnProperty.call(
+				decodeWithCborX(toBytes('a1 69 5f5f70726f746f5f5f 01')) as object,
+				'__proto__',
+			),
+			false,
+		)
 
 		// a2 61 61 01 61 61 02: the key "a" twice. cbor-x keeps the last value.
 		throws(() => decodeCbor(toBytes('a2 61 61 01 61 61 02')), RangeError)

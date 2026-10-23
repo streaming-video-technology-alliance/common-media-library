@@ -10,10 +10,7 @@ import type { Track } from '../../types/model/Track.ts'
  *
  * @alpha
  */
-export function getTracksFromSwitchingSet(
-	switchingSet: SwitchingSet,
-	predicate?: (track: Track) => boolean,
-): Track[] {
+export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[] {
 	const tracks = switchingSet.tracks
 	return predicate ? tracks.filter(predicate) : tracks
 }

@@ -25,7 +25,6 @@ export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined
  * @public
  */
 export type CmcdTransportAdapter = {
-
 	/**
 	 * Install interception on the transport. Called once per
 	 * recorder `attach()`. The adapter must normalize each outgoing
@@ -33,5 +32,5 @@ export type CmcdTransportAdapter = {
 	 * if necessary) and invoke `deliver`. Returns a detach function that
 	 * restores the original transport.
 	 */
-	attach(deliver: CmcdRequestDeliver): () => void;
+	attach(deliver: CmcdRequestDeliver): () => void
 }

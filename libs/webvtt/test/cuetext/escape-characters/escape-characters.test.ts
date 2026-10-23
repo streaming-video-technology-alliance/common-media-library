@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cuetext/escape-characters tests', () => {
-
 	it('amp.vtt', async () => {
 		await expectCuesEqualAll('test/cuetext/escape-characters/amp.vtt', 'test/cuetext/escape-characters/amp.json')
 	})
@@ -12,7 +11,10 @@ describe('cuetext/escape-characters tests', () => {
 	})
 
 	it('incorrect.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/escape-characters/incorrect.vtt', 'test/cuetext/escape-characters/incorrect.json')
+		await expectCuesEqualAll(
+			'test/cuetext/escape-characters/incorrect.vtt',
+			'test/cuetext/escape-characters/incorrect.json',
+		)
 	})
 
 	it('lrm.vtt', async () => {
@@ -32,7 +34,9 @@ describe('cuetext/escape-characters tests', () => {
 	})
 
 	it('together.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/escape-characters/together.vtt', 'test/cuetext/escape-characters/together.json')
+		await expectCuesEqualAll(
+			'test/cuetext/escape-characters/together.vtt',
+			'test/cuetext/escape-characters/together.json',
+		)
 	})
-
 })

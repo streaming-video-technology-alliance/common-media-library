@@ -17,8 +17,19 @@ function parentElementOf(parent: XmlNode): XmlNode | null {
  */
 function createTreeBuilder(keepComments: boolean, includeParentElement: boolean): XmlBuilder<XmlNode> {
 	const createLeaf = includeParentElement
-		? (parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({ nodeName, nodeValue, attributes: {}, childNodes: [], parentElement: parentElementOf(parent) })
-		: (_parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({ nodeName, nodeValue, attributes: {}, childNodes: [] })
+		? (parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({
+				nodeName,
+				nodeValue,
+				attributes: {},
+				childNodes: [],
+				parentElement: parentElementOf(parent),
+			})
+		: (_parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({
+				nodeName,
+				nodeValue,
+				attributes: {},
+				childNodes: [],
+			})
 
 	const appendLeaf = (parent: XmlNode, nodeName: string, nodeValue: string): void => {
 		parent.childNodes.push(createLeaf(parent, nodeName, nodeValue))
@@ -29,8 +40,23 @@ function createTreeBuilder(keepComments: boolean, includeParentElement: boolean)
 			? (): XmlNode => ({ nodeName: '#document', nodeValue: null, childNodes: [], attributes: {}, parentElement: null })
 			: (): XmlNode => ({ nodeName: '#document', nodeValue: null, childNodes: [], attributes: {} }),
 		createElement: includeParentElement
-			? (parent, nodeName, attributes, localName, prefix): XmlNode => ({ nodeName, nodeValue: null, attributes, childNodes: [], prefix, localName, parentElement: parentElementOf(parent) })
-			: (_parent, nodeName, attributes, localName, prefix): XmlNode => ({ nodeName, nodeValue: null, attributes, childNodes: [], prefix, localName }),
+			? (parent, nodeName, attributes, localName, prefix): XmlNode => ({
+					nodeName,
+					nodeValue: null,
+					attributes,
+					childNodes: [],
+					prefix,
+					localName,
+					parentElement: parentElementOf(parent),
+				})
+			: (_parent, nodeName, attributes, localName, prefix): XmlNode => ({
+					nodeName,
+					nodeValue: null,
+					attributes,
+					childNodes: [],
+					prefix,
+					localName,
+				}),
 		appendChild: (parent, child) => {
 			parent.childNodes.push(child)
 		},

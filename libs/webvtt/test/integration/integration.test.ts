@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../utils/expectCuesEqualAll.ts'
 
 describe('integration tests', () => {
-
 	it('arrows.vtt', async () => {
 		await expectCuesEqualAll('test/integration/arrows.vtt', 'test/integration/arrows.json')
 	})
@@ -48,5 +47,4 @@ describe('integration tests', () => {
 	it('spec-example.vtt', async () => {
 		await expectCuesEqualAll('test/integration/spec-example.vtt', 'test/integration/spec-example.json')
 	})
-
 })

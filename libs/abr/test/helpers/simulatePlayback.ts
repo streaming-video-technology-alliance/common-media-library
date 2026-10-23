@@ -12,7 +12,7 @@ const WALK_VOLATILITY = 0.3
 /**
  * A piece of a throughput trace. The throughput is `bandwidth` bits per second until `end` seconds.
  */
-type TracePiece = { end: number, bandwidth: number }
+type TracePiece = { end: number; bandwidth: number }
 
 type ThroughputTrace = readonly TracePiece[]
 
@@ -91,7 +91,7 @@ function downloadSeconds(trace: ThroughputTrace, start: number, bits: number): n
 	throw new RangeError('The trace ended before the download finished')
 }
 
-type Ewma = { alpha: number, estimate: number, duration: number }
+type Ewma = { alpha: number; estimate: number; duration: number }
 
 function createEwma(halfLife: number): Ewma {
 	return { alpha: Math.pow(0.5, 1 / halfLife), estimate: 0, duration: 0 }
@@ -110,7 +110,7 @@ function readEwma(ewma: Ewma): number {
 
 // The estimate is the smaller of two exponentially weighted averages.
 // A local estimate keeps the tests of this package independent of `@svta/cml-throughput`.
-function createThroughputEstimate(): { sample(seconds: number, bandwidth: number): void, get(): number } {
+function createThroughputEstimate(): { sample(seconds: number, bandwidth: number): void; get(): number } {
 	const fast = createEwma(FAST_HALF_LIFE)
 	const slow = createEwma(SLOW_HALF_LIFE)
 
@@ -147,7 +147,14 @@ export function simulatePlayback(selector: BitrateSelector, options: SimulationO
 	}
 
 	function select(): BitrateDecision {
-		return selector.select({ ladder, bufferLevel: buffer, throughput: estimate.get(), now: time * MILLISECONDS_PER_SECOND, bufferTarget: bufferCap, segmentDuration: omitSegmentDuration ? undefined : segmentDuration })
+		return selector.select({
+			ladder,
+			bufferLevel: buffer,
+			throughput: estimate.get(),
+			now: time * MILLISECONDS_PER_SECOND,
+			bufferTarget: bufferCap,
+			segmentDuration: omitSegmentDuration ? undefined : segmentDuration,
+		})
 	}
 
 	// Asks for a rung. A decision with a delay makes the player wait and ask again, as the contract says.

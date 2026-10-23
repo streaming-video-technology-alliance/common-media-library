@@ -99,17 +99,10 @@ export class Row {
 		}
 
 		if (this.pos < 0) {
-			this.logger.log(
-				VerboseLevel.DEBUG,
-				'Negative cursor position ' + this.pos,
-			)
+			this.logger.log(VerboseLevel.DEBUG, 'Negative cursor position ' + this.pos)
 			this.pos = 0
-		}
-		else if (this.pos > NR_COLS) {
-			this.logger.log(
-				VerboseLevel.DEBUG,
-				'Too large cursor position ' + this.pos,
-			)
+		} else if (this.pos > NR_COLS) {
+			this.logger.log(VerboseLevel.DEBUG, 'Too large cursor position ' + this.pos)
 			this.pos = NR_COLS
 		}
 	}
@@ -144,14 +137,7 @@ export class Row {
 		if (this.pos >= NR_COLS) {
 			this.logger.log(
 				VerboseLevel.ERROR,
-				() =>
-					'Cannot insert ' +
-					byte.toString(16) +
-					' (' +
-					char +
-					') at position ' +
-					this.pos +
-					'. Skipping it!',
+				() => 'Cannot insert ' + byte.toString(16) + ' (' + char + ') at position ' + this.pos + '. Skipping it!',
 			)
 			return
 		}
@@ -189,8 +175,7 @@ export class Row {
 		}
 		if (empty) {
 			return ''
-		}
-		else {
+		} else {
 			return chars.join('')
 		}
 	}

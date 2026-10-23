@@ -20,8 +20,14 @@ export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView {
 	const defaultSampleDurationSize = 4
 	const defaultSampleSizeSize = 4
 	const defaultSampleFlagsSize = 4
-	const totalSize = headerSize + fullBoxSize + trackIdSize + defaultSampleDescriptionIndexSize +
-		defaultSampleDurationSize + defaultSampleSizeSize + defaultSampleFlagsSize
+	const totalSize =
+		headerSize +
+		fullBoxSize +
+		trackIdSize +
+		defaultSampleDescriptionIndexSize +
+		defaultSampleDurationSize +
+		defaultSampleSizeSize +
+		defaultSampleFlagsSize
 
 	const writer = new IsoBoxWriteView('trex', totalSize)
 	writer.writeFullBox(box.version, box.flags)

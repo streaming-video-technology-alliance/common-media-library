@@ -15,7 +15,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const timeSize = v1 ? 8 : 4
-	const entrySize = timeSize + timeSize + // time + moofOffset
+	const entrySize =
+		timeSize +
+		timeSize + // time + moofOffset
 		(box.lengthSizeOfTrafNum + 1) +
 		(box.lengthSizeOfTrunNum + 1) +
 		(box.lengthSizeOfSampleNum + 1)

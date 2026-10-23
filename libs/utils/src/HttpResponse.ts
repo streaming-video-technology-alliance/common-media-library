@@ -8,49 +8,48 @@ import type { ResponseTypeMap } from './ResponseTypeMap.ts'
  * @public
  */
 export type HttpResponse<R extends HttpRequest = HttpRequest> = {
-
 	/**
 	 * The origin request.
 	 */
-	request: R;
+	request: R
 
 	/**
 	 * The final URL obtained after any redirects.
 	 */
-	url?: string;
+	url?: string
 
 	/**
 	 * Whether the request was redirected.
 	 */
-	redirected?: boolean;
+	redirected?: boolean
 
 	/**
 	 * The HTTP status code of the response.
 	 */
-	status?: number;
+	status?: number
 
 	/**
 	 * The status message corresponding to the HTTP status code.
 	 */
-	statusText?: string;
+	statusText?: string
 
 	/**
 	 * The type of the response.
 	 */
-	type?: string;
+	type?: string
 
 	/**
 	 * The response headers.
 	 */
-	headers?: Record<string, string>;
+	headers?: Record<string, string>
 
 	/**
 	 * The response data.
 	 */
-	data?: ResponseTypeMap<R['responseType']>;
+	data?: ResponseTypeMap<R['responseType']>
 
 	/**
 	 * The network timing of the request/response.
 	 */
-	resourceTiming?: ResourceTiming;
-};
+	resourceTiming?: ResourceTiming
+}

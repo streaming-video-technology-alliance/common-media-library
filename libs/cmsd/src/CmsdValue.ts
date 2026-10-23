@@ -8,4 +8,12 @@ import type { CmsdStreamingFormat } from './CmsdStreamingFormat.ts'
  *
  * @public
  */
-export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
+export type CmsdValue =
+	| CmsdObjectType
+	| CmsdStreamingFormat
+	| CmsdStreamType
+	| string
+	| number
+	| boolean
+	| symbol
+	| SfToken

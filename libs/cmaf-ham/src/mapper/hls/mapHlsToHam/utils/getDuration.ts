@@ -12,10 +12,7 @@ import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.ts'
  *
  * @alpha
  */
-export function getDuration(
-	manifest: HlsManifest,
-	segments: SegmentHls[],
-): number | null {
+export function getDuration(manifest: HlsManifest, segments: SegmentHls[]): number | null {
 	if (!manifest?.targetDuration) {
 		console.error('Could not calculate duration, manifest is undefined.')
 		return null

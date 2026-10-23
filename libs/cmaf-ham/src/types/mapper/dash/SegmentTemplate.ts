@@ -7,10 +7,10 @@
  */
 export type SegmentTemplate = {
 	$: {
-		duration: string;
-		initialization: string;
-		media: string;
-		startNumber: string;
-		timescale: string;
-	};
-};
+		duration: string
+		initialization: string
+		media: string
+		startNumber: string
+		timescale: string
+	}
+}

@@ -13,7 +13,7 @@ export type CmsdDynamicParams = {
 	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
 	 * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
 	 */
-	[index: CmsdCustomKey]: CmsdValue;
+	[index: CmsdCustomKey]: CmsdValue
 
 	/**
 	 * Duress
@@ -24,7 +24,7 @@ export type CmsdDynamicParams = {
 	 *
 	 * Boolean
 	 */
-	du?: boolean;
+	du?: boolean
 
 	/**
 	 * Estimated Throughput
@@ -44,7 +44,7 @@ export type CmsdDynamicParams = {
 	 *
 	 * Integer Kbps
 	 */
-	etp?: number;
+	etp?: number
 
 	/**
 	 * Max suggested bitrate
@@ -54,7 +54,7 @@ export type CmsdDynamicParams = {
 	 *
 	 * Integer Kbps
 	 */
-	mb?: number;
+	mb?: number
 
 	/**
 	 * Response delay
@@ -64,7 +64,7 @@ export type CmsdDynamicParams = {
 	 *
 	 * Integer milliseconds
 	 */
-	rd?: number;
+	rd?: number
 
 	/**
 	 * Round Trip Time
@@ -75,5 +75,5 @@ export type CmsdDynamicParams = {
 	 *
 	 * Integer Kbps
 	 */
-	rtt?: number;
-};
+	rtt?: number
+}

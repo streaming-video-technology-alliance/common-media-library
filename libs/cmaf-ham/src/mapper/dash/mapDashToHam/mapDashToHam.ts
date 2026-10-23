@@ -35,22 +35,11 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 		const selectionSetGroups: Record<string, SelectionSet> = {}
 
 		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
-			const tracks: Track[] = adaptationSet.Representation.map(
-				(representation: Representation) => {
-					const segments: Segment[] = mapSegments(
-						adaptationSet,
-						representation,
-						duration,
-					)
+			const tracks: Track[] = adaptationSet.Representation.map((representation: Representation) => {
+				const segments: Segment[] = mapSegments(adaptationSet, representation, duration)
 
-					return mapTracks(
-						adaptationSet,
-						representation,
-						segments,
-						getInitializationUrl(adaptationSet, representation),
-					)
-				},
-			)
+				return mapTracks(adaptationSet, representation, segments, getInitializationUrl(adaptationSet, representation))
+			})
 
 			const group: string = getGroup(adaptationSet)
 			const contentType = getContentType(adaptationSet, adaptationSet.Representation[0])
@@ -63,10 +52,7 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 			}
 
 			selectionSetGroups[group].switchingSets.push({
-				id:
-					adaptationSet.$.id ??
-					adaptationSet.ContentComponent?.at(0)?.$.id ??
-					group,
+				id: adaptationSet.$.id ?? adaptationSet.ContentComponent?.at(0)?.$.id ?? group,
 				tracks,
 				baseUrls: [],
 			} as SwitchingSet)

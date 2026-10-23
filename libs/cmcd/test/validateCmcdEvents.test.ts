@@ -23,14 +23,23 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 	it('reports errors for missing e and ts', () => {
 		const result = validateCmcdEvents('br=3000,sid="abc",v=2')
 		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'e'), true)
-		equal(result.issues.some(i => i.key === 'ts'), true)
+		equal(
+			result.issues.some(i => i.key === 'e'),
+			true,
+		)
+		equal(
+			result.issues.some(i => i.key === 'ts'),
+			true,
+		)
 	})
 
 	it('reports error for custom event without cen', () => {
 		const result = validateCmcdEvents('e=ce,sid="abc",ts=1700000000000,v=2')
 		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'cen'), true)
+		equal(
+			result.issues.some(i => i.key === 'cen'),
+			true,
+		)
 	})
 
 	it('forwards the version option', () => {
@@ -49,8 +58,14 @@ br=3000,sid="s1",v=2`
 
 		const result = validateCmcdEvents(body)
 		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'e'), true)
-		equal(result.issues.some(i => i.key === 'ts'), true)
+		equal(
+			result.issues.some(i => i.key === 'e'),
+			true,
+		)
+		equal(
+			result.issues.some(i => i.key === 'ts'),
+			true,
+		)
 	})
 
 	it('reports error for an empty string', () => {
@@ -116,7 +131,10 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 	it('reports error when a multi-record body ends with a line feed', () => {
 		const result = validateCmcdEvents('e=ps,sid="s",ts=1,sta=p,v=2\ne=t,sid="s",ts=2,v=2\n')
 		equal(result.valid, false)
-		equal(result.issues.some(i => i.severity === 'error' && i.message.includes('line feed')), true)
+		equal(
+			result.issues.some(i => i.severity === 'error' && i.message.includes('line feed')),
+			true,
+		)
 	})
 
 	it('accepts a body that ends without a line feed', () => {

@@ -132,10 +132,7 @@ export class CaptionScreen {
 	}
 
 	setPAC(pacData: PACData): void {
-		this.logger.log(
-			VerboseLevel.INFO,
-			() => 'pacData = ' + JSON.stringify(pacData),
-		)
+		this.logger.log(VerboseLevel.INFO, () => 'pacData = ' + JSON.stringify(pacData))
 		let newRow = pacData.row - 1
 		if (this.nrRollUpRows && newRow < this.nrRollUpRows - 1) {
 			newRow = this.nrRollUpRows - 1
@@ -159,9 +156,7 @@ export class CaptionScreen {
 				const time = this.logger.time
 				if (prevLineTime !== null && time !== null && prevLineTime < time) {
 					for (let i = 0; i < this.nrRollUpRows; i++) {
-						this.rows[newRow - this.nrRollUpRows + i + 1].copy(
-							lastOutputScreen.rows[topRowIndex + i],
-						)
+						this.rows[newRow - this.nrRollUpRows + i + 1].copy(lastOutputScreen.rows[topRowIndex + i])
 					}
 				}
 			}
@@ -189,10 +184,7 @@ export class CaptionScreen {
 	 * Set background/extra foreground, but first do back_space, and then insert space (backwards compatibility).
 	 */
 	setBkgData(bkgData: Partial<PenStyles>): void {
-		this.logger.log(
-			VerboseLevel.INFO,
-			() => 'bkgData = ' + JSON.stringify(bkgData),
-		)
+		this.logger.log(VerboseLevel.INFO, () => 'bkgData = ' + JSON.stringify(bkgData))
 		this.backSpace()
 		this.setPen(bkgData)
 		this.insertChar(0x20) // Space
@@ -204,10 +196,7 @@ export class CaptionScreen {
 
 	rollUp(): void {
 		if (this.nrRollUpRows === null) {
-			this.logger.log(
-				VerboseLevel.DEBUG,
-				'roll_up but nrRollUpRows not set yet',
-			)
+			this.logger.log(VerboseLevel.DEBUG, 'roll_up but nrRollUpRows not set yet')
 			return // Not properly setup
 		}
 		this.logger.log(VerboseLevel.TEXT, () => this.getDisplayText())
@@ -232,8 +221,7 @@ export class CaptionScreen {
 				rowNr = i + 1
 				if (asOneRow) {
 					displayText.push('Row ' + rowNr + ": '" + rowText + "'")
-				}
-				else {
+				} else {
 					displayText.push(rowText.trim())
 				}
 			}
@@ -241,8 +229,7 @@ export class CaptionScreen {
 		if (displayText.length > 0) {
 			if (asOneRow) {
 				text = '[' + displayText.join(' | ') + ']'
-			}
-			else {
+			} else {
 				text = displayText.join('\n')
 			}
 		}

@@ -166,7 +166,8 @@ function setEntry(map: Record<string, unknown>, key: unknown, value: unknown): v
 	if (key !== null && typeof key === 'object') throw new RangeError('Unsupported CBOR map key')
 	const name = String(key)
 	if (Object.prototype.hasOwnProperty.call(map, name)) throw new RangeError('Duplicate CBOR map key')
-	if (name === '__proto__') Object.defineProperty(map, name, { value, enumerable: true, writable: true, configurable: true })
+	if (name === '__proto__')
+		Object.defineProperty(map, name, { value, enumerable: true, writable: true, configurable: true })
 	else map[name] = value
 }
 
@@ -207,13 +208,22 @@ function readItem(reader: Reader): unknown {
 	}
 	const argument = readArgument(reader, info)
 	switch (majorType) {
-		case MAJOR_UINT: return argument
-		case MAJOR_NEGINT: return typeof argument === 'number' && argument < Number.MAX_SAFE_INTEGER ? -1 - argument : BigInt(-1) - BigInt(argument)
-		case MAJOR_BYTES: return readBytes(reader, argument)
-		case MAJOR_TEXT: return readText(readBytes(reader, argument))
-		case MAJOR_ARRAY: return readArray(reader, argument)
-		case MAJOR_MAP: return readMap(reader, argument)
-		default: return readTag(reader, argument, start)
+		case MAJOR_UINT:
+			return argument
+		case MAJOR_NEGINT:
+			return typeof argument === 'number' && argument < Number.MAX_SAFE_INTEGER
+				? -1 - argument
+				: BigInt(-1) - BigInt(argument)
+		case MAJOR_BYTES:
+			return readBytes(reader, argument)
+		case MAJOR_TEXT:
+			return readText(readBytes(reader, argument))
+		case MAJOR_ARRAY:
+			return readArray(reader, argument)
+		case MAJOR_MAP:
+			return readMap(reader, argument)
+		default:
+			return readTag(reader, argument, start)
 	}
 }
 

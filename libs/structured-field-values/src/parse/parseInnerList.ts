@@ -57,10 +57,7 @@ export function parseInnerList(src: string, options?: SfDecodeOptions): ParsedVa
 			src = src.substring(1)
 			const parsedParameters = parseParameters(src, options)
 
-			return parsedValue(
-				new SfItem(innerList, parsedParameters.value) as any,
-				parsedParameters.src,
-			)
+			return parsedValue(new SfItem(innerList, parsedParameters.value) as any, parsedParameters.src)
 		}
 
 		const parsedItem = parseItem(src, options)

@@ -3,7 +3,7 @@ import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts'
 /**
  * @internal
  */
-export type DashParser = (raw: string) => DashManifest;
+export type DashParser = (raw: string) => DashManifest
 
 let dashParser: DashParser
 

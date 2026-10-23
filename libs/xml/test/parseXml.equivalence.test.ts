@@ -157,8 +157,8 @@ const OPTION_SETS: Record<string, XmlParseOptions> = {
 type Expectation = { throws: string } | { sha256: string; length: number } | { tree: unknown }
 
 type CaseFixture = {
-	input: { length: number; sha256: string };
-	results: Record<string, Expectation>;
+	input: { length: number; sha256: string }
+	results: Record<string, Expectation>
 }
 
 const sha256 = (text: string): string => createHash('sha256').update(text).digest('hex')
@@ -175,19 +175,16 @@ function serializeNode(node: XmlNode, path: number[], paths: Map<XmlNode, number
 	for (const key of Object.keys(node)) {
 		if (key === 'childNodes') {
 			out[key] = node.childNodes.map((child, index) => serializeNode(child, [...path, index], paths))
-		}
-		else if (key === 'parentElement') {
+		} else if (key === 'parentElement') {
 			const parent = node.parentElement
 			if (parent === null) {
 				out[key] = null
-			}
-			else {
+			} else {
 				const parentPath = parent === undefined ? undefined : paths.get(parent)
 				ok(parentPath !== undefined, `parentElement of node at [${path.join(',')}] is not an ancestor node`)
 				out[key] = parentPath
 			}
-		}
-		else {
+		} else {
 			out[key] = node[key as keyof XmlNode]
 		}
 	}
@@ -250,7 +247,9 @@ function formatFixtures(fixtures: Record<string, CaseFixture>): string {
 		lines.push('\t\t"results": {')
 		const results = Object.entries(entry.results)
 		results.forEach(([label, expectation], index) => {
-			lines.push(`\t\t\t${JSON.stringify(label)}: ${JSON.stringify(expectation)}${index < results.length - 1 ? ',' : ''}`)
+			lines.push(
+				`\t\t\t${JSON.stringify(label)}: ${JSON.stringify(expectation)}${index < results.length - 1 ? ',' : ''}`,
+			)
 		})
 		lines.push('\t\t}')
 		lines.push(`\t}${caseIndex < cases.length - 1 ? ',' : ''}`)
@@ -268,7 +267,7 @@ describe('parseXml equivalence', () => {
 	let fixtures: Record<string, CaseFixture> = {}
 
 	before(async () => {
-		outcomes.push(...await Promise.all(optionLabels.map(label => runParseWorker({ inputs }, OPTION_SETS[label]))))
+		outcomes.push(...(await Promise.all(optionLabels.map(label => runParseWorker({ inputs }, OPTION_SETS[label])))))
 
 		if (process.env['UPDATE_FIXTURES']) {
 			fixtures = {}
@@ -280,8 +279,7 @@ describe('parseXml equivalence', () => {
 				fixtures[name] = { input: { length: inputs[index].length, sha256: sha256(inputs[index]) }, results }
 			})
 			writeFileSync(FIXTURE_PATH, formatFixtures(fixtures))
-		}
-		else {
+		} else {
 			fixtures = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8'))
 		}
 	})

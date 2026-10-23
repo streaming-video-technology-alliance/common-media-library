@@ -7,7 +7,7 @@ import type { ProtectionScheme } from './ProtectionScheme.ts'
  * @alpha
  */
 export type Protection = {
-	defaultKid: string;
-	keySystems: KeySystemMap;
-	scheme: ProtectionScheme;
+	defaultKid: string
+	keySystems: KeySystemMap
+	scheme: ProtectionScheme
 }

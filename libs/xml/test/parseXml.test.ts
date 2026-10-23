@@ -46,7 +46,10 @@ describe('parseXml', () => {
 		equal(childNodes.length, 2)
 
 		const doctype = childNodes[0].nodeValue
-		equal(doctype, '!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd"')
+		equal(
+			doctype,
+			'!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd"',
+		)
 
 		const root = childNodes[1]
 		const firstChild = root.childNodes[0]
@@ -214,7 +217,9 @@ describe('parseXml', () => {
 		})
 
 		it('throws on an unquoted attribute value', async () => {
-			await rejects(parseXmlGuarded('<a b=c/>'), { message: /^Malformed attribute "b": expected quoted value after "="/ })
+			await rejects(parseXmlGuarded('<a b=c/>'), {
+				message: /^Malformed attribute "b": expected quoted value after "="/,
+			})
 		})
 
 		it('throws on a quoted value with no equals sign', async () => {
@@ -226,17 +231,15 @@ describe('parseXml', () => {
 		})
 
 		it('throws when the input ends inside an attribute name', async () => {
-			await rejects(
-				parseXmlGuarded('<MPD><Period><SegmentTimeline><S d="180000" r'),
-				{ message: /^Malformed attribute "r": expected "=" after name\n.*\n.*\nChar: end of input$/ },
-			)
+			await rejects(parseXmlGuarded('<MPD><Period><SegmentTimeline><S d="180000" r'), {
+				message: /^Malformed attribute "r": expected "=" after name\n.*\n.*\nChar: end of input$/,
+			})
 		})
 
 		it('throws when the input ends after the equals sign', async () => {
-			await rejects(
-				parseXmlGuarded('<a b='),
-				{ message: /^Malformed attribute "b": expected quoted value after "="\nLine: 0\nColumn: 6\nChar: end of input$/ },
-			)
+			await rejects(parseXmlGuarded('<a b='), {
+				message: /^Malformed attribute "b": expected quoted value after "="\nLine: 0\nColumn: 6\nChar: end of input$/,
+			})
 		})
 
 		it('reports the line and column of the malformed attribute', async () => {
@@ -274,17 +277,19 @@ describe('parseXml', () => {
 	describe('truncated input', () => {
 		it('parses a complete XML declaration followed by markup', async () => {
 			const doc = await parseXmlGuarded('<?xml version="1.0" encoding="UTF-8"?><a b="1"><c/>text</a>')
-			deepStrictEqual(doc.childNodes, [{
-				nodeName: 'a',
-				nodeValue: null,
-				attributes: { b: '1' },
-				childNodes: [
-					{ nodeName: 'c', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'c' },
-					{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] },
-				],
-				prefix: null,
-				localName: 'a',
-			}])
+			deepStrictEqual(doc.childNodes, [
+				{
+					nodeName: 'a',
+					nodeValue: null,
+					attributes: { b: '1' },
+					childNodes: [
+						{ nodeName: 'c', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'c' },
+						{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] },
+					],
+					prefix: null,
+					localName: 'a',
+				},
+			])
 		})
 
 		it('returns an empty document when the input ends inside the XML declaration', async () => {
@@ -294,55 +299,75 @@ describe('parseXml', () => {
 
 		it('keeps the parsed children when the input ends inside the root close tag', async () => {
 			const doc = await parseXmlGuarded('<a>text</a')
-			deepStrictEqual(doc.childNodes, [{
-				nodeName: 'a',
-				nodeValue: null,
-				attributes: {},
-				childNodes: [{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] }],
-				prefix: null,
-				localName: 'a',
-			}])
+			deepStrictEqual(doc.childNodes, [
+				{
+					nodeName: 'a',
+					nodeValue: null,
+					attributes: {},
+					childNodes: [{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] }],
+					prefix: null,
+					localName: 'a',
+				},
+			])
 		})
 
 		it('keeps the parsed children when the input ends inside a nested close tag', async () => {
 			const doc = await parseXmlGuarded('<MPD><Period><S d="1"/></Period')
-			deepStrictEqual(doc.childNodes, [{
-				nodeName: 'MPD',
-				nodeValue: null,
-				attributes: {},
-				childNodes: [{
-					nodeName: 'Period',
+			deepStrictEqual(doc.childNodes, [
+				{
+					nodeName: 'MPD',
 					nodeValue: null,
 					attributes: {},
-					childNodes: [{ nodeName: 'S', nodeValue: null, attributes: { d: '1' }, childNodes: [], prefix: null, localName: 'S' }],
+					childNodes: [
+						{
+							nodeName: 'Period',
+							nodeValue: null,
+							attributes: {},
+							childNodes: [
+								{
+									nodeName: 'S',
+									nodeValue: null,
+									attributes: { d: '1' },
+									childNodes: [],
+									prefix: null,
+									localName: 'S',
+								},
+							],
+							prefix: null,
+							localName: 'Period',
+						},
+					],
 					prefix: null,
-					localName: 'Period',
-				}],
-				prefix: null,
-				localName: 'MPD',
-			}])
+					localName: 'MPD',
+				},
+			])
 		})
 
 		it('keeps the parsed children when the input ends right after `</` at the document level', async () => {
 			const doc = await parseXmlGuarded('<a/></')
-			deepStrictEqual(doc.childNodes, [{ nodeName: 'a', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'a' }])
+			deepStrictEqual(doc.childNodes, [
+				{ nodeName: 'a', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'a' },
+			])
 		})
 
 		it('reports end of input when a mismatched close tag is cut off', async () => {
-			await rejects(
-				parseXmlGuarded('<a>text</b'),
-				{ message: /^Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input$/ },
-			)
+			await rejects(parseXmlGuarded('<a>text</b'), {
+				message: /^Unexpected close tag\nLine: 0\nColumn: 11\nChar: end of input$/,
+			})
 		})
 
 		it('keeps a CDATA prefix cut off before its second bracket as a doctype node', async () => {
 			const doc = await parseXmlGuarded('<a><![CDA')
-			deepStrictEqual(doc.childNodes[0].childNodes, [{ nodeName: '#doctype', nodeValue: '![CDA', attributes: {}, childNodes: [] }])
+			deepStrictEqual(doc.childNodes[0].childNodes, [
+				{ nodeName: '#doctype', nodeValue: '![CDA', attributes: {}, childNodes: [] },
+			])
 		})
 
 		it('keeps a lone `<!` at the end of the input as a doctype node', async () => {
 			const doc = await parseXmlGuarded('<a><!')
-			deepStrictEqual(doc.childNodes[0].childNodes, [{ nodeName: '#doctype', nodeValue: '!', attributes: {}, childNodes: [] }])
+			deepStrictEqual(doc.childNodes[0].childNodes, [
+				{ nodeName: '#doctype', nodeValue: '!', attributes: {}, childNodes: [] },
+			])
 		})
 
 		it('keeps the text before a lone `<` at the end of the input', async () => {
@@ -355,12 +380,16 @@ describe('parseXml', () => {
 
 		it('keeps an element whose start tag is cut off after its name', async () => {
 			const doc = await parseXmlGuarded('<a><bc')
-			deepStrictEqual(doc.childNodes[0].childNodes, [{ nodeName: 'bc', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'bc' }])
+			deepStrictEqual(doc.childNodes[0].childNodes, [
+				{ nodeName: 'bc', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'bc' },
+			])
 		})
 
 		it('keeps a doctype cut off before its closing bracket', async () => {
 			const doc = await parseXmlGuarded('<!DOCTYPE html')
-			deepStrictEqual(doc.childNodes, [{ nodeName: '#doctype', nodeValue: '!DOCTYPE html', attributes: {}, childNodes: [] }])
+			deepStrictEqual(doc.childNodes, [
+				{ nodeName: '#doctype', nodeValue: '!DOCTYPE html', attributes: {}, childNodes: [] },
+			])
 		})
 
 		it('terminates on every truncation of the fixtures', async () => {

@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cuetext/voice tests', () => {
-
 	it('no-end-gt.vtt', async () => {
 		await expectCuesEqualAll('test/cuetext/voice/no-end-gt.vtt', 'test/cuetext/voice/no-end-gt.json')
 	})
@@ -24,7 +23,9 @@ describe('cuetext/voice tests', () => {
 	})
 
 	it('with-two-subclasses.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/voice/with-two-subclasses.vtt', 'test/cuetext/voice/with-two-subclasses.json')
+		await expectCuesEqualAll(
+			'test/cuetext/voice/with-two-subclasses.vtt',
+			'test/cuetext/voice/with-two-subclasses.json',
+		)
 	})
-
 })

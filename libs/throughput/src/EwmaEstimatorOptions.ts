@@ -10,7 +10,7 @@ export type EwmaEstimatorOptions = {
 	 *
 	 * @defaultValue `NaN`
 	 */
-	defaultEstimate?: number;
+	defaultEstimate?: number
 
 	/**
 	 * The number of bytes to sample before `getEstimate` returns a measured estimate.
@@ -19,7 +19,7 @@ export type EwmaEstimatorOptions = {
 	 *
 	 * @defaultValue `0`
 	 */
-	minTotalBytes?: number;
+	minTotalBytes?: number
 
 	/**
 	 * The smallest `encodedBodySize`, in bytes, that counts as a sample.
@@ -29,19 +29,19 @@ export type EwmaEstimatorOptions = {
 	 *
 	 * @defaultValue `0`
 	 */
-	minBodySize?: number;
+	minBodySize?: number
 
 	/**
 	 * The half-life of the fast moving average, in seconds.
 	 * Samples from the last `fastHalfLife` seconds have half of the weight in the estimate.
 	 * shaka-player uses 2.
 	 */
-	fastHalfLife: number;
+	fastHalfLife: number
 
 	/**
 	 * The half-life of the slow moving average, in seconds.
 	 * Samples from the last `slowHalfLife` seconds have half of the weight in the estimate.
 	 * shaka-player uses 5.
 	 */
-	slowHalfLife: number;
-};
+	slowHalfLife: number
+}

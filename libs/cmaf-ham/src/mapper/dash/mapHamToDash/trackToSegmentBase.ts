@@ -1,4 +1,3 @@
-
 import type { AudioTrack } from '../../../types/model/AudioTrack.ts'
 import type { Segment } from '../../../types/model/Segment.ts'
 import type { Track } from '../../../types/model/Track.ts'
@@ -8,11 +7,7 @@ import { byteRangeToDashString } from '../../../utils/byteRange.ts'
 
 export function trackToSegmentBase(track: Track): SegmentBase[] {
 	const segments: SegmentBase[] = []
-	if (
-		track.segments.length > 0 &&
-		track.initialization.byteRange &&
-		track.segments[0].byteRange
-	) {
+	if (track.segments.length > 0 && track.initialization.byteRange && track.segments[0].byteRange) {
 		let firstSegment: SegmentBase | undefined = undefined
 		// Use the new byteRange object format from initialization
 		const initByteRange = track.initialization.byteRange
@@ -36,8 +31,7 @@ export function trackToSegmentBase(track: Track): SegmentBase[] {
 		if (firstSegment) {
 			segments.push(firstSegment)
 		}
-	}
-	else {
+	} else {
 		track.segments.forEach((segment: Segment) => {
 			let newSegment: SegmentBase | undefined
 			if (segment.byteRange) {

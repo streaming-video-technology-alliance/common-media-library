@@ -7,7 +7,7 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type CompositionTimeToSampleBox = FullBox & {
-	type: 'ctts';
-	entryCount: number;
-	entries: CompositionTimeToSampleEntry[];
-};
+	type: 'ctts'
+	entryCount: number
+	entries: CompositionTimeToSampleEntry[]
+}

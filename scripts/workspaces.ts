@@ -2,15 +2,15 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 export type Workspace = {
-	folder: string;
-	name: string;
-	peers: string[];
-};
+	folder: string
+	name: string
+	peers: string[]
+}
 
 type PackageJson = {
-	name: string;
-	peerDependencies?: Record<string, string>;
-};
+	name: string
+	peerDependencies?: Record<string, string>
+}
 
 const scope = '@svta/cml-'
 
@@ -18,7 +18,7 @@ const scope = '@svta/cml-'
 export function loadWorkspaces(dir: string): Workspace[] {
 	return readdirSync(dir, { withFileTypes: true })
 		.filter(entry => entry.isDirectory() && existsSync(path.join(dir, entry.name, 'package.json')))
-		.map((entry) => {
+		.map(entry => {
 			const folder = `${dir}/${entry.name}`
 			const json: PackageJson = JSON.parse(readFileSync(path.join(folder, 'package.json'), 'utf8'))
 			const peers = Object.keys(json.peerDependencies ?? {}).filter(peer => peer.startsWith(scope))
@@ -34,7 +34,7 @@ function isReady(workspace: Workspace, names: Set<string>, done: Set<string>): b
 // Packages with the same readiness are ordered by folder name, so the result is stable.
 export function sortWorkspaces(workspaces: Workspace[]): Workspace[] {
 	const names = new Set(workspaces.map(w => w.name))
-	const remaining = [...workspaces].sort((a, b) => a.folder < b.folder ? -1 : a.folder > b.folder ? 1 : 0)
+	const remaining = [...workspaces].sort((a, b) => (a.folder < b.folder ? -1 : a.folder > b.folder ? 1 : 0))
 	const done = new Set<string>()
 	const sorted: Workspace[] = []
 
@@ -57,7 +57,11 @@ export function sortWorkspaces(workspaces: Workspace[]): Workspace[] {
 
 // Runs `task` for every workspace. A workspace starts once all of its peers finished,
 // with at most `limit` tasks at the same time. The first failure stops new tasks.
-export function runWorkspaces(workspaces: Workspace[], limit: number, task: (workspace: Workspace) => Promise<void>): Promise<void> {
+export function runWorkspaces(
+	workspaces: Workspace[],
+	limit: number,
+	task: (workspace: Workspace) => Promise<void>,
+): Promise<void> {
 	const pending = sortWorkspaces(workspaces)
 	const names = new Set(pending.map(w => w.name))
 	const done = new Set<string>()
@@ -86,14 +90,17 @@ export function runWorkspaces(workspaces: Workspace[], limit: number, task: (wor
 				const [workspace] = pending.splice(index, 1)
 				active++
 
-				task(workspace).then(() => {
-					active--
-					done.add(workspace.name)
-					next()
-				}, (error) => {
-					failed = true
-					reject(error)
-				})
+				task(workspace).then(
+					() => {
+						active--
+						done.add(workspace.name)
+						next()
+					},
+					error => {
+						failed = true
+						reject(error)
+					},
+				)
 			}
 		}
 

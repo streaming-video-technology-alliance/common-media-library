@@ -8,6 +8,6 @@ import type { SfParameters } from './SfParameters.ts'
  * @public
  */
 export type SfInnerList = {
-	value: SfItem[] | SfBareItem[],
-	params: SfParameters,
-};
+	value: SfItem[] | SfBareItem[]
+	params: SfParameters
+}

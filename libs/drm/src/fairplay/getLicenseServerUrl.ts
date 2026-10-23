@@ -13,7 +13,8 @@
 export function getLicenseServerUrl(initData: Uint16Array): string {
 	let initDataString = ''
 	for (const code of initData) {
-		if (code !== 0) { // Ignore null characters
+		if (code !== 0) {
+			// Ignore null characters
 			initDataString += String.fromCharCode(code)
 		}
 	}

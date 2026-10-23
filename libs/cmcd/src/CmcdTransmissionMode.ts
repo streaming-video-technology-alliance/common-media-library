@@ -47,10 +47,9 @@ export const CmcdTransmissionMode = {
 	 * Request headers
 	 */
 	HEADERS: CMCD_HEADERS as typeof CMCD_HEADERS,
-
 } as const
 
 /**
  * @public
  */
-export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>;
+export type CmcdTransmissionMode = ValueOf<typeof CmcdTransmissionMode>

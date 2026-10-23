@@ -30,20 +30,19 @@ import { serializeParams } from './serializeParams.ts'
 /**
  * @internal
  */
-export function serializeInnerList(value: SfInnerList): string;
+export function serializeInnerList(value: SfInnerList): string
 
 /**
  * @internal
  */
-export function serializeInnerList(value: SfItem[] | SfBareItem[], params?: SfParameters): string;
+export function serializeInnerList(value: SfItem[] | SfBareItem[], params?: SfParameters): string
 
 export function serializeInnerList(value: SfInnerList | SfItem[] | SfBareItem[], params?: SfParameters): string {
 	let list: SfItem[] | SfBareItem[]
 
 	if (Array.isArray(value)) {
 		list = value
-	}
-	else {
+	} else {
 		list = value.value
 		params = value.params
 	}

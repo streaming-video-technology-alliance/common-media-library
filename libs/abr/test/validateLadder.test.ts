@@ -3,7 +3,7 @@ import { describe, it } from 'node:test'
 import { validateLadder } from '../src/validateLadder.ts'
 
 function rungs(...bandwidths: number[]): { bandwidth: number }[] {
-	return bandwidths.map((bandwidth) => ({ bandwidth }))
+	return bandwidths.map(bandwidth => ({ bandwidth }))
 }
 
 describe('validateLadder', () => {

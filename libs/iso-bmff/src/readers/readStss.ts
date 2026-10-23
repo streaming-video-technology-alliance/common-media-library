@@ -24,4 +24,4 @@ export function readStss(view: IsoBoxReadView): SyncSampleBox {
 			sampleNumber: view.readUint(4),
 		})),
 	}
-};
+}

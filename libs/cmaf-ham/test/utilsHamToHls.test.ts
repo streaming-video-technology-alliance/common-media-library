@@ -46,12 +46,12 @@ describe('getSegments', () => {
 		equal(
 			res,
 			'#EXTINF:4.011,\n' +
-			'#EXT-X-BYTERANGE:123@456\n' +
-			'\n' +
-			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4\n' +
-			'#EXTINF:3.989,\n' +
-			'\n' +
-			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
+				'#EXT-X-BYTERANGE:123@456\n' +
+				'\n' +
+				'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4\n' +
+				'#EXTINF:3.989,\n' +
+				'\n' +
+				'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
 		)
 	})
 })
@@ -60,10 +60,7 @@ describe('getUrlInitialization', () => {
 	it('returns url initialization', () => {
 		const track: AudioTrack = getAudioTrack({})
 		const res = getUrlInitialization(track)
-		equal(
-			res,
-			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4',
-		)
+		equal(res, 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4')
 	})
 
 	it('returns empty string if track has no urlInitialization', () => {

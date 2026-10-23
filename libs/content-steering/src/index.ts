@@ -15,4 +15,3 @@ export * from './isValidSteeringManifest.ts'
 export type * from './PathwayClone.ts'
 export type * from './SteeringManifest.ts'
 export type * from './UriReplacement.ts'
-

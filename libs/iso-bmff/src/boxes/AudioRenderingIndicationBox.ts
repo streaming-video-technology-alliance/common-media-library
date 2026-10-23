@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type AudioRenderingIndicationBox = FullBox & {
-	type: 'ardi';
-	audioRenderingIndication: number;
-};
+	type: 'ardi'
+	audioRenderingIndication: number
+}

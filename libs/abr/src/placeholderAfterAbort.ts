@@ -17,7 +17,12 @@ import type { BolaParams } from './BolaParams.ts'
  * @param bufferLevel - The real buffer level when the download aborted, in seconds. The value is 0 or more.
  * @returns The placeholder buffer after the abort, in seconds
  */
-export function placeholderAfterAbort(params: BolaParams, replacementPosition: number, placeholder: number, bufferLevel: number): number {
+export function placeholderAfterAbort(
+	params: BolaParams,
+	replacementPosition: number,
+	placeholder: number,
+	bufferLevel: number,
+): number {
 	const limit = replacementPosition > 0 ? params.thresholds[replacementPosition] : MINIMUM_BUFFER
 
 	return Math.min(placeholder, Math.max(0, limit - bufferLevel))

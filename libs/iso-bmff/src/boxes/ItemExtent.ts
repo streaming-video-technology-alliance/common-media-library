@@ -4,7 +4,7 @@
  * @public
  */
 export type ItemExtent = {
-	extentIndex?: number;
-	extentOffset: number;
-	extentLength: number;
-};
+	extentIndex?: number
+	extentOffset: number
+	extentLength: number
+}

@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cuetext/format tests', () => {
-
 	it('double-line-break.vtt', async () => {
 		await expectCuesEqualAll('test/cuetext/format/double-line-break.vtt', 'test/cuetext/format/double-line-break.json')
 	})
@@ -22,5 +21,4 @@ describe('cuetext/format tests', () => {
 	it('no-newline-at-end.vtt', async () => {
 		await expectCuesEqualAll('test/cuetext/format/no-newline-at-end.vtt', 'test/cuetext/format/no-newline-at-end.json')
 	})
-
 })

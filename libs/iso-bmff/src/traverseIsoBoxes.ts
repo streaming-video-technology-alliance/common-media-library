@@ -45,8 +45,7 @@ export function* traverseIsoBoxes<T>(boxes: Iterable<T>, config?: TraverseIsoBox
 
 				if (depthFirst) {
 					yield* traverseIsoBoxes(next, { depthFirst, maxDepth: maxDepth - 1 })
-				}
-				else {
+				} else {
 					queue.push([next, depth + 1])
 				}
 			}

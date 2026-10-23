@@ -11,7 +11,14 @@ import type { TrackRunBox } from './TrackRunBox.ts'
  *
  * @public
  */
-export type TrackFragmentBoxChild = TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox | SubsampleInformationBox;
+export type TrackFragmentBoxChild =
+	| TrackFragmentHeaderBox
+	| TrackFragmentBaseMediaDecodeTimeBox
+	| TrackRunBox
+	| SampleAuxiliaryInformationSizesBox
+	| SampleAuxiliaryInformationOffsetsBox
+	| SampleEncryptionBox
+	| SubsampleInformationBox
 
 /**
  * Track Fragment Box - 'traf' - Container
@@ -19,6 +26,6 @@ export type TrackFragmentBoxChild = TrackFragmentHeaderBox | TrackFragmentBaseMe
  * @public
  */
 export type TrackFragmentBox = {
-	type: 'traf';
-	boxes: TrackFragmentBoxChild[];
-};
+	type: 'traf'
+	boxes: TrackFragmentBoxChild[]
+}

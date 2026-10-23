@@ -11,11 +11,11 @@ export type BolaDecision = BitrateDecision & {
 	/**
 	 * The state of the selector after the call.
 	 */
-	readonly state: BolaState;
+	readonly state: BolaState
 
 	/**
 	 * The placeholder buffer, in seconds, after the call.
 	 * The selector adds it to the real buffer level to get the effective buffer.
 	 */
-	readonly placeholder: number;
-};
+	readonly placeholder: number
+}

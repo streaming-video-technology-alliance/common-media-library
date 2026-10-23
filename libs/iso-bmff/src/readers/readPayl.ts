@@ -15,4 +15,4 @@ export function readPayl(view: IsoBoxReadView): WebVttCuePayloadBox {
 		type: 'payl',
 		cueText: view.readUtf8(-1),
 	}
-};
+}

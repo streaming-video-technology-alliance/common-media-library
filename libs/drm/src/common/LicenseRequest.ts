@@ -8,44 +8,43 @@
  */
 export type LicenseRequest = {
 	/**
-	* License server URL.
-	*/
-	url: string;
+	 * License server URL.
+	 */
+	url: string
 
 	/**
-	* HTTP method
-	*/
-	method: 'GET' | 'POST';
+	 * HTTP method
+	 */
+	method: 'GET' | 'POST'
 
 	/**
-	* The HTTP response type
-	*/
-	responseType: XMLHttpRequestResponseType;
+	 * The HTTP response type
+	 */
+	responseType: XMLHttpRequestResponseType
 
 	/**
-	* The HTP request headers
-	*/
-	headers?: Record<string, string>;
+	 * The HTP request headers
+	 */
+	headers?: Record<string, string>
 
 	/**
-	* Whether request is done using credentials (cross-site cookies)
-	*/
-	withCredentials?: boolean;
+	 * Whether request is done using credentials (cross-site cookies)
+	 */
+	withCredentials?: boolean
 
 	/**
-	* The license request message type
-	* (see https://www.w3.org/TR/encrypted-media/#dom-mediakeymessagetype)
-	*/
-	messageType?: MediaKeyMessageType;
+	 * The license request message type
+	 * (see https://www.w3.org/TR/encrypted-media/#dom-mediakeymessagetype)
+	 */
+	messageType?: MediaKeyMessageType
 
 	/**
-	* The corresponding EME session ID
-	*/
-	sessionId?: string;
+	 * The corresponding EME session ID
+	 */
+	sessionId?: string
 
 	/**
-	* The license request data
-	*/
-	data?: ArrayBuffer;
-};
-
+	 * The license request data
+	 */
+	data?: ArrayBuffer
+}

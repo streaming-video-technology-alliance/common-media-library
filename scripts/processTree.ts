@@ -2,15 +2,19 @@ import { spawn, type ChildProcess, type ChildProcessByStdio } from 'node:child_p
 import type { Readable } from 'node:stream'
 
 type Options = {
-	cwd?: string;
-	env?: NodeJS.ProcessEnv;
-};
+	cwd?: string
+	env?: NodeJS.ProcessEnv
+}
 
 const windows = process.platform === 'win32'
 
 // Starts a process with piped output in its own process group, so that `killTree`
 // can stop it together with the subprocesses that inherit the pipes.
-export function spawnTree(command: string, args: string[], options: Options): ChildProcessByStdio<null, Readable, Readable> {
+export function spawnTree(
+	command: string,
+	args: string[],
+	options: Options,
+): ChildProcessByStdio<null, Readable, Readable> {
 	return spawn(command, args, { ...options, detached: !windows, stdio: ['ignore', 'pipe', 'pipe'] })
 }
 
@@ -27,8 +31,7 @@ export function killTree(child: ChildProcess): void {
 
 	try {
 		process.kill(-child.pid, 'SIGTERM')
-	}
-	catch {
+	} catch {
 		// The process group exited between the check above and the signal.
 	}
 }

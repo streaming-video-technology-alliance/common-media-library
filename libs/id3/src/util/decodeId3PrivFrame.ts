@@ -11,9 +11,7 @@ import { utf8ArrayToStr } from './utf8ArrayToStr.ts'
  *
  * @internal
  */
-export function decodeId3PrivFrame(
-	frame: RawId3Frame,
-): DecodedId3Frame<ArrayBufferLike> | undefined {
+export function decodeId3PrivFrame(frame: RawId3Frame): DecodedId3Frame<ArrayBufferLike> | undefined {
 	/*
 	Format: <text string>\0<binary data>
 	*/

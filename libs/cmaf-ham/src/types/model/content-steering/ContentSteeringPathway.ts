@@ -4,6 +4,6 @@
  * @alpha
  */
 export type ContentSteeringPathway = {
-	id: string;
-	url: string;
-};
+	id: string
+	url: string
+}

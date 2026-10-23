@@ -18,8 +18,10 @@ import { toBareValue } from './toBareValue.ts'
 import { toTokenString } from './toTokenString.ts'
 
 function hasKey(spec: CmcdKeySpec, reportingMode: CmcdReportingMode, isV1: boolean): boolean {
-	return (spec.mode === undefined || spec.mode === reportingMode)
-		&& (spec.version === undefined || (spec.version === 1) === isV1)
+	return (
+		(spec.mode === undefined || spec.mode === reportingMode) &&
+		(spec.version === undefined || (spec.version === 1) === isV1)
+	)
 }
 
 function isRequired(spec: CmcdKeySpec, event: string | undefined): boolean {
@@ -67,7 +69,13 @@ function insertKey(keys: string[], specs: CmcdKeySpec[], key: string): void {
 	specs.splice(index, 0, CMCD_KEY_SPECS[key])
 }
 
-function prepareValue(key: string, value: unknown, spec: CmcdKeySpec, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): unknown {
+function prepareValue(
+	key: string,
+	value: unknown,
+	spec: CmcdKeySpec,
+	options: CmcdEncodeOptions,
+	formatterOptions: CmcdFormatterOptions,
+): unknown {
 	const formatter = options.formatters?.[key as CmcdKey]
 
 	if (typeof formatter !== 'function') {
@@ -111,7 +119,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results as Cmcd
 	}
 
-	const version = options.version || toBareValue(obj['v']) as CmcdVersion || CMCD_V2
+	const version = options.version || (toBareValue(obj['v']) as CmcdVersion) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
 	const isV1 = version === 1
 	const isEventReport = !isV1 && reportingMode === CMCD_EVENT_MODE
@@ -127,7 +135,9 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	}
 
 	const data = isV1 ? downConvertToV1(obj, objectType) : obj
-	const eventValue = isEventReport ? prepareValue('e', data['e'], CMCD_KEY_SPECS['e'], options, formatterOptions) : undefined
+	const eventValue = isEventReport
+		? prepareValue('e', data['e'], CMCD_KEY_SPECS['e'], options, formatterOptions)
+		: undefined
 	const event = toTokenString(eventValue)
 	const keys: string[] = []
 	const specs: CmcdKeySpec[] = []
@@ -143,8 +153,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		if (typeof filter !== 'function' || filter(key as CmcdKey)) {
 			passed = true
-		}
-		else if (!isRequired(spec, event)) {
+		} else if (!isRequired(spec, event)) {
 			continue
 		}
 
@@ -193,14 +202,11 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		if (key === 'v') {
 			values[i] = version
-		}
-		else if (key === 'ot') {
+		} else if (key === 'ot') {
 			values[i] = objectTypeValue
-		}
-		else if (key === 'e') {
+		} else if (key === 'e') {
 			values[i] = eventValue
-		}
-		else if (isV1 || allowsObjectType(spec, objectType)) {
+		} else if (isV1 || allowsObjectType(spec, objectType)) {
 			values[i] = prepareValue(key, data[key], spec, options, formatterOptions)
 		}
 

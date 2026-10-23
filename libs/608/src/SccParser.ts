@@ -56,7 +56,7 @@ export class SccParser {
 
 		for (let l = 1; l < lines.length; l += 2) {
 			if (lines[l] !== '') {
-				break  // Every second line should be empty
+				break // Every second line should be empty
 			}
 			this.nrLinesParsed++
 			const lineData = this.parseDataLine(lines[l + 1])
@@ -94,9 +94,13 @@ export class SccParser {
 			const lastParts = parts[2].split(';')
 			parts[2] = lastParts[0]
 			const frames = parseInt(lastParts[1], 10)
-			return (30 * (60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) + frames) * 1001 / 30000
+			return (
+				((30 * (60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) + frames) *
+					1001) /
+				30000
+			)
 		}
-		return 0  // in case if format is incorrect
+		return 0 // in case if format is incorrect
 	}
 
 	getHeaderStatus(): boolean {

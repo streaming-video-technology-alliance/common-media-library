@@ -5,14 +5,14 @@ import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformati
  *
  * @public
  */
-export type ItemProtectionBoxChild = ProtectionSchemeInformationBox;
+export type ItemProtectionBoxChild = ProtectionSchemeInformationBox
 /**
  * Item Protection Box - 'ipro' - Container
  *
  * @public
  */
 export type ItemProtectionBox = {
-	type: 'ipro';
-	boxes: ItemProtectionBoxChild[];
-	protectionCount: number;
-};
+	type: 'ipro'
+	boxes: ItemProtectionBoxChild[]
+	protectionCount: number
+}

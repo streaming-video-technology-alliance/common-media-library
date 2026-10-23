@@ -11,14 +11,13 @@ import { writeIsoBox } from './writeIsoBox.ts'
 // statement when IsoBoxReadableStream is unused.
 const ReadableStreamBase: typeof ReadableStream = /* @__PURE__ */ (() =>
 	typeof ReadableStream === 'undefined'
-		// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-		? class {
-			constructor() {
-				throw new Error('ReadableStream is not available in this environment')
-			}
-		} as unknown as typeof ReadableStream
-		: ReadableStream
-)()
+		? // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+			(class {
+				constructor() {
+					throw new Error('ReadableStream is not available in this environment')
+				}
+			} as unknown as typeof ReadableStream)
+		: ReadableStream)()
 
 /**
  * A readable stream of ISO BMFF boxes as Uint8Arrays.

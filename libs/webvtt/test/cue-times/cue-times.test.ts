@@ -39,7 +39,10 @@ describe('cue-times tests', () => {
 	})
 
 	it('minimum-spots-over-sixty.vtt', async () => {
-		await expectCuesEqualAll('test/cue-times/minimum-spots-over-sixty.vtt', 'test/cue-times/minimum-spots-over-sixty.json')
+		await expectCuesEqualAll(
+			'test/cue-times/minimum-spots-over-sixty.vtt',
+			'test/cue-times/minimum-spots-over-sixty.json',
+		)
 	})
 
 	it('minimum-time-spots.vtt', async () => {
@@ -81,5 +84,4 @@ describe('cue-times tests', () => {
 	it('tab-right.vtt', async () => {
 		await expectCuesEqualAll('test/cue-times/tab-right.vtt', 'test/cue-times/with-data.json')
 	})
-
 })

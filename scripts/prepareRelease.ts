@@ -7,18 +7,18 @@ import { satisfiesRange } from './satisfiesRange.ts'
 import { unreleasedEntries } from './unreleasedEntries.ts'
 
 type PackageJson = {
-	name: string;
-	version: string;
-	peerDependencies?: Record<string, string>;
-};
+	name: string
+	version: string
+	peerDependencies?: Record<string, string>
+}
 
 type PackageInfo = {
-	folder: string;
-	name: string;
-	current: PackageJson;
-	published: string | undefined;
-	publishedPeers: Record<string, string>;
-};
+	folder: string
+	name: string
+	current: PackageJson
+	published: string | undefined
+	publishedPeers: Record<string, string>
+}
 
 async function loadCurrentPackage(folder: string): Promise<PackageJson> {
 	const file = path.resolve(folder, 'package.json')
@@ -26,12 +26,14 @@ async function loadCurrentPackage(folder: string): Promise<PackageJson> {
 }
 
 async function loadPackages(): Promise<PackageInfo[]> {
-	return Promise.all(projects.map(async (folder) => {
-		const current = await loadCurrentPackage(folder)
-		const published = await viewPublished(current.name, 'version')
-		const publishedPeers = published ? await viewPublishedPeers(current.name) : {}
-		return { folder, name: current.name, current, published, publishedPeers }
-	}))
+	return Promise.all(
+		projects.map(async folder => {
+			const current = await loadCurrentPackage(folder)
+			const published = await viewPublished(current.name, 'version')
+			const publishedPeers = published ? await viewPublishedPeers(current.name) : {}
+			return { folder, name: current.name, current, published, publishedPeers }
+		}),
+	)
 }
 
 function today(): string {
@@ -42,7 +44,12 @@ function today(): string {
 	return `${yyyy}-${mm}-${dd}`
 }
 
-async function updateChangelog(folder: string, version: string, previousVersion: string, changes: string[]): Promise<void> {
+async function updateChangelog(
+	folder: string,
+	version: string,
+	previousVersion: string,
+	changes: string[],
+): Promise<void> {
 	const pkg = path.basename(folder)
 	const file = path.resolve(folder, 'CHANGELOG.md')
 	const changelog = await readFile(file, 'utf8')
@@ -56,12 +63,16 @@ async function updateChangelog(folder: string, version: string, previousVersion:
 	const linkBreak = '\n'
 	const last = sections.length - 1
 	const links = sections[last].split(linkBreak)
-	const index = links.findIndex((link) => head.test(link))
+	const index = links.findIndex(link => head.test(link))
 
 	if (index >= 0) {
 		const unreleased = links[index]
 		links[index] = unreleased.replace(/\/[0-9a-z-]+v[0-9a-zA-Z.-]+\.\.\.HEAD/, `/${versionTag}...HEAD`)
-		links.splice(index + 1, 0, `[${version}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/${pkg}-v${previousVersion}...${versionTag}`)
+		links.splice(
+			index + 1,
+			0,
+			`[${version}]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/${pkg}-v${previousVersion}...${versionTag}`,
+		)
 	}
 
 	sections[last] = links.join(linkBreak)
@@ -151,8 +162,7 @@ while (bumped) {
 
 if (patched.length === 0) {
 	console.log('\nNo packages need patching.')
-}
-else {
+} else {
 	console.log(`\n${patched.length} package(s) patched.`)
 }
 

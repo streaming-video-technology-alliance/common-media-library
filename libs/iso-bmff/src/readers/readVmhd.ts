@@ -18,4 +18,4 @@ export function readVmhd(view: IsoBoxReadView): VideoMediaHeaderBox {
 		graphicsmode: view.readUint(2),
 		opcolor: view.readArray(UINT, 2, 3),
 	}
-};
+}

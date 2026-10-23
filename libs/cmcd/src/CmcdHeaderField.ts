@@ -61,7 +61,7 @@ export const CmcdHeaderField = {
 /**
  * @public
  */
-export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>;
+export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>
 
 /**
  * All CMCD header fields as an array.

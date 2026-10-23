@@ -17,12 +17,9 @@ import { decodeId3UrlFrame } from './decodeId3UrlFrame.ts'
 export function decodeId3Frame(frame: RawId3Frame): Id3Frame | undefined {
 	if (frame.type === 'PRIV') {
 		return decodeId3PrivFrame(frame)
-	}
-	else if (frame.type[0] === 'W') {
+	} else if (frame.type[0] === 'W') {
 		return decodeId3UrlFrame(frame)
-	}
-
-	else if (frame.type === 'APIC') {
+	} else if (frame.type === 'APIC') {
 		return decodeId3ImageFrame(frame)
 	}
 

@@ -34,4 +34,4 @@ export function readVisualSampleEntryBox<T extends IsoBoxType>(type: T, view: Is
 		preDefined3: readInt(2),
 		boxes: readBoxes<VisualSampleEntryBoxChild>(),
 	}
-};
+}

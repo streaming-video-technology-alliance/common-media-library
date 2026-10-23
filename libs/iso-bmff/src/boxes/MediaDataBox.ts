@@ -4,6 +4,6 @@
  * @public
  */
 export type MediaDataBox = {
-	type: 'mdat';
-	data: Uint8Array;
-};
+	type: 'mdat'
+	data: Uint8Array
+}

@@ -46,16 +46,18 @@ describe('validateC2paMerkleSegment', () => {
 			contents.map(c => computeBmffHash(c, { offsetPrefixSize: 8, exclusions: EXCLUSIONS })),
 		)
 		levels = await buildTreeLevels(leafHashes)
-		merkleMaps = [{
-			uniqueId: UNIQUE_ID,
-			localId: 1,
-			count: SEGMENT_COUNT,
-			hashes: manifestRow(levels, TREE_DEPTH),
-			initHash: null,
-			alg: 'SHA-256',
-			exclusions: EXCLUSIONS,
-			offsetPrefixSize: 8,
-		}]
+		merkleMaps = [
+			{
+				uniqueId: UNIQUE_ID,
+				localId: 1,
+				count: SEGMENT_COUNT,
+				hashes: manifestRow(levels, TREE_DEPTH),
+				initHash: null,
+				alg: 'SHA-256',
+				exclusions: EXCLUSIONS,
+				offsetPrefixSize: 8,
+			},
+		]
 		segments = Array.from({ length: SEGMENT_COUNT }, (_, i) => buildSegment(i))
 	})
 
@@ -172,10 +174,7 @@ describe('validateC2paMerkleSegment', () => {
 		const content = buildMediaContent(0)
 		const leafHash = await computeBmffHash(content, { offsetPrefixSize: 8, exclusions: EXCLUSIONS })
 		const singleMaps = merkleMapWith({ count: 1, hashes: [leafHash] })
-		const segment = concatBytes(
-			content,
-			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 1, location: 0 }),
-		)
+		const segment = concatBytes(content, buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 1, location: 0 }))
 
 		const validated = await validateC2paMerkleSegment(segment, singleMaps)
 
@@ -242,16 +241,18 @@ describe('validateC2paMerkleSegment', () => {
 		)
 		const gapLevels = await buildTreeLevels(leafHashes)
 		const depth = gapLevels.length - 1
-		const gapMaps: MerkleMap[] = [{
-			uniqueId: UNIQUE_ID,
-			localId: 1,
-			count,
-			hashes: manifestRow(gapLevels, depth),
-			initHash: null,
-			alg: 'SHA-256',
-			exclusions: EXCLUSIONS,
-			offsetPrefixSize: 8,
-		}]
+		const gapMaps: MerkleMap[] = [
+			{
+				uniqueId: UNIQUE_ID,
+				localId: 1,
+				count,
+				hashes: manifestRow(gapLevels, depth),
+				initHash: null,
+				alg: 'SHA-256',
+				exclusions: EXCLUSIONS,
+				offsetPrefixSize: 8,
+			},
+		]
 		function gapSegment(location: number): Uint8Array {
 			return concatBytes(
 				buildMediaContent(location * 10),
@@ -313,8 +314,18 @@ describe('validateC2paMerkleSegment', () => {
 		const twoTrackMaps: MerkleMap[] = [merkleMaps[0], { ...merkleMaps[0], localId: 2 }]
 		const validSegment = concatBytes(
 			buildMediaContent(0),
-			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 1, location: 0, hashes: buildProofPath(levels, 0, TREE_DEPTH) }),
-			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 2, location: 0, hashes: buildProofPath(levels, 0, TREE_DEPTH) }),
+			buildMerkleAuxBox({
+				uniqueId: UNIQUE_ID,
+				localId: 1,
+				location: 0,
+				hashes: buildProofPath(levels, 0, TREE_DEPTH),
+			}),
+			buildMerkleAuxBox({
+				uniqueId: UNIQUE_ID,
+				localId: 2,
+				location: 0,
+				hashes: buildProofPath(levels, 0, TREE_DEPTH),
+			}),
 		)
 
 		const bothPass = await validateC2paMerkleSegment(validSegment, twoTrackMaps)
@@ -323,8 +334,18 @@ describe('validateC2paMerkleSegment', () => {
 
 		const mixedSegment = concatBytes(
 			buildMediaContent(0),
-			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 1, location: 0, hashes: buildProofPath(levels, 0, TREE_DEPTH) }),
-			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 99, location: 0, hashes: buildProofPath(levels, 0, TREE_DEPTH) }),
+			buildMerkleAuxBox({
+				uniqueId: UNIQUE_ID,
+				localId: 1,
+				location: 0,
+				hashes: buildProofPath(levels, 0, TREE_DEPTH),
+			}),
+			buildMerkleAuxBox({
+				uniqueId: UNIQUE_ID,
+				localId: 99,
+				location: 0,
+				hashes: buildProofPath(levels, 0, TREE_DEPTH),
+			}),
 		)
 		const oneFails = await validateC2paMerkleSegment(mixedSegment, twoTrackMaps)
 		strictEqual(oneFails.result.isValid, false)

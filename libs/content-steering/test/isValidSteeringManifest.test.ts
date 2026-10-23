@@ -10,17 +10,19 @@ describe('isValidSteeringManifest', () => {
 			VERSION: 1,
 			TTL: 100,
 			'PATHWAY-PRIORITY': ['pathway1', 'pathway2'],
-			'PATHWAY-CLONES': [{
-				'BASE-ID': 'pathway1',
-				'ID': 'clone1',
-				'URI-REPLACEMENT': {
-					HOST: 'example.com',
-					PARAMS: {
-						param1: 'value1',
-						param2: 'value2',
+			'PATHWAY-CLONES': [
+				{
+					'BASE-ID': 'pathway1',
+					'ID': 'clone1',
+					'URI-REPLACEMENT': {
+						HOST: 'example.com',
+						PARAMS: {
+							param1: 'value1',
+							param2: 'value2',
+						},
 					},
 				},
-			}],
+			],
 		}
 
 		assert(isValidSteeringManifest(manifest))
@@ -56,7 +58,10 @@ describe('isValidSteeringManifest', () => {
 		it('invalid PATHWAY-PRIORITY', () => {
 			equal(isValidSteeringManifest(Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': [] })), false)
 			equal(isValidSteeringManifest(Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': '' })), false)
-			equal(isValidSteeringManifest(Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': ['pathway1', 'pathway1'] })), false)
+			equal(
+				isValidSteeringManifest(Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': ['pathway1', 'pathway1'] })),
+				false,
+			)
 		})
 	})
 })

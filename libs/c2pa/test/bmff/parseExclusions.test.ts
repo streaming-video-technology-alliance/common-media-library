@@ -20,7 +20,13 @@ describe('parseExclusions', () => {
 	})
 
 	it('returns an unconditional exclusion for a null or empty data field', () => {
-		deepStrictEqual(parseExclusions([{ xpath: '/ftyp', data: null, length: null }, { xpath: '/uuid', data: [] }]), [{ xpath: '/ftyp' }, { xpath: '/uuid' }])
+		deepStrictEqual(
+			parseExclusions([
+				{ xpath: '/ftyp', data: null, length: null },
+				{ xpath: '/uuid', data: [] },
+			]),
+			[{ xpath: '/ftyp' }, { xpath: '/uuid' }],
+		)
 	})
 
 	it('parses every optional field of the §18.6.2 exclusions-map', () => {
@@ -28,7 +34,10 @@ describe('parseExclusions', () => {
 			xpath: '/moov/trak[2]/udta',
 			length: 32,
 			data: [{ offset: 8, value: Uint8Array.of(0xaa) }],
-			subset: [{ offset: 8, length: 4 }, { offset: 16, length: 0 }],
+			subset: [
+				{ offset: 8, length: 4 },
+				{ offset: 16, length: 0 },
+			],
 			version: 1,
 			flags: Uint8Array.of(0, 0, 1),
 			exact: false,
@@ -37,7 +46,15 @@ describe('parseExclusions', () => {
 	})
 
 	it('treats a null optional field as absent', () => {
-		const exclusion = { xpath: '/moov', length: null, data: null, subset: null, version: null, flags: null, exact: null }
+		const exclusion = {
+			xpath: '/moov',
+			length: null,
+			data: null,
+			subset: null,
+			version: null,
+			flags: null,
+			exact: null,
+		}
 		deepStrictEqual(parseExclusions([exclusion]), [{ xpath: '/moov' }])
 	})
 
@@ -70,7 +87,10 @@ describe('parseExclusions', () => {
 		['a constraint that is not a map', [{ xpath: '/uuid', data: [8] }]],
 		['a constraint without an offset', [{ xpath: '/uuid', data: [{ value: Uint8Array.of(1) }] }]],
 		['a constraint offset that is negative', [{ xpath: '/uuid', data: [{ offset: -8, value: Uint8Array.of(1) }] }]],
-		['a constraint offset that is a text string', [{ xpath: '/uuid', data: [{ offset: '8', value: Uint8Array.of(1) }] }]],
+		[
+			'a constraint offset that is a text string',
+			[{ xpath: '/uuid', data: [{ offset: '8', value: Uint8Array.of(1) }] }],
+		],
 		['a constraint without a value', [{ xpath: '/uuid', data: [{ offset: 8 }] }]],
 		['a constraint value that is an array of integers', [{ xpath: '/uuid', data: [{ offset: 8, value: [1] }] }]],
 		['a constraint value that is a text string', [{ xpath: '/uuid', data: [{ offset: 8, value: 'x' }] }]],
@@ -89,10 +109,54 @@ describe('parseExclusions', () => {
 		['a subset entry without a length', [{ xpath: '/moov', subset: [{ offset: 8 }] }]],
 		['a subset entry offset that is negative', [{ xpath: '/moov', subset: [{ offset: -8, length: 4 }] }]],
 		['a subset entry length that is a text string', [{ xpath: '/moov', subset: [{ offset: 8, length: '4' }] }]],
-		['subset offsets that decrease', [{ xpath: '/moov', subset: [{ offset: 16, length: 4 }, { offset: 8, length: 4 }] }]],
-		['subset offsets that repeat', [{ xpath: '/moov', subset: [{ offset: 8, length: 4 }, { offset: 8, length: 4 }] }]],
-		['subset ranges that overlap', [{ xpath: '/moov', subset: [{ offset: 8, length: 8 }, { offset: 12, length: 4 }] }]],
-		['a subset length of 0 before the last entry', [{ xpath: '/moov', subset: [{ offset: 8, length: 0 }, { offset: 16, length: 4 }] }]],
+		[
+			'subset offsets that decrease',
+			[
+				{
+					xpath: '/moov',
+					subset: [
+						{ offset: 16, length: 4 },
+						{ offset: 8, length: 4 },
+					],
+				},
+			],
+		],
+		[
+			'subset offsets that repeat',
+			[
+				{
+					xpath: '/moov',
+					subset: [
+						{ offset: 8, length: 4 },
+						{ offset: 8, length: 4 },
+					],
+				},
+			],
+		],
+		[
+			'subset ranges that overlap',
+			[
+				{
+					xpath: '/moov',
+					subset: [
+						{ offset: 8, length: 8 },
+						{ offset: 12, length: 4 },
+					],
+				},
+			],
+		],
+		[
+			'a subset length of 0 before the last entry',
+			[
+				{
+					xpath: '/moov',
+					subset: [
+						{ offset: 8, length: 0 },
+						{ offset: 16, length: 4 },
+					],
+				},
+			],
+		],
 	]
 
 	for (const [description, exclusions] of NONCONFORMING_EXCLUSIONS) {

@@ -5,7 +5,7 @@ import type { TrackEncryptionBox } from './TrackEncryptionBox.ts'
  *
  * @public
  */
-export type SchemeInformationBoxChild = TrackEncryptionBox;
+export type SchemeInformationBoxChild = TrackEncryptionBox
 
 /**
  * Scheme Information Box - 'schi' - Container
@@ -13,6 +13,6 @@ export type SchemeInformationBoxChild = TrackEncryptionBox;
  * @public
  */
 export type SchemeInformationBox = {
-	type: 'schi';
-	boxes: SchemeInformationBoxChild[];
-};
+	type: 'schi'
+	boxes: SchemeInformationBoxChild[]
+}

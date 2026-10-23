@@ -12,7 +12,7 @@ describe('structured field serialization', async () => {
 		read('serialisation-tests/token-generated'),
 	])
 
-	suites.flat().forEach((suite) => {
+	suites.flat().forEach(suite => {
 		try {
 			if (suite.header_type === `item`) {
 				// encode
@@ -22,10 +22,8 @@ describe('structured field serialization', async () => {
 				test(suite.name, () => {
 					assert.deepStrictEqual(str, encoded, suite.name)
 				})
-
 			}
-		}
-		catch (error) {
+		} catch (error) {
 			test(suite.name, () => {
 				assert.deepStrictEqual(suite.must_fail, true, error as any)
 			})

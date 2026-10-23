@@ -142,7 +142,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		}
 
 		params = next
-		bandwidths = ladder.map((rung) => rung.bandwidth)
+		bandwidths = ladder.map(rung => rung.bandwidth)
 		bufferTarget = target
 
 		return next
@@ -188,7 +188,13 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	}
 
 	// The conversion of a rebuild needs the elapsed time in the placeholder, so the call adds the time first.
-	function selectInSteadyState(input: BitrateSelectorInput, rungParams: BolaParams, previousParams: BolaParams | undefined, bufferLevel: number, throughput: number): BolaDecision {
+	function selectInSteadyState(
+		input: BitrateSelectorInput,
+		rungParams: BolaParams,
+		previousParams: BolaParams | undefined,
+		bufferLevel: number,
+		throughput: number,
+	): BolaDecision {
 		consumeElapsedTime(input.now)
 
 		if (previousParams && previousParams !== rungParams) {
@@ -226,18 +232,39 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 			return position
 		}
 
-		return limitUpwardSwitch(position, currentPosition(rungParams), findRung(rungParams.rungs, throughput * safetyFactor))
+		return limitUpwardSwitch(
+			position,
+			currentPosition(rungParams),
+			findRung(rungParams.rungs, throughput * safetyFactor),
+		)
 	}
 
 	// The starvation guard has one pass, and rung 0 is its fallback. It needs a positive `segmentDuration`, a known throughput, and enough finished samples.
-	function limitStarvation(rungParams: BolaParams, position: number, input: BitrateSelectorInput, bufferLevel: number, throughput: number): number {
-		if (finishedSampleCount < STARVATION_GUARD_SAMPLE_COUNT || Number.isNaN(throughput) || !isPositiveFinite(input.segmentDuration)) {
+	function limitStarvation(
+		rungParams: BolaParams,
+		position: number,
+		input: BitrateSelectorInput,
+		bufferLevel: number,
+		throughput: number,
+	): number {
+		if (
+			finishedSampleCount < STARVATION_GUARD_SAMPLE_COUNT ||
+			Number.isNaN(throughput) ||
+			!isPositiveFinite(input.segmentDuration)
+		) {
 			return position
 		}
 
 		const playbackRate = isPositiveFinite(input.playbackRate) ? input.playbackRate : 1
 
-		return applyStarvationGuard(rungParams.rungs, position, input.segmentDuration, throughput * starvationSafetyFactor, bufferLevel / playbackRate, NO_TOLERANCE)
+		return applyStarvationGuard(
+			rungParams.rungs,
+			position,
+			input.segmentDuration,
+			throughput * starvationSafetyFactor,
+			bufferLevel / playbackRate,
+			NO_TOLERANCE,
+		)
 	}
 
 	// A stall empties the placeholder and the time bases.

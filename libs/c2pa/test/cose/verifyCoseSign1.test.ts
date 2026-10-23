@@ -7,11 +7,7 @@ describe('verifyCoseSign1', () => {
 	// #region example
 	it('returns false for a COSE_Sign1 with an invalid signature', async () => {
 		// Generate a fresh key pair for testing
-		const keyPair = await crypto.subtle.generateKey(
-			{ name: 'ECDSA', namedCurve: 'P-256' },
-			false,
-			['sign', 'verify'],
-		)
+		const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify'])
 
 		// A minimal COSE_Sign1 with empty protected header and empty signature
 		const minimal = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
@@ -24,11 +20,7 @@ describe('verifyCoseSign1', () => {
 	// #endregion example
 
 	it('verifies a freshly signed COSE_Sign1 structure', async () => {
-		const keyPair = await crypto.subtle.generateKey(
-			{ name: 'ECDSA', namedCurve: 'P-256' },
-			false,
-			['sign', 'verify'],
-		)
+		const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify'])
 
 		const { buildSigStructure } = await import('../../src/cose/buildSigStructure.ts')
 		const protectedBytes = new Uint8Array([0xa1, 0x01, 0x26]) // {1: -7} = ECDSA
@@ -36,11 +28,7 @@ describe('verifyCoseSign1', () => {
 
 		const sigStructure = buildSigStructure(protectedBytes, payload)
 		const rawSignature = new Uint8Array(
-			await crypto.subtle.sign(
-				{ name: 'ECDSA', hash: { name: 'SHA-256' } },
-				keyPair.privateKey,
-				sigStructure,
-			),
+			await crypto.subtle.sign({ name: 'ECDSA', hash: { name: 'SHA-256' } }, keyPair.privateKey, sigStructure),
 		)
 
 		const coseSign1 = {
@@ -58,11 +46,7 @@ describe('verifyCoseSign1', () => {
 	})
 
 	it('returns false for a mutated payload', async () => {
-		const keyPair = await crypto.subtle.generateKey(
-			{ name: 'ECDSA', namedCurve: 'P-256' },
-			false,
-			['sign', 'verify'],
-		)
+		const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign', 'verify'])
 
 		const { buildSigStructure } = await import('../../src/cose/buildSigStructure.ts')
 		const protectedBytes = new Uint8Array([0xa1, 0x01, 0x26])
@@ -70,11 +54,7 @@ describe('verifyCoseSign1', () => {
 
 		const sigStructure = buildSigStructure(protectedBytes, payload)
 		const rawSignature = new Uint8Array(
-			await crypto.subtle.sign(
-				{ name: 'ECDSA', hash: { name: 'SHA-256' } },
-				keyPair.privateKey,
-				sigStructure,
-			),
+			await crypto.subtle.sign({ name: 'ECDSA', hash: { name: 'SHA-256' } }, keyPair.privateKey, sigStructure),
 		)
 
 		const coseSign1 = {

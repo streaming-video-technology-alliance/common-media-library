@@ -7,15 +7,15 @@ export type DecodedId3Frame<T> = {
 	/**
 	 * The four letter frame ID.
 	 */
-	key: string;
+	key: string
 
 	/**
 	 * The data payload.
 	 */
-	data: T;
+	data: T
 
 	/**
 	 * A text description of the frame if provided.
 	 */
-	info?: any;
-};
+	info?: any
+}

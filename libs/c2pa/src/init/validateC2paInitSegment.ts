@@ -33,7 +33,8 @@ function ensureDecodedCbor(value: unknown): unknown {
 }
 
 // RFC 8949 section 3.4.1: the date-time of RFC 3339, as refined by RFC 4287 section 3.3 (C2PA section 6.9)
-const RFC_3339_DATE_TIME = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:[0-5]\d){2}(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/
+const RFC_3339_DATE_TIME =
+	/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:[0-5]\d){2}(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)$/
 const CBOR_TAG_DATE_TIME = 0
 
 // §18.25.2: CBOR tag 0 with an RFC 3339 date-time
@@ -83,14 +84,16 @@ async function validateBmffHashAssertion(
 	assertion: C2paAssertion | null,
 ): Promise<BmffHashCode | null> {
 	if (!assertion) return null
-	if (assertion.data === null || typeof assertion.data !== 'object' || Array.isArray(assertion.data)) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
+	if (assertion.data === null || typeof assertion.data !== 'object' || Array.isArray(assertion.data))
+		return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	const data = assertion.data as Record<string, unknown>
 	// §18.6.6.1 step 2: a Merkle initHash verifies the init, so only an init with Merkle maps may omit `hash`.
 	// validateMerkleMaps checks each map.
 	const rawHash = data['hash']
 	const merkle = data['merkle']
 	const hash = rawHash instanceof Uint8Array ? rawHash : null
-	if (!hash && !(rawHash == null && Array.isArray(merkle) && merkle.length > 0)) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
+	if (!hash && !(rawHash == null && Array.isArray(merkle) && merkle.length > 0))
+		return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	const exclusions = parseExclusions(data['exclusions'])
 	if (!exclusions) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 	// §19.2.3: the bmff-hash-map of an init segment includes the moov box
@@ -159,10 +162,7 @@ async function verifyAndConvertKey(
 	}
 }
 
-async function validateSingleSessionKey(
-	entry: unknown,
-	certificate: Uint8Array,
-): Promise<ValidatedSessionKey | null> {
+async function validateSingleSessionKey(entry: unknown, certificate: Uint8Array): Promise<ValidatedSessionKey | null> {
 	try {
 		const fields = extractSessionKeyFields(entry)
 		if (!fields) return null
@@ -238,8 +238,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const { manifest } = internalData
 	const { codes: integrityCodes, certificate, verifiedAssertions } = await validateManifestIntegrity(internalData)
 
-	const bmffHashAssertion =
-		verifiedAssertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
+	const bmffHashAssertion = verifiedAssertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL) ?? null
 	// §19.2.3: the manifest of an init segment has a c2pa.hash.bmff.v3 assertion. An assertion
 	// in the store that the claim does not verify reports an integrity code instead.
 	const bmffHashMissing = !internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
@@ -251,9 +250,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	const merkleMaps = await validateMerkleMaps(bytes, bmffHashAssertion, merkleCodes)
 	const codes = new Set<LiveVideoStatusCode | C2paStatusCode>(merkleCodes)
 
-	const sessionKeysAssertion = verifiedAssertions.find(
-		a => a.label === SESSION_KEYS_ASSERTION_LABEL,
-	)
+	const sessionKeysAssertion = verifiedAssertions.find(a => a.label === SESSION_KEYS_ASSERTION_LABEL)
 	const sessionKeysValidation =
 		sessionKeysAssertion && certificate
 			? await validateSessionKeys(sessionKeysAssertion, certificate)

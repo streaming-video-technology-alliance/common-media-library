@@ -17,7 +17,10 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @public
  */
-export function writeAudioSampleEntryBox<T extends AudioSampleEntryType = AudioSampleEntryType>(box: AudioSampleEntryBox<T>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeAudioSampleEntryBox<T extends AudioSampleEntryType = AudioSampleEntryType>(
+	box: AudioSampleEntryBox<T>,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2
@@ -30,8 +33,17 @@ export function writeAudioSampleEntryBox<T extends AudioSampleEntryType = AudioS
 
 	const { bytes, size } = writeChildBoxes(box.boxes, config)
 
-	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + reserved2Size +
-		channelcountSize + samplesizeSize + preDefinedSize + reserved3Size + samplerateSize + size
+	const totalSize =
+		headerSize +
+		reserved1Size +
+		dataReferenceIndexSize +
+		reserved2Size +
+		channelcountSize +
+		samplesizeSize +
+		preDefinedSize +
+		reserved3Size +
+		samplerateSize +
+		size
 
 	const writer = new IsoBoxWriteView(box.type, totalSize)
 

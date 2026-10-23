@@ -12,12 +12,7 @@ import { getTracksFromSwitchingSet } from './getTracksFromSwitchingSet.ts'
  *
  * @alpha
  */
-export function getTracksFromSelectionSet(
-	selectionSet: SelectionSet,
-	predicate?: (track: Track) => boolean,
-): Track[] {
-	const tracks = selectionSet.switchingSets.flatMap((switchingSet) =>
-		getTracksFromSwitchingSet(switchingSet),
-	)
+export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?: (track: Track) => boolean): Track[] {
+	const tracks = selectionSet.switchingSets.flatMap(switchingSet => getTracksFromSwitchingSet(switchingSet))
 	return predicate ? tracks.filter(predicate) : tracks
 }

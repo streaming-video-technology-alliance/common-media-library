@@ -3,7 +3,6 @@ import { strictEqual } from 'node:assert'
 import { describe, it } from 'node:test'
 
 describe('findCencContentProtection', () => {
-
 	it('should return null if no matching ContentProtection is found', () => {
 		//#region example
 		const cpArray = [

@@ -23,8 +23,7 @@ export function findCencContentProtection(cpArray: ContentProtection[]): Content
 		if (
 			cp.schemeIdUri?.toLowerCase() === MP4_PROTECTION_SCHEME &&
 			cp.value &&
-			(cp.value.toLowerCase() === CENC ||
-				cp.value.toLowerCase() === CBCS)
+			(cp.value.toLowerCase() === CENC || cp.value.toLowerCase() === CBCS)
 		) {
 			return cp
 		}

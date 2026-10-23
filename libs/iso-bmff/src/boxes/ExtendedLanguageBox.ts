@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type ExtendedLanguageBox = FullBox & {
-	type: 'elng';
-	extendedLanguage: string;
-};
+	type: 'elng'
+	extendedLanguage: string
+}

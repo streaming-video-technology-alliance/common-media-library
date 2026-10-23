@@ -9,14 +9,13 @@ import { WebVttTransformer } from './WebVttTransformer.ts'
 // statement when WebVttTransformStream is unused.
 const TransformStreamBase: typeof TransformStream = /* @__PURE__ */ (() =>
 	typeof TransformStream === 'undefined'
-		// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-		? class {
-			constructor() {
-				throw new Error('TransformStream is not available in this environment')
-			}
-		} as unknown as typeof TransformStream
-		: TransformStream
-)()
+		? // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+			(class {
+				constructor() {
+					throw new Error('TransformStream is not available in this environment')
+				}
+			} as unknown as typeof TransformStream)
+		: TransformStream)()
 
 /**
  * WebVTT transform stream.

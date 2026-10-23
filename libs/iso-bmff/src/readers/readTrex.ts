@@ -20,4 +20,4 @@ export function readTrex(view: IsoBoxReadView): TrackExtendsBox {
 		defaultSampleSize: view.readUint(4),
 		defaultSampleFlags: view.readUint(4),
 	}
-};
+}

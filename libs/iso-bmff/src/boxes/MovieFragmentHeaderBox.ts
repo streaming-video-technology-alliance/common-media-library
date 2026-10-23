@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type MovieFragmentHeaderBox = FullBox & {
-	type: 'mfhd';
-	sequenceNumber: number;
-};
+	type: 'mfhd'
+	sequenceNumber: number
+}

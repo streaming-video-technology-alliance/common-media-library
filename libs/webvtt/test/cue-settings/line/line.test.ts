@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cue-settings/line tests', () => {
-
 	it('bad-delimiter.vtt', async () => {
 		await expectCuesEqualAll('test/cue-settings/line/bad-delimiter.vtt', 'test/cue-settings/line/bad-line.json')
 	})
@@ -24,7 +23,10 @@ describe('cue-settings/line tests', () => {
 	})
 
 	it('decimal-percent.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/line/decimal-percent.vtt', 'test/cue-settings/line/decimal-percent.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/line/decimal-percent.vtt',
+			'test/cue-settings/line/decimal-percent.json',
+		)
 	})
 
 	// Turn back on issue: https://github.com/mozilla/vtt.js/issues/255
@@ -34,7 +36,10 @@ describe('cue-settings/line tests', () => {
 
 	// Turn back on issue: https://github.com/mozilla/vtt.js/issues/255
 	it('large-integer-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/line/large-integer-value.vtt', 'test/cue-settings/line/large-integer-value.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/line/large-integer-value.vtt',
+			'test/cue-settings/line/large-integer-value.json',
+		)
 	})
 
 	it('line-end-align.vtt', async () => {
@@ -42,16 +47,25 @@ describe('cue-settings/line tests', () => {
 	})
 
 	it('line-start-align.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/line/line-start-align.vtt', 'test/cue-settings/line/line-start-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/line/line-start-align.vtt',
+			'test/cue-settings/line/line-start-align.json',
+		)
 	})
 
 	// Turn back on issue: https://github.com/mozilla/vtt.js/issues/255
 	it('negative-integer-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/line/negative-integer-value.vtt', 'test/cue-settings/line/negative-integer-value.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/line/negative-integer-value.vtt',
+			'test/cue-settings/line/negative-integer-value.json',
+		)
 	})
 
 	it('negative-percent-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/line/negative-percent-value.vtt', 'test/cue-settings/line/bad-line.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/line/negative-percent-value.vtt',
+			'test/cue-settings/line/bad-line.json',
+		)
 	})
 
 	it('negative-zeros.vtt', async () => {
@@ -79,7 +93,9 @@ describe('cue-settings/line tests', () => {
 	})
 
 	it('space-before-delimiter.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/line/space-before-delimiter.vtt', 'test/cue-settings/line/bad-line.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/line/space-before-delimiter.vtt',
+			'test/cue-settings/line/bad-line.json',
+		)
 	})
-
 })

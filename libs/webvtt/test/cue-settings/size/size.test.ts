@@ -2,7 +2,6 @@ import { describe, it } from 'node:test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cue-settings/size tests', () => {
-
 	it('bad-delimiter.vtt', async () => {
 		await expectCuesEqualAll('test/cue-settings/size/bad-delimiter.vtt', 'test/cue-settings/size/bad-size.json')
 	})
@@ -16,7 +15,10 @@ describe('cue-settings/size tests', () => {
 	})
 
 	it('decimal-percent.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/size/decimal-percent.vtt', 'test/cue-settings/size/decimal-percent.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/size/decimal-percent.vtt',
+			'test/cue-settings/size/decimal-percent.json',
+		)
 	})
 
 	it('integer-value.vtt', async () => {
@@ -28,7 +30,10 @@ describe('cue-settings/size tests', () => {
 	})
 
 	it('negative-percent-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/size/negative-percent-value.vtt', 'test/cue-settings/size/bad-size.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/size/negative-percent-value.vtt',
+			'test/cue-settings/size/bad-size.json',
+		)
 	})
 
 	it('no-value.vtt', async () => {
@@ -52,7 +57,9 @@ describe('cue-settings/size tests', () => {
 	})
 
 	it('space-before-delimiter.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/size/space-before-delimiter.vtt', 'test/cue-settings/size/bad-size.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/size/space-before-delimiter.vtt',
+			'test/cue-settings/size/bad-size.json',
+		)
 	})
-
 })

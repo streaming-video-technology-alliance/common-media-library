@@ -17,4 +17,4 @@ export const EncryptionScheme = {
  *
  * @public
  */
-export type EncryptionScheme = ValueOf<typeof EncryptionScheme>;
+export type EncryptionScheme = ValueOf<typeof EncryptionScheme>

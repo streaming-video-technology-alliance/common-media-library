@@ -1,10 +1,15 @@
 import type { BitrateSelector, LadderRung } from '@svta/cml-abr'
-import { createThroughputSelector, DEFAULT_SAFETY_FACTOR, DEFAULT_STARVATION_TOLERANCE, DEFAULT_UPGRADE_FACTOR } from '@svta/cml-abr'
+import {
+	createThroughputSelector,
+	DEFAULT_SAFETY_FACTOR,
+	DEFAULT_STARVATION_TOLERANCE,
+	DEFAULT_UPGRADE_FACTOR,
+} from '@svta/cml-abr'
 import { deepEqual, equal, throws } from 'node:assert'
 import { describe, it } from 'node:test'
 
 function rungs(...bandwidths: number[]): LadderRung[] {
-	return bandwidths.map((bandwidth) => ({ bandwidth }))
+	return bandwidths.map(bandwidth => ({ bandwidth }))
 }
 
 const ladder = rungs(300_000, 750_000, 1_500_000, 3_000_000, 6_000_000)
@@ -75,7 +80,13 @@ describe('createThroughputSelector', () => {
 		it('picks the highest rung at or below the safe throughput', () => {
 			//#region example
 			const selector = createThroughputSelector()
-			const ladder = [{ bandwidth: 300_000 }, { bandwidth: 750_000 }, { bandwidth: 1_500_000 }, { bandwidth: 3_000_000 }, { bandwidth: 6_000_000 }]
+			const ladder = [
+				{ bandwidth: 300_000 },
+				{ bandwidth: 750_000 },
+				{ bandwidth: 1_500_000 },
+				{ bandwidth: 3_000_000 },
+				{ bandwidth: 6_000_000 },
+			]
 
 			const { index } = selector.select({ ladder, bufferLevel: 4, throughput: 3_000_000, now: 0 })
 
@@ -115,26 +126,52 @@ describe('createThroughputSelector', () => {
 			const selector = createThroughputSelector()
 
 			for (const bandwidth of [NaN, 0, -1, Infinity]) {
-				throws(() => selector.select({ ladder: rungs(300_000, bandwidth, 1_500_000), bufferLevel: 4, throughput: 3_000_000, now: 0 }), {
-					name: 'RangeError',
-					message: `Invalid ladder: expected a positive finite bandwidth at 1, received ${bandwidth}`,
-				})
+				throws(
+					() =>
+						selector.select({
+							ladder: rungs(300_000, bandwidth, 1_500_000),
+							bufferLevel: 4,
+							throughput: 3_000_000,
+							now: 0,
+						}),
+					{
+						name: 'RangeError',
+						message: `Invalid ladder: expected a positive finite bandwidth at 1, received ${bandwidth}`,
+					},
+				)
 			}
 		})
 
 		it('throws when the ladder is not in ascending order of bandwidth', () => {
 			const selector = createThroughputSelector()
 
-			throws(() => selector.select({ ladder: rungs(300_000, 1_500_000, 750_000), bufferLevel: 4, throughput: 3_000_000, now: 0 }), {
-				name: 'RangeError',
-				message: 'Invalid ladder: expected ascending bandwidth, received 1500000 at 1 and 750000 at 2',
-			})
+			throws(
+				() =>
+					selector.select({
+						ladder: rungs(300_000, 1_500_000, 750_000),
+						bufferLevel: 4,
+						throughput: 3_000_000,
+						now: 0,
+					}),
+				{
+					name: 'RangeError',
+					message: 'Invalid ladder: expected ascending bandwidth, received 1500000 at 1 and 750000 at 2',
+				},
+			)
 		})
 
 		it('accepts equal neighbouring bandwidths and picks the highest position', () => {
 			const selector = createThroughputSelector()
 
-			equal(selector.select({ ladder: rungs(300_000, 750_000, 750_000, 1_500_000), bufferLevel: 4, throughput: 1_000_000, now: 0 }).index, 2)
+			equal(
+				selector.select({
+					ladder: rungs(300_000, 750_000, 750_000, 1_500_000),
+					bufferLevel: 4,
+					throughput: 1_000_000,
+					now: 0,
+				}).index,
+				2,
+			)
 		})
 
 		it('returns rung 0 before the first sample when the throughput is unknown', () => {
@@ -203,7 +240,11 @@ describe('createThroughputSelector', () => {
 				const selector = createThroughputSelector()
 				load(selector, 1_500_000)
 
-				equal(selector.select({ ladder, bufferLevel: 4, throughput: Number(throughput), now: 0 }).index, index, `throughput ${throughput}`)
+				equal(
+					selector.select({ ladder, bufferLevel: 4, throughput: Number(throughput), now: 0 }).index,
+					index,
+					`throughput ${throughput}`,
+				)
 			}
 		})
 
@@ -213,7 +254,15 @@ describe('createThroughputSelector', () => {
 
 			// The player removed the 1.5 Mbps rung. The current rung is now 750 kbps.
 			// The safe pick is 3 Mbps. The upgrade pick, at 0.7 * 4.2 Mbps, is 750 kbps.
-			equal(selector.select({ ladder: rungs(300_000, 750_000, 3_000_000, 6_000_000), bufferLevel: 4, throughput: 4_200_000, now: 0 }).index, 1)
+			equal(
+				selector.select({
+					ladder: rungs(300_000, 750_000, 3_000_000, 6_000_000),
+					bufferLevel: 4,
+					throughput: 4_200_000,
+					now: 0,
+				}).index,
+				1,
+			)
 		})
 
 		it('maps the current rung to rung 0 when no rung is at or below its bandwidth', () => {
@@ -222,7 +271,11 @@ describe('createThroughputSelector', () => {
 
 			// The current rung is rung 0 of this ladder, so the hysteresis applies.
 			// The safe pick is 1.5 Mbps. The upgrade pick, at 0.7 * 1.8 Mbps, is 750 kbps.
-			equal(selector.select({ ladder: rungs(750_000, 1_500_000, 3_000_000), bufferLevel: 4, throughput: 1_800_000, now: 0 }).index, 0)
+			equal(
+				selector.select({ ladder: rungs(750_000, 1_500_000, 3_000_000), bufferLevel: 4, throughput: 1_800_000, now: 0 })
+					.index,
+				0,
+			)
 		})
 
 		it('ignores an aborted sample', () => {
@@ -272,7 +325,17 @@ describe('createThroughputSelector', () => {
 				const selector = createThroughputSelector()
 				load(selector, 6_000_000)
 
-				equal(selector.select({ ladder, bufferLevel: Number(bufferLevel), throughput: 6_000_000, now: 0, segmentDuration: 4 }).index, index, `bufferLevel ${bufferLevel}`)
+				equal(
+					selector.select({
+						ladder,
+						bufferLevel: Number(bufferLevel),
+						throughput: 6_000_000,
+						now: 0,
+						segmentDuration: 4,
+					}).index,
+					index,
+					`bufferLevel ${bufferLevel}`,
+				)
 			}
 		})
 
@@ -290,7 +353,17 @@ describe('createThroughputSelector', () => {
 				const selector = createThroughputSelector()
 				load(selector, 6_000_000)
 
-				equal(selector.select({ ladder, bufferLevel: Number(bufferLevel), throughput: 6_000_000, now: 0, segmentDuration: 10 }).index, index, `bufferLevel ${bufferLevel}`)
+				equal(
+					selector.select({
+						ladder,
+						bufferLevel: Number(bufferLevel),
+						throughput: 6_000_000,
+						now: 0,
+						segmentDuration: 10,
+					}).index,
+					index,
+					`bufferLevel ${bufferLevel}`,
+				)
 			}
 		})
 
@@ -333,7 +406,11 @@ describe('createThroughputSelector', () => {
 			// At playback rate 1 the pick is 3 Mbps. Its download takes 2.2 s, so the 1.5 Mbps rung passes with 2 s of buffer.
 			equal(selector.select({ ladder, bufferLevel: 2, throughput: 6_000_000, now: 0, segmentDuration: 4 }).index, 2)
 			// At playback rate 2 the pick is 1.5 Mbps. Its download takes 1.1 s, more than the 1 s budget, so the 750 kbps rung passes.
-			equal(selector.select({ ladder, bufferLevel: 2, throughput: 6_000_000, now: 0, segmentDuration: 4, playbackRate: 2 }).index, 1)
+			equal(
+				selector.select({ ladder, bufferLevel: 2, throughput: 6_000_000, now: 0, segmentDuration: 4, playbackRate: 2 })
+					.index,
+				1,
+			)
 		})
 	})
 

@@ -6,5 +6,5 @@ import type { SwitchingSet } from './SwitchingSet.ts'
  * @alpha
  */
 export type AlignedSwitchingSet = {
-	switchingSets: SwitchingSet[];
-};
+	switchingSets: SwitchingSet[]
+}

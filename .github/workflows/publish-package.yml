@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "The package short name to publish (i.e utils for @svta/cml-utils)"
+        description: 'The package short name to publish (i.e utils for @svta/cml-utils)'
         required: true
 
 jobs:
@@ -23,9 +23,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: "npm"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@svta"
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@svta'
 
       - name: Install
         run: npm ci

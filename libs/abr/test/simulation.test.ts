@@ -18,7 +18,7 @@ const LAST_SEGMENTS = 5
 // The top rung of L1 needs 6 Mbps. A link of 2 Mbps sustains its third rung.
 const STEADY_LINK_RUNG = L1[2].bandwidth
 
-type Setup = { name: string, ladder: LadderRung[], bufferCap: number }
+type Setup = { name: string; ladder: LadderRung[]; bufferCap: number }
 
 // The buffer time of BOLA is 20 s for L1 and 30 s for L2. Two setups use a cap below that time.
 const SETUPS: Setup[] = [
@@ -35,7 +35,12 @@ const SELECTORS: [string, () => BitrateSelector][] = [
 	['the throughput selector', createThroughput],
 ]
 
-function play(createSelector: () => BitrateSelector, setup: Setup, seed: number, omitSegmentDuration = false): SimulationResult {
+function play(
+	createSelector: () => BitrateSelector,
+	setup: Setup,
+	seed: number,
+	omitSegmentDuration = false,
+): SimulationResult {
 	return simulatePlayback(createSelector(), {
 		ladder: setup.ladder,
 		trace: createRandomWalkTrace(seed, MINIMUM_BANDWIDTH, MAXIMUM_BANDWIDTH),
@@ -62,12 +67,17 @@ function average(values: readonly number[]): number {
 
 // The stalls of all the seeds. A player that omits `segmentDuration` makes a selector skip its starvation guard.
 function totalStalls(createSelector: () => BitrateSelector, setup: Setup, omitSegmentDuration = false): number {
-	return Array.from({ length: SEED_COUNT }, (_, index) => play(createSelector, setup, index + 1, omitSegmentDuration).stallCount).reduce((sum, count) => sum + count, 0)
+	return Array.from(
+		{ length: SEED_COUNT },
+		(_, index) => play(createSelector, setup, index + 1, omitSegmentDuration).stallCount,
+	).reduce((sum, count) => sum + count, 0)
 }
 
 // The mean bandwidth of the rungs that a selector used, averaged over the seeds.
 function averageBandwidth(createSelector: () => BitrateSelector, setup: Setup): number {
-	const perSeed = Array.from({ length: SEED_COUNT }, (_, index) => average(play(createSelector, setup, index + 1).bandwidths))
+	const perSeed = Array.from({ length: SEED_COUNT }, (_, index) =>
+		average(play(createSelector, setup, index + 1).bandwidths),
+	)
 
 	return average(perSeed)
 }
@@ -89,8 +99,14 @@ describe('playback simulation', () => {
 					const context = `${selectorName}, ${setup.name}, seed ${seed}`
 
 					equal(result.bandwidths.length, SEGMENT_COUNT, context)
-					ok(result.bandwidths.every((bandwidth) => bandwidths.has(bandwidth)), `${context}: every rung is in the ladder`)
-					ok(result.delays.every((delay) => Number.isFinite(delay) && delay >= 0), `${context}: every delay is finite and not negative`)
+					ok(
+						result.bandwidths.every(bandwidth => bandwidths.has(bandwidth)),
+						`${context}: every rung is in the ladder`,
+					)
+					ok(
+						result.delays.every(delay => Number.isFinite(delay) && delay >= 0),
+						`${context}: every delay is finite and not negative`,
+					)
 					equal(result.repeatedDelays, 0, `${context}: the call after a wait returns no delay`)
 				}
 			}

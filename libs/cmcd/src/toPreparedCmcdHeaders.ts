@@ -14,7 +14,10 @@ import { groupCmcdHeaders } from './groupCmcdHeaders.ts'
  *
  * @internal
  */
-export function toPreparedCmcdHeaders(data: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, string> {
+export function toPreparedCmcdHeaders(
+	data: Cmcd,
+	customHeaderMap?: Partial<CmcdHeaderMap>,
+): Record<CmcdHeaderField, string> {
 	const result = {} as Record<CmcdHeaderField, string>
 	const shards = groupCmcdHeaders(data, customHeaderMap)
 

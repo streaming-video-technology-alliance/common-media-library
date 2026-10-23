@@ -212,11 +212,11 @@ export async function validateC2paManifestBoxSegment(
 
 	const streamIdValid = state?.lastStreamId == null || streamId === state.lastStreamId
 	const sequenceNumberValid =
-		state?.lastSequenceNumber == null ||
-		(sequenceNumber !== null && sequenceNumber > state.lastSequenceNumber)
+		state?.lastSequenceNumber == null || (sequenceNumber !== null && sequenceNumber > state.lastSequenceNumber)
 
 	// §19.3.1: the manifest of each segment has a c2pa.hash.bmff.v3 assertion. Without it, nothing binds the segment content.
-	const bmffHashMissing = internalData !== null && !internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
+	const bmffHashMissing =
+		internalData !== null && !internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
 	let bmffHashMatches = !bmffHashMissing
 	if (bmff.hashBytes !== null) {
 		// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
@@ -231,13 +231,12 @@ export async function validateC2paManifestBoxSegment(
 
 	const continuityCodes = await validateContinuity(manifest, liveVideo, lastManifestId, options)
 
-	const liveVideoCodes = [...new Set([
-		...collectErrorCodes(
-			manifest !== null, liveVideo !== null,
-			streamIdValid, sequenceNumberValid, bmffHashMatches,
-		),
-		...continuityCodes,
-	])]
+	const liveVideoCodes = [
+		...new Set([
+			...collectErrorCodes(manifest !== null, liveVideo !== null, streamIdValid, sequenceNumberValid, bmffHashMatches),
+			...continuityCodes,
+		]),
+	]
 
 	const integrityCodes: readonly C2paStatusCode[] = integrity?.codes ?? []
 
@@ -254,7 +253,14 @@ export async function validateC2paManifestBoxSegment(
 	}
 
 	// The continuity check does not gate the advance.
-	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed && currentManifestId !== null
+	const authentic =
+		manifest !== null &&
+		liveVideo !== null &&
+		integrity !== null &&
+		integrity.codes.length === 0 &&
+		bmffHashMatches &&
+		!bmff.malformed &&
+		currentManifestId !== null
 	const advance = authentic && streamIdValid && sequenceNumberValid
 
 	return {

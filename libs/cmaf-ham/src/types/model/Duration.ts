@@ -4,5 +4,5 @@
  * @alpha
  */
 export type Duration = {
-	duration: number;
-};
+	duration: number
+}

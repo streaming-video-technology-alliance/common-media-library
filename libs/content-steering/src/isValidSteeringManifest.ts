@@ -28,12 +28,21 @@ export function isValidSteeringManifest(manifest: SteeringManifest): boolean {
 	}
 
 	// PATHWAY-PRIORITY must be an array of strings and must not contain duplicates
-	if (!Array.isArray(PATHWAY_PRIORITY) || PATHWAY_PRIORITY.length === 0 || new Set(PATHWAY_PRIORITY).size !== PATHWAY_PRIORITY.length) {
+	if (
+		!Array.isArray(PATHWAY_PRIORITY) ||
+		PATHWAY_PRIORITY.length === 0 ||
+		new Set(PATHWAY_PRIORITY).size !== PATHWAY_PRIORITY.length
+	) {
 		return false
 	}
 
 	// PATHWAY-CLONES must be an array of valid pathway clones
-	if (PATHWAY_CLONES && (!Array.isArray(PATHWAY_CLONES) || PATHWAY_CLONES.length === 0 || PATHWAY_CLONES.some(clone => !isValidPathwayClone(clone)))) {
+	if (
+		PATHWAY_CLONES &&
+		(!Array.isArray(PATHWAY_CLONES) ||
+			PATHWAY_CLONES.length === 0 ||
+			PATHWAY_CLONES.some(clone => !isValidPathwayClone(clone)))
+	) {
 		return false
 	}
 

@@ -7,7 +7,6 @@ import type { CmcdTransportAdapter } from './CmcdTransportAdapter.ts'
  * @public
  */
 export type CmcdReportRecorderOptions = {
-
 	/**
 	 * URLs whose POST requests the recorder intercepts and answers with a
 	 * synthetic 204 response instead of sending them to the network. A
@@ -16,7 +15,7 @@ export type CmcdReportRecorderOptions = {
 	 * Use this option to verify CMCD event-mode reports without real
 	 * network calls to placeholder endpoints.
 	 */
-	eventTargetUrls?: readonly string[];
+	eventTargetUrls?: readonly string[]
 
 	/**
 	 * Override the default transport adapters. Defaults to
@@ -26,7 +25,7 @@ export type CmcdReportRecorderOptions = {
 	 * If the player under test uses a non-standard transport, for example
 	 * a custom HTTP client, supply this option.
 	 */
-	transports?: readonly CmcdTransportAdapter[];
+	transports?: readonly CmcdTransportAdapter[]
 
 	/**
 	 * Default timeout (in milliseconds) applied to every `waitFor*`
@@ -35,7 +34,7 @@ export type CmcdReportRecorderOptions = {
 	 *
 	 * @defaultValue `15000`
 	 */
-	waitTimeout?: number;
+	waitTimeout?: number
 
 	/**
 	 * Called once for each captured CMCD report, immediately after it
@@ -52,5 +51,5 @@ export type CmcdReportRecorderOptions = {
 	 * @example
 	 * {@includeCode ../test/CmcdReportRecorder.test.ts#example-on-report}
 	 */
-	onReport?: (report: CmcdRecordedReport) => void;
+	onReport?: (report: CmcdRecordedReport) => void
 }

@@ -22,4 +22,4 @@ export function readPrft(view: IsoBoxReadView): ProducerReferenceTimeBox {
 		ntpTimestampFrac: view.readUint(4),
 		mediaTime: view.readUint(version === 1 ? 8 : 4),
 	}
-};
+}

@@ -21,7 +21,9 @@ export function validateLadder(ladder: readonly LadderRung[]): void {
 		}
 
 		if (i > 0 && bandwidth < ladder[i - 1].bandwidth) {
-			throw new RangeError(`Invalid ladder: expected ascending bandwidth, received ${ladder[i - 1].bandwidth} at ${i - 1} and ${bandwidth} at ${i}`)
+			throw new RangeError(
+				`Invalid ladder: expected ascending bandwidth, received ${ladder[i - 1].bandwidth} at ${i - 1} and ${bandwidth} at ${i}`,
+			)
 		}
 	}
 }

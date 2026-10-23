@@ -3,7 +3,7 @@ export function isCCType(type: number): boolean {
 }
 
 export function isNonEmptyCCData(ccData1: number, ccData2: number): boolean {
-	return (ccData1 & 0x7F) > 0 || (ccData2 & 0x7F) > 0
+	return (ccData1 & 0x7f) > 0 || (ccData2 & 0x7f) > 0
 }
 
 /**
@@ -33,7 +33,7 @@ export function parseCcData(raw: DataView, pos: number, endPos: number, fieldDat
 
 	// process_cc_data_flag is not checked: a caption-bearing payload always sets it, and
 	// honoring a cleared flag would silently drop pairs some packagers emit regardless.
-	const ccCount = raw.getUint8(pos) & 0x1F
+	const ccCount = raw.getUint8(pos) & 0x1f
 
 	// Skip cc_count and the em_data byte to reach the first cc construct.
 	let cursor = pos + 2

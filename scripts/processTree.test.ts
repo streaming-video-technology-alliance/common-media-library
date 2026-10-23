@@ -12,7 +12,7 @@ setInterval(() => {}, 1000)
 `
 
 function firstLine(stream: Readable): Promise<string> {
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		let text = ''
 		const onData = (chunk: Buffer): void => {
 			text += chunk.toString()
@@ -31,8 +31,7 @@ function isRunning(pid: number): boolean {
 	try {
 		process.kill(pid, 0)
 		return true
-	}
-	catch {
+	} catch {
 		return false
 	}
 }
@@ -55,7 +54,7 @@ describe('killTree', () => {
 		ok(grandchild > 0, 'the grandchild did not report its pid')
 		ok(isRunning(grandchild))
 
-		const closed = new Promise<boolean>((resolve) => {
+		const closed = new Promise<boolean>(resolve => {
 			child.on('close', () => resolve(true))
 			setTimeout(() => resolve(false), 3000).unref()
 		})

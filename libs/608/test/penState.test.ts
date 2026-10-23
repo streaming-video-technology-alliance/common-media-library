@@ -83,11 +83,9 @@ describe('PenState Tests', () => {
 		auxPenState.background = 'white'
 		auxPenState.flash = true
 
-
 		equal(penState.equals(auxPenState), false)
 
 		penState.copy(auxPenState)
 		equal(penState.equals(auxPenState), true)
 	})
-
 })

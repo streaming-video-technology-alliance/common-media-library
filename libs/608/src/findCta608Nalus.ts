@@ -11,7 +11,8 @@ import { extractNalUnitType } from './utils/seiHelpers.ts'
  * @public
  */
 export function findCta608Nalus(raw: DataView, startPos: number, size: number): number[][] {
-	let nalSize = 0, cursor = startPos
+	let nalSize = 0,
+		cursor = startPos
 	const cta608NaluRanges = []
 
 	// Check SEI data according to ANSI-SCTE 128
@@ -34,7 +35,8 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 			// SEI NAL Unit. The NAL header is 1 byte (H.264) or 2 bytes (H.265/H.266)
 			let pos = cursor + 4 + seiInfo.headerSize
 			let payloadType = -1
-			while (pos < cursor + 4 + nalSize - 1) { // The last byte should be rbsp_trailing_bits
+			while (pos < cursor + 4 + nalSize - 1) {
+				// The last byte should be rbsp_trailing_bits
 				payloadType = 0
 				let b = 255
 				while (b === 255) {

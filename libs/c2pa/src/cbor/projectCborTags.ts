@@ -5,7 +5,8 @@ const TAG_EPOCH_DATE_TIME = 1
 const MILLISECONDS_PER_SECOND = 1000
 
 function setKey(map: Record<string, unknown>, key: string, value: unknown): void {
-	if (key === '__proto__') Object.defineProperty(map, key, { value, enumerable: true, writable: true, configurable: true })
+	if (key === '__proto__')
+		Object.defineProperty(map, key, { value, enumerable: true, writable: true, configurable: true })
 	else map[key] = value
 }
 
@@ -28,7 +29,8 @@ export function projectCborTags(value: unknown): unknown {
 	if (value instanceof CborTag) {
 		const content = value.value
 		if (value.tag === TAG_DATE_TIME_STRING && typeof content === 'string') return new Date(content)
-		if (value.tag === TAG_EPOCH_DATE_TIME && typeof content === 'number') return new Date(Math.round(content * MILLISECONDS_PER_SECOND))
+		if (value.tag === TAG_EPOCH_DATE_TIME && typeof content === 'number')
+			return new Date(Math.round(content * MILLISECONDS_PER_SECOND))
 		return { tag: value.tag, value: projectCborTags(content) }
 	}
 	if (Array.isArray(value)) return value.map(projectCborTags)

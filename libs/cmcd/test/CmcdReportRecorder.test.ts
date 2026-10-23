@@ -148,7 +148,6 @@ describe('CmcdReportRecorder', () => {
 				ok((err as Error).message.includes('detached'))
 			}
 		})
-
 	})
 
 	describe('classification', () => {
@@ -512,7 +511,9 @@ describe('CmcdReportRecorder', () => {
 			let received: CmcdRecordedReport | undefined
 			recorder.attach({
 				transports: [t],
-				onReport: (report: CmcdRecordedReport) => { received = report },
+				onReport: (report: CmcdRecordedReport) => {
+					received = report
+				},
 			})
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
 			const fromGet = recorder.getReports()[0]
@@ -572,7 +573,9 @@ describe('CmcdReportRecorder', () => {
 			recorder.attach({
 				transports: [t],
 				eventTargetUrls: ['https://events.example.com'],
-				onReport: () => { throw new Error('listener boom') },
+				onReport: () => {
+					throw new Error('listener boom')
+				},
 			})
 			const waiter = recorder.waitForEvents({ timeout: 1000 })
 			const synthetic = t.simulate({
@@ -612,7 +615,9 @@ describe('createXhrTransport', () => {
 			xhr.setRequestHeader('CMCD-Request', 'sid="abc"')
 			xhr.send()
 
-			const captured = recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
+			const captured = recorder
+				.getReports()
+				.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'header')
 			equal(captured[0].request.url, 'https://e.com/seg.m4s')
@@ -634,7 +639,9 @@ describe('createXhrTransport', () => {
 			xhr.open('GET', 'https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
 			xhr.send()
 
-			const captured = recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
+			const captured = recorder
+				.getReports()
+				.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'query')
 			recorder.detach()
@@ -686,13 +693,17 @@ describe('createXhrTransport', () => {
 			const xhr = new MockXhr()
 			let loaded = false
 			let loadEnded = false
-			xhr.onload = () => { loaded = true }
-			xhr.onloadend = () => { loadEnded = true }
+			xhr.onload = () => {
+				loaded = true
+			}
+			xhr.onloadend = () => {
+				loadEnded = true
+			}
 			xhr.open('POST', 'https://events.example.com/cmcd')
 			xhr.send('sid="abc"')
 
 			// Wait one microtask for the synthetic completion to fire
-			await new Promise((r) => setTimeout(r, 0))
+			await new Promise(r => setTimeout(r, 0))
 
 			ok(loaded, 'onload should have fired')
 			ok(loadEnded, 'onloadend should have fired')
@@ -735,7 +746,10 @@ describe('default transports', () => {
 
 			await fetch('https://e.com/b.m4s?CMCD=sid%3D%22y%22')
 
-			equal(recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT).length, 2)
+			equal(
+				recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT).length,
+				2,
+			)
 			recorder.detach()
 		} finally {
 			;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = origXhr
@@ -821,7 +835,9 @@ describe('createFetchTransport', () => {
 
 			await fetch('https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
 
-			const captured = recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
+			const captured = recorder
+				.getReports()
+				.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'query')
 			equal(captured[0].request.url, 'https://e.com/seg.m4s?CMCD=sid%3D%22abc%22')
@@ -841,7 +857,9 @@ describe('createFetchTransport', () => {
 				headers: { 'CMCD-Request': 'sid="abc"' },
 			})
 
-			const captured = recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
+			const captured = recorder
+				.getReports()
+				.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
 			equal(captured.length, 1)
 			equal(captured[0].reportingMode, 'header')
 			equal(captured[0].request.headers?.['cmcd-request'], 'sid="abc"')
@@ -891,7 +909,10 @@ describe('createFetchTransport', () => {
 	it('returns a synthetic 204 when URL matches eventTargetUrls and does not call the underlying fetch', async () => {
 		let underlyingCalls = 0
 		const origFetch = globalThis.fetch
-		globalThis.fetch = async () => { underlyingCalls += 1; return new Response('', { status: 200 }) }
+		globalThis.fetch = async () => {
+			underlyingCalls += 1
+			return new Response('', { status: 200 })
+		}
 
 		try {
 			const recorder = new CmcdReportRecorder()
@@ -935,7 +956,9 @@ describe('createFetchTransport', () => {
 
 			equal(seen.length, 1, 'underlying fetch received the call')
 			equal(seen[0].body, 'payload', 'body reached underlying fetch unconsumed')
-			const captured = recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
+			const captured = recorder
+				.getReports()
+				.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT)
 			equal(captured.length, 1, 'recorder captured the request')
 			equal(captured[0].request.body, 'payload', 'recorder also saw the body')
 			recorder.detach()

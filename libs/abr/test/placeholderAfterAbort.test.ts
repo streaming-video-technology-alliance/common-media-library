@@ -19,11 +19,19 @@ const THRESHOLDS = bolaThresholds(L1_BANDWIDTHS, BOLA_DEFAULT_BUFFER_TARGET)
 
 describe('placeholderAfterAbort', () => {
 	it('caps the placeholder so that the effective buffer is at the threshold of the replacement', () => {
-		closeTo(placeholderAfterAbort(PARAMS, REPLACEMENT_POSITION, LARGE_PLACEHOLDER, BUFFER_LEVEL), THRESHOLDS[REPLACEMENT_POSITION] - BUFFER_LEVEL, TOLERANCE)
+		closeTo(
+			placeholderAfterAbort(PARAMS, REPLACEMENT_POSITION, LARGE_PLACEHOLDER, BUFFER_LEVEL),
+			THRESHOLDS[REPLACEMENT_POSITION] - BUFFER_LEVEL,
+			TOLERANCE,
+		)
 	})
 
 	it('uses MINIMUM_BUFFER as the limit when the replacement is the lowest rung', () => {
-		closeTo(placeholderAfterAbort(PARAMS, LOWEST_POSITION, LARGE_PLACEHOLDER, BUFFER_LEVEL), MINIMUM_BUFFER - BUFFER_LEVEL, TOLERANCE)
+		closeTo(
+			placeholderAfterAbort(PARAMS, LOWEST_POSITION, LARGE_PLACEHOLDER, BUFFER_LEVEL),
+			MINIMUM_BUFFER - BUFFER_LEVEL,
+			TOLERANCE,
+		)
 	})
 
 	it('does not grow the placeholder', () => {
@@ -33,7 +41,10 @@ describe('placeholderAfterAbort', () => {
 	})
 
 	it('returns 0 when the buffer is at or above the limit', () => {
-		equal(placeholderAfterAbort(PARAMS, REPLACEMENT_POSITION, LARGE_PLACEHOLDER, PARAMS.thresholds[REPLACEMENT_POSITION]), 0)
+		equal(
+			placeholderAfterAbort(PARAMS, REPLACEMENT_POSITION, LARGE_PLACEHOLDER, PARAMS.thresholds[REPLACEMENT_POSITION]),
+			0,
+		)
 		equal(placeholderAfterAbort(PARAMS, LOWEST_POSITION, LARGE_PLACEHOLDER, MINIMUM_BUFFER + 1), 0)
 	})
 })

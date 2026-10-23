@@ -51,11 +51,12 @@ export function readBoxes(bytes: Uint8Array, start: number, end: number): BmffBo
 		// size 1 puts a 64-bit largesize after the type.
 		if (size === 0) {
 			size = end - offset
-		}
-		else if (size === 1) {
+		} else if (size === 1) {
 			headerSize = LARGESIZE_HEADER_SIZE
 			if (offset + headerSize > end) break
-			size = view.getUint32(offset + LARGESIZE_OFFSET, false) * 0x100000000 + view.getUint32(offset + LARGESIZE_OFFSET + 4, false)
+			size =
+				view.getUint32(offset + LARGESIZE_OFFSET, false) * 0x100000000 +
+				view.getUint32(offset + LARGESIZE_OFFSET + 4, false)
 		}
 		if (size < headerSize || offset + size > end) break
 		const type = readBoxType(bytes, offset + BOX_TYPE_OFFSET)

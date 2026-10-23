@@ -57,11 +57,15 @@ export function buildSigStructure(
 	externalAad: Uint8Array = new Uint8Array(0),
 ): Uint8Array {
 	const totalLength =
-		1 // array header
-		+ 1 + COSE_SIG1_CONTEXT_BYTES.length // context string (length < 24, fits inline)
-		+ byteStringHeaderSize(protectedBytes.length) + protectedBytes.length
-		+ byteStringHeaderSize(externalAad.length) + externalAad.length
-		+ byteStringHeaderSize(payload.length) + payload.length
+		1 + // array header
+		1 +
+		COSE_SIG1_CONTEXT_BYTES.length + // context string (length < 24, fits inline)
+		byteStringHeaderSize(protectedBytes.length) +
+		protectedBytes.length +
+		byteStringHeaderSize(externalAad.length) +
+		externalAad.length +
+		byteStringHeaderSize(payload.length) +
+		payload.length
 
 	const result = new Uint8Array(totalLength)
 	let offset = 0

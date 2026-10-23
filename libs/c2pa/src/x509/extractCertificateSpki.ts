@@ -1,10 +1,4 @@
-import {
-	ASN1_TAG_CONTEXT_0,
-	ASN1_TAG_INTEGER,
-	ASN1_TAG_SEQUENCE,
-	readElement,
-	readElementRaw,
-} from './asn1.ts'
+import { ASN1_TAG_CONTEXT_0, ASN1_TAG_INTEGER, ASN1_TAG_SEQUENCE, readElement, readElementRaw } from './asn1.ts'
 
 /**
  * Extracts the SubjectPublicKeyInfo (SPKI) DER bytes from an X.509 DER certificate.
@@ -66,8 +60,7 @@ export function extractCertificateSpki(certDER: Uint8Array): Uint8Array | null {
 
 		// 7. SubjectPublicKeyInfo (SEQUENCE) — return full DER encoding
 		return readElementRaw(tbs.value, offset)
-	}
-	catch {
+	} catch {
 		return null
 	}
 }

@@ -7,4 +7,4 @@ import type { CmcdObjectType } from './CmcdObjectType.ts'
  *
  * @public
  */
-export type CmcdObjectTypeList = (number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>)[];
+export type CmcdObjectTypeList = (number | SfItem<number, ExclusiveRecord<CmcdObjectType, boolean>>)[]

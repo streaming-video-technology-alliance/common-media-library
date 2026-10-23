@@ -20,8 +20,8 @@ describe('verifySignerBinding', () => {
 
 		// Build a minimal COSE key (kty=1 OKP, crv=6 Ed25519) with the shape that the CBOR reader decodes
 		const sessionCoseKey = {
-			1: 1,     // kty: OKP
-			[-1]: 6,  // crv: Ed25519
+			1: 1, // kty: OKP
+			[-1]: 6, // crv: Ed25519
 			[-2]: xBytes,
 		}
 

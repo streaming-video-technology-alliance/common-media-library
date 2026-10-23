@@ -12,8 +12,5 @@ import { readId3Size } from './util/readId3Size.ts'
  * @public
  */
 export function canParseId3(data: Uint8Array, offset: number): boolean {
-	return (
-		isId3Header(data, offset) &&
-		readId3Size(data, offset + 6) + 10 <= data.length - offset
-	)
+	return isId3Header(data, offset) && readId3Size(data, offset + 6) + 10 <= data.length - offset
 }

@@ -11,7 +11,6 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  * @public
  */
 export type CmcdResponse = CmcdRequest & {
-
 	/**
 	 * CMSD Dynamic Header
 	 *
@@ -22,7 +21,7 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#cmsd-dynamic-header | CTA-5004-B CMSD Dynamic Header}
 	 */
-	cmsdd?: string;
+	cmsdd?: string
 
 	/**
 	 * CMSD Static Header
@@ -34,7 +33,7 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#cmsd-static-header | CTA-5004-B CMSD Static Header}
 	 */
-	cmsds?: string;
+	cmsds?: string
 
 	/**
 	 * Response code
@@ -48,7 +47,7 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#response-code | CTA-5004-B Response Code}
 	 */
-	rc?: number;
+	rc?: number
 
 	/**
 	 * SMRT-Data Header
@@ -60,7 +59,7 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#smrt-data-header | CTA-5004-B SMRT-Data Header}
 	 */
-	smrt?: string;
+	smrt?: string
 
 	/**
 	 * Time to first byte
@@ -72,7 +71,7 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#time-to-first-byte | CTA-5004-B Time to First Byte}
 	 */
-	ttfb?: number;
+	ttfb?: number
 
 	/**
 	 * Time to first body byte
@@ -84,7 +83,7 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#time-to-first-body-byte | CTA-5004-B Time to First Body Byte}
 	 */
-	ttfbb?: number;
+	ttfbb?: number
 
 	/**
 	 * Time to last byte
@@ -96,7 +95,7 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#time-to-last-byte | CTA-5004-B Time to Last Byte}
 	 */
-	ttlb?: number;
+	ttlb?: number
 
 	/**
 	 * Request URL
@@ -108,5 +107,5 @@ export type CmcdResponse = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#request-url | CTA-5004-B Request URL}
 	 */
-	url?: string;
-};
+	url?: string
+}

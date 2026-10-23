@@ -61,8 +61,7 @@ export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 			kid,
 			alg,
 		}
-	}
-	catch (error) {
+	} catch (error) {
 		throw new Error(`Failed to decode COSE_Sign1: ${(error as Error).message}`)
 	}
 }

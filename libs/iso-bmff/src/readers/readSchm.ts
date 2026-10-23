@@ -21,4 +21,4 @@ export function readSchm(view: IsoBoxReadView): SchemeTypeBox {
 		schemeVersion: view.readUint(4),
 		schemeUri: flags & 0x000001 ? view.readString(-1) : undefined,
 	}
-};
+}

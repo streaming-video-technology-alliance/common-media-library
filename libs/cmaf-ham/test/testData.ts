@@ -95,9 +95,4 @@ const segmentTemplate: SegmentTemplate = {
 
 const duration = 13
 
-export {
-	duration, representationBase,
-	representationList,
-	representationTemplate, segmentTemplate,
-}
-
+export { duration, representationBase, representationList, representationTemplate, segmentTemplate }

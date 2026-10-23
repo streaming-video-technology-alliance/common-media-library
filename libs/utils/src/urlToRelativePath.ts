@@ -24,8 +24,7 @@ export function urlToRelativePath(url: string, base: string): string {
 	let to: URL
 	try {
 		to = new URL(url)
-	}
-	catch {
+	} catch {
 		return url
 	}
 

@@ -4,5 +4,5 @@
  * @public
  */
 export type SyncSample = {
-	sampleNumber: number;
-};
+	sampleNumber: number
+}

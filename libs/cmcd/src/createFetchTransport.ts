@@ -45,13 +45,8 @@ export function createFetchTransport(): CmcdTransportAdapter {
 		attach(deliver: CmcdRequestDeliver): () => void {
 			const origFetch = globalThis.fetch
 
-			globalThis.fetch = async (
-				input: RequestInfo | URL,
-				init?: RequestInit,
-			): Promise<Response> => {
-				const inspect = input instanceof Request
-					? input.clone()
-					: new Request(input, init)
+			globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+				const inspect = input instanceof Request ? input.clone() : new Request(input, init)
 				const httpRequest = await toHttpRequest(inspect)
 				const synthetic = deliver(httpRequest)
 				if (synthetic) {

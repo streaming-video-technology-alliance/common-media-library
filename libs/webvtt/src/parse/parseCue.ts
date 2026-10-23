@@ -25,61 +25,65 @@ export function parseCue(input: string, cue: WebVttCue, regionList: WebVttRegion
 	function consumeCueSettings(input: string, cue: WebVttCue): void {
 		const settings = new Settings()
 
-		parseOptions(input, function (k, v) {
-			switch (k) {
-				case 'region': {
-					// Find the last region we parsed with the same region id.
-					for (let i = regionList.length - 1; i >= 0; i--) {
-						if (regionList[i].id === v) {
-							settings.set(k, regionList[i])
-							break
+		parseOptions(
+			input,
+			function (k, v) {
+				switch (k) {
+					case 'region': {
+						// Find the last region we parsed with the same region id.
+						for (let i = regionList.length - 1; i >= 0; i--) {
+							if (regionList[i].id === v) {
+								settings.set(k, regionList[i])
+								break
+							}
 						}
+						break
 					}
-					break
-				}
-				case 'vertical': {
-					settings.alt(k, v, ['rl', 'lr'])
-					break
-				}
-				case 'line': {
-					const vals = v.split(',')
-					const vals0 = vals[0]
-					settings.integer(k, vals0)
-					if (settings.percent(k, vals0)) {
-						settings.set('snapToLines', false)
+					case 'vertical': {
+						settings.alt(k, v, ['rl', 'lr'])
+						break
 					}
-					settings.alt(k, vals0, ['auto'])
-					if (vals.length === 2) {
-						settings.alt('lineAlign', vals[1], ['start', 'center', 'end'])
+					case 'line': {
+						const vals = v.split(',')
+						const vals0 = vals[0]
+						settings.integer(k, vals0)
+						if (settings.percent(k, vals0)) {
+							settings.set('snapToLines', false)
+						}
+						settings.alt(k, vals0, ['auto'])
+						if (vals.length === 2) {
+							settings.alt('lineAlign', vals[1], ['start', 'center', 'end'])
+						}
+						break
 					}
-					break
-				}
-				case 'position': {
-					const vals = v.split(',')
-					settings.percent(k, vals[0])
-					if (vals.length === 2) {
-						settings.alt('positionAlign', vals[1], ['line-left', 'center', 'line-right', 'auto'])
+					case 'position': {
+						const vals = v.split(',')
+						settings.percent(k, vals[0])
+						if (vals.length === 2) {
+							settings.alt('positionAlign', vals[1], ['line-left', 'center', 'line-right', 'auto'])
+						}
+						break
 					}
-					break
+					case 'size': {
+						settings.percent(k, v)
+						break
+					}
+					case 'align': {
+						settings.alt(k, v, ['start', 'center', 'end', 'left', 'right'])
+						break
+					}
 				}
-				case 'size': {
-					settings.percent(k, v)
-					break
-				}
-				case 'align': {
-					settings.alt(k, v, ['start', 'center', 'end', 'left', 'right'])
-					break
-				}
-			}
-		}, /:/, /\s/)
+			},
+			/:/,
+			/\s/,
+		)
 
 		// Apply default values for any missing fields.
 		cue.region = settings.get('region', null)
 		cue.vertical = settings.get('vertical', '')
 		try {
 			cue.line = settings.get('line', 'auto')
-		}
-		catch (e) {
+		} catch (e) {
 			// eslint-ignore-line
 		}
 		cue.lineAlign = settings.get('lineAlign', 'start')
@@ -88,14 +92,12 @@ export function parseCue(input: string, cue: WebVttCue, regionList: WebVttRegion
 		// Safari still uses the old middle value and won't accept center
 		try {
 			cue.align = settings.get('align', 'center')
-		}
-		catch (e) {
+		} catch (e) {
 			cue.align = settings.get('align', 'middle' as AlignSetting)
 		}
 		try {
 			cue.position = settings.get('position', 'auto')
-		}
-		catch (e) {
+		} catch (e) {
 			const positions = {
 				start: 0,
 				left: 0,
@@ -117,14 +119,15 @@ export function parseCue(input: string, cue: WebVttCue, regionList: WebVttRegion
 
 	// 4.1 WebVTT cue timings.
 	skipWhitespace()
-	cue.startTime = consumeTimeStamp()   // (1) collect cue start time
+	cue.startTime = consumeTimeStamp() // (1) collect cue start time
 	skipWhitespace()
-	if (input.substr(0, 3) !== '-->') {     // (3) next characters must match "-->"
+	if (input.substr(0, 3) !== '-->') {
+		// (3) next characters must match "-->"
 		throw new WebVttParsingError(BAD_TIMESTAMP + " (time stamps must be separated by '-->'): ")
 	}
 	input = input.substr(3)
 	skipWhitespace()
-	cue.endTime = consumeTimeStamp()     // (5) collect cue end time
+	cue.endTime = consumeTimeStamp() // (5) collect cue end time
 
 	// 4.1 WebVTT cue settings list.
 	skipWhitespace()

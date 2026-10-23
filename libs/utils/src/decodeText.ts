@@ -23,8 +23,7 @@ export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: Dec
 
 	if (isArrayBufferLike(data)) {
 		view = new DataView(data)
-	}
-	else {
+	} else {
 		view = new DataView(data.buffer, data.byteOffset, data.byteLength)
 	}
 
@@ -50,8 +49,7 @@ export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: Dec
 		else if (first == 0xff && second == 0xfe) {
 			encoding = UTF_16_LE
 			byteOffset = 2
-		}
-		else {
+		} else {
 			encoding = UTF_8
 		}
 	}
@@ -79,15 +77,13 @@ export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: Dec
 					if (byteOffset + 1 < byteLength) {
 						const byte2 = view.getUint8(byteOffset + 1)
 						if (byte2 >= 128 && byte2 <= 191) {
-							char = ((char & 0x1F) << 6) | (byte2 & 0x3F)
+							char = ((char & 0x1f) << 6) | (byte2 & 0x3f)
 							byteOffset += 2
-						}
-						else {
+						} else {
 							// Invalid sequence, skip
 							byteOffset++
 						}
-					}
-					else {
+					} else {
 						// Incomplete sequence, skip
 						byteOffset++
 					}
@@ -98,15 +94,13 @@ export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: Dec
 						const byte2 = view.getUint8(byteOffset + 1)
 						const byte3 = view.getUint8(byteOffset + 2)
 						if (byte2 >= 128 && byte2 <= 191 && byte3 >= 128 && byte3 <= 191) {
-							char = ((char & 0x0F) << 12) | ((byte2 & 0x3F) << 6) | (byte3 & 0x3F)
+							char = ((char & 0x0f) << 12) | ((byte2 & 0x3f) << 6) | (byte3 & 0x3f)
 							byteOffset += 3
-						}
-						else {
+						} else {
 							// Invalid sequence, skip
 							byteOffset++
 						}
-					}
-					else {
+					} else {
 						// Incomplete sequence, skip
 						byteOffset++
 					}
@@ -118,15 +112,13 @@ export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: Dec
 						const byte3 = view.getUint8(byteOffset + 2)
 						const byte4 = view.getUint8(byteOffset + 3)
 						if (byte2 >= 128 && byte2 <= 191 && byte3 >= 128 && byte3 <= 191 && byte4 >= 128 && byte4 <= 191) {
-							char = ((char & 0x07) << 18) | ((byte2 & 0x3F) << 12) | ((byte3 & 0x3F) << 6) | (byte4 & 0x3F)
+							char = ((char & 0x07) << 18) | ((byte2 & 0x3f) << 12) | ((byte3 & 0x3f) << 6) | (byte4 & 0x3f)
 							byteOffset += 4
-						}
-						else {
+						} else {
 							// Invalid sequence, skip
 							byteOffset++
 						}
-					}
-					else {
+					} else {
 						// Incomplete sequence, skip
 						byteOffset++
 					}

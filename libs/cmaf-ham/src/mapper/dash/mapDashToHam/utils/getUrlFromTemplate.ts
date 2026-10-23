@@ -34,9 +34,7 @@ export function getUrlFromTemplate(
 		if (match.includes('Number')) {
 			return segmentId
 		}
-		console.error(
-			`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`,
-		)
+		console.error(`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`)
 		return match
 	})
 }

@@ -34,7 +34,11 @@ export function buildUuidBox(usertype: readonly number[], payload: Uint8Array): 
  * Builds a box with a 64-bit `largesize` header (ISO/IEC 14496-12 section 4.2): a size field of 1,
  * the type, and the 8-byte largesize. `largesize` defaults to the box length.
  */
-export function buildLargesizeBox(type: string, payload: Uint8Array = new Uint8Array(0), largesize: number = 16 + payload.length): Uint8Array {
+export function buildLargesizeBox(
+	type: string,
+	payload: Uint8Array = new Uint8Array(0),
+	largesize: number = 16 + payload.length,
+): Uint8Array {
 	const box = new Uint8Array(16 + payload.length)
 	const view = new DataView(box.buffer)
 	view.setUint32(0, 1, false)
@@ -74,7 +78,7 @@ export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(U
 		for (let i = 0; i < current.length; i += 2) {
 			const left = current[i]
 			const right = current[i + 1] ?? null
-			next.push(left && right ? await hashPair(left, right) : left ?? right)
+			next.push(left && right ? await hashPair(left, right) : (left ?? right))
 		}
 		levels.push(next)
 		current = next
@@ -115,7 +119,11 @@ export type AuxBoxFields = {
 // §A.5.1.2/A.5.4.1.4 aux box: version/flags + purpose\0 + CBOR with string keys.
 // `paddingBytes` simulates the fixed-size padding §A.5.4.1.4 requires when
 // multiple boxes for one Merkle tree share a file.
-export function buildMerkleAuxBox(fields: AuxBoxFields, purpose: string = MERKLE_BOX_PURPOSE, paddingBytes: number = 0): Uint8Array {
+export function buildMerkleAuxBox(
+	fields: AuxBoxFields,
+	purpose: string = MERKLE_BOX_PURPOSE,
+	paddingBytes: number = 0,
+): Uint8Array {
 	const map: Record<string, unknown> = {
 		uniqueId: fields.uniqueId,
 		localId: fields.localId,
@@ -169,13 +177,22 @@ const BMFF_HASH_LABEL = 'c2pa.hash.bmff.v3'
 
 // The claim declares the single bmff hash assertion by hash, so it lands in the validator's
 // claim-verified assertion set. A validator reads the assertion only from that set.
-async function assembleMerkleInitSegment(assertionData: Record<string, unknown>, sign: ((claimCborBytes: Uint8Array) => Promise<Uint8Array>) | null): Promise<Uint8Array> {
+async function assembleMerkleInitSegment(
+	assertionData: Record<string, unknown>,
+	sign: ((claimCborBytes: Uint8Array) => Promise<Uint8Array>) | null,
+): Promise<Uint8Array> {
 	const bmffAssertion = buildJumb(BMFF_HASH_LABEL, buildBox('cbor', encodeCbor(assertionData)))
 	const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 	const claimCborBytes = encodeCbor({
 		instanceID: MERKLE_MANIFEST_ID,
 		signature: signatureUri(MERKLE_MANIFEST_ID),
-		created_assertions: [{ url: `self#jumbf=c2pa.assertions/${BMFF_HASH_LABEL}`, hash: await sha256(bmffAssertion.subarray(8)), alg: 'sha256' }],
+		created_assertions: [
+			{
+				url: `self#jumbf=c2pa.assertions/${BMFF_HASH_LABEL}`,
+				hash: await sha256(bmffAssertion.subarray(8)),
+				alg: 'sha256',
+			},
+		],
 	})
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 	const manifestContent = [claim, assertionStore]
@@ -198,6 +215,9 @@ export async function buildMerkleInitSegment(assertionData: Record<string, unkno
 }
 
 // Init segment with a `c2pa.hash.bmff.v3` assertion and a claim signed by `signer`.
-export async function buildSignedMerkleInitSegment(assertionData: Record<string, unknown>, signer: Pick<TestSigner, 'sign'>): Promise<Uint8Array> {
+export async function buildSignedMerkleInitSegment(
+	assertionData: Record<string, unknown>,
+	signer: Pick<TestSigner, 'sign'>,
+): Promise<Uint8Array> {
 	return assembleMerkleInitSegment(assertionData, claimCborBytes => signer.sign(claimCborBytes))
 }

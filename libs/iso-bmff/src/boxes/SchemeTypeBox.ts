@@ -6,8 +6,8 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SchemeTypeBox = FullBox & {
-	type: 'schm';
-	schemeType: number;
-	schemeVersion: number;
-	schemeUri?: string;
-};
+	type: 'schm'
+	schemeType: number
+	schemeVersion: number
+	schemeUri?: string
+}

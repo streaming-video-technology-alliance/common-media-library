@@ -38,7 +38,11 @@ export class IsoBoxReadView {
 	 * @param config - The configuration for the IsoView.
 	 */
 	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
-		this.dataView = isArrayBufferLike(raw) ? new DataView(raw) : (raw instanceof DataView) ? raw : new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+		this.dataView = isArrayBufferLike(raw)
+			? new DataView(raw)
+			: raw instanceof DataView
+				? raw
+				: new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
 	}
@@ -127,8 +131,7 @@ export class IsoBoxReadView {
 				if (size === -1) {
 					result = readTerminatedString(dataView, offset)
 					cursor = result.length + 1
-				}
-				else {
+				} else {
 					result = readString(dataView, offset, size)
 				}
 				break
@@ -142,8 +145,7 @@ export class IsoBoxReadView {
 				if (size === -1) {
 					result = readUtf8TerminatedString(dataView, offset)
 					cursor = result.length + 1
-				}
-				else {
+				} else {
 					result = readUtf8String(dataView, offset)
 				}
 				break
@@ -277,7 +279,7 @@ export class IsoBoxReadView {
 			cursor += 8
 		}
 
-		const actualSize = box.size === 0 ? this.bytesRemaining : box.largesize ?? box.size
+		const actualSize = box.size === 0 ? this.bytesRemaining : (box.largesize ?? box.size)
 		if (this.cursor + actualSize > dataView.byteLength) {
 			this.truncated = true
 			throw new Error('Truncated box')
@@ -361,8 +363,7 @@ export class IsoBoxReadView {
 				}
 
 				yield box
-			}
-			catch (error) {
+			} catch (error) {
 				if (error instanceof Error && error.message === 'Truncated box') {
 					break
 				}

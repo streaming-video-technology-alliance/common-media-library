@@ -21,40 +21,36 @@ describe('sortWorkspaces', () => {
 	})
 
 	it('orders independent packages by folder name', () => {
-		const sorted = sortWorkspaces([
-			workspace('xml'),
-			workspace('608'),
-			workspace('cta'),
-		])
+		const sorted = sortWorkspaces([workspace('xml'), workspace('608'), workspace('cta')])
 		deepEqual(folders(sorted), ['libs/608', 'libs/cta', 'libs/xml'])
 	})
 
 	it('ignores a peer that is not one of the workspaces', () => {
-		const sorted = sortWorkspaces([
-			workspace('dash', ['xml', 'missing']),
-			workspace('xml'),
-		])
+		const sorted = sortWorkspaces([workspace('dash', ['xml', 'missing']), workspace('xml')])
 		deepEqual(folders(sorted), ['libs/xml', 'libs/dash'])
 	})
 
 	it('throws for a dependency cycle and names the packages in the cycle', () => {
-		throws(() => sortWorkspaces([
-			workspace('utils'),
-			workspace('a', ['b']),
-			workspace('b', ['a']),
-		]), /cycle.*@svta\/cml-a.*@svta\/cml-b|cycle.*@svta\/cml-b.*@svta\/cml-a/)
+		throws(
+			() => sortWorkspaces([workspace('utils'), workspace('a', ['b']), workspace('b', ['a'])]),
+			/cycle.*@svta\/cml-a.*@svta\/cml-b|cycle.*@svta\/cml-b.*@svta\/cml-a/,
+		)
 	})
 })
 
 describe('runWorkspaces', () => {
 	type Event = { folder: string; type: 'start' | 'end' }
 
-	async function run(workspaces: Workspace[], limit: number, fail: string[] = []): Promise<{ events: Event[]; peak: number }> {
+	async function run(
+		workspaces: Workspace[],
+		limit: number,
+		fail: string[] = [],
+	): Promise<{ events: Event[]; peak: number }> {
 		const events: Event[] = []
 		let active = 0
 		let peak = 0
 
-		const result = runWorkspaces(workspaces, limit, async (w) => {
+		const result = runWorkspaces(workspaces, limit, async w => {
 			events.push({ folder: w.folder, type: 'start' })
 			active++
 			peak = Math.max(peak, active)
@@ -72,11 +68,10 @@ describe('runWorkspaces', () => {
 	}
 
 	it('starts a package only after all of its peers finished', async () => {
-		const { events } = await run([
-			workspace('cmcd', ['utils', 'sfv']),
-			workspace('sfv', ['utils']),
-			workspace('utils'),
-		], 4)
+		const { events } = await run(
+			[workspace('cmcd', ['utils', 'sfv']), workspace('sfv', ['utils']), workspace('utils')],
+			4,
+		)
 
 		const index = (folder: string, type: Event['type']): number =>
 			events.findIndex(e => e.folder === `libs/${folder}` && e.type === type)
@@ -87,27 +82,20 @@ describe('runWorkspaces', () => {
 	})
 
 	it('never runs more tasks at once than the limit', async () => {
-		const { peak, events } = await run([
-			workspace('a'),
-			workspace('b'),
-			workspace('c'),
-			workspace('d'),
-			workspace('e'),
-		], 2)
+		const { peak, events } = await run(
+			[workspace('a'), workspace('b'), workspace('c'), workspace('d'), workspace('e')],
+			2,
+		)
 
 		equal(peak, 2)
 		equal(events.filter(e => e.type === 'end').length, 5)
 	})
 
 	it('rejects with the first failure and starts no further packages', async () => {
-		const workspaces = [
-			workspace('utils'),
-			workspace('a', ['utils']),
-			workspace('b', ['a']),
-		]
+		const workspaces = [workspace('utils'), workspace('a', ['utils']), workspace('b', ['a'])]
 
 		await rejects(
-			runWorkspaces(workspaces, 1, async (w) => {
+			runWorkspaces(workspaces, 1, async w => {
 				if (w.folder === 'libs/a') {
 					throw new Error('libs/a failed')
 				}
@@ -116,7 +104,10 @@ describe('runWorkspaces', () => {
 		)
 
 		const { events } = await run(workspaces, 1, ['libs/a'])
-		equal(events.some(e => e.folder === 'libs/b'), false)
+		equal(
+			events.some(e => e.folder === 'libs/b'),
+			false,
+		)
 	})
 })
 

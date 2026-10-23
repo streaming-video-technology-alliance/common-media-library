@@ -34,6 +34,4 @@ if (missing.length > 0) {
 }
 
 // Sorted so that every peer comes before the packages that depend on it.
-export const projects: string[] = workspaces
-	.map(w => w.folder)
-	.filter(folder => published.includes(folder))
+export const projects: string[] = workspaces.map(w => w.folder).filter(folder => published.includes(folder))

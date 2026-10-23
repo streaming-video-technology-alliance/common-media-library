@@ -5,4 +5,4 @@ import type { TypeBox } from './TypeBox.ts'
  *
  * @public
  */
-export type SegmentTypeBox = TypeBox<'styp'>;
+export type SegmentTypeBox = TypeBox<'styp'>

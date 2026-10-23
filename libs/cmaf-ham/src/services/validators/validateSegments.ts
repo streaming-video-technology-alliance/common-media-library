@@ -26,11 +26,7 @@ import { validateSegment } from './validateSegment.ts'
  * @alpha
  *
  */
-export function validateSegments(
-	segments: Segment[],
-	trackId?: string,
-	prevValidation?: Validation,
-): Validation {
+export function validateSegments(segments: Segment[], trackId?: string, prevValidation?: Validation): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],

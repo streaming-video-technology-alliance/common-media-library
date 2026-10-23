@@ -5,7 +5,7 @@
  */
 export type Role = {
 	$: {
-		schemeIdUri: string;
-		value: string;
-	};
-};
+		schemeIdUri: string
+		value: string
+	}
+}

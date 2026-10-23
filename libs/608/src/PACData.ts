@@ -4,9 +4,9 @@
  * @public
  */
 export type PACData = {
-	row: number;
-	indent: number | null;
-	color: string | null;
-	underline: boolean;
-	italics: boolean;
-};
+	row: number
+	indent: number | null
+	color: string | null
+	underline: boolean
+	italics: boolean
+}

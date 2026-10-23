@@ -15,4 +15,4 @@ export function readFrma(view: IsoBoxReadView): OriginalFormatBox {
 		type: 'frma',
 		dataFormat: view.readUint(4),
 	}
-};
+}

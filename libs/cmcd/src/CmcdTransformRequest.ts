@@ -41,15 +41,17 @@ import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
  *
  * @public
  */
-export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
+export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<
+	Omit<HttpRequest, 'customData' | 'headers'>
+> & {
 	/**
 	 * The headers associated with the request.
 	 */
-	readonly headers?: Readonly<Record<string, string>>;
+	readonly headers?: Readonly<Record<string, string>>
 
 	/**
 	 * Any custom data the caller attached to the request, including the
 	 * player's own fields.
 	 */
-	readonly customData?: DeepReadonly<C>;
-};
+	readonly customData?: DeepReadonly<C>
+}

@@ -18,4 +18,4 @@ export const WebVttResultType = {
 /**
  * @public
  */
-export type WebVttResultType = ValueOf<typeof WebVttResultType>;
+export type WebVttResultType = ValueOf<typeof WebVttResultType>

@@ -7,10 +7,10 @@ import type { CmcdValue } from './CmcdValue.ts'
 import { upConvertToV2 } from './upConvertToV2.ts'
 
 // Define the input type for reduceValue
-type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[];
+type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[]
 
 // Define the output type for reduceValue - matches what CMCD values can be, including arrays
-type ReduceValueOutput = CmcdValue | ReduceValueOutput[];
+type ReduceValueOutput = CmcdValue | ReduceValueOutput[]
 
 function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): ReduceValueOutput {
 	if (Array.isArray(value)) {
@@ -35,7 +35,7 @@ function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): R
 	}
 
 	return value as ReduceValueOutput
-};
+}
 
 /**
  * Decode a CMCD string to an object.

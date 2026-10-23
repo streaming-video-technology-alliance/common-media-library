@@ -51,11 +51,14 @@ const NO_RANGES: readonly ByteRange[] = []
  */
 export function parseXpath(xpath: string): XpathNode[] | null {
 	if (!XPATH_PATTERN.test(xpath)) return null
-	return xpath.slice(1).split('/').map(node => {
-		const bracket = node.indexOf('[')
-		if (bracket < 0) return { type: node, index: 0 }
-		return { type: node.slice(0, bracket), index: Number(node.slice(bracket + 1, -1)) }
-	})
+	return xpath
+		.slice(1)
+		.split('/')
+		.map(node => {
+			const bracket = node.indexOf('[')
+			if (bracket < 0) return { type: node, index: 0 }
+			return { type: node.slice(0, bracket), index: Number(node.slice(bracket + 1, -1)) }
+		})
 }
 
 /**
@@ -123,7 +126,12 @@ function constraintsMatch(box: BmffBox, exclusion: BmffHashExclusion): boolean {
 
 // Subset offsets count from the start of the box header. A length of 0 runs to the end of the box.
 // Bytes beyond the end of the box are never hashed.
-function appendSubset(ranges: ByteRange[], boxStart: number, boxLength: number, subset: readonly BmffHashSubset[]): void {
+function appendSubset(
+	ranges: ByteRange[],
+	boxStart: number,
+	boxLength: number,
+	subset: readonly BmffHashSubset[],
+): void {
 	for (const { offset, length } of subset) {
 		if (offset >= boxLength) continue
 		const end = length === 0 ? boxLength : Math.min(offset + length, boxLength)
@@ -138,19 +146,33 @@ function appendMatch(ranges: ByteRange[], box: BmffBox, exclusion: BmffHashExclu
 
 // Appends the ranges that `exclusions` exclude among the child boxes between `start` and `end` of `root`.
 // `depth` is the xpath node that the children match.
-function appendChildRanges(root: Uint8Array, start: number, end: number, depth: number, exclusions: readonly CompiledExclusion[], ranges: ByteRange[]): void {
+function appendChildRanges(
+	root: Uint8Array,
+	start: number,
+	end: number,
+	depth: number,
+	exclusions: readonly CompiledExclusion[],
+	ranges: ByteRange[],
+): void {
 	for (const child of readBoxes(root, start, end)) {
 		let nested: CompiledExclusion[] | undefined
 		for (const compiled of exclusions) {
 			if (!nodeMatches(compiled.nodes[depth], child)) continue
 			if (compiled.nodes.length > depth + 1) {
-				(nested ??= []).push(compiled)
-			}
-			else if (constraintsMatch(child, compiled.exclusion)) {
+				;(nested ??= []).push(compiled)
+			} else if (constraintsMatch(child, compiled.exclusion)) {
 				appendMatch(ranges, child, compiled.exclusion)
 			}
 		}
-		if (nested) appendChildRanges(root, child.offset + payloadOffset(child), child.offset + child.bytes.length, depth + 1, nested, ranges)
+		if (nested)
+			appendChildRanges(
+				root,
+				child.offset + payloadOffset(child),
+				child.offset + child.bytes.length,
+				depth + 1,
+				nested,
+				ranges,
+			)
 	}
 }
 
@@ -180,19 +202,22 @@ function mergeRanges(ranges: ByteRange[]): readonly ByteRange[] {
  *
  * @internal
  */
-export function findExcludedRanges(box: BmffBox, exclusions: readonly CompiledExclusion[]): readonly ByteRange[] | null {
+export function findExcludedRanges(
+	box: BmffBox,
+	exclusions: readonly CompiledExclusion[],
+): readonly ByteRange[] | null {
 	let ranges: ByteRange[] | undefined
 	let nested: CompiledExclusion[] | undefined
 	for (const compiled of exclusions) {
 		if (!nodeMatches(compiled.nodes[0], box)) continue
 		if (compiled.nodes.length > 1) {
-			(nested ??= []).push(compiled)
+			;(nested ??= []).push(compiled)
 			continue
 		}
 		if (!constraintsMatch(box, compiled.exclusion)) continue
 		if (!compiled.exclusion.subset) return null
-		appendSubset(ranges ??= [], 0, box.bytes.length, compiled.exclusion.subset)
+		appendSubset((ranges ??= []), 0, box.bytes.length, compiled.exclusion.subset)
 	}
-	if (nested) appendChildRanges(box.bytes, payloadOffset(box), box.bytes.length, 1, nested, ranges ??= [])
+	if (nested) appendChildRanges(box.bytes, payloadOffset(box), box.bytes.length, 1, nested, (ranges ??= []))
 	return ranges ? mergeRanges(ranges) : NO_RANGES
 }

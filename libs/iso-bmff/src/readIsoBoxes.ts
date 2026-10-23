@@ -18,12 +18,15 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  *
  * @public
  */
-export function readIsoBoxes<const R extends IsoBoxReaderMap>(raw: IsoBoxData, config: IsoBoxReadViewConfig & { readers: R }): IsoBoxReaderReturn<R>[];
+export function readIsoBoxes<const R extends IsoBoxReaderMap>(
+	raw: IsoBoxData,
+	config: IsoBoxReadViewConfig & { readers: R },
+): IsoBoxReaderReturn<R>[]
 
 /**
  * @public
  */
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[];
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[]
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[] {
 	const boxes = []
 

@@ -14,4 +14,4 @@ export function readVtte(_: IsoBoxReadView): WebVttEmptySampleBox {
 	return {
 		type: 'vtte',
 	}
-};
+}

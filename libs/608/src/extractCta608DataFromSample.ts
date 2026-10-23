@@ -1,8 +1,4 @@
-import {
-	extractNalUnitType,
-	getSeiData,
-	parseCta608DataFromSei,
-} from './utils/seiHelpers.ts'
+import { extractNalUnitType, getSeiData, parseCta608DataFromSei } from './utils/seiHelpers.ts'
 
 /**
  * Extracts CEA-608 data from a given sample.

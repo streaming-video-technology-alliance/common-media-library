@@ -28,5 +28,5 @@ export type BolaSelector = Omit<BitrateSelector, 'select'> & {
 	 * @throws RangeError when the ladder is not in ascending order of bandwidth
 	 * @throws RangeError when `input.bufferTarget` is not a positive finite number
 	 */
-	select(input: BitrateSelectorInput): BolaDecision;
-};
+	select(input: BitrateSelectorInput): BolaDecision
+}

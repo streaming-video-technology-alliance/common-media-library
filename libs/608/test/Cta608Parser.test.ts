@@ -4,7 +4,6 @@ import { deepEqual, equal } from 'node:assert'
 import { beforeEach, describe, it, mock } from 'node:test'
 
 describe('Cea608Parser Tests', () => {
-
 	let parser: any
 
 	beforeEach(() => {

@@ -68,7 +68,7 @@ describe('createBolaParams', () => {
 
 	it('does not depend on the scale of the bandwidths', () => {
 		const scale = 7.3
-		const scaled = createBolaParams(rungs(...bandwidthsOf(L2).map((bandwidth) => bandwidth * scale)), BUFFER_TARGET)
+		const scaled = createBolaParams(rungs(...bandwidthsOf(L2).map(bandwidth => bandwidth * scale)), BUFFER_TARGET)
 		const original = createBolaParams(L2, BUFFER_TARGET)
 
 		original.thresholds.forEach((threshold, i) => closeTo(scaled.thresholds[i], threshold, MATCH_TOLERANCE))

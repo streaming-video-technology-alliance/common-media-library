@@ -5,4 +5,4 @@ import type { IsoBoxMap } from './IsoBoxMap.ts'
  *
  * @public
  */
-export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
+export type IsoBox = IsoBoxMap[keyof IsoBoxMap]

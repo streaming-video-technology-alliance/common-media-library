@@ -3,7 +3,16 @@ import { readCborItem } from '../cbor/readCborItem.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
-import { JUMBF_UUID, asInteger, bytesToHex, hashesEqual, matchesUuid, normalizeAlgorithmName, readUuidBoxPurpose, toUint8Array } from '../utils.ts'
+import {
+	JUMBF_UUID,
+	asInteger,
+	bytesToHex,
+	hashesEqual,
+	matchesUuid,
+	normalizeAlgorithmName,
+	readUuidBoxPurpose,
+	toUint8Array,
+} from '../utils.ts'
 import type { UuidParsedBox } from '../utils.ts'
 import type { MerkleMap, MerkleSegmentState, MerkleSegmentValidation } from './MerkleSegmentValidation.ts'
 
@@ -139,9 +148,8 @@ async function verifyMerkleProof(
 		if (siblingIndex >= 0 && siblingIndex < layer) {
 			const sibling = path[proofIndex++]
 			if (!sibling) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
-			currentHash = currentIndex % 2 === 0
-				? await hashPair(currentHash, sibling, alg)
-				: await hashPair(sibling, currentHash, alg)
+			currentHash =
+				currentIndex % 2 === 0 ? await hashPair(currentHash, sibling, alg) : await hashPair(sibling, currentHash, alg)
 		}
 		currentIndex = Math.floor(currentIndex / 2)
 	}
@@ -155,11 +163,7 @@ async function verifyMerkleProof(
 
 // --- Public API ---
 
-function findMerkleMap(
-	merkleMaps: readonly MerkleMap[],
-	uniqueId: number,
-	localId: number,
-): MerkleMap | null {
+function findMerkleMap(merkleMaps: readonly MerkleMap[], uniqueId: number, localId: number): MerkleMap | null {
 	return merkleMaps.find(m => m.uniqueId === uniqueId && m.localId === localId) ?? null
 }
 
@@ -175,10 +179,11 @@ async function computeLeafHash(
 	merkleMap: MerkleMap,
 	cache: LeafHashCache,
 ): Promise<Uint8Array> {
-	const cached = cache.find(entry =>
-		entry.alg === merkleMap.alg &&
-		entry.offsetPrefixSize === merkleMap.offsetPrefixSize &&
-		entry.exclusions === merkleMap.exclusions,
+	const cached = cache.find(
+		entry =>
+			entry.alg === merkleMap.alg &&
+			entry.offsetPrefixSize === merkleMap.offsetPrefixSize &&
+			entry.exclusions === merkleMap.exclusions,
 	)
 	if (cached) return cached.hash
 

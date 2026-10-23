@@ -46,7 +46,12 @@ type ClaimSignatureCheck = {
  * is reported as a failure. A manifest with more than one claim box reports `CLAIM_MULTIPLE`
  * through `claimCode` (§15.6.1), so no signature check runs.
  */
-async function validateClaimSignature({ claimCborBytes, claimCode, signatureUriCode, signatureBytes }: InternalManifestData): Promise<ClaimSignatureCheck> {
+async function validateClaimSignature({
+	claimCborBytes,
+	claimCode,
+	signatureUriCode,
+	signatureBytes,
+}: InternalManifestData): Promise<ClaimSignatureCheck> {
 	const certificate = signatureBytes ? extractCertificateFromSignatureBytes(signatureBytes) : null
 
 	if (claimCode === Code.CLAIM_MULTIPLE) return { code: null, certificate }
@@ -118,5 +123,9 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 		codes.push(internal.claimCode)
 	}
 
-	return { codes: [...new Set(codes)], certificate: signature.certificate, verifiedAssertions: assertionHashes.verified }
+	return {
+		codes: [...new Set(codes)],
+		certificate: signature.certificate,
+		verifiedAssertions: assertionHashes.verified,
+	}
 }

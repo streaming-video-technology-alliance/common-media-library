@@ -6,5 +6,5 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  * @public
  */
 export type Box<T extends IsoBoxType = never> = {
-	type: T;
-};
+	type: T
+}

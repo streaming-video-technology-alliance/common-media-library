@@ -7,4 +7,4 @@ import type { CommonMediaResponse } from './CommonMediaResponse.ts'
  *
  * @public
  */
-export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>;
+export type ResponseInterceptor = (response: CommonMediaResponse) => Promise<CommonMediaResponse>

@@ -15,7 +15,11 @@ const TARGET = BOLA_DEFAULT_BUFFER_TARGET
 const NEW_TOP_BANDWIDTH = 12_000_000
 const NEW_MIDDLE_BANDWIDTH = 2_200_000
 const [LOWEST, SECOND, MIDDLE, FOURTH, TOP] = L1_BANDWIDTHS
-const TARGET_CHANGES = [[20, 40], [40, 24], [TARGET, 45]]
+const TARGET_CHANGES = [
+	[20, 40],
+	[40, 24],
+	[TARGET, 45],
+]
 
 function pickBandwidth(params: BolaParams, effectiveBuffer: number): number {
 	return params.rungs[selectRungByBuffer(params, effectiveBuffer)].bandwidth
@@ -54,23 +58,31 @@ describe('remapEffectiveBuffer', () => {
 	})
 
 	it('changes decisions only where a rung is added at the top', () => {
-		forEachLevel(createBolaParams(L1, TARGET), createBolaParams(withRung(L1, NEW_TOP_BANDWIDTH), TARGET), (before, after) => {
-			if (before === TOP) {
-				ok(after === TOP || after === NEW_TOP_BANDWIDTH)
-			} else {
-				equal(after, before)
-			}
-		})
+		forEachLevel(
+			createBolaParams(L1, TARGET),
+			createBolaParams(withRung(L1, NEW_TOP_BANDWIDTH), TARGET),
+			(before, after) => {
+				if (before === TOP) {
+					ok(after === TOP || after === NEW_TOP_BANDWIDTH)
+				} else {
+					equal(after, before)
+				}
+			},
+		)
 	})
 
 	it('changes decisions only where the top rung is removed', () => {
-		forEachLevel(createBolaParams(L1, TARGET), createBolaParams(withoutRung(L1, L1.length - 1), TARGET), (before, after) => {
-			if (before === TOP) {
-				equal(after, FOURTH)
-			} else {
-				equal(after, before)
-			}
-		})
+		forEachLevel(
+			createBolaParams(L1, TARGET),
+			createBolaParams(withoutRung(L1, L1.length - 1), TARGET),
+			(before, after) => {
+				if (before === TOP) {
+					equal(after, FOURTH)
+				} else {
+					equal(after, before)
+				}
+			},
+		)
 	})
 
 	it('changes decisions only where the lowest rung is removed', () => {
@@ -86,13 +98,17 @@ describe('remapEffectiveBuffer', () => {
 	it('changes decisions only next to a rung that is added in the middle', () => {
 		const neighbours = [MIDDLE, FOURTH]
 
-		forEachLevel(createBolaParams(L1, TARGET), createBolaParams(withRung(L1, NEW_MIDDLE_BANDWIDTH), TARGET), (before, after) => {
-			if (neighbours.includes(before)) {
-				ok(after === before || after === NEW_MIDDLE_BANDWIDTH)
-			} else {
-				equal(after, before)
-			}
-		})
+		forEachLevel(
+			createBolaParams(L1, TARGET),
+			createBolaParams(withRung(L1, NEW_MIDDLE_BANDWIDTH), TARGET),
+			(before, after) => {
+				if (neighbours.includes(before)) {
+					ok(after === before || after === NEW_MIDDLE_BANDWIDTH)
+				} else {
+					equal(after, before)
+				}
+			},
+		)
 	})
 
 	it('changes decisions only where a rung is removed from the middle', () => {

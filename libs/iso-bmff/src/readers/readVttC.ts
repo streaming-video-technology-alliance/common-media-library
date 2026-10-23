@@ -15,4 +15,4 @@ export function readVttC(view: IsoBoxReadView): WebVttConfigurationBox {
 		type: 'vttC',
 		config: view.readUtf8(),
 	}
-};
+}

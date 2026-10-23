@@ -26,7 +26,10 @@ import { validateCmcdEvents } from './validateCmcdEvents.ts'
  *
  * @public
  */
-export function validateCmcdEventReport(request: HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdEventsValidationResult {
+export function validateCmcdEventReport(
+	request: HttpRequest,
+	options?: Omit<CmcdValidationOptions, 'reportingMode'>,
+): CmcdEventsValidationResult {
 	const issues: CmcdEventsValidationResult['issues'] = []
 
 	if (request.method !== 'POST') {

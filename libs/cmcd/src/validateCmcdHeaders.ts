@@ -32,7 +32,10 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * @public
  */
-export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdDataValidationResult {
+export function validateCmcdHeaders(
+	headers: Record<string, string> | Headers,
+	options?: Omit<CmcdValidationOptions, 'reportingMode'>,
+): CmcdDataValidationResult {
 	const h = ensureHeaders(headers)
 	const issues: CmcdValidationResult['issues'] = []
 	const decoded: Partial<Record<CmcdHeaderField, Record<string, unknown>>> = {}

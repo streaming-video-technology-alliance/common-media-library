@@ -20,38 +20,40 @@ const identifier = /`([^`]+)`/g
 const identifierShape = /^[A-Za-z_$][\w$]*$/
 
 export type Bullet = {
-	task: string;
-	exports: string[];
-	text: string;
-};
+	task: string
+	exports: string[]
+	text: string
+}
 
 export type WhenToUse = {
-	bullets: Bullet[];
-	closing: string;
-	text: string;
-};
+	bullets: Bullet[]
+	closing: string
+	text: string
+}
 
 export type Guide = {
-	path: string;
-	title: string;
-	description: string;
-	text: string;
-};
+	path: string
+	title: string
+	description: string
+	text: string
+}
 
 export type PackageDocs = {
-	folder: string;
-	slug: string;
-	name: string;
-	description: string;
-	readme: string;
-	guides: Guide[];
-	apiReportPath: string;
-	apiReport: string;
-	whenToUse: WhenToUse;
-};
+	folder: string
+	slug: string
+	name: string
+	description: string
+	readme: string
+	guides: Guide[]
+	apiReportPath: string
+	apiReport: string
+	whenToUse: WhenToUse
+}
 
 function shape(file: string, problem: string): Error {
-	return new Error(`${file}: ${problem}. Expected a "${sectionHeading}" heading, ${minBullets} to ${maxBullets} bullets of the form "- <task>: \`export\`, \`export\`", and a closing paragraph.`)
+	return new Error(
+		`${file}: ${problem}. Expected a "${sectionHeading}" heading, ${minBullets} to ${maxBullets} bullets of the form "- <task>: \`export\`, \`export\`", and a closing paragraph.`,
+	)
 }
 
 function parseBullet(text: string, file: string): Bullet {
@@ -105,8 +107,7 @@ export function parseWhenToUse(readme: string, file: string): WhenToUse {
 				throw shape(file, `the bullet "${line}" comes after the closing paragraph`)
 			}
 			bullets.push(parseBullet(line.slice(2), file))
-		}
-		else if (line.trim() !== '') {
+		} else if (line.trim() !== '') {
 			if (bullets.length === 0) {
 				throw shape(file, `the line "${line}" comes before the first bullet`)
 			}
@@ -145,7 +146,10 @@ export function readExports(apiReport: string): Map<string, string> {
 
 	for (const list of apiReport.matchAll(exportList)) {
 		for (const item of list[1].split(',')) {
-			const name = item.trim().split(/\s+as\s+/).pop()
+			const name = item
+				.trim()
+				.split(/\s+as\s+/)
+				.pop()
 
 			if (name) {
 				record(name, 'public')
@@ -163,11 +167,15 @@ export function checkExports(section: WhenToUse, exports: Map<string, string>, f
 			const tag = exports.get(name)
 
 			if (tag === undefined) {
-				throw new Error(`${file}: "${name}" in the bullet "${bullet.text}" is not an export of the package. Check the API report under config/.`)
+				throw new Error(
+					`${file}: "${name}" in the bullet "${bullet.text}" is not an export of the package. Check the API report under config/.`,
+				)
 			}
 
 			if (tag === 'internal') {
-				throw new Error(`${file}: "${name}" in the bullet "${bullet.text}" is marked @internal. Name a public entry point.`)
+				throw new Error(
+					`${file}: "${name}" in the bullet "${bullet.text}" is marked @internal. Name a public entry point.`,
+				)
 			}
 		}
 	}
@@ -186,27 +194,31 @@ export function rewriteLinks(markdown: string, sourcePath: string, toUrl: (repoP
 	const dir = path.posix.dirname(sourcePath)
 	let fenced = false
 
-	const rewrite = (text: string): string => text.replace(link, (match, target: string) => {
-		if (notRelative.test(target)) {
-			return match
-		}
+	const rewrite = (text: string): string =>
+		text.replace(link, (match, target: string) => {
+			if (notRelative.test(target)) {
+				return match
+			}
 
-		const hash = target.indexOf('#')
-		const file = hash === -1 ? target : target.slice(0, hash)
-		const anchor = hash === -1 ? '' : target.slice(hash)
-		const repoPath = path.posix.normalize(path.posix.join(dir, file))
+			const hash = target.indexOf('#')
+			const file = hash === -1 ? target : target.slice(0, hash)
+			const anchor = hash === -1 ? '' : target.slice(hash)
+			const repoPath = path.posix.normalize(path.posix.join(dir, file))
 
-		return `](${toUrl(repoPath)}${anchor})`
-	})
+			return `](${toUrl(repoPath)}${anchor})`
+		})
 
-	return markdown.split(fenceLine).map((part, i) => {
-		if (i % 2 === 1) {
-			fenced = !fenced
-			return part
-		}
+	return markdown
+		.split(fenceLine)
+		.map((part, i) => {
+			if (i % 2 === 1) {
+				fenced = !fenced
+				return part
+			}
 
-		return fenced ? part : rewrite(part)
-	}).join('')
+			return fenced ? part : rewrite(part)
+		})
+		.join('')
 }
 
 /** The GitHub URL of a repo path. */
@@ -219,7 +231,7 @@ export function sourceUrl(repoPath: string): string {
  * site root. A target without a copy points at GitHub.
  */
 export function siteUrl(copies: Map<string, string>): (repoPath: string) => string {
-	return (repoPath) => {
+	return repoPath => {
 		const copy = copies.get(repoPath)
 		return copy === undefined ? sourceUrl(repoPath) : siteBase + copy
 	}
@@ -259,18 +271,31 @@ export function loadPackageDocs(folder: string): PackageDocs {
 	const apiReport = readRepoFile(apiReportPath)
 	const docsDir = path.join(repoRoot, folder, 'docs')
 	const guides = existsSync(docsDir)
-		? readdirSync(docsDir).filter(f => f.endsWith('.md')).sort().map(f => loadGuide(`${folder}/docs/${f}`))
+		? readdirSync(docsDir)
+				.filter(f => f.endsWith('.md'))
+				.sort()
+				.map(f => loadGuide(`${folder}/docs/${f}`))
 		: []
 	const whenToUse = parseWhenToUse(readme, readmePath)
 
 	checkExports(whenToUse, readExports(apiReport), readmePath)
 
-	return { folder, slug, name: json.name, description: json.description, readme, guides, apiReportPath, apiReport, whenToUse }
+	return {
+		folder,
+		slug,
+		name: json.name,
+		description: json.description,
+		readme,
+		guides,
+		apiReportPath,
+		apiReport,
+		whenToUse,
+	}
 }
 
 /** Reads every published package, ordered by folder name. */
 export function loadAllPackageDocs(): PackageDocs[] {
-	return projects.map(loadPackageDocs).sort((a, b) => a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0)
+	return projects.map(loadPackageDocs).sort((a, b) => (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0))
 }
 
 /** Maps the repo path of every file that the site copies to its path under the site root. */
@@ -290,15 +315,19 @@ export function siteCopies(packages: PackageDocs[]): Map<string, string> {
 
 /** The package index that goes between the markers in SKILL.md. */
 export function renderIndex(packages: PackageDocs[]): string {
-	return packages.map(pkg => [
-		`### ${pkg.name}`,
-		'',
-		pkg.description,
-		'',
-		rewriteLinks(pkg.whenToUse.text, `${pkg.folder}/README.md`, sourceUrl),
-		'',
-		`Reference: references/${pkg.slug}.md`,
-	].join('\n')).join('\n\n')
+	return packages
+		.map(pkg =>
+			[
+				`### ${pkg.name}`,
+				'',
+				pkg.description,
+				'',
+				rewriteLinks(pkg.whenToUse.text, `${pkg.folder}/README.md`, sourceUrl),
+				'',
+				`Reference: references/${pkg.slug}.md`,
+			].join('\n'),
+		)
+		.join('\n\n')
 }
 
 /** The README, guides, and API report of one package in one markdown file. */
@@ -346,11 +375,19 @@ export function renderLlmsTxt(packages: PackageDocs[]): string {
 		'',
 		'## Guides',
 		'',
-		...packages.flatMap(pkg => pkg.guides.map(guide => `- [${guide.title}](${siteBase}llms/${pkg.slug}/docs/${path.posix.basename(guide.path)}): ${pkg.name}. ${guide.description}`)),
+		...packages.flatMap(pkg =>
+			pkg.guides.map(
+				guide =>
+					`- [${guide.title}](${siteBase}llms/${pkg.slug}/docs/${path.posix.basename(guide.path)}): ${pkg.name}. ${guide.description}`,
+			),
+		),
 		'',
 		'## API reports',
 		'',
-		...packages.map(pkg => `- [${pkg.name} API report](${siteBase}llms/${pkg.slug}/api.md): every export of ${pkg.name} with its signature`),
+		...packages.map(
+			pkg =>
+				`- [${pkg.name} API report](${siteBase}llms/${pkg.slug}/api.md): every export of ${pkg.name} with its signature`,
+		),
 		'',
 		'## Optional',
 		'',

@@ -20,4 +20,4 @@ export type CmcdCustomValue =
 	| (symbol | SfItem<symbol>)[]
 	| SfToken
 	| SfItem<SfToken>
-	| (SfToken | SfItem<SfToken>)[];
+	| (SfToken | SfItem<SfToken>)[]

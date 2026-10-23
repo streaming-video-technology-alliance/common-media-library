@@ -25,6 +25,8 @@ import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
  *
  * @public
  */
-export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView) => AudioSampleEntryBox<T> {
+export function createAudioSampleEntryReader<T extends IsoBoxType>(
+	type: T,
+): (view: IsoBoxReadView) => AudioSampleEntryBox<T> {
 	return (view: IsoBoxReadView) => readAudioSampleEntryBox<T>(type, view)
 }

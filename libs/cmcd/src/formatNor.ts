@@ -12,8 +12,7 @@ function toBase(baseUrl: string | undefined): string | undefined {
 
 	try {
 		return new URL(getBaseUrl(baseUrl)).href
-	}
-	catch {
+	} catch {
 		return undefined
 	}
 }
@@ -64,7 +63,10 @@ function formatEntries(entries: unknown[], base: string | undefined, version: Cm
  *
  * @internal
  */
-export function formatNor(value: unknown, options: Pick<CmcdFormatterOptions, 'version' | 'baseUrl'>): ValueOrArray<CmcdNorEntry> | undefined {
+export function formatNor(
+	value: unknown,
+	options: Pick<CmcdFormatterOptions, 'version' | 'baseUrl'>,
+): ValueOrArray<CmcdNorEntry> | undefined {
 	const base = toBase(options.baseUrl)
 	const version = options.version
 

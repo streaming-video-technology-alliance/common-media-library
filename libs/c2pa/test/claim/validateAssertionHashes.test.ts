@@ -26,7 +26,10 @@ describe('validateAssertionHashes', () => {
 
 		const { codes, verified } = await validateAssertionHashes(refs, assertions)
 		deepStrictEqual(codes, [])
-		deepStrictEqual(verified.map(a => a.label), ['c2pa.hash.bmff.v3'])
+		deepStrictEqual(
+			verified.map(a => a.label),
+			['c2pa.hash.bmff.v3'],
+		)
 	})
 	// #endregion example
 
@@ -54,10 +57,7 @@ describe('validateAssertionHashes', () => {
 		const refs: ClaimAssertionRef[] = [
 			{ url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/c2pa.session-keys', hash, alg: null },
 		]
-		const assertions = [
-			makeAssertion('c2pa.session-keys', payload),
-			makeAssertion('c2pa.session-keys', payload),
-		]
+		const assertions = [makeAssertion('c2pa.session-keys', payload), makeAssertion('c2pa.session-keys', payload)]
 
 		const { codes, verified } = await validateAssertionHashes(refs, assertions)
 		deepStrictEqual(codes, [C2paStatusCode.ASSERTION_MISSING])
@@ -98,9 +98,7 @@ describe('validateAssertionHashes', () => {
 		const payload = new Uint8Array([0x10])
 		const hash = await sha256(payload)
 
-		const refs: ClaimAssertionRef[] = [
-			{ url: 'c2pa.assertions/c2pa.session-keys', hash, alg: null },
-		]
+		const refs: ClaimAssertionRef[] = [{ url: 'c2pa.assertions/c2pa.session-keys', hash, alg: null }]
 		const assertions = [makeAssertion('c2pa.session-keys', payload)]
 
 		const { codes } = await validateAssertionHashes(refs, assertions)
@@ -111,9 +109,7 @@ describe('validateAssertionHashes', () => {
 		const payload = new Uint8Array([0x42])
 		const hash = await sha256(payload)
 
-		const refs: ClaimAssertionRef[] = [
-			{ url: 'self#jumbf=/c2pa/m/c2pa.assertions/test', hash, alg: 'sha256' },
-		]
+		const refs: ClaimAssertionRef[] = [{ url: 'self#jumbf=/c2pa/m/c2pa.assertions/test', hash, alg: 'sha256' }]
 		const assertions = [makeAssertion('test', payload)]
 
 		const { codes } = await validateAssertionHashes(refs, assertions)

@@ -58,12 +58,10 @@ function buildWorkspace(workspace: Workspace): Promise<void> {
 					console.log(text)
 				}
 				resolve()
-			}
-			else if (signal) {
+			} else if (signal) {
 				console.error(`${workspace.name} cancelled after ${seconds}s`)
 				reject(new Error(`${workspace.name} build cancelled`))
-			}
-			else {
+			} else {
 				console.error(`${workspace.name} failed with exit code ${code} after ${seconds}s`)
 				if (text) {
 					console.error(text)
@@ -79,11 +77,12 @@ const started = performance.now()
 
 try {
 	await runWorkspaces(workspaces, limit, buildWorkspace)
-	console.log(`Built ${workspaces.length} packages in ${((performance.now() - started) / 1000).toFixed(1)}s with concurrency ${limit}`)
+	console.log(
+		`Built ${workspaces.length} packages in ${((performance.now() - started) / 1000).toFixed(1)}s with concurrency ${limit}`,
+	)
 	writeSkill()
 	console.log(`Wrote ${skillDir}`)
-}
-catch (error) {
+} catch (error) {
 	cancelAll()
 	console.error(error instanceof Error ? error.message : String(error))
 	process.exitCode = 1

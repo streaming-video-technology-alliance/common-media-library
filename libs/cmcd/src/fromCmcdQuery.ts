@@ -19,7 +19,10 @@ import { decodeCmcd } from './decodeCmcd.ts'
  * @example
  * {@includeCode ../test/fromCmcdQuery.test.ts#example}
  */
-export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
+export function fromCmcdQuery(
+	query: string | URLSearchParams,
+	options: CmcdDecodeOptions & { convertToLatest: true },
+): Cmcd
 /**
  * Decode CMCD data from a query string.
  *

@@ -6,11 +6,11 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type ItemInfoEntry = FullBox & {
-	type: 'infe';
-	itemId: number;
-	itemProtectionIndex: number;
-	itemName: string;
-	contentType: string;
-	contentEncoding?: string;
-	extensionType?: string;
-};
+	type: 'infe'
+	itemId: number
+	itemProtectionIndex: number
+	itemName: string
+	contentType: string
+	contentEncoding?: string
+	extensionType?: string
+}

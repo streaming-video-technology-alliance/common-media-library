@@ -18,13 +18,12 @@ import type { CmcdStreamingFormat } from './CmcdStreamingFormat.ts'
  * @public
  */
 export type CmcdRequest = {
-
 	/**
 	 * Custom key names may be used, but they MUST have a hyphenated prefix. The prefix ensures that there is no
 	 * namespace collision with future CMCD revisions. Clients SHOULD use a reverse-DNS syntax when defining their own
 	 * prefix.
 	 */
-	[index: CmcdCustomKey]: CmcdCustomValue | undefined;
+	[index: CmcdCustomKey]: CmcdCustomValue | undefined
 
 	/**
 	 * Aggregate encoded bitrate
@@ -38,7 +37,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#aggregate-encoded-bitrate | CTA-5004-B Aggregate Encoded Bitrate}
 	 */
-	ab?: CmcdObjectTypeList;
+	ab?: CmcdObjectTypeList
 
 	/**
 	 * Backgrounded
@@ -50,7 +49,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#backgrounded | CTA-5004-B Backgrounded}
 	 */
-	bg?: boolean;
+	bg?: boolean
 
 	/**
 	 * Buffer length
@@ -61,7 +60,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#buffer-length | CTA-5004-B Buffer Length}
 	 */
-	bl?: CmcdObjectTypeList;
+	bl?: CmcdObjectTypeList
 
 	/**
 	 * Encoded bitrate
@@ -75,7 +74,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#encoded-bitrate | CTA-5004-B Encoded Bitrate}
 	 */
-	br?: CmcdObjectTypeList;
+	br?: CmcdObjectTypeList
 
 	/**
 	 * Buffer starvation
@@ -89,7 +88,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#buffer-starvation | CTA-5004-B Buffer Starvation}
 	 */
-	bs?: boolean;
+	bs?: boolean
 
 	/**
 	 * Buffer Starvation Absolute
@@ -101,7 +100,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#buffer-starvation-absolute | CTA-5004-B Buffer Starvation Absolute}
 	 */
-	bsa?: CmcdObjectTypeList;
+	bsa?: CmcdObjectTypeList
 
 	/**
 	 * Buffer Starvation Duration
@@ -113,7 +112,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#buffer-starvation-duration | CTA-5004-B Buffer Starvation Duration}
 	 */
-	bsd?: CmcdObjectTypeList;
+	bsd?: CmcdObjectTypeList
 
 	/**
 	 * Buffer Starvation Duration Absolute
@@ -125,7 +124,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#buffer-starvation-duration-absolute | CTA-5004-B Buffer Starvation Duration Absolute}
 	 */
-	bsda?: CmcdObjectTypeList;
+	bsda?: CmcdObjectTypeList
 
 	/**
 	 * CDN ID
@@ -136,7 +135,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#cdn-id | CTA-5004-B CDN ID}
 	 */
-	cdn?: string;
+	cdn?: string
 
 	/**
 	 * Content ID
@@ -148,7 +147,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#content-id | CTA-5004-B Content ID}
 	 */
-	cid?: string;
+	cid?: string
 
 	/**
 	 * Content Signature
@@ -161,7 +160,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#content-signature | CTA-5004-B Content Signature}
 	 */
-	cs?: string;
+	cs?: string
 
 	/**
 	 * Object duration
@@ -175,7 +174,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#object-duration | CTA-5004-B Object Duration}
 	 */
-	d?: number;
+	d?: number
 
 	/**
 	 * Dropped Frames Absolute
@@ -189,7 +188,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#dropped-frames-absolute | CTA-5004-B Dropped Frames Absolute}
 	 */
-	dfa?: number;
+	dfa?: number
 
 	/**
 	 * Deadline
@@ -202,7 +201,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#deadline | CTA-5004-B Deadline}
 	 */
-	dl?: number;
+	dl?: number
 
 	/**
 	 * Player Error Code
@@ -215,7 +214,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#player-error-code | CTA-5004-B Player Error Code}
 	 */
-	ec?: string[];
+	ec?: string[]
 
 	/**
 	 * Lowest aggregated encoded bitrate
@@ -229,7 +228,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#lowest-aggregated-encoded-bitrate | CTA-5004-B Lowest Aggregated Encoded Bitrate}
 	 */
-	lab?: CmcdObjectTypeList;
+	lab?: CmcdObjectTypeList
 
 	/**
 	 * Lowest encoded bitrate
@@ -244,7 +243,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#lowest-encoded-bitrate | CTA-5004-B Lowest Encoded Bitrate}
 	 */
-	lb?: CmcdObjectTypeList;
+	lb?: CmcdObjectTypeList
 
 	/**
 	 * Live stream latency
@@ -256,7 +255,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#live-stream-latency | CTA-5004-B Live Stream Latency}
 	 */
-	ltc?: number;
+	ltc?: number
 
 	/**
 	 * Media Start Delay
@@ -272,7 +271,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#media-start-delay | CTA-5004-B Media Start Delay}
 	 */
-	msd?: number;
+	msd?: number
 
 	/**
 	 * Measured throughput
@@ -291,7 +290,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#measured-throughput | CTA-5004-B Measured Throughput}
 	 */
-	mtp?: CmcdObjectTypeList;
+	mtp?: CmcdObjectTypeList
 
 	/**
 	 * Next object request
@@ -318,7 +317,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#next-object-request | CTA-5004-B Next Object Request}
 	 */
-	nor?: (string | SfItem<string, { r: string }>)[];
+	nor?: (string | SfItem<string, { r: string }>)[]
 
 	/**
 	 * Non rendered
@@ -329,7 +328,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#non-rendered | CTA-5004-B Non Rendered}
 	 */
-	nr?: boolean;
+	nr?: boolean
 
 	/**
 	 * Object type
@@ -353,7 +352,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#object-type | CTA-5004-B Object Type}
 	 */
-	ot?: CmcdObjectType;
+	ot?: CmcdObjectType
 
 	/**
 	 * Playhead bitrate
@@ -364,7 +363,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#playhead-bitrate | CTA-5004-B Playhead Bitrate}
 	 */
-	pb?: CmcdObjectTypeList;
+	pb?: CmcdObjectTypeList
 
 	/**
 	 * Playback rate
@@ -375,7 +374,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#playback-rate | CTA-5004-B Playback Rate}
 	 */
-	pr?: number;
+	pr?: number
 
 	/**
 	 * Playhead time
@@ -386,7 +385,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#playhead-time | CTA-5004-B Playhead Time}
 	 */
-	pt?: number;
+	pt?: number
 
 	/**
 	 * Requested maximum throughput
@@ -398,7 +397,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#requested-maximum-throughput | CTA-5004-B Requested Maximum Throughput}
 	 */
-	rtp?: number;
+	rtp?: number
 
 	/**
 	 * Streaming format
@@ -415,7 +414,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#streaming-format | CTA-5004-B Streaming Format}
 	 */
-	sf?: CmcdStreamingFormat;
+	sf?: CmcdStreamingFormat
 
 	/**
 	 * Session ID
@@ -429,7 +428,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#session-id | CTA-5004-B Session ID}
 	 */
-	sid?: string;
+	sid?: string
 
 	/**
 	 * Sequence Number
@@ -442,7 +441,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#sequence-number | CTA-5004-B Sequence Number}
 	 */
-	sn?: number;
+	sn?: number
 
 	/**
 	 * Stream type
@@ -455,7 +454,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#stream-type | CTA-5004-B Stream Type}
 	 */
-	st?: CmcdStreamType;
+	st?: CmcdStreamType
 
 	/**
 	 * State
@@ -476,7 +475,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#state | CTA-5004-B State}
 	 */
-	sta?: CmcdPlayerState;
+	sta?: CmcdPlayerState
 
 	/**
 	 * Startup
@@ -489,7 +488,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#startup | CTA-5004-B Startup}
 	 */
-	su?: boolean;
+	su?: boolean
 
 	/**
 	 * Top aggregated encoded bitrate
@@ -503,7 +502,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#top-aggregated-encoded-bitrate | CTA-5004-B Top Aggregated Encoded Bitrate}
 	 */
-	tab?: CmcdObjectTypeList;
+	tab?: CmcdObjectTypeList
 
 	/**
 	 * Top encoded bitrate
@@ -518,7 +517,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#top-encoded-bitrate | CTA-5004-B Top Encoded Bitrate}
 	 */
-	tb?: CmcdObjectTypeList;
+	tb?: CmcdObjectTypeList
 
 	/**
 	 * Target Buffer length
@@ -530,7 +529,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#target-buffer-length | CTA-5004-B Target Buffer Length}
 	 */
-	tbl?: CmcdObjectTypeList;
+	tbl?: CmcdObjectTypeList
 
 	/**
 	 * Top playable bitrate
@@ -551,7 +550,7 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#top-playable-bitrate | CTA-5004-B Top Playable Bitrate}
 	 */
-	tpb?: CmcdObjectTypeList;
+	tpb?: CmcdObjectTypeList
 
 	/**
 	 * Version
@@ -564,5 +563,5 @@ export type CmcdRequest = {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#version | CTA-5004-B Version}
 	 */
-	v?: number;
-};
+	v?: number
+}

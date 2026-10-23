@@ -12,7 +12,7 @@ describe('writeEmsg', function () {
 			id: 1,
 			schemeIdUri: 'urn:test:scheme',
 			value: '1',
-			messageData: new Uint8Array([0x49, 0x44, 0x33, 0x04, 0x00, 0x01])
+			messageData: new Uint8Array([0x49, 0x44, 0x33, 0x04, 0x00, 0x01]),
 		}
 
 		const writer = writeEmsg(box)
@@ -39,25 +39,56 @@ describe('writeEmsg', function () {
 			id: 0,
 			schemeIdUri: 'a',
 			value: '',
-			messageData: new Uint8Array([0xff])
+			messageData: new Uint8Array([0xff]),
 		}
 
 		const writer = writeEmsg(box)
 		const buffer = new Uint8Array(writer.buffer)
 
-		assert.strictEqual(Buffer.compare(buffer, new Uint8Array([
-			0x00, 0x00, 0x00, 0x24, // size
-			0x65, 0x6d, 0x73, 0x67, // type
-			0x01, 0x00, 0x00, 0x00, // version + flags
-			0x00, 0x00, 0x00, 0x01, // timescale
-			0x00, 0x00, 0x00, 0x00, // presentationTime (hi)
-			0x00, 0x00, 0x00, 0x00, // presentationTime (lo)
-			0x00, 0x00, 0x00, 0x00, // eventDuration
-			0x00, 0x00, 0x00, 0x00, // id
-			0x61, 0x00,             // schemeIdUri 'a' + terminator
-			0x00,                   // value '' + terminator
-			0xff,                   // messageData
-		])), 0)
+		assert.strictEqual(
+			Buffer.compare(
+				buffer,
+				new Uint8Array([
+					0x00,
+					0x00,
+					0x00,
+					0x24, // size
+					0x65,
+					0x6d,
+					0x73,
+					0x67, // type
+					0x01,
+					0x00,
+					0x00,
+					0x00, // version + flags
+					0x00,
+					0x00,
+					0x00,
+					0x01, // timescale
+					0x00,
+					0x00,
+					0x00,
+					0x00, // presentationTime (hi)
+					0x00,
+					0x00,
+					0x00,
+					0x00, // presentationTime (lo)
+					0x00,
+					0x00,
+					0x00,
+					0x00, // eventDuration
+					0x00,
+					0x00,
+					0x00,
+					0x00, // id
+					0x61,
+					0x00, // schemeIdUri 'a' + terminator
+					0x00, // value '' + terminator
+					0xff, // messageData
+				]),
+			),
+			0,
+		)
 	})
 
 	it('should preserve messageData through a version 1 round trip when value is empty', function () {
@@ -72,7 +103,7 @@ describe('writeEmsg', function () {
 			id: 1,
 			schemeIdUri: 'https://aomedia.org/emsg/ID3',
 			value: '',
-			messageData
+			messageData,
 		}
 
 		const writer = writeEmsg(box)
@@ -96,7 +127,7 @@ describe('writeEmsg', function () {
 			id: 1,
 			schemeIdUri: '',
 			value: '1',
-			messageData
+			messageData,
 		}
 
 		const writer = writeEmsg(box)
@@ -121,7 +152,7 @@ describe('writeEmsg', function () {
 			id: 7,
 			schemeIdUri: '',
 			value: '',
-			messageData
+			messageData,
 		}
 
 		const writer = writeEmsg(box)

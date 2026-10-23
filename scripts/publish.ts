@@ -6,16 +6,16 @@ import { viewPublished, viewPublishedPeers } from './npmView.ts'
 import { projects } from './projects.ts'
 import { satisfiesRange } from './satisfiesRange.ts'
 
-type PackageName = string;
-type PackageFolder = string;
-type PackageFile = string;
+type PackageName = string
+type PackageFolder = string
+type PackageFile = string
 type PackageJson = {
-	name: PackageName;
-	version: string;
-	peerDependencies: Record<string, string>;
-};
-type Package = [PackageFolder, PackageFile, PackageJson];
-type Packages = Record<PackageName, Package>;
+	name: PackageName
+	version: string
+	peerDependencies: Record<string, string>
+}
+type Package = [PackageFolder, PackageFile, PackageJson]
+type Packages = Record<PackageName, Package>
 
 async function loadPackage(folder: string): Promise<Package> {
 	console.log(`Loading ${folder}...`)
@@ -25,11 +25,10 @@ async function loadPackage(folder: string): Promise<Package> {
 }
 
 async function loadPackages(): Promise<Packages> {
-	return (await Promise.all(projects.map(loadPackage)))
-		.reduce((result, pkg) => {
-			result[pkg[2].name] = pkg
-			return result
-		}, {} as Packages)
+	return (await Promise.all(projects.map(loadPackage))).reduce((result, pkg) => {
+		result[pkg[2].name] = pkg
+		return result
+	}, {} as Packages)
 }
 
 const tagRegex = /^\d+\.\d+\.\d+(.*$)/
@@ -96,7 +95,9 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 			const currentPeer = packages[dep][2].version
 
 			if (!satisfiesRange(currentPeer, range)) {
-				throw new Error(`Package ${name} (${version}) needs a version bump. Its published release accepts ${dep}@${range}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`)
+				throw new Error(
+					`Package ${name} (${version}) needs a version bump. Its published release accepts ${dep}@${range}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`,
+				)
 			}
 		}
 	}
@@ -106,12 +107,10 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 
 const packages = await loadPackages()
 const needsPublish: [PackageJson, string][] = await Promise.all(
-	Object
-		.entries(packages)
-		.map(async ([name, pkg]) => {
-			const result = await processPackage(name, pkg, packages)
-			return [pkg[2], result]
-		})
+	Object.entries(packages).map(async ([name, pkg]) => {
+		const result = await processPackage(name, pkg, packages)
+		return [pkg[2], result]
+	}),
 )
 
 // Publish the packages

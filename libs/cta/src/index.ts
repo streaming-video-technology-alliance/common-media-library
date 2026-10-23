@@ -11,4 +11,3 @@ export * from './CmStreamType.ts'
 export type * from './CmValue.ts'
 export * from './isTokenField.ts'
 export * from './isValid.ts'
-

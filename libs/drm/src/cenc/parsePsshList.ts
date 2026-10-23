@@ -118,4 +118,3 @@ export function parsePsshList(data: ArrayBufferLike | Uint8Array): Record<string
 
 	return pssh
 }
-

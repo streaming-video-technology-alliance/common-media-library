@@ -5,13 +5,7 @@ import { describe, it } from 'node:test'
 describe('arrayBufferToHex', () => {
 	it('should convert ArrayBuffer to hex string', () => {
 		//#region example
-		const data = new Uint8Array([
-			160, 86, 74, 247,
-			96, 194,
-			217, 75,
-			150, 16,
-			199, 174, 112, 213, 217, 112,
-		])
+		const data = new Uint8Array([160, 86, 74, 247, 96, 194, 217, 75, 150, 16, 199, 174, 112, 213, 217, 112])
 		const result = arrayBufferToHex(data.buffer)
 
 		equal(result, 'a0564af760c2d94b9610c7ae70d5d970')

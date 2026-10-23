@@ -22,11 +22,7 @@ describe('verifyClaimSignature', () => {
 	// #endregion example
 
 	it('returns false for completely invalid inputs', async () => {
-		const result = await verifyClaimSignature(
-			new Uint8Array(0),
-			new Uint8Array(0),
-			new Uint8Array(0),
-		)
+		const result = await verifyClaimSignature(new Uint8Array(0), new Uint8Array(0), new Uint8Array(0))
 		strictEqual(result, false)
 	})
 
@@ -41,11 +37,7 @@ describe('verifyClaimSignature', () => {
 
 		// This may return true or false depending on whether the generator
 		// produced a valid claim signature. We just verify it doesn't throw.
-		const result = await verifyClaimSignature(
-			internalData.signatureBytes,
-			internalData.claimCborBytes,
-			certificate,
-		)
+		const result = await verifyClaimSignature(internalData.signatureBytes, internalData.claimCborBytes, certificate)
 		strictEqual(typeof result, 'boolean')
 	})
 })

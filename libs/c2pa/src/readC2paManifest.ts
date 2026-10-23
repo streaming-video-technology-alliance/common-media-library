@@ -16,7 +16,6 @@ import { parseJumbfLabel } from './jumbf/parseJumbfLabel.ts'
 import { asString, findC2paUuidBox, stripJumbfUuidPrefix } from './utils.ts'
 import { extractCertificateInfo } from './x509/extractCertificateInfo.ts'
 
-
 const MAX_JUMBF_NESTING_DEPTH = 20
 const X5CHAIN_HEADER_LABEL = 33
 
@@ -104,16 +103,14 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 					data = contentBox.data
 					code = C2paStatusCode.ASSERTION_CBOR_INVALID
 				}
-			}
-			else if (contentBox.type === 'json') {
+			} else if (contentBox.type === 'json') {
 				try {
 					data = JSON.parse(TEXT_DECODER.decode(contentBox.data)) as unknown
 				} catch {
 					data = contentBox.data
 					code = C2paStatusCode.ASSERTION_JSON_INVALID
 				}
-			}
-			else {
+			} else {
 				data = contentBox.data
 			}
 		}
@@ -124,11 +121,18 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 	return assertions
 }
 
-function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; certNotBefore: string | null } {
+function parseSignatureInfo(signatureBytes: Uint8Array | null): {
+	issuer: string | null
+	certNotBefore: string | null
+} {
 	if (!signatureBytes) return { issuer: null, certNotBefore: null }
 	try {
 		const cose = decodeCoseSign1(signatureBytes)
-		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ?? cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as Uint8Array | Uint8Array[] | null | undefined
+		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ?? cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as
+			| Uint8Array
+			| Uint8Array[]
+			| null
+			| undefined
 		if (!x5chain) return { issuer: null, certNotBefore: null }
 
 		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
@@ -257,12 +261,10 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 				claimData = claim.data
 				claimCode = claim.code
 			}
-		}
-		else if (label === 'c2pa.assertions') {
+		} else if (label === 'c2pa.assertions') {
 			assertionStores++
 			internalAssertions = parseAssertionsInternal(inner)
-		}
-		else if (label === 'c2pa.signature') {
+		} else if (label === 'c2pa.signature') {
 			signatureBoxes++
 			const contentBox = inner.find(b => b.type === 'cbor' || b.type === 'jumc')
 			if (contentBox) signatureBytes = contentBox.data
@@ -284,11 +286,7 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 	const instanceId = asString(claimData?.['instanceID'] ?? claimData?.['instance_id'])
 	const claimGenerator = asString(claimData?.['claim_generator'] ?? claimData?.['claimGenerator'])
 	const resolvedLabel =
-		manifestLabel ??
-		asString(claimData?.['dc:title']) ??
-		asString(claimData?.['title']) ??
-		instanceId ??
-		'unknown'
+		manifestLabel ?? asString(claimData?.['dc:title']) ?? asString(claimData?.['title']) ?? instanceId ?? 'unknown'
 
 	const claimAssertionRefs = claimData ? extractClaimAssertionRefs(claimData) : []
 
@@ -312,9 +310,9 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 		claimAssertionRefs,
 		claimCborBytes,
 		claimCode,
-		signatureUriCode: signatureReference && !signatureReference.resolves ? C2paStatusCode.CLAIM_SIGNATURE_MISSING : null,
+		signatureUriCode:
+			signatureReference && !signatureReference.resolves ? C2paStatusCode.CLAIM_SIGNATURE_MISSING : null,
 		signatureBytes,
 		assertions: internalAssertions,
 	}
 }
-

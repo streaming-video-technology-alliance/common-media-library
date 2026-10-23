@@ -16,7 +16,7 @@ describe('parsePsshList', () => {
 
 		const psshBox = result[expectedUUID]
 		strictEqual(psshBox.byteLength, samplePsshBox.length) // length should match
-		deepStrictEqual(new Uint8Array(psshBox), samplePsshBox)  // actual data should match
+		deepStrictEqual(new Uint8Array(psshBox), samplePsshBox) // actual data should match
 	})
 
 	it('should parse PSSH boxes from a Uint8Array', () => {
@@ -35,7 +35,7 @@ describe('parsePsshList', () => {
 
 	it('should parse PSSH boxes from a Uint8Array subarray with non-zero byteOffset', () => {
 		// Create a larger buffer with padding before the PSSH box
-		const padding = new Uint8Array(100).fill(0xFF)
+		const padding = new Uint8Array(100).fill(0xff)
 		const combined = new Uint8Array(padding.length + samplePsshBox.length)
 		combined.set(padding, 0)
 		combined.set(samplePsshBox, padding.length)

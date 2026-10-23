@@ -14,10 +14,7 @@ import { readId3Size } from './util/readId3Size.ts'
  * @internal
  *
  */
-export function getId3Data(
-	data: Uint8Array,
-	offset: number,
-): Uint8Array | undefined {
+export function getId3Data(data: Uint8Array, offset: number): Uint8Array | undefined {
 	const front = offset
 	let length = 0
 

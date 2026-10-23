@@ -29,4 +29,4 @@ export const ManifestType = {
  *
  * @alpha
  */
-export type ManifestType = ValueOf<typeof ManifestType>;
+export type ManifestType = ValueOf<typeof ManifestType>

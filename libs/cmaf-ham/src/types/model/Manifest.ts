@@ -10,13 +10,14 @@ import type { Presentation } from './Presentation.ts'
  *
  * @alpha
  */
-export type Manifest = Duration & Base & {
-	type: ManifestType;
-	format: CmcdStreamingFormat;
-	presentations: Presentation[];
-	contentSteering?: ContentSteering;
+export type Manifest = Duration &
+	Base & {
+		type: ManifestType
+		format: CmcdStreamingFormat
+		presentations: Presentation[]
+		contentSteering?: ContentSteering
 
-	// TODO: These have very DASH specific names.
-	minimumUpdatePeriod?: number;
-	timeShiftBufferDepth?: number;
-};
+		// TODO: These have very DASH specific names.
+		minimumUpdatePeriod?: number
+		timeShiftBufferDepth?: number
+	}

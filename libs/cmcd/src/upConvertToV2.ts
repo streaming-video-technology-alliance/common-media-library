@@ -29,11 +29,9 @@ export function upConvertToV2(obj: Record<string, any>): Record<string, any> {
 
 		if (CMCD_INNER_LIST_KEYS.has(key) && !Array.isArray(toBareValue(value))) {
 			result[key] = [value]
-		}
-		else if (key === 'nor' && typeof value === 'string') {
+		} else if (key === 'nor' && typeof value === 'string') {
 			result[key] = [value]
-		}
-		else {
+		} else {
 			result[key] = value
 		}
 	}

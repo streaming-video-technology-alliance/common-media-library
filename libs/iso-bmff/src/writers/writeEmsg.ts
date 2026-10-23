@@ -20,7 +20,7 @@ export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
 
 	if (box.version === 0) {
 		// version 0: scheme_id_uri, value, timescale, presentation_time_delta, event_duration, id, message_data
-		contentSize = (box.schemeIdUri.length + 1) + (box.value.length + 1) + 4 + 4 + 4 + 4 + box.messageData.length
+		contentSize = box.schemeIdUri.length + 1 + (box.value.length + 1) + 4 + 4 + 4 + 4 + box.messageData.length
 	} else {
 		// version 1: timescale, presentation_time, event_duration, id, scheme_id_uri, value, message_data
 		contentSize = 4 + 8 + 4 + 4 + (box.schemeIdUri.length + 1) + (box.value.length + 1) + box.messageData.length

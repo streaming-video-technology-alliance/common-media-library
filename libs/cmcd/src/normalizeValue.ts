@@ -20,7 +20,9 @@ function normalizeBare(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 
 		case 'integer':
 		case 'ot-list':
-			return typeof value === 'number' && Number.isFinite(value) ? Math.round(value / spec.round) * spec.round : undefined
+			return typeof value === 'number' && Number.isFinite(value)
+				? Math.round(value / spec.round) * spec.round
+				: undefined
 
 		case 'decimal':
 			return typeof value === 'number' && Number.isFinite(value) ? value : undefined
@@ -34,7 +36,10 @@ function normalizeBare(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 		case 'token': {
 			const text = toTokenString(value)
 			const v1Map = version === 1 ? spec.v1Map : undefined
-			const token = text !== undefined && v1Map !== undefined && Object.prototype.hasOwnProperty.call(v1Map, text) ? v1Map[text] : text
+			const token =
+				text !== undefined && v1Map !== undefined && Object.prototype.hasOwnProperty.call(v1Map, text)
+					? v1Map[text]
+					: text
 
 			return token ? new SfToken(token) : undefined
 		}
@@ -71,7 +76,7 @@ function normalizeItem(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 
 function normalizeList(value: unknown, spec: CmcdKeySpec, version: CmcdVersion): unknown {
 	const wrapper = value instanceof SfItem && Array.isArray(value.value) ? value : undefined
-	const items = wrapper ? wrapper.value as unknown as unknown[] : Array.isArray(value) ? value : [value]
+	const items = wrapper ? (wrapper.value as unknown as unknown[]) : Array.isArray(value) ? value : [value]
 	const list: unknown[] = []
 
 	for (const item of items) {

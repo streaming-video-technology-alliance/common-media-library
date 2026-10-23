@@ -6,4 +6,4 @@ import type { CmcdKey } from './CmcdKey.ts'
  *
  * @public
  */
-export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>;
+export type CmcdHeaderMap = Record<CmcdHeaderField, CmcdKey[]>

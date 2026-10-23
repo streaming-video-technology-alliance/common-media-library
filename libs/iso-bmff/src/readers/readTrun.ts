@@ -38,7 +38,7 @@ export function readTrun(view: IsoBoxReadView): TrackRunBox {
 			sample.sampleFlags = view.readUint(4)
 		}
 		if (flags & 0x800) {
-			sample.sampleCompositionTimeOffset = (version === 1) ? view.readInt(4) : view.readUint(4)
+			sample.sampleCompositionTimeOffset = version === 1 ? view.readInt(4) : view.readUint(4)
 		}
 
 		return sample
@@ -53,4 +53,4 @@ export function readTrun(view: IsoBoxReadView): TrackRunBox {
 		firstSampleFlags,
 		samples,
 	}
-};
+}

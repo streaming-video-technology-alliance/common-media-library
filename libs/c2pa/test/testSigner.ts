@@ -63,10 +63,17 @@ function derUnsignedInteger(bytes: Uint8Array): Uint8Array {
 }
 
 function derName(commonName: string): Uint8Array {
-	return der(DER_SEQUENCE, der(DER_SET, der(DER_SEQUENCE,
-		der(DER_OBJECT_IDENTIFIER, OID_COMMON_NAME),
-		der(DER_UTF8_STRING, TEXT_ENCODER.encode(commonName)),
-	)))
+	return der(
+		DER_SEQUENCE,
+		der(
+			DER_SET,
+			der(
+				DER_SEQUENCE,
+				der(DER_OBJECT_IDENTIFIER, OID_COMMON_NAME),
+				der(DER_UTF8_STRING, TEXT_ENCODER.encode(commonName)),
+			),
+		),
+	)
 }
 
 function derUtcTime(time: string): Uint8Array {
@@ -74,20 +81,28 @@ function derUtcTime(time: string): Uint8Array {
 }
 
 function rawEcdsaToDer(raw: Uint8Array): Uint8Array {
-	return der(DER_SEQUENCE,
+	return der(
+		DER_SEQUENCE,
 		derUnsignedInteger(raw.subarray(0, P256_COMPONENT_BYTES)),
 		derUnsignedInteger(raw.subarray(P256_COMPONENT_BYTES)),
 	)
 }
 
 async function signEcdsaSha256(privateKey: CryptoKey, data: Uint8Array): Promise<Uint8Array> {
-	return new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, data as Uint8Array<ArrayBuffer>))
+	return new Uint8Array(
+		await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, data as Uint8Array<ArrayBuffer>),
+	)
 }
 
 /** Builds a minimal self-signed X.509 v3 certificate (RFC 5280 §4.1) over the given SubjectPublicKeyInfo. */
-async function buildSelfSignedCertificate(privateKey: CryptoKey, spki: Uint8Array, commonName: string): Promise<Uint8Array> {
+async function buildSelfSignedCertificate(
+	privateKey: CryptoKey,
+	spki: Uint8Array,
+	commonName: string,
+): Promise<Uint8Array> {
 	const signatureAlgorithm = der(DER_SEQUENCE, der(DER_OBJECT_IDENTIFIER, OID_ECDSA_WITH_SHA256))
-	const tbsCertificate = der(DER_SEQUENCE,
+	const tbsCertificate = der(
+		DER_SEQUENCE,
 		der(DER_CONTEXT_0, der(DER_INTEGER, new Uint8Array([2]))), // version v3
 		der(DER_INTEGER, new Uint8Array([1])), // serialNumber
 		signatureAlgorithm,
@@ -110,10 +125,14 @@ export async function createTestSigner(issuer: string = 'CML Test Signer'): Prom
 	const spki = new Uint8Array(await crypto.subtle.exportKey('spki', keyPair.publicKey))
 	const certificateDER = await buildSelfSignedCertificate(keyPair.privateKey, spki, issuer)
 	// cbor-x reuses its output buffer between calls, so copy every encoding.
-	const protectedBytes = Uint8Array.from(CBOR.encode(new Map<number, unknown>([
-		[COSE_HEADER_ALG, COSE_ALG_ES256],
-		[COSE_HEADER_X5CHAIN, [certificateDER]],
-	])))
+	const protectedBytes = Uint8Array.from(
+		CBOR.encode(
+			new Map<number, unknown>([
+				[COSE_HEADER_ALG, COSE_ALG_ES256],
+				[COSE_HEADER_X5CHAIN, [certificateDER]],
+			]),
+		),
+	)
 
 	return {
 		certificateDER,

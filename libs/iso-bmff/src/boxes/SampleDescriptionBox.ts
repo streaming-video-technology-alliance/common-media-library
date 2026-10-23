@@ -9,7 +9,7 @@ import type { VisualSampleEntryBox } from './VisualSampleEntryBox.ts'
  * @public
  */
 export type SampleDescriptionBox<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox> = FullBox & {
-	type: 'stsd';
-	entryCount: number,
-	entries: E[],
-};
+	type: 'stsd'
+	entryCount: number
+	entries: E[]
+}

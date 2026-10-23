@@ -5,7 +5,7 @@ import { equal, ok } from 'node:assert'
  */
 export function parseTrunSamples(view: DataView, trunOffset: number): { size: number }[] {
 	const versionAndFlags = view.getUint32(trunOffset + 8)
-	const flags = versionAndFlags & 0xFFFFFF
+	const flags = versionAndFlags & 0xffffff
 
 	const dataOffsetPresent = !!(flags & 0x001)
 	const firstSampleFlagsPresent = !!(flags & 0x004)
@@ -36,7 +36,12 @@ export function parseTrunSamples(view: DataView, trunOffset: number): { size: nu
 /**
  * Find an ISO BMFF box by type within a DataView.
  */
-export function findBox(view: DataView, type: string, start: number, end: number): { offset: number; size: number } | null {
+export function findBox(
+	view: DataView,
+	type: string,
+	start: number,
+	end: number,
+): { offset: number; size: number } | null {
 	let pos = start
 	while (pos < end - 8) {
 		const size = view.getUint32(pos)
@@ -76,7 +81,7 @@ export function parseSegment(file: Buffer): { view: DataView; mdatBodyStart: num
 
 /** Verify that the bytes at `pos` contain a valid GA94 identifier per ANSI-SCTE 128. */
 export function verifyGa94Identifier(view: DataView, pos: number): void {
-	equal(view.getUint8(pos), 0xB5, 'country code should be 0xB5')
+	equal(view.getUint8(pos), 0xb5, 'country code should be 0xB5')
 	equal(view.getUint16(pos + 1), 0x0031, 'provider code should be 0x0031')
 	equal(view.getUint32(pos + 3), 0x47413934, 'user identifier should be GA94')
 	equal(view.getUint8(pos + 7), 0x03, 'user data type code should be 0x03')

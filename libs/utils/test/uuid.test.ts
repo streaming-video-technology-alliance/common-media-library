@@ -27,8 +27,7 @@ describe('UUID generation', () => {
 			const fallback = uuid()
 			equal(regex.test(fallback), true)
 			equal(fallback === uuid(), false)
-		}
-		finally {
+		} finally {
 			Reflect.deleteProperty(crypto, 'randomUUID')
 		}
 	})

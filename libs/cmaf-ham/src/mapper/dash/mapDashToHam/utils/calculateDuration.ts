@@ -9,10 +9,7 @@
  * @param timescale - Timescale of the segment
  * @returns Segment duration
  */
-export function calculateDuration(
-	duration: string | undefined,
-	timescale: string | undefined,
-): number {
+export function calculateDuration(duration: string | undefined, timescale: string | undefined): number {
 	if (!duration || !timescale) {
 		return 1
 	}

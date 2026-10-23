@@ -22,12 +22,13 @@ const SEARCH_ITERATIONS = 80
 export function createBolaScoreModel(bandwidths: readonly number[], bufferTarget: number): BolaScoreModel {
 	const distinct = [...new Set(bandwidths)]
 	const bufferTime = Math.max(bufferTarget, MINIMUM_BUFFER + MINIMUM_BUFFER_PER_RUNG * distinct.length)
-	const utilities = distinct.map((bandwidth) => Math.log(bandwidth / distinct[0]))
+	const utilities = distinct.map(bandwidth => Math.log(bandwidth / distinct[0]))
 	const scale = (bufferTime - MINIMUM_BUFFER) / utilities[utilities.length - 1]
 	const gamma = MINIMUM_BUFFER / scale
 
 	const model: BolaScoreModel = {
-		score: (position, effectiveBuffer) => (scale * (utilities[position] + gamma) - effectiveBuffer) / distinct[position],
+		score: (position, effectiveBuffer) =>
+			(scale * (utilities[position] + gamma) - effectiveBuffer) / distinct[position],
 
 		best(effectiveBuffer) {
 			let best = 0
@@ -45,7 +46,7 @@ export function createBolaScoreModel(bandwidths: readonly number[], bufferTarget
 			return best
 		},
 
-		scoreZeroLevel: (position) => scale * (utilities[position] + gamma),
+		scoreZeroLevel: position => scale * (utilities[position] + gamma),
 	}
 
 	return model

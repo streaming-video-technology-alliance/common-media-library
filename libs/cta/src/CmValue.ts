@@ -20,4 +20,4 @@ export type CmValue =
 	| symbol
 	| SfToken
 	| SfItem
-	| SfItem[];
+	| SfItem[]

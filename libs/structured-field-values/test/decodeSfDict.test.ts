@@ -24,10 +24,13 @@ describe('decodeSfDict', () => {
 	})
 
 	it('handles invalid input', () => {
-		assert.throws(() => decodeSfDict(`a=1, b=2)`), (error: any) => {
-			assert.deepStrictEqual(error.message, `failed to parse "a=1, b=2)" as Dict`)
-			assert.deepStrictEqual(error.cause.message, `failed to parse ")" as Dict`)
-			return true
-		})
+		assert.throws(
+			() => decodeSfDict(`a=1, b=2)`),
+			(error: any) => {
+				assert.deepStrictEqual(error.message, `failed to parse "a=1, b=2)" as Dict`)
+				assert.deepStrictEqual(error.cause.message, `failed to parse ")" as Dict`)
+				return true
+			},
+		)
 	})
 })

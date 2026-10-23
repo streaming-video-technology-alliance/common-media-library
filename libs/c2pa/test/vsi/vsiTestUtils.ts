@@ -4,7 +4,16 @@ import { Encoder } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { buildSigStructure } from '../../src/cose/buildSigStructure.ts'
 import { bytesToHex, JUMBF_UUID } from '../../src/utils.ts'
-import { buildBox, buildInitMediaBoxes, buildJumb, buildMediaContent, buildUuidBox, concatBytes, sha256, signatureUri } from '../merkle/merkleTestUtils.ts'
+import {
+	buildBox,
+	buildInitMediaBoxes,
+	buildJumb,
+	buildMediaContent,
+	buildUuidBox,
+	concatBytes,
+	sha256,
+	signatureUri,
+} from '../merkle/merkleTestUtils.ts'
 import type { TestSigner } from '../testSigner.ts'
 
 const TEXT_ENCODER = new TextEncoder()
@@ -71,7 +80,12 @@ export type TestSessionKeyEntry = {
 
 // COSE_Sign1_Tagged (RFC 9052 §4.2) with an ES256 protected header, signed over `payload`.
 // The structure contains `embeddedPayload`. A detached payload is nil in the structure.
-async function signCoseSign1(privateKey: CryptoKey, unprotectedHeader: ReadonlyMap<number, unknown>, payload: Uint8Array, embeddedPayload: Uint8Array | null): Promise<Tag> {
+async function signCoseSign1(
+	privateKey: CryptoKey,
+	unprotectedHeader: ReadonlyMap<number, unknown>,
+	payload: Uint8Array,
+	embeddedPayload: Uint8Array | null,
+): Promise<Tag> {
 	const toBeSigned = buildSigStructure(ES256_PROTECTED_HEADER, payload) as Uint8Array<ArrayBuffer>
 	const signature = new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, toBeSigned))
 	return new Tag([ES256_PROTECTED_HEADER, unprotectedHeader, embeddedPayload, signature], CBOR_TAG_COSE_SIGN1)
@@ -104,19 +118,34 @@ export async function createTestSessionKey(kid: string): Promise<TestSessionKey>
  * Encodes a `signerBinding` (§18.25.2): a COSE_Sign1_Tagged signed with the session key over `payload`.
  * The structure contains `embeddedPayload` as its payload. The payload is detached (nil) if `embeddedPayload` is `null`.
  */
-export async function encodeSignerBinding(key: TestSessionKey, payload: Uint8Array, embeddedPayload: Uint8Array | null = null): Promise<Uint8Array> {
+export async function encodeSignerBinding(
+	key: TestSessionKey,
+	payload: Uint8Array,
+	embeddedPayload: Uint8Array | null = null,
+): Promise<Uint8Array> {
 	return Uint8Array.from(CBOR.encode(await signCoseSign1(key.privateKey, new Map(), payload, embeddedPayload)))
 }
 
 // The signerBinding is a COSE_Sign1 over the end-entity certificate of the signer (§18.25.2).
 // The payload is detached, unless the entry sets `signerBindingPayload`.
-async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: Uint8Array): Promise<Record<string, unknown>> {
+async function buildSessionKeyData(
+	entry: TestSessionKeyEntry,
+	certificateDER: Uint8Array,
+): Promise<Record<string, unknown>> {
 	const data: Record<string, unknown> = {
 		key: entry.key.coseKey,
 		minSequenceNumber: entry.minSequenceNumber,
-		createdAt: entry.createdAtTag === null ? entry.createdAt : new Tag(entry.createdAt, entry.createdAtTag ?? CBOR_TAG_DATE_TIME),
+		createdAt:
+			entry.createdAtTag === null
+				? entry.createdAt
+				: new Tag(entry.createdAt, entry.createdAtTag ?? CBOR_TAG_DATE_TIME),
 		validityPeriod: entry.validityPeriod,
-		signerBinding: await signCoseSign1(entry.key.privateKey, new Map(), certificateDER, entry.signerBindingPayload ?? null),
+		signerBinding: await signCoseSign1(
+			entry.key.privateKey,
+			new Map(),
+			certificateDER,
+			entry.signerBindingPayload ?? null,
+		),
 		...(entry.topLevelKid && { kid: entry.topLevelKid }),
 		...entry.fields,
 	}
@@ -128,9 +157,17 @@ async function buildSessionKeyData(entry: TestSessionKeyEntry, certificateDER: U
 // Encodes plain objects and arrays with indefinite lengths. Each ends with the break code (RFC 8949 section 3.2.2).
 // cbor-x does not decode byte strings or text strings of indefinite length.
 function encodeIndefiniteLengths(value: unknown): Uint8Array {
-	if (Array.isArray(value)) return concatBytes(Uint8Array.of(CBOR_ARRAY_INDEFINITE), ...value.map(encodeIndefiniteLengths), Uint8Array.of(CBOR_BREAK))
+	if (Array.isArray(value))
+		return concatBytes(
+			Uint8Array.of(CBOR_ARRAY_INDEFINITE),
+			...value.map(encodeIndefiniteLengths),
+			Uint8Array.of(CBOR_BREAK),
+		)
 	if (typeof value === 'object' && value !== null && Object.getPrototypeOf(value) === Object.prototype) {
-		const entries = Object.entries(value).flatMap(([key, item]) => [Uint8Array.from(CBOR.encode(key)), encodeIndefiniteLengths(item)])
+		const entries = Object.entries(value).flatMap(([key, item]) => [
+			Uint8Array.from(CBOR.encode(key)),
+			encodeIndefiniteLengths(item),
+		])
 		return concatBytes(Uint8Array.of(CBOR_MAP_INDEFINITE), ...entries, Uint8Array.of(CBOR_BREAK))
 	}
 	return Uint8Array.from(CBOR.encode(value))
@@ -145,7 +182,10 @@ export type TestAssertion =
  * Builds an init segment with a manifest store that holds the given manifest JUMBF box.
  * `mediaBoxes` are the boxes before the manifest store.
  */
-export function buildInitSegmentWithManifest(manifest: Uint8Array, mediaBoxes: Uint8Array = buildInitMediaBoxes()): Uint8Array {
+export function buildInitSegmentWithManifest(
+	manifest: Uint8Array,
+	mediaBoxes: Uint8Array = buildInitMediaBoxes(),
+): Uint8Array {
 	const purpose = TEXT_ENCODER.encode('manifest')
 	const prefix = new Uint8Array(4 + purpose.length + 1 + 8) // fullbox header + purpose\0 + aux offset
 	prefix.set(purpose, 4)
@@ -157,18 +197,32 @@ export function buildInitSegmentWithManifest(manifest: Uint8Array, mediaBoxes: U
  * The claim references every assertion and is signed by `signer`.
  * `mediaBoxes` are the boxes before the manifest store.
  */
-export async function buildSignedInitSegment(signer: TestSigner, assertions: readonly TestAssertion[], mediaBoxes: Uint8Array = buildInitMediaBoxes()): Promise<Uint8Array> {
-	const assertionBoxes = assertions.map(assertion => buildJumb(assertion.label, 'json' in assertion ? buildBox('json', assertion.json) : buildBox('cbor', assertion.cbor)))
-	const claimCborBytes = Uint8Array.from(CBOR.encode({
-		instanceID: MANIFEST_ID,
-		signature: signatureUri(MANIFEST_ID),
-		created_assertions: await Promise.all(assertionBoxes.map(async (box, index) => ({
-			url: `self#jumbf=c2pa.assertions/${assertions[index].label}`,
-			hash: await sha256(box.subarray(8)),
-			alg: 'sha256',
-		}))),
-	}))
-	const manifest = buildJumb(MANIFEST_ID,
+export async function buildSignedInitSegment(
+	signer: TestSigner,
+	assertions: readonly TestAssertion[],
+	mediaBoxes: Uint8Array = buildInitMediaBoxes(),
+): Promise<Uint8Array> {
+	const assertionBoxes = assertions.map(assertion =>
+		buildJumb(
+			assertion.label,
+			'json' in assertion ? buildBox('json', assertion.json) : buildBox('cbor', assertion.cbor),
+		),
+	)
+	const claimCborBytes = Uint8Array.from(
+		CBOR.encode({
+			instanceID: MANIFEST_ID,
+			signature: signatureUri(MANIFEST_ID),
+			created_assertions: await Promise.all(
+				assertionBoxes.map(async (box, index) => ({
+					url: `self#jumbf=c2pa.assertions/${assertions[index].label}`,
+					hash: await sha256(box.subarray(8)),
+					alg: 'sha256',
+				})),
+			),
+		}),
+	)
+	const manifest = buildJumb(
+		MANIFEST_ID,
 		buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes)),
 		buildJumb('c2pa.assertions', ...assertionBoxes),
 		buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claimCborBytes))),
@@ -182,7 +236,10 @@ export async function buildSignedInitSegment(signer: TestSigner, assertions: rea
  */
 export async function buildInitBmffHashAssertion(): Promise<TestAssertion> {
 	const hash = await computeBmffHash(buildInitMediaBoxes(), { offsetPrefixSize: 8 })
-	return { label: BMFF_HASH_LABEL, cbor: Uint8Array.from(CBOR.encode({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })) }
+	return {
+		label: BMFF_HASH_LABEL,
+		cbor: Uint8Array.from(CBOR.encode({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })),
+	}
 }
 
 /**
@@ -191,39 +248,61 @@ export async function buildInitBmffHashAssertion(): Promise<TestAssertion> {
  * both assertions and is signed by `signer`. If `indefiniteLengths` is `true`, the session keys
  * assertion encodes its maps and arrays with indefinite lengths. The COSE keys and signer bindings keep definite lengths.
  */
-export async function buildSessionKeysInitSegment(signer: TestSigner, entries: readonly TestSessionKeyEntry[], indefiniteLengths: boolean = false): Promise<Uint8Array> {
-	return buildSignedInitSegment(signer, [await buildInitBmffHashAssertion(), await buildSessionKeysAssertion(signer, entries, indefiniteLengths)])
+export async function buildSessionKeysInitSegment(
+	signer: TestSigner,
+	entries: readonly TestSessionKeyEntry[],
+	indefiniteLengths: boolean = false,
+): Promise<Uint8Array> {
+	return buildSignedInitSegment(signer, [
+		await buildInitBmffHashAssertion(),
+		await buildSessionKeysAssertion(signer, entries, indefiniteLengths),
+	])
 }
 
 /** Builds a `c2pa.session-keys` assertion (§18.25) with the given keys, bound to the certificate of `signer`. */
-export async function buildSessionKeysAssertion(signer: TestSigner, entries: readonly TestSessionKeyEntry[], indefiniteLengths: boolean = false): Promise<TestAssertion> {
+export async function buildSessionKeysAssertion(
+	signer: TestSigner,
+	entries: readonly TestSessionKeyEntry[],
+	indefiniteLengths: boolean = false,
+): Promise<TestAssertion> {
 	const keys = await Promise.all(entries.map(entry => buildSessionKeyData(entry, signer.certificateDER)))
 	const cbor = indefiniteLengths ? encodeIndefiniteLengths({ keys }) : Uint8Array.from(CBOR.encode({ keys }))
 	return { label: SESSION_KEYS_LABEL, cbor }
 }
 
 // VSI emsg box (§19.4.2) whose message data is a verifiable-segment-info signed with `key`.
-async function buildVsiEmsgBox(key: TestSessionKey, sequenceNumber: number | bigint, hash: Uint8Array): Promise<Uint8Array> {
+async function buildVsiEmsgBox(
+	key: TestSessionKey,
+	sequenceNumber: number | bigint,
+	hash: Uint8Array,
+): Promise<Uint8Array> {
 	const segmentInfoMap = {
 		sequenceNumber,
 		bmffHash: { exclusions: VSI_EXCLUSIONS, alg: 'sha256', hash },
 		manifestId: MANIFEST_ID,
 	}
 	const segmentInfoBytes = Uint8Array.from(CBOR.encode(segmentInfoMap))
-	const verifiableSegmentInfo = await signCoseSign1(key.privateKey, new Map([[COSE_HEADER_KID, key.kid]]), segmentInfoBytes, segmentInfoBytes)
-	return new Uint8Array(writeEmsg({
-		type: 'emsg',
-		version: 0,
-		flags: 0,
-		schemeIdUri: VSI_SCHEME_ID_URI,
-		value: 'fseg',
-		timescale: 1000,
-		presentationTimeDelta: 0,
-		eventDuration: 2000,
-		// The emsg version 0 id field has 32 bits.
-		id: Number(sequenceNumber) % 2 ** 32,
-		messageData: Uint8Array.from(CBOR.encode(verifiableSegmentInfo)),
-	}).buffer)
+	const verifiableSegmentInfo = await signCoseSign1(
+		key.privateKey,
+		new Map([[COSE_HEADER_KID, key.kid]]),
+		segmentInfoBytes,
+		segmentInfoBytes,
+	)
+	return new Uint8Array(
+		writeEmsg({
+			type: 'emsg',
+			version: 0,
+			flags: 0,
+			schemeIdUri: VSI_SCHEME_ID_URI,
+			value: 'fseg',
+			timescale: 1000,
+			presentationTimeDelta: 0,
+			eventDuration: 2000,
+			// The emsg version 0 id field has 32 bits.
+			id: Number(sequenceNumber) % 2 ** 32,
+			messageData: Uint8Array.from(CBOR.encode(verifiableSegmentInfo)),
+		}).buffer,
+	)
 }
 
 /**
@@ -235,6 +314,9 @@ export async function buildVsiSegment(key: TestSessionKey, sequenceNumber: numbe
 	const media = buildMediaContent(Number(sequenceNumber))
 	// The emsg box has the same size for every hash value, so a placeholder gives the final media box offsets.
 	const placeholder = await buildVsiEmsgBox(key, sequenceNumber, new Uint8Array(SHA256_BYTES))
-	const hash = await computeBmffHash(concatBytes(placeholder, media), { exclusions: VSI_EXCLUSIONS, offsetPrefixSize: 8 })
+	const hash = await computeBmffHash(concatBytes(placeholder, media), {
+		exclusions: VSI_EXCLUSIONS,
+		offsetPrefixSize: 8,
+	})
 	return concatBytes(await buildVsiEmsgBox(key, sequenceNumber, hash), media)
 }

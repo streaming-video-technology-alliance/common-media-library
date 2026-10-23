@@ -15,7 +15,7 @@ export type BolaSelectorOptions = {
 	 *
 	 * @defaultValue `DEFAULT_SAFETY_FACTOR`
 	 */
-	safetyFactor?: number;
+	safetyFactor?: number
 
 	/**
 	 * The fraction of the throughput that the starvation guard assumes for the download of the next segment.
@@ -25,5 +25,5 @@ export type BolaSelectorOptions = {
 	 *
 	 * @defaultValue `DEFAULT_STARVATION_SAFETY_FACTOR`
 	 */
-	starvationSafetyFactor?: number;
-};
+	starvationSafetyFactor?: number
+}

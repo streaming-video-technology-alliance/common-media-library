@@ -14,8 +14,8 @@ import type { WebVttRegion } from './WebVttRegion.ts'
 import type { WebVttRegionFactory } from './WebVttRegionFactory.ts'
 
 const BAD_SIGNATURE = 'Malformed WebVTT signature.'
-const createCue = (): WebVttCue => typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : createWebVttCue()
-const createRegion = (): WebVttRegion => typeof VTTRegion !== 'undefined' ? new VTTRegion() : createWebVttRegion()
+const createCue = (): WebVttCue => (typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : createWebVttCue())
+const createRegion = (): WebVttRegion => (typeof VTTRegion !== 'undefined' ? new VTTRegion() : createWebVttRegion())
 
 /**
  * A WebVTT parser.
@@ -121,16 +121,21 @@ export class WebVttParser {
 		const parseTimestampMap = (input: string): void => {
 			const settings = new Settings()
 
-			parseOptions(input, (k: string, v: string): void => {
-				switch (k) {
-					case 'MPEGT':
-						settings.integer(k + 'S', v)
-						break
-					case 'LOCA':
-						settings.set(k + 'L', parseTimeStamp(v))
-						break
-				}
-			}, /[^\d]:/, /,/)
+			parseOptions(
+				input,
+				(k: string, v: string): void => {
+					switch (k) {
+						case 'MPEGT':
+							settings.integer(k + 'S', v)
+							break
+						case 'LOCA':
+							settings.set(k + 'L', parseTimeStamp(v))
+							break
+					}
+				},
+				/[^\d]:/,
+				/,/,
+			)
 
 			this.ontimestampmap?.({
 				'MPEGTS': settings.get('MPEGTS'),
@@ -142,13 +147,17 @@ export class WebVttParser {
 		const parseHeader = (input: string): void => {
 			if (input.match(/X-TIMESTAMP-MAP/)) {
 				// This line contains HLS X-TIMESTAMP-MAP metadata
-				parseOptions(input, (k: string, v: string): void => {
-					switch (k) {
-						case 'X-TIMESTAMP-MAP':
-							parseTimestampMap(v)
-							break
-					}
-				}, /=/)
+				parseOptions(
+					input,
+					(k: string, v: string): void => {
+						switch (k) {
+							case 'X-TIMESTAMP-MAP':
+								parseTimestampMap(v)
+								break
+						}
+					},
+					/=/,
+				)
 			}
 		}
 
@@ -165,7 +174,7 @@ export class WebVttParser {
 				line = collectNextLine()
 
 				// Remove the UTF-8 BOM if it exists.
-				if (line.charCodeAt(0) === 0xFEFF) {
+				if (line.charCodeAt(0) === 0xfeff) {
 					line = line.slice(1)
 				}
 
@@ -193,8 +202,7 @@ export class WebVttParser {
 
 				if (!alreadyCollectedLine) {
 					line = collectNextLine()
-				}
-				else {
+				} else {
 					alreadyCollectedLine = false
 				}
 
@@ -203,8 +211,7 @@ export class WebVttParser {
 						// 13-18 - Allow a header (metadata) under the WEBVTT line.
 						if (/:/.test(line)) {
 							parseHeader(line)
-						}
-						else if (!line) {
+						} else if (!line) {
 							// An empty line terminates the header and blocks section.
 							this.state = WebVttParserState.BLOCKS
 						}
@@ -243,39 +250,44 @@ export class WebVttParser {
 						const regionSettings = this.regionSettings
 
 						// parse region options and set it as appropriate on the region
-						parseOptions(line, (k, v) => {
-							switch (k) {
-								case 'id':
-									regionSettings.set(k, v)
-									break
-								case 'width':
-									regionSettings.percent(k, v)
-									break
-								case 'lines':
-									regionSettings.integer(k, v)
-									break
-								case 'regionanchor':
-								case 'viewportanchor':
-									const xy = v.split(',')
-									if (xy.length !== 2) {
+						parseOptions(
+							line,
+							(k, v) => {
+								switch (k) {
+									case 'id':
+										regionSettings.set(k, v)
 										break
-									}
-									// We have to make sure both x and y parse, so use a temporary
-									// settings object here.
-									const anchor = new Settings()
-									anchor.percent('x', xy[0])
-									anchor.percent('y', xy[1])
-									if (!anchor.has('x') || !anchor.has('y')) {
+									case 'width':
+										regionSettings.percent(k, v)
 										break
-									}
-									regionSettings.set(k + 'X', anchor.get('x'))
-									regionSettings.set(k + 'Y', anchor.get('y'))
-									break
-								case 'scroll':
-									regionSettings.alt(k, v, ['up'])
-									break
-							}
-						}, /:/, /\s/)
+									case 'lines':
+										regionSettings.integer(k, v)
+										break
+									case 'regionanchor':
+									case 'viewportanchor':
+										const xy = v.split(',')
+										if (xy.length !== 2) {
+											break
+										}
+										// We have to make sure both x and y parse, so use a temporary
+										// settings object here.
+										const anchor = new Settings()
+										anchor.percent('x', xy[0])
+										anchor.percent('y', xy[1])
+										if (!anchor.has('x') || !anchor.has('y')) {
+											break
+										}
+										regionSettings.set(k + 'X', anchor.get('x'))
+										regionSettings.set(k + 'Y', anchor.get('y'))
+										break
+									case 'scroll':
+										regionSettings.alt(k, v, ['up'])
+										break
+								}
+							},
+							/:/,
+							/\s/,
+						)
 						continue
 
 					case WebVttParserState.STYLE:
@@ -350,8 +362,7 @@ export class WebVttParser {
 						try {
 							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							parseCue(line, this.cue!, this.regionList)
-						}
-						catch (e) {
+						} catch (e) {
 							this.reportOrThrowError(e)
 							// In case of an error ignore rest of the cue.
 							this.cue = null
@@ -368,7 +379,7 @@ export class WebVttParser {
 						// 35 - If we have the special substring '-->' then report the cue,
 						// but do not collect the line as we need to process the current
 						// one as a new cue.
-						if (!line || hasSubstring && (alreadyCollectedLine = true)) {
+						if (!line || (hasSubstring && (alreadyCollectedLine = true))) {
 							// We are done parsing this cue.
 							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							this.oncue?.(this.cue!)
@@ -391,8 +402,7 @@ export class WebVttParser {
 						continue
 				}
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			this.reportOrThrowError(e)
 
 			// If we are currently parsing a cue, report what we have.
@@ -429,8 +439,7 @@ export class WebVttParser {
 			if (this.state === WebVttParserState.INITIAL) {
 				throw new WebVttParsingError(BAD_SIGNATURE)
 			}
-		}
-		catch (e) {
+		} catch (e) {
 			this.reportOrThrowError(e)
 		}
 
@@ -444,8 +453,7 @@ export class WebVttParser {
 	private reportOrThrowError(error: any): void {
 		if (error instanceof WebVttParsingError) {
 			this.onparsingerror?.(error)
-		}
-		else {
+		} else {
 			throw error
 		}
 	}

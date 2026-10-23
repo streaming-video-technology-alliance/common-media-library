@@ -27,18 +27,12 @@ import { validateTrack } from './validateTrack.ts'
  * @alpha
  *
  */
-export function validateTracks(
-	tracks: Track[],
-	switchingSetId?: string,
-	prevValidation?: Validation,
-): Validation {
+export function validateTracks(tracks: Track[], switchingSetId?: string, prevValidation?: Validation): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = switchingSetId
-		? ` in the switching set with id = ${switchingSetId}`
-		: '.'
+	const moreInformation = switchingSetId ? ` in the switching set with id = ${switchingSetId}` : '.'
 	let tracksDuration: number
 
 	tracks.forEach((track: Track) => {
@@ -47,9 +41,7 @@ export function validateTracks(
 		}
 		if (tracksDuration !== track.duration) {
 			validation.status = false
-			validation.errorMessages.push(
-				`All the tracks must have the same duration${moreInformation}`,
-			)
+			validation.errorMessages.push(`All the tracks must have the same duration${moreInformation}`)
 		}
 		validateTrack(track, switchingSetId, validation)
 	})

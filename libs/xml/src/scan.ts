@@ -2,27 +2,27 @@ import { unescapeHtml } from '@svta/cml-utils'
 import type { XmlBuilder } from './XmlBuilder.ts'
 
 // Character codes
-const OPEN_BRACKET_CC = 60            // '<'
-const CLOSE_BRACKET_CC = 62           // '>'
-const MINUS_CC = 45                   // '-'
-const SLASH_CC = 47                   // '/'
-const QUESTION_CC = 63                // '?'
-const EXCLAMATION_CC = 33             // '!'
-const SINGLE_QUOTE_CC = 39            // "'"
-const DOUBLE_QUOTE_CC = 34            // '"'
-const OPEN_CORNER_BRACKET_CC = 91     // '['
-const CLOSE_CORNER_BRACKET_CC = 93    // ']'
-const AMPERSAND_CC = 38               // '&'
-const EQUALS_CC = 61                  // '='
-const COLON_CC = 58                   // ':'
-const SPACE_CC = 32                   // ' '
-const TAB_CC = 9                      // '\t'
-const CR_CC = 13                      // '\r'
-const LF_CC = 10                      // '\n'
-const UPPER_A_CC = 65                 // 'A'
-const UPPER_Z_CC = 90                 // 'Z'
-const LOWER_A_CC = 97                 // 'a'
-const LOWER_Z_CC = 122                // 'z'
+const OPEN_BRACKET_CC = 60 // '<'
+const CLOSE_BRACKET_CC = 62 // '>'
+const MINUS_CC = 45 // '-'
+const SLASH_CC = 47 // '/'
+const QUESTION_CC = 63 // '?'
+const EXCLAMATION_CC = 33 // '!'
+const SINGLE_QUOTE_CC = 39 // "'"
+const DOUBLE_QUOTE_CC = 34 // '"'
+const OPEN_CORNER_BRACKET_CC = 91 // '['
+const CLOSE_CORNER_BRACKET_CC = 93 // ']'
+const AMPERSAND_CC = 38 // '&'
+const EQUALS_CC = 61 // '='
+const COLON_CC = 58 // ':'
+const SPACE_CC = 32 // ' '
+const TAB_CC = 9 // '\t'
+const CR_CC = 13 // '\r'
+const LF_CC = 10 // '\n'
+const UPPER_A_CC = 65 // 'A'
+const UPPER_Z_CC = 90 // 'Z'
+const LOWER_A_CC = 97 // 'a'
+const LOWER_Z_CC = 122 // 'z'
 
 /**
  * Creates an error that reports the line and column of `pos`
@@ -30,9 +30,13 @@ const LOWER_Z_CC = 122                // 'z'
 function syntaxError(input: string, pos: number, message: string): Error {
 	const parsedText = input.substring(0, pos).split('\n')
 	return new Error(
-		message + '\nLine: ' + (parsedText.length - 1) +
-		'\nColumn: ' + (parsedText[parsedText.length - 1].length + 1) +
-		'\nChar: ' + (pos < input.length ? input[pos] : 'end of input'),
+		message +
+			'\nLine: ' +
+			(parsedText.length - 1) +
+			'\nColumn: ' +
+			(parsedText[parsedText.length - 1].length + 1) +
+			'\nChar: ' +
+			(pos < input.length ? input[pos] : 'end of input'),
 	)
 }
 
@@ -48,7 +52,14 @@ function syntaxError(input: string, pos: number, message: string): Error {
  * @param stack - The open-element stack, containing the document
  * @param names - The tag names of the open elements, containing `''` for the document
  */
-export function scan<T>(input: string, start: number, keepWhitespace: boolean, builder: XmlBuilder<T>, stack: T[], names: string[]): void {
+export function scan<T>(
+	input: string,
+	start: number,
+	keepWhitespace: boolean,
+	builder: XmlBuilder<T>,
+	stack: T[],
+	names: string[],
+): void {
 	const createElement = builder.createElement
 	const appendChild = builder.appendChild
 	const appendText = builder.appendText
@@ -100,10 +111,15 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, b
 			const closeStart = pos + 2
 			const nameEnd = closeStart + currentName.length
 			const afterName = nameEnd < length ? input.charCodeAt(nameEnd) : 0
-			const closesTag = input.startsWith(currentName, closeStart) && (
-				nameEnd >= length ||
-				(currentName !== '' && (afterName === CLOSE_BRACKET_CC || afterName === SPACE_CC || afterName === TAB_CC || afterName === CR_CC || afterName === LF_CC))
-			)
+			const closesTag =
+				input.startsWith(currentName, closeStart) &&
+				(nameEnd >= length ||
+					(currentName !== '' &&
+						(afterName === CLOSE_BRACKET_CC ||
+							afterName === SPACE_CC ||
+							afterName === TAB_CC ||
+							afterName === CR_CC ||
+							afterName === LF_CC)))
 			const end = input.indexOf('>', closeStart)
 			pos = end === -1 ? length : end
 			if (!closesTag) {
@@ -146,7 +162,12 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, b
 				continue
 			}
 
-			if (third === OPEN_CORNER_BRACKET_CC && pos + 8 < length && input.charCodeAt(pos + 8) === OPEN_CORNER_BRACKET_CC && input.startsWith('CDATA', pos + 3)) {
+			if (
+				third === OPEN_CORNER_BRACKET_CC &&
+				pos + 8 < length &&
+				input.charCodeAt(pos + 8) === OPEN_CORNER_BRACKET_CC &&
+				input.startsWith('CDATA', pos + 3)
+			) {
 				// CDATA section, up to the first ']]>'
 				const end = input.indexOf(']]>', pos + 9)
 				if (appendCdata !== undefined) {
@@ -167,8 +188,7 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, b
 				}
 				if (cc === OPEN_CORNER_BRACKET_CC) {
 					bracketed = true
-				}
-				else if (bracketed && cc === CLOSE_CORNER_BRACKET_CC) {
+				} else if (bracketed && cc === CLOSE_CORNER_BRACKET_CC) {
 					bracketed = false
 				}
 				pos++
@@ -184,7 +204,16 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, b
 		const nameStart = ++pos
 		let colon = -1
 		cc = pos < length ? input.charCodeAt(pos) : 0
-		while (pos < length && cc !== SPACE_CC && cc !== CLOSE_BRACKET_CC && cc !== SLASH_CC && cc !== EQUALS_CC && cc !== LF_CC && cc !== CR_CC && cc !== TAB_CC) {
+		while (
+			pos < length &&
+			cc !== SPACE_CC &&
+			cc !== CLOSE_BRACKET_CC &&
+			cc !== SLASH_CC &&
+			cc !== EQUALS_CC &&
+			cc !== LF_CC &&
+			cc !== CR_CC &&
+			cc !== TAB_CC
+		) {
 			if (cc === COLON_CC && colon === -1) {
 				colon = pos
 			}
@@ -199,7 +228,16 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, b
 			if ((cc >= UPPER_A_CC && cc <= UPPER_Z_CC) || (cc >= LOWER_A_CC && cc <= LOWER_Z_CC)) {
 				const attributeStart = pos
 				cc = ++pos < length ? input.charCodeAt(pos) : 0
-				while (pos < length && cc !== SPACE_CC && cc !== CLOSE_BRACKET_CC && cc !== SLASH_CC && cc !== EQUALS_CC && cc !== LF_CC && cc !== CR_CC && cc !== TAB_CC) {
+				while (
+					pos < length &&
+					cc !== SPACE_CC &&
+					cc !== CLOSE_BRACKET_CC &&
+					cc !== SLASH_CC &&
+					cc !== EQUALS_CC &&
+					cc !== LF_CC &&
+					cc !== CR_CC &&
+					cc !== TAB_CC
+				) {
 					cc = ++pos < length ? input.charCodeAt(pos) : 0
 				}
 				const attributeName = input.slice(attributeStart, pos)
@@ -219,7 +257,11 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, b
 						cc = ++pos < length ? input.charCodeAt(pos) : 0
 					}
 					if (cc !== SINGLE_QUOTE_CC && cc !== DOUBLE_QUOTE_CC) {
-						throw syntaxError(input, pos, 'Malformed attribute "' + attributeName + '": expected quoted value after "="')
+						throw syntaxError(
+							input,
+							pos,
+							'Malformed attribute "' + attributeName + '": expected quoted value after "="',
+						)
 					}
 				}
 
@@ -259,8 +301,7 @@ export function scan<T>(input: string, start: number, keepWhitespace: boolean, b
 			if (appendChild !== undefined) {
 				appendChild(current, element)
 			}
-		}
-		else {
+		} else {
 			stack.push(element)
 			names.push(name)
 			current = element

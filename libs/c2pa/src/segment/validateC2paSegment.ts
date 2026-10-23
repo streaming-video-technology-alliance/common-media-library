@@ -13,7 +13,10 @@ import { resolveImportAlgorithm } from '../cose/resolveImportAlgorithm.ts'
 import { bytesToHex, isKeyExpired } from '../utils.ts'
 import type { SegmentValidationResult } from './SegmentValidation.ts'
 
-function findSessionKey(sessionKeys: readonly ValidatedSessionKey[], kidHex: string | null): ValidatedSessionKey | null {
+function findSessionKey(
+	sessionKeys: readonly ValidatedSessionKey[],
+	kidHex: string | null,
+): ValidatedSessionKey | null {
 	if (!kidHex || sessionKeys.length === 0) return null
 	return sessionKeys.find(k => k.kid === kidHex) ?? null
 }
@@ -89,13 +92,7 @@ export async function validateC2paSegment(
 	}
 
 	const algorithm = resolveImportAlgorithm(sessionKey.jwk)
-	const publicKey = await crypto.subtle.importKey(
-		'jwk',
-		sessionKey.jwk as JsonWebKey,
-		algorithm,
-		false,
-		['verify'],
-	)
+	const publicKey = await crypto.subtle.importKey('jwk', sessionKey.jwk as JsonWebKey, algorithm, false, ['verify'])
 
 	const [signatureValid, hashValid] = await Promise.all([
 		verifyCoseSign1(coseSign1, payload, publicKey),

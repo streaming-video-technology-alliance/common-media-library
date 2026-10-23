@@ -33,4 +33,4 @@ export function readTkhd(view: IsoBoxReadView): TrackHeaderBox {
 		width: view.readTemplate(4),
 		height: view.readTemplate(4),
 	}
-};
+}

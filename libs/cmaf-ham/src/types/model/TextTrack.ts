@@ -5,4 +5,4 @@ import type { Track } from './Track.ts'
  *
  * @alpha
  */
-export type TextTrack = Track;
+export type TextTrack = Track

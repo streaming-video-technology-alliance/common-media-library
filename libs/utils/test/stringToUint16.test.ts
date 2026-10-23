@@ -14,7 +14,10 @@ describe('stringToUint16', () => {
 	it('handles special characters', () => {
 		const str = '!@#$%^&*()_+{}|:"<>? 😀🚀🌟'
 
-		const result = new Uint16Array([33, 64, 35, 36, 37, 94, 38, 42, 40, 41, 95, 43, 123, 125, 124, 58, 34, 60, 62, 63, 32, 55357, 56832, 55357, 56960, 55356, 57119])
+		const result = new Uint16Array([
+			33, 64, 35, 36, 37, 94, 38, 42, 40, 41, 95, 43, 123, 125, 124, 58, 34, 60, 62, 63, 32, 55357, 56832, 55357, 56960,
+			55356, 57119,
+		])
 
 		deepEqual(stringToUint16(str), result)
 	})

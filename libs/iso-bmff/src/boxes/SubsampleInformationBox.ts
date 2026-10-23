@@ -7,7 +7,7 @@ import type { SubsampleEntry } from './SubsampleEntry.ts'
  * @public
  */
 export type SubsampleInformationBox = FullBox & {
-	type: 'subs';
-	entryCount: number;
-	entries: SubsampleEntry[];
-};
+	type: 'subs'
+	entryCount: number
+	entries: SubsampleEntry[]
+}

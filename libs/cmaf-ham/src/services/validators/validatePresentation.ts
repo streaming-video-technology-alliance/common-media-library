@@ -36,11 +36,7 @@ export function validatePresentation(presentation: Presentation): Validation {
 		validation.errorMessages.push('Presentation id is undefined')
 	}
 
-	validateSelectionSets(
-		presentation.selectionSets,
-		presentation.id,
-		validation,
-	)
+	validateSelectionSets(presentation.selectionSets, presentation.id, validation)
 
 	return validation
 }

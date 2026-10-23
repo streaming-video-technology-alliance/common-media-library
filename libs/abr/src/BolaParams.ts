@@ -9,30 +9,30 @@ export type BolaParams = {
 	/**
 	 * The distinct rungs. Equal neighbouring bandwidths merge into one rung.
 	 */
-	readonly rungs: readonly LadderRung[];
+	readonly rungs: readonly LadderRung[]
 
 	/**
 	 * The position in the player ladder of each distinct rung. The highest position of equal bandwidths wins.
 	 */
-	readonly positions: readonly number[];
+	readonly positions: readonly number[]
 
 	/**
 	 * The effective buffer, in seconds, at which each rung becomes the best choice.
 	 */
-	readonly thresholds: readonly number[];
+	readonly thresholds: readonly number[]
 
 	/**
 	 * The effective buffer, in seconds, at which the score of each rung reaches zero.
 	 */
-	readonly maximumBuffers: readonly number[];
+	readonly maximumBuffers: readonly number[]
 
 	/**
 	 * The weight of the utility in the score. The paper calls it V.
 	 */
-	readonly utilityScale: number;
+	readonly utilityScale: number
 
 	/**
 	 * The natural logarithm of the lowest bandwidth. The utility of a rung is its logarithm minus this value.
 	 */
-	readonly lowestBandwidthLog: number;
-};
+	readonly lowestBandwidthLog: number
+}

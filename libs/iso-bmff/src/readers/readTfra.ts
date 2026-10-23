@@ -17,14 +17,14 @@ export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox {
 	const reserved = view.readUint(4)
 
 	const lengthSizeOfTrafNum = (reserved & 0x00000030) >> 4
-	const lengthSizeOfTrunNum = (reserved & 0x0000000C) >> 2
-	const lengthSizeOfSampleNum = (reserved & 0x00000003)
+	const lengthSizeOfTrunNum = (reserved & 0x0000000c) >> 2
+	const lengthSizeOfSampleNum = reserved & 0x00000003
 
 	const numberOfEntry = view.readUint(4)
 
 	const entries = view.readEntries<TrackFragmentRandomAccessEntry>(numberOfEntry, () => ({
-		time: view.readUint((version === 1) ? 8 : 4),
-		moofOffset: view.readUint((version === 1) ? 8 : 4),
+		time: view.readUint(version === 1 ? 8 : 4),
+		moofOffset: view.readUint(version === 1 ? 8 : 4),
 		trafNumber: view.readUint(lengthSizeOfTrafNum + 1),
 		trunNumber: view.readUint(lengthSizeOfTrunNum + 1),
 		sampleNumber: view.readUint(lengthSizeOfSampleNum + 1),
@@ -42,4 +42,4 @@ export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox {
 		numberOfEntry,
 		entries,
 	}
-};
+}

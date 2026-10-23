@@ -4,17 +4,17 @@ import type { SfItem, SfToken } from '@svta/cml-structured-field-values'
  * The encoder exports the benchmark uses. A baseline build loaded from a path provides the same shape.
  */
 export type EncoderApi = {
-	encodeSfDict: (value: Record<string, any> | Map<string, any>, options?: { whitespace?: boolean }) => string;
-	encodeSfItem: (value: any, params?: Record<string, any>) => string;
-	encodeSfList: (value: any[], options?: { whitespace?: boolean }) => string;
-	SfItem: typeof SfItem;
-	SfToken: typeof SfToken;
-};
+	encodeSfDict: (value: Record<string, any> | Map<string, any>, options?: { whitespace?: boolean }) => string
+	encodeSfItem: (value: any, params?: Record<string, any>) => string
+	encodeSfList: (value: any[], options?: { whitespace?: boolean }) => string
+	SfItem: typeof SfItem
+	SfToken: typeof SfToken
+}
 
 export type Input = {
-	name: string;
-	call: () => string;
-};
+	name: string
+	call: () => string
+}
 
 const COMPACT = { whitespace: false }
 
@@ -42,11 +42,17 @@ export function makeInputs({ encodeSfDict, encodeSfItem, encodeSfList, SfItem, S
 		tb: 6000,
 		v: 2,
 	}
-	const cmcdItems = Object.fromEntries(Object.entries(cmcd).map(([key, value]) => [key, value instanceof SfItem ? value : new SfItem(value)]))
+	const cmcdItems = Object.fromEntries(
+		Object.entries(cmcd).map(([key, value]) => [key, value instanceof SfItem ? value : new SfItem(value)]),
+	)
 	const cmcdMap = new Map(Object.entries(cmcd))
 	const integers = Array.from({ length: 20 }, (_, i) => i * 1000 + 7)
 	const wideDict = Object.fromEntries(Array.from({ length: 100 }, (_, i) => [`k${i}`, i * 31]))
-	const urls = Array.from({ length: 10 }, (_, i) => `https://cdn.example.com/live/channel-${i}/video/1080p/segment_${String(i).padStart(6, '0')}.m4s?token=abcdef0123456789`)
+	const urls = Array.from(
+		{ length: 10 },
+		(_, i) =>
+			`https://cdn.example.com/live/channel-${i}/video/1080p/segment_${String(i).padStart(6, '0')}.m4s?token=abcdef0123456789`,
+	)
 	const escaped = Array.from({ length: 10 }, (_, i) => `say "hi" ${i} and \\ backslash \\ path "quoted" end`)
 	const decimals = Array.from({ length: 20 }, (_, i) => 1.2345 + i * 0.371)
 	const bytes = { b: new Uint8Array(32).map((_, i) => i * 7) }

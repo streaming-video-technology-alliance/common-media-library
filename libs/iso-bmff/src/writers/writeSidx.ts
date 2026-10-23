@@ -24,8 +24,16 @@ export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
 	const reservedSize = 2
 	const referenceCountSize = 2
 	const referencesSize = box.references.length * 12 // 3 x 4 bytes per reference
-	const totalSize = headerSize + fullBoxSize + referenceIdSize + timescaleSize +
-		earliestPresentationTimeSize + firstOffsetSize + reservedSize + referenceCountSize + referencesSize
+	const totalSize =
+		headerSize +
+		fullBoxSize +
+		referenceIdSize +
+		timescaleSize +
+		earliestPresentationTimeSize +
+		firstOffsetSize +
+		reservedSize +
+		referenceCountSize +
+		referencesSize
 
 	const writer = new IsoBoxWriteView('sidx', totalSize)
 	writer.writeFullBox(box.version, box.flags)
@@ -39,13 +47,13 @@ export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
 
 	for (const ref of box.references) {
 		// Pack referenceType (1 bit) + referencedSize (31 bits)
-		const reference = ((ref.referenceType & 0x1) << 31) | (ref.referencedSize & 0x7FFFFFFF)
+		const reference = ((ref.referenceType & 0x1) << 31) | (ref.referencedSize & 0x7fffffff)
 		writer.writeUint(reference, 4)
 
 		writer.writeUint(ref.subsegmentDuration, 4)
 
 		// Pack startsWithSap (1 bit) + sapType (3 bits) + sapDeltaTime (28 bits)
-		const sap = ((ref.startsWithSap & 0x1) << 31) | ((ref.sapType & 0x7) << 28) | (ref.sapDeltaTime & 0x0FFFFFFF)
+		const sap = ((ref.startsWithSap & 0x1) << 31) | ((ref.sapType & 0x7) << 28) | (ref.sapDeltaTime & 0x0fffffff)
 		writer.writeUint(sap, 4)
 	}
 

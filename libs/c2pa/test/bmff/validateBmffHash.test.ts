@@ -58,7 +58,9 @@ describe('validateBmffHash', () => {
 		const moov = buildBox('moov', concatBytes(mvhd, udta))
 		const mdat = buildBox('mdat', Uint8Array.of(7, 8, 9))
 		const segment = concatBytes(moov, mdat)
-		const expected = await sha256(concatBytes(encodeBoxOffset(0), moov.subarray(0, 8), mvhd, encodeBoxOffset(moov.length), mdat))
+		const expected = await sha256(
+			concatBytes(encodeBoxOffset(0), moov.subarray(0, 8), mvhd, encodeBoxOffset(moov.length), mdat),
+		)
 
 		ok(await validateBmffHash(segment, expected, { exclusions: [{ xpath: '/moov/udta' }] }))
 	})
