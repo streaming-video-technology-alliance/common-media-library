@@ -1,6 +1,16 @@
 import { defineConfig, type ViteUserConfig } from 'vite-plus'
 
 const config: ViteUserConfig = defineConfig({
+	fmt: {
+		semi: false,
+		singleQuote: true,
+		useTabs: true,
+		printWidth: 120,
+		arrowParens: 'avoid',
+		quoteProps: 'preserve',
+		// Test fixtures, changelogs, and the api-extractor reports stay byte-identical.
+		ignorePatterns: ['**/*.json', '**/*.md', 'structured-field-tests/'],
+	},
 	pack: {
 		// Keep the output names dist/index.js and dist/index.d.ts.
 		fixedExtension: false,
