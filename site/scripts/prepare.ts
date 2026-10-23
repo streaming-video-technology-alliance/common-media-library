@@ -1,5 +1,6 @@
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { loadAdopters } from './adopters.ts'
 import { parseReleases, renderReleases, retitleChangelog, type Release } from './changelog.ts'
 import { rewriteReadmeLinks } from './links.ts'
 import { loadPackage, renderPackageIndex, type PackageInfo } from './packages.ts'
@@ -54,6 +55,13 @@ for (const project of projects) {
 }
 
 writeFileSync(path.join(packagesDir, 'packages.json'), `${JSON.stringify(packages, null, '\t')}\n`)
+
+const adopters = loadAdopters(
+	path.join(siteDir, 'adopters.json'),
+	new Set(packages.map(pkg => pkg.folder)),
+)
+console.log(`Checked ${adopters.length} adopters`)
+
 writeFileSync(path.join(packagesDir, 'index.md'), renderPackageIndex(packages))
 writeFileSync(path.join(releasesDir, 'index.md'), renderReleases(releases))
 writeFileSync(

@@ -8,7 +8,12 @@ const required = [
 	'index.html',
 	'404.html',
 	'llms.txt',
+	'cml-mark.svg',
+	'cml-lockup-light.svg',
+	'cml-lockup-dark.svg',
+	'apple-touch-icon.png',
 	'guide/getting-started.html',
+	'guide/llms.html',
 	'packages/index.html',
 	'packages/cmcd/index.html',
 	'packages/cmcd/guides/user-guide.html',
@@ -51,6 +56,16 @@ const bytes = statSync(path.join(chunksDir, index)).size
 if (bytes > limit) {
 	console.error(
 		`The search index is ${bytes} bytes. The limit is ${limit} bytes. Trim searchExcerpt or exclude pages.`,
+	)
+	process.exit(1)
+}
+
+const theme = readdirSync(chunksDir).find(file => file.startsWith('theme.'))
+const themeCode = theme ? readFileSync(path.join(chunksDir, theme), 'utf8') : ''
+
+if (!themeCode.includes('Page not found') || !themeCode.includes('Browse the packages')) {
+	console.error(
+		'The theme chunk lacks the not-found page text. Check that site/.vitepress/theme/index.js exports Layout from Layout.vue.',
 	)
 	process.exit(1)
 }
