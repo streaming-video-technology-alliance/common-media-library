@@ -36,7 +36,7 @@
 		"lint": "vp lint .",
 		"build": "node scripts/buildAll.ts",
 		"pretest": "npm run lint && vp fmt --check . && npm run build && npm run typecheck",
-		"test": "node --no-warnings --test scripts/*.test.ts && npm test --workspaces --if-present",
+		"test": "vp test --run",
 		"start": "npm start -w dev",
 		"prepare-release": "node scripts/prepareRelease.ts",
 		"pub": "node scripts/publish.ts",
@@ -70,7 +70,8 @@
 		"typedoc-vitepress-theme": "1.1.4",
 		"typescript": "5.8.2",
 		"vite-plus": "1.3.0",
-		"vitepress": "2.0.0-alpha.20"
+		"vitepress": "2.0.0-alpha.20",
+		"vitest": "5.0.5"
 	},
 	"overrides": {
 		"vite": "npm:@voidzero-dev/vite-plus-core@1.3.0"

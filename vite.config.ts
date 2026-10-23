@@ -13,6 +13,11 @@ const config: ViteUserConfig = defineConfig({
 		// Keep the output names dist/index.js and dist/index.d.ts.
 		fixedExtension: false,
 	},
+	test: {
+		include: ['libs/*/**/*.test.ts', 'scripts/**/*.test.ts'],
+		setupFiles: ['./vitest.setup.ts'],
+		restoreMocks: true,
+	},
 	lint: {
 		plugins: ['typescript'],
 		categories: {
