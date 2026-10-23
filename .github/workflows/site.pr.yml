@@ -1,0 +1,46 @@
+name: Site
+
+on:
+  pull_request:
+    paths:
+      - "site/**"
+      - "libs/*/src/**"
+      - "libs/*/test/**"
+      - "libs/*/docs/**"
+      - "libs/*/README.md"
+      - "libs/*/CHANGELOG.md"
+      - "libs/*/package.json"
+      - "libs/*/config/**"
+      - "scripts/agentDocs.ts"
+      - "scripts/projects.ts"
+      - "scripts/workspaces.ts"
+      - "tsconfig.typedoc.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/site.pr.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  site:
+    concurrency:
+      group: site-${{ github.ref }}
+      cancel-in-progress: true
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - name: Install
+        run: npm ci
+
+      - name: Build Site
+        run: npm run build -w site
+        env:
+          SITE_BASE: /common-media-library/

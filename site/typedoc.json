@@ -1,25 +1,33 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
-	"name": "CML",
-	"alwaysCreateEntryPointModule": false,
-	"favicon": "./favicon3-150x150.png",
-	"groupReferencesByType": false,
-	"cleanOutputDir": true,
-	"customCss": "./styles.css",
-	"entryPointStrategy": "packages",
-	"entryPoints": [
-		"../libs/*"
+	"extends": ["./api-entry.json"],
+	"plugin": [
+		"typedoc-plugin-markdown",
+		"typedoc-vitepress-theme",
+		"./scripts/typedocModuleNames.ts"
 	],
+	"name": "API reference",
+	"entryPointStrategy": "packages",
 	"packageOptions": {
-		"alwaysCreateEntryPointModule": false,
-		"entryPoints": [
-			"src/index.ts"
-		],
+		"entryPoints": ["src/index.ts"],
 		"tsconfig": "../../tsconfig.typedoc.json",
 		"jsDocCompatibility": false,
-		"projectDocuments": [
-			"docs/*.md"
-		]
+		"readme": "none"
+	},
+	"readme": "none",
+	"out": "./api",
+	"docsRoot": "./",
+	"cleanOutputDir": true,
+	"excludeInternal": true,
+	"excludePrivate": true,
+	"hideGenerator": true,
+	"treatWarningsAsErrors": true,
+	"jsDocCompatibility": false,
+	"hideBreadcrumbs": true,
+	"useCodeBlocks": true,
+	"sidebar": {
+		"collapsed": true,
+		"pretty": false
 	},
 	"externalSymbolLinkMappings": {
 		"global": {
@@ -77,17 +85,5 @@
 			"Exclude": "https://www.typescriptlang.org/docs/handbook/utility-types.html#excludeuniontype-excludedmembers",
 			"ReturnType": "https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype"
 		}
-	},
-	"excludeInternal": true,
-	"excludePrivate": true,
-	"hideGenerator": true,
-	"jsDocCompatibility": false,
-	"navigation": {
-		"includeGroups": true,
-		"includeCategories": true
-	},
-	"out": "./dist",
-	"readme": "../README.md",
-	"searchInComments": true,
-	"searchInDocuments": true
+	}
 }
