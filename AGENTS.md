@@ -23,6 +23,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm run build -w libs/<package>`: Build a package. The root `npm run build` builds every package in dependency order.
 - `npm run typecheck`: Run the typechecker
 - `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies. The script passes `--config ../../vite.config.ts --dir .`, because `vp test` inside a package directory does not find the root configuration on its own.
+- Test files share long-lived Vitest workers, so module state carries over between files. A test that removes a global or needs a fresh module cache goes in a file named `*.environment.test.ts`. Those files run in a separate project with one worker per file.
 - `npm test`: Full validation at the root. It runs lint, the format check, build all, typecheck, then every package's tests. The PR checks run this command.
 - `npm run format`: Run the linter with auto-fix, then format the code
 - `npm run site`: Start the website dev server. `npm run build -w site` builds the website into `site/dist`. The build fails on dead links in any README or guide.
