@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+- The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 
 ## [1.7.0] - 2026-10-22
 

@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs'
-import { defineConfig, type DefaultTheme } from 'vitepress'
+import { defineConfig } from 'vitepress'
 import { siteBase } from '../scripts/base.ts'
 import type { PackageInfo } from '../scripts/packages.ts'
 import { searchExcerpt } from '../scripts/searchExcerpt.ts'
+import { buildSidebar, type SidebarItem } from '../scripts/sidebar.ts'
 
 const base = siteBase()
 const repo = 'https://github.com/streaming-video-technology-alliance/common-media-library'
@@ -12,60 +13,10 @@ const repo = 'https://github.com/streaming-video-technology-alliance/common-medi
 const packages: PackageInfo[] = JSON.parse(
 	readFileSync(new URL('../packages/packages.json', import.meta.url), 'utf8'),
 )
-packages.sort((a, b) => a.folder.localeCompare(b.folder))
-const apiSidebar: DefaultTheme.SidebarItem[] = JSON.parse(
+const apiSidebar: SidebarItem[] = JSON.parse(
 	readFileSync(new URL('../api/typedoc-sidebar.json', import.meta.url), 'utf8'),
 )
-
-function packageSidebar(pkg: PackageInfo, withApi: boolean): DefaultTheme.SidebarItem[] {
-	const api = withApi ? apiSidebar.find(item => item.link === `/api/${pkg.folder}/`) : undefined
-	const items: DefaultTheme.SidebarItem[] = [{ text: 'Overview', link: `/packages/${pkg.folder}/` }]
-
-	if (pkg.guides.length > 0) {
-		items.push({
-			text: 'Guides',
-			items: pkg.guides.map(guide => ({
-				text: guide.title,
-				link: `/packages/${pkg.folder}/guides/${guide.slug}`,
-			})),
-		})
-	}
-
-	items.push(
-		withApi
-			? { text: 'API', link: `/api/${pkg.folder}/`, collapsed: true, items: api?.items ?? [] }
-			: { text: 'API', link: `/api/${pkg.folder}/` },
-		{ text: 'Changelog', link: `/packages/${pkg.folder}/changelog` },
-	)
-
-	return [{ text: pkg.name, items }]
-}
-
-const sidebar: DefaultTheme.SidebarMulti = {
-	'/guide/': [
-		{ text: 'Guide', items: [{ text: 'Getting started', link: '/guide/getting-started' }] },
-	],
-	'/packages/': [
-		{
-			text: 'Packages',
-			items: packages.map(pkg => ({ text: pkg.name, link: `/packages/${pkg.folder}/` })),
-		},
-	],
-	'/api/': [
-		{
-			text: 'API reference',
-			items: packages.map(pkg => ({ text: pkg.name, link: `/api/${pkg.folder}/` })),
-		},
-	],
-	'/releases/': [{ text: 'Releases', items: [{ text: 'All releases', link: '/releases/' }] }],
-}
-
-// VitePress picks the longest matching key, so package paths win over the section paths.
-// Every sidebar entry ships in the shared site data, so the API tree appears under one key only.
-for (const pkg of packages) {
-	sidebar[`/packages/${pkg.folder}/`] = packageSidebar(pkg, false)
-	sidebar[`/api/${pkg.folder}/`] = packageSidebar(pkg, true)
-}
+const sidebar = buildSidebar(packages, apiSidebar)
 
 export default defineConfig({
 	title: 'Common Media Library',

@@ -23,8 +23,6 @@ Do not rewrite the rate-based or BOLA selectors. For a different algorithm, impl
 npm i @svta/cml-abr
 ```
 
-The package has one peer dependency, `@svta/cml-utils`. The package imports it only with `import type`, so nothing from it appears in the runtime output.
-
 ## Usage
 
 ```typescript

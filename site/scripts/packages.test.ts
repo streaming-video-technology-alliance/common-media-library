@@ -11,7 +11,12 @@ function fixture(folder: string, guides: Record<string, string> = {}): string {
 	mkdirSync(dir, { recursive: true })
 	writeFileSync(
 		path.join(dir, 'package.json'),
-		JSON.stringify({ name: `@svta/cml-${folder}`, version: '1.2.3', description: 'Does things' }),
+		JSON.stringify({
+			name: `@svta/cml-${folder}`,
+			version: '1.2.3',
+			description: 'Does things',
+			peerDependencies: { '@svta/cml-utils': '*', 'cbor-x': '^1' },
+		}),
 	)
 
 	for (const [file, title] of Object.entries(guides)) {
@@ -38,11 +43,16 @@ describe('loadPackage', () => {
 				{ slug: 'user-guide', title: 'User Guide' },
 				{ slug: 'validation-guide', title: 'Validation Guide' },
 			],
+			peers: ['utils'],
 		})
 	})
 
 	it('returns no guides when the docs folder is missing', () => {
 		deepEqual(loadPackage(fixture('utils'), 'utils').guides, [])
+	})
+
+	it('lists CML peers as folder names and ignores other peers', () => {
+		deepEqual(loadPackage(fixture('cmcd'), 'cmcd').peers, ['utils'])
 	})
 
 	it('fails for a package without a group', () => {
@@ -60,6 +70,7 @@ describe('renderPackageIndex', () => {
 				description: 'Utilities',
 				group: 'Core',
 				guides: [],
+				peers: [],
 			},
 			{
 				folder: 'cmcd',
@@ -68,6 +79,7 @@ describe('renderPackageIndex', () => {
 				description: 'CMCD',
 				group: 'Delivery',
 				guides: [],
+				peers: [],
 			},
 		]
 		const text = renderPackageIndex(packages)

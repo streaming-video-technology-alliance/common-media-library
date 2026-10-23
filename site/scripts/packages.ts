@@ -3,6 +3,8 @@ import path from 'node:path'
 import { parseFrontmatter } from './frontmatter.ts'
 import { groupOrder, groups, type PackageGroup } from './groups.ts'
 
+const scope = '@svta/cml-'
+
 export type GuideInfo = {
 	slug: string
 	title: string
@@ -15,12 +17,14 @@ export type PackageInfo = {
 	description: string
 	group: PackageGroup
 	guides: GuideInfo[]
+	peers: string[]
 }
 
 type Manifest = {
 	name: string
 	version: string
 	description?: string
+	peerDependencies?: Record<string, string>
 }
 
 function loadGuides(docsDir: string): GuideInfo[] {
@@ -49,12 +53,18 @@ export function loadPackage(libsDir: string, folder: string): PackageInfo {
 		)
 	}
 
+	const peers = Object.keys(manifest.peerDependencies ?? {})
+		.filter(name => name.startsWith(scope))
+		.map(name => name.slice(scope.length))
+		.sort()
+
 	return {
 		folder,
 		name: manifest.name,
 		version: manifest.version,
 		description: manifest.description ?? '',
 		group,
+		peers,
 		guides: loadGuides(path.join(dir, 'docs')),
 	}
 }
