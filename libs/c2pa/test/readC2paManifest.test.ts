@@ -77,7 +77,8 @@ describe('readC2paManifest', () => {
 	it('projects the createdAt of a session key to a Date in the public data', () => {
 		const { manifest } = readC2paManifest(loadFixture('vsi_init_with_signer_binding.mp4'))
 		const assertion = manifest.assertions.find(a => a.label === SESSION_KEYS_LABEL)
-		const [key] = (assertion?.data as { keys: { createdAt: unknown }[] }).keys
+		ok(assertion)
+		const [key] = (assertion.data as { keys: { createdAt: unknown }[] }).keys
 
 		ok(key.createdAt instanceof Date)
 		strictEqual(key.createdAt.toISOString(), '2026-09-20T21:12:18.000Z')
@@ -86,7 +87,8 @@ describe('readC2paManifest', () => {
 	it('keeps the CBOR tag of the createdAt of a session key in taggedData', () => {
 		const { assertions } = readC2paManifest(loadFixture('vsi_init_with_signer_binding.mp4'))
 		const assertion = assertions.find(a => a.label === SESSION_KEYS_LABEL)
-		const [key] = (assertion?.taggedData as { keys: { createdAt: unknown }[] }).keys
+		ok(assertion)
+		const [key] = (assertion.taggedData as { keys: { createdAt: unknown }[] }).keys
 
 		ok(key.createdAt instanceof CborTag)
 		strictEqual(key.createdAt.tag, 0)
