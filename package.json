@@ -32,7 +32,7 @@
 		"DRM"
 	],
 	"scripts": {
-		"format": "vp fmt . && vp lint --fix .",
+		"format": "vp lint --fix . && vp fmt .",
 		"lint": "vp lint .",
 		"build": "node scripts/buildAll.ts",
 		"pretest": "npm run lint && vp fmt --check . && npm run build && npm run typecheck",

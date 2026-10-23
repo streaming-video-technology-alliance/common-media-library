@@ -24,7 +24,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm run typecheck`: Run the typechecker
 - `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies.
 - `npm test`: Full validation at the root. It runs lint, the format check, build all, typecheck, then every package's tests. The PR checks run this command.
-- `npm run format`: Format the code, then run the linter with auto-fix
+- `npm run format`: Run the linter with auto-fix, then format the code
 - `npm run site`: Start the website dev server. `npm run build -w site` builds the website into `site/dist`. The build fails on dead links in any README or guide.
 - Formatting, lint, and package builds run through Vite+: `vp fmt`, `vp lint`, and `vp pack`. The configuration is `vite.config.ts` at the root.
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
