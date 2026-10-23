@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `recordResponseReceived` derives `ttfb` with `getTimeToFirstByteMs` from `@svta/cml-utils`. The report omits `ttfb` when `responseStart` is before `startTime` or after the end of the response. Before, the report carried the raw difference ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587)).
 - The `validateCmcdEventReport` doc now renders the example code block. The docs build no longer warns about the `@example` tag.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - Every code example in the guides now typechecks. The `recordResponseReceived` examples now include `encodedBodySize` ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).

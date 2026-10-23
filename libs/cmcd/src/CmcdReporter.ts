@@ -1,5 +1,5 @@
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
-import { uuid } from '@svta/cml-utils'
+import { getTimeToFirstByteMs, uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_REQUEST_PROVENANCE } from './CMCD_REQUEST_PROVENANCE.ts'
@@ -1058,8 +1058,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			if (timing.startTime != null) {
 				derived.ts = Math.round(this.timeOrigin + timing.startTime)
 
-				if (timing.responseStart != null) {
-					derived.ttfb = Math.round(timing.responseStart - timing.startTime)
+				const ttfb = getTimeToFirstByteMs(timing)
+
+				if (Number.isFinite(ttfb)) {
+					derived.ttfb = Math.round(ttfb)
 				}
 			}
 

@@ -4391,6 +4391,28 @@ describe('CmcdReporter', () => {
 			ok(body.includes('ttlb=200'))
 		})
 
+		it('omits ttfb when responseStart is outside the response', async () => {
+			const { requester, requests } = createMockRequester()
+			const reporter = new CmcdReporter(createRrConfig(), requester)
+
+			reporter.recordResponseReceived(
+				createResponse(reporter, {
+					resourceTiming: {
+						startTime: 1000,
+						responseStart: 900,
+						duration: 200,
+						encodedBodySize: 1024,
+					},
+				}),
+			)
+
+			await new Promise(resolve => setTimeout(resolve, 10))
+
+			const body = requests[0].body as string
+			ok(!body.includes('ttfb='))
+			ok(body.includes('ttlb=200'))
+		})
+
 		it('allows player-supplied overrides via data parameter', async () => {
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(createRrConfig(), requester)
