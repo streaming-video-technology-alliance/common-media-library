@@ -19,7 +19,7 @@
 		"name": "Video.js",
 		"url": "https://github.com/videojs/video.js",
 		"packages": ["cmcd"],
-		"note": "In the spf package."
+		"note": "Uses CML in its spf package."
 	},
 	{
 		"name": "Eyevinn warp-player",

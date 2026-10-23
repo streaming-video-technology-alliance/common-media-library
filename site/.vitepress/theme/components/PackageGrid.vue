@@ -13,7 +13,7 @@ const groups = groupOrder
 		<h2>Packages</h2>
 		<div v-for="entry in groups" :key="entry.group" class="group">
 			<h3>{{ entry.group }}</h3>
-			<ul>
+			<ul role="list">
 				<li v-for="pkg in entry.items" :key="pkg.folder">
 					<a :href="withBase(`/packages/${pkg.folder}/`)">
 						<span class="name">{{ pkg.name }}</span>
@@ -30,14 +30,14 @@ const groups = groupOrder
 .package-grid {
 	max-width: 1152px;
 	margin: 0 auto;
-	padding: 48px 24px 0;
+	padding: 48px 0 0;
 }
-h2 {
+.package-grid h2 {
 	font-size: 28px;
 	font-weight: 600;
 	margin-bottom: 8px;
 }
-h3 {
+.package-grid h3 {
 	font-size: 14px;
 	font-weight: 600;
 	letter-spacing: 0.04em;
@@ -45,7 +45,7 @@ h3 {
 	color: var(--vp-c-text-2);
 	margin: 32px 0 12px;
 }
-ul {
+.package-grid ul {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 	gap: 16px;
@@ -56,7 +56,7 @@ ul {
 .package-grid li {
 	margin: 0;
 }
-a {
+.package-grid a {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
@@ -69,7 +69,7 @@ a {
 	text-decoration: none;
 	transition: border-color 0.2s;
 }
-a:hover {
+.package-grid a:hover {
 	border-color: var(--vp-c-brand-1);
 }
 .name {

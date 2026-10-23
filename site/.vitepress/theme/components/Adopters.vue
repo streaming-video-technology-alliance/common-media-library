@@ -6,7 +6,7 @@ import adopters from '../../../adopters.json'
 	<section class="adopters">
 		<h2>Who uses CML</h2>
 		<p>Players and tools that build on these packages.</p>
-		<ul>
+		<ul role="list">
 			<li v-for="adopter in adopters" :key="adopter.name">
 				<a :href="adopter.url" target="_blank" rel="noopener">{{ adopter.name }}</a>
 				<span v-if="adopter.packages.length > 0" class="packages">{{ adopter.packages.map(pkg => `cml-${pkg}`).join(', ') }}</span>
@@ -20,18 +20,18 @@ import adopters from '../../../adopters.json'
 .adopters {
 	max-width: 1152px;
 	margin: 0 auto;
-	padding: 48px 24px 0;
+	padding: 48px 0 0;
 }
-h2 {
+.adopters h2 {
 	font-size: 28px;
 	font-weight: 600;
 	margin-bottom: 8px;
 }
-p {
+.adopters p {
 	color: var(--vp-c-text-2);
 	margin: 0 0 20px;
 }
-ul {
+.adopters ul {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 	gap: 16px;
@@ -49,12 +49,12 @@ ul {
 	border-radius: 12px;
 	background: var(--vp-c-bg-soft);
 }
-a {
+.adopters a {
 	font-weight: 600;
 	color: var(--vp-c-brand-1);
 	text-decoration: none;
 }
-a:hover {
+.adopters a:hover {
 	text-decoration: underline;
 }
 .packages,

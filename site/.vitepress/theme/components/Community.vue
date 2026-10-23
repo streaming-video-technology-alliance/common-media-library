@@ -10,7 +10,7 @@ const links = [
 <template>
 	<section class="community">
 		<h2>Community</h2>
-		<ul>
+		<ul role="list">
 			<li v-for="link in links" :key="link.href">
 				<a :href="link.href" target="_blank" rel="noopener">{{ link.text }}</a>
 				<span>{{ link.detail }}</span>
@@ -23,14 +23,14 @@ const links = [
 .community {
 	max-width: 1152px;
 	margin: 0 auto;
-	padding: 48px 24px 64px;
+	padding: 48px 0 64px;
 }
-h2 {
+.community h2 {
 	font-size: 28px;
 	font-weight: 600;
 	margin-bottom: 20px;
 }
-ul {
+.community ul {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 	gap: 16px;
@@ -48,15 +48,15 @@ ul {
 	border-radius: 12px;
 	background: var(--vp-c-bg-soft);
 }
-a {
+.community a {
 	font-weight: 600;
 	color: var(--vp-c-brand-1);
 	text-decoration: none;
 }
-a:hover {
+.community a:hover {
 	text-decoration: underline;
 }
-span {
+.community span {
 	font-size: 13px;
 	color: var(--vp-c-text-2);
 }
