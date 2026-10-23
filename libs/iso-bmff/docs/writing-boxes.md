@@ -20,15 +20,9 @@ If you provide raw box objects, also provide a configuration object that names t
 If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer:
 
 ```typescript
-import {
-	defaultWriterConfig,
-	writeIsoBoxes,
-	type IsoBoxStreamable,
-} from "@svta/cml-iso-bmff";
+import { defaultWriterConfig, writeIsoBoxes } from "@svta/cml-iso-bmff";
 
-declare const sourceBuffer: SourceBuffer;
-
-const boxes: IsoBoxStreamable[] = [
+const boxes = [
 	{
 		type: "ftyp",
 		majorBrand: "isom",
@@ -47,7 +41,7 @@ const boxes: IsoBoxStreamable[] = [
 const byteArrays = writeIsoBoxes(boxes, defaultWriterConfig());
 
 for (const byteArray of byteArrays) {
-	sourceBuffer.appendBuffer(byteArray);
+	sourceBuffer.appendBuffer(byteArray.buffer);
 	// wait for updateend event
 }
 ```
@@ -57,16 +51,9 @@ for (const byteArray of byteArrays) {
 For optimal bundle size with tree shaking, import only the writers you need:
 
 ```typescript
-import {
-	writeFtyp,
-	writeIsoBoxes,
-	writeMdat,
-	type IsoBoxStreamable,
-} from "@svta/cml-iso-bmff";
+import { writeFtyp, writeIsoBoxes, writeMdat } from "@svta/cml-iso-bmff";
 
-declare const sourceBuffer: SourceBuffer;
-
-const boxes: IsoBoxStreamable[] = [
+const boxes = [
 	{
 		type: "ftyp",
 		majorBrand: "isom",
@@ -94,7 +81,7 @@ const byteArrays = writeIsoBoxes(boxes, {
 });
 
 for (const byteArray of byteArrays) {
-	sourceBuffer.appendBuffer(byteArray);
+	sourceBuffer.appendBuffer(byteArray.buffer);
 	// wait for updateend event
 }
 ```
@@ -107,12 +94,9 @@ The `createIsoBoxReadableStream` function writes boxes to a readable stream. It 
 import {
 	createIsoBoxReadableStream,
 	defaultWriterConfig,
-	type IsoBoxStreamable,
 } from "@svta/cml-iso-bmff";
 
-declare const transport: WebTransport;
-
-const boxes: IsoBoxStreamable[] = [
+const boxes = [
 	{
 		type: "ftyp",
 		majorBrand: "isom",
@@ -130,8 +114,8 @@ const boxes: IsoBoxStreamable[] = [
 
 const readableStream = createIsoBoxReadableStream(boxes, defaultWriterConfig());
 
-const stream = await transport.createBidirectionalStream();
-readableStream.pipeTo(stream.writable);
+const stream = await webTransport.createBidirectionalStream();
+readableStream.pipeTo(transport.writable);
 ```
 
 ## Type safety

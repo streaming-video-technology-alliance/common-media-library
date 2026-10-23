@@ -1,7 +1,7 @@
 import { deepEqual, equal, ok } from 'node:assert/strict'
 import path from 'node:path'
 import { describe, it } from 'node:test'
-import { checkExamples, extractExampleBlocks, formatDiagnostic, listExampleFiles, readExampleBlocks, type ExampleBlock } from './checkExamples.ts'
+import { checkExamples, extractExampleBlocks, formatDiagnostic, listExampleFiles, parseExampleContext, readExampleBlocks, type ExampleBlock } from './checkExamples.ts'
 
 const repoRoot = path.resolve(import.meta.dirname, '..')
 
@@ -71,5 +71,46 @@ describe('example blocks', () => {
 			...diagnostics.map(formatDiagnostic),
 		].join('\n')
 		equal(diagnostics.length, 0, report)
+	})
+})
+
+describe('parseExampleContext', () => {
+	it('returns each statement with its line and the names it declares', () => {
+		const text = "declare const reporter: import('@svta/cml-cmcd').CmcdReporter\n\ntype Panel = { append(): void }\ndeclare function startPlayer(): void\n"
+		const statements = parseExampleContext(text, 'libs/x/docs/guide.context.d.ts')
+		deepEqual(statements.map(statement => [statement.line, statement.names]), [[1, ['reporter']], [3, ['Panel']], [4, ['startPlayer']]])
+		equal(statements[0].text, "declare const reporter: import('@svta/cml-cmcd').CmcdReporter")
+	})
+})
+
+describe('checkExamples with a context', () => {
+	const context = parseExampleContext("declare const reporter: import('@svta/cml-cmcd').CmcdReporter\ndeclare function startPlayer(): void\n", 'libs/x/docs/guide.context.d.ts')
+
+	it('prepends the context statements to a block that does not declare the names', () => {
+		const block: ExampleBlock = { file: 'libs/x/docs/guide.md', line: 1, code: 'reporter.update({ bl: [3000] });\nstartPlayer();\n', context }
+		deepEqual(checkExamples([block], repoRoot), [])
+	})
+
+	it('skips a context statement when the block declares the name', () => {
+		const code = 'import { CmcdReporter } from "@svta/cml-cmcd";\nconst reporter = new CmcdReporter({ cid: "a" });\nreporter.update({ bl: [3000] });\n'
+		deepEqual(checkExamples([{ file: 'libs/x/docs/guide.md', line: 1, code, context }], repoRoot), [])
+	})
+
+	it('reports a block error at the markdown line', () => {
+		const block: ExampleBlock = { file: 'libs/x/docs/guide.md', line: 5, code: 'startPlayer();\nreporter.update({ bl: "a" });\n', context }
+		const diagnostics = checkExamples([block], repoRoot)
+		equal(diagnostics.length, 1)
+		equal(diagnostics[0].code, 2322)
+		equal(diagnostics[0].file, 'libs/x/docs/guide.md')
+		equal(diagnostics[0].line, 7)
+	})
+
+	it('reports a context error in the context file', () => {
+		const broken = parseExampleContext('declare function startPlayer(): void\ndeclare const reporter: Missing\n', 'libs/x/docs/guide.context.d.ts')
+		const diagnostics = checkExamples([{ file: 'libs/x/docs/guide.md', line: 1, code: 'console.log(reporter);\n', context: broken }], repoRoot)
+		equal(diagnostics.length, 1)
+		equal(diagnostics[0].code, 2304)
+		equal(diagnostics[0].file, 'libs/x/docs/guide.context.d.ts')
+		equal(diagnostics[0].line, 2)
 	})
 })

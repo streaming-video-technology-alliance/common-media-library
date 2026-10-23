@@ -21,8 +21,6 @@ A `SequenceState` object passes from each media segment call to the next and tra
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
-declare const initUrl: string
-
 const initResponse = await fetch(initUrl)
 const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
@@ -50,10 +48,6 @@ C2PA section 19.2.3 requires a `c2pa.hash.bmff.v3` assertion in the init manifes
 `sessionKeys` includes only keys with a valid signer binding and an unexpired validity period:
 
 ```typescript
-import type { InitSegmentValidation } from '@svta/cml-c2pa'
-
-declare const init: InitSegmentValidation
-
 for (const key of init.sessionKeys) {
   console.log('Key ID:', key.kid)
   console.log('Curve:', key.jwk.crv)
@@ -79,10 +73,7 @@ Each `ValidatedSessionKey` contains:
 
 ```typescript
 import { validateC2paSegment } from '@svta/cml-c2pa'
-import type { InitSegmentValidation, SequenceState } from '@svta/cml-c2pa'
-
-declare const init: InitSegmentValidation
-declare const segmentUrls: string[]
+import type { SequenceState } from '@svta/cml-c2pa'
 
 // undefined on first call — the function creates a fresh state internally
 let sequenceState: SequenceState | undefined
@@ -245,9 +236,6 @@ Narrow the type to access additional fields:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'
-import type { SegmentValidationResult } from '@svta/cml-c2pa'
-
-declare const result: SegmentValidationResult
 
 const { sequenceResult } = result
 

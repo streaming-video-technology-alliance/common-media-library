@@ -12,10 +12,6 @@ All validation functions in `@svta/cml-c2pa` return structured results with an `
 Every result follows the same pattern:
 
 ```typescript
-import type { SegmentValidationResult } from '@svta/cml-c2pa'
-
-declare const result: SegmentValidationResult
-
 if (!result.isValid) {
   for (const code of result.errorCodes) {
     console.error(`Validation failure: ${code}`)
@@ -69,9 +65,6 @@ Example of handling specific error codes:
 
 ```typescript
 import { LiveVideoStatusCode } from '@svta/cml-c2pa'
-import type { SegmentValidationResult } from '@svta/cml-c2pa'
-
-declare const result: SegmentValidationResult
 
 for (const code of result.errorCodes) {
   switch (code) {
@@ -163,10 +156,6 @@ The `signatureInfo` object contains:
 | `certNotBefore` | `string \| null` | Certificate validity start (ISO 8601) |
 
 ```typescript
-import type { InitSegmentValidation } from '@svta/cml-c2pa'
-
-declare const init: InitSegmentValidation
-
 const { isValid, manifest } = init // or result for the Manifest Box method
 
 // The assertions list is the raw assertion store, so read it only when isValid is true.
@@ -205,9 +194,6 @@ Narrow the type to access the `GAP_DETECTED` fields:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'
-import type { SegmentValidationResult } from '@svta/cml-c2pa'
-
-declare const result: SegmentValidationResult
 
 if (result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
   console.warn(

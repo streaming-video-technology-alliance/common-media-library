@@ -2,6 +2,18 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import ts from 'typescript'
 
+/** One statement of a context file, with the names it declares. */
+export type ContextStatement = {
+	/** Repo-relative path of the context file. */
+	file: string;
+	/** 1-based line of the statement in the context file. */
+	line: number;
+	/** The statement text, without leading comments. */
+	text: string;
+	/** The names the statement declares. */
+	names: string[];
+};
+
 /** One fenced TypeScript block of a markdown file. */
 export type ExampleBlock = {
 	/** Repo-relative path of the markdown file, with forward slashes. */
@@ -10,6 +22,18 @@ export type ExampleBlock = {
 	line: number;
 	/** The code between the fences, with a trailing newline. */
 	code: string;
+	/** The statements of the context file next to the markdown file. */
+	context?: ContextStatement[];
+};
+
+/** One compiler error, located in the markdown file or in a context file. */
+export type ExampleDiagnostic = {
+	file: string;
+	/** 1-based line. 0 when the error has no location. */
+	line: number;
+	/** The numeric TypeScript code, such as 2304. */
+	code: number;
+	message: string;
 };
 
 const openFence = /^(`{3,})(\S*)/
@@ -76,23 +100,117 @@ export function listExampleFiles(repoRoot: string): string[] {
 	return files
 }
 
-/** Reads every example block of the files that `listExampleFiles` returns. */
-export function readExampleBlocks(repoRoot: string): ExampleBlock[] {
-	return listExampleFiles(repoRoot).flatMap(file => extractExampleBlocks(readFileSync(path.join(repoRoot, file), 'utf8'), file))
+function bindingNames(name: ts.BindingName, names: string[]): void {
+	if (ts.isIdentifier(name)) {
+		names.push(name.text)
+		return
+	}
+
+	for (const element of name.elements) {
+		if (ts.isBindingElement(element)) {
+			bindingNames(element.name, names)
+		}
+	}
 }
 
-/** One compiler error, located in the markdown file. */
-export type ExampleDiagnostic = {
-	file: string;
-	/** 1-based markdown line. 0 when the error has no location. */
-	line: number;
-	/** The numeric TypeScript code, such as 2304. */
-	code: number;
-	message: string;
-};
+/** The names that a top-level statement declares: variables, functions, classes, types, and imports. */
+export function declaredNames(statement: ts.Statement): string[] {
+	const names: string[] = []
+
+	if (ts.isVariableStatement(statement)) {
+		for (const declaration of statement.declarationList.declarations) {
+			bindingNames(declaration.name, names)
+		}
+	} else if (ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement) || ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement) || ts.isEnumDeclaration(statement) || ts.isModuleDeclaration(statement)) {
+		if (statement.name && ts.isIdentifier(statement.name)) {
+			names.push(statement.name.text)
+		}
+	} else if (ts.isImportDeclaration(statement) && statement.importClause) {
+		const clause = statement.importClause
+		if (clause.name) {
+			names.push(clause.name.text)
+		}
+		if (clause.namedBindings) {
+			if (ts.isNamespaceImport(clause.namedBindings)) {
+				names.push(clause.namedBindings.name.text)
+			} else {
+				for (const element of clause.namedBindings.elements) {
+					names.push(element.name.text)
+				}
+			}
+		}
+	}
+
+	return names
+}
+
+/** Splits a context file into statements. Comments between statements are dropped. */
+export function parseExampleContext(text: string, file: string): ContextStatement[] {
+	const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true)
+
+	return source.statements.map(statement => ({
+		file,
+		line: source.getLineAndCharacterOfPosition(statement.getStart(source)).line + 1,
+		text: statement.getText(source),
+		names: declaredNames(statement),
+	}))
+}
+
+/** Reads the context file of a markdown file: the same path with `.context.d.ts` in place of `.md`. */
+export function readExampleContext(repoRoot: string, file: string): ContextStatement[] {
+	const contextFile = file.replace(/\.md$/, '.context.d.ts')
+	const fullPath = path.join(repoRoot, contextFile)
+
+	return existsSync(fullPath) ? parseExampleContext(readFileSync(fullPath, 'utf8'), contextFile) : []
+}
+
+/** Reads every example block of the files that `listExampleFiles` returns, with the context of each file. */
+export function readExampleBlocks(repoRoot: string): ExampleBlock[] {
+	return listExampleFiles(repoRoot).flatMap(file => {
+		const context = readExampleContext(repoRoot, file)
+		const markdown = readFileSync(path.join(repoRoot, file), 'utf8')
+		return extractExampleBlocks(markdown, file).map(block => ({ ...block, context }))
+	})
+}
 
 /** The folder, under the repo root, that holds the virtual block modules. It does not exist on disk. */
 const virtualFolder = '.example-check'
+
+type Header = {
+	text: string;
+	/** Lines that the header adds before the block code. */
+	lines: number;
+	/** Each prepended statement with its first line in the header. */
+	statements: { start: number; statement: ContextStatement }[];
+};
+
+const emptyHeader: Header = { text: '', lines: 0, statements: [] }
+
+/** The context statements that a block needs: every statement whose names the block does not declare itself. */
+function contextHeader(block: ExampleBlock): Header {
+	const context = block.context ?? []
+
+	if (context.length === 0) {
+		return emptyHeader
+	}
+
+	const source = ts.createSourceFile('block.ts', block.code, ts.ScriptTarget.Latest, true)
+	const own = new Set(source.statements.flatMap(declaredNames))
+	const statements: Header['statements'] = []
+	const parts: string[] = []
+	let lines = 0
+
+	for (const statement of context) {
+		if (statement.names.some(name => own.has(name))) {
+			continue
+		}
+		statements.push({ start: lines, statement })
+		parts.push(statement.text)
+		lines += statement.text.split('\n').length
+	}
+
+	return parts.length === 0 ? emptyHeader : { text: `${parts.join('\n')}\n\n`, lines: lines + 1, statements }
+}
 
 /** The root tsconfig options, adjusted for a noEmit check of standalone blocks. */
 export function exampleCompilerOptions(repoRoot: string): ts.CompilerOptions {
@@ -121,19 +239,22 @@ export function exampleCompilerOptions(repoRoot: string): ts.CompilerOptions {
 	}
 }
 
+type Origin = { block: ExampleBlock; header: Header }
+
 /** Typechecks every block as its own ES module. Package imports resolve to the built `dist/` folders. */
 export function checkExamples(blocks: ExampleBlock[], repoRoot: string): ExampleDiagnostic[] {
 	const options = exampleCompilerOptions(repoRoot)
 	const base = path.join(repoRoot, virtualFolder)
 	const virtual = new Map<string, string>()
-	const origin = new Map<string, ExampleBlock>()
+	const origin = new Map<string, Origin>()
 
 	virtual.set(path.join(base, 'package.json'), '{"type":"module"}')
 
 	blocks.forEach((block, index) => {
 		const name = path.join(base, `${block.file}.${index}.ts`)
-		virtual.set(name, block.code)
-		origin.set(name, block)
+		const header = contextHeader(block)
+		virtual.set(name, header.text + block.code)
+		origin.set(name, { block, header })
 	})
 
 	const host = ts.createCompilerHost(options)
@@ -153,17 +274,23 @@ export function checkExamples(blocks: ExampleBlock[], repoRoot: string): Example
 	return ts.getPreEmitDiagnostics(program).map(diagnostic => locate(diagnostic, origin))
 }
 
-function locate(diagnostic: ts.Diagnostic, origin: Map<string, ExampleBlock>): ExampleDiagnostic {
+function locate(diagnostic: ts.Diagnostic, origin: Map<string, Origin>): ExampleDiagnostic {
 	const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
-	const block = diagnostic.file ? origin.get(diagnostic.file.fileName) : undefined
+	const found = diagnostic.file ? origin.get(diagnostic.file.fileName) : undefined
 
-	if (!diagnostic.file || !block || diagnostic.start === undefined) {
+	if (!diagnostic.file || !found || diagnostic.start === undefined) {
 		return { file: diagnostic.file?.fileName ?? '', line: 0, code: diagnostic.code, message }
 	}
 
+	const { block, header } = found
 	const { line } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
 
-	return { file: block.file, line: block.line + 1 + line, code: diagnostic.code, message }
+	if (line < header.lines) {
+		const entry = header.statements.findLast(candidate => candidate.start <= line) ?? header.statements[0]
+		return { file: entry.statement.file, line: entry.statement.line + (line - entry.start), code: diagnostic.code, message }
+	}
+
+	return { file: block.file, line: block.line + 1 + (line - header.lines), code: diagnostic.code, message }
 }
 
 /** `file:line TScode: message`, one line. */
