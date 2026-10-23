@@ -12,6 +12,7 @@ and this project adheres to
 
 - The `validateCmcdEventReport` doc now renders the example code block. The docs build no longer warns about the `@example` tag.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- Every code example in the guides now typechecks. The `recordResponseReceived` examples now include `encodedBodySize` ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 
 ## [2.8.3] - 2026-10-18
 
