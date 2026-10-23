@@ -22,7 +22,12 @@ export function getSeiData(raw: DataView, startPos: number, endPos: number): Dat
 	return new DataView(new Uint8Array(data).buffer)
 }
 
-export function isCea608Sei(payloadType: number, payloadSize: number, sei: DataView, pos: number): boolean {
+export function isCea608Sei(
+	payloadType: number,
+	payloadSize: number,
+	sei: DataView,
+	pos: number,
+): boolean {
 	// user_data_registered_itu_t_t35 is payload type 4, and the A/53 identifier is 8 bytes.
 	if (payloadType !== 4 || payloadSize < 8) {
 		return false
@@ -86,7 +91,10 @@ export function isSeiNalUnitType(unitType: number): boolean {
  * @param pos - The position of the first NAL header byte
  * @returns An object containing the NAL unit type and header size, or null if not an SEI NAL unit
  */
-export function extractNalUnitType(raw: DataView, pos: number): { nalType: number; headerSize: number } | null {
+export function extractNalUnitType(
+	raw: DataView,
+	pos: number,
+): { nalType: number; headerSize: number } | null {
 	const byte0 = raw.getUint8(pos)
 
 	// H.264: 1-byte header, type in bits 0-4

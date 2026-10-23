@@ -68,7 +68,13 @@ export class PenState {
 	}
 
 	isDefault(): boolean {
-		return this.foreground === 'white' && !this.underline && !this.italics && this.background === 'black' && !this.flash
+		return (
+			this.foreground === 'white' &&
+			!this.underline &&
+			!this.italics &&
+			this.background === 'black' &&
+			!this.flash
+		)
 	}
 
 	equals(other: PenState): boolean {

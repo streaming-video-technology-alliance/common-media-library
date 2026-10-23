@@ -1,4 +1,10 @@
-import type { BitrateSelectorInput, BolaDecision, BolaSelector, LadderRung, SegmentSample } from '@svta/cml-abr'
+import type {
+	BitrateSelectorInput,
+	BolaDecision,
+	BolaSelector,
+	LadderRung,
+	SegmentSample,
+} from '@svta/cml-abr'
 import {
 	BOLA_DEFAULT_BUFFER_TARGET,
 	BolaState,
@@ -51,8 +57,16 @@ const LADDERS: LadderRung[][] = [
 	rungs(ONE_BANDWIDTH),
 	rungs(ONE_BANDWIDTH, ONE_BANDWIDTH),
 ]
-const BUFFER_TARGETS = [BOLA_DEFAULT_BUFFER_TARGET / 2, BOLA_DEFAULT_BUFFER_TARGET, BOLA_DEFAULT_BUFFER_TARGET * 2]
-const STARVATION_SAFETY_FACTORS = [DEFAULT_STARVATION_SAFETY_FACTOR / 2, DEFAULT_STARVATION_SAFETY_FACTOR, 1]
+const BUFFER_TARGETS = [
+	BOLA_DEFAULT_BUFFER_TARGET / 2,
+	BOLA_DEFAULT_BUFFER_TARGET,
+	BOLA_DEFAULT_BUFFER_TARGET * 2,
+]
+const STARVATION_SAFETY_FACTORS = [
+	DEFAULT_STARVATION_SAFETY_FACTOR / 2,
+	DEFAULT_STARVATION_SAFETY_FACTOR,
+	1,
+]
 const KNOWN_STATES: string[] = Object.values(BolaState)
 
 type Random = () => number
@@ -62,7 +76,11 @@ function pick<T>(random: Random, values: readonly T[]): T {
 }
 
 // Checks what every decision promises, whatever the events before it were.
-function checkDecision(decision: BolaDecision, ladder: readonly LadderRung[], context: string): void {
+function checkDecision(
+	decision: BolaDecision,
+	ladder: readonly LadderRung[],
+	context: string,
+): void {
 	ok(
 		Number.isInteger(decision.index) && decision.index >= 0 && decision.index < ladder.length,
 		`${context}: index ${decision.index} is in the ladder`,
@@ -99,7 +117,8 @@ function checkStarvationGuard(
 	const bufferLevel = isPositiveNumber(input.bufferLevel) ? input.bufferLevel : 0
 	const playbackRate = isPositiveNumber(input.playbackRate) ? input.playbackRate : 1
 	const bandwidth = ladder[decision.index].bandwidth
-	const downloadSeconds = (bandwidth * segmentDuration) / (input.throughput * starvationSafetyFactor)
+	const downloadSeconds =
+		(bandwidth * segmentDuration) / (input.throughput * starvationSafetyFactor)
 
 	ok(
 		bandwidth === ladder[0].bandwidth || downloadSeconds <= bufferLevel / playbackRate,
@@ -144,7 +163,10 @@ function playSequence(seed: number): void {
 		bufferLevel =
 			random() < STALL_PROBABILITY
 				? 0
-				: Math.min(MAXIMUM_BUFFER_LEVEL, Math.max(0, bufferLevel + (random() - 0.5) * BUFFER_STEP_SPREAD))
+				: Math.min(
+						MAXIMUM_BUFFER_LEVEL,
+						Math.max(0, bufferLevel + (random() - 0.5) * BUFFER_STEP_SPREAD),
+					)
 
 		const input: BitrateSelectorInput = {
 			ladder,
@@ -154,7 +176,9 @@ function playSequence(seed: number): void {
 			bufferTarget: usesBufferTarget ? bufferTarget : undefined,
 			segmentDuration: random() < SEGMENT_DURATION_PASS_PROBABILITY ? SEGMENT_DURATION : undefined,
 			playbackRate:
-				random() < PLAYBACK_RATE_PASS_PROBABILITY ? MINIMUM_PLAYBACK_RATE + random() * PLAYBACK_RATE_SPREAD : undefined,
+				random() < PLAYBACK_RATE_PASS_PROBABILITY
+					? MINIMUM_PLAYBACK_RATE + random() * PLAYBACK_RATE_SPREAD
+					: undefined,
 		}
 		const decision = selector.select(input)
 		const distinctCount = new Set(ladder.map(rung => rung.bandwidth)).size
@@ -169,7 +193,14 @@ function playSequence(seed: number): void {
 			Number.isFinite(input.throughput)
 
 		if (isGuardActive && isPositiveNumber(input.segmentDuration)) {
-			checkStarvationGuard(decision, ladder, input, input.segmentDuration, starvationSafetyFactor, context)
+			checkStarvationGuard(
+				decision,
+				ladder,
+				input,
+				input.segmentDuration,
+				starvationSafetyFactor,
+				context,
+			)
 		}
 
 		previousState = decision.state

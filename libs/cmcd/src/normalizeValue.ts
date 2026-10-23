@@ -37,7 +37,9 @@ function normalizeBare(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 			const text = toTokenString(value)
 			const v1Map = version === 1 ? spec.v1Map : undefined
 			const token =
-				text !== undefined && v1Map !== undefined && Object.prototype.hasOwnProperty.call(v1Map, text)
+				text !== undefined &&
+				v1Map !== undefined &&
+				Object.prototype.hasOwnProperty.call(v1Map, text)
 					? v1Map[text]
 					: text
 
@@ -57,7 +59,9 @@ function normalizeBare(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 				return value.length > 0 ? value : undefined
 			}
 
-			return typeof value === 'boolean' || typeof value === 'symbol' || value instanceof SfToken ? value : undefined
+			return typeof value === 'boolean' || typeof value === 'symbol' || value instanceof SfToken
+				? value
+				: undefined
 
 		default:
 			return undefined
@@ -76,7 +80,11 @@ function normalizeItem(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 
 function normalizeList(value: unknown, spec: CmcdKeySpec, version: CmcdVersion): unknown {
 	const wrapper = value instanceof SfItem && Array.isArray(value.value) ? value : undefined
-	const items = wrapper ? (wrapper.value as unknown as unknown[]) : Array.isArray(value) ? value : [value]
+	const items = wrapper
+		? (wrapper.value as unknown as unknown[])
+		: Array.isArray(value)
+			? value
+			: [value]
 	const list: unknown[] = []
 
 	for (const item of items) {
@@ -109,7 +117,11 @@ function normalizeList(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
  *
  * @internal
  */
-export function normalizeValue(value: unknown, spec: CmcdKeySpec, options: CmcdFormatterOptions): unknown {
+export function normalizeValue(
+	value: unknown,
+	spec: CmcdKeySpec,
+	options: CmcdFormatterOptions,
+): unknown {
 	if (spec.type === 'nor') {
 		return formatNor(value, options)
 	}

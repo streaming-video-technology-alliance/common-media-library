@@ -49,7 +49,10 @@ async function until(check: () => boolean, ms: number): Promise<boolean> {
 
 describe('killTree', () => {
 	it('stops the process and the subprocesses that share its output pipes', async () => {
-		const child = spawnTree(process.execPath, ['-e', parentScript], { cwd: process.cwd(), env: process.env })
+		const child = spawnTree(process.execPath, ['-e', parentScript], {
+			cwd: process.cwd(),
+			env: process.env,
+		})
 		const grandchild = Number(await firstLine(child.stdout))
 		ok(grandchild > 0, 'the grandchild did not report its pid')
 		ok(isRunning(grandchild))
@@ -62,7 +65,11 @@ describe('killTree', () => {
 		killTree(child)
 
 		equal(await closed, true, 'the process did not close within 3 seconds after killTree')
-		equal(await until(() => !isRunning(grandchild), 1000), true, 'the grandchild is still running after killTree')
+		equal(
+			await until(() => !isRunning(grandchild), 1000),
+			true,
+			'the grandchild is still running after killTree',
+		)
 	})
 
 	it('does nothing for a process that already exited', async () => {

@@ -3,7 +3,11 @@ import { describe, it } from 'node:test'
 import { loadWorkspaces, runWorkspaces, sortWorkspaces, type Workspace } from './workspaces.ts'
 
 function workspace(folder: string, peers: string[] = []): Workspace {
-	return { folder: `libs/${folder}`, name: `@svta/cml-${folder}`, peers: peers.map(p => `@svta/cml-${p}`) }
+	return {
+		folder: `libs/${folder}`,
+		name: `@svta/cml-${folder}`,
+		peers: peers.map(p => `@svta/cml-${p}`),
+	}
 }
 
 function folders(workspaces: Workspace[]): string[] {

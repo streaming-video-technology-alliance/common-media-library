@@ -1,5 +1,10 @@
 import type { CmcdTransportAdapter, CmcdRequestDeliver, CmcdRecordedReport } from '@svta/cml-cmcd'
-import { createFetchTransport, createXhrTransport, CmcdReportRecorder, CmcdRecordedRequestType } from '@svta/cml-cmcd'
+import {
+	createFetchTransport,
+	createXhrTransport,
+	CmcdReportRecorder,
+	CmcdRecordedRequestType,
+} from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -279,7 +284,12 @@ describe('CmcdReportRecorder', () => {
 			})
 			ok(response instanceof Response)
 			equal(response?.status, 204)
-			equal(recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT).length, 1)
+			equal(
+				recorder
+					.getReports()
+					.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT).length,
+				1,
+			)
 			recorder.detach()
 		})
 
@@ -386,7 +396,12 @@ describe('CmcdReportRecorder', () => {
 			})
 			t.simulate({ url: 'https://e.com/a.mpd?CMCD=x', method: 'GET', headers: {} })
 			t.simulate({ url: 'https://e.com/b.m4s?CMCD=x', method: 'GET', headers: {} })
-			t.simulate({ url: 'https://events.example.com/cmcd', method: 'POST', headers: {}, body: 'sid="x"' })
+			t.simulate({
+				url: 'https://events.example.com/cmcd',
+				method: 'POST',
+				headers: {},
+				body: 'sid="x"',
+			})
 			equal((await recorder.waitForReports()).length, 3)
 			equal((await recorder.waitForManifest()).length, 1)
 			equal((await recorder.waitForSegments()).length, 1)
@@ -445,7 +460,12 @@ describe('CmcdReportRecorder', () => {
 				eventTargetUrls: ['https://events.example.com'],
 			})
 			t.simulate({ url: 'https://e.com/a.m4s?CMCD=x', method: 'GET', headers: {} })
-			t.simulate({ url: 'https://events.example.com/cmcd', method: 'POST', headers: {}, body: 'sid="x"' })
+			t.simulate({
+				url: 'https://events.example.com/cmcd',
+				method: 'POST',
+				headers: {},
+				body: 'sid="x"',
+			})
 			const result = await recorder.waitForEvents({ timeout: 1000 })
 			equal(result.length, 1)
 			equal(result[0].type, CmcdRecordedRequestType.EVENT)
@@ -709,7 +729,12 @@ describe('createXhrTransport', () => {
 			ok(loadEnded, 'onloadend should have fired')
 			equal(xhr.status, 204)
 			equal(xhr.readyState, 4)
-			equal(recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT).length, 1)
+			equal(
+				recorder
+					.getReports()
+					.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT).length,
+				1,
+			)
 			recorder.detach()
 		} finally {
 			restoreXhrShim()
@@ -747,7 +772,9 @@ describe('default transports', () => {
 			await fetch('https://e.com/b.m4s?CMCD=sid%3D%22y%22')
 
 			equal(
-				recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT).length,
+				recorder
+					.getReports()
+					.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.SEGMENT).length,
 				2,
 			)
 			recorder.detach()
@@ -883,7 +910,9 @@ describe('createFetchTransport', () => {
 				body: 'sid="abc",ts=1234',
 			})
 
-			const captured = recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT)
+			const captured = recorder
+				.getReports()
+				.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT)
 			equal(captured.length, 1)
 			equal(captured[0].request.body, 'sid="abc",ts=1234')
 			recorder.detach()
@@ -928,7 +957,12 @@ describe('createFetchTransport', () => {
 
 			equal(response.status, 204)
 			equal(underlyingCalls, 0, 'underlying fetch should not have been invoked')
-			equal(recorder.getReports().filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT).length, 1)
+			equal(
+				recorder
+					.getReports()
+					.filter((r: CmcdRecordedReport) => r.type === CmcdRecordedRequestType.EVENT).length,
+				1,
+			)
 			recorder.detach()
 		} finally {
 			globalThis.fetch = origFetch

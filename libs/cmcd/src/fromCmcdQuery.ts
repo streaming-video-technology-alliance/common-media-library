@@ -33,8 +33,14 @@ export function fromCmcdQuery(
  *
  * @public
  */
-export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData
-export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData | Cmcd {
+export function fromCmcdQuery(
+	query: string | URLSearchParams,
+	options?: CmcdDecodeOptions,
+): CmcdData
+export function fromCmcdQuery(
+	query: string | URLSearchParams,
+	options?: CmcdDecodeOptions,
+): CmcdData | Cmcd {
 	if (typeof query === 'string') {
 		query = new URLSearchParams(query)
 	}

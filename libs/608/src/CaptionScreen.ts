@@ -156,7 +156,9 @@ export class CaptionScreen {
 				const time = this.logger.time
 				if (prevLineTime !== null && time !== null && prevLineTime < time) {
 					for (let i = 0; i < this.nrRollUpRows; i++) {
-						this.rows[newRow - this.nrRollUpRows + i + 1].copy(lastOutputScreen.rows[topRowIndex + i])
+						this.rows[newRow - this.nrRollUpRows + i + 1].copy(
+							lastOutputScreen.rows[topRowIndex + i],
+						)
 					}
 				}
 			}

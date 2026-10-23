@@ -62,15 +62,25 @@ if (baseline !== undefined) {
 	variants.unshift({
 		name: `parseXml (${baseline})`,
 		load: async () => {
-			const module: { parseXml: ParseFunction } = await import(pathToFileURL(resolve(baseline)).href)
+			const module: { parseXml: ParseFunction } = await import(
+				pathToFileURL(resolve(baseline)).href
+			)
 			return module.parseXml
 		},
 	})
 }
 
 const inputs: Input[] = [
-	{ name: 'pretty />, 100k S', make: () => generateMpd({ pretty: true }), iterations: forceGc ? 20 : 60 },
-	{ name: 'minified />, 100k S', make: () => generateMpd({ pretty: false }), iterations: forceGc ? 20 : 60 },
+	{
+		name: 'pretty />, 100k S',
+		make: () => generateMpd({ pretty: true }),
+		iterations: forceGc ? 20 : 60,
+	},
+	{
+		name: 'minified />, 100k S',
+		make: () => generateMpd({ pretty: false }),
+		iterations: forceGc ? 20 : 60,
+	},
 	{
 		name: 'pretty </S>, 100k S',
 		make: () => generateMpd({ pretty: true, closed: true }),
@@ -86,7 +96,11 @@ const inputs: Input[] = [
 		make: () => generateMpd({ periods: 60, adaptationSets: 2, segments: 20, closed: true }),
 		iterations: 300,
 	},
-	{ name: 'bbb_30fps.mpd', make: () => readFileSync(resolve(FIXTURES, 'bbb_30fps.mpd'), 'utf8'), iterations: 3000 },
+	{
+		name: 'bbb_30fps.mpd',
+		make: () => readFileSync(resolve(FIXTURES, 'bbb_30fps.mpd'), 'utf8'),
+		iterations: 3000,
+	},
 ].filter(input => only === undefined || input.name.includes(only))
 
 let sink: unknown = null

@@ -47,7 +47,11 @@ function needsV1ObjectType(obj: Record<string, any>, filter: CmcdEncodeOptions['
 }
 
 function allowsObjectType(spec: CmcdKeySpec, objectType: string | undefined): boolean {
-	if (objectType === undefined || (spec.type !== 'integer' && spec.type !== 'ot-list') || spec.ot === undefined) {
+	if (
+		objectType === undefined ||
+		(spec.type !== 'integer' && spec.type !== 'ot-list') ||
+		spec.ot === undefined
+	) {
 		return true
 	}
 
@@ -82,7 +86,9 @@ function prepareValue(
 		return value == null ? undefined : normalizeValue(value, spec, formatterOptions)
 	}
 
-	const formatted: unknown = isValid(value) ? formatter(value as CmcdValue, formatterOptions) : value
+	const formatted: unknown = isValid(value)
+		? formatter(value as CmcdValue, formatterOptions)
+		: value
 
 	if (!isValid(formatted) && !(formatted === false && spec.type === 'boolean')) {
 		return undefined
@@ -123,7 +129,11 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
 	const isV1 = version === 1
 	const isEventReport = !isV1 && reportingMode === CMCD_EVENT_MODE
-	const formatterOptions: CmcdFormatterOptions = { version, reportingMode, baseUrl: options.baseUrl }
+	const formatterOptions: CmcdFormatterOptions = {
+		version,
+		reportingMode,
+		baseUrl: options.baseUrl,
+	}
 	const filter = options.filter
 
 	let objectTypeValue: unknown
@@ -174,7 +184,13 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	}
 
 	if (needsObjectType && !isV1) {
-		objectTypeValue = prepareValue('ot', data['ot'], CMCD_KEY_SPECS['ot'], options, formatterOptions)
+		objectTypeValue = prepareValue(
+			'ot',
+			data['ot'],
+			CMCD_KEY_SPECS['ot'],
+			options,
+			formatterOptions,
+		)
 		objectType = toTokenString(objectTypeValue)
 	}
 

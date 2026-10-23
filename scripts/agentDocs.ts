@@ -3,8 +3,10 @@ import path from 'node:path'
 import { parseArgs } from 'node:util'
 import { projects } from './projects.ts'
 
-export const siteBase = 'https://streaming-video-technology-alliance.github.io/common-media-library/'
-export const sourceBase = 'https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/'
+export const siteBase =
+	'https://streaming-video-technology-alliance.github.io/common-media-library/'
+export const sourceBase =
+	'https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/'
 export const skillDir = 'skills/common-media-library'
 export const repoRoot: string = path.resolve(import.meta.dirname, '..')
 export const indexStart = '<!-- packages:start -->'
@@ -190,7 +192,11 @@ const fenceLine = /^(```.*)$/m
  * that holds the text. `toUrl` receives the repo path of the link target and returns the URL.
  * The content of fenced code blocks stays unchanged.
  */
-export function rewriteLinks(markdown: string, sourcePath: string, toUrl: (repoPath: string) => string): string {
+export function rewriteLinks(
+	markdown: string,
+	sourcePath: string,
+	toUrl: (repoPath: string) => string,
+): string {
 	const dir = path.posix.dirname(sourcePath)
 	let fenced = false
 
@@ -244,7 +250,8 @@ function readRepoFile(repoPath: string): string {
 function loadGuide(repoPath: string): Guide {
 	const text = readRepoFile(repoPath)
 	const front = text.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? ''
-	const field = (key: string): string => front.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))?.[1].trim() ?? ''
+	const field = (key: string): string =>
+		front.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))?.[1].trim() ?? ''
 
 	return {
 		path: repoPath,
@@ -257,11 +264,16 @@ function loadGuide(repoPath: string): Guide {
 /** Reads one package and validates its When to use section against its API report. */
 export function loadPackageDocs(folder: string): PackageDocs {
 	const slug = path.posix.basename(folder)
-	const json = JSON.parse(readRepoFile(`${folder}/package.json`)) as { name: string; description: string }
+	const json = JSON.parse(readRepoFile(`${folder}/package.json`)) as {
+		name: string
+		description: string
+	}
 	const readmePath = `${folder}/README.md`
 	const readme = readRepoFile(readmePath)
 	const configDir = path.join(repoRoot, folder, 'config')
-	const reportFile = existsSync(configDir) ? readdirSync(configDir).find(f => f.endsWith('.api.md')) : undefined
+	const reportFile = existsSync(configDir)
+		? readdirSync(configDir).find(f => f.endsWith('.api.md'))
+		: undefined
 
 	if (reportFile === undefined) {
 		throw new Error(`${folder}: no API report under config/. Build the package first.`)
@@ -295,7 +307,9 @@ export function loadPackageDocs(folder: string): PackageDocs {
 
 /** Reads every published package, ordered by folder name. */
 export function loadAllPackageDocs(): PackageDocs[] {
-	return projects.map(loadPackageDocs).sort((a, b) => (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0))
+	return projects
+		.map(loadPackageDocs)
+		.sort((a, b) => (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0))
 }
 
 /** Maps the repo path of every file that the site copies to its path under the site root. */
@@ -339,7 +353,10 @@ export function renderReference(pkg: PackageDocs, toUrl: (repoPath: string) => s
 	]
 
 	return sources
-		.map(([repoPath, text]) => `<!-- ${repoPath} -->\n${rewriteLinks(text, repoPath, toUrl).trimEnd()}\n`)
+		.map(
+			([repoPath, text]) =>
+				`<!-- ${repoPath} -->\n${rewriteLinks(text, repoPath, toUrl).trimEnd()}\n`,
+		)
 		.join('\n')
 }
 
@@ -349,7 +366,9 @@ export function replaceIndex(skill: string, index: string): string {
 	const end = skill.indexOf(indexEnd)
 
 	if (start === -1 || end === -1 || end < start) {
-		throw new Error(`${skillDir}/SKILL.md: the markers ${indexStart} and ${indexEnd} are missing or out of order.`)
+		throw new Error(
+			`${skillDir}/SKILL.md: the markers ${indexStart} and ${indexEnd} are missing or out of order.`,
+		)
 	}
 
 	return `${skill.slice(0, start + indexStart.length)}\n\n${index}\n\n${skill.slice(end)}`
@@ -432,11 +451,16 @@ export function writeSite(outDir: string): void {
 	}
 
 	writeFileSync(path.join(outDir, 'llms.txt'), renderLlmsTxt(packages))
-	writeFileSync(path.join(outDir, 'llms-full.txt'), packages.map(pkg => renderReference(pkg, toUrl)).join('\n'))
+	writeFileSync(
+		path.join(outDir, 'llms-full.txt'),
+		packages.map(pkg => renderReference(pkg, toUrl)).join('\n'),
+	)
 }
 
 if (process.argv[1] === import.meta.filename) {
-	const { values } = parseArgs({ options: { skill: { type: 'boolean' }, site: { type: 'string' } } })
+	const { values } = parseArgs({
+		options: { skill: { type: 'boolean' }, site: { type: 'string' } },
+	})
 
 	if (!values.skill && values.site === undefined) {
 		throw new Error('Pass --skill, --site <dir>, or both.')

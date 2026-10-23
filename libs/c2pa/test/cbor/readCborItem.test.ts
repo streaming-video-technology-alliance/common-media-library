@@ -4,7 +4,8 @@ import { Tag } from 'cbor-x'
 import { encode, Encoder } from 'cbor-x/encode'
 import { CborTag, decodeCbor, readCborItem } from '../../src/cbor/readCborItem.ts'
 
-const toBytes = (hex: string): Uint8Array => Uint8Array.from(Buffer.from(hex.replace(/ /g, ''), 'hex'))
+const toBytes = (hex: string): Uint8Array =>
+	Uint8Array.from(Buffer.from(hex.replace(/ /g, ''), 'hex'))
 
 // Plain CBOR as real signers emit it: no tag 64 on byte strings, and Maps encode as plain CBOR maps.
 const PLAIN = new Encoder({ tagUint8Array: false, useRecords: false, mapsAsObjects: false })
@@ -117,7 +118,11 @@ describe('decodeCbor', () => {
 		it('rejects a map with a duplicate key', () => {
 			// {"a": 1, "a": 2}, {1: 1, 1: 2}, and the first map with an indefinite length
 			for (const hex of ['a2 6161 01 6161 02', 'a2 01 01 01 02', 'bf 6161 01 6161 02 ff']) {
-				throws(() => decodeCbor(toBytes(hex)), { name: 'RangeError', message: 'Duplicate CBOR map key' }, hex)
+				throws(
+					() => decodeCbor(toBytes(hex)),
+					{ name: 'RangeError', message: 'Duplicate CBOR map key' },
+					hex,
+				)
 			}
 		})
 
@@ -130,7 +135,11 @@ describe('decodeCbor', () => {
 				'a2 f93c00 01 01 02',
 				'a2 695f5f70726f746f5f5f 01 695f5f70726f746f5f5f 02',
 			]) {
-				throws(() => decodeCbor(toBytes(hex)), { name: 'RangeError', message: 'Duplicate CBOR map key' }, hex)
+				throws(
+					() => decodeCbor(toBytes(hex)),
+					{ name: 'RangeError', message: 'Duplicate CBOR map key' },
+					hex,
+				)
 			}
 		})
 
@@ -144,7 +153,10 @@ describe('decodeCbor', () => {
 
 		it('stores a __proto__ key as an own property and keeps the prototype', () => {
 			// a1 69 5f5f70726f746f5f5f a1 6161 01: {"__proto__": {"a": 1}}
-			const value = decodeCbor(toBytes('a1 69 5f5f70726f746f5f5f a1 6161 01')) as Record<string, unknown>
+			const value = decodeCbor(toBytes('a1 69 5f5f70726f746f5f5f a1 6161 01')) as Record<
+				string,
+				unknown
+			>
 
 			ok(Object.prototype.hasOwnProperty.call(value, '__proto__'))
 			deepStrictEqual(Object.getOwnPropertyDescriptor(value, '__proto__')?.value, { a: 1 })
@@ -265,7 +277,9 @@ describe('decodeCbor', () => {
 		it('keeps the bytes of a tagged COSE_Sign1 inside a map', () => {
 			const coseSign1 = new Tag([toBytes('a10126'), new Map(), null, new Uint8Array(64)], 18)
 			const tagBytes = Uint8Array.from(PLAIN.encode(coseSign1))
-			const bytes = Uint8Array.from(PLAIN.encode({ key: 1, signerBinding: coseSign1, validityPeriod: 3600 }))
+			const bytes = Uint8Array.from(
+				PLAIN.encode({ key: 1, signerBinding: coseSign1, validityPeriod: 3600 }),
+			)
 
 			const value = decodeCbor(bytes) as { signerBinding: CborTag }
 
@@ -324,7 +338,8 @@ describe('decodeCbor', () => {
 		})
 
 		it('decodes 128 nested levels and rejects 129', () => {
-			const nested = (levels: number): Uint8Array => Uint8Array.from([...Array(levels - 1).fill(0x81), 0x80])
+			const nested = (levels: number): Uint8Array =>
+				Uint8Array.from([...Array(levels - 1).fill(0x81), 0x80])
 			let value = decodeCbor(nested(128))
 			for (let level = 1; level < 128; level++) value = (value as unknown[])[0]
 			deepStrictEqual(value, [])

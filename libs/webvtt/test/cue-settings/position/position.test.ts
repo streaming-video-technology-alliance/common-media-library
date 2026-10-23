@@ -24,7 +24,10 @@ describe('cue-settings/position tests', () => {
 	})
 
 	it('bad-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/position/bad-value.vtt', 'test/cue-settings/position/bad-position.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/position/bad-value.vtt',
+			'test/cue-settings/position/bad-position.json',
+		)
 	})
 
 	it('bogus-value.vtt', async () => {

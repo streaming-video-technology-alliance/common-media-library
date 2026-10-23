@@ -10,7 +10,11 @@ import { extractNalUnitType, getSeiData, parseCta608DataFromSei } from './utils/
  *
  * @public
  */
-export function extractCta608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {
+export function extractCta608DataFromSample(
+	raw: DataView,
+	startPos: number,
+	sampleSize: number,
+): number[][] {
 	let nalSize: number = 0
 	const fieldData: number[][] = [[], []]
 

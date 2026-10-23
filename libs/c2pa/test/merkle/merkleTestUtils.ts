@@ -66,7 +66,9 @@ async function hashPair(left: Uint8Array, right: Uint8Array): Promise<Uint8Array
 }
 
 // Builds all levels of the tree, leaf level first; null entries are rightmost padding.
-export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(Uint8Array | null)[][]> {
+export async function buildTreeLevels(
+	leaves: readonly Uint8Array[],
+): Promise<(Uint8Array | null)[][]> {
 	const depth = leaves.length > 1 ? Math.ceil(Math.log2(leaves.length)) : 0
 	const level: (Uint8Array | null)[] = [...leaves]
 	while (level.length < 2 ** depth) level.push(null)
@@ -87,7 +89,10 @@ export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(U
 }
 
 // Row as stored in the manifest: the level's nodes with null padding excluded.
-export function manifestRow(levels: readonly (readonly (Uint8Array | null)[])[], level: number): Uint8Array[] {
+export function manifestRow(
+	levels: readonly (readonly (Uint8Array | null)[])[],
+	level: number,
+): Uint8Array[] {
 	return (levels[level] ?? []).filter((node): node is Uint8Array => node !== null)
 }
 
@@ -134,7 +139,10 @@ export function buildMerkleAuxBox(
 	const purposeBytes = TEXT_ENCODER.encode(purpose)
 	const prefix = new Uint8Array(4 + purposeBytes.length + 1) // version/flags + purpose\0
 	prefix.set(purposeBytes, 4)
-	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encodeCbor(map) as Uint8Array, new Uint8Array(paddingBytes)))
+	return buildUuidBox(
+		JUMBF_UUID,
+		concatBytes(prefix, encodeCbor(map) as Uint8Array, new Uint8Array(paddingBytes)),
+	)
 }
 
 // Aux box with the right prefix but undecodable CBOR data, for malformed-payload tests.
@@ -196,7 +204,8 @@ async function assembleMerkleInitSegment(
 	})
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 	const manifestContent = [claim, assertionStore]
-	if (sign) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
+	if (sign)
+		manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
 	const manifestJumb = buildJumb(MERKLE_MANIFEST_ID, ...manifestContent)
 	const store = buildJumb('c2pa', manifestJumb)
 
@@ -210,7 +219,9 @@ async function assembleMerkleInitSegment(
 
 // Unsigned init segment with a `c2pa.hash.bmff.v3` assertion. It has no signature box, so
 // validation reports CLAIM_SIGNATURE_MISSING next to the codes a test asserts on.
-export async function buildMerkleInitSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
+export async function buildMerkleInitSegment(
+	assertionData: Record<string, unknown>,
+): Promise<Uint8Array> {
 	return assembleMerkleInitSegment(assertionData, null)
 }
 

@@ -137,7 +137,14 @@ export class Row {
 		if (this.pos >= NR_COLS) {
 			this.logger.log(
 				VerboseLevel.ERROR,
-				() => 'Cannot insert ' + byte.toString(16) + ' (' + char + ') at position ' + this.pos + '. Skipping it!',
+				() =>
+					'Cannot insert ' +
+					byte.toString(16) +
+					' (' +
+					char +
+					') at position ' +
+					this.pos +
+					'. Skipping it!',
 			)
 			return
 		}

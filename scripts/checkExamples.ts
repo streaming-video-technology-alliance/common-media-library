@@ -181,7 +181,9 @@ export function readExampleContext(repoRoot: string, file: string): ContextState
 	const contextFile = file.replace(/\.md$/, '.context.d.ts')
 	const fullPath = path.join(repoRoot, contextFile)
 
-	return existsSync(fullPath) ? parseExampleContext(readFileSync(fullPath, 'utf8'), contextFile) : []
+	return existsSync(fullPath)
+		? parseExampleContext(readFileSync(fullPath, 'utf8'), contextFile)
+		: []
 }
 
 /** Reads every example block of the files that `listExampleFiles` returns, with the context of each file. */
@@ -234,7 +236,9 @@ function contextHeader(block: ExampleBlock): Header {
 		lines += statement.text.split('\n').length
 	}
 
-	return parts.length === 0 ? emptyHeader : { text: `${parts.join('\n')}\n\n`, lines: lines + 1, statements }
+	return parts.length === 0
+		? emptyHeader
+		: { text: `${parts.join('\n')}\n\n`, lines: lines + 1, statements }
 }
 
 /** The root tsconfig options, adjusted for a noEmit check of standalone blocks. */
@@ -246,10 +250,15 @@ export function exampleCompilerOptions(repoRoot: string): ts.CompilerOptions {
 		throw new Error(ts.flattenDiagnosticMessageText(config.error.messageText, '\n'))
 	}
 
-	const { options, errors } = ts.convertCompilerOptionsFromJson(config.config.compilerOptions, repoRoot)
+	const { options, errors } = ts.convertCompilerOptionsFromJson(
+		config.config.compilerOptions,
+		repoRoot,
+	)
 
 	if (errors.length > 0) {
-		throw new Error(errors.map(error => ts.flattenDiagnosticMessageText(error.messageText, '\n')).join('\n'))
+		throw new Error(
+			errors.map(error => ts.flattenDiagnosticMessageText(error.messageText, '\n')).join('\n'),
+		)
 	}
 
 	const {
@@ -321,7 +330,8 @@ function locate(diagnostic: ts.Diagnostic, origin: Map<string, Origin>): Example
 	const { line } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
 
 	if (line < header.lines) {
-		const entry = header.statements.findLast(candidate => candidate.start <= line) ?? header.statements[0]
+		const entry =
+			header.statements.findLast(candidate => candidate.start <= line) ?? header.statements[0]
 		return {
 			file: entry.statement.file,
 			line: entry.statement.line + (line - entry.start),
@@ -330,7 +340,12 @@ function locate(diagnostic: ts.Diagnostic, origin: Map<string, Origin>): Example
 		}
 	}
 
-	return { file: block.file, line: block.line + 1 + (line - header.lines), code: diagnostic.code, message }
+	return {
+		file: block.file,
+		line: block.line + 1 + (line - header.lines),
+		code: diagnostic.code,
+		message,
+	}
 }
 
 /** `file:line TScode: message`, one line. */

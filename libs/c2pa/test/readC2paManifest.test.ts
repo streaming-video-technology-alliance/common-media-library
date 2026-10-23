@@ -48,7 +48,9 @@ describe('readC2paManifest', () => {
 		doesNotThrow(() => readC2paManifest(bytes))
 
 		const { manifest } = readC2paManifest(bytes)
-		const liveVideoAssertion = manifest.assertions.find((a: C2paAssertion) => a.label === 'c2pa.livevideo.segment')
+		const liveVideoAssertion = manifest.assertions.find(
+			(a: C2paAssertion) => a.label === 'c2pa.livevideo.segment',
+		)
 
 		ok(liveVideoAssertion !== undefined, 'c2pa.livevideo.segment assertion should be present')
 	})
@@ -72,7 +74,10 @@ describe('readC2paManifest', () => {
 		const bytes = loadFixture('init_signed_with_session_keys.m4s')
 		const { manifest } = readC2paManifest(bytes)
 
-		ok(typeof manifest.instanceId === 'string' || manifest.instanceId === null, 'instanceId should be string or null')
+		ok(
+			typeof manifest.instanceId === 'string' || manifest.instanceId === null,
+			'instanceId should be string or null',
+		)
 	})
 
 	it('projects the createdAt of a session key to a Date in the public data', () => {
@@ -143,7 +148,9 @@ describe('readC2paManifest', () => {
 
 	for (const [description, claimCbor] of CLAIMS_THAT_ARE_NOT_MAPS) {
 		it(`reports CLAIM_MALFORMED for a claim box that holds ${description}`, () => {
-			const { claimCode, claimCborBytes, claimAssertionRefs, manifest } = readC2paManifest(manifestWithClaim(claimCbor))
+			const { claimCode, claimCborBytes, claimAssertionRefs, manifest } = readC2paManifest(
+				manifestWithClaim(claimCbor),
+			)
 
 			strictEqual(claimCode, 'claim.malformed')
 			strictEqual(claimCode, C2paStatusCode.CLAIM_MALFORMED)

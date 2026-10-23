@@ -35,13 +35,19 @@ describe('shouldExcludeBox', () => {
 
 	it('returns false for an exclusion with a subset', () => {
 		const [moov] = readRootBoxes(buildBox('moov', new Uint8Array(16)))
-		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 8, length: 0 }] }]), false)
+		strictEqual(
+			shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 8, length: 0 }] }]),
+			false,
+		)
 	})
 
 	// §19.2.3: a subset that covers every byte of the box leaves nothing of the box in the hash.
 	it('returns true for subset ranges that cover the whole box', () => {
 		const [moov] = readRootBoxes(buildBox('moov', buildBox('free')))
-		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 0 }] }]), true)
+		strictEqual(
+			shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 0 }] }]),
+			true,
+		)
 		strictEqual(
 			shouldExcludeBox(moov, [
 				{
@@ -55,20 +61,33 @@ describe('shouldExcludeBox', () => {
 			true,
 		)
 		strictEqual(
-			shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 8 }] }, { xpath: '/moov/free' }]),
+			shouldExcludeBox(moov, [
+				{ xpath: '/moov', subset: [{ offset: 0, length: 8 }] },
+				{ xpath: '/moov/free' },
+			]),
 			true,
 		)
 	})
 
 	it('returns false for subset ranges that leave a byte of the box', () => {
 		const [moov] = readRootBoxes(buildBox('moov', new Uint8Array(16)))
-		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 1, length: 0 }] }]), false)
-		strictEqual(shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 23 }] }]), false)
+		strictEqual(
+			shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 1, length: 0 }] }]),
+			false,
+		)
+		strictEqual(
+			shouldExcludeBox(moov, [{ xpath: '/moov', subset: [{ offset: 0, length: 23 }] }]),
+			false,
+		)
 	})
 
 	describe('xpath index', () => {
 		const [first, , second] = readRootBoxes(
-			concatBytes(buildBox('uuid', Uint8Array.of(1)), buildBox('free'), buildBox('uuid', Uint8Array.of(2))),
+			concatBytes(
+				buildBox('uuid', Uint8Array.of(1)),
+				buildBox('free'),
+				buildBox('uuid', Uint8Array.of(2)),
+			),
 		)
 
 		it('matches [1] against the first box of the type', () => {
@@ -111,13 +130,25 @@ describe('shouldExcludeBox', () => {
 
 		it('matches the flags exactly by default', () => {
 			strictEqual(shouldExcludeBox(meta, [{ xpath: '/meta', flags: Uint8Array.of(0, 0, 5) }]), true)
-			strictEqual(shouldExcludeBox(meta, [{ xpath: '/meta', flags: Uint8Array.of(0, 0, 1) }]), false)
+			strictEqual(
+				shouldExcludeBox(meta, [{ xpath: '/meta', flags: Uint8Array.of(0, 0, 1) }]),
+				false,
+			)
 		})
 
 		it('matches the flags as a bit mask when exact is false', () => {
-			strictEqual(shouldExcludeBox(meta, [{ xpath: '/meta', flags: [0, 0, 1], exact: false }]), true)
-			strictEqual(shouldExcludeBox(meta, [{ xpath: '/meta', flags: [0, 0, 1], exact: true }]), false)
-			strictEqual(shouldExcludeBox(meta, [{ xpath: '/meta', flags: [0, 0, 2], exact: false }]), false)
+			strictEqual(
+				shouldExcludeBox(meta, [{ xpath: '/meta', flags: [0, 0, 1], exact: false }]),
+				true,
+			)
+			strictEqual(
+				shouldExcludeBox(meta, [{ xpath: '/meta', flags: [0, 0, 1], exact: true }]),
+				false,
+			)
+			strictEqual(
+				shouldExcludeBox(meta, [{ xpath: '/meta', flags: [0, 0, 2], exact: false }]),
+				false,
+			)
 		})
 
 		it('does not match a box too short for a version and flags', () => {
@@ -132,7 +163,9 @@ describe('shouldExcludeBox', () => {
 		})
 
 		it('reads the version and flags after the usertype of a uuid box', () => {
-			const [uuid] = readRootBoxes(buildBox('uuid', concatBytes(new Uint8Array(16), FULLBOX_HEADER)))
+			const [uuid] = readRootBoxes(
+				buildBox('uuid', concatBytes(new Uint8Array(16), FULLBOX_HEADER)),
+			)
 			strictEqual(shouldExcludeBox(uuid, [{ xpath: '/uuid', version: 1, flags: [0, 0, 5] }]), true)
 			strictEqual(shouldExcludeBox(uuid, [{ xpath: '/uuid', version: 0 }]), false)
 		})
@@ -146,20 +179,29 @@ describe('shouldExcludeBox', () => {
 
 		it('matches the box bytes at the offset from the box start', () => {
 			strictEqual(
-				shouldExcludeBox(uuid, [{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xca, 0xfe) }] }]),
+				shouldExcludeBox(uuid, [
+					{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xca, 0xfe) }] },
+				]),
 				true,
 			)
 		})
 
 		it('does not match other bytes', () => {
 			strictEqual(
-				shouldExcludeBox(uuid, [{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xaa, 0xbb) }] }]),
+				shouldExcludeBox(uuid, [
+					{ xpath: '/uuid', data: [{ offset: 8, value: Uint8Array.of(0xaa, 0xbb) }] },
+				]),
 				false,
 			)
 		})
 
 		it('does not match a value that runs past the end of the box', () => {
-			strictEqual(shouldExcludeBox(uuid, [{ xpath: '/uuid', data: [{ offset: 20, value: new Uint8Array(8) }] }]), false)
+			strictEqual(
+				shouldExcludeBox(uuid, [
+					{ xpath: '/uuid', data: [{ offset: 20, value: new Uint8Array(8) }] },
+				]),
+				false,
+			)
 		})
 	})
 })

@@ -67,7 +67,10 @@ async function updateChangelog(
 
 	if (index >= 0) {
 		const unreleased = links[index]
-		links[index] = unreleased.replace(/\/[0-9a-z-]+v[0-9a-zA-Z.-]+\.\.\.HEAD/, `/${versionTag}...HEAD`)
+		links[index] = unreleased.replace(
+			/\/[0-9a-z-]+v[0-9a-zA-Z.-]+\.\.\.HEAD/,
+			`/${versionTag}...HEAD`,
+		)
 		links.splice(
 			index + 1,
 			0,
@@ -140,7 +143,9 @@ while (bumped) {
 		// Bump the version: use prerelease for pre-release versions, patch otherwise
 		const previousVersion = pkg.current.version
 		const isPrerelease = /^\d+\.\d+\.\d+-.+$/.test(previousVersion)
-		await cmd(`npm --no-git-tag-version version ${isPrerelease ? 'prerelease' : 'patch'} -w ${pkg.folder}`)
+		await cmd(
+			`npm --no-git-tag-version version ${isPrerelease ? 'prerelease' : 'patch'} -w ${pkg.folder}`,
+		)
 
 		// Re-read the updated version
 		const updated = await loadCurrentPackage(pkg.folder)
@@ -183,7 +188,9 @@ for (const pkg of packages) {
 }
 
 if (unreleased.length > 0) {
-	console.warn(`\nWarning: ${unreleased.length} package(s) have unreleased changelog entries and no version change:`)
+	console.warn(
+		`\nWarning: ${unreleased.length} package(s) have unreleased changelog entries and no version change:`,
+	)
 	console.warn(unreleased.join('\n'))
 	console.warn('Run "npm run ver <package> <version>" for each package whose changes should ship.')
 }

@@ -96,14 +96,23 @@ describe('placeholderAfterSample', () => {
 		)
 
 		closeTo(decayed, SMALL_PLACEHOLDER * PLACEHOLDER_DECAY + SEGMENT_DURATION, TOLERANCE)
-		closeTo(capped, MAXIMUM_BUFFERS[0] - (HIGH_BUFFER_LEVEL + REQUEST_SECONDS) + SEGMENT_DURATION, TOLERANCE)
+		closeTo(
+			capped,
+			MAXIMUM_BUFFERS[0] - (HIGH_BUFFER_LEVEL + REQUEST_SECONDS) + SEGMENT_DURATION,
+			TOLERANCE,
+		)
 	})
 
 	it('adds nothing for a segment that is not a replacement', () => {
 		const plain = placeholderAfterSample(PARAMS, SMALL_PLACEHOLDER, sampleAt(1), LOW_BUFFER_LEVEL)
 
 		equal(
-			placeholderAfterSample(PARAMS, SMALL_PLACEHOLDER, sampleAt(1, { isReplacement: false }), LOW_BUFFER_LEVEL),
+			placeholderAfterSample(
+				PARAMS,
+				SMALL_PLACEHOLDER,
+				sampleAt(1, { isReplacement: false }),
+				LOW_BUFFER_LEVEL,
+			),
 			plain,
 		)
 	})

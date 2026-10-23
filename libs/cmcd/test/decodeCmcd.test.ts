@@ -66,7 +66,8 @@ describe('decodeCmcd', () => {
 		// Token preservation plus params preservation make the codec
 		// symmetric: with tokens reduced to strings (the default), a
 		// custom-key token would re-encode quoted.
-		const s = 'br=(3000;ot=v 6000),com.example-tok=abc,com.example-x=1;p=2,ot=v,su,tab=(3000);p=2,v=2'
+		const s =
+			'br=(3000;ot=v 6000),com.example-tok=abc,com.example-x=1;p=2,ot=v,su,tab=(3000);p=2,v=2'
 
 		equal(encodeCmcd(decodeCmcd(s, { useSymbol: false }) as Cmcd), s)
 		equal(encodeCmcd(decodeCmcd(s, { useSymbol: true }) as Cmcd), s)

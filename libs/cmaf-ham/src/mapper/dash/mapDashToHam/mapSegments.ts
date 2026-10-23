@@ -24,10 +24,15 @@ import { mapSegmentTemplate } from './mapSegmentTemplate.ts'
  * @param duration - Duration of the segments
  * @returns list of ham segments
  */
-export function mapSegments(adaptationSet: AdaptationSet, representation: Representation, duration: number): Segment[] {
+export function mapSegments(
+	adaptationSet: AdaptationSet,
+	representation: Representation,
+	duration: number,
+): Segment[] {
 	const segmentTemplate: SegmentTemplate | undefined =
 		adaptationSet.SegmentTemplate?.at(0) ?? representation.SegmentTemplate?.at(0)
-	const segmentList: SegmentList[] | undefined = adaptationSet.SegmentList ?? representation.SegmentList
+	const segmentList: SegmentList[] | undefined =
+		adaptationSet.SegmentList ?? representation.SegmentList
 	if (representation.SegmentBase) {
 		return mapSegmentBase(representation, duration)
 	} else if (segmentList) {

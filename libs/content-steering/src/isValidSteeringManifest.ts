@@ -15,7 +15,12 @@ export function isValidSteeringManifest(manifest: SteeringManifest): boolean {
 		return false
 	}
 
-	const { VERSION, TTL, 'PATHWAY-PRIORITY': PATHWAY_PRIORITY, 'PATHWAY-CLONES': PATHWAY_CLONES } = manifest
+	const {
+		VERSION,
+		TTL,
+		'PATHWAY-PRIORITY': PATHWAY_PRIORITY,
+		'PATHWAY-CLONES': PATHWAY_CLONES,
+	} = manifest
 
 	// version is required and must be a valid number
 	if (typeof VERSION !== 'number' || VERSION !== 1) {

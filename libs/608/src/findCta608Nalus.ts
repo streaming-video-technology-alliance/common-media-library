@@ -24,7 +24,12 @@ export function findCta608Nalus(raw: DataView, startPos: number, size: number): 
 		const providerCode = raw.getUint16(pos + 1)
 		const userIdentifier = raw.getUint32(pos + 3)
 		const userDataTypeCode = raw.getUint8(pos + 7)
-		return countryCode == 181 && providerCode == 49 && userIdentifier == 1195456820 && userDataTypeCode == 3
+		return (
+			countryCode == 181 &&
+			providerCode == 49 &&
+			userIdentifier == 1195456820 &&
+			userDataTypeCode == 3
+		)
 	}
 
 	while (cursor < startPos + size) {

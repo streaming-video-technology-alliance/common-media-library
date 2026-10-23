@@ -68,4 +68,9 @@ export type CmcdHeaderField = ValueOf<typeof CmcdHeaderField>
  *
  * @public
  */
-export const CMCD_HEADER_FIELDS: readonly CmcdHeaderField[] = [CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS]
+export const CMCD_HEADER_FIELDS: readonly CmcdHeaderField[] = [
+	CMCD_OBJECT,
+	CMCD_REQUEST,
+	CMCD_SESSION,
+	CMCD_STATUS,
+]

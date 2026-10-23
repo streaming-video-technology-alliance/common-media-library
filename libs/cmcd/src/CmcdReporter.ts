@@ -107,7 +107,8 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 		const ai = a[i]
 		const bi = b[i]
 		if (ai === bi) continue
-		if ((typeof ai === 'number' ? ai : ai.value) !== (typeof bi === 'number' ? bi : bi.value)) return false
+		if ((typeof ai === 'number' ? ai : ai.value) !== (typeof bi === 'number' ? bi : bi.value))
+			return false
 
 		// ExclusiveRecord: params (when defined) has exactly one key
 		const ap = typeof ai === 'number' ? undefined : ai.params
@@ -115,7 +116,13 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 		const ak = ap && Object.keys(ap)[0]
 		const bk = bp && Object.keys(bp)[0]
 		if (ak !== bk) return false
-		if (ak !== undefined && bk !== undefined && ap && bp && ap[ak as keyof typeof ap] !== bp[bk as keyof typeof bp])
+		if (
+			ak !== undefined &&
+			bk !== undefined &&
+			ap &&
+			bp &&
+			ap[ak as keyof typeof ap] !== bp[bk as keyof typeof bp]
+		)
 			return false
 	}
 
@@ -179,7 +186,8 @@ function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
  * beyond `e` and `ts`. Built from the state-change table plus the three
  * event types whose required key is event data, not player state.
  */
-const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
+const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> =
+	/* @__PURE__ */ buildRequiredEventKeys()
 
 /**
  * Copies a value with the `SfItem` structure, including its `params` record
@@ -257,7 +265,9 @@ function copyReportValues(data: Cmcd): Cmcd {
  */
 function decodeSnapshot(provenance: unknown): Cmcd {
 	const encoded =
-		provenance !== null && typeof provenance === 'object' ? (provenance as { data?: unknown }).data : undefined
+		provenance !== null && typeof provenance === 'object'
+			? (provenance as { data?: unknown }).data
+			: undefined
 
 	if (typeof encoded !== 'string' || !encoded) {
 		return {}
@@ -285,9 +295,17 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	return fetch(url, init)
 }
 
-function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): CmcdReporterConfigNormalized<C> {
+function createCmcdReporterConfig<C>(
+	config: Partial<CmcdReporterConfig<C>>,
+): CmcdReporterConfigNormalized<C> {
 	// Apply top-level config defaults
-	const { version = CMCD_V2, eventTargets = [], sid = uuid(), transmissionMode = CMCD_QUERY, ...rest } = config
+	const {
+		version = CMCD_V2,
+		eventTargets = [],
+		sid = uuid(),
+		transmissionMode = CMCD_QUERY,
+		...rest
+	} = config
 
 	// Type-checked, never type-coerced: a numeric string or boolean falls
 	// back to the default instead of converting, and a Symbol must not
@@ -377,7 +395,8 @@ type CmcdSession<C> = {
  * @public
  */
 export class CmcdReporter<C = Record<string, unknown>> {
-	private timeOrigin = performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
+	private timeOrigin =
+		performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
 	private config: CmcdReporterConfigNormalized<C>
 
 	/**
@@ -642,7 +661,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// (not the pre-merge value) ensures correctness after a session change,
 		// and unifies the comparison basis with recordEvent's internal dedup.
 		for (const entry of STATE_FIELDS) {
-			if (entry.field in data && !entry.equal(session.data[entry.field], session.lastEmitted[entry.field])) {
+			if (
+				entry.field in data &&
+				!entry.equal(session.data[entry.field], session.lastEmitted[entry.field])
+			) {
 				this.recordEvent(entry.event)
 			}
 		}
@@ -758,7 +780,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *                  parameter, which the reporter passes to each target's
 	 *                  `transform`.
 	 */
-	private emitEvent(session: CmcdSession<C>, type: CmcdEventType, data: Partial<Cmcd>, request?: HttpRequest): void {
+	private emitEvent(
+		session: CmcdSession<C>,
+		type: CmcdEventType,
+		data: Partial<Cmcd>,
+		request?: HttpRequest,
+	): void {
 		const entry = STATE_FIELDS_BY_EVENT.get(type)
 		if (entry) {
 			const field = entry.field
@@ -883,7 +910,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			report.ts = ts
 		}
 
-		if (requiredKey && isValid(requiredValue) && !isValid((report as Record<string, unknown>)[requiredKey])) {
+		if (
+			requiredKey &&
+			isValid(requiredValue) &&
+			!isValid((report as Record<string, unknown>)[requiredKey])
+		) {
 			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 
@@ -987,7 +1018,9 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *               supplied here.
 	 */
 	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(
-		response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance }>>,
+		response: HttpResponse<
+			HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance }>
+		>,
 		data: Partial<Cmcd> = {},
 	): void {
 		const { request } = response
@@ -1005,7 +1038,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		const cmcd = provenance === undefined ? { ...request.customData?.cmcd } : decodeSnapshot(provenance)
+		const cmcd =
+			provenance === undefined ? { ...request.customData?.cmcd } : decodeSnapshot(provenance)
 
 		// The record's cid is the content the request was issued under. It
 		// overrides the session store's current value so a response landing
@@ -1098,7 +1132,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * and reports derived keys over session data, matching the tolerance of
 	 * `decodeSnapshot()` when reading.
 	 */
-	private createRequestProvenance(data: Partial<Cmcd> | undefined, baseUrl: string | undefined): CmcdRequestProvenance {
+	private createRequestProvenance(
+		data: Partial<Cmcd> | undefined,
+		baseUrl: string | undefined,
+	): CmcdRequestProvenance {
 		const base = this.session.provenance
 
 		if (!data) {
@@ -1337,7 +1374,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * current session, the method also cancels those configs' timers. A session
 	 * started after the disposal gets new target state and is unaffected.
 	 */
-	private disposeEventTarget(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>): void {
+	private disposeEventTarget(
+		session: CmcdSession<C>,
+		config: CmcdEventReportConfigNormalized<C>,
+	): void {
 		session.eventTargets.forEach((target, sibling) => {
 			if (sibling.url !== config.url || target.disposed) {
 				return

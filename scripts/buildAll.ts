@@ -39,7 +39,10 @@ function buildWorkspace(workspace: Workspace): Promise<void> {
 	const started = performance.now()
 
 	return new Promise<void>((resolve, reject) => {
-		const child = spawnTree(process.execPath, [build], { cwd: path.join(root, workspace.folder), env })
+		const child = spawnTree(process.execPath, [build], {
+			cwd: path.join(root, workspace.folder),
+			env,
+		})
 		const output: Buffer[] = []
 
 		children.add(child)

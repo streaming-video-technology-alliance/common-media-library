@@ -44,7 +44,10 @@ import { serializeError } from './serializeError.ts'
 /**
  * @internal
  */
-export function serializeDict(dict: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string {
+export function serializeDict(
+	dict: Record<string, any> | Map<string, any>,
+	options?: SfEncodeOptions,
+): string {
 	if (typeof dict !== 'object' || dict == null) {
 		throw serializeError(dict, DICT)
 	}

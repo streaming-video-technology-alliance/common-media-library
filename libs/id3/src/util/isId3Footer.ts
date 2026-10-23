@@ -18,7 +18,12 @@ export function isId3Footer(data: Uint8Array, offset: number): boolean {
 			// check version is within range
 			if (data[offset + 3] < 0xff && data[offset + 4] < 0xff) {
 				// check size is within range
-				if (data[offset + 6] < 0x80 && data[offset + 7] < 0x80 && data[offset + 8] < 0x80 && data[offset + 9] < 0x80) {
+				if (
+					data[offset + 6] < 0x80 &&
+					data[offset + 7] < 0x80 &&
+					data[offset + 8] < 0x80 &&
+					data[offset + 9] < 0x80
+				) {
 					return true
 				}
 			}

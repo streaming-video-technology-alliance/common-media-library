@@ -27,7 +27,11 @@ function pickBandwidth(params: BolaParams, effectiveBuffer: number): number {
 
 // Calls `check` with the bandwidth picked before and after the conversion, for every buffer level of the grid.
 // The converted buffer can be negative. The selector keeps the placeholder at 0 or more, so the effective buffer is too.
-function forEachLevel(previous: BolaParams, next: BolaParams, check: (before: number, after: number) => void): void {
+function forEachLevel(
+	previous: BolaParams,
+	next: BolaParams,
+	check: (before: number, after: number) => void,
+): void {
 	for (let effectiveBuffer = 0; effectiveBuffer <= GRID_END; effectiveBuffer += GRID_STEP) {
 		const converted = Math.max(0, remapEffectiveBuffer(previous, next, effectiveBuffer))
 
@@ -40,7 +44,11 @@ describe('remapEffectiveBuffer', () => {
 		const params = createBolaParams(L1, TARGET)
 
 		for (const effectiveBuffer of [0, 4.5, 11, 25]) {
-			closeTo(remapEffectiveBuffer(params, params, effectiveBuffer), effectiveBuffer, IDENTITY_TOLERANCE)
+			closeTo(
+				remapEffectiveBuffer(params, params, effectiveBuffer),
+				effectiveBuffer,
+				IDENTITY_TOLERANCE,
+			)
 		}
 	})
 
@@ -86,13 +94,17 @@ describe('remapEffectiveBuffer', () => {
 	})
 
 	it('changes decisions only where the lowest rung is removed', () => {
-		forEachLevel(createBolaParams(L1, TARGET), createBolaParams(withoutRung(L1, 0), TARGET), (before, after) => {
-			if (before === LOWEST) {
-				equal(after, SECOND)
-			} else {
-				equal(after, before)
-			}
-		})
+		forEachLevel(
+			createBolaParams(L1, TARGET),
+			createBolaParams(withoutRung(L1, 0), TARGET),
+			(before, after) => {
+				if (before === LOWEST) {
+					equal(after, SECOND)
+				} else {
+					equal(after, before)
+				}
+			},
+		)
 	})
 
 	it('changes decisions only next to a rung that is added in the middle', () => {
@@ -112,12 +124,16 @@ describe('remapEffectiveBuffer', () => {
 	})
 
 	it('changes decisions only where a rung is removed from the middle', () => {
-		forEachLevel(createBolaParams(L1, TARGET), createBolaParams(withoutRung(L1, 2), TARGET), (before, after) => {
-			if (before === MIDDLE) {
-				ok(after === SECOND || after === FOURTH)
-			} else {
-				equal(after, before)
-			}
-		})
+		forEachLevel(
+			createBolaParams(L1, TARGET),
+			createBolaParams(withoutRung(L1, 2), TARGET),
+			(before, after) => {
+				if (before === MIDDLE) {
+					ok(after === SECOND || after === FOURTH)
+				} else {
+					equal(after, before)
+				}
+			},
+		)
 	})
 })

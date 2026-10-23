@@ -19,7 +19,8 @@ export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
 	const defaultIsEncryptedSize = 3
 	const defaultIvSizeSize = 1
 	const defaultKidSize = 16
-	const totalSize = headerSize + fullBoxSize + defaultIsEncryptedSize + defaultIvSizeSize + defaultKidSize
+	const totalSize =
+		headerSize + fullBoxSize + defaultIsEncryptedSize + defaultIvSizeSize + defaultKidSize
 
 	const writer = new IsoBoxWriteView('tenc', totalSize)
 	writer.writeFullBox(box.version, box.flags)

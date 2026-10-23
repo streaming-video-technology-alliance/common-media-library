@@ -35,7 +35,8 @@ describe('validateLadder', () => {
 	it('throws with both positions and values when the ladder is not in ascending order', () => {
 		throws(() => validateLadder(rungs(300_000, 1_500_000, 750_000, 3_000_000)), {
 			name: 'RangeError',
-			message: 'Invalid ladder: expected ascending bandwidth, received 1500000 at 1 and 750000 at 2',
+			message:
+				'Invalid ladder: expected ascending bandwidth, received 1500000 at 1 and 750000 at 2',
 		})
 	})
 })

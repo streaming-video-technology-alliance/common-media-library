@@ -1,5 +1,11 @@
 import type { Cmcd, CmcdEncodeOptions } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, decodeCmcd, encodeCmcd } from '@svta/cml-cmcd'
+import {
+	CmcdEventType,
+	CmcdPlayerState,
+	CmcdReportingMode,
+	decodeCmcd,
+	encodeCmcd,
+} from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -15,7 +21,10 @@ describe('encodeCmcd', () => {
 		//#region example
 		const input = { br: [1000], 'com.example-hello': 'world', ec: ['ERR001', 'ERR002'], su: true }
 		const options = { version: 2 as const, reportingMode: CmcdReportingMode.REQUEST }
-		equal(encodeCmcd(input, options), 'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2')
+		equal(
+			encodeCmcd(input, options),
+			'br=(1000),com.example-hello="world",ec=("ERR001" "ERR002"),su,v=2',
+		)
 		//#endregion example
 	})
 
@@ -25,7 +34,10 @@ describe('encodeCmcd', () => {
 
 	it('ignore invalid values', () => {
 		// @ts-expect-error - This is a test
-		equal(encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }), 'v=2')
+		equal(
+			encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }),
+			'v=2',
+		)
 	})
 
 	it('rounds tbl to the nearest 100 ms', () => {
@@ -68,7 +80,10 @@ describe('encodeCmcd', () => {
 	})
 
 	it('rounds the aggregate bitrate keys to integers', () => {
-		equal(encodeCmcd({ ab: [4000.6], lab: [1500.5], tab: [6049.6] }), 'ab=(4001),lab=(1501),tab=(6050),v=2')
+		equal(
+			encodeCmcd({ ab: [4000.6], lab: [1500.5], tab: [6049.6] }),
+			'ab=(4001),lab=(1501),tab=(6050),v=2',
+		)
 	})
 
 	it('rounds the integer request keys to integers', () => {
@@ -96,12 +111,22 @@ describe('encodeCmcd', () => {
 
 	it('rounds a fractional ts instead of failing to serialize it', () => {
 		const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, ts: 1727712000000.5 }
-		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=ps,sta=p,ts=1727712000001,v=2')
+		equal(
+			encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }),
+			'e=ps,sta=p,ts=1727712000001,v=2',
+		)
 	})
 
 	it('drops an inner list element that is not a finite number', () => {
 		const input = {
-			pb: [2500.4, null, 'abc', Infinity, toCmcdValue('x', { v: true }), toCmcdValue(1000.6, { a: true })],
+			pb: [
+				2500.4,
+				null,
+				'abc',
+				Infinity,
+				toCmcdValue('x', { v: true }),
+				toCmcdValue(1000.6, { a: true }),
+			],
 		} as unknown as Cmcd
 		equal(encodeCmcd(input), 'pb=(2500 1001;a),v=2')
 	})
@@ -123,7 +148,11 @@ describe('encodeCmcd', () => {
 
 	it('replaces a ts that is not a number with the current time', context => {
 		context.mock.timers.enable({ apis: ['Date'], now: 1234 })
-		const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, ts: '1727712000000' } as unknown as Cmcd
+		const input = {
+			e: CmcdEventType.PLAY_STATE,
+			sta: CmcdPlayerState.PLAYING,
+			ts: '1727712000000',
+		} as unknown as Cmcd
 		equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), 'e=ps,sta=p,ts=1234,v=2')
 	})
 
@@ -148,7 +177,10 @@ describe('encodeCmcd', () => {
 
 		it("doesn't filter version key", () => {
 			equal(
-				encodeCmcd({ v: 2, cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' }),
+				encodeCmcd(
+					{ v: 2, cid: 'content-id', sid: 'session-id' },
+					{ filter: key => key === 'cid' },
+				),
 				'cid="content-id",v=2',
 			)
 		})
@@ -156,103 +188,166 @@ describe('encodeCmcd', () => {
 		it("doesn't filter e key in event mode", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.TIME_INTERVAL, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			ok(output.includes('e=t'), 'e key must not be filtered out in event mode')
 		})
 
 		it("doesn't filter ts key in event mode", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.TIME_INTERVAL, ts: 1640995200000, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			ok(output.includes('ts='), 'ts key must not be filtered out in event mode')
 		})
 
 		it("doesn't filter cen key in event mode when event type is ce", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.CUSTOM_EVENT, cen: 'my-custom-event', cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
-			ok(output.includes('cen="my-custom-event"'), 'cen key must not be filtered out in event mode when e=ce')
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
+			ok(
+				output.includes('cen="my-custom-event"'),
+				'cen key must not be filtered out in event mode when e=ce',
+			)
 		})
 
 		it("doesn't filter sta key in event mode when event type is ps", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			ok(output.includes('sta='), 'sta key must not be filtered out in event mode when e=ps')
 		})
 
 		it("doesn't filter pr key in event mode when event type is pr", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1.5, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			ok(output.includes('pr='), 'pr key must not be filtered out in event mode when e=pr')
 		})
 
 		it("doesn't filter cid key in event mode when event type is c", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.CONTENT_ID, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'sid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'sid',
+			})
 			ok(output.includes('cid='), 'cid key must not be filtered out in event mode when e=c')
 		})
 
 		it("doesn't filter bg key in event mode when event type is b", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.BACKGROUNDED_MODE, bg: true, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			ok(output.includes('bg'), 'bg key must not be filtered out in event mode when e=b')
 		})
 
 		it('encodes bg=?0 in event mode when bg is false', context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.BACKGROUNDED_MODE, bg: false, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			ok(output.includes('bg=?0'), 'bg must be emitted as ?0 when false on e=b state-change event')
 		})
 
 		it('still strips bg=false in request mode', () => {
 			const input = { bg: false, cid: 'content-id' }
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST })
-			equal(output.includes('bg'), false, 'bg=false should still be stripped in request mode (v1 default-omission)')
+			equal(
+				output.includes('bg'),
+				false,
+				'bg=false should still be stripped in request mode (v1 default-omission)',
+			)
 		})
 
 		it('still strips bg=false in non-b event mode', context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
-			const input = { e: CmcdEventType.RESPONSE_RECEIVED, bg: false, url: 'https://example.com/v.mp4' }
+			const input = {
+				e: CmcdEventType.RESPONSE_RECEIVED,
+				bg: false,
+				url: 'https://example.com/v.mp4',
+			}
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
-			equal(output.includes('bg'), false, 'bg=false should still be stripped when event type is not b')
+			equal(
+				output.includes('bg'),
+				false,
+				'bg=false should still be stripped when event type is not b',
+			)
 		})
 
 		it('still strips sta="" in event mode when event type is ps', context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.PLAY_STATE, sta: '' as any, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			equal(output.includes('sta='), false, 'sta="" is a caller bug and should not be carved out')
 		})
 
 		it('still strips cid=false in event mode when event type is c', context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.CONTENT_ID, cid: false as any, sid: 'session-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'sid' })
-			equal(output.includes('cid='), false, 'cid=false is a caller bug (cid is a string field); carve-out is bg-only')
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'sid',
+			})
+			equal(
+				output.includes('cid='),
+				false,
+				'cid=false is a caller bug (cid is a string field); carve-out is bg-only',
+			)
 		})
 
 		it("doesn't filter br key in event mode when event type is bc", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.BITRATE_CHANGE, br: [3000], cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			ok(output.includes('br='), 'br key must not be filtered out in event mode when e=bc')
 		})
 
 		it("doesn't force-include sta when value is undefined", context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const input = { e: CmcdEventType.PLAY_STATE, cid: 'content-id' }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' })
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.EVENT,
+				filter: key => key === 'cid',
+			})
 			equal(output.includes('sta='), false)
 		})
 
 		it("doesn't force-include required field in request mode", () => {
-			const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id', br: [3000] }
-			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST, filter: key => key === 'br' })
+			const input = {
+				e: CmcdEventType.PLAY_STATE,
+				sta: CmcdPlayerState.PLAYING,
+				cid: 'content-id',
+				br: [3000],
+			}
+			const output = encodeCmcd(input, {
+				reportingMode: CmcdReportingMode.REQUEST,
+				filter: key => key === 'br',
+			})
 			equal(output.includes('sta='), false, 'sta should be filtered out in request mode')
 		})
 
@@ -279,7 +374,11 @@ describe('encodeCmcd', () => {
 		it('still skips pr=1 in request mode even when e=pr is in input data', () => {
 			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1, cid: 'content-id' }
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.REQUEST })
-			equal(output.includes('pr=1'), false, 'pr=1 should be suppressed in request mode regardless of e')
+			equal(
+				output.includes('pr=1'),
+				false,
+				'pr=1 should be suppressed in request mode regardless of e',
+			)
 		})
 	})
 
@@ -326,7 +425,10 @@ describe('encodeCmcd', () => {
 		const options: CmcdEncodeOptions = {
 			baseUrl: 'http://test.com/base/manifest/manifest.mpd',
 		}
-		equal(encodeCmcd(input, options), 'nor=("../segments/video/1.mp4";r="0-99" "../segments/video/2.mp4");x,v=2')
+		equal(
+			encodeCmcd(input, options),
+			'nor=("../segments/video/1.mp4";r="0-99" "../segments/video/2.mp4");x,v=2',
+		)
 	})
 
 	it('converts a nor SfItem to a relative path when baseUrl is provided', () => {
@@ -383,7 +485,10 @@ describe('encodeCmcd', () => {
 		})
 
 		it('returns encoded string for request mode', () => {
-			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.REQUEST }), CMCD_STRING_REQUEST)
+			equal(
+				encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.REQUEST }),
+				CMCD_STRING_REQUEST,
+			)
 		})
 
 		it('returns encoded string for response received', () => {
@@ -441,17 +546,29 @@ describe('encodeCmcd', () => {
 		})
 
 		it('selects an item without an object type flag when no flag matches ot for V1', () => {
-			equal(encodeCmcd(decodeCmcd('mtp=(6000;a 15000),ot=v') as Cmcd, { version: 1 }), 'mtp=15000,ot=v')
 			equal(
-				encodeCmcd({ mtp: [toCmcdValue(6000, { a: true }), toCmcdValue(15000, {})], ot: 'v' } as unknown as Cmcd, {
-					version: 1,
-				}),
+				encodeCmcd(decodeCmcd('mtp=(6000;a 15000),ot=v') as Cmcd, { version: 1 }),
+				'mtp=15000,ot=v',
+			)
+			equal(
+				encodeCmcd(
+					{
+						mtp: [toCmcdValue(6000, { a: true }), toCmcdValue(15000, {})],
+						ot: 'v',
+					} as unknown as Cmcd,
+					{
+						version: 1,
+					},
+				),
 				'mtp=15000,ot=v',
 			)
 		})
 
 		it('prefers a matching object type flag over an item without a flag for V1', () => {
-			equal(encodeCmcd(decodeCmcd('mtp=(15000 6000;a),ot=a') as Cmcd, { version: 1 }), 'mtp=6000,ot=a')
+			equal(
+				encodeCmcd(decodeCmcd('mtp=(15000 6000;a),ot=a') as Cmcd, { version: 1 }),
+				'mtp=6000,ot=a',
+			)
 		})
 
 		it('omits an inner-list key when no item matches ot for V1', () => {
@@ -461,7 +578,9 @@ describe('encodeCmcd', () => {
 		})
 
 		it('unwraps inner lists with parameters to plain scalars for V1', () => {
-			const input = decodeCmcd('bl=(2100 3200);p=2,br=(3000 6000);p=2,mtp=(25400 1200);p=1,tb=(6000 128);x') as Cmcd
+			const input = decodeCmcd(
+				'bl=(2100 3200);p=2,br=(3000 6000);p=2,mtp=(25400 1200);p=1,tb=(6000 128);x',
+			) as Cmcd
 			equal(encodeCmcd(input, { version: 1 }), 'bl=2100,br=3000,mtp=25400,tb=6000')
 		})
 
@@ -530,7 +649,12 @@ describe('encodeCmcd', () => {
 		})
 
 		it('keeps response-received keys when e is an SfToken', () => {
-			const input = { e: new SfToken('rr'), rc: 200, ts: 1000, url: 'https://example.com/seg.m4s' } as unknown as Cmcd
+			const input = {
+				e: new SfToken('rr'),
+				rc: 200,
+				ts: 1000,
+				url: 'https://example.com/seg.m4s',
+			} as unknown as Cmcd
 			equal(
 				encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }),
 				'e=rr,rc=200,ts=1000,url="https://example.com/seg.m4s",v=2',
@@ -566,7 +690,10 @@ describe('encodeCmcd', () => {
 		})
 
 		it('encodes the aggregate bitrate keys when the exact keys are absent', () => {
-			equal(encodeCmcd({ ab: [2500], lab: [200], tab: [3000], v: 2 }), 'ab=(2500),lab=(200),tab=(3000),v=2')
+			equal(
+				encodeCmcd({ ab: [2500], lab: [200], tab: [3000], v: 2 }),
+				'ab=(2500),lab=(200),tab=(3000),v=2',
+			)
 		})
 	})
 })

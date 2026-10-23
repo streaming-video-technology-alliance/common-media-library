@@ -83,7 +83,11 @@ describe('validateActionIngredients', () => {
 			{
 				label: 'c2pa.actions.v2',
 				data: {
-					actions: [{ action: 'c2pa.opened' }, { action: 'c2pa.placed' }, { action: 'c2pa.created' }],
+					actions: [
+						{ action: 'c2pa.opened' },
+						{ action: 'c2pa.placed' },
+						{ action: 'c2pa.created' },
+					],
 				},
 			},
 		])

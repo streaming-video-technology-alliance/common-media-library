@@ -11,5 +11,11 @@
  * {@includeCode ../../test/fourCcToUint32.test.ts#example}
  */
 export function fourCcToUint32(str: string): number {
-	return ((str.charCodeAt(0) << 24) | (str.charCodeAt(1) << 16) | (str.charCodeAt(2) << 8) | str.charCodeAt(3)) >>> 0
+	return (
+		((str.charCodeAt(0) << 24) |
+			(str.charCodeAt(1) << 16) |
+			(str.charCodeAt(2) << 8) |
+			str.charCodeAt(3)) >>>
+		0
+	)
 }

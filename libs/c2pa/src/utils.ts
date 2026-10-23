@@ -40,7 +40,11 @@ export function bytesToHex(bytes: Uint8Array): string {
  *
  * @internal
  */
-export function isKeyExpired(createdAt: string, validityPeriodSeconds: number, now: Date = new Date()): boolean {
+export function isKeyExpired(
+	createdAt: string,
+	validityPeriodSeconds: number,
+	now: Date = new Date(),
+): boolean {
 	const createdAtMs = new Date(createdAt).getTime()
 	if (Number.isNaN(createdAtMs)) return true
 	const validityEnd = new Date(createdAtMs + validityPeriodSeconds * MILLISECONDS_PER_SECOND)
@@ -128,7 +132,9 @@ export type UuidParsedBox = {
  * @internal
  */
 export function findC2paUuidBox(boxes: ParsedIsoBox[]): UuidParsedBox | undefined {
-	return (boxes as UuidParsedBox[]).find(box => box.type === 'uuid' && isC2paUuid(box.usertype ?? []))
+	return (boxes as UuidParsedBox[]).find(
+		box => box.type === 'uuid' && isC2paUuid(box.usertype ?? []),
+	)
 }
 
 const FULLBOX_HEADER_SIZE = 4
@@ -137,7 +143,9 @@ const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 
 // Reads a version/flags + null-terminated purpose prefix, or null if malformed.
 /** @internal */
-export function readUuidBoxPurpose(payload: Uint8Array): { purpose: string; rest: Uint8Array } | null {
+export function readUuidBoxPurpose(
+	payload: Uint8Array,
+): { purpose: string; rest: Uint8Array } | null {
 	if (payload.length < FULLBOX_HEADER_SIZE) return null
 
 	let offset = FULLBOX_HEADER_SIZE

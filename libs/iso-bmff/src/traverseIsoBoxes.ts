@@ -15,7 +15,10 @@ import { isContainer } from './utils/isContainer.ts'
  *
  * @public
  */
-export function* traverseIsoBoxes<T>(boxes: Iterable<T>, config?: TraverseIsoBoxesConfig): Generator<T> {
+export function* traverseIsoBoxes<T>(
+	boxes: Iterable<T>,
+	config?: TraverseIsoBoxesConfig,
+): Generator<T> {
 	const depthFirst = config?.depthFirst ?? true
 	const maxDepth = config?.maxDepth ?? Infinity
 

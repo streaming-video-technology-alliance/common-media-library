@@ -53,7 +53,10 @@ export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
 		writer.writeUint(ref.subsegmentDuration, 4)
 
 		// Pack startsWithSap (1 bit) + sapType (3 bits) + sapDeltaTime (28 bits)
-		const sap = ((ref.startsWithSap & 0x1) << 31) | ((ref.sapType & 0x7) << 28) | (ref.sapDeltaTime & 0x0fffffff)
+		const sap =
+			((ref.startsWithSap & 0x1) << 31) |
+			((ref.sapType & 0x7) << 28) |
+			(ref.sapDeltaTime & 0x0fffffff)
 		writer.writeUint(sap, 4)
 	}
 

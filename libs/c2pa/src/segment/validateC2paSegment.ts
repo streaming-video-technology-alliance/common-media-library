@@ -52,7 +52,10 @@ export async function validateC2paSegment(
 	segmentBytes: Uint8Array,
 	sessionKeys: readonly ValidatedSessionKey[],
 	sequenceState: SequenceState = createSequenceState(),
-): Promise<{ readonly result: SegmentValidationResult; readonly nextSequenceState: SequenceState } | null> {
+): Promise<{
+	readonly result: SegmentValidationResult
+	readonly nextSequenceState: SequenceState
+} | null> {
 	const emsgBox = extractVsiEmsgBox(segmentBytes)
 	if (!emsgBox) return null
 
@@ -92,7 +95,13 @@ export async function validateC2paSegment(
 	}
 
 	const algorithm = resolveImportAlgorithm(sessionKey.jwk)
-	const publicKey = await crypto.subtle.importKey('jwk', sessionKey.jwk as JsonWebKey, algorithm, false, ['verify'])
+	const publicKey = await crypto.subtle.importKey(
+		'jwk',
+		sessionKey.jwk as JsonWebKey,
+		algorithm,
+		false,
+		['verify'],
+	)
 
 	const [signatureValid, hashValid] = await Promise.all([
 		verifyCoseSign1(coseSign1, payload, publicKey),

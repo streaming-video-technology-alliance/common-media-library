@@ -35,7 +35,10 @@ export function fromCmcdHeaders(
  *
  * @public
  */
-export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData
+export function fromCmcdHeaders(
+	headers: Record<string, string> | Headers,
+	options?: CmcdDecodeOptions,
+): CmcdData
 export function fromCmcdHeaders(
 	headers: Record<string, string> | Headers,
 	options?: CmcdDecodeOptions,

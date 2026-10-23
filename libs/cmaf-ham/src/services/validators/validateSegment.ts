@@ -15,7 +15,11 @@ import type { Validation } from '../../types/mapper/Validation.ts'
  *
  * @alpha
  */
-export function validateSegment(segment: Segment, trackId?: string, prevValidation?: Validation): Validation {
+export function validateSegment(
+	segment: Segment,
+	trackId?: string,
+	prevValidation?: Validation,
+): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],

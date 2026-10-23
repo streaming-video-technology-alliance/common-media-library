@@ -54,5 +54,10 @@ export type CmcdKeySpec = CmcdKeyRules &
 				readonly supersededBy?: string
 		  }
 		| { readonly type: 'nor' }
-		| { readonly type: 'custom'; readonly omitDefault: false; readonly max: number; readonly v1Max: number }
+		| {
+				readonly type: 'custom'
+				readonly omitDefault: false
+				readonly max: number
+				readonly v1Max: number
+		  }
 	)

@@ -62,10 +62,12 @@ describe('decodeVsiMap', () => {
 
 	it('names the supported range and the received value in the sequenceNumber error', () => {
 		throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber(BigInt(2 ** 53))), {
-			message: 'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got 9007199254740992',
+			message:
+				'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got 9007199254740992',
 		})
 		throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber('7')), {
-			message: 'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got string',
+			message:
+				'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got string',
 		})
 	})
 

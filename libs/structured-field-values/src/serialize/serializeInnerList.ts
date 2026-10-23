@@ -37,7 +37,10 @@ export function serializeInnerList(value: SfInnerList): string
  */
 export function serializeInnerList(value: SfItem[] | SfBareItem[], params?: SfParameters): string
 
-export function serializeInnerList(value: SfInnerList | SfItem[] | SfBareItem[], params?: SfParameters): string {
+export function serializeInnerList(
+	value: SfInnerList | SfItem[] | SfBareItem[],
+	params?: SfParameters,
+): string {
 	let list: SfItem[] | SfBareItem[]
 
 	if (Array.isArray(value)) {

@@ -1,4 +1,10 @@
-import { type CmcdHeaderField, CMCD_OBJECT, CMCD_REQUEST, CMCD_SESSION, CMCD_STATUS } from './CmcdHeaderField.ts'
+import {
+	type CmcdHeaderField,
+	CMCD_OBJECT,
+	CMCD_REQUEST,
+	CMCD_SESSION,
+	CMCD_STATUS,
+} from './CmcdHeaderField.ts'
 import type { CmcdRequestKey } from './CmcdRequestKey.ts'
 
 /**

@@ -3,27 +3,45 @@ import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cuetext/languages tests', () => {
 	it('arabic.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/languages/arabic.vtt', 'test/cuetext/languages/arabic.json')
+		await expectCuesEqualAll(
+			'test/cuetext/languages/arabic.vtt',
+			'test/cuetext/languages/arabic.json',
+		)
 	})
 
 	it('chinese.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/languages/chinese.vtt', 'test/cuetext/languages/chinese.json')
+		await expectCuesEqualAll(
+			'test/cuetext/languages/chinese.vtt',
+			'test/cuetext/languages/chinese.json',
+		)
 	})
 
 	it('greek.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/languages/greek.vtt', 'test/cuetext/languages/greek.json')
+		await expectCuesEqualAll(
+			'test/cuetext/languages/greek.vtt',
+			'test/cuetext/languages/greek.json',
+		)
 	})
 
 	it('hebrew.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/languages/hebrew.vtt', 'test/cuetext/languages/hebrew.json')
+		await expectCuesEqualAll(
+			'test/cuetext/languages/hebrew.vtt',
+			'test/cuetext/languages/hebrew.json',
+		)
 	})
 
 	it('japanese.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/languages/japanese.vtt', 'test/cuetext/languages/japanese.json')
+		await expectCuesEqualAll(
+			'test/cuetext/languages/japanese.vtt',
+			'test/cuetext/languages/japanese.json',
+		)
 	})
 
 	it('korean.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/languages/korean.vtt', 'test/cuetext/languages/korean.json')
+		await expectCuesEqualAll(
+			'test/cuetext/languages/korean.vtt',
+			'test/cuetext/languages/korean.json',
+		)
 	})
 
 	it('long_string_arabic.vtt', async () => {
@@ -97,7 +115,10 @@ describe('cuetext/languages tests', () => {
 	})
 
 	it('russian.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/languages/russian.vtt', 'test/cuetext/languages/russian.json')
+		await expectCuesEqualAll(
+			'test/cuetext/languages/russian.vtt',
+			'test/cuetext/languages/russian.json',
+		)
 	})
 
 	it('thai.vtt', async () => {

@@ -40,7 +40,9 @@ const P256_COORDINATE_BYTES = 32
 const SHA256_BYTES = 32
 
 // cbor-x reuses its output buffer between calls, so copy every encoding.
-const ES256_PROTECTED_HEADER = Uint8Array.from(CBOR.encode(new Map([[COSE_HEADER_ALG, COSE_ALG_ES256]])))
+const ES256_PROTECTED_HEADER = Uint8Array.from(
+	CBOR.encode(new Map([[COSE_HEADER_ALG, COSE_ALG_ES256]])),
+)
 
 const MANIFEST_ID = 'urn:uuid:vsi-test-manifest'
 const SESSION_KEYS_LABEL = 'c2pa.session-keys'
@@ -87,8 +89,13 @@ async function signCoseSign1(
 	embeddedPayload: Uint8Array | null,
 ): Promise<Tag> {
 	const toBeSigned = buildSigStructure(ES256_PROTECTED_HEADER, payload) as Uint8Array<ArrayBuffer>
-	const signature = new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, toBeSigned))
-	return new Tag([ES256_PROTECTED_HEADER, unprotectedHeader, embeddedPayload, signature], CBOR_TAG_COSE_SIGN1)
+	const signature = new Uint8Array(
+		await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, toBeSigned),
+	)
+	return new Tag(
+		[ES256_PROTECTED_HEADER, unprotectedHeader, embeddedPayload, signature],
+		CBOR_TAG_COSE_SIGN1,
+	)
 }
 
 /**
@@ -96,7 +103,10 @@ async function signCoseSign1(
  * so create the keys once per test file.
  */
 export async function createTestSessionKey(kid: string): Promise<TestSessionKey> {
-	const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])
+	const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+		'sign',
+		'verify',
+	])
 	// Uncompressed point: 0x04 || x || y
 	const point = new Uint8Array(await crypto.subtle.exportKey('raw', keyPair.publicKey))
 	const kidBytes = TEXT_ENCODER.encode(kid)
@@ -123,7 +133,9 @@ export async function encodeSignerBinding(
 	payload: Uint8Array,
 	embeddedPayload: Uint8Array | null = null,
 ): Promise<Uint8Array> {
-	return Uint8Array.from(CBOR.encode(await signCoseSign1(key.privateKey, new Map(), payload, embeddedPayload)))
+	return Uint8Array.from(
+		CBOR.encode(await signCoseSign1(key.privateKey, new Map(), payload, embeddedPayload)),
+	)
 }
 
 // The signerBinding is a COSE_Sign1 over the end-entity certificate of the signer (§18.25.2).
@@ -151,7 +163,9 @@ async function buildSessionKeyData(
 	}
 	if (!entry.deterministicKeyOrder) return data
 	// RFC 8949 section 4.2.1: a shorter encoded text key sorts first, then the bytes decide
-	return Object.fromEntries(Object.entries(data).sort(([a], [b]) => a.length - b.length || (a < b ? -1 : 1)))
+	return Object.fromEntries(
+		Object.entries(data).sort(([a], [b]) => a.length - b.length || (a < b ? -1 : 1)),
+	)
 }
 
 // Encodes plain objects and arrays with indefinite lengths. Each ends with the break code (RFC 8949 section 3.2.2).
@@ -163,7 +177,11 @@ function encodeIndefiniteLengths(value: unknown): Uint8Array {
 			...value.map(encodeIndefiniteLengths),
 			Uint8Array.of(CBOR_BREAK),
 		)
-	if (typeof value === 'object' && value !== null && Object.getPrototypeOf(value) === Object.prototype) {
+	if (
+		typeof value === 'object' &&
+		value !== null &&
+		Object.getPrototypeOf(value) === Object.prototype
+	) {
 		const entries = Object.entries(value).flatMap(([key, item]) => [
 			Uint8Array.from(CBOR.encode(key)),
 			encodeIndefiniteLengths(item),
@@ -189,7 +207,10 @@ export function buildInitSegmentWithManifest(
 	const purpose = TEXT_ENCODER.encode('manifest')
 	const prefix = new Uint8Array(4 + purpose.length + 1 + 8) // fullbox header + purpose\0 + aux offset
 	prefix.set(purpose, 4)
-	return concatBytes(mediaBoxes, buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))))
+	return concatBytes(
+		mediaBoxes,
+		buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))),
+	)
 }
 
 /**
@@ -265,8 +286,12 @@ export async function buildSessionKeysAssertion(
 	entries: readonly TestSessionKeyEntry[],
 	indefiniteLengths: boolean = false,
 ): Promise<TestAssertion> {
-	const keys = await Promise.all(entries.map(entry => buildSessionKeyData(entry, signer.certificateDER)))
-	const cbor = indefiniteLengths ? encodeIndefiniteLengths({ keys }) : Uint8Array.from(CBOR.encode({ keys }))
+	const keys = await Promise.all(
+		entries.map(entry => buildSessionKeyData(entry, signer.certificateDER)),
+	)
+	const cbor = indefiniteLengths
+		? encodeIndefiniteLengths({ keys })
+		: Uint8Array.from(CBOR.encode({ keys }))
 	return { label: SESSION_KEYS_LABEL, cbor }
 }
 
@@ -310,7 +335,10 @@ async function buildVsiEmsgBox(
  * moof and mdat boxes with 8-byte box-offset prefixes (§18.6.2).
  * A BigInt `sequenceNumber` encodes as a CBOR unsigned integer of 8 bytes.
  */
-export async function buildVsiSegment(key: TestSessionKey, sequenceNumber: number | bigint): Promise<Uint8Array> {
+export async function buildVsiSegment(
+	key: TestSessionKey,
+	sequenceNumber: number | bigint,
+): Promise<Uint8Array> {
 	const media = buildMediaContent(Number(sequenceNumber))
 	// The emsg box has the same size for every hash value, so a placeholder gives the final media box offsets.
 	const placeholder = await buildVsiEmsgBox(key, sequenceNumber, new Uint8Array(SHA256_BYTES))

@@ -34,7 +34,12 @@ describe('parseList', () => {
 
 	test('list of lists', () => {
 		assert.deepStrictEqual(parseList(`("foo" "bar"), ("baz"), ("bat" "one"), ()`), {
-			value: [new SfItem(['foo', 'bar']), new SfItem(['baz']), new SfItem(['bat', 'one']), new SfItem([])],
+			value: [
+				new SfItem(['foo', 'bar']),
+				new SfItem(['baz']),
+				new SfItem(['bat', 'one']),
+				new SfItem([]),
+			],
 			src: ``,
 		})
 	})
@@ -42,8 +47,8 @@ describe('parseList', () => {
 	test('list with params', () => {
 		assert.deepStrictEqual(parseList(`("foo"; a=1;b=2);lvl=5, ("bar" "baz");lvl=1`), {
 			value: [
-				new SfItem([new SfItem('foo', { 'a': 1, 'b': 2 })], { 'lvl': 5 }),
-				new SfItem(['bar', 'baz'], { 'lvl': 1 }),
+				new SfItem([new SfItem('foo', { a: 1, b: 2 })], { lvl: 5 }),
+				new SfItem(['bar', 'baz'], { lvl: 1 }),
 			],
 			src: ``,
 		})

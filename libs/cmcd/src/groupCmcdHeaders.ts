@@ -6,7 +6,9 @@ import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
 import type { CmcdHeaderValue } from './CmcdHeaderValue.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 
-function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdHeaderKey, CmcdHeaderField> {
+function createHeaderMap(
+	headerMap: Partial<CmcdHeaderMap>,
+): Record<CmcdHeaderKey, CmcdHeaderField> {
 	return Object.keys(headerMap).reduce(
 		(acc, field) => {
 			headerMap[field as CmcdHeaderField]?.forEach(key => (acc[key] = field as CmcdHeaderField))

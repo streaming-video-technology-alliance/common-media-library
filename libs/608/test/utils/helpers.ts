@@ -62,7 +62,11 @@ export function findBox(
 /**
  * Parse an m4s segment and return the DataView, mdat body start offset, and sample sizes.
  */
-export function parseSegment(file: Buffer): { view: DataView; mdatBodyStart: number; samples: { size: number }[] } {
+export function parseSegment(file: Buffer): {
+	view: DataView
+	mdatBodyStart: number
+	samples: { size: number }[]
+} {
 	const view = new DataView(file.buffer, file.byteOffset, file.byteLength)
 
 	const moof = findBox(view, 'moof', 0, view.byteLength)

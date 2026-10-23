@@ -15,6 +15,7 @@
  */
 export function isArrayBufferLike(value: unknown): value is ArrayBufferLike {
 	return (
-		value instanceof ArrayBuffer || (typeof SharedArrayBuffer !== 'undefined' && value instanceof SharedArrayBuffer)
+		value instanceof ArrayBuffer ||
+		(typeof SharedArrayBuffer !== 'undefined' && value instanceof SharedArrayBuffer)
 	)
 }

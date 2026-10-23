@@ -50,7 +50,9 @@ export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 		const unprotectedHeader = (unprotectedRaw ?? {}) as CoseHeader
 		const kidRaw = protectedHeader[COSE_KEY_KID] ?? unprotectedHeader[COSE_KEY_KID] ?? null
 		const kid = kidRaw != null ? toUint8Array(kidRaw) : null
-		const alg = (protectedHeader[COSE_KEY_ALG] ?? unprotectedHeader[COSE_KEY_ALG] ?? null) as number | null
+		const alg = (protectedHeader[COSE_KEY_ALG] ?? unprotectedHeader[COSE_KEY_ALG] ?? null) as
+			| number
+			| null
 
 		return {
 			protectedBytes,

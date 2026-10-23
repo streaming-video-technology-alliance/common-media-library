@@ -105,7 +105,10 @@ console.log('Regenerating HAM to DASH snapshots...')
 // Note: ham3 is already an array of Presentations, don't wrap it again
 const dashFromHam3 = hamToDash(ham3)
 
-writeFileSync('./test/data/dash-samples/fromHam/dashFromHam3.json', JSON.stringify(dashFromHam3.manifest, null, 2))
+writeFileSync(
+	'./test/data/dash-samples/fromHam/dashFromHam3.json',
+	JSON.stringify(dashFromHam3.manifest, null, 2),
+)
 
 console.log('✅ HAM to DASH snapshots regenerated')
 

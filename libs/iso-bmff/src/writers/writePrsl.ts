@@ -14,9 +14,14 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @public
  */
-export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
-	const preselectionTagBytes = box.flags & 0x1000 && box.preselectionTag ? encodeText(box.preselectionTag) : null
-	const interleavingTagBytes = box.flags & 0x4000 && box.interleavingTag ? encodeText(box.interleavingTag) : null
+export function writePrsl(
+	box: PreselectionGroupBox,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
+	const preselectionTagBytes =
+		box.flags & 0x1000 && box.preselectionTag ? encodeText(box.preselectionTag) : null
+	const interleavingTagBytes =
+		box.flags & 0x4000 && box.interleavingTag ? encodeText(box.interleavingTag) : null
 
 	const headerSize = 8
 	const fullBoxSize = 4

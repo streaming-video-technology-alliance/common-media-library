@@ -14,7 +14,9 @@ export type InternalAssertionData = {
 	/** The CBOR of the assertion with its tags, absent for a JSON or binary assertion and for CBOR that does not decode */
 	readonly taggedData?: unknown
 	/** `ASSERTION_CBOR_INVALID` if the CBOR of the assertion does not decode, `ASSERTION_JSON_INVALID` if the JSON of the assertion does not parse, else absent */
-	readonly code?: typeof C2paStatusCode.ASSERTION_CBOR_INVALID | typeof C2paStatusCode.ASSERTION_JSON_INVALID
+	readonly code?:
+		| typeof C2paStatusCode.ASSERTION_CBOR_INVALID
+		| typeof C2paStatusCode.ASSERTION_JSON_INVALID
 }
 
 /**

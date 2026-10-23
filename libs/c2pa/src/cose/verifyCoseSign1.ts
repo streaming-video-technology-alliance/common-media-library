@@ -33,7 +33,11 @@ function getComponentSize(publicKey: CryptoKey): number {
 }
 
 function isDerEncoded(signature: Uint8Array, expectedRawLength: number): boolean {
-	return signature.length !== expectedRawLength && signature.length > 2 && signature[0] === DER_SEQUENCE_TAG
+	return (
+		signature.length !== expectedRawLength &&
+		signature.length > 2 &&
+		signature[0] === DER_SEQUENCE_TAG
+	)
 }
 
 function parseDerLength(der: Uint8Array, offset: number): { length: number; nextOffset: number } {
@@ -43,7 +47,8 @@ function parseDerLength(der: Uint8Array, offset: number): { length: number; next
 		return { length: firstByte, nextOffset: offset + 1 }
 	}
 	const numBytes = firstByte & 0x7f
-	if (numBytes === 0 || offset + numBytes >= der.length) throw new Error('DER signature: invalid long-form length')
+	if (numBytes === 0 || offset + numBytes >= der.length)
+		throw new Error('DER signature: invalid long-form length')
 	let length = 0
 	for (let i = 1; i <= numBytes; i++) {
 		length = (length << 8) | der[offset + i]
@@ -51,7 +56,10 @@ function parseDerLength(der: Uint8Array, offset: number): { length: number; next
 	return { length, nextOffset: offset + 1 + numBytes }
 }
 
-function extractDerInteger(der: Uint8Array, offset: number): { value: Uint8Array; nextOffset: number } {
+function extractDerInteger(
+	der: Uint8Array,
+	offset: number,
+): { value: Uint8Array; nextOffset: number } {
 	if (der[offset] !== DER_INTEGER_TAG) throw new Error('DER signature: expected INTEGER tag')
 	const { length, nextOffset: valueStart } = parseDerLength(der, offset + 1)
 	let start = valueStart
@@ -81,7 +89,8 @@ function resolveVerifyAlgorithm(publicKey: CryptoKey) {
 	if (name === ED25519_ALGORITHM) return { name: ED25519_ALGORITHM }
 	if (name === ECDSA_ALGORITHM) {
 		const curve = (publicKey.algorithm as EcKeyAlgorithm).namedCurve
-		const hash = curve === CURVE_P384 ? HASH_SHA384 : curve === CURVE_P521 ? HASH_SHA512 : HASH_SHA256
+		const hash =
+			curve === CURVE_P384 ? HASH_SHA384 : curve === CURVE_P521 ? HASH_SHA512 : HASH_SHA256
 		return { name: ECDSA_ALGORITHM, hash: { name: hash } }
 	}
 	if (name === RSA_PSS_ALGORITHM) {

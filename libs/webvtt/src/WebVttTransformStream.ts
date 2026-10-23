@@ -23,7 +23,10 @@ const TransformStreamBase: typeof TransformStream = /* @__PURE__ */ (() =>
  * @public
  */
 export class WebVttTransformStream extends TransformStreamBase<string, WebVttResult> {
-	constructor(writableStrategy?: QueuingStrategy<string>, readableStrategy?: QueuingStrategy<WebVttResult>) {
+	constructor(
+		writableStrategy?: QueuingStrategy<string>,
+		readableStrategy?: QueuingStrategy<WebVttResult>,
+	) {
 		super(new WebVttTransformer(), writableStrategy, readableStrategy)
 	}
 }

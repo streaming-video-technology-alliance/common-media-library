@@ -54,7 +54,8 @@ describe('createThroughputSelector', () => {
 		it('throws when upgradeFactor is above safetyFactor', () => {
 			throws(() => createThroughputSelector({ safetyFactor: 0.8, upgradeFactor: 0.9 }), {
 				name: 'RangeError',
-				message: 'Invalid upgradeFactor: expected a value at or below safetyFactor 0.8, received 0.9',
+				message:
+					'Invalid upgradeFactor: expected a value at or below safetyFactor 0.8, received 0.9',
 			})
 		})
 
@@ -98,7 +99,10 @@ describe('createThroughputSelector', () => {
 		it('returns a delay of 0', () => {
 			const selector = createThroughputSelector()
 
-			deepEqual(selector.select({ ladder, bufferLevel: 4, throughput: 3_000_000, now: 0 }), { index: 2, delay: 0 })
+			deepEqual(selector.select({ ladder, bufferLevel: 4, throughput: 3_000_000, now: 0 }), {
+				index: 2,
+				delay: 0,
+			})
 		})
 
 		it('picks rung 0 when no rung fits', () => {
@@ -155,7 +159,8 @@ describe('createThroughputSelector', () => {
 					}),
 				{
 					name: 'RangeError',
-					message: 'Invalid ladder: expected ascending bandwidth, received 1500000 at 1 and 750000 at 2',
+					message:
+						'Invalid ladder: expected ascending bandwidth, received 1500000 at 1 and 750000 at 2',
 				},
 			)
 		})
@@ -204,7 +209,16 @@ describe('createThroughputSelector', () => {
 
 			// At a buffer level of 0 the second pass of the guard allows 4 s, so the 3 Mbps rung passes.
 			for (const bufferLevel of [NaN, -1, Infinity]) {
-				equal(selector.select({ ladder, bufferLevel, throughput: 6_000_000, now: 0, segmentDuration: 4 }).index, 3)
+				equal(
+					selector.select({
+						ladder,
+						bufferLevel,
+						throughput: 6_000_000,
+						now: 0,
+						segmentDuration: 4,
+					}).index,
+					3,
+				)
 			}
 		})
 
@@ -212,7 +226,11 @@ describe('createThroughputSelector', () => {
 			const selector = createThroughputSelector()
 
 			for (const playbackRate of [NaN, 0, -1, Infinity]) {
-				equal(selector.select({ ladder, bufferLevel: 4, throughput: 5_000_000, now: 0, playbackRate }).index, 3)
+				equal(
+					selector.select({ ladder, bufferLevel: 4, throughput: 5_000_000, now: 0, playbackRate })
+						.index,
+					3,
+				)
 			}
 		})
 
@@ -220,9 +238,17 @@ describe('createThroughputSelector', () => {
 			const selector = createThroughputSelector()
 
 			// 0.9 * 5 Mbps is 4.5 Mbps.
-			equal(selector.select({ ladder, bufferLevel: 4, throughput: 5_000_000, now: 0, playbackRate: 1 }).index, 3)
+			equal(
+				selector.select({ ladder, bufferLevel: 4, throughput: 5_000_000, now: 0, playbackRate: 1 })
+					.index,
+				3,
+			)
 			// 0.9 * 5 Mbps / 2 is 2.25 Mbps.
-			equal(selector.select({ ladder, bufferLevel: 4, throughput: 5_000_000, now: 0, playbackRate: 2 }).index, 2)
+			equal(
+				selector.select({ ladder, bufferLevel: 4, throughput: 5_000_000, now: 0, playbackRate: 2 })
+					.index,
+				2,
+			)
 		})
 	})
 
@@ -272,8 +298,12 @@ describe('createThroughputSelector', () => {
 			// The current rung is rung 0 of this ladder, so the hysteresis applies.
 			// The safe pick is 1.5 Mbps. The upgrade pick, at 0.7 * 1.8 Mbps, is 750 kbps.
 			equal(
-				selector.select({ ladder: rungs(750_000, 1_500_000, 3_000_000), bufferLevel: 4, throughput: 1_800_000, now: 0 })
-					.index,
+				selector.select({
+					ladder: rungs(750_000, 1_500_000, 3_000_000),
+					bufferLevel: 4,
+					throughput: 1_800_000,
+					now: 0,
+				}).index,
 				0,
 			)
 		})
@@ -372,14 +402,32 @@ describe('createThroughputSelector', () => {
 			load(selector, 6_000_000)
 
 			// The budget is 1 s. The 750 kbps rung downloads in 0.56 s.
-			equal(selector.select({ ladder, bufferLevel: 0, throughput: 6_000_000, now: 0, segmentDuration: 4 }).index, 1)
+			equal(
+				selector.select({
+					ladder,
+					bufferLevel: 0,
+					throughput: 6_000_000,
+					now: 0,
+					segmentDuration: 4,
+				}).index,
+				1,
+			)
 		})
 
 		it('passes rung 0 in the second pass with a tolerance of 0', () => {
 			const selector = createThroughputSelector({ starvationTolerance: 0 })
 			load(selector, 6_000_000)
 
-			equal(selector.select({ ladder, bufferLevel: 0, throughput: 6_000_000, now: 0, segmentDuration: 4 }).index, 0)
+			equal(
+				selector.select({
+					ladder,
+					bufferLevel: 0,
+					throughput: 6_000_000,
+					now: 0,
+					segmentDuration: 4,
+				}).index,
+				0,
+			)
 		})
 
 		it('falls through to rung 0 when the throughput is 0', () => {
@@ -387,7 +435,11 @@ describe('createThroughputSelector', () => {
 			load(selector, 6_000_000)
 
 			// Every download time is Infinity, so neither pass keeps a rung above 0.
-			equal(selector.select({ ladder, bufferLevel: 8, throughput: 0, now: 0, segmentDuration: 4 }).index, 0)
+			equal(
+				selector.select({ ladder, bufferLevel: 8, throughput: 0, now: 0, segmentDuration: 4 })
+					.index,
+				0,
+			)
 		})
 
 		it('skips the guard when segmentDuration is not a positive number', () => {
@@ -395,7 +447,16 @@ describe('createThroughputSelector', () => {
 			load(selector, 6_000_000)
 
 			for (const segmentDuration of [undefined, 0, -4, NaN, Infinity]) {
-				equal(selector.select({ ladder, bufferLevel: 0.5, throughput: 6_000_000, now: 0, segmentDuration }).index, 3)
+				equal(
+					selector.select({
+						ladder,
+						bufferLevel: 0.5,
+						throughput: 6_000_000,
+						now: 0,
+						segmentDuration,
+					}).index,
+					3,
+				)
 			}
 		})
 
@@ -404,11 +465,26 @@ describe('createThroughputSelector', () => {
 			load(selector, 6_000_000)
 
 			// At playback rate 1 the pick is 3 Mbps. Its download takes 2.2 s, so the 1.5 Mbps rung passes with 2 s of buffer.
-			equal(selector.select({ ladder, bufferLevel: 2, throughput: 6_000_000, now: 0, segmentDuration: 4 }).index, 2)
+			equal(
+				selector.select({
+					ladder,
+					bufferLevel: 2,
+					throughput: 6_000_000,
+					now: 0,
+					segmentDuration: 4,
+				}).index,
+				2,
+			)
 			// At playback rate 2 the pick is 1.5 Mbps. Its download takes 1.1 s, more than the 1 s budget, so the 750 kbps rung passes.
 			equal(
-				selector.select({ ladder, bufferLevel: 2, throughput: 6_000_000, now: 0, segmentDuration: 4, playbackRate: 2 })
-					.index,
+				selector.select({
+					ladder,
+					bufferLevel: 2,
+					throughput: 6_000_000,
+					now: 0,
+					segmentDuration: 4,
+					playbackRate: 2,
+				}).index,
 				1,
 			)
 		})

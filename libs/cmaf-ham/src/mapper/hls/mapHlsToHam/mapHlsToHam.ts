@@ -14,14 +14,22 @@ export function mapHlsToHam(manifest: ManifestFile): Presentation[] {
 	const mainManifestParsed = parseHlsManifest(manifest.manifest)
 	const manifestHls = addMetadataToHls(manifest, mainManifestParsed)
 	const selectionSets: SelectionSet[] = []
-	const manifestPlaylists = manifestHls.ancillaryManifests ? [...manifestHls.ancillaryManifests] : []
+	const manifestPlaylists = manifestHls.ancillaryManifests
+		? [...manifestHls.ancillaryManifests]
+		: []
 
-	const audioSwitchingSets = audioGroupsToSwitchingSets(mainManifestParsed.mediaGroups?.AUDIO, manifestPlaylists)
+	const audioSwitchingSets = audioGroupsToSwitchingSets(
+		mainManifestParsed.mediaGroups?.AUDIO,
+		manifestPlaylists,
+	)
 	const subtitleSwitchingSets = subtitleGroupsToSwitchingSets(
 		mainManifestParsed.mediaGroups?.SUBTITLES,
 		manifestPlaylists,
 	)
-	const videoSwitchingSets = videoPlaylistsToSwitchingSets(mainManifestParsed.playlists, manifestPlaylists)
+	const videoSwitchingSets = videoPlaylistsToSwitchingSets(
+		mainManifestParsed.playlists,
+		manifestPlaylists,
+	)
 
 	let selectionSetId = 0
 

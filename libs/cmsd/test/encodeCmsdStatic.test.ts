@@ -1,4 +1,9 @@
-import { CmsdObjectType, CmsdStreamingFormat, CmsdStreamType, encodeCmsdStatic } from '@svta/cml-cmsd'
+import {
+	CmsdObjectType,
+	CmsdStreamingFormat,
+	CmsdStreamType,
+	encodeCmsdStatic,
+} from '@svta/cml-cmsd'
 import { SfToken } from '@svta/cml-structured-field-values'
 import { equal } from 'node:assert'
 import { describe, it } from 'node:test'

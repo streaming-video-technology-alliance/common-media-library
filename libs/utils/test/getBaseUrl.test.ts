@@ -11,7 +11,10 @@ describe('getBaseUrl', () => {
 	})
 
 	it('returns the base URL from a URL object', () => {
-		equal(getBaseUrl(new URL('https://example.com/path/to/file.mp4')), 'https://example.com/path/to/')
+		equal(
+			getBaseUrl(new URL('https://example.com/path/to/file.mp4')),
+			'https://example.com/path/to/',
+		)
 	})
 
 	it('returns origin with trailing slash when file is at root', () => {
@@ -23,11 +26,17 @@ describe('getBaseUrl', () => {
 	})
 
 	it('strips query parameters', () => {
-		equal(getBaseUrl('https://example.com/path/to/file.mp4?param=foo&another=bar'), 'https://example.com/path/to/')
+		equal(
+			getBaseUrl('https://example.com/path/to/file.mp4?param=foo&another=bar'),
+			'https://example.com/path/to/',
+		)
 	})
 
 	it('strips hash', () => {
-		equal(getBaseUrl('https://example.com/path/to/file.mp4#hash=baz'), 'https://example.com/path/to/')
+		equal(
+			getBaseUrl('https://example.com/path/to/file.mp4#hash=baz'),
+			'https://example.com/path/to/',
+		)
 	})
 
 	it('handles deeply nested paths', () => {
@@ -39,6 +48,9 @@ describe('getBaseUrl', () => {
 	})
 
 	it('preserves non-default port in origin', () => {
-		equal(getBaseUrl('https://example.com:8080/path/to/file.mp4'), 'https://example.com:8080/path/to/')
+		equal(
+			getBaseUrl('https://example.com:8080/path/to/file.mp4'),
+			'https://example.com:8080/path/to/',
+		)
 	})
 })

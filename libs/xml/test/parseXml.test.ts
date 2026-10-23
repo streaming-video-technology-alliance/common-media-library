@@ -33,7 +33,10 @@ describe('parseXml', () => {
 		const root = childNodes[0]
 
 		equal(root.nodeName, 'MPD')
-		equal(root.attributes['profiles'], 'urn:hbbtv:dash:profile:isoff-live:2012,urn:mpeg:dash:profile:isoff-live:2011')
+		equal(
+			root.attributes['profiles'],
+			'urn:hbbtv:dash:profile:isoff-live:2012,urn:mpeg:dash:profile:isoff-live:2011',
+		)
 
 		const firstChild = root.childNodes[0]
 		equal(firstChild.childNodes[0].nodeValue, './')
@@ -145,7 +148,9 @@ describe('parseXml', () => {
 		})
 
 		it('sets parentElement to parent element for nested elements', () => {
-			const doc = parseXml('<root><child><grandchild/></child></root>', { includeParentElement: true })
+			const doc = parseXml('<root><child><grandchild/></child></root>', {
+				includeParentElement: true,
+			})
 			const root = doc.childNodes[0]
 			const child = root.childNodes[0]
 			const grandchild = child.childNodes[0]
@@ -173,7 +178,10 @@ describe('parseXml', () => {
 		})
 
 		it('sets parentElement correctly for comment nodes', () => {
-			const doc = parseXml('<root><!-- comment --></root>', { includeParentElement: true, keepComments: true })
+			const doc = parseXml('<root><!-- comment --></root>', {
+				includeParentElement: true,
+				keepComments: true,
+			})
 			const root = doc.childNodes[0]
 			const commentNode = root.childNodes[0]
 
@@ -205,15 +213,21 @@ describe('parseXml', () => {
 
 	describe('malformed attributes', () => {
 		it('throws on a valueless attribute', async () => {
-			await rejects(parseXmlGuarded('<a b>'), { message: /^Malformed attribute "b": expected "=" after name/ })
+			await rejects(parseXmlGuarded('<a b>'), {
+				message: /^Malformed attribute "b": expected "=" after name/,
+			})
 		})
 
 		it('throws on a valueless attribute in a self-closing tag', async () => {
-			await rejects(parseXmlGuarded('<a b/>'), { message: /^Malformed attribute "b": expected "=" after name/ })
+			await rejects(parseXmlGuarded('<a b/>'), {
+				message: /^Malformed attribute "b": expected "=" after name/,
+			})
 		})
 
 		it('throws on a valueless attribute after a quoted attribute', async () => {
-			await rejects(parseXmlGuarded('<a b="c" d>'), { message: /^Malformed attribute "d": expected "=" after name/ })
+			await rejects(parseXmlGuarded('<a b="c" d>'), {
+				message: /^Malformed attribute "d": expected "=" after name/,
+			})
 		})
 
 		it('throws on an unquoted attribute value', async () => {
@@ -223,7 +237,9 @@ describe('parseXml', () => {
 		})
 
 		it('throws on a quoted value with no equals sign', async () => {
-			await rejects(parseXmlGuarded('<a b "c"/>'), { message: /^Malformed attribute "b": expected "=" after name/ })
+			await rejects(parseXmlGuarded('<a b "c"/>'), {
+				message: /^Malformed attribute "b": expected "=" after name/,
+			})
 		})
 
 		it('reports the valueless attribute, not the element that follows it', async () => {
@@ -238,12 +254,15 @@ describe('parseXml', () => {
 
 		it('throws when the input ends after the equals sign', async () => {
 			await rejects(parseXmlGuarded('<a b='), {
-				message: /^Malformed attribute "b": expected quoted value after "="\nLine: 0\nColumn: 6\nChar: end of input$/,
+				message:
+					/^Malformed attribute "b": expected quoted value after "="\nLine: 0\nColumn: 6\nChar: end of input$/,
 			})
 		})
 
 		it('reports the line and column of the malformed attribute', async () => {
-			await rejects(parseXmlGuarded('<root>\n\t<a b>'), { message: /\nLine: 1\nColumn: 6\nChar: >$/ })
+			await rejects(parseXmlGuarded('<root>\n\t<a b>'), {
+				message: /\nLine: 1\nColumn: 6\nChar: >$/,
+			})
 		})
 
 		it('throws when the input ends inside a quoted attribute value', async () => {
@@ -276,14 +295,23 @@ describe('parseXml', () => {
 
 	describe('truncated input', () => {
 		it('parses a complete XML declaration followed by markup', async () => {
-			const doc = await parseXmlGuarded('<?xml version="1.0" encoding="UTF-8"?><a b="1"><c/>text</a>')
+			const doc = await parseXmlGuarded(
+				'<?xml version="1.0" encoding="UTF-8"?><a b="1"><c/>text</a>',
+			)
 			deepStrictEqual(doc.childNodes, [
 				{
 					nodeName: 'a',
 					nodeValue: null,
 					attributes: { b: '1' },
 					childNodes: [
-						{ nodeName: 'c', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'c' },
+						{
+							nodeName: 'c',
+							nodeValue: null,
+							attributes: {},
+							childNodes: [],
+							prefix: null,
+							localName: 'c',
+						},
 						{ nodeName: '#text', nodeValue: 'text', attributes: {}, childNodes: [] },
 					],
 					prefix: null,
@@ -346,7 +374,14 @@ describe('parseXml', () => {
 		it('keeps the parsed children when the input ends right after `</` at the document level', async () => {
 			const doc = await parseXmlGuarded('<a/></')
 			deepStrictEqual(doc.childNodes, [
-				{ nodeName: 'a', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'a' },
+				{
+					nodeName: 'a',
+					nodeValue: null,
+					attributes: {},
+					childNodes: [],
+					prefix: null,
+					localName: 'a',
+				},
 			])
 		})
 
@@ -374,14 +409,28 @@ describe('parseXml', () => {
 			const doc = await parseXmlGuarded('<a>x<')
 			deepStrictEqual(doc.childNodes[0].childNodes, [
 				{ nodeName: '#text', nodeValue: 'x', attributes: {}, childNodes: [] },
-				{ nodeName: '', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: '' },
+				{
+					nodeName: '',
+					nodeValue: null,
+					attributes: {},
+					childNodes: [],
+					prefix: null,
+					localName: '',
+				},
 			])
 		})
 
 		it('keeps an element whose start tag is cut off after its name', async () => {
 			const doc = await parseXmlGuarded('<a><bc')
 			deepStrictEqual(doc.childNodes[0].childNodes, [
-				{ nodeName: 'bc', nodeValue: null, attributes: {}, childNodes: [], prefix: null, localName: 'bc' },
+				{
+					nodeName: 'bc',
+					nodeValue: null,
+					attributes: {},
+					childNodes: [],
+					prefix: null,
+					localName: 'bc',
+				},
 			])
 		})
 

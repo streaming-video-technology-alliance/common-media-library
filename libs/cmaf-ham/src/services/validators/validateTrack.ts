@@ -35,7 +35,11 @@ import { validateSegments } from './validateSegments.ts'
  * @alpha
  *
  */
-export function validateTrack(track: Track, switchingSetId?: string, prevValidation?: Validation): Validation {
+export function validateTrack(
+	track: Track,
+	switchingSetId?: string,
+	prevValidation?: Validation,
+): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
@@ -78,7 +82,11 @@ export function validateTrack(track: Track, switchingSetId?: string, prevValidat
  * @returns Validation object
  * @see Validation
  */
-function _validateVideoTrack(videoTrack: VideoTrack, switchingSetId?: string, prevValidation?: Validation): Validation {
+function _validateVideoTrack(
+	videoTrack: VideoTrack,
+	switchingSetId?: string,
+	prevValidation?: Validation,
+): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
@@ -87,7 +95,9 @@ function _validateVideoTrack(videoTrack: VideoTrack, switchingSetId?: string, pr
 
 	if (!videoTrack.codecs || videoTrack.codecs.length === 0) {
 		validation.status = false
-		validation.errorMessages.push(`VideoTrack with id: ${videoTrack.id} does not have codecs${moreInformation}`)
+		validation.errorMessages.push(
+			`VideoTrack with id: ${videoTrack.id} does not have codecs${moreInformation}`,
+		)
 	}
 
 	return validation
@@ -107,7 +117,11 @@ function _validateVideoTrack(videoTrack: VideoTrack, switchingSetId?: string, pr
  * @returns Validation object
  * @see Validation
  */
-function _validateAudioTrack(audioTrack: AudioTrack, switchingSetId?: string, prevValidation?: Validation): Validation {
+function _validateAudioTrack(
+	audioTrack: AudioTrack,
+	switchingSetId?: string,
+	prevValidation?: Validation,
+): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
@@ -116,7 +130,9 @@ function _validateAudioTrack(audioTrack: AudioTrack, switchingSetId?: string, pr
 
 	if (!audioTrack.codecs || audioTrack.codecs.length === 0) {
 		validation.status = false
-		validation.errorMessages.push(`AudioTrack with id: ${audioTrack.id} does not have codecs${moreInformation}`)
+		validation.errorMessages.push(
+			`AudioTrack with id: ${audioTrack.id} does not have codecs${moreInformation}`,
+		)
 	}
 
 	return validation
@@ -136,7 +152,11 @@ function _validateAudioTrack(audioTrack: AudioTrack, switchingSetId?: string, pr
  * @returns Validation object
  * @see Validation
  */
-function _validateTextTrack(textTrack: TextTrack, switchingSetId?: string, prevValidation?: Validation): Validation {
+function _validateTextTrack(
+	textTrack: TextTrack,
+	switchingSetId?: string,
+	prevValidation?: Validation,
+): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],
@@ -145,7 +165,9 @@ function _validateTextTrack(textTrack: TextTrack, switchingSetId?: string, prevV
 
 	if (!textTrack.language) {
 		validation.status = false
-		validation.errorMessages.push(`TextTrack with id: ${textTrack.id} does not have codec${moreInformation}`)
+		validation.errorMessages.push(
+			`TextTrack with id: ${textTrack.id} does not have codec${moreInformation}`,
+		)
 	}
 
 	return validation

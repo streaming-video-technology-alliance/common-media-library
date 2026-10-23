@@ -105,7 +105,10 @@ describe('validateCmcdValues', () => {
 	})
 
 	it('reports error for each mtp element that is not a multiple of 100 (v2)', () => {
-		const result = validateCmcdValues({ mtp: [150, new SfItem(1200, { v: true }), new SfItem(250, { a: true })], v: 2 })
+		const result = validateCmcdValues({
+			mtp: [150, new SfItem(1200, { v: true }), new SfItem(250, { a: true })],
+			v: 2,
+		})
 		equal(result.valid, false)
 		deepEqual(
 			result.issues.map(i => [i.key, i.severity]),

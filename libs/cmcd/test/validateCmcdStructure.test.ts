@@ -6,7 +6,10 @@ import { describe, it } from 'node:test'
 describe('validateCmcdStructure', () => {
 	it('provides a valid example', () => {
 		// #region example
-		const result = validateCmcdStructure({ e: 'bc', br: [3000], ts: 1234567890 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: 'bc', br: [3000], ts: 1234567890 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, true)
 		// #endregion example
 	})
@@ -39,7 +42,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('reports error for non-custom event with cen', () => {
-		const result = validateCmcdStructure({ e: 'ps', cen: 'myevent', sta: 'p', ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: 'ps', cen: 'myevent', sta: 'p', ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, false)
 		equal(
 			result.issues.some(i => i.key === 'cen' && i.severity === 'error'),
@@ -56,7 +62,12 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('accepts rr event with response keys and url', () => {
-		const result = validateCmcdStructure({ e: 'rr', rc: 200, ttfb: 100, url: 'https://example.com/video.mp4' })
+		const result = validateCmcdStructure({
+			e: 'rr',
+			rc: 200,
+			ttfb: 100,
+			url: 'https://example.com/video.mp4',
+		})
 		equal(result.valid, true)
 	})
 
@@ -107,7 +118,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('accepts c event with cid', () => {
-		const result = validateCmcdStructure({ e: 'c', cid: 'content-123', ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: 'c', cid: 'content-123', ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, true)
 	})
 
@@ -121,7 +135,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('accepts v2 b event without bg as the exit from backgrounded mode', () => {
-		const result = validateCmcdStructure({ e: 'b', ts: 1234567890, v: 2 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: 'b', ts: 1234567890, v: 2 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, true)
 	})
 
@@ -145,7 +162,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('accepts bc event with br', () => {
-		const result = validateCmcdStructure({ e: 'bc', br: [3000], ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: 'bc', br: [3000], ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, true)
 	})
 
@@ -166,7 +186,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it("doesn't require any state field for e=ce when cen is present", () => {
-		const result = validateCmcdStructure({ e: 'ce', cen: 'foo', ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: 'ce', cen: 'foo', ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, true)
 	})
 
@@ -180,7 +203,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('accepts error event with ec', () => {
-		const result = validateCmcdStructure({ e: 'e', ec: ['ERR-001'], ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: 'e', ec: ['ERR-001'], ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, true)
 	})
 
@@ -203,7 +229,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('reports error for event key in request mode', () => {
-		const result = validateCmcdStructure({ e: 'br', ts: 123, br: 3000 }, { reportingMode: 'request' })
+		const result = validateCmcdStructure(
+			{ e: 'br', ts: 123, br: 3000 },
+			{ reportingMode: 'request' },
+		)
 		equal(result.valid, false)
 		const errorKeys = result.issues.filter(i => i.severity === 'error').map(i => i.key)
 		equal(errorKeys.includes('e'), true)
@@ -211,7 +240,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('reports error for response key in request mode', () => {
-		const result = validateCmcdStructure({ rc: 200, ttfb: 100, br: 3000 }, { reportingMode: 'request' })
+		const result = validateCmcdStructure(
+			{ rc: 200, ttfb: 100, br: 3000 },
+			{ reportingMode: 'request' },
+		)
 		equal(result.valid, false)
 		const errorKeys = result.issues.filter(i => i.severity === 'error').map(i => i.key)
 		equal(errorKeys.includes('rc'), true)
@@ -239,7 +271,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('reports a missing sta when e is a Symbol', () => {
-		const result = validateCmcdStructure({ e: Symbol.for('ps'), ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: Symbol.for('ps'), ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, false)
 		equal(
 			result.issues.some(i => i.key === 'sta' && i.severity === 'error'),
@@ -248,7 +283,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('reports a missing ec when e is an SfToken', () => {
-		const result = validateCmcdStructure({ e: new SfToken('e'), ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: new SfToken('e'), ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, false)
 		equal(
 			result.issues.some(i => i.key === 'ec' && i.severity === 'error'),
@@ -257,7 +295,10 @@ describe('validateCmcdStructure', () => {
 	})
 
 	it('accepts cen on a custom event when e is an SfToken', () => {
-		const result = validateCmcdStructure({ e: new SfToken('ce'), cen: 'my-event', ts: 123 }, { reportingMode: 'event' })
+		const result = validateCmcdStructure(
+			{ e: new SfToken('ce'), cen: 'my-event', ts: 123 },
+			{ reportingMode: 'event' },
+		)
 		equal(result.valid, true)
 	})
 
@@ -334,7 +375,9 @@ describe('validateCmcdStructure', () => {
 			equal(result.valid, false, aggregate)
 			const message = `Key "${aggregate}" must not be present when "${exact}" is present.`
 			equal(
-				result.issues.some(i => i.key === aggregate && i.severity === 'error' && i.message === message),
+				result.issues.some(
+					i => i.key === aggregate && i.severity === 'error' && i.message === message,
+				),
 				true,
 				aggregate,
 			)

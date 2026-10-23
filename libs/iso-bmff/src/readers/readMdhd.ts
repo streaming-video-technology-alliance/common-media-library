@@ -18,7 +18,11 @@ export function readMdhd(view: IsoBoxReadView): MediaHeaderBox {
 	const timescale = view.readUint(4)
 	const duration = view.readUint(version == 1 ? 8 : 4)
 	const lang = view.readUint(2)
-	const language = String.fromCharCode(((lang >> 10) & 0x1f) + 0x60, ((lang >> 5) & 0x1f) + 0x60, (lang & 0x1f) + 0x60)
+	const language = String.fromCharCode(
+		((lang >> 10) & 0x1f) + 0x60,
+		((lang >> 5) & 0x1f) + 0x60,
+		(lang & 0x1f) + 0x60,
+	)
 
 	const preDefined = view.readUint(2)
 

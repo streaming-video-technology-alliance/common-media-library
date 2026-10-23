@@ -95,7 +95,9 @@ export class SccParser {
 			parts[2] = lastParts[0]
 			const frames = parseInt(lastParts[1], 10)
 			return (
-				((30 * (60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) + frames) *
+				((30 *
+					(60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) +
+					frames) *
 					1001) /
 				30000
 			)

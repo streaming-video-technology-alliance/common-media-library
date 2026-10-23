@@ -26,7 +26,9 @@ export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBuffer
  * @public
  */
 export function parsePsshList(data: Uint8Array): Record<string, Uint8Array>
-export function parsePsshList(data: ArrayBufferLike | Uint8Array): Record<string, ArrayBufferLike | Uint8Array> {
+export function parsePsshList(
+	data: ArrayBufferLike | Uint8Array,
+): Record<string, ArrayBufferLike | Uint8Array> {
 	if (!data) {
 		return {}
 	}

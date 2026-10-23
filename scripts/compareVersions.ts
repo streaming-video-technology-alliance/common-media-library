@@ -16,7 +16,9 @@ export function parseVersion(version: string): ParsedVersion {
 	const match = versionPattern.exec(version)
 
 	if (!match) {
-		throw new Error(`Invalid version "${version}". Expected <major>.<minor>.<patch>[-<prerelease>][+<build>].`)
+		throw new Error(
+			`Invalid version "${version}". Expected <major>.<minor>.<patch>[-<prerelease>][+<build>].`,
+		)
 	}
 
 	return {

@@ -28,7 +28,8 @@ export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView {
 	const reservedSize = 4
 	const numberOfEntrySize = 4
 	const entriesSize = box.numberOfEntry * entrySize
-	const totalSize = headerSize + fullBoxSize + trackIdSize + reservedSize + numberOfEntrySize + entriesSize
+	const totalSize =
+		headerSize + fullBoxSize + trackIdSize + reservedSize + numberOfEntrySize + entriesSize
 
 	const writer = new IsoBoxWriteView('tfra', totalSize)
 	writer.writeFullBox(box.version, box.flags)
@@ -36,7 +37,8 @@ export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView {
 	writer.writeUint(box.trackId, 4)
 
 	// Pack reserved with length sizes
-	const reserved = (box.lengthSizeOfTrafNum << 4) | (box.lengthSizeOfTrunNum << 2) | box.lengthSizeOfSampleNum
+	const reserved =
+		(box.lengthSizeOfTrafNum << 4) | (box.lengthSizeOfTrunNum << 2) | box.lengthSizeOfSampleNum
 	writer.writeUint(reserved, 4)
 
 	writer.writeUint(box.numberOfEntry, 4)

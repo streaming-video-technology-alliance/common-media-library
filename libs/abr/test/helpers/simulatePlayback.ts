@@ -49,7 +49,11 @@ export function createConstantTrace(bandwidth: number): ThroughputTrace {
 /**
  * Creates a deterministic trace in which the throughput follows a random walk between `minimum` and `maximum` bits per second.
  */
-export function createRandomWalkTrace(seed: number, minimum: number, maximum: number): ThroughputTrace {
+export function createRandomWalkTrace(
+	seed: number,
+	minimum: number,
+	maximum: number,
+): ThroughputTrace {
 	const random = createSeededRandom(seed)
 	const pieces: TracePiece[] = []
 	let end = 0
@@ -57,7 +61,10 @@ export function createRandomWalkTrace(seed: number, minimum: number, maximum: nu
 
 	while (end < TRACE_SECONDS) {
 		end += MINIMUM_PIECE_SECONDS + random() * PIECE_SECONDS_SPREAD
-		bandwidth = Math.min(maximum, Math.max(minimum, bandwidth * Math.exp(WALK_VOLATILITY * normal(random))))
+		bandwidth = Math.min(
+			maximum,
+			Math.max(minimum, bandwidth * Math.exp(WALK_VOLATILITY * normal(random))),
+		)
 		pieces.push({ end, bandwidth })
 	}
 
@@ -110,7 +117,10 @@ function readEwma(ewma: Ewma): number {
 
 // The estimate is the smaller of two exponentially weighted averages.
 // A local estimate keeps the tests of this package independent of `@svta/cml-throughput`.
-function createThroughputEstimate(): { sample(seconds: number, bandwidth: number): void; get(): number } {
+function createThroughputEstimate(): {
+	sample(seconds: number, bandwidth: number): void
+	get(): number
+} {
 	const fast = createEwma(FAST_HALF_LIFE)
 	const slow = createEwma(SLOW_HALF_LIFE)
 
@@ -131,7 +141,10 @@ function createThroughputEstimate(): { sample(seconds: number, bandwidth: number
  * It samples every download.
  * The player starts to play after the first segment, and a stall is time with an empty buffer.
  */
-export function simulatePlayback(selector: BitrateSelector, options: SimulationOptions): SimulationResult {
+export function simulatePlayback(
+	selector: BitrateSelector,
+	options: SimulationOptions,
+): SimulationResult {
 	const { ladder, trace, bufferCap, segmentCount, segmentDuration, omitSegmentDuration } = options
 	const estimate = createThroughputEstimate()
 	const result: SimulationResult = { bandwidths: [], delays: [], repeatedDelays: 0, stallCount: 0 }
@@ -199,7 +212,11 @@ export function simulatePlayback(selector: BitrateSelector, options: SimulationO
 		estimate.sample(seconds, bits / seconds)
 
 		return {
-			timing: { startTime, encodedBodySize: bits / BITS_PER_BYTE, duration: seconds * MILLISECONDS_PER_SECOND },
+			timing: {
+				startTime,
+				encodedBodySize: bits / BITS_PER_BYTE,
+				duration: seconds * MILLISECONDS_PER_SECOND,
+			},
 			bandwidth,
 			duration: segmentDuration,
 			bufferLevel,

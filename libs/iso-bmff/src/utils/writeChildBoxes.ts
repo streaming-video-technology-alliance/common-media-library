@@ -12,7 +12,10 @@ import { writeBoxes } from './writeBoxes.ts'
  *
  * @internal
  */
-export function writeChildBoxes(boxes: IsoBox[], config: IsoBoxWriteViewConfig): { bytes: Uint8Array[]; size: number } {
+export function writeChildBoxes(
+	boxes: IsoBox[],
+	config: IsoBoxWriteViewConfig,
+): { bytes: Uint8Array[]; size: number } {
 	const bytes = writeBoxes(boxes, config)
 	const size = bytes.reduce((size, byte) => size + byte.byteLength, 0)
 

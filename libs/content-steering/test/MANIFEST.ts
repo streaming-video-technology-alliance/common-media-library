@@ -7,7 +7,7 @@ export const MANIFEST: SteeringManifest = {
 	'PATHWAY-CLONES': [
 		{
 			'BASE-ID': 'base1',
-			'ID': 'clone1',
+			ID: 'clone1',
 			'URI-REPLACEMENT': {
 				HOST: 'example.com',
 				PARAMS: {

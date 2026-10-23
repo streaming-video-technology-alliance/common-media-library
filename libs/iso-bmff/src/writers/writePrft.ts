@@ -21,7 +21,12 @@ export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView {
 	const ntpTimestampSecSize = 4
 	const ntpTimestampFracSize = 4
 	const totalSize =
-		headerSize + fullBoxSize + referenceTrackIdSize + ntpTimestampSecSize + ntpTimestampFracSize + mediaTimeSize
+		headerSize +
+		fullBoxSize +
+		referenceTrackIdSize +
+		ntpTimestampSecSize +
+		ntpTimestampFracSize +
+		mediaTimeSize
 
 	const writer = new IsoBoxWriteView('prft', totalSize)
 	writer.writeFullBox(box.version, box.flags)

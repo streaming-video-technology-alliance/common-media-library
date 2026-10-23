@@ -239,7 +239,11 @@ export class IsoBoxReadView {
 	 * @param length - The number of values to read.
 	 * @returns The array of values.
 	 */
-	readArray = <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number): IsoFieldTypeMap[T][] => {
+	readArray = <T extends keyof IsoFieldTypeMap>(
+		type: T,
+		size: number,
+		length: number,
+	): IsoFieldTypeMap[T][] => {
 		const value = []
 
 		for (let i = 0; i < length; i++) {

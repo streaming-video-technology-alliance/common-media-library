@@ -3,27 +3,45 @@ import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cue-settings/align tests', () => {
 	it('bad-align.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/bad-align.vtt', 'test/cue-settings/align/bad-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/bad-align.vtt',
+			'test/cue-settings/align/bad-align.json',
+		)
 	})
 
 	it('bad-delimiter.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/bad-delimiter.vtt', 'test/cue-settings/align/bad-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/bad-delimiter.vtt',
+			'test/cue-settings/align/bad-align.json',
+		)
 	})
 
 	it('bogus-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/bogus-value.vtt', 'test/cue-settings/align/bad-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/bogus-value.vtt',
+			'test/cue-settings/align/bad-align.json',
+		)
 	})
 
 	it('capital-keyword.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/capital-keyword.vtt', 'test/cue-settings/align/bad-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/capital-keyword.vtt',
+			'test/cue-settings/align/bad-align.json',
+		)
 	})
 
 	it('keyword-end.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/keyword-end.vtt', 'test/cue-settings/align/keyword-end.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/keyword-end.vtt',
+			'test/cue-settings/align/keyword-end.json',
+		)
 	})
 
 	it('keyword-left.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/keyword-left.vtt', 'test/cue-settings/align/keyword-left.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/keyword-left.vtt',
+			'test/cue-settings/align/keyword-left.json',
+		)
 	})
 
 	it('keyword-middle.vtt', async () => {
@@ -34,15 +52,24 @@ describe('cue-settings/align tests', () => {
 	})
 
 	it('keyword-right.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/keyword-right.vtt', 'test/cue-settings/align/keyword-right.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/keyword-right.vtt',
+			'test/cue-settings/align/keyword-right.json',
+		)
 	})
 
 	it('keyword-start.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/keyword-start.vtt', 'test/cue-settings/align/keyword-start.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/keyword-start.vtt',
+			'test/cue-settings/align/keyword-start.json',
+		)
 	})
 
 	it('no-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/align/no-value.vtt', 'test/cue-settings/align/bad-align.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/align/no-value.vtt',
+			'test/cue-settings/align/bad-align.json',
+		)
 	})
 
 	it('space-after-delimiter.vtt', async () => {

@@ -8,7 +8,7 @@ describe('isValidPathwayClone', () => {
 		//#region example
 		const pathwayClone = {
 			'BASE-ID': 'pathway1',
-			'ID': 'clone1',
+			ID: 'clone1',
 			'URI-REPLACEMENT': {
 				HOST: 'example.com',
 				PARAMS: {

@@ -1,5 +1,11 @@
 import type { Cmcd } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType } from '@svta/cml-cmcd'
+import {
+	CmcdEventType,
+	CmcdObjectType,
+	CmcdPlayerState,
+	CmcdStreamingFormat,
+	CmcdStreamType,
+} from '@svta/cml-cmcd'
 
 export const CMCD_INPUT: Cmcd = {
 	// common keys

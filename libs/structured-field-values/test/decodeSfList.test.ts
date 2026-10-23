@@ -9,8 +9,8 @@ describe('decodeSfList', () => {
 
 	it('parses valid input', () => {
 		assert.deepStrictEqual(decodeSfList(`("foo"; a=1;b=2);lvl=5, ("bar" "baz");lvl=1`), [
-			new SfItem([new SfItem('foo', { 'a': 1, 'b': 2 })], { 'lvl': 5 }),
-			new SfItem(['bar', 'baz'], { 'lvl': 1 }),
+			new SfItem([new SfItem('foo', { a: 1, b: 2 })], { lvl: 5 }),
+			new SfItem(['bar', 'baz'], { lvl: 1 }),
 		])
 	})
 

@@ -69,8 +69,14 @@ describe('decodeIso8601Duration', () => {
 		equal(decodeIso8601Duration('P1M1DT1H2M3S') > 60 * 60 * 24 * 28 + 90123 - 1, true)
 
 		// Years, Months, hours, minutes, and seconds.
-		equal(decodeIso8601Duration('P1Y1M1DT1H2M3S') < 60 * 60 * 24 * 366 + 60 * 60 * 24 * 31 + 90123 + 1, true)
-		equal(decodeIso8601Duration('P1Y1M1DT1H2M3S') > 60 * 60 * 24 * 365 + 60 * 60 * 24 * 28 + 90123 - 1, true)
+		equal(
+			decodeIso8601Duration('P1Y1M1DT1H2M3S') < 60 * 60 * 24 * 366 + 60 * 60 * 24 * 31 + 90123 + 1,
+			true,
+		)
+		equal(
+			decodeIso8601Duration('P1Y1M1DT1H2M3S') > 60 * 60 * 24 * 365 + 60 * 60 * 24 * 28 + 90123 - 1,
+			true,
+		)
 
 		equal(decodeIso8601Duration('PT'), 0)
 		equal(decodeIso8601Duration('P'), 0)

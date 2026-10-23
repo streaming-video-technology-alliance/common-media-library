@@ -42,7 +42,12 @@ describe('placeholderAfterAbort', () => {
 
 	it('returns 0 when the buffer is at or above the limit', () => {
 		equal(
-			placeholderAfterAbort(PARAMS, REPLACEMENT_POSITION, LARGE_PLACEHOLDER, PARAMS.thresholds[REPLACEMENT_POSITION]),
+			placeholderAfterAbort(
+				PARAMS,
+				REPLACEMENT_POSITION,
+				LARGE_PLACEHOLDER,
+				PARAMS.thresholds[REPLACEMENT_POSITION],
+			),
 			0,
 		)
 		equal(placeholderAfterAbort(PARAMS, LOWEST_POSITION, LARGE_PLACEHOLDER, MINIMUM_BUFFER + 1), 0)

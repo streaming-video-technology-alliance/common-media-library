@@ -13,7 +13,10 @@ import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE } from './CmcdReportingMode.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
-import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
+import {
+	CMCD_VALIDATION_SEVERITY_ERROR,
+	CMCD_VALIDATION_SEVERITY_WARNING,
+} from './CmcdValidationSeverity.ts'
 import { resolveVersion } from './resolveVersion.ts'
 import { toBareValue } from './toBareValue.ts'
 import { toTokenString } from './toTokenString.ts'

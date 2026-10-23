@@ -42,7 +42,11 @@ describe('ArithmeticMeanEstimator', () => {
 		for (const encodedBodySize of [0, -125, NaN, Infinity]) {
 			estimator.sample({ startTime: 6000, encodedBodySize, duration: 1000 })
 
-			equal(estimator.getEstimate(), 375, `expected the estimate to ignore a body size of ${encodedBodySize}`)
+			equal(
+				estimator.getEstimate(),
+				375,
+				`expected the estimate to ignore a body size of ${encodedBodySize}`,
+			)
 		}
 	})
 
@@ -66,7 +70,11 @@ describe('ArithmeticMeanEstimator', () => {
 		for (const duration of [0, -1000, NaN, Infinity]) {
 			estimator.sample({ startTime: 6000, encodedBodySize: 125, duration })
 
-			equal(estimator.getEstimate(), 375, `expected the estimate to ignore a duration of ${duration}`)
+			equal(
+				estimator.getEstimate(),
+				375,
+				`expected the estimate to ignore a duration of ${duration}`,
+			)
 		}
 	})
 

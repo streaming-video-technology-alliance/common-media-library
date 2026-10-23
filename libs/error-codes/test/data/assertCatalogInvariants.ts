@@ -15,7 +15,12 @@ export function assertCatalogInvariants(
 	for (const [name, value] of Object.entries(catalog)) {
 		ok(Number.isInteger(value))
 		strictEqual(Math.floor(value / 1000), category)
-		const constName = name === 'UNKNOWN' ? (category === 0 ? 'SVTA_UNKNOWN' : `${constPrefix}_UNKNOWN`) : `SVTA_${name}`
+		const constName =
+			name === 'UNKNOWN'
+				? category === 0
+					? 'SVTA_UNKNOWN'
+					: `${constPrefix}_UNKNOWN`
+				: `SVTA_${name}`
 		strictEqual(exported[constName], value, `individual const ${constName} missing or mismatched`)
 	}
 	strictEqual(catalog['UNKNOWN'], category === 0 ? 999 : category * 1000)

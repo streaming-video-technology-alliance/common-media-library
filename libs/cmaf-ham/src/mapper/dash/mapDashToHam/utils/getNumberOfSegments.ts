@@ -16,5 +16,7 @@ import { calculateDuration } from './calculateDuration.ts'
  */
 export function getNumberOfSegments(segmentTemplate: SegmentTemplate, duration: number): number {
 	// FIXME: This equation may be wrong
-	return Math.round(duration / calculateDuration(segmentTemplate.$.duration, segmentTemplate.$.timescale))
+	return Math.round(
+		duration / calculateDuration(segmentTemplate.$.duration, segmentTemplate.$.timescale),
+	)
 }

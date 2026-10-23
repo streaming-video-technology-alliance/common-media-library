@@ -22,7 +22,10 @@ import { getHlsCodec } from './utils/getHlsCodec.ts'
  *
  * @alpha
  */
-export function audioGroupsToSwitchingSets(mediaGroupsAudio: any, manifestPlaylists: ManifestFile[]): SwitchingSet[] {
+export function audioGroupsToSwitchingSets(
+	mediaGroupsAudio: any,
+	manifestPlaylists: ManifestFile[],
+): SwitchingSet[] {
 	const audioSwitchingSets: SwitchingSet[] = []
 	const audioTracks: AudioTrack[] = []
 

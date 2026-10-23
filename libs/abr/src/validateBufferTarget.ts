@@ -7,6 +7,8 @@ import { isPositiveFinite } from './isPositiveFinite.ts'
  */
 export function validateBufferTarget(bufferTarget: number): void {
 	if (!isPositiveFinite(bufferTarget)) {
-		throw new RangeError(`Invalid bufferTarget: expected a positive finite number of seconds, received ${bufferTarget}`)
+		throw new RangeError(
+			`Invalid bufferTarget: expected a positive finite number of seconds, received ${bufferTarget}`,
+		)
 	}
 }

@@ -6,4 +6,7 @@ import type { IsoBoxType } from './IsoBoxType.ts'
  *
  * @public
  */
-export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view: IsoBoxReadView, type: T) => B
+export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (
+	view: IsoBoxReadView,
+	type: T,
+) => B

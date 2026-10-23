@@ -15,7 +15,8 @@ const repoRoot = path.resolve(import.meta.dirname, '..')
 
 describe('extractExampleBlocks', () => {
 	it('returns the ts and typescript fences with the line of the opening fence', () => {
-		const markdown = '# Title\n\n```typescript\nconst a = 1\n```\n\ntext\n\n```ts\nconst b = 2\n```\n'
+		const markdown =
+			'# Title\n\n```typescript\nconst a = 1\n```\n\ntext\n\n```ts\nconst b = 2\n```\n'
 		deepEqual(extractExampleBlocks(markdown, 'libs/x/README.md'), [
 			{ file: 'libs/x/README.md', line: 3, code: 'const a = 1\n' },
 			{ file: 'libs/x/README.md', line: 9, code: 'const b = 2\n' },
@@ -23,13 +24,16 @@ describe('extractExampleBlocks', () => {
 	})
 
 	it('ignores fences of other languages and fences nested in them', () => {
-		const markdown = '```bash\nnpm install\n```\n\n````markdown\n```typescript\nnot code\n```\n````\n'
+		const markdown =
+			'```bash\nnpm install\n```\n\n````markdown\n```typescript\nnot code\n```\n````\n'
 		deepEqual(extractExampleBlocks(markdown, 'f.md'), [])
 	})
 
 	it('keeps blank lines inside a block', () => {
 		const markdown = '```typescript\nconst a = 1\n\nconst b = 2\n```\n'
-		deepEqual(extractExampleBlocks(markdown, 'f.md'), [{ file: 'f.md', line: 1, code: 'const a = 1\n\nconst b = 2\n' }])
+		deepEqual(extractExampleBlocks(markdown, 'f.md'), [
+			{ file: 'f.md', line: 1, code: 'const a = 1\n\nconst b = 2\n' },
+		])
 	})
 
 	it('accepts a closing fence that is longer than the opening fence', () => {
@@ -42,12 +46,16 @@ describe('extractExampleBlocks', () => {
 
 	it('does not close a block with a shorter fence', () => {
 		const markdown = '````typescript\n```\nconst a = 1\n```\n````\n'
-		deepEqual(extractExampleBlocks(markdown, 'f.md'), [{ file: 'f.md', line: 1, code: '```\nconst a = 1\n```\n' }])
+		deepEqual(extractExampleBlocks(markdown, 'f.md'), [
+			{ file: 'f.md', line: 1, code: '```\nconst a = 1\n```\n' },
+		])
 	})
 
 	it('returns a block that the document ends without closing', () => {
 		const markdown = 'text\n\n```typescript\nconst a = 1\n'
-		deepEqual(extractExampleBlocks(markdown, 'f.md'), [{ file: 'f.md', line: 3, code: 'const a = 1\n' }])
+		deepEqual(extractExampleBlocks(markdown, 'f.md'), [
+			{ file: 'f.md', line: 3, code: 'const a = 1\n' },
+		])
 	})
 })
 
@@ -89,7 +97,8 @@ describe('checkExamples', () => {
 	})
 
 	it('accepts top-level await and the same declare in two blocks', () => {
-		const code = 'declare const url: string\nconst response = await fetch(url)\nconsole.log(response.status)\n'
+		const code =
+			'declare const url: string\nconst response = await fetch(url)\nconsole.log(response.status)\n'
 		const blocks: ExampleBlock[] = [
 			{ file: 'a.md', line: 1, code },
 			{ file: 'b.md', line: 1, code },
@@ -154,7 +163,10 @@ describe('checkExamples with a context', () => {
 	it('skips a context statement when the block declares the name', () => {
 		const code =
 			'import { CmcdReporter } from "@svta/cml-cmcd";\nconst reporter = new CmcdReporter({ cid: "a" });\nreporter.update({ bl: [3000] });\n'
-		deepEqual(checkExamples([{ file: 'libs/x/docs/guide.md', line: 1, code, context }], repoRoot), [])
+		deepEqual(
+			checkExamples([{ file: 'libs/x/docs/guide.md', line: 1, code, context }], repoRoot),
+			[],
+		)
 	})
 
 	it('reports a block error at the markdown line', () => {
@@ -177,7 +189,14 @@ describe('checkExamples with a context', () => {
 			'libs/x/docs/guide.context.d.ts',
 		)
 		const diagnostics = checkExamples(
-			[{ file: 'libs/x/docs/guide.md', line: 1, code: 'console.log(reporter);\n', context: broken }],
+			[
+				{
+					file: 'libs/x/docs/guide.md',
+					line: 1,
+					code: 'console.log(reporter);\n',
+					context: broken,
+				},
+			],
 			repoRoot,
 		)
 		equal(diagnostics.length, 1)

@@ -13,7 +13,12 @@ describe('SvtaRemotePlayErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaRemotePlayErrorCode, SvtaErrorCategory.REMOTE_PLAY, 10, 'SVTA_REMOTE_PLAY')
+		assertCatalogInvariants(
+			SvtaRemotePlayErrorCode,
+			SvtaErrorCategory.REMOTE_PLAY,
+			10,
+			'SVTA_REMOTE_PLAY',
+		)
 	})
 
 	it('matches the spec table', () => {

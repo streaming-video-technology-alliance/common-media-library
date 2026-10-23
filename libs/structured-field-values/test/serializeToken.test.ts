@@ -24,18 +24,42 @@ test('serializeToken', () => {
 	assert.deepStrictEqual(serializeToken(Symbol.for(`to/ken`)), `to/ken`)
 
 	assert.throws(() => serializeToken(Symbol.for(`to"ken`)), /failed to serialize "to"ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to(ken`)), /failed to serialize "to\(ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to)ken`)), /failed to serialize "to\)ken" as Token/)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to(ken`)),
+		/failed to serialize "to\(ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to)ken`)),
+		/failed to serialize "to\)ken" as Token/,
+	)
 	assert.throws(() => serializeToken(Symbol.for(`to,ken`)), /failed to serialize "to,ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to;ken`)), /failed to serialize "to;ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to<ken`)), /failed to serialize "to<ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to=ken`)), /failed to serialize "to=ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to>ken`)), /failed to serialize "to>ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to?ken`)), /failed to serialize "to\?ken" as Token/)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to?ken`)),
+		/failed to serialize "to\?ken" as Token/,
+	)
 	assert.throws(() => serializeToken(Symbol.for(`to@ken`)), /failed to serialize "to@ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to[ken`)), /failed to serialize "to\[ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to\\ken`)), /failed to serialize "to\\ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to]ken`)), /failed to serialize "to\]ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to{ken`)), /failed to serialize "to\{ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to}ken`)), /failed to serialize "to\}ken" as Token/)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to[ken`)),
+		/failed to serialize "to\[ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to\\ken`)),
+		/failed to serialize "to\\ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to]ken`)),
+		/failed to serialize "to\]ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to{ken`)),
+		/failed to serialize "to\{ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to}ken`)),
+		/failed to serialize "to\}ken" as Token/,
+	)
 })

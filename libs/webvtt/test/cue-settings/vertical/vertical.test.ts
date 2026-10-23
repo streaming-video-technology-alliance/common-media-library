@@ -47,7 +47,10 @@ describe('cue-settings/vertical tests', () => {
 	})
 
 	it('no-value.vtt', async () => {
-		await expectCuesEqualAll('test/cue-settings/vertical/no-value.vtt', 'test/cue-settings/vertical/bad-vertical.json')
+		await expectCuesEqualAll(
+			'test/cue-settings/vertical/no-value.vtt',
+			'test/cue-settings/vertical/bad-vertical.json',
+		)
 	})
 
 	it('space-after-delimiter.vtt', async () => {

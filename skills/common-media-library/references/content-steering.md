@@ -83,7 +83,7 @@ export function isValidSteeringManifest(manifest: SteeringManifest): boolean;
 // @beta
 export type PathwayClone = {
     "BASE-ID": string;
-    "ID": string;
+    ID: string;
     "URI-REPLACEMENT": UriReplacement;
 };
 

@@ -3,7 +3,10 @@ import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts'
 
 //Add metadata to manifest.
 //In the future, if any other fields are wanted to be added, they can be added here.
-export function addMetadataToDash(dashManifest: DashManifest, manifest: ManifestFile): ManifestFile {
+export function addMetadataToDash(
+	dashManifest: DashManifest,
+	manifest: ManifestFile,
+): ManifestFile {
 	if (!manifest.metadata) {
 		manifest.metadata = new Map<string, string>()
 	}

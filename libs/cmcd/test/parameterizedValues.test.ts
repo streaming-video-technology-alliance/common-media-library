@@ -1,5 +1,12 @@
 import type { Cmcd, CmcdDecodeOptions } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdReporter, decodeCmcd, encodeCmcd, toCmcdHeaders, validateCmcd } from '@svta/cml-cmcd'
+import {
+	CmcdEventType,
+	CmcdReporter,
+	decodeCmcd,
+	encodeCmcd,
+	toCmcdHeaders,
+	validateCmcd,
+} from '@svta/cml-cmcd'
 import { SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
@@ -34,7 +41,9 @@ function errorsOf(input: string): string[] {
 }
 
 function hasMember(input: string, member: string): boolean {
-	return Object.values(toCmcdHeaders(decodeCmcd(input) as Cmcd)).some(value => value.includes(member))
+	return Object.values(toCmcdHeaders(decodeCmcd(input) as Cmcd)).some(value =>
+		value.includes(member),
+	)
 }
 
 function bareList(value: unknown): unknown[] {
@@ -80,7 +89,10 @@ describe('values with parameters', () => {
 			})
 
 			it('sends the first value in version 1, or omits a key that version 1 does not have', () => {
-				equal(encodeCmcd(decodeCmcd(input) as Cmcd, { version: 1 }), VERSION_1_KEYS.includes(key) ? `${key}=1200` : '')
+				equal(
+					encodeCmcd(decodeCmcd(input) as Cmcd, { version: 1 }),
+					VERSION_1_KEYS.includes(key) ? `${key}=1200` : '',
+				)
 			})
 
 			it('puts the member in a header', () => {
@@ -154,7 +166,11 @@ describe('values with parameters', () => {
 
 		it('reports a wrong value inside an SfItem', () => {
 			ok(errorsOf('d=12.5;x,ot=v,v=2').includes('Key "d" must be a finite integer.'))
-			ok(errorsOf('br=(1200.5);p=2,v=2').includes('Key "br" array element [0] must be a finite integer.'))
+			ok(
+				errorsOf('br=(1200.5);p=2,v=2').includes(
+					'Key "br" array element [0] must be a finite integer.',
+				),
+			)
 		})
 
 		it('keeps a version 2 payload unchanged when v has parameters', () => {

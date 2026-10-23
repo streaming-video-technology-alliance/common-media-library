@@ -26,7 +26,8 @@ export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
 	if (box.flags & 0x800) sampleSize += 4 // sampleCompositionTimeOffset
 
 	const samplesSize = sampleSize * box.sampleCount
-	const totalSize = headerSize + fullBoxSize + sampleCountSize + dataOffsetSize + firstSampleFlagsSize + samplesSize
+	const totalSize =
+		headerSize + fullBoxSize + sampleCountSize + dataOffsetSize + firstSampleFlagsSize + samplesSize
 
 	const writer = new IsoBoxWriteView('trun', totalSize)
 	writer.writeFullBox(box.version, box.flags)

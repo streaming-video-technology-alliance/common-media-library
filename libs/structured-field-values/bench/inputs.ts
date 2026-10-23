@@ -4,7 +4,10 @@ import type { SfItem, SfToken } from '@svta/cml-structured-field-values'
  * The encoder exports the benchmark uses. A baseline build loaded from a path provides the same shape.
  */
 export type EncoderApi = {
-	encodeSfDict: (value: Record<string, any> | Map<string, any>, options?: { whitespace?: boolean }) => string
+	encodeSfDict: (
+		value: Record<string, any> | Map<string, any>,
+		options?: { whitespace?: boolean },
+	) => string
 	encodeSfItem: (value: any, params?: Record<string, any>) => string
 	encodeSfList: (value: any[], options?: { whitespace?: boolean }) => string
 	SfItem: typeof SfItem
@@ -22,7 +25,13 @@ const COMPACT = { whitespace: false }
  * Builds the benchmark inputs with the classes of the encoder under test, so that its `instanceof` checks match.
  * The CMCD dictionaries have the shape `prepareCmcdData` produces for a version 2 request.
  */
-export function makeInputs({ encodeSfDict, encodeSfItem, encodeSfList, SfItem, SfToken }: EncoderApi): Input[] {
+export function makeInputs({
+	encodeSfDict,
+	encodeSfItem,
+	encodeSfList,
+	SfItem,
+	SfToken,
+}: EncoderApi): Input[] {
 	const cmcd: Record<string, any> = {
 		bl: 21300,
 		br: [new SfItem(1000, { ot: new SfToken('v') })],
@@ -43,7 +52,10 @@ export function makeInputs({ encodeSfDict, encodeSfItem, encodeSfList, SfItem, S
 		v: 2,
 	}
 	const cmcdItems = Object.fromEntries(
-		Object.entries(cmcd).map(([key, value]) => [key, value instanceof SfItem ? value : new SfItem(value)]),
+		Object.entries(cmcd).map(([key, value]) => [
+			key,
+			value instanceof SfItem ? value : new SfItem(value),
+		]),
 	)
 	const cmcdMap = new Map(Object.entries(cmcd))
 	const integers = Array.from({ length: 20 }, (_, i) => i * 1000 + 7)
@@ -53,7 +65,10 @@ export function makeInputs({ encodeSfDict, encodeSfItem, encodeSfList, SfItem, S
 		(_, i) =>
 			`https://cdn.example.com/live/channel-${i}/video/1080p/segment_${String(i).padStart(6, '0')}.m4s?token=abcdef0123456789`,
 	)
-	const escaped = Array.from({ length: 10 }, (_, i) => `say "hi" ${i} and \\ backslash \\ path "quoted" end`)
+	const escaped = Array.from(
+		{ length: 10 },
+		(_, i) => `say "hi" ${i} and \\ backslash \\ path "quoted" end`,
+	)
 	const decimals = Array.from({ length: 20 }, (_, i) => 1.2345 + i * 0.371)
 	const bytes = { b: new Uint8Array(32).map((_, i) => i * 7) }
 	const params = { a: 1, b: true, c: new SfToken('tok') }

@@ -9,7 +9,11 @@ export function encodeCbor(value: unknown): Uint8Array {
 }
 
 /** Encodes the map `value` with fewer than 23 entries, then appends one more entry with the key `key` and the value `entry` */
-export function encodeCborMapWithEntry(value: Record<string, unknown>, key: unknown, entry: unknown): Uint8Array {
+export function encodeCborMapWithEntry(
+	value: Record<string, unknown>,
+	key: unknown,
+	entry: unknown,
+): Uint8Array {
 	const map = encodeCbor(value)
 	// cbor-x writes the length of an object map in two bytes (0xb9), so the header is replaced
 	const info = map[0] & 0x1f

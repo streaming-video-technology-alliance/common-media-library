@@ -17,7 +17,11 @@ function toBase(baseUrl: string | undefined): string | undefined {
 	}
 }
 
-function formatPath(path: unknown, base: string | undefined, version: CmcdVersion): string | undefined {
+function formatPath(
+	path: unknown,
+	base: string | undefined,
+	version: CmcdVersion,
+): string | undefined {
 	if (typeof path !== 'string' || path === '') {
 		return undefined
 	}
@@ -27,7 +31,11 @@ function formatPath(path: unknown, base: string | undefined, version: CmcdVersio
 	return version === 1 ? encodeURIComponent(relative) : relative
 }
 
-function formatEntry(entry: unknown, base: string | undefined, version: CmcdVersion): CmcdNorEntry | undefined {
+function formatEntry(
+	entry: unknown,
+	base: string | undefined,
+	version: CmcdVersion,
+): CmcdNorEntry | undefined {
 	if (entry instanceof SfItem) {
 		const path = formatPath(entry.value, base, version)
 
@@ -37,7 +45,11 @@ function formatEntry(entry: unknown, base: string | undefined, version: CmcdVers
 	return formatPath(entry, base, version)
 }
 
-function formatEntries(entries: unknown[], base: string | undefined, version: CmcdVersion): CmcdNorEntry[] | undefined {
+function formatEntries(
+	entries: unknown[],
+	base: string | undefined,
+	version: CmcdVersion,
+): CmcdNorEntry[] | undefined {
 	const list: CmcdNorEntry[] = []
 
 	for (const entry of entries) {

@@ -40,8 +40,18 @@ describe('validateC2paSegment', () => {
 			const key001 = await createTestSessionKey('key_001')
 			const key002 = await createTestSessionKey('key_002')
 			init = await buildSessionKeysInitSegment(signer, [
-				{ key: key001, minSequenceNumber: 175, createdAt: '2025-07-29T10:00:00Z', validityPeriod: 3900 },
-				{ key: key002, minSequenceNumber: 1975, createdAt: KEY_002_CREATED_AT, validityPeriod: 3900 },
+				{
+					key: key001,
+					minSequenceNumber: 175,
+					createdAt: '2025-07-29T10:00:00Z',
+					validityPeriod: 3900,
+				},
+				{
+					key: key002,
+					minSequenceNumber: 1975,
+					createdAt: KEY_002_CREATED_AT,
+					validityPeriod: 3900,
+				},
 			])
 			segment = await buildVsiSegment(key002, 1975)
 		})
@@ -107,7 +117,10 @@ describe('validateC2paSegment', () => {
 		it('accepts a segment with a sequenceNumber of 2^32', async context => {
 			const sessionKeys = await validateInitAtNow(context)
 
-			const validated = await validateC2paSegment(await buildVsiSegment(key, BigInt(2 ** 32)), sessionKeys)
+			const validated = await validateC2paSegment(
+				await buildVsiSegment(key, BigInt(2 ** 32)),
+				sessionKeys,
+			)
 
 			strictEqual(validated?.result.sequenceNumber, 2 ** 32)
 			strictEqual(validated?.result.isValid, true)
@@ -140,7 +153,10 @@ describe('validateC2paSegment', () => {
 		it('does not accept a segment below a minSequenceNumber above 2^53 - 1', async context => {
 			const sessionKeys = await validateInitAtNow(context, unsafeMinimumInit)
 
-			await rejects(validateC2paSegment(await buildVsiSegment(key, BigInt(2 ** 53)), sessionKeys), /sequenceNumber/)
+			await rejects(
+				validateC2paSegment(await buildVsiSegment(key, BigInt(2 ** 53)), sessionKeys),
+				/sequenceNumber/,
+			)
 		})
 	})
 })
@@ -205,7 +221,11 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		strictEqual(forged?.result.isValid, false)
 
 		// The next authentic in-order segment must still validate.
-		const r2 = await validateC2paSegment(await buildVsiSegment(key, 2), sessionKeys, forged?.nextSequenceState)
+		const r2 = await validateC2paSegment(
+			await buildVsiSegment(key, 2),
+			sessionKeys,
+			forged?.nextSequenceState,
+		)
 		strictEqual(r2?.result.isValid, true)
 		deepStrictEqual(r2?.result.errorCodes, [])
 	})
@@ -240,7 +260,11 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 	it('leaves the sequence state unchanged for tampered media with a valid signature', async () => {
 		const state1 = await afterFirstSegment()
 
-		const tampered = await validateC2paSegment(tamperMedia(await buildVsiSegment(key, 2)), sessionKeys, state1)
+		const tampered = await validateC2paSegment(
+			tamperMedia(await buildVsiSegment(key, 2)),
+			sessionKeys,
+			state1,
+		)
 
 		deepStrictEqual(tampered?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
 		deepStrictEqual(tampered?.nextSequenceState, state1)
@@ -269,14 +293,22 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 	it('reports SEGMENT_INVALID and leaves the state unchanged below the minSequenceNumber of the key', async () => {
 		const minKey = await createTestSessionKey('key_min')
 		const init = await buildSessionKeysInitSegment(await createTestSigner(), [
-			{ key: minKey, minSequenceNumber: 10, createdAt: KEY_CREATED_AT, validityPeriod: KEY_VALIDITY_PERIOD },
+			{
+				key: minKey,
+				minSequenceNumber: 10,
+				createdAt: KEY_CREATED_AT,
+				validityPeriod: KEY_VALIDITY_PERIOD,
+			},
 		])
 		const keys = (await validateC2paInitSegment(init)).sessionKeys
 		const state: SequenceState = { lastSequenceNumber: 12, seenSequences: new Set([12]) }
 
 		const below = await validateC2paSegment(await buildVsiSegment(minKey, 5), keys, state)
 
-		strictEqual(below?.result.sequenceResult.reason, SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM)
+		strictEqual(
+			below?.result.sequenceResult.reason,
+			SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM,
+		)
 		deepStrictEqual(below?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
 		strictEqual(below?.nextSequenceState, state)
 	})
@@ -295,7 +327,11 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		})
 		strictEqual(r3?.nextSequenceState.lastSequenceNumber, 3)
 
-		const r4 = await validateC2paSegment(await buildVsiSegment(key, 4), sessionKeys, r3?.nextSequenceState)
+		const r4 = await validateC2paSegment(
+			await buildVsiSegment(key, 4),
+			sessionKeys,
+			r3?.nextSequenceState,
+		)
 		strictEqual(r4?.result.isValid, true)
 	})
 
@@ -305,7 +341,11 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		const errorCodes = []
 
 		for (const sequenceNumber of [1, 3, 2, 4]) {
-			const validated = await validateC2paSegment(await buildVsiSegment(key, sequenceNumber), sessionKeys, state)
+			const validated = await validateC2paSegment(
+				await buildVsiSegment(key, sequenceNumber),
+				sessionKeys,
+				state,
+			)
 			reasons.push(validated?.result.sequenceResult.reason)
 			errorCodes.push(validated?.result.errorCodes)
 			state = validated?.nextSequenceState
@@ -324,7 +364,11 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		const state1 = await afterFirstSegment()
 		const r2 = await validateC2paSegment(await buildVsiSegment(key, 2), sessionKeys, state1)
 
-		const replay = await validateC2paSegment(await buildVsiSegment(key, 2), sessionKeys, r2?.nextSequenceState)
+		const replay = await validateC2paSegment(
+			await buildVsiSegment(key, 2),
+			sessionKeys,
+			r2?.nextSequenceState,
+		)
 
 		strictEqual(replay?.result.sequenceResult.reason, SequenceValidationReason.DUPLICATE)
 		deepStrictEqual(replay?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
@@ -332,11 +376,19 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 
 	it('accepts the next authentic segment after a tampered segment', async () => {
 		const state1 = await afterFirstSegment()
-		const tampered = await validateC2paSegment(tamperMedia(await buildVsiSegment(key, 2)), sessionKeys, state1)
+		const tampered = await validateC2paSegment(
+			tamperMedia(await buildVsiSegment(key, 2)),
+			sessionKeys,
+			state1,
+		)
 		strictEqual(tampered?.result.isValid, false)
 
 		// The tampered segment does not advance the state, so segment 3 follows a gap.
-		const r3 = await validateC2paSegment(await buildVsiSegment(key, 3), sessionKeys, tampered?.nextSequenceState)
+		const r3 = await validateC2paSegment(
+			await buildVsiSegment(key, 3),
+			sessionKeys,
+			tampered?.nextSequenceState,
+		)
 
 		strictEqual(r3?.result.sequenceResult.reason, SequenceValidationReason.GAP_DETECTED)
 		strictEqual(r3?.result.isValid, true)

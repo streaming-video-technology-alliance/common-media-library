@@ -36,7 +36,8 @@ export function projectCborTags(value: unknown): unknown {
 	if (Array.isArray(value)) return value.map(projectCborTags)
 	if (value !== null && typeof value === 'object' && !(value instanceof Uint8Array)) {
 		const map: Record<string, unknown> = {}
-		for (const key of Object.keys(value)) setKey(map, key, projectCborTags((value as Record<string, unknown>)[key]))
+		for (const key of Object.keys(value))
+			setKey(map, key, projectCborTags((value as Record<string, unknown>)[key]))
 		return map
 	}
 	return value

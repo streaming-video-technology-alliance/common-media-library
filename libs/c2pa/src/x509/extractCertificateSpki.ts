@@ -1,4 +1,10 @@
-import { ASN1_TAG_CONTEXT_0, ASN1_TAG_INTEGER, ASN1_TAG_SEQUENCE, readElement, readElementRaw } from './asn1.ts'
+import {
+	ASN1_TAG_CONTEXT_0,
+	ASN1_TAG_INTEGER,
+	ASN1_TAG_SEQUENCE,
+	readElement,
+	readElementRaw,
+} from './asn1.ts'
 
 /**
  * Extracts the SubjectPublicKeyInfo (SPKI) DER bytes from an X.509 DER certificate.

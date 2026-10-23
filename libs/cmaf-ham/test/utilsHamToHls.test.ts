@@ -3,7 +3,12 @@ import { describe, it } from 'node:test'
 
 import type { AudioTrack } from '@svta/cml-cmaf-ham'
 
-import { encodeByteRange, getPlaylistData, getSegments, getUrlInitialization } from '@svta/cml-cmaf-ham'
+import {
+	encodeByteRange,
+	getPlaylistData,
+	getSegments,
+	getUrlInitialization,
+} from '@svta/cml-cmaf-ham'
 
 import { getAudioTrack } from './data/hlsData.ts'
 
@@ -60,7 +65,10 @@ describe('getUrlInitialization', () => {
 	it('returns url initialization', () => {
 		const track: AudioTrack = getAudioTrack({})
 		const res = getUrlInitialization(track)
-		equal(res, 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4')
+		equal(
+			res,
+			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-init.mp4',
+		)
 	})
 
 	it('returns empty string if track has no urlInitialization', () => {

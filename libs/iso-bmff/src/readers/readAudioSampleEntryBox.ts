@@ -13,7 +13,10 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  *
  * @public
  */
-export function readAudioSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView): AudioSampleEntryBox<T> {
+export function readAudioSampleEntryBox<T extends IsoBoxType>(
+	type: T,
+	view: IsoBoxReadView,
+): AudioSampleEntryBox<T> {
 	const { readArray, readUint, readTemplate, readBoxes } = view
 
 	return {

@@ -9,14 +9,20 @@ import {
 	CMCD_KEY_TYPES,
 	CMCD_V1_KEY_TYPE_OVERRIDES,
 } from './CMCD_KEY_TYPES.ts'
-import { CMCD_CUSTOM_KEY_VALUE_MAX_LENGTH, CMCD_STRING_LENGTH_LIMITS } from './CMCD_STRING_LENGTH_LIMITS.ts'
+import {
+	CMCD_CUSTOM_KEY_VALUE_MAX_LENGTH,
+	CMCD_STRING_LENGTH_LIMITS,
+} from './CMCD_STRING_LENGTH_LIMITS.ts'
 import { CMCD_TOKEN_VALUES } from './CMCD_TOKEN_VALUES.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
-import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
+import {
+	CMCD_VALIDATION_SEVERITY_ERROR,
+	CMCD_VALIDATION_SEVERITY_WARNING,
+} from './CmcdValidationSeverity.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
 import { toBareValue } from './toBareValue.ts'
@@ -59,7 +65,12 @@ function validateRounding(
 	})
 }
 
-function validateListValue(key: string, value: unknown, version: number, issues: CmcdValidationIssue[]): void {
+function validateListValue(
+	key: string,
+	value: unknown,
+	version: number,
+	issues: CmcdValidationIssue[],
+): void {
 	if (!Array.isArray(value)) {
 		issues.push({
 			key,
@@ -82,7 +93,11 @@ function validateListValue(key: string, value: unknown, version: number, issues:
 	}
 }
 
-function validateStringArrayValue(key: string, value: unknown, issues: CmcdValidationIssue[]): void {
+function validateStringArrayValue(
+	key: string,
+	value: unknown,
+	issues: CmcdValidationIssue[],
+): void {
 	if (!Array.isArray(value)) {
 		issues.push({
 			key,
@@ -205,7 +220,10 @@ export function validateCmcdValues(
 						message: `Key "${key}" must be a string.`,
 						severity: CMCD_VALIDATION_SEVERITY_ERROR,
 					})
-				} else if (key in CMCD_STRING_LENGTH_LIMITS && value.length > CMCD_STRING_LENGTH_LIMITS[key]) {
+				} else if (
+					key in CMCD_STRING_LENGTH_LIMITS &&
+					value.length > CMCD_STRING_LENGTH_LIMITS[key]
+				) {
 					issues.push({
 						key,
 						message: `Key "${key}" exceeds maximum length of ${CMCD_STRING_LENGTH_LIMITS[key]}.`,

@@ -21,7 +21,13 @@ export type GenerateMpdOptions = {
  * manifest decoded from a network response would be.
  */
 export function generateMpd(options: GenerateMpdOptions = {}): string {
-	const { periods = 50, adaptationSets = 4, segments = 500, pretty = true, closed = false } = options
+	const {
+		periods = 50,
+		adaptationSets = 4,
+		segments = 500,
+		pretty = true,
+		closed = false,
+	} = options
 	const nl = pretty ? '\n' : ''
 	const indent = (depth: number): string => (pretty ? '  '.repeat(depth) : '')
 	const segmentEnd = (closed ? '></S>' : ' />') + nl

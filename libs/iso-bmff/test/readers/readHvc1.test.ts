@@ -1,10 +1,20 @@
-import { assert, describe, filterBoxes, it, readHvc1, readStsd, type VisualSampleEntryBox } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	filterBoxes,
+	it,
+	readHvc1,
+	readStsd,
+	type VisualSampleEntryBox,
+} from '../util/box.ts'
 
 type Hvc1Box = VisualSampleEntryBox<'hvc1'>
 
 describe('readHvc1', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes('hvc1_init.mp4', 'stsd', { readers: { stsd: readStsd<Hvc1Box>, hvc1: readHvc1 } })
+		const container = filterBoxes('hvc1_init.mp4', 'stsd', {
+			readers: { stsd: readStsd<Hvc1Box>, hvc1: readHvc1 },
+		})
 
 		assert.strictEqual(container[0].type, 'stsd')
 		const box = container[0].entries[0] as Hvc1Box
@@ -25,8 +35,9 @@ describe('readHvc1', function () {
 		assert.deepStrictEqual(
 			box.compressorName,
 			[
-				0x0b, 0x48, 0x45, 0x56, 0x43, 0x20, 0x43, 0x6f, 0x64, 0x69, 0x6e, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x0b, 0x48, 0x45, 0x56, 0x43, 0x20, 0x43, 0x6f, 0x64, 0x69, 0x6e, 0x67, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00,
 			],
 		) // length + 'HEVC Coding'
 		assert.strictEqual(box.depth, 24)

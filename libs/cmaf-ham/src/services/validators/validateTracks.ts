@@ -27,7 +27,11 @@ import { validateTrack } from './validateTrack.ts'
  * @alpha
  *
  */
-export function validateTracks(tracks: Track[], switchingSetId?: string, prevValidation?: Validation): Validation {
+export function validateTracks(
+	tracks: Track[],
+	switchingSetId?: string,
+	prevValidation?: Validation,
+): Validation {
 	const validation: Validation = prevValidation ?? {
 		status: true,
 		errorMessages: [],

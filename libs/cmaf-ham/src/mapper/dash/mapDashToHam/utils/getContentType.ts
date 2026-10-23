@@ -11,7 +11,10 @@ import type { Representation } from '../../../../types/mapper/dash/Representatio
  * @param representation - Representation to get the type from
  * @returns type of the content
  */
-export function getContentType(adaptationSet: AdaptationSet, representation?: Representation): string {
+export function getContentType(
+	adaptationSet: AdaptationSet,
+	representation?: Representation,
+): string {
 	if (adaptationSet.$.contentType) {
 		return adaptationSet.$.contentType
 	}
@@ -19,7 +22,8 @@ export function getContentType(adaptationSet: AdaptationSet, representation?: Re
 		return adaptationSet.ContentComponent.at(0)?.$.contentType ?? ''
 	}
 	if (adaptationSet.$.mimeType || representation?.$.mimeType) {
-		const type = adaptationSet.$.mimeType?.split('/')[0] || representation?.$.mimeType?.split('/')[0]
+		const type =
+			adaptationSet.$.mimeType?.split('/')[0] || representation?.$.mimeType?.split('/')[0]
 		if (type === 'audio' || type === 'video' || type === 'text') {
 			return type
 		}
@@ -30,7 +34,8 @@ export function getContentType(adaptationSet: AdaptationSet, representation?: Re
 	if (adaptationSet.$.maxHeight) {
 		return 'video'
 	}
-	const adaptationRef = adaptationSet.$.id ?? `group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`
+	const adaptationRef =
+		adaptationSet.$.id ?? `group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`
 	console.error(`Could not find contentType from adaptationSet ${adaptationRef}`)
 	console.info('Using "text" as default contentType')
 	return 'text'

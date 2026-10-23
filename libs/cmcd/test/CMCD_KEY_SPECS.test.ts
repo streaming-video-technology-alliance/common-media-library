@@ -25,7 +25,9 @@ describe('CMCD_KEY_SPECS', () => {
 	})
 
 	it('gives the request keys to both reporting modes', () => {
-		const keys = KEYS.filter(key => CMCD_KEY_SPECS[key].mode === undefined && CMCD_KEY_SPECS[key].version !== 1)
+		const keys = KEYS.filter(
+			key => CMCD_KEY_SPECS[key].mode === undefined && CMCD_KEY_SPECS[key].version !== 1,
+		)
 		deepEqual(sorted(keys), sorted(CMCD_REQUEST_KEYS))
 	})
 
@@ -56,7 +58,11 @@ describe('CMCD_KEY_SPECS', () => {
 			}
 
 			ok(CMCD_FORMATTER_MAP[key], `CMCD_FORMATTER_MAP has no formatter for ${key}`)
-			equal(CMCD_FORMATTER_MAP[key](1249.6, options), Math.round(1249.6 / spec.round) * spec.round, key)
+			equal(
+				CMCD_FORMATTER_MAP[key](1249.6, options),
+				Math.round(1249.6 / spec.round) * spec.round,
+				key,
+			)
 		}
 	})
 })

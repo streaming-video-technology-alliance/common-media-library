@@ -6,7 +6,10 @@ import type { CmcdValue } from './CmcdValue.ts'
 import { formatNor } from './formatNor.ts'
 import { isValid } from './isValid.ts'
 
-const formatNumbers = (value: CmcdValue, format: (value: number) => number): ValueOrArray<number | SfItem<number>> => {
+const formatNumbers = (
+	value: CmcdValue,
+	format: (value: number) => number,
+): ValueOrArray<number | SfItem<number>> => {
 	if (Array.isArray(value)) {
 		const list: (number | SfItem<number>)[] = []
 

@@ -3,7 +3,10 @@ import { expectCuesEqualAll } from '../utils/expectCuesEqualAll.ts'
 
 describe('file-layout tests', function () {
 	it('blank-file-with-bom.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/blank-file-with-bom.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/blank-file-with-bom.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 
 	it('blank-file.vtt', async () => {
@@ -11,33 +14,54 @@ describe('file-layout tests', function () {
 	})
 
 	it('bom-garbage-data.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/bom-garbage-data.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/bom-garbage-data.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 
 	it('bom-tab-webvtt.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/bom-tab-webvtt.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/bom-tab-webvtt.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 
 	// Turn back on: https://github.com/mozilla/vtt.js/issues/262
 	it('cue-spacing.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/cue-spacing.vtt', 'test/file-layout/cue-spacing.json')
+		await expectCuesEqualAll(
+			'test/file-layout/cue-spacing.vtt',
+			'test/file-layout/cue-spacing.json',
+		)
 	})
 
 	it('garbage-signature.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/garbage-signature.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/garbage-signature.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 
 	it('header-no-new-line.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/header-no-new-line.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/header-no-new-line.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 
 	// Turn back on: https://github.com/mozilla/vtt.js/issues/262
 	it('many-comments.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/many-comments.vtt', 'test/file-layout/many-comments.json')
+		await expectCuesEqualAll(
+			'test/file-layout/many-comments.vtt',
+			'test/file-layout/many-comments.json',
+		)
 	})
 
 	it('newline-before-webvtt.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/newline-before-webvtt.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/newline-before-webvtt.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 
 	it('no-space-cue-times-cue-settings.vtt', async () => {
@@ -48,11 +72,17 @@ describe('file-layout tests', function () {
 	})
 
 	it('tab-after-bom-before-header.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/tab-after-bom-before-header.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/tab-after-bom-before-header.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 
 	it('webvtt-no-bom.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/webvtt-no-bom.vtt', 'test/file-layout/with-data.json')
+		await expectCuesEqualAll(
+			'test/file-layout/webvtt-no-bom.vtt',
+			'test/file-layout/with-data.json',
+		)
 	})
 
 	it('webvtt-space.vtt', async () => {
@@ -64,10 +94,16 @@ describe('file-layout tests', function () {
 	})
 
 	it('webvtt-with-bom.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/webvtt-with-bom.vtt', 'test/file-layout/with-data.json')
+		await expectCuesEqualAll(
+			'test/file-layout/webvtt-with-bom.vtt',
+			'test/file-layout/with-data.json',
+		)
 	})
 
 	it('bad-double-webvtt.vtt', async () => {
-		await expectCuesEqualAll('test/file-layout/bad-double-webvtt.vtt', 'test/file-layout/no-output.json')
+		await expectCuesEqualAll(
+			'test/file-layout/bad-double-webvtt.vtt',
+			'test/file-layout/no-output.json',
+		)
 	})
 })

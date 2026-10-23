@@ -25,10 +25,22 @@ import {
 	STARVATION_GUARD_SAMPLE_COUNT,
 	THRESHOLD_TOLERANCE,
 } from '../src/BOLA_CONSTANTS.ts'
-import { bolaMaximumBuffers, bolaThresholds, createBolaScoreModel } from './helpers/bolaScoreOracle.ts'
+import {
+	bolaMaximumBuffers,
+	bolaThresholds,
+	createBolaScoreModel,
+} from './helpers/bolaScoreOracle.ts'
 import { closeTo } from './helpers/closeTo.ts'
 import { L1_GOLDEN, L2_GOLDEN } from './helpers/goldenRungs.ts'
-import { L1, L1_BANDWIDTHS, L2, L2_BANDWIDTHS, rungs, withoutRung, withRung } from './helpers/ladders.ts'
+import {
+	L1,
+	L1_BANDWIDTHS,
+	L2,
+	L2_BANDWIDTHS,
+	rungs,
+	withoutRung,
+	withRung,
+} from './helpers/ladders.ts'
 import { MILLISECONDS_PER_SECOND } from './helpers/units.ts'
 
 const SEGMENT_DURATION = 4
@@ -123,7 +135,11 @@ function load(
 
 // Moves a selector from the startup state to the steady state. One segment is loaded and the buffer holds one segment.
 // The first request starts at 0, so the call to `select` happens at `requestEnd(0)`.
-function reachSteadyState(selector: BolaSelector, throughput: number, ladder: LadderRung[] = L1): BolaDecision {
+function reachSteadyState(
+	selector: BolaSelector,
+	throughput: number,
+	ladder: LadderRung[] = L1,
+): BolaDecision {
 	selector.select({ ladder, bufferLevel: 0, throughput: NaN, now: 0 })
 	load(selector, ladder[0].bandwidth, 0)
 
@@ -131,7 +147,10 @@ function reachSteadyState(selector: BolaSelector, throughput: number, ladder: La
 }
 
 // Returns a selector in the steady state with an empty placeholder, so that the real buffer alone decides.
-function createEmptyPlaceholderSelector(ladder: LadderRung[] = L1, options?: BolaSelectorOptions): BolaSelector {
+function createEmptyPlaceholderSelector(
+	ladder: LadderRung[] = L1,
+	options?: BolaSelectorOptions,
+): BolaSelector {
 	const selector = createBolaSelector(options)
 
 	reachSteadyState(selector, throughputFor(1), ladder)
@@ -142,7 +161,11 @@ function createEmptyPlaceholderSelector(ladder: LadderRung[] = L1, options?: Bol
 
 // Returns a selector in the steady state whose current rung is `bandwidth` and whose placeholder is empty.
 // Two samples finished, so the starvation guard is ready. The next call at `requestEnd(0)` adds no elapsed time.
-function createSteadySelectorAt(bandwidth: number, bufferLevel: number, options?: BolaSelectorOptions): BolaSelector {
+function createSteadySelectorAt(
+	bandwidth: number,
+	bufferLevel: number,
+	options?: BolaSelectorOptions,
+): BolaSelector {
 	const selector = createEmptyPlaceholderSelector(L1, options)
 
 	load(selector, bandwidth, bufferLevel)
@@ -233,7 +256,12 @@ describe('createBolaSelector', () => {
 	describe('type', () => {
 		it('is a BitrateSelector whose decision keeps the state and the placeholder', () => {
 			const selector: BitrateSelector = createBolaSelector()
-			const decision = createBolaSelector().select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: 0 })
+			const decision = createBolaSelector().select({
+				ladder: L1,
+				bufferLevel: 0,
+				throughput: NaN,
+				now: 0,
+			})
 			const state: BolaState = decision.state
 
 			equal(typeof selector.select, 'function')
@@ -257,7 +285,12 @@ describe('createBolaSelector', () => {
 
 			// The player downloads a 4 second segment of rung 0 (150,000 bytes) in 400 ms, at 3 Mbps.
 			const timing = { startTime: 0, encodedBodySize: 150_000, duration: 400 }
-			selector.sample({ timing, bandwidth: ladder[first.index].bandwidth, duration: 4, bufferLevel: 0 })
+			selector.sample({
+				timing,
+				bandwidth: ladder[first.index].bandwidth,
+				duration: 4,
+				bufferLevel: 0,
+			})
 
 			// Second request. The estimate is 3 Mbps, so the selector picks rung 2 (1.5 Mbps).
 			const second = selector.select({ ladder, bufferLevel: 4, throughput: 3_000_000, now: 400 })
@@ -272,14 +305,24 @@ describe('createBolaSelector', () => {
 	describe('startup state', () => {
 		it('picks rung 0 with no placeholder when the throughput is unknown', () => {
 			for (const throughput of [NaN, -1, Infinity, -Infinity]) {
-				const decision = createBolaSelector().select({ ladder: L1, bufferLevel: 0, throughput, now: 0 })
+				const decision = createBolaSelector().select({
+					ladder: L1,
+					bufferLevel: 0,
+					throughput,
+					now: 0,
+				})
 
 				deepEqual(decision, { index: 0, delay: 0, state: BolaState.STARTUP, placeholder: 0 })
 			}
 		})
 
 		it('picks rung 0 when no rung fits the throughput', () => {
-			const decision = createBolaSelector().select({ ladder: L1, bufferLevel: 0, throughput: 0, now: 0 })
+			const decision = createBolaSelector().select({
+				ladder: L1,
+				bufferLevel: 0,
+				throughput: 0,
+				now: 0,
+			})
 
 			equal(decision.index, 0)
 			equal(decision.state, BolaState.STARTUP)
@@ -344,7 +387,12 @@ describe('createBolaSelector', () => {
 
 			for (let call = 0; call < 3; call++) {
 				equal(
-					selector.select({ ladder: L1, bufferLevel: MINIMUM_BUFFER, throughput: throughputFor(1), now: call }).state,
+					selector.select({
+						ladder: L1,
+						bufferLevel: MINIMUM_BUFFER,
+						throughput: throughputFor(1),
+						now: call,
+					}).state,
 					BolaState.STARTUP,
 				)
 			}
@@ -383,8 +431,12 @@ describe('createBolaSelector', () => {
 				load(selector, L1_BANDWIDTHS[0], 0, 0, { duration })
 
 				equal(
-					selector.select({ ladder: L1, bufferLevel: MINIMUM_BUFFER, throughput: throughputFor(1), now: requestEnd(0) })
-						.state,
+					selector.select({
+						ladder: L1,
+						bufferLevel: MINIMUM_BUFFER,
+						throughput: throughputFor(1),
+						now: requestEnd(0),
+					}).state,
 					BolaState.STARTUP,
 					`duration ${duration}`,
 				)
@@ -403,11 +455,21 @@ describe('createBolaSelector', () => {
 		})
 
 		it('counts a buffer level that is not finite or is negative as 0', () => {
-			const expected = createBolaSelector().select({ ladder: L1, bufferLevel: 0, throughput: throughputFor(2), now: 0 })
+			const expected = createBolaSelector().select({
+				ladder: L1,
+				bufferLevel: 0,
+				throughput: throughputFor(2),
+				now: 0,
+			})
 
 			for (const bufferLevel of INVALID_BUFFER_LEVELS) {
 				deepEqual(
-					createBolaSelector().select({ ladder: L1, bufferLevel, throughput: throughputFor(2), now: 0 }),
+					createBolaSelector().select({
+						ladder: L1,
+						bufferLevel,
+						throughput: throughputFor(2),
+						now: 0,
+					}),
 					expected,
 				)
 			}
@@ -423,7 +485,12 @@ describe('createBolaSelector', () => {
 				const selector = createEmptyPlaceholderSelector(ladder)
 
 				for (const [bufferLevel, expected] of golden) {
-					const decision = selector.select({ ladder, bufferLevel, throughput: NaN, now: requestEnd(0) })
+					const decision = selector.select({
+						ladder,
+						bufferLevel,
+						throughput: NaN,
+						now: requestEnd(0),
+					})
 
 					equal(decision.index, expected, `buffer ${bufferLevel}`)
 					equal(decision.state, BolaState.STEADY)
@@ -500,7 +567,12 @@ describe('createBolaSelector', () => {
 		it('returns a delay of 0 in the call after the wait', () => {
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
 			const throughput = throughputBetween(1)
-			const first = selector.select({ ladder: L1, bufferLevel: GUARD_BUFFER_LEVEL, throughput, now: requestEnd(0) })
+			const first = selector.select({
+				ladder: L1,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput,
+				now: requestEnd(0),
+			})
 
 			ok(first.delay > 0)
 
@@ -519,7 +591,12 @@ describe('createBolaSelector', () => {
 		it('returns the same delay again when the buffer did not drain during the wait', () => {
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
 			const throughput = throughputBetween(1)
-			const first = selector.select({ ladder: L1, bufferLevel: GUARD_BUFFER_LEVEL, throughput, now: requestEnd(0) })
+			const first = selector.select({
+				ladder: L1,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput,
+				now: requestEnd(0),
+			})
 			const second = selector.select({
 				ladder: L1,
 				bufferLevel: GUARD_BUFFER_LEVEL,
@@ -597,7 +674,12 @@ describe('createBolaSelector', () => {
 			const elapsed = 3
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[0], LOW_BUFFER_LEVEL)
 
-			selector.select({ ladder: L1, bufferLevel: LOW_BUFFER_LEVEL, throughput: NaN, now: requestEnd(0) })
+			selector.select({
+				ladder: L1,
+				bufferLevel: LOW_BUFFER_LEVEL,
+				throughput: NaN,
+				now: requestEnd(0),
+			})
 
 			const decision = selector.select({
 				ladder: L1,
@@ -613,8 +695,14 @@ describe('createBolaSelector', () => {
 			const elapsed = 3
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[0], LOW_BUFFER_LEVEL)
 			const input = { ladder: L1, bufferLevel: LOW_BUFFER_LEVEL, throughput: NaN }
-			const first = selector.select({ ...input, now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND })
-			const second = selector.select({ ...input, now: requestEnd(0) + (elapsed - 1) * MILLISECONDS_PER_SECOND })
+			const first = selector.select({
+				...input,
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+			})
+			const second = selector.select({
+				...input,
+				now: requestEnd(0) + (elapsed - 1) * MILLISECONDS_PER_SECOND,
+			})
 
 			closeTo(first.placeholder, elapsed, TOLERANCE)
 			closeTo(second.placeholder, elapsed, TOLERANCE)
@@ -626,9 +714,15 @@ describe('createBolaSelector', () => {
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[0], LOW_BUFFER_LEVEL)
 			const control = createSteadySelectorAt(L1_BANDWIDTHS[0], LOW_BUFFER_LEVEL)
 
-			deepEqual(selector.select({ ...input, now: NaN }), control.select({ ...input, now: requestEnd(0) }))
+			deepEqual(
+				selector.select({ ...input, now: NaN }),
+				control.select({ ...input, now: requestEnd(0) }),
+			)
 
-			const later = selector.select({ ...input, now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND })
+			const later = selector.select({
+				...input,
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+			})
 
 			closeTo(later.placeholder, elapsed, TOLERANCE)
 		})
@@ -671,7 +765,11 @@ describe('createBolaSelector', () => {
 
 		it('skips the guard when segmentDuration is missing or is not a positive finite number', () => {
 			for (const segmentDuration of [undefined, ...INVALID_DURATIONS]) {
-				equal(decide(STARVING_BUFFER_LEVEL, { segmentDuration }).index, 3, `segmentDuration ${segmentDuration}`)
+				equal(
+					decide(STARVING_BUFFER_LEVEL, { segmentDuration }).index,
+					3,
+					`segmentDuration ${segmentDuration}`,
+				)
 			}
 		})
 
@@ -767,8 +865,16 @@ describe('createBolaSelector', () => {
 		})
 
 		it('uses starvationSafetyFactor for the download time', () => {
-			equal(decide(HEALTHY_BUFFER_LEVEL, {}, { starvationSafetyFactor: STRICT_STARVATION_FACTOR }).index, 2)
-			equal(decide(HEALTHY_BUFFER_LEVEL, {}, { starvationSafetyFactor: RELAXED_STARVATION_FACTOR }).index, 3)
+			equal(
+				decide(HEALTHY_BUFFER_LEVEL, {}, { starvationSafetyFactor: STRICT_STARVATION_FACTOR })
+					.index,
+				2,
+			)
+			equal(
+				decide(HEALTHY_BUFFER_LEVEL, {}, { starvationSafetyFactor: RELAXED_STARVATION_FACTOR })
+					.index,
+				3,
+			)
 		})
 
 		it('skips the delay step when it lowers the pick', () => {
@@ -781,11 +887,20 @@ describe('createBolaSelector', () => {
 
 		it('makes a lowered pick the current rung', () => {
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[3], STARVING_BUFFER_LEVEL)
-			const now = requestEnd(0) + (GUARD_BUFFER_LEVEL - STARVING_BUFFER_LEVEL) * MILLISECONDS_PER_SECOND
+			const now =
+				requestEnd(0) + (GUARD_BUFFER_LEVEL - STARVING_BUFFER_LEVEL) * MILLISECONDS_PER_SECOND
 			const input = { ladder: L1, now, segmentDuration: SEGMENT_DURATION }
-			const lowered = selector.select({ ...input, bufferLevel: STARVING_BUFFER_LEVEL, throughput: throughputFor(3) })
+			const lowered = selector.select({
+				...input,
+				bufferLevel: STARVING_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+			})
 			// The buffer now picks rung 4. The throughput sustains rung 2 only, so the oscillation guard keeps the current rung.
-			const next = selector.select({ ...input, bufferLevel: RECOVERED_BUFFER_LEVEL, throughput: throughputBetween(2) })
+			const next = selector.select({
+				...input,
+				bufferLevel: RECOVERED_BUFFER_LEVEL,
+				throughput: throughputBetween(2),
+			})
 
 			equal(lowered.index, 2)
 			equal(next.index, 2)
@@ -801,13 +916,21 @@ describe('createBolaSelector', () => {
 			reachSteadyState(above, throughputFor(1))
 
 			equal(
-				atThreshold.select({ ladder: L1, bufferLevel: STALL_THRESHOLD, throughput: NaN, now: requestEnd(0) })
-					.placeholder,
+				atThreshold.select({
+					ladder: L1,
+					bufferLevel: STALL_THRESHOLD,
+					throughput: NaN,
+					now: requestEnd(0),
+				}).placeholder,
 				0,
 			)
 			ok(
-				above.select({ ladder: L1, bufferLevel: STALL_THRESHOLD + SMALL_STEP, throughput: NaN, now: requestEnd(0) })
-					.placeholder > 0,
+				above.select({
+					ladder: L1,
+					bufferLevel: STALL_THRESHOLD + SMALL_STEP,
+					throughput: NaN,
+					now: requestEnd(0),
+				}).placeholder > 0,
 			)
 		})
 
@@ -853,8 +976,15 @@ describe('createBolaSelector', () => {
 			load(stalled, L1_BANDWIDTHS[1], STALL_THRESHOLD, SECOND_REQUEST_START)
 			load(control, L1_BANDWIDTHS[1], SEGMENT_DURATION, SECOND_REQUEST_START)
 
-			equal(stalled.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later }).placeholder, 0)
-			ok(control.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later }).placeholder > 0)
+			equal(
+				stalled.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later })
+					.placeholder,
+				0,
+			)
+			ok(
+				control.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later })
+					.placeholder > 0,
+			)
 		})
 	})
 
@@ -872,7 +1002,12 @@ describe('createBolaSelector', () => {
 				const later = requestEnd(SECOND_REQUEST_START) + LONG_WAIT_SECONDS * MILLISECONDS_PER_SECOND
 
 				equal(
-					selector.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: later }).placeholder,
+					selector.select({
+						ladder: L1,
+						bufferLevel: SEGMENT_DURATION,
+						throughput: NaN,
+						now: later,
+					}).placeholder,
 					0,
 				)
 			})
@@ -907,7 +1042,8 @@ describe('createBolaSelector', () => {
 		it('caps the placeholder so that the effective buffer at request start stays at or below the maximum buffer of the rung', () => {
 			const { selector } = createSampledSelector()
 			const bufferLevel = 8
-			const cap = L1_MAXIMUM_BUFFERS[0] - (bufferLevel + DOWNLOAD_DURATION / MILLISECONDS_PER_SECOND)
+			const cap =
+				L1_MAXIMUM_BUFFERS[0] - (bufferLevel + DOWNLOAD_DURATION / MILLISECONDS_PER_SECOND)
 
 			load(selector, L1_BANDWIDTHS[0], bufferLevel, SECOND_REQUEST_START)
 
@@ -924,7 +1060,9 @@ describe('createBolaSelector', () => {
 		it('adds the segment duration for a replacement segment', () => {
 			const { selector, placeholder } = createSampledSelector()
 
-			load(selector, L1_BANDWIDTHS[1], SEGMENT_DURATION, SECOND_REQUEST_START, { isReplacement: true })
+			load(selector, L1_BANDWIDTHS[1], SEGMENT_DURATION, SECOND_REQUEST_START, {
+				isReplacement: true,
+			})
 
 			const decision = selector.select({
 				ladder: L1,
@@ -949,13 +1087,24 @@ describe('createBolaSelector', () => {
 				const selector = createBolaSelector()
 
 				reachSteadyState(selector, throughputFor(position))
-				load(selector, L1_BANDWIDTHS[position], bufferLevel, SECOND_REQUEST_START, { aborted: true })
+				load(selector, L1_BANDWIDTHS[position], bufferLevel, SECOND_REQUEST_START, {
+					aborted: true,
+				})
 
 				return selector
 			}
 
-			function decideAfterAbort(selector: BolaSelector, bufferLevel: number, throughput: number): BolaDecision {
-				return selector.select({ ladder: L1, bufferLevel, throughput, now: requestEnd(SECOND_REQUEST_START) })
+			function decideAfterAbort(
+				selector: BolaSelector,
+				bufferLevel: number,
+				throughput: number,
+			): BolaDecision {
+				return selector.select({
+					ladder: L1,
+					bufferLevel,
+					throughput,
+					now: requestEnd(SECOND_REQUEST_START),
+				})
 			}
 
 			it('caps the placeholder at the threshold of the next lower rung', () => {
@@ -966,7 +1115,11 @@ describe('createBolaSelector', () => {
 
 			it('picks the next lower rung in the first call, even when the estimate collapsed', () => {
 				for (const throughput of [NaN, throughputFor(0)]) {
-					const decision = decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughput)
+					const decision = decideAfterAbort(
+						abortAt(3, ABORT_BUFFER_LEVEL),
+						ABORT_BUFFER_LEVEL,
+						throughput,
+					)
 
 					equal(decision.index, 2, `throughput ${throughput}`)
 				}
@@ -978,7 +1131,11 @@ describe('createBolaSelector', () => {
 				for (let abortedPosition = 2; abortedPosition < L2.length; abortedPosition++) {
 					const replacementThreshold = L2_THRESHOLDS[abortedPosition - 1]
 					const startupThroughput = L2_BANDWIDTHS[abortedPosition] / DEFAULT_SAFETY_FACTOR + 1
-					const { placeholder: startupPlaceholder } = reachSteadyState(createBolaSelector(), startupThroughput, L2)
+					const { placeholder: startupPlaceholder } = reachSteadyState(
+						createBolaSelector(),
+						startupThroughput,
+						L2,
+					)
 					// The cap binds from this buffer level on, and it applies below the threshold of the replacement.
 					const lowest = replacementThreshold - startupPlaceholder + SMALL_STEP
 					const highest = replacementThreshold - SMALL_STEP
@@ -991,7 +1148,9 @@ describe('createBolaSelector', () => {
 						const selector = createBolaSelector()
 
 						reachSteadyState(selector, startupThroughput, L2)
-						load(selector, L2_BANDWIDTHS[abortedPosition], bufferLevel, SECOND_REQUEST_START, { aborted: true })
+						load(selector, L2_BANDWIDTHS[abortedPosition], bufferLevel, SECOND_REQUEST_START, {
+							aborted: true,
+						})
 
 						const decision = selector.select({
 							ladder: L2,
@@ -1000,14 +1159,29 @@ describe('createBolaSelector', () => {
 							now: requestEnd(SECOND_REQUEST_START),
 						})
 
-						equal(decision.index, abortedPosition - 1, `aborted rung ${abortedPosition}, buffer ${bufferLevel}`)
+						equal(
+							decision.index,
+							abortedPosition - 1,
+							`aborted rung ${abortedPosition}, buffer ${bufferLevel}`,
+						)
 					}
 				}
 			})
 
 			it('blocks a return to the aborted rung until the throughput sustains it', () => {
-				equal(decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), RETURN_BUFFER_LEVEL, throughputBetween(2)).index, 2)
-				equal(decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), RETURN_BUFFER_LEVEL, throughputFor(3)).index, 3)
+				equal(
+					decideAfterAbort(
+						abortAt(3, ABORT_BUFFER_LEVEL),
+						RETURN_BUFFER_LEVEL,
+						throughputBetween(2),
+					).index,
+					2,
+				)
+				equal(
+					decideAfterAbort(abortAt(3, ABORT_BUFFER_LEVEL), RETURN_BUFFER_LEVEL, throughputFor(3))
+						.index,
+					3,
+				)
 			})
 
 			it('locates the aborted rung with the bandwidth of the sample', () => {
@@ -1015,7 +1189,9 @@ describe('createBolaSelector', () => {
 				const selector = createBolaSelector()
 
 				reachSteadyState(selector, throughputFor(3))
-				load(selector, L1_BANDWIDTHS[2], ABORT_BUFFER_LEVEL, SECOND_REQUEST_START, { aborted: true })
+				load(selector, L1_BANDWIDTHS[2], ABORT_BUFFER_LEVEL, SECOND_REQUEST_START, {
+					aborted: true,
+				})
 
 				const decision = decideAfterAbort(selector, ABORT_BUFFER_LEVEL, NaN)
 
@@ -1030,8 +1206,16 @@ describe('createBolaSelector', () => {
 			})
 
 			it('blocks a return to the second rung after its abort until the throughput sustains it', () => {
-				equal(decideAfterAbort(abortAt(1, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughputFor(0)).index, 0)
-				equal(decideAfterAbort(abortAt(1, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughputFor(1)).index, 1)
+				equal(
+					decideAfterAbort(abortAt(1, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughputFor(0))
+						.index,
+					0,
+				)
+				equal(
+					decideAfterAbort(abortAt(1, ABORT_BUFFER_LEVEL), ABORT_BUFFER_LEVEL, throughputFor(1))
+						.index,
+					1,
+				)
 			})
 
 			it('keeps the lowest rung and caps the placeholder at MINIMUM_BUFFER after an abort of the lowest rung', () => {
@@ -1071,11 +1255,23 @@ describe('createBolaSelector', () => {
 		describe('after a long request', () => {
 			// A selector that asks for a rung at `requestEnd(0)` and starts a request.
 			// The request ends after `LONG_REQUEST_DURATION` with the given sample fields. The helper returns the selector and the end time.
-			function endLongRequest(extra: Partial<SegmentSample>): { selector: BolaSelector; end: number } {
+			function endLongRequest(extra: Partial<SegmentSample>): {
+				selector: BolaSelector
+				end: number
+			} {
 				const selector = createSteadySelectorAt(L1_BANDWIDTHS[0], LOW_BUFFER_LEVEL)
-				const timing = { startTime: requestEnd(0), encodedBodySize: 1, duration: LONG_REQUEST_DURATION }
+				const timing = {
+					startTime: requestEnd(0),
+					encodedBodySize: 1,
+					duration: LONG_REQUEST_DURATION,
+				}
 
-				selector.select({ ladder: L1, bufferLevel: LOW_BUFFER_LEVEL, throughput: throughputFor(4), now: requestEnd(0) })
+				selector.select({
+					ladder: L1,
+					bufferLevel: LOW_BUFFER_LEVEL,
+					throughput: throughputFor(4),
+					now: requestEnd(0),
+				})
 				load(selector, L1_BANDWIDTHS[0], LOW_BUFFER_LEVEL, requestEnd(0), { ...extra, timing })
 
 				return { selector, end: requestEnd(0) + LONG_REQUEST_DURATION }
@@ -1133,7 +1329,12 @@ describe('createBolaSelector', () => {
 			const control = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
 			// The throughput sustains a rung below the current rung, so the guard depends on the current rung.
-			const input = { ladder: L1, bufferLevel: GUARD_BUFFER_LEVEL, throughput: throughputFor(0), now: requestEnd(0) }
+			const input = {
+				ladder: L1,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput: throughputFor(0),
+				now: requestEnd(0),
+			}
 
 			load(selector, NaN, GUARD_BUFFER_LEVEL, SECOND_REQUEST_START)
 
@@ -1171,8 +1372,12 @@ describe('createBolaSelector', () => {
 			load(selector, L1_BANDWIDTHS[0], 0)
 
 			equal(
-				selector.select({ ladder: L1, bufferLevel: SEGMENT_DURATION, throughput: throughputFor(1), now: requestEnd(0) })
-					.state,
+				selector.select({
+					ladder: L1,
+					bufferLevel: SEGMENT_DURATION,
+					throughput: throughputFor(1),
+					now: requestEnd(0),
+				}).state,
 				BolaState.STEADY,
 			)
 		})
@@ -1188,12 +1393,15 @@ describe('createBolaSelector', () => {
 				state: BolaState.STARTUP,
 				placeholder: 0,
 			})
-			deepEqual(createBolaSelector().select({ ladder: rungs(ONE_BANDWIDTH, ONE_BANDWIDTH), ...input }), {
-				index: 1,
-				delay: 0,
-				state: BolaState.STARTUP,
-				placeholder: 0,
-			})
+			deepEqual(
+				createBolaSelector().select({ ladder: rungs(ONE_BANDWIDTH, ONE_BANDWIDTH), ...input }),
+				{
+					index: 1,
+					delay: 0,
+					state: BolaState.STARTUP,
+					placeholder: 0,
+				},
+			)
 		})
 
 		it('keeps the startup state after samples', () => {
@@ -1204,7 +1412,12 @@ describe('createBolaSelector', () => {
 			load(selector, ONE_BANDWIDTH, SEGMENT_DURATION)
 
 			equal(
-				selector.select({ ladder, bufferLevel: SEGMENT_DURATION, throughput: NaN, now: requestEnd(0) }).state,
+				selector.select({
+					ladder,
+					bufferLevel: SEGMENT_DURATION,
+					throughput: NaN,
+					now: requestEnd(0),
+				}).state,
 				BolaState.STARTUP,
 			)
 		})
@@ -1228,7 +1441,12 @@ describe('createBolaSelector', () => {
 			selector.reset()
 
 			equal(
-				selector.select({ ladder: L1, bufferLevel: MINIMUM_BUFFER, throughput: throughputFor(2), now: 0 }).state,
+				selector.select({
+					ladder: L1,
+					bufferLevel: MINIMUM_BUFFER,
+					throughput: throughputFor(2),
+					now: 0,
+				}).state,
 				BolaState.STARTUP,
 			)
 		})
@@ -1261,7 +1479,10 @@ describe('createBolaSelector', () => {
 			return selector
 		}
 
-		function change(ladder: LadderRung[], bufferTarget?: number): { bandwidth: number; placeholder: number } {
+		function change(
+			ladder: LadderRung[],
+			bufferTarget?: number,
+		): { bandwidth: number; placeholder: number } {
 			const decision = createSelectorForLadderChange().select({
 				ladder,
 				bufferLevel: LADDER_CHANGE_BUFFER_LEVEL,
@@ -1322,7 +1543,11 @@ describe('createBolaSelector', () => {
 
 			selector.select({ ...input, bufferLevel: 0, bufferTarget: LARGE_BUFFER_TARGET, now: 0 })
 			load(selector, L1_BANDWIDTHS[0], 0)
-			selector.select({ ...input, bufferLevel: SEGMENT_DURATION, bufferTarget: LARGE_BUFFER_TARGET })
+			selector.select({
+				...input,
+				bufferLevel: SEGMENT_DURATION,
+				bufferTarget: LARGE_BUFFER_TARGET,
+			})
 
 			const decision = selector.select({
 				...input,
@@ -1338,10 +1563,17 @@ describe('createBolaSelector', () => {
 			for (const elapsed of CONVERSION_ELAPSED_SECONDS) {
 				const now = requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND
 
-				for (let bufferLevel = CONVERSION_SWEEP_START; bufferLevel <= SWEEP_END; bufferLevel += CONVERSION_SWEEP_STEP) {
+				for (
+					let bufferLevel = CONVERSION_SWEEP_START;
+					bufferLevel <= SWEEP_END;
+					bufferLevel += CONVERSION_SWEEP_STEP
+				) {
 					const input = { ladder: L1, bufferLevel, throughput: NaN, now }
 					const control = createSelectorForLadderChange().select(input)
-					const changed = createSelectorForLadderChange().select({ ...input, bufferTarget: LARGE_BUFFER_TARGET })
+					const changed = createSelectorForLadderChange().select({
+						...input,
+						bufferTarget: LARGE_BUFFER_TARGET,
+					})
 
 					equal(changed.index, control.index, `wait ${elapsed} s, buffer ${bufferLevel} s`)
 				}
@@ -1350,12 +1582,20 @@ describe('createBolaSelector', () => {
 
 		it('picks by the real buffer alone when the conversion would need a negative placeholder', () => {
 			const selector = createEmptyPlaceholderSelector()
-			const input = { ladder: L1, bufferLevel: TARGET_CHANGE_BUFFER_LEVEL, throughput: NaN, now: requestEnd(0) }
+			const input = {
+				ladder: L1,
+				bufferLevel: TARGET_CHANGE_BUFFER_LEVEL,
+				throughput: NaN,
+				now: requestEnd(0),
+			}
 			const before = selector.select(input)
 			const after = selector.select({ ...input, bufferTarget: LARGE_BUFFER_TARGET })
 
 			equal(after.placeholder, 0)
-			equal(after.index, createBolaScoreModel(L1_BANDWIDTHS, LARGE_BUFFER_TARGET).best(TARGET_CHANGE_BUFFER_LEVEL))
+			equal(
+				after.index,
+				createBolaScoreModel(L1_BANDWIDTHS, LARGE_BUFFER_TARGET).best(TARGET_CHANGE_BUFFER_LEVEL),
+			)
 			ok(after.index > before.index)
 		})
 
@@ -1411,19 +1651,31 @@ describe('createBolaSelector', () => {
 
 			equal(again.state, BolaState.STARTUP)
 			equal(again.index, 3)
-			closeTo(again.placeholder, Math.max(0, L1_THRESHOLDS[3] - LADDER_CHANGE_BUFFER_LEVEL), TOLERANCE)
+			closeTo(
+				again.placeholder,
+				Math.max(0, L1_THRESHOLDS[3] - LADDER_CHANGE_BUFFER_LEVEL),
+				TOLERANCE,
+			)
 		})
 
 		it('does not change any state when the new ladder is invalid', () => {
 			const selector = createSelectorForLadderChange()
 			const control = createSelectorForLadderChange()
 			const later = requestEnd(0) + LONG_WAIT_SECONDS * MILLISECONDS_PER_SECOND
-			const input = { ladder: L1, bufferLevel: LADDER_CHANGE_BUFFER_LEVEL, throughput: NaN, now: later }
+			const input = {
+				ladder: L1,
+				bufferLevel: LADDER_CHANGE_BUFFER_LEVEL,
+				throughput: NaN,
+				now: later,
+			}
 
 			// The failing calls come after a long wait. A call that adds the wait before it validates would keep it in the placeholder.
-			throws(() => selector.select({ ...input, ladder: rungs(L1_BANDWIDTHS[1], L1_BANDWIDTHS[0]) }), {
-				name: 'RangeError',
-			})
+			throws(
+				() => selector.select({ ...input, ladder: rungs(L1_BANDWIDTHS[1], L1_BANDWIDTHS[0]) }),
+				{
+					name: 'RangeError',
+				},
+			)
 			throws(() => selector.select({ ...input, bufferTarget: -1 }), { name: 'RangeError' })
 
 			// A sample replaces the time base, so the wait that the failing calls consumed would stay visible in the placeholder.
@@ -1453,7 +1705,14 @@ describe('createBolaSelector', () => {
 		it('throws a RangeError for a value that is not a positive finite number', () => {
 			for (const bufferTarget of INVALID_BUFFER_TARGETS) {
 				throws(
-					() => createBolaSelector().select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: 0, bufferTarget }),
+					() =>
+						createBolaSelector().select({
+							ladder: L1,
+							bufferLevel: 0,
+							throughput: NaN,
+							now: 0,
+							bufferTarget,
+						}),
 					{
 						name: 'RangeError',
 						message: `Invalid bufferTarget: expected a positive finite number of seconds, received ${bufferTarget}`,
@@ -1490,7 +1749,12 @@ describe('createBolaSelector', () => {
 
 		it('accepts equal neighbouring bandwidths and returns the highest index', () => {
 			const ladder = rungs(L1_BANDWIDTHS[0], L1_BANDWIDTHS[1], L1_BANDWIDTHS[1], L1_BANDWIDTHS[2])
-			const decision = createBolaSelector().select({ ladder, bufferLevel: 0, throughput: throughputFor(1), now: 0 })
+			const decision = createBolaSelector().select({
+				ladder,
+				bufferLevel: 0,
+				throughput: throughputFor(1),
+				now: 0,
+			})
 
 			equal(decision.index, 2)
 		})

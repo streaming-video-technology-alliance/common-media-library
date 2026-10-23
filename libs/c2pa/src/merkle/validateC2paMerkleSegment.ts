@@ -14,7 +14,11 @@ import {
 	toUint8Array,
 } from '../utils.ts'
 import type { UuidParsedBox } from '../utils.ts'
-import type { MerkleMap, MerkleSegmentState, MerkleSegmentValidation } from './MerkleSegmentValidation.ts'
+import type {
+	MerkleMap,
+	MerkleSegmentState,
+	MerkleSegmentValidation,
+} from './MerkleSegmentValidation.ts'
 
 type MerkleValidationCode = LiveVideoStatusCode | C2paStatusCode
 
@@ -149,7 +153,9 @@ async function verifyMerkleProof(
 			const sibling = path[proofIndex++]
 			if (!sibling) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
 			currentHash =
-				currentIndex % 2 === 0 ? await hashPair(currentHash, sibling, alg) : await hashPair(sibling, currentHash, alg)
+				currentIndex % 2 === 0
+					? await hashPair(currentHash, sibling, alg)
+					: await hashPair(sibling, currentHash, alg)
 		}
 		currentIndex = Math.floor(currentIndex / 2)
 	}
@@ -163,7 +169,11 @@ async function verifyMerkleProof(
 
 // --- Public API ---
 
-function findMerkleMap(merkleMaps: readonly MerkleMap[], uniqueId: number, localId: number): MerkleMap | null {
+function findMerkleMap(
+	merkleMaps: readonly MerkleMap[],
+	uniqueId: number,
+	localId: number,
+): MerkleMap | null {
 	return merkleMaps.find(m => m.uniqueId === uniqueId && m.localId === localId) ?? null
 }
 
@@ -260,7 +270,12 @@ export async function validateC2paMerkleSegment(
 
 		const leafHash = await computeLeafHash(segmentBytes, merkleMap, leafHashCache)
 		if (bmffHashHex === null) bmffHashHex = bytesToHex(leafHash)
-		const proofResult = await verifyMerkleProof(leafHash, segmentMap.location, segmentMap.hashes, merkleMap)
+		const proofResult = await verifyMerkleProof(
+			leafHash,
+			segmentMap.location,
+			segmentMap.hashes,
+			merkleMap,
+		)
 		if (proofResult === 'ok') {
 			// Advance on any proof-verified location, even a discontinuous one: it's
 			// genuinely signed content, so it resyncs continuity checking after a gap

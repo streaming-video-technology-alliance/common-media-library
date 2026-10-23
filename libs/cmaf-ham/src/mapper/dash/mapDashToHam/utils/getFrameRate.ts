@@ -22,7 +22,10 @@ import {
  * @param representation - To try to get the frameRate from
  * @returns object containing numerator and denominator
  */
-export function getFrameRate(adaptationSet: AdaptationSet, representation: Representation): FrameRate {
+export function getFrameRate(
+	adaptationSet: AdaptationSet,
+	representation: Representation,
+): FrameRate {
 	const frameRateDash: string = representation.$.frameRate ?? adaptationSet.$.frameRate ?? ''
 	if (!frameRateDash) {
 		console.error(`Representation ${representation.$.id} has no frame rate`)

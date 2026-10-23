@@ -19,7 +19,10 @@ import { validateCmcdValues } from './validateCmcdValues.ts'
  *
  * @public
  */
-export function validateCmcd(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult {
+export function validateCmcd(
+	data: Record<string, unknown>,
+	options?: CmcdValidationOptions,
+): CmcdValidationResult {
 	return mergeValidationResults(
 		validateCmcdKeys(data, options),
 		validateCmcdValues(data, options),

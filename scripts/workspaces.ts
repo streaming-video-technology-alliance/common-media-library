@@ -34,7 +34,9 @@ function isReady(workspace: Workspace, names: Set<string>, done: Set<string>): b
 // Packages with the same readiness are ordered by folder name, so the result is stable.
 export function sortWorkspaces(workspaces: Workspace[]): Workspace[] {
 	const names = new Set(workspaces.map(w => w.name))
-	const remaining = [...workspaces].sort((a, b) => (a.folder < b.folder ? -1 : a.folder > b.folder ? 1 : 0))
+	const remaining = [...workspaces].sort((a, b) =>
+		a.folder < b.folder ? -1 : a.folder > b.folder ? 1 : 0,
+	)
 	const done = new Set<string>()
 	const sorted: Workspace[] = []
 
@@ -42,7 +44,9 @@ export function sortWorkspaces(workspaces: Workspace[]): Workspace[] {
 		const ready = remaining.filter(w => isReady(w, names, done))
 
 		if (ready.length === 0) {
-			throw new Error(`Dependency cycle between workspaces: ${remaining.map(w => w.name).join(', ')}`)
+			throw new Error(
+				`Dependency cycle between workspaces: ${remaining.map(w => w.name).join(', ')}`,
+			)
 		}
 
 		for (const workspace of ready) {

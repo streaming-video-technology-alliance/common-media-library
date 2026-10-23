@@ -69,7 +69,10 @@ function incomplete(): RangeError {
 }
 
 function readUint32(bytes: Uint8Array, offset: number): number {
-	return ((bytes[offset] << 24) >>> 0) + ((bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3])
+	return (
+		((bytes[offset] << 24) >>> 0) +
+		((bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3])
+	)
 }
 
 function readArgument(reader: Reader, info: number): number | bigint {
@@ -136,7 +139,8 @@ function readText(view: Uint8Array): string {
 }
 
 function enter(reader: Reader): void {
-	if (++reader.depth > MAX_NESTING_DEPTH) throw new RangeError('CBOR nesting deeper than 128 levels')
+	if (++reader.depth > MAX_NESTING_DEPTH)
+		throw new RangeError('CBOR nesting deeper than 128 levels')
 }
 
 // Consumes the break code of an indefinite-length container (RFC 8949 section 3.2.2)
@@ -165,9 +169,15 @@ function readArray(reader: Reader, count: number | bigint): unknown[] {
 function setEntry(map: Record<string, unknown>, key: unknown, value: unknown): void {
 	if (key !== null && typeof key === 'object') throw new RangeError('Unsupported CBOR map key')
 	const name = String(key)
-	if (Object.prototype.hasOwnProperty.call(map, name)) throw new RangeError('Duplicate CBOR map key')
+	if (Object.prototype.hasOwnProperty.call(map, name))
+		throw new RangeError('Duplicate CBOR map key')
 	if (name === '__proto__')
-		Object.defineProperty(map, name, { value, enumerable: true, writable: true, configurable: true })
+		Object.defineProperty(map, name, {
+			value,
+			enumerable: true,
+			writable: true,
+			configurable: true,
+		})
 	else map[name] = value
 }
 
@@ -177,7 +187,8 @@ function readMap(reader: Reader, count: number | bigint): Record<string, unknown
 	if (count === INDEFINITE_COUNT) {
 		while (!atBreak(reader)) setEntry(map, readItem(reader), readItem(reader))
 	} else {
-		if (typeof count !== 'number' || count * 2 > reader.bytes.length - reader.offset) throw incomplete()
+		if (typeof count !== 'number' || count * 2 > reader.bytes.length - reader.offset)
+			throw incomplete()
 		for (let i = 0; i < count; i++) setEntry(map, readItem(reader), readItem(reader))
 	}
 	reader.depth--

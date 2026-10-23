@@ -48,7 +48,9 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 	})
 
 	it('validates a valid response received event', () => {
-		const result = validateCmcdEvents('e=rr,sid="abc",ts=1700000000000,url="https://example.com",rc=200,ttfb=50,v=2')
+		const result = validateCmcdEvents(
+			'e=rr,sid="abc",ts=1700000000000,url="https://example.com",rc=200,ttfb=50,v=2',
+		)
 		equal(result.valid, true)
 	})
 
@@ -115,7 +117,9 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 	})
 
 	it('accepts a token field that carries params', () => {
-		const result = validateCmcdEvents('e=ps,ot=m;com.example-p=1,sid="session-1",sta=p,ts=1700000000000,v=2')
+		const result = validateCmcdEvents(
+			'e=ps,ot=m;com.example-p=1,sid="session-1",sta=p,ts=1700000000000,v=2',
+		)
 		equal(result.valid, true)
 		deepStrictEqual(result.issues, [])
 	})
@@ -138,6 +142,9 @@ e=t,sid="session-1",ts=1700000001000,bl=(5000),v=2`
 	})
 
 	it('accepts a body that ends without a line feed', () => {
-		deepStrictEqual(validateCmcdEvents('e=ps,sid="s",ts=1,sta=p,v=2\ne=t,sid="s",ts=2,v=2').issues, [])
+		deepStrictEqual(
+			validateCmcdEvents('e=ps,sid="s",ts=1,sta=p,v=2\ne=t,sid="s",ts=2,v=2').issues,
+			[],
+		)
 	})
 })

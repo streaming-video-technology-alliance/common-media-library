@@ -175,7 +175,11 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		return { index: rungParams.positions[position], delay, state, placeholder }
 	}
 
-	function selectInStartup(rungParams: BolaParams, bufferLevel: number, safeThroughput: number): BolaDecision {
+	function selectInStartup(
+		rungParams: BolaParams,
+		bufferLevel: number,
+		safeThroughput: number,
+	): BolaDecision {
 		const position = Number.isNaN(safeThroughput) ? 0 : findRung(rungParams.rungs, safeThroughput)
 
 		placeholder = Math.max(0, rungParams.thresholds[position] - bufferLevel)
@@ -225,7 +229,11 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	}
 
 	// The rung with the best score for the effective buffer, limited by the oscillation guard when the throughput is known.
-	function pickByBuffer(rungParams: BolaParams, effectiveBuffer: number, throughput: number): number {
+	function pickByBuffer(
+		rungParams: BolaParams,
+		effectiveBuffer: number,
+		throughput: number,
+	): number {
 		const position = selectRungByBuffer(rungParams, effectiveBuffer)
 
 		if (Number.isNaN(throughput)) {
@@ -337,11 +345,17 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 			const rungParams = syncParams(input.ladder, target)
 
 			if (rungParams.rungs.length === 1) {
-				return { index: rungParams.positions[0], delay: 0, state: BolaState.STARTUP, placeholder: 0 }
+				return {
+					index: rungParams.positions[0],
+					delay: 0,
+					state: BolaState.STARTUP,
+					placeholder: 0,
+				}
 			}
 
 			// NaN stands for an unknown throughput. A throughput of 0 is a measurement.
-			const throughput = Number.isFinite(input.throughput) && input.throughput >= 0 ? input.throughput : NaN
+			const throughput =
+				Number.isFinite(input.throughput) && input.throughput >= 0 ? input.throughput : NaN
 
 			return state === BolaState.STARTUP
 				? selectInStartup(rungParams, bufferLevel, throughput * safetyFactor)

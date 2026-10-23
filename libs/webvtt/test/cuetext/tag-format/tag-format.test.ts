@@ -10,7 +10,10 @@ describe('cuetext/tag-format tests', () => {
 	})
 
 	it('end-tag-no-gt.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/tag-format/end-tag-no-gt.vtt', 'test/cuetext/tag-format/end-tag-no-gt.json')
+		await expectCuesEqualAll(
+			'test/cuetext/tag-format/end-tag-no-gt.vtt',
+			'test/cuetext/tag-format/end-tag-no-gt.json',
+		)
 	})
 
 	it('incorrect-close-tag-order.vtt', async () => {
@@ -21,11 +24,17 @@ describe('cuetext/tag-format tests', () => {
 	})
 
 	it('no-closing-gt', async () => {
-		await expectCuesEqualAll('test/cuetext/tag-format/no-closing-gt.vtt', 'test/cuetext/tag-format/no-closing-gt.json')
+		await expectCuesEqualAll(
+			'test/cuetext/tag-format/no-closing-gt.vtt',
+			'test/cuetext/tag-format/no-closing-gt.json',
+		)
 	})
 
 	it('no-start-tag.vtt', async () => {
-		await expectCuesEqualAll('test/cuetext/tag-format/no-start-tag.vtt', 'test/cuetext/tag-format/no-start-tag.json')
+		await expectCuesEqualAll(
+			'test/cuetext/tag-format/no-start-tag.vtt',
+			'test/cuetext/tag-format/no-start-tag.json',
+		)
 	})
 
 	it('start-tag-missing-gt.vtt', async () => {

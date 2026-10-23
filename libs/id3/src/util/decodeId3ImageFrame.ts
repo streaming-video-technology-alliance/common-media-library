@@ -21,7 +21,9 @@ type MetadataFrame = {
  *
  * @internal
  */
-export function decodeId3ImageFrame(frame: RawId3Frame): DecodedId3Frame<string | ArrayBufferLike> | undefined {
+export function decodeId3ImageFrame(
+	frame: RawId3Frame,
+): DecodedId3Frame<string | ArrayBufferLike> | undefined {
 	const metadataFrame: MetadataFrame = {
 		key: frame.type,
 		description: '',

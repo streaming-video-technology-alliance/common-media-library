@@ -23,7 +23,12 @@ export function isNonEmptyCCData(ccData1: number, ccData2: number): boolean {
  * @param endPos - The exclusive upper bound to read within
  * @param fieldData - Field 1 and field 2 byte arrays, appended to in place
  */
-export function parseCcData(raw: DataView, pos: number, endPos: number, fieldData: number[][]): void {
+export function parseCcData(
+	raw: DataView,
+	pos: number,
+	endPos: number,
+	fieldData: number[][],
+): void {
 	// cc_count and em_data must both be within the enclosing structure. A T.35 payload
 	// carrying nothing but the 8-byte identifier ends here, and reading on would run past
 	// the end of the DataView.

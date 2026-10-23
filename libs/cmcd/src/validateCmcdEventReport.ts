@@ -39,7 +39,9 @@ export function validateCmcdEventReport(
 		})
 	}
 
-	const contentType = request.headers ? ensureHeaders(request.headers).get('Content-Type') : undefined
+	const contentType = request.headers
+		? ensureHeaders(request.headers).get('Content-Type')
+		: undefined
 
 	if (!contentType) {
 		issues.push({

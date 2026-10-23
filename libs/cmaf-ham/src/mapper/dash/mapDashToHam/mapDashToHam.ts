@@ -38,7 +38,12 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 			const tracks: Track[] = adaptationSet.Representation.map((representation: Representation) => {
 				const segments: Segment[] = mapSegments(adaptationSet, representation, duration)
 
-				return mapTracks(adaptationSet, representation, segments, getInitializationUrl(adaptationSet, representation))
+				return mapTracks(
+					adaptationSet,
+					representation,
+					segments,
+					getInitializationUrl(adaptationSet, representation),
+				)
 			})
 
 			const group: string = getGroup(adaptationSet)

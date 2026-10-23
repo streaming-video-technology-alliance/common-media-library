@@ -40,7 +40,11 @@ export function urlToRelativePath(url: string, base: string): string {
 	// count common parents, stopping before the destination file
 	let common = 0
 
-	while (common < toPath.length - 1 && common < fromPath.length && toPath[common] === fromPath[common]) {
+	while (
+		common < toPath.length - 1 &&
+		common < fromPath.length &&
+		toPath[common] === fromPath[common]
+	) {
 		common++
 	}
 
@@ -49,7 +53,10 @@ export function urlToRelativePath(url: string, base: string): string {
 	let relativePath = '../'.repeat(ups) + toPath.slice(common).join('/')
 
 	// RFC 3986 section 4.2: a relative-path reference cannot be empty, start with "/", or have ":" in its first segment
-	if (ups === 0 && (relativePath === '' || relativePath.startsWith('/') || toPath[common].includes(':'))) {
+	if (
+		ups === 0 &&
+		(relativePath === '' || relativePath.startsWith('/') || toPath[common].includes(':'))
+	) {
 		relativePath = './' + relativePath
 	}
 

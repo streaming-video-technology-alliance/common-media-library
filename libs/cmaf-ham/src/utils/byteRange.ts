@@ -23,7 +23,9 @@ export type ByteRangeObject = {
  *
  * @alpha
  */
-export function parseByteRangeString(byteRangeString: string | undefined): ByteRangeObject | undefined {
+export function parseByteRangeString(
+	byteRangeString: string | undefined,
+): ByteRangeObject | undefined {
 	if (!byteRangeString) {
 		return undefined
 	}

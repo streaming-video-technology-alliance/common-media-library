@@ -130,7 +130,9 @@ describe('createIsoBoxReadableStream', function () {
 			},
 			{
 				type: 'mdat',
-				data: new Uint8Array([102, 105, 114, 115, 116, 115, 101, 99, 111, 110, 100, 116, 104, 105, 114, 100]),
+				data: new Uint8Array([
+					102, 105, 114, 115, 116, 115, 101, 99, 111, 110, 100, 116, 104, 105, 114, 100,
+				]),
 			},
 		]
 

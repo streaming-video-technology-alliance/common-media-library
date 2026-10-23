@@ -196,14 +196,26 @@ describe('CmcdReporter', () => {
 		describe('msd validation', () => {
 			const cases = [
 				{ name: 'accepts 0 as a valid instant-start value', input: 0, wire: 'msd%3D0' },
-				{ name: 'rounds fractional milliseconds to the nearest integer', input: 12.5, wire: 'msd%3D13' },
-				{ name: 'accepts the RFC 8941 integer maximum', input: 999_999_999_999_999, wire: 'msd%3D999999999999999' },
+				{
+					name: 'rounds fractional milliseconds to the nearest integer',
+					input: 12.5,
+					wire: 'msd%3D13',
+				},
+				{
+					name: 'accepts the RFC 8941 integer maximum',
+					input: 999_999_999_999_999,
+					wire: 'msd%3D999999999999999',
+				},
 				{
 					name: 'accepts a value that rounds down to the maximum',
 					input: 999_999_999_999_998.6,
 					wire: 'msd%3D999999999999999',
 				},
-				{ name: 'rejects values above the RFC 8941 integer maximum', input: 1_000_000_000_000_000, wire: null },
+				{
+					name: 'rejects values above the RFC 8941 integer maximum',
+					input: 1_000_000_000_000_000,
+					wire: null,
+				},
 				{ name: 'rejects Infinity', input: Infinity, wire: null },
 				{ name: 'rejects negative values', input: -1, wire: null },
 				{ name: 'rejects NaN', input: NaN, wire: null },
@@ -302,7 +314,10 @@ describe('CmcdReporter', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
-			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' }, { sid: 'INJECTED' })
+			const req = reporter.createRequestReport(
+				{ url: 'https://example.com/video.mp4' },
+				{ sid: 'INJECTED' },
+			)
 
 			ok(req.url.includes('sid%3D%22test-session%22'))
 			ok(!req.url.includes('INJECTED'))
@@ -423,7 +438,10 @@ describe('CmcdReporter', () => {
 			const { requester } = createMockRequester()
 			const reporter = new CmcdReporter(createConfig(), requester)
 
-			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' }, { msd: 5000 })
+			const req = reporter.createRequestReport(
+				{ url: 'https://example.com/video.mp4' },
+				{ msd: 5000 },
+			)
 
 			ok(!req.url.includes('msd'))
 		})
@@ -497,7 +515,8 @@ describe('CmcdReporter', () => {
 			const reporter = new CmcdReporter({ sid: 's1', cid: 'c1' })
 
 			const first = (
-				reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }).customData as Record<symbol, unknown>
+				reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
+					.customData as Record<symbol, unknown>
 			)[PROVENANCE] as CmcdRequestProvenance
 
 			equal(first.sid, 's1')
@@ -510,7 +529,8 @@ describe('CmcdReporter', () => {
 			reporter.update({ sid: 's2' })
 
 			const second = (
-				reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' }).customData as Record<symbol, unknown>
+				reporter.createRequestReport({ url: 'https://cdn.example.com/seg2.mp4' })
+					.customData as Record<symbol, unknown>
 			)[PROVENANCE] as CmcdRequestProvenance
 
 			notEqual(second, first)
@@ -535,7 +555,10 @@ describe('CmcdReporter', () => {
 		it('carries encoded per-call data on the provenance record', () => {
 			const reporter = new CmcdReporter({ sid: 's1', enabledKeys: ['sid', 'sn', 'v'] })
 
-			const r1 = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			const r1 = reporter.createRequestReport(
+				{ url: 'https://cdn.example.com/seg1.mp4' },
+				{ ot: 'v', d: 2000 },
+			)
 			const p1 = (r1.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
 
 			ok(Object.isFrozen(p1))
@@ -739,8 +762,14 @@ describe('CmcdReporter', () => {
 			await new Promise(resolve => setTimeout(resolve, 10))
 
 			equal(requests.length, 2)
-			ok((requests[0].body as string).includes('cid="c1"'), `expected request-time cid in ${requests[0].body}`)
-			ok((requests[1].body as string).includes('cid="c2"'), `expected re-minted cid in ${requests[1].body}`)
+			ok(
+				(requests[0].body as string).includes('cid="c1"'),
+				`expected request-time cid in ${requests[0].body}`,
+			)
+			ok(
+				(requests[1].body as string).includes('cid="c2"'),
+				`expected re-minted cid in ${requests[1].body}`,
+			)
 		})
 
 		it('carries per-call data through disabled request reporting to the response event', async () => {
@@ -763,7 +792,10 @@ describe('CmcdReporter', () => {
 
 			// Request reporting is disabled, yet the response still reports:
 			// the per-call data rides the provenance record.
-			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			const request = reporter.createRequestReport(
+				{ url: 'https://cdn.example.com/seg1.mp4' },
+				{ ot: 'v', d: 2000 },
+			)
 			reporter.recordResponseReceived({ status: 200, request })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -795,7 +827,10 @@ describe('CmcdReporter', () => {
 
 			// The transform cancels decoration, but the snapshot is captured
 			// from the caller's inputs before the transform runs.
-			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			const request = reporter.createRequestReport(
+				{ url: 'https://cdn.example.com/seg1.mp4' },
+				{ ot: 'v', d: 2000 },
+			)
 			ok(!request.url.includes('CMCD'))
 
 			reporter.recordResponseReceived({ status: 200, request })
@@ -831,7 +866,10 @@ describe('CmcdReporter', () => {
 				requester,
 			)
 
-			const request = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' }, { ot: 'v', d: 2000 })
+			const request = reporter.createRequestReport(
+				{ url: 'https://cdn.example.com/seg1.mp4' },
+				{ ot: 'v', d: 2000 },
+			)
 			ok(request.url.includes('d%3D9999'), `expected transformed wire in ${request.url}`)
 
 			reporter.recordResponseReceived({ status: 200, request })
@@ -862,7 +900,9 @@ describe('CmcdReporter', () => {
 				{ url: 'https://cdn.example.com/seg1.mp4' },
 				{ 'com.example-big': 1_000_000_000_000_000 },
 			)
-			const provenance = (request.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+			const provenance = (request.customData as Record<symbol, unknown>)[
+				PROVENANCE
+			] as CmcdRequestProvenance
 			equal(provenance.data, undefined)
 
 			reporter.recordResponseReceived({ status: 200, request })
@@ -885,7 +925,9 @@ describe('CmcdReporter', () => {
 			)
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
-			const provenance = (stale.customData as Record<symbol, unknown>)[PROVENANCE] as CmcdRequestProvenance
+			const provenance = (stale.customData as Record<symbol, unknown>)[
+				PROVENANCE
+			] as CmcdRequestProvenance
 			equal(provenance.sid, 's1')
 
 			reporter.update({ sid: 's2' })
@@ -1450,7 +1492,7 @@ describe('CmcdReporter', () => {
 			// send and re-queueing.
 			throws(() =>
 				reporter.recordEvent(CmcdEventType.ERROR, {
-					'ec': ['404'],
+					ec: ['404'],
 					'com.example-bad': [{ junk: true }],
 				} as unknown as Partial<Cmcd>),
 			)
@@ -1463,7 +1505,10 @@ describe('CmcdReporter', () => {
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('ec=("500")'), `expected ec 500 in ${requests[0].body}`)
+			ok(
+				(requests[0].body as string).includes('ec=("500")'),
+				`expected ec 500 in ${requests[0].body}`,
+			)
 
 			reporter.flush()
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1541,7 +1586,10 @@ describe('CmcdReporter', () => {
 			await new Promise(resolve => setTimeout(resolve, 10))
 
 			equal(requests.length, 1)
-			ok((requests[0].body as string).includes('tab=(3000)'), `expected tab=(3000) in ${requests[0].body}`)
+			ok(
+				(requests[0].body as string).includes('tab=(3000)'),
+				`expected tab=(3000) in ${requests[0].body}`,
+			)
 
 			// Nothing poisoned stays queued.
 			reporter.flush()
@@ -1712,7 +1760,8 @@ describe('CmcdReporter', () => {
 			// The gate must stay open: the report never carried msd. Asserted on
 			// the private flag because a fixed config has no observable follow-up.
 			equal(
-				(reporter as unknown as { session: { requestTarget: { msdSent: boolean } } }).session.requestTarget.msdSent,
+				(reporter as unknown as { session: { requestTarget: { msdSent: boolean } } }).session
+					.requestTarget.msdSent,
 				false,
 			)
 		})
@@ -1844,7 +1893,10 @@ describe('CmcdReporter', () => {
 				requester,
 			)
 
-			const req = reporter.createRequestReport({ url: 'https://example.com/manifest.mpd' }, { ot: 'm', d: 4000 })
+			const req = reporter.createRequestReport(
+				{ url: 'https://example.com/manifest.mpd' },
+				{ ot: 'm', d: 4000 },
+			)
 
 			deepEqual(Object.keys(req.customData.cmcd).sort(), ['ot', 'sid', 'v'])
 		})
@@ -2050,7 +2102,8 @@ describe('CmcdReporter', () => {
 							enabledKeys: ['url', 'rc', 'sid', 'v', 'e', 'ts', 'sn'],
 							batchSize: 1,
 							// Event mode, this target only: segment responses only
-							transform: (data, request) => (request?.customData?.['requestType'] === 'segment' ? data : null),
+							transform: (data, request) =>
+								request?.customData?.['requestType'] === 'segment' ? data : null,
 						},
 					],
 				},
@@ -2164,7 +2217,10 @@ describe('CmcdReporter', () => {
 					requester,
 				)
 
-				const input = { url: 'https://example.com/video.mp4', customData: { player: { kind: 'segment' } } }
+				const input = {
+					url: 'https://example.com/video.mp4',
+					customData: { player: { kind: 'segment' } },
+				}
 				const req = reporter.createRequestReport(input)
 
 				equal(seen.length, 1)
@@ -2224,7 +2280,10 @@ describe('CmcdReporter', () => {
 					requester,
 				)
 
-				throws(() => reporter.createRequestReport({ url: 'https://example.com/video.mp4' }), /transform boom/)
+				throws(
+					() => reporter.createRequestReport({ url: 'https://example.com/video.mp4' }),
+					/transform boom/,
+				)
 			})
 		})
 
@@ -2599,9 +2658,27 @@ describe('CmcdReporter', () => {
 		})
 
 		describe('required event keys', () => {
-			const ALL_KEYS = ['sta', 'pr', 'cid', 'bg', 'br', 'cen', 'ec', 'url', 'rc', 'sid', 'v', 'e', 'ts', 'sn'] as const
+			const ALL_KEYS = [
+				'sta',
+				'pr',
+				'cid',
+				'bg',
+				'br',
+				'cen',
+				'ec',
+				'url',
+				'rc',
+				'sid',
+				'v',
+				'e',
+				'ts',
+				'sn',
+			] as const
 
-			function createTarget(events: CmcdEventType[], transform: CmcdEventReportTransform): Partial<CmcdReporterConfig> {
+			function createTarget(
+				events: CmcdEventType[],
+				transform: CmcdEventReportTransform,
+			): Partial<CmcdReporterConfig> {
 				return {
 					sid: 'test-session',
 					enabledKeys: [...ALL_KEYS],
@@ -2644,11 +2721,26 @@ describe('CmcdReporter', () => {
 			})
 
 			const stateFamilies = [
-				{ event: CmcdEventType.PLAY_STATE, key: 'sta', update: { sta: 'p' as const }, wire: 'sta=p' },
+				{
+					event: CmcdEventType.PLAY_STATE,
+					key: 'sta',
+					update: { sta: 'p' as const },
+					wire: 'sta=p',
+				},
 				{ event: CmcdEventType.PLAYBACK_RATE, key: 'pr', update: { pr: 2 }, wire: 'pr=2' },
-				{ event: CmcdEventType.CONTENT_ID, key: 'cid', update: { cid: 'movie-7' }, wire: 'cid="movie-7"' },
+				{
+					event: CmcdEventType.CONTENT_ID,
+					key: 'cid',
+					update: { cid: 'movie-7' },
+					wire: 'cid="movie-7"',
+				},
 				{ event: CmcdEventType.BACKGROUNDED_MODE, key: 'bg', update: { bg: true }, wire: 'bg' },
-				{ event: CmcdEventType.BITRATE_CHANGE, key: 'br', update: { br: [5000] }, wire: 'br=(5000)' },
+				{
+					event: CmcdEventType.BITRATE_CHANGE,
+					key: 'br',
+					update: { br: [5000] },
+					wire: 'br=(5000)',
+				},
 			]
 
 			for (const family of stateFamilies) {
@@ -2671,7 +2763,10 @@ describe('CmcdReporter', () => {
 
 			it('restores cen for custom events', async () => {
 				const { requester, requests } = createMockRequester()
-				const reporter = new CmcdReporter(createTarget([CmcdEventType.CUSTOM_EVENT], stripAll), requester)
+				const reporter = new CmcdReporter(
+					createTarget([CmcdEventType.CUSTOM_EVENT], stripAll),
+					requester,
+				)
 
 				reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'my-event' })
 
@@ -2701,7 +2796,10 @@ describe('CmcdReporter', () => {
 
 			it('restores url for response received events', async () => {
 				const { requester, requests } = createMockRequester()
-				const reporter = new CmcdReporter(createTarget([CmcdEventType.RESPONSE_RECEIVED], stripAll), requester)
+				const reporter = new CmcdReporter(
+					createTarget([CmcdEventType.RESPONSE_RECEIVED], stripAll),
+					requester,
+				)
 
 				reporter.recordResponseReceived({
 					request: reporter.createRequestReport({ url: 'https://cdn.example.com/seg.mp4' }),
@@ -2801,7 +2899,9 @@ describe('CmcdReporter', () => {
 				const { requester, requests } = createMockRequester()
 				const reporter = new CmcdReporter(
 					createTarget([CmcdEventType.BACKGROUNDED_MODE], data =>
-						data.e === CmcdEventType.BACKGROUNDED_MODE && !('bg' in data) ? { ...data, bg: false } : data,
+						data.e === CmcdEventType.BACKGROUNDED_MODE && !('bg' in data)
+							? { ...data, bg: false }
+							: data,
 					),
 					requester,
 				)
@@ -2984,7 +3084,9 @@ describe('CmcdReporter', () => {
 			const THROWING_URL = 'https://throwing.example.com/cmcd'
 			const HEALTHY_URL = 'https://healthy.example.com/cmcd'
 
-			function createIsolationReporter(requester: (request: HttpRequest) => Promise<{ status: number }>) {
+			function createIsolationReporter(
+				requester: (request: HttpRequest) => Promise<{ status: number }>,
+			) {
 				return new CmcdReporter(
 					{
 						sid: 'test-session',
@@ -3242,7 +3344,8 @@ describe('CmcdReporter', () => {
 					{
 						sid: 'test-session',
 						enabledKeys: [...RR_KEYS],
-						transform: (data, request) => (request.customData?.requestType === 'license' ? null : data),
+						transform: (data, request) =>
+							request.customData?.requestType === 'license' ? null : data,
 						eventTargets: [
 							{
 								url: 'https://example.com/cmcd',
@@ -3290,7 +3393,8 @@ describe('CmcdReporter', () => {
 					{
 						sid: 'test-session',
 						enabledKeys: ['sid'],
-						transform: (data, request) => (request.customData?.requestType === 'license' ? null : data),
+						transform: (data, request) =>
+							request.customData?.requestType === 'license' ? null : data,
 					},
 					requester,
 				)
@@ -3315,7 +3419,8 @@ describe('CmcdReporter', () => {
 					{
 						sid: 'test-session',
 						enabledKeys: ['sid'],
-						transform: (data, request) => (request.customData?.requestType === 'segment' ? data : null),
+						transform: (data, request) =>
+							request.customData?.requestType === 'segment' ? data : null,
 					},
 					requester,
 				)
@@ -3589,7 +3694,10 @@ describe('CmcdReporter', () => {
 				requester,
 			)
 
-			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'ad-quartile', 'com.example-detail': 'q3' })
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, {
+				cen: 'ad-quartile',
+				'com.example-detail': 'q3',
+			})
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -3614,7 +3722,10 @@ describe('CmcdReporter', () => {
 				requester,
 			)
 
-			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, { cen: 'ad-quartile', 'com.example-detail': 'q3' })
+			reporter.recordEvent(CmcdEventType.CUSTOM_EVENT, {
+				cen: 'ad-quartile',
+				'com.example-detail': 'q3',
+			})
 
 			await new Promise(resolve => setTimeout(resolve, 10))
 
@@ -4040,7 +4151,11 @@ describe('CmcdReporter', () => {
 				requester,
 			)
 
-			reporter.update({ 'Com.Example-foo': 'a', '2com.example-x': 'b', '-a-b': 'c' } as Partial<Cmcd>)
+			reporter.update({
+				'Com.Example-foo': 'a',
+				'2com.example-x': 'b',
+				'-a-b': 'c',
+			} as Partial<Cmcd>)
 
 			const req = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
 			ok(req.url.includes('sid%3D'))
@@ -4103,7 +4218,9 @@ describe('CmcdReporter', () => {
 	})
 
 	describe('recordResponseReceived', () => {
-		function createRrConfig(overrides: Partial<CmcdReporterConfig> = {}): Partial<CmcdReporterConfig> {
+		function createRrConfig(
+			overrides: Partial<CmcdReporterConfig> = {},
+		): Partial<CmcdReporterConfig> {
 			return {
 				sid: 'test-session',
 				cid: 'test-content',
@@ -4120,7 +4237,10 @@ describe('CmcdReporter', () => {
 			}
 		}
 
-		function createResponse(reporter: CmcdReporter, overrides: Partial<HttpResponse> = {}): HttpResponse {
+		function createResponse(
+			reporter: CmcdReporter,
+			overrides: Partial<HttpResponse> = {},
+		): HttpResponse {
 			return {
 				request: reporter.createRequestReport({ url: 'https://cdn.example.com/segment.mp4' }),
 				status: 200,

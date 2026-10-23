@@ -44,7 +44,11 @@ async function hardBinding(): Promise<Partial<InternalManifestData>> {
 	return {
 		assertions: [{ label: BMFF_V3_LABEL, data: {}, rawBoxPayload }],
 		claimAssertionRefs: [
-			{ url: `self#jumbf=c2pa.assertions/${BMFF_V3_LABEL}`, hash: await sha256(rawBoxPayload), alg: 'sha256' },
+			{
+				url: `self#jumbf=c2pa.assertions/${BMFF_V3_LABEL}`,
+				hash: await sha256(rawBoxPayload),
+				alg: 'sha256',
+			},
 		],
 	}
 }
@@ -98,7 +102,9 @@ describe('validateManifestIntegrity', () => {
 	})
 
 	it('reports CLAIM_SIGNATURE_MISSING when the manifest has no signature box', async () => {
-		const { codes, certificate } = await validateManifestIntegrity(internalData({ signatureBytes: null }))
+		const { codes, certificate } = await validateManifestIntegrity(
+			internalData({ signatureBytes: null }),
+		)
 
 		ok(codes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISSING))
 		strictEqual(codes.includes(C2paStatusCode.CLAIM_SIGNATURE_MISMATCH), false)
@@ -126,7 +132,9 @@ describe('validateManifestIntegrity', () => {
 	it('reports CLAIM_MISSING when the manifest has no claim box', async () => {
 		const signatureBytes = await signer.sign(EMPTY_CLAIM_CBOR)
 
-		const { codes } = await validateManifestIntegrity(internalData({ claimCborBytes: null, signatureBytes }))
+		const { codes } = await validateManifestIntegrity(
+			internalData({ claimCborBytes: null, signatureBytes }),
+		)
 
 		ok(codes.includes(C2paStatusCode.CLAIM_MISSING))
 	})
@@ -172,7 +180,9 @@ describe('validateManifestIntegrity', () => {
 			buildJumb('c2pa.signature', buildBox('cbor', await signer.sign(claim))),
 		)
 
-		const { codes } = await validateManifestIntegrity(readC2paManifest(buildInitSegmentWithManifest(manifest)))
+		const { codes } = await validateManifestIntegrity(
+			readC2paManifest(buildInitSegmentWithManifest(manifest)),
+		)
 
 		deepStrictEqual(codes, [C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH])
 	})
@@ -216,7 +226,12 @@ describe('validateManifestIntegrity: hard binding labels (§15.10.1.2, §6.4, §
 	}
 
 	// A part binding, the multi-asset assertion, and the legacy label are not standard hard bindings (§18.9.2).
-	for (const label of ['c2pa.hash.data.part', 'c2pa.hash.data.part__2', 'c2pa.hash.multi-asset', 'c2pa.hash.bmff']) {
+	for (const label of [
+		'c2pa.hash.data.part',
+		'c2pa.hash.data.part__2',
+		'c2pa.hash.multi-asset',
+		'c2pa.hash.bmff',
+	]) {
 		it(`does not count ${label} next to ${BMFF_V3}`, async () => {
 			strictEqual(await hasMultipleHardBindings(label), false)
 		})
@@ -232,7 +247,11 @@ describe('validateManifestIntegrity: claim box codes (§15.6.1)', () => {
 
 	it('reports CLAIM_MULTIPLE once, without CLAIM_MISSING', async () => {
 		const { codes } = await validateManifestIntegrity(
-			internalData({ claimCborBytes: null, claimCode: C2paStatusCode.CLAIM_MULTIPLE, signatureBytes }),
+			internalData({
+				claimCborBytes: null,
+				claimCode: C2paStatusCode.CLAIM_MULTIPLE,
+				signatureBytes,
+			}),
 		)
 
 		deepStrictEqual(codes, [C2paStatusCode.CLAIM_MULTIPLE])

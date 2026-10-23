@@ -21,7 +21,11 @@ import {
 	signatureUri,
 } from '../merkle/merkleTestUtils.ts'
 import { createTestSigner, type TestSigner } from '../testSigner.ts'
-import { createTestSessionKey, encodeSignerBinding, type TestSessionKey } from '../vsi/vsiTestUtils.ts'
+import {
+	createTestSessionKey,
+	encodeSignerBinding,
+	type TestSessionKey,
+} from '../vsi/vsiTestUtils.ts'
 
 // Manifests whose assertion store or manifest box holds more than one box with the same label,
 // or an assertion the claim does not reference. C2PA 2.4 section 8.4.1 (an ambiguous label is
@@ -41,7 +45,10 @@ type AssertionRef = { readonly label: string; readonly box: Uint8Array }
 
 // One session key entry (§18.25.2). The signer binding is signed with the session key over
 // `bindingPayload`, which is the signer's end-entity certificate for a valid binding.
-async function sessionKeyEntry(key: TestSessionKey, bindingPayload: Uint8Array): Promise<Record<string, unknown>> {
+async function sessionKeyEntry(
+	key: TestSessionKey,
+	bindingPayload: Uint8Array,
+): Promise<Record<string, unknown>> {
 	return {
 		key: key.coseKey,
 		minSequenceNumber: 0,
@@ -55,7 +62,10 @@ function sessionKeysBoxOf(entries: readonly Record<string, unknown>[]): Uint8Arr
 	return buildJumb(SESSION_KEYS_LABEL, buildBox('cbor', encodeCbor({ keys: entries })))
 }
 
-async function buildSessionKeysBox(key: TestSessionKey, certificateDER: Uint8Array): Promise<Uint8Array> {
+async function buildSessionKeysBox(
+	key: TestSessionKey,
+	certificateDER: Uint8Array,
+): Promise<Uint8Array> {
 	return sessionKeysBoxOf([await sessionKeyEntry(key, certificateDER)])
 }
 
@@ -65,7 +75,10 @@ function undeclaredBox(): Uint8Array {
 }
 
 function buildBmffFlatBox(hash: Uint8Array): Uint8Array {
-	return buildJumb(BMFF_LABEL, buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })))
+	return buildJumb(
+		BMFF_LABEL,
+		buildBox('cbor', encodeCbor({ exclusions: [{ xpath: '/uuid' }], alg: 'sha256', hash })),
+	)
 }
 
 // A c2pa.hash.bmff.v3 box whose flat hash covers the ftyp and moov boxes of buildInitMediaBoxes (§19.2.3).
@@ -108,7 +121,10 @@ function wrapManifest(mediaBoxes: Uint8Array, ...children: readonly Uint8Array[]
 	const purpose = new TextEncoder().encode('manifest')
 	const prefix = new Uint8Array(4 + purpose.length + 1 + 8)
 	prefix.set(purpose, 4)
-	return concatBytes(mediaBoxes, buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))))
+	return concatBytes(
+		mediaBoxes,
+		buildUuidBox(JUMBF_UUID, concatBytes(prefix, buildJumb('c2pa', manifest))),
+	)
 }
 
 type ClaimOptions = {
@@ -237,10 +253,22 @@ describe('duplicate assertion labels (security)', () => {
 	})
 
 	it('does not validate tampered manifest-box media behind a duplicate c2pa.hash.bmff.v3', async () => {
-		const original = concatBytes(buildBox('styp', new TextEncoder().encode('msdh')), buildMediaContent(1))
-		const tampered = concatBytes(buildBox('styp', new TextEncoder().encode('msdh')), buildMediaContent(99))
-		const hashOriginal = await computeBmffHash(original, { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
-		const hashTampered = await computeBmffHash(tampered, { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const original = concatBytes(
+			buildBox('styp', new TextEncoder().encode('msdh')),
+			buildMediaContent(1),
+		)
+		const tampered = concatBytes(
+			buildBox('styp', new TextEncoder().encode('msdh')),
+			buildMediaContent(99),
+		)
+		const hashOriginal = await computeBmffHash(original, {
+			exclusions: [{ xpath: '/uuid' }],
+			offsetPrefixSize: 8,
+		})
+		const hashTampered = await computeBmffHash(tampered, {
+			exclusions: [{ xpath: '/uuid' }],
+			offsetPrefixSize: 8,
+		})
 		const live = buildLiveVideoBox(1)
 		const attackerBmff = buildBmffFlatBox(hashTampered)
 		const legitBmff = buildBmffFlatBox(hashOriginal)
@@ -263,8 +291,14 @@ describe('duplicate assertion labels (security)', () => {
 	})
 
 	it('rejects a prepended duplicate c2pa.livevideo.segment box', async () => {
-		const media = concatBytes(buildBox('styp', new TextEncoder().encode('msdh')), buildMediaContent(1))
-		const hash = await computeBmffHash(media, { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const media = concatBytes(
+			buildBox('styp', new TextEncoder().encode('msdh')),
+			buildMediaContent(1),
+		)
+		const hash = await computeBmffHash(media, {
+			exclusions: [{ xpath: '/uuid' }],
+			offsetPrefixSize: 8,
+		})
 		const bmff = buildBmffFlatBox(hash)
 		const attackerLive = buildLiveVideoBox(9999)
 		const legitLive = buildLiveVideoBox(1)
@@ -278,7 +312,10 @@ describe('duplicate assertion labels (security)', () => {
 			signer,
 		)
 
-		const { result, nextState } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID)
+		const { result, nextState } = await validateC2paManifestBoxSegment(
+			segment,
+			PREVIOUS_MANIFEST_ID,
+		)
 
 		strictEqual(result.isValid, false)
 		ok(result.errorCodes.includes(C2paStatusCode.ASSERTION_MISSING))
@@ -335,13 +372,27 @@ describe('duplicate assertion labels (security)', () => {
 	})
 
 	it('does not validate tampered manifest-box media behind an undeclared c2pa.hash.bmff.v3', async () => {
-		const original = concatBytes(buildBox('styp', new TextEncoder().encode('msdh')), buildMediaContent(1))
-		const tampered = concatBytes(buildBox('styp', new TextEncoder().encode('msdh')), buildMediaContent(99))
-		const hashOriginal = await computeBmffHash(original, { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const original = concatBytes(
+			buildBox('styp', new TextEncoder().encode('msdh')),
+			buildMediaContent(1),
+		)
+		const tampered = concatBytes(
+			buildBox('styp', new TextEncoder().encode('msdh')),
+			buildMediaContent(99),
+		)
+		const hashOriginal = await computeBmffHash(original, {
+			exclusions: [{ xpath: '/uuid' }],
+			offsetPrefixSize: 8,
+		})
 		const live = buildLiveVideoBox(1)
 		const bmff = buildBmffFlatBox(hashOriginal)
 		// Tampered media on disk; the claim references only the live-video assertion, omitting BMFF.
-		const segment = await assembleSegment(tampered, [live, bmff], [{ label: LIVE_VIDEO_LABEL, box: live }], signer)
+		const segment = await assembleSegment(
+			tampered,
+			[live, bmff],
+			[{ label: LIVE_VIDEO_LABEL, box: live }],
+			signer,
+		)
 
 		const { result } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID)
 
@@ -361,7 +412,10 @@ describe('duplicate assertion labels (security)', () => {
 				alg: 'sha256',
 				merkle: [{ uniqueId: 1, localId: 1, count: 1, hashes: [root], initHash, alg: 'sha256' }],
 			})
-		const bmff = buildJumb(BMFF_LABEL, buildBox('cbor', merkleCbor(await sha256(new TextEncoder().encode('root-0')))))
+		const bmff = buildJumb(
+			BMFF_LABEL,
+			buildBox('cbor', merkleCbor(await sha256(new TextEncoder().encode('root-0')))),
+		)
 		// A second hard binding with the §6.4 numbered-instance suffix.
 		const bmffInstance = buildJumb(
 			`${BMFF_LABEL}__1`,
@@ -388,8 +442,17 @@ describe('duplicate assertion labels (security)', () => {
 	// would validate with the duplicate removed.
 	it('rejects a manifest with two claim boxes', async () => {
 		const sessionKeys = await buildSessionKeysBox(legitKey, signer.certificateDER)
-		const { claim, signature } = await signedClaimBoxes([{ label: SESSION_KEYS_LABEL, box: sessionKeys }], signer)
-		const init = wrapManifest(buildInitMediaBoxes(), claim, claim, buildJumb('c2pa.assertions', sessionKeys), signature)
+		const { claim, signature } = await signedClaimBoxes(
+			[{ label: SESSION_KEYS_LABEL, box: sessionKeys }],
+			signer,
+		)
+		const init = wrapManifest(
+			buildInitMediaBoxes(),
+			claim,
+			claim,
+			buildJumb('c2pa.assertions', sessionKeys),
+			signature,
+		)
 
 		const result = await validateC2paInitSegment(init)
 
@@ -403,7 +466,10 @@ describe('duplicate assertion labels (security)', () => {
 
 	it('rejects a manifest with two signature boxes', async () => {
 		const sessionKeys = await buildSessionKeysBox(legitKey, signer.certificateDER)
-		const { claim, signature } = await signedClaimBoxes([{ label: SESSION_KEYS_LABEL, box: sessionKeys }], signer)
+		const { claim, signature } = await signedClaimBoxes(
+			[{ label: SESSION_KEYS_LABEL, box: sessionKeys }],
+			signer,
+		)
 		const init = wrapManifest(
 			buildInitMediaBoxes(),
 			claim,
@@ -424,7 +490,10 @@ describe('duplicate assertion labels (security)', () => {
 
 	it('rejects a manifest with two assertion stores', async () => {
 		const sessionKeys = await buildSessionKeysBox(legitKey, signer.certificateDER)
-		const { claim, signature } = await signedClaimBoxes([{ label: SESSION_KEYS_LABEL, box: sessionKeys }], signer)
+		const { claim, signature } = await signedClaimBoxes(
+			[{ label: SESSION_KEYS_LABEL, box: sessionKeys }],
+			signer,
+		)
 		const store = buildJumb('c2pa.assertions', sessionKeys)
 		const init = wrapManifest(buildInitMediaBoxes(), claim, store, store, signature)
 
@@ -439,8 +508,14 @@ describe('duplicate assertion labels (security)', () => {
 	})
 
 	it('reads nothing from either claim of a manifest-box segment with two claim boxes', async () => {
-		const media = concatBytes(buildBox('styp', new TextEncoder().encode('msdh')), buildMediaContent(1))
-		const hash = await computeBmffHash(media, { exclusions: [{ xpath: '/uuid' }], offsetPrefixSize: 8 })
+		const media = concatBytes(
+			buildBox('styp', new TextEncoder().encode('msdh')),
+			buildMediaContent(1),
+		)
+		const hash = await computeBmffHash(media, {
+			exclusions: [{ xpath: '/uuid' }],
+			offsetPrefixSize: 8,
+		})
 		const live = buildLiveVideoBox(5)
 		const bmff = buildBmffFlatBox(hash)
 		const refs = [
@@ -457,7 +532,10 @@ describe('duplicate assertion labels (security)', () => {
 			last.signature,
 		)
 
-		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID)
+		const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
+			segment,
+			PREVIOUS_MANIFEST_ID,
+		)
 
 		deepStrictEqual(
 			result.errorCodes.filter(code => code.startsWith('claim')),
@@ -540,7 +618,12 @@ describe('duplicate assertion labels (security)', () => {
 			{ label: SESSION_KEYS_LABEL, box: sessionKeys },
 		]
 		const { claim, signature } = await signedClaimBoxes(refs, signer, { refsField: 'assertions' })
-		const init = wrapManifest(buildInitMediaBoxes(), claim, buildJumb('c2pa.assertions', bmff, sessionKeys), signature)
+		const init = wrapManifest(
+			buildInitMediaBoxes(),
+			claim,
+			buildJumb('c2pa.assertions', bmff, sessionKeys),
+			signature,
+		)
 
 		const result = await validateC2paInitSegment(init)
 

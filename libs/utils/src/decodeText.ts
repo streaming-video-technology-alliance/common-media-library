@@ -18,7 +18,10 @@ import { UTF_8 } from './UTF_8.ts'
  * @example
  * {@includeCode ../test/decodeText.test.ts#example}
  */
-export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: DecodeTextOptions = {}): string {
+export function decodeText(
+	data: ArrayBufferLike | ArrayBufferView,
+	options: DecodeTextOptions = {},
+): string {
 	let view: DataView
 
 	if (isArrayBufferLike(data)) {
@@ -111,8 +114,19 @@ export function decodeText(data: ArrayBufferLike | ArrayBufferView, options: Dec
 						const byte2 = view.getUint8(byteOffset + 1)
 						const byte3 = view.getUint8(byteOffset + 2)
 						const byte4 = view.getUint8(byteOffset + 3)
-						if (byte2 >= 128 && byte2 <= 191 && byte3 >= 128 && byte3 <= 191 && byte4 >= 128 && byte4 <= 191) {
-							char = ((char & 0x07) << 18) | ((byte2 & 0x3f) << 12) | ((byte3 & 0x3f) << 6) | (byte4 & 0x3f)
+						if (
+							byte2 >= 128 &&
+							byte2 <= 191 &&
+							byte3 >= 128 &&
+							byte3 <= 191 &&
+							byte4 >= 128 &&
+							byte4 <= 191
+						) {
+							char =
+								((char & 0x07) << 18) |
+								((byte2 & 0x3f) << 12) |
+								((byte3 & 0x3f) << 6) |
+								(byte4 & 0x3f)
 							byteOffset += 4
 						} else {
 							// Invalid sequence, skip

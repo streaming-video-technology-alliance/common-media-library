@@ -1,4 +1,7 @@
-import type { VisualSampleEntryBox, VisualSampleEntryBoxChild } from '../boxes/VisualSampleEntryBox.ts'
+import type {
+	VisualSampleEntryBox,
+	VisualSampleEntryBoxChild,
+} from '../boxes/VisualSampleEntryBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
@@ -13,7 +16,10 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  *
  * @public
  */
-export function readVisualSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView): VisualSampleEntryBox<T> {
+export function readVisualSampleEntryBox<T extends IsoBoxType>(
+	type: T,
+	view: IsoBoxReadView,
+): VisualSampleEntryBox<T> {
 	const { readArray, readUint, readInt, readTemplate, readBoxes } = view
 
 	return {

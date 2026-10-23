@@ -31,7 +31,12 @@ export function placeholderAfterSample(
 		: 0
 	const bufferAtRequestStart = bufferLevel + requestSeconds
 	const maximumBuffer = params.maximumBuffers[findRung(params.rungs, segment.bandwidth)]
-	const decayed = Math.min(placeholder * PLACEHOLDER_DECAY, Math.max(0, maximumBuffer - bufferAtRequestStart))
+	const decayed = Math.min(
+		placeholder * PLACEHOLDER_DECAY,
+		Math.max(0, maximumBuffer - bufferAtRequestStart),
+	)
 
-	return segment.isReplacement && isPositiveFinite(segment.duration) ? decayed + segment.duration : decayed
+	return segment.isReplacement && isPositiveFinite(segment.duration)
+		? decayed + segment.duration
+		: decayed
 }

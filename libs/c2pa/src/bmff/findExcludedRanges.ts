@@ -83,7 +83,11 @@ function nodeMatches(node: XpathNode, box: BmffBox): boolean {
 	return node.type === box.type && (node.index === 0 || node.index === box.index)
 }
 
-function bytesMatchAt(bytes: Uint8Array, offset: number, expected: Uint8Array | readonly number[]): boolean {
+function bytesMatchAt(
+	bytes: Uint8Array,
+	offset: number,
+	expected: Uint8Array | readonly number[],
+): boolean {
 	if (offset + expected.length > bytes.length) return false
 	for (let i = 0; i < expected.length; i++) {
 		if (bytes[offset + i] !== expected[i]) return false
@@ -113,7 +117,8 @@ function constraintsMatch(box: BmffBox, exclusion: BmffHashExclusion): boolean {
 			if (flags.length !== FLAGS_SIZE) return false
 			const boxFlags = readUint24(box.bytes, at + 1)
 			const expected = readUint24(flags, 0)
-			if (exclusion.exact === false ? (boxFlags & expected) !== expected : boxFlags !== expected) return false
+			if (exclusion.exact === false ? (boxFlags & expected) !== expected : boxFlags !== expected)
+				return false
 		}
 	}
 	if (data) {
@@ -218,6 +223,7 @@ export function findExcludedRanges(
 		if (!compiled.exclusion.subset) return null
 		appendSubset((ranges ??= []), 0, box.bytes.length, compiled.exclusion.subset)
 	}
-	if (nested) appendChildRanges(box.bytes, payloadOffset(box), box.bytes.length, 1, nested, (ranges ??= []))
+	if (nested)
+		appendChildRanges(box.bytes, payloadOffset(box), box.bytes.length, 1, nested, (ranges ??= []))
 	return ranges ? mergeRanges(ranges) : NO_RANGES
 }

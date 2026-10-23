@@ -64,7 +64,11 @@ export class Cta608Channel {
 
 	private logger: CaptionsLogger
 
-	constructor(channelNumber: number, outputFilter: CueHandler, logger: CaptionsLogger = new CaptionsLogger()) {
+	constructor(
+		channelNumber: number,
+		outputFilter: CueHandler,
+		logger: CaptionsLogger = new CaptionsLogger(),
+	) {
 		this.chNr = channelNumber
 		this.outputFilter = outputFilter
 		this.mode = null
@@ -136,7 +140,10 @@ export class Cta608Channel {
 		const screen = this.writeScreen === this.displayedMemory ? 'DISP' : 'NON_DISP'
 		this.logger.log(VerboseLevel.INFO, () => screen + ': ' + this.writeScreen.getDisplayText(true))
 		if (this.mode === 'MODE_PAINT-ON' || this.mode === 'MODE_ROLL-UP') {
-			this.logger.log(VerboseLevel.TEXT, () => 'DISPLAYED: ' + this.displayedMemory.getDisplayText(true))
+			this.logger.log(
+				VerboseLevel.TEXT,
+				() => 'DISPLAYED: ' + this.displayedMemory.getDisplayText(true),
+			)
 			this.outputDataUpdate()
 		}
 	}

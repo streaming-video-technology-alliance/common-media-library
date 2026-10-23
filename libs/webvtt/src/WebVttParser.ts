@@ -14,8 +14,10 @@ import type { WebVttRegion } from './WebVttRegion.ts'
 import type { WebVttRegionFactory } from './WebVttRegionFactory.ts'
 
 const BAD_SIGNATURE = 'Malformed WebVTT signature.'
-const createCue = (): WebVttCue => (typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : createWebVttCue())
-const createRegion = (): WebVttRegion => (typeof VTTRegion !== 'undefined' ? new VTTRegion() : createWebVttRegion())
+const createCue = (): WebVttCue =>
+	typeof VTTCue !== 'undefined' ? new VTTCue(0, 0, '') : createWebVttCue()
+const createRegion = (): WebVttRegion =>
+	typeof VTTRegion !== 'undefined' ? new VTTRegion() : createWebVttRegion()
 
 /**
  * A WebVTT parser.
@@ -138,8 +140,8 @@ export class WebVttParser {
 			)
 
 			this.ontimestampmap?.({
-				'MPEGTS': settings.get('MPEGTS'),
-				'LOCAL': settings.get('LOCAL'),
+				MPEGTS: settings.get('MPEGTS'),
+				LOCAL: settings.get('LOCAL'),
 			})
 		}
 
@@ -414,7 +416,10 @@ export class WebVttParser {
 
 			// Enter BADWEBVTT state if header was not parsed correctly otherwise
 			// another exception occurred so enter BADCUE state.
-			this.state = this.state === WebVttParserState.INITIAL ? WebVttParserState.BAD_WEBVTT : WebVttParserState.BAD_CUE
+			this.state =
+				this.state === WebVttParserState.INITIAL
+					? WebVttParserState.BAD_WEBVTT
+					: WebVttParserState.BAD_CUE
 		}
 		return this
 	}

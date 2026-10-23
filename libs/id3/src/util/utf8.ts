@@ -3,7 +3,11 @@ import { isArrayBufferLike } from '@svta/cml-utils'
 /**
  * @internal
  */
-export function toUint8(data: BufferSource, offset: number = 0, length: number = Infinity): Uint8Array {
+export function toUint8(
+	data: BufferSource,
+	offset: number = 0,
+	length: number = Infinity,
+): Uint8Array {
 	return view(data, offset, length, Uint8Array)
 }
 
@@ -38,5 +42,10 @@ function unsafeGetArrayBuffer(view: BufferSource) {
 }
 
 function isArrayBufferView(obj: any): obj is ArrayBufferView {
-	return obj && isArrayBufferLike(obj.buffer) && obj.byteLength !== undefined && obj.byteOffset !== undefined
+	return (
+		obj &&
+		isArrayBufferLike(obj.buffer) &&
+		obj.byteLength !== undefined &&
+		obj.byteOffset !== undefined
+	)
 }

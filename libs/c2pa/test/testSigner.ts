@@ -90,7 +90,11 @@ function rawEcdsaToDer(raw: Uint8Array): Uint8Array {
 
 async function signEcdsaSha256(privateKey: CryptoKey, data: Uint8Array): Promise<Uint8Array> {
 	return new Uint8Array(
-		await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, data as Uint8Array<ArrayBuffer>),
+		await crypto.subtle.sign(
+			{ name: 'ECDSA', hash: 'SHA-256' },
+			privateKey,
+			data as Uint8Array<ArrayBuffer>,
+		),
 	)
 }
 
@@ -112,7 +116,12 @@ async function buildSelfSignedCertificate(
 		spki,
 	)
 	const signature = rawEcdsaToDer(await signEcdsaSha256(privateKey, tbsCertificate))
-	return der(DER_SEQUENCE, tbsCertificate, signatureAlgorithm, der(DER_BIT_STRING, new Uint8Array([0]), signature))
+	return der(
+		DER_SEQUENCE,
+		tbsCertificate,
+		signatureAlgorithm,
+		der(DER_BIT_STRING, new Uint8Array([0]), signature),
+	)
 }
 
 /**
@@ -121,7 +130,10 @@ async function buildSelfSignedCertificate(
  * one signer per test file.
  */
 export async function createTestSigner(issuer: string = 'CML Test Signer'): Promise<TestSigner> {
-	const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])
+	const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+		'sign',
+		'verify',
+	])
 	const spki = new Uint8Array(await crypto.subtle.exportKey('spki', keyPair.publicKey))
 	const certificateDER = await buildSelfSignedCertificate(keyPair.privateKey, spki, issuer)
 	// cbor-x reuses its output buffer between calls, so copy every encoding.
@@ -138,7 +150,10 @@ export async function createTestSigner(issuer: string = 'CML Test Signer'): Prom
 		certificateDER,
 		issuer,
 		async sign(claimCborBytes: Uint8Array): Promise<Uint8Array> {
-			const signature = await signEcdsaSha256(keyPair.privateKey, buildSigStructure(protectedBytes, claimCborBytes))
+			const signature = await signEcdsaSha256(
+				keyPair.privateKey,
+				buildSigStructure(protectedBytes, claimCborBytes),
+			)
 			const coseSign1 = Uint8Array.from(CBOR.encode([protectedBytes, new Map(), null, signature]))
 			return concat(new Uint8Array([COSE_SIGN1_TAG]), coseSign1)
 		},

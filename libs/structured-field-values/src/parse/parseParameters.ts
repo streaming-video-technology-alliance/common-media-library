@@ -46,7 +46,10 @@ import { parseKey } from './parseKey.ts'
 /**
  * @internal
  */
-export function parseParameters(src: string, options?: SfDecodeOptions): ParsedValue<SfParameters | undefined> {
+export function parseParameters(
+	src: string,
+	options?: SfDecodeOptions,
+): ParsedValue<SfParameters | undefined> {
 	let parameters: SfParameters | undefined = undefined
 	while (src.length > 0) {
 		if (src[0] !== ';') {

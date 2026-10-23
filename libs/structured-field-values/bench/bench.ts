@@ -232,13 +232,18 @@ function makeCorpusCases(api: EncoderApi): Input[] {
 		...readdirSync(CORPUS)
 			.filter(file => file.endsWith('.json'))
 			.map(file => resolve(CORPUS, file)),
-		...readdirSync(resolve(CORPUS, 'serialisation-tests')).map(file => resolve(CORPUS, 'serialisation-tests', file)),
+		...readdirSync(resolve(CORPUS, 'serialisation-tests')).map(file =>
+			resolve(CORPUS, 'serialisation-tests', file),
+		),
 	]
 	const cases: Input[] = []
 
 	for (const file of files) {
 		for (const suite of JSON.parse(readFileSync(file, 'utf8'))) {
-			if (suite.expected === undefined || JSON.stringify(suite.expected).includes('displaystring')) {
+			if (
+				suite.expected === undefined ||
+				JSON.stringify(suite.expected).includes('displaystring')
+			) {
 				continue
 			}
 			const name = `${basename(file)}: ${suite.name}`
@@ -250,7 +255,11 @@ function makeCorpusCases(api: EncoderApi): Input[] {
 				cases.push({
 					name,
 					call: () =>
-						api.encodeSfDict(Object.fromEntries(suite.expected.map(([key, entry]: any[]) => [key, formatItem(entry)]))),
+						api.encodeSfDict(
+							Object.fromEntries(
+								suite.expected.map(([key, entry]: any[]) => [key, formatItem(entry)]),
+							),
+						),
 				})
 			}
 		}
@@ -289,9 +298,13 @@ async function verify(): Promise<void> {
 			identical++
 		} else if (expected.startsWith(THROWS) && actual.startsWith(THROWS)) {
 			messageOnly++
-			differences.push(`error message  ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`)
+			differences.push(
+				`error message  ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`,
+			)
 		} else {
-			differences.push(`OUTPUT         ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`)
+			differences.push(
+				`OUTPUT         ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`,
+			)
 		}
 	})
 

@@ -37,11 +37,21 @@ type ParseMessage = {
  * never returns fails the test instead of hanging the test runner. A prefix sweep reports only
  * whether each parse returned; the parsed trees stay in the worker.
  */
-export function runParseWorker(job: { inputs: string[] }, options?: XmlParseOptions): Promise<ParseOutcome<XmlNode>[]>
-export function runParseWorker(job: { prefixesOf: string }, options?: XmlParseOptions): Promise<ParseOutcome<true>[]>
-export function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promise<ParseOutcome<unknown>[]> {
+export function runParseWorker(
+	job: { inputs: string[] },
+	options?: XmlParseOptions,
+): Promise<ParseOutcome<XmlNode>[]>
+export function runParseWorker(
+	job: { prefixesOf: string },
+	options?: XmlParseOptions,
+): Promise<ParseOutcome<true>[]>
+export function runParseWorker(
+	job: ParseJob,
+	options?: XmlParseOptions,
+): Promise<ParseOutcome<unknown>[]> {
 	const count = 'inputs' in job ? job.inputs.length : job.prefixesOf.length + 1
-	const inputAt = (index: number): string => ('inputs' in job ? job.inputs[index] : job.prefixesOf.slice(0, index))
+	const inputAt = (index: number): string =>
+		'inputs' in job ? job.inputs[index] : job.prefixesOf.slice(0, index)
 
 	if (count === 0) {
 		return Promise.resolve([])
@@ -68,7 +78,9 @@ export function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promis
 			timer = setTimeout(() => {
 				settle(() =>
 					fail(
-						new Error(`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputAt(current))}`),
+						new Error(
+							`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputAt(current))}`,
+						),
 					),
 				)
 			}, PARSE_TIMEOUT_MS)

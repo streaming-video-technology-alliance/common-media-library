@@ -69,7 +69,11 @@ export class Cta608Parser {
 
 	constructor(field: SupportedField, out1: any, out2: any) {
 		const logger = (this.logger = new CaptionsLogger())
-		this.channels = [null, new Cta608Channel(field, out1, logger), new Cta608Channel(field + 1, out2, logger)]
+		this.channels = [
+			null,
+			new Cta608Channel(field, out1, logger),
+			new Cta608Channel(field + 1, out2, logger),
+		]
 	}
 
 	/**
@@ -98,7 +102,12 @@ export class Cta608Parser {
 			} else {
 				this.logger.log(
 					VerboseLevel.DATA,
-					() => '[' + numArrayToHexArray([byteList[i], byteList[i + 1]]) + '] -> (' + numArrayToHexArray([a, b]) + ')',
+					() =>
+						'[' +
+						numArrayToHexArray([byteList[i], byteList[i + 1]]) +
+						'] -> (' +
+						numArrayToHexArray([a, b]) +
+						')',
 				)
 			}
 
@@ -108,7 +117,10 @@ export class Cta608Parser {
 				// Skip redundant control codes
 				if (hasCmdRepeated(a, b, cmdHistory)) {
 					setLastCmd(null, null, cmdHistory)
-					this.logger.log(VerboseLevel.DEBUG, () => 'Repeated command (' + numArrayToHexArray([a, b]) + ') is dropped')
+					this.logger.log(
+						VerboseLevel.DEBUG,
+						() => 'Repeated command (' + numArrayToHexArray([a, b]) + ') is dropped',
+					)
 					continue
 				}
 				setLastCmd(a, b, this.cmdHistory)
@@ -305,7 +317,9 @@ export class Cta608Parser {
 
 		pacData.underline = (pacIndex & 1) === 1
 		if (pacIndex <= 0xd) {
-			pacData.color = ['white', 'green', 'blue', 'cyan', 'red', 'yellow', 'magenta', 'white'][Math.floor(pacIndex / 2)]
+			pacData.color = ['white', 'green', 'blue', 'cyan', 'red', 'yellow', 'magenta', 'white'][
+				Math.floor(pacIndex / 2)
+			]
 		} else if (pacIndex <= 0xf) {
 			pacData.italics = true
 			pacData.color = 'white'
@@ -345,13 +359,19 @@ export class Cta608Parser {
 				oneCode = b + 0x90
 			}
 
-			this.logger.log(VerboseLevel.INFO, () => "Special char '" + getCharForByte(oneCode) + "' in channel " + channelNr)
+			this.logger.log(
+				VerboseLevel.INFO,
+				() => "Special char '" + getCharForByte(oneCode) + "' in channel " + channelNr,
+			)
 			charCodes = [oneCode]
 		} else if (a >= 0x20 && a <= 0x7f) {
 			charCodes = b === 0 ? [a] : [a, b]
 		}
 		if (charCodes) {
-			this.logger.log(VerboseLevel.DEBUG, () => 'Char codes =  ' + numArrayToHexArray(charCodes).join(','))
+			this.logger.log(
+				VerboseLevel.DEBUG,
+				() => 'Char codes =  ' + numArrayToHexArray(charCodes).join(','),
+			)
 		}
 		return charCodes
 	}

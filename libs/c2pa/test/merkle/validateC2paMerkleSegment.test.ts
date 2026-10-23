@@ -109,7 +109,12 @@ describe('validateC2paMerkleSegment', () => {
 		const segment = concatBytes(
 			buildMediaContent(0),
 			buildMerkleAuxBox(
-				{ uniqueId: UNIQUE_ID, localId: 1, location: 0, hashes: buildProofPath(levels, 0, TREE_DEPTH) },
+				{
+					uniqueId: UNIQUE_ID,
+					localId: 1,
+					location: 0,
+					hashes: buildProofPath(levels, 0, TREE_DEPTH),
+				},
 				'merkle',
 				16,
 			),
@@ -174,7 +179,10 @@ describe('validateC2paMerkleSegment', () => {
 		const content = buildMediaContent(0)
 		const leafHash = await computeBmffHash(content, { offsetPrefixSize: 8, exclusions: EXCLUSIONS })
 		const singleMaps = merkleMapWith({ count: 1, hashes: [leafHash] })
-		const segment = concatBytes(content, buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 1, location: 0 }))
+		const segment = concatBytes(
+			content,
+			buildMerkleAuxBox({ uniqueId: UNIQUE_ID, localId: 1, location: 0 }),
+		)
 
 		const validated = await validateC2paMerkleSegment(segment, singleMaps)
 

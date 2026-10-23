@@ -92,7 +92,10 @@ export type EnsureEncryptedInitOptions = {
  * @example
  * {@includeCode ../test/ensureEncryptedInit.test.ts#example}
  */
-export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array {
+export function ensureEncryptedInit(
+	init: Uint8Array,
+	options?: Partial<EnsureEncryptedInitOptions>,
+): Uint8Array {
 	const {
 		prepend = true,
 		includeOriginal = true,
@@ -112,12 +115,16 @@ export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEn
 		return init
 	}
 
-	const entries = stsd.entries.filter(({ type }) => videoTypes.includes(type) || audioTypes.includes(type))
+	const entries = stsd.entries.filter(
+		({ type }) => videoTypes.includes(type) || audioTypes.includes(type),
+	)
 
 	// Add sinf to each sample entry box
 	for (const entry of entries) {
 		const type = videoTypes.includes(entry.type) ? 'encv' : 'enca'
-		const box = { ...entry, boxes: entry.boxes.slice(), type } as AudioSampleEntryBox | VisualSampleEntryBox
+		const box = { ...entry, boxes: entry.boxes.slice(), type } as
+			| AudioSampleEntryBox
+			| VisualSampleEntryBox
 
 		if (prepend) {
 			stsd.entries.unshift(box)

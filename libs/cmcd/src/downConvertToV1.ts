@@ -55,7 +55,10 @@ function unwrapValue(value: unknown, ot: string | undefined): unknown {
  *
  * @internal
  */
-export function downConvertToV1(obj: Record<string, any>, ot: string | undefined): Record<string, any> {
+export function downConvertToV1(
+	obj: Record<string, any>,
+	ot: string | undefined,
+): Record<string, any> {
 	const result: Record<string, any> = {}
 
 	for (const [key, value] of Object.entries(obj)) {

@@ -190,8 +190,14 @@ export class IsoBoxWriteView {
 	 * @param size - The size, in bytes, of each data value.
 	 * @param length - The number of values to write. (optional)
 	 */
-	writeArray = <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number, length: number): void => {
-		const write = type === UINT ? this.writeUint : type === TEMPLATE ? this.writeTemplate : this.writeInt
+	writeArray = <T extends keyof IsoFieldTypeMap>(
+		data: number[],
+		type: T,
+		size: number,
+		length: number,
+	): void => {
+		const write =
+			type === UINT ? this.writeUint : type === TEMPLATE ? this.writeTemplate : this.writeInt
 
 		for (let i = 0; i < length; i++) {
 			write(data[i] ?? 0, size)

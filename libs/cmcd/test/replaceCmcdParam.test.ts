@@ -8,19 +8,28 @@ describe('replaceCmcdParam', () => {
 	})
 
 	it('adds the parameter after the other parameters', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1&b=2', 'sn=0'), 'https://cdn.test/1.m4s?a=1&b=2&CMCD=sn%3D0')
+		equal(
+			replaceCmcdParam('https://cdn.test/1.m4s?a=1&b=2', 'sn=0'),
+			'https://cdn.test/1.m4s?a=1&b=2&CMCD=sn%3D0',
+		)
 	})
 
 	it('keeps the other parts of the URL byte for byte', () => {
 		equal(
-			replaceCmcdParam('https://CDN.test:443/a/./1.m4s?token=exp=1~acl=/*~hmac=ab&x=a%20b&flag', 'sn=0'),
+			replaceCmcdParam(
+				'https://CDN.test:443/a/./1.m4s?token=exp=1~acl=/*~hmac=ab&x=a%20b&flag',
+				'sn=0',
+			),
 			'https://CDN.test:443/a/./1.m4s?token=exp=1~acl=/*~hmac=ab&x=a%20b&flag&CMCD=sn%3D0',
 		)
 	})
 
 	it('adds no separator to an empty query or after a trailing separator', () => {
 		equal(replaceCmcdParam('https://cdn.test/1.m4s?', 'sn=0'), 'https://cdn.test/1.m4s?CMCD=sn%3D0')
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1&', 'sn=0'), 'https://cdn.test/1.m4s?a=1&CMCD=sn%3D0')
+		equal(
+			replaceCmcdParam('https://cdn.test/1.m4s?a=1&', 'sn=0'),
+			'https://cdn.test/1.m4s?a=1&CMCD=sn%3D0',
+		)
 	})
 
 	it('replaces the first CMCD parameter in place and removes the others', () => {
@@ -28,12 +37,21 @@ describe('replaceCmcdParam', () => {
 			replaceCmcdParam('https://cdn.test/1.m4s?CMCD=sn%3D1&a=1&CMCD=sn%3D2', 'sn=3'),
 			'https://cdn.test/1.m4s?CMCD=sn%3D3&a=1',
 		)
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1&CMCD&b=2', 'sn=3'), 'https://cdn.test/1.m4s?a=1&CMCD=sn%3D3&b=2')
+		equal(
+			replaceCmcdParam('https://cdn.test/1.m4s?a=1&CMCD&b=2', 'sn=3'),
+			'https://cdn.test/1.m4s?a=1&CMCD=sn%3D3&b=2',
+		)
 	})
 
 	it('keeps the fragment at the end', () => {
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1#t=10', 'sn=0'), 'https://cdn.test/1.m4s?a=1&CMCD=sn%3D0#t=10')
-		equal(replaceCmcdParam('https://cdn.test/1.m4s#t=10', 'sn=0'), 'https://cdn.test/1.m4s?CMCD=sn%3D0#t=10')
+		equal(
+			replaceCmcdParam('https://cdn.test/1.m4s?a=1#t=10', 'sn=0'),
+			'https://cdn.test/1.m4s?a=1&CMCD=sn%3D0#t=10',
+		)
+		equal(
+			replaceCmcdParam('https://cdn.test/1.m4s#t=10', 'sn=0'),
+			'https://cdn.test/1.m4s?CMCD=sn%3D0#t=10',
+		)
 	})
 
 	it('does not read a query in the fragment', () => {
@@ -49,7 +67,10 @@ describe('replaceCmcdParam', () => {
 
 	it('only removes the parameter when the value is empty', () => {
 		equal(replaceCmcdParam('https://cdn.test/1.m4s?CMCD=sn%3D1'), 'https://cdn.test/1.m4s')
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?CMCD=sn%3D1&a=1#t', ''), 'https://cdn.test/1.m4s?a=1#t')
+		equal(
+			replaceCmcdParam('https://cdn.test/1.m4s?CMCD=sn%3D1&a=1#t', ''),
+			'https://cdn.test/1.m4s?a=1#t',
+		)
 		equal(replaceCmcdParam('https://cdn.test/1.m4s?a=1'), 'https://cdn.test/1.m4s?a=1')
 	})
 
@@ -58,7 +79,10 @@ describe('replaceCmcdParam', () => {
 			replaceCmcdParam('https://cdn.test/1.m4s?XCMCD=1&CMCDX=2&cmcd=3'),
 			'https://cdn.test/1.m4s?XCMCD=1&CMCDX=2&cmcd=3',
 		)
-		equal(replaceCmcdParam('https://cdn.test/1.m4s?XCMCD=1', 'sn=0'), 'https://cdn.test/1.m4s?XCMCD=1&CMCD=sn%3D0')
+		equal(
+			replaceCmcdParam('https://cdn.test/1.m4s?XCMCD=1', 'sn=0'),
+			'https://cdn.test/1.m4s?XCMCD=1&CMCD=sn%3D0',
+		)
 	})
 
 	it('encodes the value as the CTA-5004-B examples do', () => {

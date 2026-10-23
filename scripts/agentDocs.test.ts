@@ -72,26 +72,38 @@ describe('parseWhenToUse', () => {
 	})
 
 	it('throws when the heading is missing', () => {
-		throws(() => parseWhenToUse('# x\n\n## Installation\n', file), /libs\/example\/README\.md: the heading is missing/)
+		throws(
+			() => parseWhenToUse('# x\n\n## Installation\n', file),
+			/libs\/example\/README\.md: the heading is missing/,
+		)
 	})
 
 	it('throws when a bullet has no colon', () => {
 		throws(
-			() => parseWhenToUse('## When to use\n\n- Parse boxes `readBoxes`\n- Two: `a`\n\nClosing.\n', file),
+			() =>
+				parseWhenToUse(
+					'## When to use\n\n- Parse boxes `readBoxes`\n- Two: `a`\n\nClosing.\n',
+					file,
+				),
 			/the bullet "Parse boxes `readBoxes`" has no colon/,
 		)
 	})
 
 	it('throws when a bullet names no export after the colon', () => {
 		throws(
-			() => parseWhenToUse('## When to use\n\n- Parse boxes: nothing\n- Two: `a`\n\nClosing.\n', file),
+			() =>
+				parseWhenToUse('## When to use\n\n- Parse boxes: nothing\n- Two: `a`\n\nClosing.\n', file),
 			/names no export after the colon/,
 		)
 	})
 
 	it('throws when text other than an export list follows the colon', () => {
 		throws(
-			() => parseWhenToUse('## When to use\n\n- Parse boxes: `a` and `b`\n- Two: `a`\n\nClosing.\n', file),
+			() =>
+				parseWhenToUse(
+					'## When to use\n\n- Parse boxes: `a` and `b`\n- Two: `a`\n\nClosing.\n',
+					file,
+				),
 			/text after the colon that is not an export list/,
 		)
 	})
@@ -104,14 +116,21 @@ describe('parseWhenToUse', () => {
 	})
 
 	it('throws when there are too few or too many bullets', () => {
-		throws(() => parseWhenToUse('## When to use\n\n## Installation\n', file), /the section has 0 bullets/)
+		throws(
+			() => parseWhenToUse('## When to use\n\n## Installation\n', file),
+			/the section has 0 bullets/,
+		)
 		const many = Array.from({ length: 9 }, (_, i) => `- Task ${i}: \`a\``).join('\n')
-		throws(() => parseWhenToUse(`## When to use\n\n${many}\n\nClosing.\n`, file), /the section has 9 bullets/)
+		throws(
+			() => parseWhenToUse(`## When to use\n\n${many}\n\nClosing.\n`, file),
+			/the section has 9 bullets/,
+		)
 	})
 
 	it('throws when text comes before the first bullet', () => {
 		throws(
-			() => parseWhenToUse('## When to use\n\nIntro.\n\n- One: `a`\n- Two: `b`\n\nClosing.\n', file),
+			() =>
+				parseWhenToUse('## When to use\n\nIntro.\n\n- One: `a`\n- Two: `b`\n\nClosing.\n', file),
 			/comes before the first bullet/,
 		)
 	})
@@ -174,7 +193,12 @@ describe('checkExports', () => {
 	it('throws for an identifier that the API report marks as internal', () => {
 		const section = parseWhenToUse('## When to use\n\n- Hide a box: `hidden`\n\nClosing.\n', file)
 		throws(
-			() => checkExports(section, readExports('```ts\n\n// @internal\nexport function hidden(): void;\n```'), file),
+			() =>
+				checkExports(
+					section,
+					readExports('```ts\n\n// @internal\nexport function hidden(): void;\n```'),
+					file,
+				),
 			/libs\/example\/README\.md: "hidden" in the bullet "Hide a box: `hidden`" is marked @internal\. Name a public entry point\./,
 		)
 	})
@@ -197,7 +221,11 @@ describe('rewriteLinks', () => {
 
 	it('resolves a guide link to a sibling guide and keeps the anchor', () => {
 		equal(
-			rewriteLinks('[Keys](./user-guide.md#custom-keys)', 'libs/cmcd/docs/validation-guide.md', toUrl),
+			rewriteLinks(
+				'[Keys](./user-guide.md#custom-keys)',
+				'libs/cmcd/docs/validation-guide.md',
+				toUrl,
+			),
 			'[Keys](https://example.test/libs/cmcd/docs/user-guide.md#custom-keys)',
 		)
 	})
@@ -238,8 +266,13 @@ describe('sourceUrl', () => {
 
 describe('siteUrl', () => {
 	it('points a copied file at the site and any other file at the source', () => {
-		const toUrl = siteUrl(new Map([['libs/iso-bmff/docs/reading-boxes.md', 'llms/iso-bmff/docs/reading-boxes.md']]))
-		equal(toUrl('libs/iso-bmff/docs/reading-boxes.md'), `${siteBase}llms/iso-bmff/docs/reading-boxes.md`)
+		const toUrl = siteUrl(
+			new Map([['libs/iso-bmff/docs/reading-boxes.md', 'llms/iso-bmff/docs/reading-boxes.md']]),
+		)
+		equal(
+			toUrl('libs/iso-bmff/docs/reading-boxes.md'),
+			`${siteBase}llms/iso-bmff/docs/reading-boxes.md`,
+		)
 		equal(toUrl('libs/iso-bmff/src/index.ts'), `${sourceBase}libs/iso-bmff/src/index.ts`)
 	})
 })
@@ -319,7 +352,10 @@ describe('renderReference', () => {
 describe('replaceIndex', () => {
 	it('replaces the text between the markers and keeps the rest', () => {
 		const skill = `# Skill\n\n${indexStart}\nold\n${indexEnd}\n\n## Links\n`
-		equal(replaceIndex(skill, 'new'), `# Skill\n\n${indexStart}\n\nnew\n\n${indexEnd}\n\n## Links\n`)
+		equal(
+			replaceIndex(skill, 'new'),
+			`# Skill\n\n${indexStart}\n\nnew\n\n${indexEnd}\n\n## Links\n`,
+		)
 	})
 
 	it('throws when a marker is missing', () => {
@@ -338,12 +374,22 @@ describe('renderLlmsTxt', () => {
 			true,
 		)
 		equal(
-			text.includes(`\n## Guides\n\n- [Guide](${siteBase}llms/example/docs/guide.md): @svta/cml-example. A guide\n`),
+			text.includes(
+				`\n## Guides\n\n- [Guide](${siteBase}llms/example/docs/guide.md): @svta/cml-example. A guide\n`,
+			),
 			true,
 		)
-		equal(text.includes(`\n## API reports\n\n- [@svta/cml-example API report](${siteBase}llms/example/api.md): `), true)
+		equal(
+			text.includes(
+				`\n## API reports\n\n- [@svta/cml-example API report](${siteBase}llms/example/api.md): `,
+			),
+			true,
+		)
 		equal(text.includes(`\n## Optional\n\n- [llms-full.txt](${siteBase}llms-full.txt): `), true)
-		equal(text.includes('npx skills add streaming-video-technology-alliance/common-media-library'), true)
+		equal(
+			text.includes('npx skills add streaming-video-technology-alliance/common-media-library'),
+			true,
+		)
 	})
 })
 
@@ -362,7 +408,11 @@ describe('writeSkill', () => {
 		equal(skill.split('\n').length < 500, true, 'SKILL.md has 500 lines or more')
 		for (const folder of projects) {
 			const slug = path.posix.basename(folder)
-			equal(skill.includes(`\nReference: references/${slug}.md\n`), true, `${slug} is missing from the index`)
+			equal(
+				skill.includes(`\nReference: references/${slug}.md\n`),
+				true,
+				`${slug} is missing from the index`,
+			)
 			equal(
 				existsSync(path.join(repoRoot, skillDir, 'references', `${slug}.md`)),
 				true,
@@ -379,7 +429,11 @@ describe('writeSkill', () => {
 			skill,
 			'a second writeSkill call changed SKILL.md',
 		)
-		equal(readFileSync(isoBmffPath, 'utf8'), isoBmff, 'a second writeSkill call changed references/iso-bmff.md')
+		equal(
+			readFileSync(isoBmffPath, 'utf8'),
+			isoBmff,
+			'a second writeSkill call changed references/iso-bmff.md',
+		)
 	})
 })
 

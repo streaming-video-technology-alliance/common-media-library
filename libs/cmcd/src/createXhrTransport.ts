@@ -41,7 +41,10 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 			target['response'] = text
 			target['responseText'] = text
 			if (typeof xhr.onload === 'function') {
-				xhr.onload.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('load') as ProgressEvent<EventTarget>)
+				xhr.onload.call(
+					xhr as unknown as XMLHttpRequest,
+					new ProgressEventCtor('load') as ProgressEvent<EventTarget>,
+				)
 			}
 			if (typeof xhr.onloadend === 'function') {
 				xhr.onloadend.call(
@@ -80,14 +83,21 @@ export function createXhrTransport(): CmcdTransportAdapter {
 				return origOpen.apply(this, arguments as unknown as Parameters<typeof origOpen>)
 			}
 
-			Xhr.prototype.setRequestHeader = function (this: XhrInstance, name: string, value: string): void {
+			Xhr.prototype.setRequestHeader = function (
+				this: XhrInstance,
+				name: string,
+				value: string,
+			): void {
 				if (this._cmcdHeaders) {
 					this._cmcdHeaders[name.toLowerCase()] = value
 				}
 				return origSetRequestHeader.apply(this, [name, value])
 			}
 
-			Xhr.prototype.send = function (this: XhrInstance, body?: Document | XMLHttpRequestBodyInit | null): void {
+			Xhr.prototype.send = function (
+				this: XhrInstance,
+				body?: Document | XMLHttpRequestBodyInit | null,
+			): void {
 				const httpRequest: HttpRequest = {
 					url: this._cmcdUrl ?? '',
 					method: (this._cmcdMethod ?? 'GET').toUpperCase(),

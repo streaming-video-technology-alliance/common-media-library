@@ -28,7 +28,10 @@ export function mapSegmentTemplate(
 	let cumulativeTime = 0
 
 	for (let id = init; id < numberOfSegments + init; id++) {
-		const segmentDuration = calculateDuration(segmentTemplate.$.duration, segmentTemplate.$.timescale)
+		const segmentDuration = calculateDuration(
+			segmentTemplate.$.duration,
+			segmentTemplate.$.timescale,
+		)
 		const startTime = cumulativeTime
 		cumulativeTime += segmentDuration
 

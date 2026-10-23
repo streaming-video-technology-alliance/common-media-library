@@ -89,7 +89,8 @@ export const SvtaRemotePlayErrorCode = {
 	/**
 	 * Sender unable to initialize remote play
 	 */
-	SENDER_INITIALIZATION_ERROR: SVTA_SENDER_INITIALIZATION_ERROR as typeof SVTA_SENDER_INITIALIZATION_ERROR,
+	SENDER_INITIALIZATION_ERROR:
+		SVTA_SENDER_INITIALIZATION_ERROR as typeof SVTA_SENDER_INITIALIZATION_ERROR,
 
 	/**
 	 * Sender unable to make a connection to the receiver
@@ -104,7 +105,8 @@ export const SvtaRemotePlayErrorCode = {
 	/**
 	 * Receiver refused remote play connection
 	 */
-	RECEIVER_CONNECTION_REFUSED: SVTA_RECEIVER_CONNECTION_REFUSED as typeof SVTA_RECEIVER_CONNECTION_REFUSED,
+	RECEIVER_CONNECTION_REFUSED:
+		SVTA_RECEIVER_CONNECTION_REFUSED as typeof SVTA_RECEIVER_CONNECTION_REFUSED,
 
 	/**
 	 * Connection to the receiver lost
@@ -119,12 +121,14 @@ export const SvtaRemotePlayErrorCode = {
 	/**
 	 * Receiver is not supported to playback this stream
 	 */
-	RECEIVER_UNSUPPORTED_STREAM: SVTA_RECEIVER_UNSUPPORTED_STREAM as typeof SVTA_RECEIVER_UNSUPPORTED_STREAM,
+	RECEIVER_UNSUPPORTED_STREAM:
+		SVTA_RECEIVER_UNSUPPORTED_STREAM as typeof SVTA_RECEIVER_UNSUPPORTED_STREAM,
 
 	/**
 	 * Receiver is already in remote play
 	 */
-	RECEIVER_ALREADY_IN_REMOTE_PLAY: SVTA_RECEIVER_ALREADY_IN_REMOTE_PLAY as typeof SVTA_RECEIVER_ALREADY_IN_REMOTE_PLAY,
+	RECEIVER_ALREADY_IN_REMOTE_PLAY:
+		SVTA_RECEIVER_ALREADY_IN_REMOTE_PLAY as typeof SVTA_RECEIVER_ALREADY_IN_REMOTE_PLAY,
 
 	/**
 	 * Receiver terminated playback because of an error

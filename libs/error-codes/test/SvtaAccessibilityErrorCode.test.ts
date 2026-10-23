@@ -13,7 +13,12 @@ describe('SvtaAccessibilityErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaAccessibilityErrorCode, SvtaErrorCategory.ACCESSIBILITY, 5, 'SVTA_ACCESSIBILITY')
+		assertCatalogInvariants(
+			SvtaAccessibilityErrorCode,
+			SvtaErrorCategory.ACCESSIBILITY,
+			5,
+			'SVTA_ACCESSIBILITY',
+		)
 	})
 
 	it('matches the spec table', () => {

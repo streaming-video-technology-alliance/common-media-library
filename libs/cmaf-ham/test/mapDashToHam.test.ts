@@ -10,7 +10,11 @@ import {
 	representationTemplate,
 	segmentTemplate,
 } from './testData.ts'
-import { expectedSegmentBase, expectedSegmentList, expectedSegmentTemplate } from './testExpected.ts'
+import {
+	expectedSegmentBase,
+	expectedSegmentList,
+	expectedSegmentTemplate,
+} from './testExpected.ts'
 
 describe('map segments', () => {
 	describe('mapSegmentBase', () => {

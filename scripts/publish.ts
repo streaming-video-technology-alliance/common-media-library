@@ -49,11 +49,17 @@ async function createRelease(folder: string, json: PackageJson): Promise<void> {
 	const notesFile = path.join(tmpdir(), `release-notes-${folderName}.md`)
 	await writeFile(notesFile, notes)
 	const prerelease = json.version.replace(tagRegex, '$1') ? '--prerelease' : ''
-	await cmd(`gh release create "${tag}" --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`)
+	await cmd(
+		`gh release create "${tag}" --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`,
+	)
 }
 
 // Check for updates and resolve wildcard peer dependencies to caret ranges
-async function processPackage(name: PackageName, pkg: Package, packages: Packages): Promise<string> {
+async function processPackage(
+	name: PackageName,
+	pkg: Package,
+	packages: Packages,
+): Promise<string> {
 	console.log(`Processing ${name}...`)
 	const [folder, file, packageJson] = pkg
 	const { version, peerDependencies = {} } = packageJson
@@ -122,6 +128,8 @@ for (const pkg of needsPublish) {
 	}
 
 	const tag = json.version.replace(tagRegex, '$1')
-	await cmd(`npm publish --provenance --access public -w ${folder} ${tag ? `--tag prerelease` : ''}`)
+	await cmd(
+		`npm publish --provenance --access public -w ${folder} ${tag ? `--tag prerelease` : ''}`,
+	)
 	await createRelease(folder, json)
 }

@@ -34,12 +34,17 @@ const links = sections[last].split(linkBreak)
 const index = links.findIndex(link => link.endsWith(headSuffix) && link.includes(tagPrefix))
 
 if (index < 0) {
-	throw new Error(`Missing ${tagPrefix}<version>${headSuffix} compare link in ${folder}/CHANGELOG.md`)
+	throw new Error(
+		`Missing ${tagPrefix}<version>${headSuffix} compare link in ${folder}/CHANGELOG.md`,
+	)
 }
 
 const unreleased = links[index]
 const tagStart = unreleased.lastIndexOf(tagPrefix)
-const previous = unreleased.slice(tagStart + tagPrefix.length, unreleased.length - headSuffix.length)
+const previous = unreleased.slice(
+	tagStart + tagPrefix.length,
+	unreleased.length - headSuffix.length,
+)
 links[index] = unreleased.slice(0, tagStart) + version + headSuffix
 links.splice(
 	index + 1,

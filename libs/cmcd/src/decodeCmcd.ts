@@ -52,7 +52,10 @@ function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): R
  * @example
  * {@includeCode ../test/decodeCmcd.test.ts#example}
  */
-export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
+export function decodeCmcd(
+	cmcd: string,
+	options: CmcdDecodeOptions & { convertToLatest: true },
+): Cmcd
 /**
  * Decode a CMCD string to an object.
  *
@@ -64,7 +67,10 @@ export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & { convertT
  *
  * @public
  */
-export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T
+export function decodeCmcd<T extends CmcdData = CmcdData>(
+	cmcd: string,
+	options?: CmcdDecodeOptions,
+): T
 export function decodeCmcd(cmcd: string, options?: CmcdDecodeOptions): CmcdData | Cmcd {
 	if (!cmcd) {
 		return {} as CmcdData

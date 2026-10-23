@@ -1,5 +1,11 @@
 import type { CmcdFormatter, CmcdV1 } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdPlayerState, CmcdReportingMode, prepareCmcdData, toCmcdValue } from '@svta/cml-cmcd'
+import {
+	CmcdEventType,
+	CmcdPlayerState,
+	CmcdReportingMode,
+	prepareCmcdData,
+	toCmcdValue,
+} from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
@@ -75,7 +81,10 @@ describe('prepareCmcdData', () => {
 
 	describe('filtering', () => {
 		it('applies the filter option', () => {
-			const data = prepareCmcdData({ cid: 'content-id', sid: 'session-id' }, { filter: key => key === 'cid' })
+			const data = prepareCmcdData(
+				{ cid: 'content-id', sid: 'session-id' },
+				{ filter: key => key === 'cid' },
+			)
 			ok('cid' in data)
 			ok(!('sid' in data))
 			equal(data['v'], 2)
@@ -125,7 +134,12 @@ describe('prepareCmcdData', () => {
 		it('force-includes url for filtered response received events', context => {
 			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
 			const data = prepareCmcdData(
-				{ e: CmcdEventType.RESPONSE_RECEIVED, url: 'https://example.com/seg.mp4', rc: 200, cid: 'content-id' },
+				{
+					e: CmcdEventType.RESPONSE_RECEIVED,
+					url: 'https://example.com/seg.mp4',
+					rc: 200,
+					cid: 'content-id',
+				},
 				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
 			)
 			ok('url' in data)
@@ -240,7 +254,9 @@ describe('prepareCmcdData', () => {
 			if (
 				key === 'v' ||
 				key === 'ts' ||
-				(type !== CMCD_KEY_TYPE_INTEGER && type !== CMCD_KEY_TYPE_NUMBER && type !== CMCD_KEY_TYPE_NUMBER_LIST)
+				(type !== CMCD_KEY_TYPE_INTEGER &&
+					type !== CMCD_KEY_TYPE_NUMBER &&
+					type !== CMCD_KEY_TYPE_NUMBER_LIST)
 			) {
 				continue
 			}
@@ -277,7 +293,12 @@ describe('prepareCmcdData', () => {
 		})
 
 		it('drops custom keys that fail RFC 8941 key serialization', () => {
-			const data = prepareCmcdData({ 'Com.Example-foo': 'a', '2com.example-x': 'b', '-a-b': 'c', cid: 'content-id' })
+			const data = prepareCmcdData({
+				'Com.Example-foo': 'a',
+				'2com.example-x': 'b',
+				'-a-b': 'c',
+				cid: 'content-id',
+			})
 			ok(!('Com.Example-foo' in data))
 			ok(!('2com.example-x' in data))
 			ok(!('-a-b' in data))
@@ -366,7 +387,10 @@ describe('prepareCmcdData', () => {
 			})
 
 			it(`keeps ${aggregate} when ${exact} is filtered out`, () => {
-				const data = prepareCmcdData({ [aggregate]: [5000], [exact]: [3000] }, { filter: key => key !== exact })
+				const data = prepareCmcdData(
+					{ [aggregate]: [5000], [exact]: [3000] },
+					{ filter: key => key !== exact },
+				)
 				ok(aggregate in data)
 				ok(!(exact in data))
 			})
@@ -451,7 +475,14 @@ describe('prepareCmcdData', () => {
 
 	describe('key table rules', () => {
 		it('drops a value that does not match the type of its key', () => {
-			const data = prepareCmcdData({ bs: 'yes', sid: 123, ot: 5, d: [4000], ec: ['E1', 5], cid: 'content-id' })
+			const data = prepareCmcdData({
+				bs: 'yes',
+				sid: 123,
+				ot: 5,
+				d: [4000],
+				ec: ['E1', 5],
+				cid: 'content-id',
+			})
 			ok(!('bs' in data))
 			ok(!('sid' in data))
 			ok(!('ot' in data))
@@ -479,7 +510,10 @@ describe('prepareCmcdData', () => {
 		})
 
 		it('applies the version 1 limits of cid and of a custom string', () => {
-			const data = prepareCmcdData({ cid: 'c'.repeat(65), 'com.example-x': 'x'.repeat(65), su: true }, { version: 1 })
+			const data = prepareCmcdData(
+				{ cid: 'c'.repeat(65), 'com.example-x': 'x'.repeat(65), su: true },
+				{ version: 1 },
+			)
 			ok(!('cid' in data))
 			equal(data['com.example-x'], 'x'.repeat(65))
 		})
@@ -587,7 +621,10 @@ describe('prepareCmcdData', () => {
 		})
 
 		it('reads the version from the value inside v', () => {
-			deepEqual(prepareCmcdData({ v: new SfItem(1, { x: true }), br: [3000], sid: 's' }), { br: 3000, sid: 's' })
+			deepEqual(prepareCmcdData({ v: new SfItem(1, { x: true }), br: [3000], sid: 's' }), {
+				br: 3000,
+				sid: 's',
+			})
 		})
 	})
 
@@ -626,9 +663,15 @@ describe('prepareCmcdData', () => {
 		it('runs the version 1 ot formatter only when the output needs the object type', () => {
 			const calls: string[] = []
 			const formatters = { ot: countCalls(calls, 'ot') }
-			deepEqual(prepareCmcdData({ ot: 'v', sid: 's' }, { version: 1, filter: key => key === 'sid', formatters }), {
-				sid: 's',
-			})
+			deepEqual(
+				prepareCmcdData(
+					{ ot: 'v', sid: 's' },
+					{ version: 1, filter: key => key === 'sid', formatters },
+				),
+				{
+					sid: 's',
+				},
+			)
 			deepEqual(calls, [])
 			equal(
 				prepareCmcdData(

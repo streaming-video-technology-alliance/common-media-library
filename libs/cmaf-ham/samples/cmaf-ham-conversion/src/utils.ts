@@ -57,6 +57,8 @@ export function listMPDFiles(directory: string): string[] {
  */
 export function listDirectories(directoryPath: string): string[] {
 	const filesAndDirectories = fs.readdirSync(directoryPath)
-	const directories = filesAndDirectories.filter(item => fs.statSync(path.join(directoryPath, item)).isDirectory())
+	const directories = filesAndDirectories.filter(item =>
+		fs.statSync(path.join(directoryPath, item)).isDirectory(),
+	)
 	return directories
 }

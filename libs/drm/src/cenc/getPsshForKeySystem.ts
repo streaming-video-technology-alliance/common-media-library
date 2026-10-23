@@ -13,7 +13,10 @@ import { parsePsshList } from './parsePsshList.ts'
  * @example
  * {@includeCode ../../test/cenc/getPsshForKeySystem.test.ts#example}
  */
-export function getPsshForKeySystem(uuid: string, initData: ArrayBufferLike): ArrayBufferLike | null {
+export function getPsshForKeySystem(
+	uuid: string,
+	initData: ArrayBufferLike,
+): ArrayBufferLike | null {
 	if (!initData || !uuid) {
 		return null
 	}

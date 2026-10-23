@@ -13,7 +13,7 @@ describe('isValidSteeringManifest', () => {
 			'PATHWAY-CLONES': [
 				{
 					'BASE-ID': 'pathway1',
-					'ID': 'clone1',
+					ID: 'clone1',
 					'URI-REPLACEMENT': {
 						HOST: 'example.com',
 						PARAMS: {
@@ -59,7 +59,9 @@ describe('isValidSteeringManifest', () => {
 			equal(isValidSteeringManifest(Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': [] })), false)
 			equal(isValidSteeringManifest(Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': '' })), false)
 			equal(
-				isValidSteeringManifest(Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': ['pathway1', 'pathway1'] })),
+				isValidSteeringManifest(
+					Object.assign({}, MANIFEST, { 'PATHWAY-PRIORITY': ['pathway1', 'pathway1'] }),
+				),
 				false,
 			)
 		})

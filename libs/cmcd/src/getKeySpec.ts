@@ -3,7 +3,12 @@ import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdKeySpec } from './CmcdKeySpec.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 
-const CUSTOM_KEY_SPEC: CmcdKeySpec = { type: 'custom', omitDefault: false, max: 64, v1Max: Infinity }
+const CUSTOM_KEY_SPEC: CmcdKeySpec = {
+	type: 'custom',
+	omitDefault: false,
+	max: 64,
+	v1Max: Infinity,
+}
 
 /**
  * Returns the row of a key in the key table.

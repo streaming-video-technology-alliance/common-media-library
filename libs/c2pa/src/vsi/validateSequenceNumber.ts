@@ -73,7 +73,12 @@ export function validateSequenceNumber(
 		const missingFrom = state.lastSequenceNumber + 1
 		const missingTo = sequenceNumber - 1
 		return {
-			result: { isValid: false, reason: SequenceValidationReason.GAP_DETECTED, missingFrom, missingTo },
+			result: {
+				isValid: false,
+				reason: SequenceValidationReason.GAP_DETECTED,
+				missingFrom,
+				missingTo,
+			},
 			nextState: {
 				lastSequenceNumber: sequenceNumber,
 				seenSequences: pruneSeenSequences(nextSeenSequences, sequenceNumber),

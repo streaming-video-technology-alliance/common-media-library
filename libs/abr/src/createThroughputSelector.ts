@@ -89,7 +89,14 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 				const budget = bufferLevel / playbackRate
 				const tolerance = Math.min(segmentDuration, starvationTolerance)
 
-				index = applyStarvationGuard(ladder, index, segmentDuration, throughput * safetyFactor, budget, tolerance)
+				index = applyStarvationGuard(
+					ladder,
+					index,
+					segmentDuration,
+					throughput * safetyFactor,
+					budget,
+					tolerance,
+				)
 			}
 
 			return { index, delay: 0 }

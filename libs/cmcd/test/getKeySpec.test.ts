@@ -9,7 +9,12 @@ describe('getKeySpec', () => {
 	})
 
 	it('returns the custom row for a custom key', () => {
-		deepEqual(getKeySpec('com.example-x'), { type: 'custom', omitDefault: false, max: 64, v1Max: Infinity })
+		deepEqual(getKeySpec('com.example-x'), {
+			type: 'custom',
+			omitDefault: false,
+			max: 64,
+			v1Max: Infinity,
+		})
 	})
 
 	it('returns undefined for a key that is neither reserved nor custom', () => {

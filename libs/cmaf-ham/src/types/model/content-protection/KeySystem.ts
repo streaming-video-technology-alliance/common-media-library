@@ -5,4 +5,7 @@ import type { FAIRPLAY_KEY_SYSTEM, PLAYREADY_KEY_SYSTEM, WIDEVINE_KEY_SYSTEM } f
  *
  * @alpha
  */
-export type KeySystem = typeof FAIRPLAY_KEY_SYSTEM | typeof PLAYREADY_KEY_SYSTEM | typeof WIDEVINE_KEY_SYSTEM
+export type KeySystem =
+	| typeof FAIRPLAY_KEY_SYSTEM
+	| typeof PLAYREADY_KEY_SYSTEM
+	| typeof WIDEVINE_KEY_SYSTEM

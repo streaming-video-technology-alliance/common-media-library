@@ -37,7 +37,9 @@ export function unescapeHtml(text: string): string {
 			default: {
 				if (match[1] === '#') {
 					const code =
-						match[2] === 'x' || match[2] === 'X' ? parseInt(match.slice(3), 16) : parseInt(match.slice(2), 10)
+						match[2] === 'x' || match[2] === 'X'
+							? parseInt(match.slice(3), 16)
+							: parseInt(match.slice(2), 10)
 					return String.fromCodePoint(code)
 				}
 				return match

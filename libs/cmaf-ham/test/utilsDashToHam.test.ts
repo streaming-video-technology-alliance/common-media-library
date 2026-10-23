@@ -83,7 +83,10 @@ describe('getChannels', () => {
 	})
 
 	it('returns 0 when Representation and AdaptationSet have no value', () => {
-		const res = getChannels({} as AdaptationSet, { $: { id: 'representationId' } } as Representation)
+		const res = getChannels(
+			{} as AdaptationSet,
+			{ $: { id: 'representationId' } } as Representation,
+		)
 		equal(res, 0)
 	})
 })
@@ -215,7 +218,10 @@ describe('getContentType', () => {
 
 describe('getFrameRate', () => {
 	it('returns frameRate from representation if it exists', () => {
-		const res = getFrameRate({ $: { frameRate: '24' } } as AdaptationSet, { $: { frameRate: '30' } } as Representation)
+		const res = getFrameRate(
+			{ $: { frameRate: '24' } } as AdaptationSet,
+			{ $: { frameRate: '30' } } as Representation,
+		)
 		deepStrictEqual(res, {
 			frameRateNumerator: 30,
 			frameRateDenominator: 0,
@@ -234,7 +240,10 @@ describe('getFrameRate', () => {
 	})
 
 	it('returns frameRate from adaptationSet if it exists and representation does not have frameRate', () => {
-		const res = getFrameRate({ $: { frameRate: '24' } } as AdaptationSet, { $: {} } as Representation)
+		const res = getFrameRate(
+			{ $: { frameRate: '24' } } as AdaptationSet,
+			{ $: {} } as Representation,
+		)
 		deepStrictEqual(res, {
 			frameRateNumerator: 24,
 			frameRateDenominator: 0,
@@ -280,7 +289,10 @@ describe('getLanguage', () => {
 
 describe('getNumberOfSegments', () => {
 	it('getNumberOfSegments', () => {
-		const res = getNumberOfSegments({ $: { duration: '100', timescale: '10' } } as SegmentTemplate, 50)
+		const res = getNumberOfSegments(
+			{ $: { duration: '100', timescale: '10' } } as SegmentTemplate,
+			50,
+		)
 		equal(res, 5)
 	})
 })
@@ -307,7 +319,10 @@ describe('getSampleRate', () => {
 	})
 
 	it('returns audioSamplingRate from adaptationSet if it exists and representation does not have audioSamplingRate', () => {
-		const res = getSampleRate({ $: { audioSamplingRate: '48000' } } as AdaptationSet, { $: {} } as Representation)
+		const res = getSampleRate(
+			{ $: { audioSamplingRate: '48000' } } as AdaptationSet,
+			{ $: {} } as Representation,
+		)
 		equal(res, 48000)
 	})
 
@@ -319,7 +334,10 @@ describe('getSampleRate', () => {
 
 describe('getSar', () => {
 	it('returns sar from representation if it exists', () => {
-		const res = getSar({ $: { sar: '1:1' } } as AdaptationSet, { $: { sar: '2:2' } } as Representation)
+		const res = getSar(
+			{ $: { sar: '1:1' } } as AdaptationSet,
+			{ $: { sar: '2:2' } } as Representation,
+		)
 		equal(res, '2:2')
 	})
 

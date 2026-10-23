@@ -113,7 +113,10 @@ export function extractCertificateInfo(certDER: Uint8Array): CertificateInfo | n
 		// Issuer
 		el = readElement(tbs.value, offset)
 		if (!el || el.tag !== ASN1_TAG_SEQUENCE) return null
-		const issuer = findRDNValue(el.value, OID_COMMON_NAME) ?? findRDNValue(el.value, OID_ORG_NAME) ?? 'Unknown Issuer'
+		const issuer =
+			findRDNValue(el.value, OID_COMMON_NAME) ??
+			findRDNValue(el.value, OID_ORG_NAME) ??
+			'Unknown Issuer'
 		offset += el.totalSize
 
 		// Validity

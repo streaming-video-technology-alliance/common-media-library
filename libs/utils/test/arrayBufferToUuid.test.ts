@@ -15,7 +15,9 @@ describe('arrayBufferToUuid', () => {
 
 	it('should convert 16-byte ArrayBuffer to UUID format', () => {
 		//#region example
-		const data = new Uint8Array([160, 86, 74, 247, 96, 194, 217, 75, 150, 16, 199, 174, 112, 213, 217, 112])
+		const data = new Uint8Array([
+			160, 86, 74, 247, 96, 194, 217, 75, 150, 16, 199, 174, 112, 213, 217, 112,
+		])
 		const result = arrayBufferToUuid(data.buffer)
 
 		equal(result, 'a0564af7-60c2-d94b-9610-c7ae70d5d970')

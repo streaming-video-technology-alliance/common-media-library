@@ -247,7 +247,11 @@ export function scan<T>(
 						cc = ++pos < length ? input.charCodeAt(pos) : 0
 					}
 					if (cc !== EQUALS_CC) {
-						throw syntaxError(input, pos, 'Malformed attribute "' + attributeName + '": expected "=" after name')
+						throw syntaxError(
+							input,
+							pos,
+							'Malformed attribute "' + attributeName + '": expected "=" after name',
+						)
 					}
 				}
 
