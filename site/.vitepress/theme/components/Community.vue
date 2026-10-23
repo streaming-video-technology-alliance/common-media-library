@@ -1,9 +1,25 @@
 <script setup>
 const links = [
-	{ text: 'Discord', href: 'https://discord.gg/g2c5vwGvUc', detail: 'Ask questions and meet the maintainers.' },
-	{ text: 'GitHub Discussions', href: 'https://github.com/streaming-video-technology-alliance/common-media-library/discussions', detail: 'Longer threads and proposals.' },
-	{ text: 'SVTA Players and Playback group', href: 'https://www.svta.org/', detail: 'The working group that oversees the project.' },
-	{ text: 'Contributing guide', href: 'https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md', detail: 'How to report a bug or open a pull request.' },
+	{
+		text: 'Discord',
+		href: 'https://discord.gg/g2c5vwGvUc',
+		detail: 'Ask questions and meet the maintainers.',
+	},
+	{
+		text: 'GitHub Discussions',
+		href: 'https://github.com/streaming-video-technology-alliance/common-media-library/discussions',
+		detail: 'Longer threads and proposals.',
+	},
+	{
+		text: 'SVTA Players and Playback group',
+		href: 'https://www.svta.org/',
+		detail: 'The working group that oversees the project.',
+	},
+	{
+		text: 'Contributing guide',
+		href: 'https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/CONTRIBUTING.md',
+		detail: 'How to report a bug or open a pull request.',
+	},
 ]
 </script>
 

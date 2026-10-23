@@ -9,7 +9,9 @@ import adopters from '../../../adopters.json'
 		<ul role="list">
 			<li v-for="adopter in adopters" :key="adopter.name">
 				<a :href="adopter.url" target="_blank" rel="noopener">{{ adopter.name }}</a>
-				<span v-if="adopter.packages.length > 0" class="packages">{{ adopter.packages.map(pkg => `cml-${pkg}`).join(', ') }}</span>
+				<span v-if="adopter.packages.length > 0" class="packages">{{
+					adopter.packages.map(pkg => `cml-${pkg}`).join(', ')
+				}}</span>
 				<span v-if="adopter.note" class="note">{{ adopter.note }}</span>
 			</li>
 		</ul>

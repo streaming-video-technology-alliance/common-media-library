@@ -7,7 +7,7 @@ import { withBase } from 'vitepress'
 	<DefaultTheme.Layout>
 		<template #not-found>
 			<div class="not-found">
-				<img :src="withBase('/cml-mark.svg')" alt="" width="96" height="96">
+				<img :src="withBase('/cml-mark.svg')" alt="" width="96" height="96" />
 				<h1>Page not found</h1>
 				<p>The address has no page. Search for a package name, or browse the packages.</p>
 				<a :href="withBase('/packages/')">Browse the packages</a>

@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs'
 
 export type Adopter = {
-	name: string;
-	url: string;
-	packages: string[];
-	note?: string;
+	name: string
+	url: string
+	packages: string[]
+	note?: string
 }
 
 function fail(index: number, message: string): never {

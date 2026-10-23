@@ -4,7 +4,12 @@ import { groupOrder } from '../../../scripts/groups.ts'
 import packages from '../../../packages/packages.json'
 
 const groups = groupOrder
-	.map(group => ({ group, items: packages.filter(pkg => pkg.group === group).sort((a, b) => a.folder.localeCompare(b.folder)) }))
+	.map(group => ({
+		group,
+		items: packages
+			.filter(pkg => pkg.group === group)
+			.sort((a, b) => a.folder.localeCompare(b.folder)),
+	}))
 	.filter(entry => entry.items.length > 0)
 </script>
 
