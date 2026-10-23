@@ -13,6 +13,7 @@ const required = [
 	'cml-lockup-dark.svg',
 	'apple-touch-icon.png',
 	'guide/getting-started.html',
+	'guide/llms.html',
 	'packages/index.html',
 	'packages/cmcd/index.html',
 	'packages/cmcd/guides/user-guide.html',

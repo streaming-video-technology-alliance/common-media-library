@@ -46,7 +46,13 @@ export function buildSidebar(packages: PackageInfo[], apiSidebar: SidebarItem[])
 	const sorted = [...packages].sort((a, b) => a.folder.localeCompare(b.folder))
 	const sidebar: Sidebar = {
 		'/guide/': [
-			{ text: 'Guide', items: [{ text: 'Getting started', link: '/guide/getting-started' }] },
+			{
+				text: 'Guide',
+				items: [
+					{ text: 'Getting started', link: '/guide/getting-started' },
+					{ text: 'CML and coding agents', link: '/guide/llms' },
+				],
+			},
 		],
 		'/packages/': [
 			{
