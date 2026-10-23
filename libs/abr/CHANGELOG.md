@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Changed
 
-- The starvation guard of both selectors adds the first-byte wait to the download time of a rung. The wait is the mean of `responseStart - startTime` over the last four finished samples. The guard ignores a sample whose `responseStart` is missing or outside the response ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- The starvation guard of both selectors adds the time to first byte to the download time of a rung. The value is the mean of `responseStart - startTime` over the last four finished samples. The guard ignores a sample whose `responseStart` is missing or outside the response ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 

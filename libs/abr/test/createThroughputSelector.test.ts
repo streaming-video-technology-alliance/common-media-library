@@ -25,13 +25,17 @@ function load(selector: BitrateSelector, bandwidth: number, aborted?: boolean): 
 	})
 }
 
-// Records a 4 second segment of 6 Mbps that waited `waitMs` for its first byte.
-function loadAfterWait(selector: BitrateSelector, waitMs: number, aborted?: boolean): void {
+// Records a 4 second segment of 6 Mbps with a time to first byte of `timeToFirstByteMs`.
+function loadWithTimeToFirstByte(
+	selector: BitrateSelector,
+	timeToFirstByteMs: number,
+	aborted?: boolean,
+): void {
 	selector.sample({
 		timing: {
 			startTime: 0,
-			responseStart: waitMs,
-			duration: waitMs + 500,
+			responseStart: timeToFirstByteMs,
+			duration: timeToFirstByteMs + 500,
 			encodedBodySize: 3_000_000,
 		},
 		bandwidth: 6_000_000,
@@ -505,63 +509,63 @@ describe('createThroughputSelector', () => {
 			)
 		})
 
-		it('adds the mean first-byte wait of the last four samples to the download time', () => {
+		it('adds the mean time to first byte of the last four samples to the download time', () => {
 			// The pick is 3 Mbps, which downloads in 2.2 s at the safe throughput of 5.4 Mbps.
-			// The last four samples waited 1 s for the first byte, so the download needs 3.2 s.
+			// The last four samples have a time to first byte of 1 s, so the download needs 3.2 s.
 			const selector = createThroughputSelector()
 			const input = { ladder, throughput: 6_000_000, now: 0, segmentDuration: 4 }
 
 			for (let i = 0; i < 4; i++) {
-				loadAfterWait(selector, 1000)
+				loadWithTimeToFirstByte(selector, 1000)
 			}
 
 			equal(selector.select({ ...input, bufferLevel: 3 }).index, 2)
 			equal(selector.select({ ...input, bufferLevel: 3.5 }).index, 3)
 		})
 
-		it('drops the first-byte wait of a sample before the last four', () => {
+		it('drops the time to first byte of a sample before the last four', () => {
 			const selector = createThroughputSelector()
 			const input = { ladder, throughput: 6_000_000, now: 0, segmentDuration: 4 }
 
-			loadAfterWait(selector, 10_000)
+			loadWithTimeToFirstByte(selector, 10_000)
 			for (let i = 0; i < 4; i++) {
-				loadAfterWait(selector, 1000)
+				loadWithTimeToFirstByte(selector, 1000)
 			}
 
 			equal(selector.select({ ...input, bufferLevel: 3.5 }).index, 3)
 		})
 
-		it('ignores the first-byte wait of an aborted sample', () => {
+		it('ignores the time to first byte of an aborted sample', () => {
 			const selector = createThroughputSelector()
 			const input = { ladder, throughput: 6_000_000, now: 0, segmentDuration: 4 }
 
 			for (let i = 0; i < 4; i++) {
-				loadAfterWait(selector, 1000)
+				loadWithTimeToFirstByte(selector, 1000)
 			}
-			loadAfterWait(selector, 20_000, true)
+			loadWithTimeToFirstByte(selector, 20_000, true)
 
 			equal(selector.select({ ...input, bufferLevel: 3.5 }).index, 3)
 		})
 
-		it('does not count a sample without responseStart as a wait of 0', () => {
-			// Two samples waited 1 s and two have no responseStart. The mean stays 1 s, so the download needs 3.2 s.
+		it('does not count a sample without responseStart as a time to first byte of 0', () => {
+			// Two samples have a time to first byte of 1 s and two have no responseStart. The mean stays 1 s, so the download needs 3.2 s.
 			const selector = createThroughputSelector()
 			const input = { ladder, throughput: 6_000_000, now: 0, segmentDuration: 4 }
 
-			loadAfterWait(selector, 1000)
+			loadWithTimeToFirstByte(selector, 1000)
 			load(selector, 6_000_000)
-			loadAfterWait(selector, 1000)
+			loadWithTimeToFirstByte(selector, 1000)
 			load(selector, 6_000_000)
 
 			equal(selector.select({ ...input, bufferLevel: 3 }).index, 2)
 		})
 
-		it('forgets the first-byte waits after a reset', () => {
+		it('forgets the time to first byte samples after a reset', () => {
 			const selector = createThroughputSelector()
 			const input = { ladder, throughput: 6_000_000, now: 0, segmentDuration: 4 }
 
 			for (let i = 0; i < 4; i++) {
-				loadAfterWait(selector, 1000)
+				loadWithTimeToFirstByte(selector, 1000)
 			}
 			selector.reset()
 			load(selector, 6_000_000)

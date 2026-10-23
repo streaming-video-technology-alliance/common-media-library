@@ -1,5 +1,5 @@
 import { applyStarvationGuard } from './applyStarvationGuard.ts'
-import { averageFirstByteWait } from './averageFirstByteWait.ts'
+import { averageTimeToFirstByte } from './averageTimeToFirstByte.ts'
 import type { BitrateDecision } from './BitrateDecision.ts'
 import type { BitrateSelector } from './BitrateSelector.ts'
 import type { BitrateSelectorInput } from './BitrateSelectorInput.ts'
@@ -8,7 +8,7 @@ import { DEFAULT_STARVATION_TOLERANCE } from './DEFAULT_STARVATION_TOLERANCE.ts'
 import { DEFAULT_UPGRADE_FACTOR } from './DEFAULT_UPGRADE_FACTOR.ts'
 import { findRung } from './findRung.ts'
 import { isPositiveFinite } from './isPositiveFinite.ts'
-import { recordFirstByteWait } from './recordFirstByteWait.ts'
+import { recordTimeToFirstByte } from './recordTimeToFirstByte.ts'
 import type { SegmentSample } from './SegmentSample.ts'
 import type { ThroughputSelectorOptions } from './ThroughputSelectorOptions.ts'
 import { validateFactor } from './validateFactor.ts'
@@ -25,7 +25,7 @@ import { validateLadder } from './validateLadder.ts'
  *   and returns the higher of the current rung and that pick.
  * - Starvation guard. When the input has a positive `segmentDuration`, the first pass keeps the highest rung,
  *   at or below the pick, that downloads within `bufferLevel / playbackRate`. The download time of a rung is the
- *   mean first-byte wait of the last four samples plus the transfer of one segment at `throughput * safetyFactor`.
+ *   mean time to first byte of the last four samples plus the transfer of one segment at `throughput * safetyFactor`.
  *   If no rung passes, the second pass allows `min(segmentDuration, starvationTolerance)` more.
  *   Rung 0 passes the second pass in every case.
  *
@@ -65,8 +65,8 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 
 	// The bandwidth, in bits per second, of the last sample that was not aborted. NaN before the first sample.
 	let currentBandwidth = NaN
-	// The first-byte waits, in seconds, of the last four samples that were not aborted.
-	const firstByteWaits: number[] = []
+	// The time to first byte, in seconds, of the last four samples that were not aborted.
+	const timeToFirstByteSamples: number[] = []
 
 	return {
 		select(input: BitrateSelectorInput): BitrateDecision {
@@ -100,7 +100,7 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 					index,
 					segmentDuration,
 					throughput * safetyFactor,
-					averageFirstByteWait(firstByteWaits),
+					averageTimeToFirstByte(timeToFirstByteSamples),
 					budget,
 					tolerance,
 				)
@@ -115,12 +115,12 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 			}
 
 			currentBandwidth = segment.bandwidth
-			recordFirstByteWait(firstByteWaits, segment.timing)
+			recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
 		},
 
 		reset(): void {
 			currentBandwidth = NaN
-			firstByteWaits.length = 0
+			timeToFirstByteSamples.length = 0
 		},
 	}
 }

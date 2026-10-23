@@ -1,11 +1,11 @@
 import type { ResourceTiming } from './ResourceTiming.ts'
 
 /**
- * Returns the milliseconds a response waited for its first byte.
+ * Returns the time to first byte of a response, in milliseconds.
  *
  * When `responseStart` is a finite number between `startTime` and the end of the response,
  * the function returns the time from `startTime` to `responseStart`. Otherwise the function returns `NaN`.
- * The wait and the transfer from {@link getTransferDurationMs} add up to `duration`.
+ * The time to first byte and the transfer from {@link getTransferDurationMs} add up to `duration`.
  *
  * @example
  * {@includeCode ../test/getTimeToFirstByteMs.test.ts#example}
