@@ -29,3 +29,7 @@ features:
   - title: Peer dependencies stay inside CML
     details: No framework, no runtime, no polyfills.
 ---
+
+<PackageGrid />
+<Adopters />
+<Community />
