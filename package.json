@@ -42,7 +42,7 @@
 		"pub": "node scripts/publish.ts",
 		"clean": "node scripts/clean.ts",
 		"ver": "node scripts/version.ts",
-		"docs": "npm start -w site",
+		"site": "npm start -w site",
 		"notes": "node scripts/createReleaseNotes.ts",
 		"typecheck": "tsc --noEmit"
 	},
