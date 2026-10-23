@@ -19,8 +19,12 @@ const guide: Redirect = { from: 'documents/_svta_cml-cmcd.User_Guide.html', to: 
 
 // Runs the stub script against a fake `location` and returns the URL it navigates to.
 function follow(redirect: Redirect, hash: string): string {
-	const script = redirectHtml(redirect, base).match(/<script>([\s\S]*?)<\/script>/)?.[1]
-	ok(script, 'the stub has a script')
+	const html = redirectHtml(redirect, base)
+	const open = '<script>'
+	const start = html.indexOf(open)
+	const end = html.indexOf('</script>')
+	ok(start >= 0 && end > start, 'the stub has a script')
+	const script = html.slice(start + open.length, end)
 	const location = { hash, href: '', replace(url: string) { location.href = url } }
 	runInNewContext(script, { location })
 	return location.href
