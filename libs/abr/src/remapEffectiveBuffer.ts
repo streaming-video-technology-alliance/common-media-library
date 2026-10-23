@@ -16,8 +16,13 @@ import { MINIMUM_BUFFER } from './BOLA_CONSTANTS.ts'
  * @param effectiveBuffer - The effective buffer in seconds under `previous`
  * @returns The effective buffer in seconds under `next`
  */
-export function remapEffectiveBuffer(previous: BolaParams, next: BolaParams, effectiveBuffer: number): number {
-	const theta = (effectiveBuffer - MINIMUM_BUFFER) / previous.utilityScale + previous.lowestBandwidthLog
+export function remapEffectiveBuffer(
+	previous: BolaParams,
+	next: BolaParams,
+	effectiveBuffer: number,
+): number {
+	const theta =
+		(effectiveBuffer - MINIMUM_BUFFER) / previous.utilityScale + previous.lowestBandwidthLog
 
 	return MINIMUM_BUFFER + next.utilityScale * (theta - next.lowestBandwidthLog)
 }

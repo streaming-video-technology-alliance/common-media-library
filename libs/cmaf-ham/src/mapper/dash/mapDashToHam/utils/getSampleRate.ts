@@ -20,9 +20,7 @@ export function getSampleRate(
 		0
 	)
 	if (!sampleRate) {
-		console.error(
-			`Representation ${representation.$.id} has no audioSamplingRate`,
-		)
+		console.error(`Representation ${representation.$.id} has no audioSamplingRate`)
 	}
 	return sampleRate
 }

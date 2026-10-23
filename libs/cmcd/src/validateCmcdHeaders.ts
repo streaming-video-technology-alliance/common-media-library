@@ -32,7 +32,10 @@ import { validateCmcd } from './validateCmcd.ts'
  *
  * @public
  */
-export function validateCmcdHeaders(headers: Record<string, string> | Headers, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdDataValidationResult {
+export function validateCmcdHeaders(
+	headers: Record<string, string> | Headers,
+	options?: Omit<CmcdValidationOptions, 'reportingMode'>,
+): CmcdDataValidationResult {
 	const h = ensureHeaders(headers)
 	const issues: CmcdValidationResult['issues'] = []
 	const decoded: Partial<Record<CmcdHeaderField, Record<string, unknown>>> = {}
@@ -77,7 +80,10 @@ export function validateCmcdHeaders(headers: Record<string, string> | Headers, o
 		issues,
 	}
 
-	const merged: Record<string, unknown> = Object.assign({}, ...CMCD_HEADER_FIELDS.map(f => decoded[f]).filter(Boolean))
+	const merged: Record<string, unknown> = Object.assign(
+		{},
+		...CMCD_HEADER_FIELDS.map(f => decoded[f]).filter(Boolean),
+	)
 	const payloadResult = validateCmcd(merged, { ...options, reportingMode: CMCD_REQUEST_MODE })
 
 	const result = mergeValidationResults(shardResult, payloadResult)

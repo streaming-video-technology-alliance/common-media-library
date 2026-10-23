@@ -38,4 +38,4 @@ export function readPssh(view: IsoBoxReadView): ProtectionSystemSpecificHeaderBo
 		dataSize,
 		data,
 	}
-};
+}

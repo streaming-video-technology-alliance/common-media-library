@@ -10,10 +10,10 @@ describe('convertCoseKeyToJwk', () => {
 		const y = new Uint8Array(32).fill(0xbb)
 		// kty=2 (EC2), crv=1 (P-256), x=-2, y=-3
 		const coseKey = {
-			1: 2,     // kty: EC2
-			[-1]: 1,  // crv: P-256
-			[-2]: x,  // x
-			[-3]: y,  // y
+			1: 2, // kty: EC2
+			[-1]: 1, // crv: P-256
+			[-2]: x, // x
+			[-3]: y, // y
 		}
 		const jwk = convertCoseKeyToJwk(coseKey)
 		strictEqual(jwk.kty, 'EC')
@@ -26,9 +26,9 @@ describe('convertCoseKeyToJwk', () => {
 	it('converts an OKP Ed25519 COSE key to JWK', () => {
 		const x = new Uint8Array(32).fill(0xcc)
 		const coseKey = {
-			1: 1,     // kty: OKP
-			[-1]: 6,  // crv: Ed25519
-			[-2]: x,  // x
+			1: 1, // kty: OKP
+			[-1]: 6, // crv: Ed25519
+			[-2]: x, // x
 		}
 		const jwk = convertCoseKeyToJwk(coseKey)
 		strictEqual(jwk.kty, 'OKP')

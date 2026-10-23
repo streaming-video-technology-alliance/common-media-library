@@ -38,7 +38,13 @@ describe('extractCertificateInfo', () => {
 
 		const info = extractCertificateInfo(certDER)
 		ok(info !== null, 'should parse the certificate')
-		ok(typeof info.issuer === 'string' && info.issuer.length > 0, 'issuer should be a non-empty string')
-		ok(typeof info.notBefore === 'string' && info.notBefore.length > 0, 'notBefore should be a non-empty string')
+		ok(
+			typeof info.issuer === 'string' && info.issuer.length > 0,
+			'issuer should be a non-empty string',
+		)
+		ok(
+			typeof info.notBefore === 'string' && info.notBefore.length > 0,
+			'notBefore should be a non-empty string',
+		)
 	})
 })

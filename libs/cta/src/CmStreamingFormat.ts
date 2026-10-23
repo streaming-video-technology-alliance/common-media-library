@@ -32,4 +32,4 @@ export const CmStreamingFormat = {
  *
  * @internal
  */
-export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>;
+export type CmStreamingFormat = ValueOf<typeof CmStreamingFormat>

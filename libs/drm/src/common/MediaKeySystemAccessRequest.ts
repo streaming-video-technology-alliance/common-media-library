@@ -5,6 +5,6 @@
  * @public
  */
 export type MediaKeySystemAccessRequest = {
-	keySystem: string;
-	configurations: MediaKeySystemConfiguration[];
-};
+	keySystem: string
+	configurations: MediaKeySystemConfiguration[]
+}

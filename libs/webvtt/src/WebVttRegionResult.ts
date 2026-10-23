@@ -6,4 +6,4 @@ import type { WebVttRegion } from './WebVttRegion.ts'
  *
  * @public
  */
-export type WebVttRegionResult = TypedResult<'region', WebVttRegion>;
+export type WebVttRegionResult = TypedResult<'region', WebVttRegion>

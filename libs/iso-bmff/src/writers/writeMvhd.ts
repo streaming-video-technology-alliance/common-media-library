@@ -27,8 +27,18 @@ export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView {
 	const preDefinedSize = 24 // 6 x 4 bytes
 	const nextTrackIdSize = 4
 
-	const totalSize = headerSize + fullBoxSize + timesSize + timescaleSize + rateSize +
-		volumeSize + reserved1Size + reserved2Size + matrixSize + preDefinedSize + nextTrackIdSize
+	const totalSize =
+		headerSize +
+		fullBoxSize +
+		timesSize +
+		timescaleSize +
+		rateSize +
+		volumeSize +
+		reserved1Size +
+		reserved2Size +
+		matrixSize +
+		preDefinedSize +
+		nextTrackIdSize
 
 	const writer = new IsoBoxWriteView('mvhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)

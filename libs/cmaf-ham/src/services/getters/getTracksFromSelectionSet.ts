@@ -16,7 +16,7 @@ export function getTracksFromSelectionSet(
 	selectionSet: SelectionSet,
 	predicate?: (track: Track) => boolean,
 ): Track[] {
-	const tracks = selectionSet.switchingSets.flatMap((switchingSet) =>
+	const tracks = selectionSet.switchingSets.flatMap(switchingSet =>
 		getTracksFromSwitchingSet(switchingSet),
 	)
 	return predicate ? tracks.filter(predicate) : tracks

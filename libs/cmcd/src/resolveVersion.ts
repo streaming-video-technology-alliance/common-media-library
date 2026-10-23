@@ -7,7 +7,10 @@ import { toBareValue } from './toBareValue.ts'
  *
  * @internal
  */
-export function resolveVersion(data: Record<string, unknown>, options?: CmcdValidationOptions): number {
+export function resolveVersion(
+	data: Record<string, unknown>,
+	options?: CmcdValidationOptions,
+): number {
 	if (options?.version === 1 || options?.version === 2) {
 		return options.version
 	}

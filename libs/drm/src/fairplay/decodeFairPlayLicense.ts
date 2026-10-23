@@ -13,7 +13,5 @@ import { decodeBase64 } from '@svta/cml-utils'
  */
 
 export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array {
-	return typeof response === 'string'
-		? decodeBase64(response)
-		: new Uint8Array(response)
+	return typeof response === 'string' ? decodeBase64(response) : new Uint8Array(response)
 }

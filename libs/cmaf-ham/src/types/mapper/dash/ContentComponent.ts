@@ -4,7 +4,7 @@
  */
 export type ContentComponent = {
 	$: {
-		contentType: string;
-		id: string;
-	};
-};
+		contentType: string
+		id: string
+	}
+}

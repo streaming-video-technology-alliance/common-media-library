@@ -13,7 +13,12 @@ describe('SvtaAdvertisingErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaAdvertisingErrorCode, SvtaErrorCategory.ADVERTISING, 34, 'SVTA_ADVERTISING')
+		assertCatalogInvariants(
+			SvtaAdvertisingErrorCode,
+			SvtaErrorCategory.ADVERTISING,
+			34,
+			'SVTA_ADVERTISING',
+		)
 	})
 
 	it('matches the spec table', () => {

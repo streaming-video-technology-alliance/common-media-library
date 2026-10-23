@@ -48,7 +48,9 @@ export function satisfiesRange(version: string, range: string): boolean {
 	const match = rangePattern.exec(trimmed)
 
 	if (!match || !isVersion(match[2])) {
-		throw new Error(`Unsupported range "${range}". Expected "*", a version, "^<version>", or ">=<version>".`)
+		throw new Error(
+			`Unsupported range "${range}". Expected "*", a version, "^<version>", or ">=<version>".`,
+		)
 	}
 
 	const [, operator, floor] = match

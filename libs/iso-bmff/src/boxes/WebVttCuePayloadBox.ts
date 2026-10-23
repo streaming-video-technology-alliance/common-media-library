@@ -4,6 +4,6 @@
  * @public
  */
 export type WebVttCuePayloadBox = {
-	type: 'payl';
-	cueText: string;
-};
+	type: 'payl'
+	cueText: string
+}

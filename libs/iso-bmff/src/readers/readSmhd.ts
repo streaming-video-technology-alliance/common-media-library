@@ -17,4 +17,4 @@ export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox {
 		balance: view.readUint(2),
 		reserved: view.readUint(2),
 	}
-};
+}

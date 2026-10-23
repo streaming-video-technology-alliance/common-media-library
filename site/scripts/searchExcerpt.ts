@@ -17,7 +17,14 @@ export function searchExcerpt(markdown: string): string {
 		.join('\n')
 		.split(/\n\s*\n/)
 		.map(part => part.trim())
-		.find(part => part !== '' && !part.startsWith('#') && !part.startsWith('Defined in:') && !part.startsWith('|') && !releaseTag.test(part))
+		.find(
+			part =>
+				part !== '' &&
+				!part.startsWith('#') &&
+				!part.startsWith('Defined in:') &&
+				!part.startsWith('|') &&
+				!releaseTag.test(part),
+		)
 
 	return paragraph ? `${title}\n\n${paragraph}\n` : `${title}\n`
 }

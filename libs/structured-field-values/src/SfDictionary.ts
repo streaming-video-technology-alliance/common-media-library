@@ -5,4 +5,4 @@ import type { SfMember } from './SfMember.ts'
  *
  * @public
  */
-export type SfDictionary = Record<string, SfMember> | Map<string, SfMember>;
+export type SfDictionary = Record<string, SfMember> | Map<string, SfMember>

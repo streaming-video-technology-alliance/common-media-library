@@ -53,7 +53,9 @@ if (!index) {
 const bytes = statSync(path.join(chunksDir, index)).size
 
 if (bytes > limit) {
-	console.error(`The search index is ${bytes} bytes. The limit is ${limit} bytes. Trim searchExcerpt or exclude pages.`)
+	console.error(
+		`The search index is ${bytes} bytes. The limit is ${limit} bytes. Trim searchExcerpt or exclude pages.`,
+	)
 	process.exit(1)
 }
 

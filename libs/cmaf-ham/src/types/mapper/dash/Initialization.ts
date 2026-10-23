@@ -5,7 +5,7 @@
  */
 export type Initialization = {
 	$: {
-		range?: string;
-		sourceURL?: string;
-	};
-};
+		range?: string
+		sourceURL?: string
+	}
+}

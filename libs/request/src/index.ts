@@ -11,4 +11,3 @@ export * from './RequestResponseType.ts'
 export type * from './ResourceTiming.ts'
 export type * from './ResponseInterceptor.ts'
 export type * from './ResponseTypeMap.ts'
-

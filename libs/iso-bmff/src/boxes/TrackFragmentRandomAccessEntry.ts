@@ -4,9 +4,9 @@
  * @public
  */
 export type TrackFragmentRandomAccessEntry = {
-	time: number;
-	moofOffset: number;
-	trafNumber: number;
-	trunNumber: number;
-	sampleNumber: number;
-};
+	time: number
+	moofOffset: number
+	trafNumber: number
+	trunNumber: number
+	sampleNumber: number
+}

@@ -76,8 +76,7 @@ export function parseDict(src: string, options?: SfDecodeOptions): ParsedValue<S
 			const parsedItemOrInnerList = parseItemOrInnerList(src.substring(1), options)
 			member = parsedItemOrInnerList.value
 			src = parsedItemOrInnerList.src
-		}
-		else {
+		} else {
 			const parsedParameters = parseParameters(src, options)
 			member = new SfItem(true, parsedParameters.value)
 			src = parsedParameters.src

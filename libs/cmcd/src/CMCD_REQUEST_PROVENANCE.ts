@@ -22,4 +22,6 @@
  *
  * @public
  */
-export const CMCD_REQUEST_PROVENANCE: unique symbol = /* @__PURE__ */ Symbol.for('@svta/cml-cmcd/request-provenance')
+export const CMCD_REQUEST_PROVENANCE: unique symbol = /* @__PURE__ */ Symbol.for(
+	'@svta/cml-cmcd/request-provenance',
+)

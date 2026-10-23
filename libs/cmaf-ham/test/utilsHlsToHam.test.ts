@@ -46,10 +46,7 @@ describe('getDuration', () => {
 	})
 
 	it('returns duration if manifest has targetDuration and there are segments', () => {
-		const res = getDuration(
-			{ targetDuration: 3 } as HlsManifest,
-			getSegments(),
-		)
+		const res = getDuration({ targetDuration: 3 } as HlsManifest, getSegments())
 		equal(res, 6)
 	})
 })

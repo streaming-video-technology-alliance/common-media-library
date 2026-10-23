@@ -12,6 +12,6 @@ import type { Track } from './Track.ts'
  * @alpha
  */
 export type AudioTrack = Track & {
-	sampleRate: number;
-	channels: number;
-};
+	sampleRate: number
+	channels: number
+}

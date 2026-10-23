@@ -4,8 +4,7 @@ import { exec } from './exec.ts'
 export async function viewPublished(name: string, prop: string): Promise<string | undefined> {
 	try {
 		return (await exec(`npm view ${name} ${prop}`)).trim()
-	}
-	catch (error) {
+	} catch (error) {
 		if (error instanceof Error && error.message.includes('E404')) {
 			return undefined
 		}

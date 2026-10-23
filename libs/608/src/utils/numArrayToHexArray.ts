@@ -5,4 +5,4 @@ export function numArrayToHexArray(numArray: number[]): string[] {
 	}
 
 	return hexArray
-};
+}

@@ -30,10 +30,10 @@ export function readSidx(view: IsoBoxReadView): SegmentIndexBox {
 		entry.subsegmentDuration = readUint(4)
 		entry.sap = readUint(4)
 		entry.referenceType = (entry.reference >> 31) & 0x00000001
-		entry.referencedSize = entry.reference & 0x7FFFFFFF
+		entry.referencedSize = entry.reference & 0x7fffffff
 		entry.startsWithSap = (entry.sap >> 31) & 0x00000001
 		entry.sapType = (entry.sap >> 28) & 0x00000007
-		entry.sapDeltaTime = (entry.sap & 0x0FFFFFFF)
+		entry.sapDeltaTime = entry.sap & 0x0fffffff
 
 		return entry
 	})
@@ -49,4 +49,4 @@ export function readSidx(view: IsoBoxReadView): SegmentIndexBox {
 		reserved,
 		references,
 	}
-};
+}

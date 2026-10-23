@@ -7,7 +7,13 @@ const BASE_URL = 'https://a.test/x/seg1.m4s'
 
 describe('formatNor', () => {
 	it('converts each path relative to baseUrl', () => {
-		deepEqual(formatNor(['https://a.test/x/seg2.m4s', 'https://b.test/seg3.m4s'], { version: 2, baseUrl: BASE_URL }), ['seg2.m4s', 'https://b.test/seg3.m4s'])
+		deepEqual(
+			formatNor(['https://a.test/x/seg2.m4s', 'https://b.test/seg3.m4s'], {
+				version: 2,
+				baseUrl: BASE_URL,
+			}),
+			['seg2.m4s', 'https://b.test/seg3.m4s'],
+		)
 	})
 
 	it('wraps one path in a list in version 2', () => {
@@ -15,7 +21,13 @@ describe('formatNor', () => {
 	})
 
 	it('keeps the parameters of an entry and of an inner list', () => {
-		const value = formatNor(new SfItem([new SfItem('https://a.test/x/seg2.m4s', { r: '0-99' }), 'b.m4s'], { p: 2 }), { version: 2, baseUrl: BASE_URL })
+		const value = formatNor(
+			new SfItem([new SfItem('https://a.test/x/seg2.m4s', { r: '0-99' }), 'b.m4s'], { p: 2 }),
+			{
+				version: 2,
+				baseUrl: BASE_URL,
+			},
+		)
 		ok(value instanceof SfItem)
 		deepEqual(value.params, { p: 2 })
 		const [first, second] = value.value as unknown as SfItem[]
@@ -30,7 +42,9 @@ describe('formatNor', () => {
 	})
 
 	it('ignores a baseUrl that is not a valid URL', () => {
-		deepEqual(formatNor(['https://a.test/x/seg2.m4s'], { version: 2, baseUrl: 'not a url' }), ['https://a.test/x/seg2.m4s'])
+		deepEqual(formatNor(['https://a.test/x/seg2.m4s'], { version: 2, baseUrl: 'not a url' }), [
+			'https://a.test/x/seg2.m4s',
+		])
 	})
 
 	it('drops an entry that is not a non-empty string', () => {

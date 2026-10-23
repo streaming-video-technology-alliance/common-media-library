@@ -17,7 +17,10 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @public
  */
-export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = VisualSampleEntryType>(box: VisualSampleEntryBox<T>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = VisualSampleEntryType>(
+	box: VisualSampleEntryBox<T>,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
 	const dataReferenceIndexSize = 2
@@ -34,10 +37,23 @@ export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = Visu
 	const depthSize = 2
 	const preDefined3Size = 2
 	const { bytes, size } = writeChildBoxes(box.boxes, config)
-	const totalSize = headerSize + reserved1Size + dataReferenceIndexSize + preDefined1Size +
-		reserved2Size + preDefined2Size + widthSize + heightSize + horizresolutionSize +
-		vertresolutionSize + reserved3Size + frameCountSize + compressorNameSize +
-		depthSize + preDefined3Size + size
+	const totalSize =
+		headerSize +
+		reserved1Size +
+		dataReferenceIndexSize +
+		preDefined1Size +
+		reserved2Size +
+		preDefined2Size +
+		widthSize +
+		heightSize +
+		horizresolutionSize +
+		vertresolutionSize +
+		reserved3Size +
+		frameCountSize +
+		compressorNameSize +
+		depthSize +
+		preDefined3Size +
+		size
 
 	const writer = new IsoBoxWriteView(box.type, totalSize)
 
@@ -54,7 +70,7 @@ export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = Visu
 	writer.writeUint(box.frameCount, 2)
 	writer.writeArray(box.compressorName, UINT, 1, 32)
 	writer.writeUint(box.depth, 2)
-	writer.writeUint(box.preDefined3 & 0xFFFF, 2)
+	writer.writeUint(box.preDefined3 & 0xffff, 2)
 	writer.writeBytes(bytes)
 
 	return writer

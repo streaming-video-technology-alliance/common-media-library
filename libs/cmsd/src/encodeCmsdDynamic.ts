@@ -10,7 +10,7 @@ import type { CmsdDynamic } from './CmsdDynamic.ts'
  *
  * @public
  */
-export function encodeCmsdDynamic(value: SfItem[]): string;
+export function encodeCmsdDynamic(value: SfItem[]): string
 
 /**
  * Encode a single CMSD Dynamic object.
@@ -22,7 +22,7 @@ export function encodeCmsdDynamic(value: SfItem[]): string;
  *
  * @public
  */
-export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string;
+export function encodeCmsdDynamic(value: string, cmsd: CmsdDynamic): string
 
 export function encodeCmsdDynamic(value: string | SfItem[], cmsd?: CmsdDynamic): string {
 	if (!value) {

@@ -6,8 +6,8 @@ import type { Event } from './Event.ts'
  * @alpha
  */
 export type EventStream = {
-	schemeIdUri: string,
-	timescale: number;
-	events: Event[];
-	presentationTimeOffset: number;
-};
+	schemeIdUri: string
+	timescale: number
+	events: Event[]
+	presentationTimeOffset: number
+}

@@ -18,8 +18,7 @@ export function getInitializationUrl(
 	let initializationUrl: string | undefined
 	if (representation.SegmentBase) {
 		initializationUrl = representation.BaseURL?.[0] ?? ''
-	}
-	else if (adaptationSet.SegmentList || representation.SegmentList) {
+	} else if (adaptationSet.SegmentList || representation.SegmentList) {
 		initializationUrl =
 			representation.SegmentList?.at(0)?.Initialization[0].$.sourceURL ||
 			adaptationSet.SegmentList?.at(0)?.Initialization[0].$.sourceURL
@@ -29,10 +28,7 @@ export function getInitializationUrl(
 			adaptationSet.SegmentTemplate?.at(0)?.$.initialization ||
 			representation.SegmentTemplate?.at(0)?.$.initialization
 		if (initializationUrl?.includes('$RepresentationID$')) {
-			initializationUrl = initializationUrl.replace(
-				'$RepresentationID$',
-				representation.$.id ?? '',
-			)
+			initializationUrl = initializationUrl.replace('$RepresentationID$', representation.$.id ?? '')
 		}
 	}
 	return initializationUrl

@@ -16,4 +16,4 @@ export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox {
 		...view.readFullBox(),
 		audioRenderingIndication: view.readUint(1),
 	}
-};
+}

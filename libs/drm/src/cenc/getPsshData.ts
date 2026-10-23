@@ -18,10 +18,9 @@ export function getPsshData(pssh: ArrayBufferLike): ArrayBufferLike {
 
 	if (version > 0) {
 		const kidCount = view.getUint32(dataOffset)
-		dataOffset += 4 + (16 * kidCount)
+		dataOffset += 4 + 16 * kidCount
 	}
 
 	dataOffset += 4 // Data size
 	return pssh.slice(dataOffset)
 }
-

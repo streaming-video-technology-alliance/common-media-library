@@ -27,4 +27,7 @@ import type { CmcdTransformRequest } from './CmcdTransformRequest.ts'
  *
  * @public
  */
-export type CmcdEventReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C> | undefined) => Cmcd | null;
+export type CmcdEventReportTransform<C = Record<string, unknown>> = (
+	data: Cmcd,
+	request: CmcdTransformRequest<C> | undefined,
+) => Cmcd | null

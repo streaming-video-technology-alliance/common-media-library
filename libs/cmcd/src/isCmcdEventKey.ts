@@ -18,7 +18,5 @@ const CMCD_EVENT_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_EVE
  * {@includeCode ../test/isCmcdEventKey.test.ts#example}
  */
 export function isCmcdEventKey(key: string): key is keyof Cmcd {
-	return isCmcdRequestKey(key) ||
-		isCmcdResponseReceivedKey(key) ||
-		CMCD_EVENT_KEY_SET.has(key)
+	return isCmcdRequestKey(key) || isCmcdResponseReceivedKey(key) || CMCD_EVENT_KEY_SET.has(key)
 }

@@ -5,5 +5,5 @@
  */
 export type Entity = {
 	/** Entity ID */
-	entityId: number;
-};
+	entityId: number
+}

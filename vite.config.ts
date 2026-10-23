@@ -1,6 +1,14 @@
 import { defineConfig, type ViteUserConfig } from 'vite-plus'
 
 const config: ViteUserConfig = defineConfig({
+	fmt: {
+		semi: false,
+		singleQuote: true,
+		useTabs: true,
+		arrowParens: 'avoid',
+		// Oxfmt does not format test fixtures, changelogs, and the api-extractor reports.
+		ignorePatterns: ['**/*.json', '**/*.md', 'structured-field-tests/'],
+	},
 	pack: {
 		// Keep the output names dist/index.js and dist/index.d.ts.
 		fixedExtension: false,

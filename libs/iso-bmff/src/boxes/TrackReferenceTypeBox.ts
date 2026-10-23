@@ -4,6 +4,6 @@
  * @public
  */
 export type TrackReferenceTypeBox = {
-	type: 'tref';
-	trackIds: number[];
-};
+	type: 'tref'
+	trackIds: number[]
+}

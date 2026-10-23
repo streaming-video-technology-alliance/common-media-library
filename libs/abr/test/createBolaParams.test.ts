@@ -23,8 +23,12 @@ describe('createBolaParams', () => {
 		closeTo(l1.utilityScale, 3.3381, REFERENCE_TOLERANCE)
 		closeTo(l2.utilityScale, 6.2382, REFERENCE_TOLERANCE)
 
-		l1Thresholds.forEach((expected, i) => closeTo(l1.thresholds[i + 1], expected, REFERENCE_TOLERANCE))
-		l2Thresholds.forEach((expected, i) => closeTo(l2.thresholds[i + 1], expected, REFERENCE_TOLERANCE))
+		l1Thresholds.forEach((expected, i) =>
+			closeTo(l1.thresholds[i + 1], expected, REFERENCE_TOLERANCE),
+		)
+		l2Thresholds.forEach((expected, i) =>
+			closeTo(l2.thresholds[i + 1], expected, REFERENCE_TOLERANCE),
+		)
 	})
 
 	it('places each threshold where the score model switches to that rung', () => {
@@ -41,7 +45,9 @@ describe('createBolaParams', () => {
 			const params = createBolaParams(ladder, BUFFER_TARGET)
 			const model = createBolaScoreModel(bandwidthsOf(ladder), BUFFER_TARGET)
 
-			params.maximumBuffers.forEach((maximumBuffer, i) => closeTo(model.score(i, maximumBuffer), 0, MATCH_TOLERANCE))
+			params.maximumBuffers.forEach((maximumBuffer, i) =>
+				closeTo(model.score(i, maximumBuffer), 0, MATCH_TOLERANCE),
+			)
 		}
 	})
 
@@ -63,19 +69,30 @@ describe('createBolaParams', () => {
 		const smallest = MINIMUM_BUFFER + MINIMUM_BUFFER_PER_RUNG * L1.length
 
 		deepEqual(createBolaParams(L1, 1), createBolaParams(L1, smallest))
-		ok(createBolaParams(L1, smallest + 5).thresholds[1] !== createBolaParams(L1, smallest).thresholds[1])
+		ok(
+			createBolaParams(L1, smallest + 5).thresholds[1] !==
+				createBolaParams(L1, smallest).thresholds[1],
+		)
 	})
 
 	it('does not depend on the scale of the bandwidths', () => {
 		const scale = 7.3
-		const scaled = createBolaParams(rungs(...bandwidthsOf(L2).map((bandwidth) => bandwidth * scale)), BUFFER_TARGET)
+		const scaled = createBolaParams(
+			rungs(...bandwidthsOf(L2).map(bandwidth => bandwidth * scale)),
+			BUFFER_TARGET,
+		)
 		const original = createBolaParams(L2, BUFFER_TARGET)
 
-		original.thresholds.forEach((threshold, i) => closeTo(scaled.thresholds[i], threshold, MATCH_TOLERANCE))
+		original.thresholds.forEach((threshold, i) =>
+			closeTo(scaled.thresholds[i], threshold, MATCH_TOLERANCE),
+		)
 	})
 
 	it('merges equal neighbouring bandwidths and keeps the highest position', () => {
-		const params = createBolaParams(rungs(300_000, 300_000, 750_000, 750_000, 750_000, 1_500_000), BUFFER_TARGET)
+		const params = createBolaParams(
+			rungs(300_000, 300_000, 750_000, 750_000, 750_000, 1_500_000),
+			BUFFER_TARGET,
+		)
 
 		deepEqual(bandwidthsOf(params.rungs), [300_000, 750_000, 1_500_000])
 		deepEqual(params.positions, [1, 4, 5])

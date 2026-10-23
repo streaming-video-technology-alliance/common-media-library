@@ -57,4 +57,4 @@ export const CmObjectType = {
  *
  * @internal
  */
-export type CmObjectType = ValueOf<typeof CmObjectType>;
+export type CmObjectType = ValueOf<typeof CmObjectType>

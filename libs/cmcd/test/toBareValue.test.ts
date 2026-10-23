@@ -13,7 +13,10 @@ describe('toBareValue', () => {
 
 	it('returns the list inside an SfItem that wraps a list', () => {
 		const list = toBareValue(new SfItem([1200, 3400], { p: 2 })) as SfItem<number>[]
-		deepEqual(list.map(item => item.value), [1200, 3400])
+		deepEqual(
+			list.map(item => item.value),
+			[1200, 3400],
+		)
 	})
 
 	it('returns any other value unchanged', () => {

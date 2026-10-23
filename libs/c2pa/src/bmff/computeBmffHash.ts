@@ -23,7 +23,12 @@ function excludedLength(ranges: readonly ByteRange[]): number {
 }
 
 // Writes the box bytes outside `ranges` to `target` at `offset` and returns the number of bytes written.
-function writeKeptBytes(target: Uint8Array, offset: number, bytes: Uint8Array, ranges: readonly ByteRange[]): number {
+function writeKeptBytes(
+	target: Uint8Array,
+	offset: number,
+	bytes: Uint8Array,
+	ranges: readonly ByteRange[],
+): number {
 	if (ranges.length === 0) {
 		target.set(bytes, offset)
 		return bytes.length
@@ -95,7 +100,10 @@ function buildHashInput(
  *
  * @internal
  */
-export async function computeBmffHash(segmentBytes: Uint8Array, options?: BmffHashOptions): Promise<Uint8Array> {
+export async function computeBmffHash(
+	segmentBytes: Uint8Array,
+	options?: BmffHashOptions,
+): Promise<Uint8Array> {
 	const exclusions = options?.exclusions ?? []
 	const alg = options?.alg ?? DEFAULT_HASH_ALG
 	const offsetPrefixSize = options?.offsetPrefixSize ?? 0

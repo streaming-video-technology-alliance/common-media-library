@@ -5,36 +5,36 @@ import ts from 'typescript'
 /** One statement of a context file, with the names it declares. */
 export type ContextStatement = {
 	/** Repo-relative path of the context file. */
-	file: string;
+	file: string
 	/** 1-based line of the statement in the context file. */
-	line: number;
+	line: number
 	/** The statement text, without leading comments. */
-	text: string;
+	text: string
 	/** The names the statement declares. */
-	names: string[];
-};
+	names: string[]
+}
 
 /** One fenced TypeScript block of a markdown file. */
 export type ExampleBlock = {
 	/** Repo-relative path of the markdown file, with forward slashes. */
-	file: string;
+	file: string
 	/** 1-based line of the opening fence. */
-	line: number;
+	line: number
 	/** The code between the fences, with a trailing newline. */
-	code: string;
+	code: string
 	/** The statements of the context file next to the markdown file. */
-	context?: ContextStatement[];
-};
+	context?: ContextStatement[]
+}
 
 /** One compiler error, located in the markdown file or in a context file. */
 export type ExampleDiagnostic = {
-	file: string;
+	file: string
 	/** 1-based line. 0 when the error has no location. */
-	line: number;
+	line: number
 	/** The numeric TypeScript code, such as 2304. */
-	code: number;
-	message: string;
-};
+	code: number
+	message: string
+}
 
 const openFence = /^(`{3,})(\S*)/
 const closeFence = /^(`{3,})\s*$/
@@ -134,7 +134,14 @@ export function declaredNames(statement: ts.Statement): string[] {
 		for (const declaration of statement.declarationList.declarations) {
 			bindingNames(declaration.name, names)
 		}
-	} else if (ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement) || ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement) || ts.isEnumDeclaration(statement) || ts.isModuleDeclaration(statement)) {
+	} else if (
+		ts.isFunctionDeclaration(statement) ||
+		ts.isClassDeclaration(statement) ||
+		ts.isTypeAliasDeclaration(statement) ||
+		ts.isInterfaceDeclaration(statement) ||
+		ts.isEnumDeclaration(statement) ||
+		ts.isModuleDeclaration(statement)
+	) {
 		if (statement.name && ts.isIdentifier(statement.name)) {
 			names.push(statement.name.text)
 		}
@@ -174,7 +181,9 @@ export function readExampleContext(repoRoot: string, file: string): ContextState
 	const contextFile = file.replace(/\.md$/, '.context.d.ts')
 	const fullPath = path.join(repoRoot, contextFile)
 
-	return existsSync(fullPath) ? parseExampleContext(readFileSync(fullPath, 'utf8'), contextFile) : []
+	return existsSync(fullPath)
+		? parseExampleContext(readFileSync(fullPath, 'utf8'), contextFile)
+		: []
 }
 
 /** Reads every example block of the files that `listExampleFiles` returns, with the context of each file. */
@@ -195,12 +204,12 @@ function slash(file: string): string {
 }
 
 type Header = {
-	text: string;
+	text: string
 	/** Lines that the header adds before the block code. */
-	lines: number;
+	lines: number
 	/** Each prepended statement with its first line in the header. */
-	statements: { start: number; statement: ContextStatement }[];
-};
+	statements: { start: number; statement: ContextStatement }[]
+}
 
 const emptyHeader: Header = { text: '', lines: 0, statements: [] }
 
@@ -227,7 +236,9 @@ function contextHeader(block: ExampleBlock): Header {
 		lines += statement.text.split('\n').length
 	}
 
-	return parts.length === 0 ? emptyHeader : { text: `${parts.join('\n')}\n\n`, lines: lines + 1, statements }
+	return parts.length === 0
+		? emptyHeader
+		: { text: `${parts.join('\n')}\n\n`, lines: lines + 1, statements }
 }
 
 /** The root tsconfig options, adjusted for a noEmit check of standalone blocks. */
@@ -239,13 +250,28 @@ export function exampleCompilerOptions(repoRoot: string): ts.CompilerOptions {
 		throw new Error(ts.flattenDiagnosticMessageText(config.error.messageText, '\n'))
 	}
 
-	const { options, errors } = ts.convertCompilerOptionsFromJson(config.config.compilerOptions, repoRoot)
+	const { options, errors } = ts.convertCompilerOptionsFromJson(
+		config.config.compilerOptions,
+		repoRoot,
+	)
 
 	if (errors.length > 0) {
-		throw new Error(errors.map(error => ts.flattenDiagnosticMessageText(error.messageText, '\n')).join('\n'))
+		throw new Error(
+			errors.map(error => ts.flattenDiagnosticMessageText(error.messageText, '\n')).join('\n'),
+		)
 	}
 
-	const { incremental, declaration, declarationMap, isolatedDeclarations, sourceMap, inlineSources, outDir, tsBuildInfoFile, ...rest } = options
+	const {
+		incremental,
+		declaration,
+		declarationMap,
+		isolatedDeclarations,
+		sourceMap,
+		inlineSources,
+		outDir,
+		tsBuildInfoFile,
+		...rest
+	} = options
 
 	return {
 		...rest,
@@ -304,11 +330,22 @@ function locate(diagnostic: ts.Diagnostic, origin: Map<string, Origin>): Example
 	const { line } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
 
 	if (line < header.lines) {
-		const entry = header.statements.findLast(candidate => candidate.start <= line) ?? header.statements[0]
-		return { file: entry.statement.file, line: entry.statement.line + (line - entry.start), code: diagnostic.code, message }
+		const entry =
+			header.statements.findLast(candidate => candidate.start <= line) ?? header.statements[0]
+		return {
+			file: entry.statement.file,
+			line: entry.statement.line + (line - entry.start),
+			code: diagnostic.code,
+			message,
+		}
 	}
 
-	return { file: block.file, line: block.line + 1 + (line - header.lines), code: diagnostic.code, message }
+	return {
+		file: block.file,
+		line: block.line + 1 + (line - header.lines),
+		code: diagnostic.code,
+		message,
+	}
 }
 
 /** `file:line TScode: message`, one line. */

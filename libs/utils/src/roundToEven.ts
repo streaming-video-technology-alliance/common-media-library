@@ -20,8 +20,7 @@ export function roundToEven(value: number, precision: number): number {
 		// If the tail of the decimal place is 'equidistant' we round to the nearest even value
 		const flooredValue = Math.floor(value * decimalShift)
 		return (flooredValue % 2 === 0 ? flooredValue : flooredValue + 1) / decimalShift
-	}
-	else {
+	} else {
 		// Otherwise, proceed as normal
 		return Math.round(value * decimalShift) / decimalShift
 	}

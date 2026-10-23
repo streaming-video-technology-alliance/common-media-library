@@ -41,8 +41,7 @@ export function decodeSfItem(input: string, options?: SfDecodeOptions): SfItem {
 		}
 
 		return value
-	}
-	catch (cause) {
+	} catch (cause) {
 		throw parseError(input, ITEM, cause)
 	}
 }

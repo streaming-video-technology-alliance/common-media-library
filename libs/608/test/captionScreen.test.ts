@@ -24,5 +24,4 @@ describe('CaptionScreen Tests', () => {
 		mock.method(captionScreen.rows[0], 'getTextString', () => myText)
 		equal(captionScreen.getDisplayText(true), expectedText)
 	})
-
 })

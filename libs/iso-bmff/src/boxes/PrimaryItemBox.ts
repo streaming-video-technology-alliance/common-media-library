@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type PrimaryItemBox = FullBox & {
-	type: 'pitm';
-	itemId: number;
-};
+	type: 'pitm'
+	itemId: number
+}

@@ -29,4 +29,3 @@ export * from './WebVttResult.ts'
 export * from './WebVttResultType.ts'
 export * from './WebVttStyleResult.ts'
 export * from './WebVttTimestampMapResult.ts'
-

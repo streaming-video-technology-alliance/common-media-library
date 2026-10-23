@@ -5,4 +5,4 @@ import type { WebVttCue } from './WebVttCue.ts'
  *
  * @public
  */
-export type WebVttCueFactory = () => WebVttCue;
+export type WebVttCueFactory = () => WebVttCue

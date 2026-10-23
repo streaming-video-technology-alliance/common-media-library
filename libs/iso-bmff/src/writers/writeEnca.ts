@@ -13,6 +13,9 @@ import { writeAudioSampleEntryBox } from './writeAudioSampleEntryBox.ts'
  *
  * @public
  */
-export function writeEnca(box: AudioSampleEntryBox<'enca'>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeEnca(
+	box: AudioSampleEntryBox<'enca'>,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	return writeAudioSampleEntryBox(box, config)
 }

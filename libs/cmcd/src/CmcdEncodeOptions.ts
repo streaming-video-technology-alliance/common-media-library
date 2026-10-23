@@ -16,14 +16,14 @@ export type CmcdEncodeOptions = {
 	 *
 	 * @defaultValue `CMCD_V2`
 	 */
-	version?: CmcdVersion;
+	version?: CmcdVersion
 
 	/**
 	 * The reporting mode to use.
 	 *
 	 * @defaultValue `CmcdReportingMode.REQUEST`
 	 */
-	reportingMode?: CmcdReportingMode;
+	reportingMode?: CmcdReportingMode
 
 	/**
 	 * A map of CMCD keys to custom formatters. A formatter replaces the value rule of its key.
@@ -37,12 +37,12 @@ export type CmcdEncodeOptions = {
 	 *
 	 * The encoder does not call a formatter for an empty value, for `false`, or for `v`. It also skips the formatter of a key that it does not send. The formatters of `ot` and `e` still run when a rule needs their value.
 	 */
-	formatters?: Partial<CmcdFormatterMap>;
+	formatters?: Partial<CmcdFormatterMap>
 
 	/**
 	 * A map of CMCD header fields to custom CMCD keys.
 	 */
-	customHeaderMap?: Partial<CmcdHeaderMap>;
+	customHeaderMap?: Partial<CmcdHeaderMap>
 
 	/**
 	 * A filter function for CMCD keys.
@@ -51,7 +51,7 @@ export type CmcdEncodeOptions = {
 	 *
 	 * @returns `true` if the key should be included, `false` otherwise.
 	 */
-	filter?: (key: CmcdKey) => boolean;
+	filter?: (key: CmcdKey) => boolean
 
 	/**
 	 * Base URL (typically the manifest or current request URL) used to convert absolute `nor` values
@@ -60,10 +60,10 @@ export type CmcdEncodeOptions = {
 	 * `nor` values are emitted unchanged (subject to the version 1 URL-encoding rule).
 	 * If `baseUrl` is not a valid URL, the encoder ignores it.
 	 */
-	baseUrl?: string;
+	baseUrl?: string
 
 	/**
 	 * Array of event names to filter.
 	 */
-	events?: string[];
-};
+	events?: string[]
+}

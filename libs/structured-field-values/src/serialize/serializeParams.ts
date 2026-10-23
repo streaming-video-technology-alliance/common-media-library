@@ -39,7 +39,8 @@ export function serializeParams(params?: Record<string, any>): string {
 		const value = params[key]
 		output += `;${serializeKey(key)}`
 
-		if (value !== true) { // omit true
+		if (value !== true) {
+			// omit true
 			output += `=${serializeBareItem(value)}`
 		}
 	}

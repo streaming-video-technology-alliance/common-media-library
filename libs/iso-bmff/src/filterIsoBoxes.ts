@@ -19,13 +19,25 @@ import { traverseIsoBoxes } from './traverseIsoBoxes.ts'
  * @public
  */
 
-export function filterIsoBoxes<T, S extends T>(boxes: Iterable<T>, callback: (box: T) => box is S, config?: TraverseIsoBoxesConfig): S[];
+export function filterIsoBoxes<T, S extends T>(
+	boxes: Iterable<T>,
+	callback: (box: T) => box is S,
+	config?: TraverseIsoBoxesConfig,
+): S[]
 
 /**
  * @public
  */
-export function filterIsoBoxes<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T[];
-export function filterIsoBoxes<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T[] {
+export function filterIsoBoxes<T>(
+	boxes: Iterable<T>,
+	callback: (box: T) => boolean,
+	config?: TraverseIsoBoxesConfig,
+): T[]
+export function filterIsoBoxes<T>(
+	boxes: Iterable<T>,
+	callback: (box: T) => boolean,
+	config?: TraverseIsoBoxesConfig,
+): T[] {
 	const result: T[] = []
 
 	for (const box of traverseIsoBoxes(boxes, config)) {

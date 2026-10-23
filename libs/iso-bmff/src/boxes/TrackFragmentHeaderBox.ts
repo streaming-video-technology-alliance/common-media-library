@@ -6,11 +6,11 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type TrackFragmentHeaderBox = FullBox & {
-	type: 'tfhd';
-	trackId: number;
-	baseDataOffset?: number;
-	sampleDescriptionIndex?: number;
-	defaultSampleDuration?: number;
-	defaultSampleSize?: number;
-	defaultSampleFlags?: number;
-};
+	type: 'tfhd'
+	trackId: number
+	baseDataOffset?: number
+	sampleDescriptionIndex?: number
+	defaultSampleDuration?: number
+	defaultSampleSize?: number
+	defaultSampleFlags?: number
+}

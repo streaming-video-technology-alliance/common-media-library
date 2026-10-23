@@ -4,8 +4,8 @@
  * @public
  */
 export type TypeBox<T> = {
-	type: T;
-	majorBrand: string;
-	minorVersion: number;
-	compatibleBrands: string[];
-};
+	type: T
+	majorBrand: string
+	minorVersion: number
+	compatibleBrands: string[]
+}

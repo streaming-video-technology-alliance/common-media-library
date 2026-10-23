@@ -3,7 +3,7 @@ import type { DashManifest } from '../../types/mapper/dash/DashManifest.ts'
 /**
  * @internal
  */
-export type DashSerializer = (json: DashManifest) => string;
+export type DashSerializer = (json: DashManifest) => string
 
 let xmlSerializer: DashSerializer
 

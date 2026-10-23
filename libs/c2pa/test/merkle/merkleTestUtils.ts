@@ -34,7 +34,11 @@ export function buildUuidBox(usertype: readonly number[], payload: Uint8Array): 
  * Builds a box with a 64-bit `largesize` header (ISO/IEC 14496-12 section 4.2): a size field of 1,
  * the type, and the 8-byte largesize. `largesize` defaults to the box length.
  */
-export function buildLargesizeBox(type: string, payload: Uint8Array = new Uint8Array(0), largesize: number = 16 + payload.length): Uint8Array {
+export function buildLargesizeBox(
+	type: string,
+	payload: Uint8Array = new Uint8Array(0),
+	largesize: number = 16 + payload.length,
+): Uint8Array {
 	const box = new Uint8Array(16 + payload.length)
 	const view = new DataView(box.buffer)
 	view.setUint32(0, 1, false)
@@ -62,7 +66,9 @@ async function hashPair(left: Uint8Array, right: Uint8Array): Promise<Uint8Array
 }
 
 // Builds all levels of the tree, leaf level first; null entries are rightmost padding.
-export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(Uint8Array | null)[][]> {
+export async function buildTreeLevels(
+	leaves: readonly Uint8Array[],
+): Promise<(Uint8Array | null)[][]> {
 	const depth = leaves.length > 1 ? Math.ceil(Math.log2(leaves.length)) : 0
 	const level: (Uint8Array | null)[] = [...leaves]
 	while (level.length < 2 ** depth) level.push(null)
@@ -74,7 +80,7 @@ export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(U
 		for (let i = 0; i < current.length; i += 2) {
 			const left = current[i]
 			const right = current[i + 1] ?? null
-			next.push(left && right ? await hashPair(left, right) : left ?? right)
+			next.push(left && right ? await hashPair(left, right) : (left ?? right))
 		}
 		levels.push(next)
 		current = next
@@ -83,7 +89,10 @@ export async function buildTreeLevels(leaves: readonly Uint8Array[]): Promise<(U
 }
 
 // Row as stored in the manifest: the level's nodes with null padding excluded.
-export function manifestRow(levels: readonly (readonly (Uint8Array | null)[])[], level: number): Uint8Array[] {
+export function manifestRow(
+	levels: readonly (readonly (Uint8Array | null)[])[],
+	level: number,
+): Uint8Array[] {
 	return (levels[level] ?? []).filter((node): node is Uint8Array => node !== null)
 }
 
@@ -115,7 +124,11 @@ export type AuxBoxFields = {
 // §A.5.1.2/A.5.4.1.4 aux box: version/flags + purpose\0 + CBOR with string keys.
 // `paddingBytes` simulates the fixed-size padding §A.5.4.1.4 requires when
 // multiple boxes for one Merkle tree share a file.
-export function buildMerkleAuxBox(fields: AuxBoxFields, purpose: string = MERKLE_BOX_PURPOSE, paddingBytes: number = 0): Uint8Array {
+export function buildMerkleAuxBox(
+	fields: AuxBoxFields,
+	purpose: string = MERKLE_BOX_PURPOSE,
+	paddingBytes: number = 0,
+): Uint8Array {
 	const map: Record<string, unknown> = {
 		uniqueId: fields.uniqueId,
 		localId: fields.localId,
@@ -126,7 +139,10 @@ export function buildMerkleAuxBox(fields: AuxBoxFields, purpose: string = MERKLE
 	const purposeBytes = TEXT_ENCODER.encode(purpose)
 	const prefix = new Uint8Array(4 + purposeBytes.length + 1) // version/flags + purpose\0
 	prefix.set(purposeBytes, 4)
-	return buildUuidBox(JUMBF_UUID, concatBytes(prefix, encodeCbor(map) as Uint8Array, new Uint8Array(paddingBytes)))
+	return buildUuidBox(
+		JUMBF_UUID,
+		concatBytes(prefix, encodeCbor(map) as Uint8Array, new Uint8Array(paddingBytes)),
+	)
 }
 
 // Aux box with the right prefix but undecodable CBOR data, for malformed-payload tests.
@@ -169,17 +185,27 @@ const BMFF_HASH_LABEL = 'c2pa.hash.bmff.v3'
 
 // The claim declares the single bmff hash assertion by hash, so it lands in the validator's
 // claim-verified assertion set. A validator reads the assertion only from that set.
-async function assembleMerkleInitSegment(assertionData: Record<string, unknown>, sign: ((claimCborBytes: Uint8Array) => Promise<Uint8Array>) | null): Promise<Uint8Array> {
+async function assembleMerkleInitSegment(
+	assertionData: Record<string, unknown>,
+	sign: ((claimCborBytes: Uint8Array) => Promise<Uint8Array>) | null,
+): Promise<Uint8Array> {
 	const bmffAssertion = buildJumb(BMFF_HASH_LABEL, buildBox('cbor', encodeCbor(assertionData)))
 	const assertionStore = buildJumb('c2pa.assertions', bmffAssertion)
 	const claimCborBytes = encodeCbor({
 		instanceID: MERKLE_MANIFEST_ID,
 		signature: signatureUri(MERKLE_MANIFEST_ID),
-		created_assertions: [{ url: `self#jumbf=c2pa.assertions/${BMFF_HASH_LABEL}`, hash: await sha256(bmffAssertion.subarray(8)), alg: 'sha256' }],
+		created_assertions: [
+			{
+				url: `self#jumbf=c2pa.assertions/${BMFF_HASH_LABEL}`,
+				hash: await sha256(bmffAssertion.subarray(8)),
+				alg: 'sha256',
+			},
+		],
 	})
 	const claim = buildJumb('c2pa.claim', buildBox('cbor', claimCborBytes))
 	const manifestContent = [claim, assertionStore]
-	if (sign) manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
+	if (sign)
+		manifestContent.push(buildJumb('c2pa.signature', buildBox('cbor', await sign(claimCborBytes))))
 	const manifestJumb = buildJumb(MERKLE_MANIFEST_ID, ...manifestContent)
 	const store = buildJumb('c2pa', manifestJumb)
 
@@ -193,11 +219,16 @@ async function assembleMerkleInitSegment(assertionData: Record<string, unknown>,
 
 // Unsigned init segment with a `c2pa.hash.bmff.v3` assertion. It has no signature box, so
 // validation reports CLAIM_SIGNATURE_MISSING next to the codes a test asserts on.
-export async function buildMerkleInitSegment(assertionData: Record<string, unknown>): Promise<Uint8Array> {
+export async function buildMerkleInitSegment(
+	assertionData: Record<string, unknown>,
+): Promise<Uint8Array> {
 	return assembleMerkleInitSegment(assertionData, null)
 }
 
 // Init segment with a `c2pa.hash.bmff.v3` assertion and a claim signed by `signer`.
-export async function buildSignedMerkleInitSegment(assertionData: Record<string, unknown>, signer: Pick<TestSigner, 'sign'>): Promise<Uint8Array> {
+export async function buildSignedMerkleInitSegment(
+	assertionData: Record<string, unknown>,
+	signer: Pick<TestSigner, 'sign'>,
+): Promise<Uint8Array> {
 	return assembleMerkleInitSegment(assertionData, claimCborBytes => signer.sign(claimCborBytes))
 }

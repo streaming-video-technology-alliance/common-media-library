@@ -8,21 +8,20 @@ import path from 'path'
  * @returns An object containing arrays of paths for main and other .m3u8 files.
  */
 export function listM3U8Files(directory: string): {
-	manifest: string;
-	playlists: string[];
-	error: boolean;
+	manifest: string
+	playlists: string[]
+	error: boolean
 } {
 	let manifest: string = null
 	const playlists: string[] = []
 
 	const files = fs.readdirSync(directory)
 
-	files.forEach((file) => {
+	files.forEach(file => {
 		if (path.extname(file) === '.m3u8') {
 			if (file === 'manifest.m3u8' || file === 'main.m3u8') {
 				manifest = path.join(directory, file)
-			}
-			else {
+			} else {
 				playlists.push(path.join(directory, file))
 			}
 		}
@@ -43,7 +42,7 @@ export function listM3U8Files(directory: string): {
 export function listMPDFiles(directory: string): string[] {
 	const mpds: string[] = []
 	const files = fs.readdirSync(directory)
-	files.forEach((file) => {
+	files.forEach(file => {
 		if (path.extname(file) === '.mpd') {
 			mpds.push(path.join(directory, file))
 		}
@@ -58,7 +57,7 @@ export function listMPDFiles(directory: string): string[] {
  */
 export function listDirectories(directoryPath: string): string[] {
 	const filesAndDirectories = fs.readdirSync(directoryPath)
-	const directories = filesAndDirectories.filter((item) =>
+	const directories = filesAndDirectories.filter(item =>
 		fs.statSync(path.join(directoryPath, item)).isDirectory(),
 	)
 	return directories

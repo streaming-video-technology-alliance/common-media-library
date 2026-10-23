@@ -3,7 +3,7 @@ import type { HlsManifest } from '../../types/mapper/hls/HlsManifest.ts'
 /**
  * @internal
  */
-export type HlsParser = (text: string) => HlsManifest;
+export type HlsParser = (text: string) => HlsManifest
 
 let hlsParser: HlsParser
 

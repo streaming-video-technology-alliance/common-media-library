@@ -4,6 +4,6 @@
  * @public
  */
 export type TypedResult<T, D> = {
-	type: T;
-	data: D;
-};
+	type: T
+	data: D
+}

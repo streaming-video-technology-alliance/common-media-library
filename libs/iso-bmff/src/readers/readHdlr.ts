@@ -20,4 +20,4 @@ export function readHdlr(view: IsoBoxReadView): HandlerReferenceBox {
 		reserved: view.readArray(UINT, 4, 3),
 		name: view.readString(-1),
 	}
-};
+}

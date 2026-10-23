@@ -16,4 +16,4 @@ export function readMfhd(view: IsoBoxReadView): MovieFragmentHeaderBox {
 		...view.readFullBox(),
 		sequenceNumber: view.readUint(4),
 	}
-};
+}

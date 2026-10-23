@@ -1,6 +1,6 @@
 import type { WebVttRegion } from '../WebVttRegion.ts'
 
-export type SettingsValue = WebVttRegion | string | number | boolean | null;
+export type SettingsValue = WebVttRegion | string | number | boolean | null
 
 // A settings object holds key/value pairs and will ignore anything but the first
 // assignment to a specific key.
@@ -50,7 +50,8 @@ export class Settings {
 
 	// Accept a setting if its a valid (signed) integer.
 	integer(k: string, v: string): void {
-		if (/^-?\d+$/.test(v)) { // integer
+		if (/^-?\d+$/.test(v)) {
+			// integer
 			this.set(k, parseInt(v, 10))
 		}
 	}

@@ -14,4 +14,4 @@ export const WebVttParserState = {
 	BAD_WEBVTT: 'BAD_WEBVTT',
 } as const
 
-export type WebVttParserState = ValueOf<typeof WebVttParserState>;
+export type WebVttParserState = ValueOf<typeof WebVttParserState>

@@ -4,5 +4,5 @@ export function readTemplate(dataView: DataView, offset: number, size: number): 
 	const half = size / 2
 	const pre = readUint(dataView, offset, half)
 	const post = readUint(dataView, offset + half, half)
-	return pre + (post / Math.pow(2, half))
-};
+	return pre + post / Math.pow(2, half)
+}

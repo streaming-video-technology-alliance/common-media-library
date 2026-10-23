@@ -19,4 +19,4 @@ export const RequestResponseType = {
 /**
  * @public
  */
-export type RequestResponseType = ValueOf<typeof RequestResponseType>;
+export type RequestResponseType = ValueOf<typeof RequestResponseType>

@@ -28,7 +28,10 @@ describe('limitUpwardSwitch', () => {
 					const result = limitUpwardSwitch(pick, current, sustained)
 
 					ok(result <= pick, `pick ${pick} current ${current} sustained ${sustained}`)
-					ok(result >= Math.min(pick, current), `pick ${pick} current ${current} sustained ${sustained}`)
+					ok(
+						result >= Math.min(pick, current),
+						`pick ${pick} current ${current} sustained ${sustained}`,
+					)
 				}
 			}
 		}

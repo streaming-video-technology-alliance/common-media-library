@@ -31,7 +31,7 @@
  * @public
  */
 export type CmcdRequestProvenance = {
-	readonly sid: string;
-	readonly cid?: string;
-	readonly data?: string;
+	readonly sid: string
+	readonly cid?: string
+	readonly data?: string
 }

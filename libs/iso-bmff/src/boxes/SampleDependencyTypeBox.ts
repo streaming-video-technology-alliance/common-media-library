@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SampleDependencyTypeBox = FullBox & {
-	type: 'sdtp';
-	sampleDependencyTable: number[];
-};
+	type: 'sdtp'
+	sampleDependencyTable: number[]
+}

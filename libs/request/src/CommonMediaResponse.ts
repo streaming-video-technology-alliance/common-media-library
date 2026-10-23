@@ -7,4 +7,4 @@ import type { CommonMediaRequest } from './CommonMediaRequest.ts'
  * @public
  */
 
-export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = HttpResponse<R>;
+export type CommonMediaResponse<R extends CommonMediaRequest = CommonMediaRequest> = HttpResponse<R>

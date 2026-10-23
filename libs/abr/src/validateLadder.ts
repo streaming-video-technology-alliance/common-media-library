@@ -17,11 +17,15 @@ export function validateLadder(ladder: readonly LadderRung[]): void {
 		const { bandwidth } = ladder[i]
 
 		if (!Number.isFinite(bandwidth) || bandwidth <= 0) {
-			throw new RangeError(`Invalid ladder: expected a positive finite bandwidth at ${i}, received ${bandwidth}`)
+			throw new RangeError(
+				`Invalid ladder: expected a positive finite bandwidth at ${i}, received ${bandwidth}`,
+			)
 		}
 
 		if (i > 0 && bandwidth < ladder[i - 1].bandwidth) {
-			throw new RangeError(`Invalid ladder: expected ascending bandwidth, received ${ladder[i - 1].bandwidth} at ${i - 1} and ${bandwidth} at ${i}`)
+			throw new RangeError(
+				`Invalid ladder: expected ascending bandwidth, received ${ladder[i - 1].bandwidth} at ${i - 1} and ${bandwidth} at ${i}`,
+			)
 		}
 	}
 }

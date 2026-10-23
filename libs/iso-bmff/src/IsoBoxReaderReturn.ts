@@ -12,4 +12,4 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  */
 export type IsoBoxReaderReturn<T> =
 	| { [K in keyof T]: T[K] extends (...args: never[]) => infer R ? ParsedBox<R> : never }[keyof T]
-	| ParsedIsoBox;
+	| ParsedIsoBox

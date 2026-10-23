@@ -15,4 +15,4 @@ export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox {
 		type: 'vlab',
 		sourceLabel: view.readUtf8(-1),
 	}
-};
+}

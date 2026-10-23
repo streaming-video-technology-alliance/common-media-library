@@ -29,7 +29,10 @@ function randomLadder(random: () => number): number[] {
 
 describe('selectRungByBuffer', () => {
 	it('picks the rungs of the design record', () => {
-		for (const [ladder, bandwidths, golden] of [[L1, L1_BANDWIDTHS, L1_GOLDEN], [L2, L2_BANDWIDTHS, L2_GOLDEN]] as const) {
+		for (const [ladder, bandwidths, golden] of [
+			[L1, L1_BANDWIDTHS, L1_GOLDEN],
+			[L2, L2_BANDWIDTHS, L2_GOLDEN],
+		] as const) {
 			const params = createBolaParams(ladder, BUFFER_TARGET)
 			const model = createBolaScoreModel(bandwidths, BUFFER_TARGET)
 
@@ -52,7 +55,11 @@ describe('selectRungByBuffer', () => {
 			for (let i = 0; i < LEVELS_PER_LADDER; i++) {
 				const effectiveBuffer = random() * (params.maximumBuffers[bandwidths.length - 1] + 5)
 
-				equal(selectRungByBuffer(params, effectiveBuffer), model.best(effectiveBuffer), `ladder ${bandwidths} target ${bufferTarget} buffer ${effectiveBuffer}`)
+				equal(
+					selectRungByBuffer(params, effectiveBuffer),
+					model.best(effectiveBuffer),
+					`ladder ${bandwidths} target ${bufferTarget} buffer ${effectiveBuffer}`,
+				)
 			}
 		}
 	})

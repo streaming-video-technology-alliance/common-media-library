@@ -30,17 +30,17 @@ export type BitrateSelector = {
 	 * @param input - The ladder, the buffer level, and the throughput estimate
 	 * @returns The position of the chosen rung in `input.ladder`, and the delay before the next request
 	 */
-	select(input: BitrateSelectorInput): BitrateDecision;
+	select(input: BitrateSelectorInput): BitrateDecision
 
 	/**
 	 * Records a finished or abandoned download.
 	 *
 	 * @param segment - The download. `segment.timing` is the object the throughput estimator received.
 	 */
-	sample(segment: SegmentSample): void;
+	sample(segment: SegmentSample): void
 
 	/**
 	 * Returns the selector to its initial state.
 	 */
-	reset(): void;
-};
+	reset(): void
+}

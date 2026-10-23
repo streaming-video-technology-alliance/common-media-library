@@ -5,4 +5,4 @@ import type { TypedResult } from '@svta/cml-utils'
  *
  * @public
  */
-export type WebVttStyleResult = TypedResult<'style', string>;
+export type WebVttStyleResult = TypedResult<'style', string>

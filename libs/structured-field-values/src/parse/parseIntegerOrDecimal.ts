@@ -122,8 +122,7 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 		}
 
 		value = parseFloat(num) * sign
-	}
-	else {
+	} else {
 		// integer
 		// 7.5.  If type is "integer" and input_number contains more than 15 characters, fail parsing.
 		if (num.length > 15) {

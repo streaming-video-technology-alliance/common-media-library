@@ -17,21 +17,21 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
 	 *
 	 * @defaultValue `undefined`
 	 */
-	sid?: string;
+	sid?: string
 
 	/**
 	 * The content ID.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	cid?: string;
+	cid?: string
 
 	/**
 	 * The event configurations. If omitted, no events are reported.
 	 *
 	 * @defaultValue `undefined`
 	 */
-	eventTargets?: CmcdEventReportConfig<C>[];
+	eventTargets?: CmcdEventReportConfig<C>[]
 
 	/**
 	 * The number of ended sessions the reporter retains state for, in
@@ -45,5 +45,5 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
 	 *
 	 * @defaultValue 2
 	 */
-	sessionRetention?: number;
+	sessionRetention?: number
 }

@@ -15,7 +15,7 @@ export type ThroughputSelectorOptions = {
 	 *
 	 * @defaultValue `DEFAULT_SAFETY_FACTOR`
 	 */
-	safetyFactor?: number;
+	safetyFactor?: number
 
 	/**
 	 * The fraction of the effective throughput that a higher rung may use.
@@ -25,7 +25,7 @@ export type ThroughputSelectorOptions = {
 	 *
 	 * @defaultValue `DEFAULT_UPGRADE_FACTOR`
 	 */
-	upgradeFactor?: number;
+	upgradeFactor?: number
 
 	/**
 	 * The seconds of stall that the second pass of the starvation guard allows, capped at the segment duration.
@@ -34,5 +34,5 @@ export type ThroughputSelectorOptions = {
 	 *
 	 * @defaultValue `DEFAULT_STARVATION_TOLERANCE`
 	 */
-	starvationTolerance?: number;
-};
+	starvationTolerance?: number
+}

@@ -26,7 +26,10 @@ describe('validateAssertionHashes', () => {
 
 		const { codes, verified } = await validateAssertionHashes(refs, assertions)
 		deepStrictEqual(codes, [])
-		deepStrictEqual(verified.map(a => a.label), ['c2pa.hash.bmff.v3'])
+		deepStrictEqual(
+			verified.map(a => a.label),
+			['c2pa.hash.bmff.v3'],
+		)
 	})
 	// #endregion example
 
@@ -38,7 +41,11 @@ describe('validateAssertionHashes', () => {
 
 	it('reports ASSERTION_MISSING when referenced assertion is absent', async () => {
 		const refs: ClaimAssertionRef[] = [
-			{ url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/cawg.metadata', hash: new Uint8Array(32), alg: null },
+			{
+				url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/cawg.metadata',
+				hash: new Uint8Array(32),
+				alg: null,
+			},
 		]
 
 		const { codes, verified } = await validateAssertionHashes(refs, [])
@@ -69,7 +76,11 @@ describe('validateAssertionHashes', () => {
 		const wrongHash = new Uint8Array(32).fill(0xff)
 
 		const refs: ClaimAssertionRef[] = [
-			{ url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/c2pa.hash.bmff.v3', hash: wrongHash, alg: null },
+			{
+				url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/c2pa.hash.bmff.v3',
+				hash: wrongHash,
+				alg: null,
+			},
 		]
 		const assertions = [makeAssertion('c2pa.hash.bmff.v3', payload)]
 
@@ -83,8 +94,16 @@ describe('validateAssertionHashes', () => {
 		const wrongHash = new Uint8Array(32).fill(0x00)
 
 		const refs: ClaimAssertionRef[] = [
-			{ url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/cawg.identity', hash: new Uint8Array(32), alg: null },
-			{ url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/c2pa.hash.bmff.v3', hash: wrongHash, alg: null },
+			{
+				url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/cawg.identity',
+				hash: new Uint8Array(32),
+				alg: null,
+			},
+			{
+				url: 'self#jumbf=/c2pa/manifest/c2pa.assertions/c2pa.hash.bmff.v3',
+				hash: wrongHash,
+				alg: null,
+			},
 		]
 		const assertions = [makeAssertion('c2pa.hash.bmff.v3', payload)]
 

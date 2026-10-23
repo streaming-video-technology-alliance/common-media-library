@@ -6,4 +6,4 @@ import type { WebVttParsingError } from './WebVttParsingError.ts'
  *
  * @public
  */
-export type WebVttErrorResult = TypedResult<'error', WebVttParsingError>;
+export type WebVttErrorResult = TypedResult<'error', WebVttParsingError>

@@ -10,7 +10,7 @@ export async function expectError(vttFile: string, error: string): Promise<void>
 
 	let parseError: WebVttParsingError | undefined
 	const parser = new WebVttParser(options)
-	parser.onparsingerror = (error: WebVttParsingError) => parseError = error
+	parser.onparsingerror = (error: WebVttParsingError) => (parseError = error)
 	parser.parse(vttText)
 	parser.flush()
 

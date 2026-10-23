@@ -1,4 +1,3 @@
-
 import type { AudioChannelConfiguration } from '../../../types/mapper/dash/AudioChannelConfiguration.ts'
 import type { Representation } from '../../../types/mapper/dash/Representation.ts'
 
@@ -12,7 +11,7 @@ import { trackToSegmentList } from './trackToSegmentList.ts'
 import { getFrameRate } from './utils/getFrameRate.ts'
 
 export function tracksToRepresentation(tracks: Track[]): Representation[] {
-	return tracks.map((track) => {
+	return tracks.map(track => {
 		const representation: Representation = {
 			$: {
 				id: track.id,
@@ -45,8 +44,7 @@ export function tracksToRepresentation(tracks: Track[]): Representation[] {
 			representation.AudioChannelConfiguration = [
 				{
 					$: {
-						schemeIdUri:
-							'urn:mpeg:dash:23003:3:audio_channel_configuration:2011', // hardcoded value
+						schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011', // hardcoded value
 						value: audioTrack.channels.toString() ?? '',
 					},
 				} as AudioChannelConfiguration,

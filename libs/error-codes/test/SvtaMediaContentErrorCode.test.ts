@@ -13,7 +13,12 @@ describe('SvtaMediaContentErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaMediaContentErrorCode, SvtaErrorCategory.MEDIA_CONTENT, 10, 'SVTA_MEDIA_CONTENT')
+		assertCatalogInvariants(
+			SvtaMediaContentErrorCode,
+			SvtaErrorCategory.MEDIA_CONTENT,
+			10,
+			'SVTA_MEDIA_CONTENT',
+		)
 	})
 
 	it('matches the spec table', () => {

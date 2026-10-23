@@ -4,8 +4,8 @@
  * @public
  */
 export type XmlParseOptions = {
-	pos?: number;
-	keepWhitespace?: boolean;
-	keepComments?: boolean;
-	includeParentElement?: boolean;
-};
+	pos?: number
+	keepWhitespace?: boolean
+	keepComments?: boolean
+	includeParentElement?: boolean
+}

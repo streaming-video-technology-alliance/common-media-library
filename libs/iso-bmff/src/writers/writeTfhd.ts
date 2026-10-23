@@ -16,13 +16,20 @@ export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
-	const baseDataOffsetSize = (box.flags & 0x01) ? 8 : 0
-	const sampleDescriptionIndexSize = (box.flags & 0x02) ? 4 : 0
-	const defaultSampleDurationSize = (box.flags & 0x08) ? 4 : 0
-	const defaultSampleSizeSize = (box.flags & 0x10) ? 4 : 0
-	const defaultSampleFlagsSize = (box.flags & 0x20) ? 4 : 0
-	const totalSize = headerSize + fullBoxSize + trackIdSize + baseDataOffsetSize +
-		sampleDescriptionIndexSize + defaultSampleDurationSize + defaultSampleSizeSize + defaultSampleFlagsSize
+	const baseDataOffsetSize = box.flags & 0x01 ? 8 : 0
+	const sampleDescriptionIndexSize = box.flags & 0x02 ? 4 : 0
+	const defaultSampleDurationSize = box.flags & 0x08 ? 4 : 0
+	const defaultSampleSizeSize = box.flags & 0x10 ? 4 : 0
+	const defaultSampleFlagsSize = box.flags & 0x20 ? 4 : 0
+	const totalSize =
+		headerSize +
+		fullBoxSize +
+		trackIdSize +
+		baseDataOffsetSize +
+		sampleDescriptionIndexSize +
+		defaultSampleDurationSize +
+		defaultSampleSizeSize +
+		defaultSampleFlagsSize
 
 	const writer = new IsoBoxWriteView('tfhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)

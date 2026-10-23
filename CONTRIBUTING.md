@@ -42,7 +42,7 @@ Look through our [existing issues](https://github.com/streaming-video-technology
 > **Warning**
 > This library requires a DCO sign-off on every commit. See https://github.com/apps/dco for more information.
 
-1. Run `npm run format` to format the code before committing.
+1. Run `npm run format` before committing. The command fixes lint findings and then formats the code with `vp fmt`. `npm test` fails on unformatted code.
 
 1. Run `npm run test` and make sure all tests pass.
 

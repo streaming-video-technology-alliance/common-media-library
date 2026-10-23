@@ -6,6 +6,6 @@ import type { SubsampleEncryption } from './SubsampleEncryption.ts'
  * @public
  */
 export type EncryptedSample = {
-	initializationVector?: Uint8Array;
-	subsampleEncryption?: SubsampleEncryption[];
-};
+	initializationVector?: Uint8Array
+	subsampleEncryption?: SubsampleEncryption[]
+}

@@ -6,9 +6,9 @@ import type { ManifestFormat } from './ManifestFormat.ts'
  * @alpha
  */
 export type ManifestFile = {
-	type: ManifestFormat;
-	manifest: string;
-	fileName?: string;
-	ancillaryManifests?: ManifestFile[];
-	metadata?: Map<string, string>;
-};
+	type: ManifestFormat
+	manifest: string
+	fileName?: string
+	ancillaryManifests?: ManifestFile[]
+	metadata?: Map<string, string>
+}

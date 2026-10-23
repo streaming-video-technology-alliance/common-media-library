@@ -6,7 +6,7 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type VideoMediaHeaderBox = FullBox & {
-	type: 'vmhd';
-	graphicsmode: number;
-	opcolor: number[];
-};
+	type: 'vmhd'
+	graphicsmode: number
+	opcolor: number[]
+}

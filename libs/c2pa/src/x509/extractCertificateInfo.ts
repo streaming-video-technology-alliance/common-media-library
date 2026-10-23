@@ -128,8 +128,7 @@ export function extractCertificateInfo(certDER: Uint8Array): CertificateInfo | n
 		}
 
 		return { issuer, notBefore }
-	}
-	catch {
+	} catch {
 		return null
 	}
 }

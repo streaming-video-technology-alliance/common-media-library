@@ -18,7 +18,10 @@ describe('isSameLadder', () => {
 	})
 
 	it('returns false when a bandwidth differs', () => {
-		equal(isSameLadder(rungs(...L1_BANDWIDTHS.slice(0, TOP), L1_BANDWIDTHS[TOP] + 1), L1_BANDWIDTHS), false)
+		equal(
+			isSameLadder(rungs(...L1_BANDWIDTHS.slice(0, TOP), L1_BANDWIDTHS[TOP] + 1), L1_BANDWIDTHS),
+			false,
+		)
 	})
 
 	it('detects a change made in place', () => {

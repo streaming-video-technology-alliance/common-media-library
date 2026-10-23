@@ -1,4 +1,3 @@
-
 import { getRequestHeadersFromMessage } from '@svta/cml-drm'
 import { deepStrictEqual } from 'node:assert'
 import { describe, it } from 'node:test'

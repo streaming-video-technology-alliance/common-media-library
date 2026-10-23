@@ -1,4 +1,13 @@
-import { assert, describe, findBox, isContainer, it, readIsoBoxes, readMdat, readSttg } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	findBox,
+	isContainer,
+	it,
+	readIsoBoxes,
+	readMdat,
+	readSttg,
+} from '../util/box.ts'
 
 describe('readSttg', function () {
 	it('should correctly parse the box from sample data', function () {

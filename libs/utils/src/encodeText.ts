@@ -1,4 +1,3 @@
-
 /**
  * Converts a string to a Uint8Array. The function works like
  * `TextEncoder.encode` and also supports environments without `TextEncoder`.

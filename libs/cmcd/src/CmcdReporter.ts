@@ -7,7 +7,14 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_CUSTOM_EVENT, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL, CmcdEventType } from './CmcdEventType.ts'
+import {
+	CMCD_EVENT_BACKGROUNDED_MODE,
+	CMCD_EVENT_CUSTOM_EVENT,
+	CMCD_EVENT_ERROR,
+	CMCD_EVENT_RESPONSE_RECEIVED,
+	CMCD_EVENT_TIME_INTERVAL,
+	CmcdEventType,
+} from './CmcdEventType.ts'
 import { CMCD_STATE_EVENT_FIELDS } from './CMCD_STATE_EVENT_FIELDS.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdObjectTypeList } from './CmcdObjectTypeList.ts'
@@ -32,22 +39,28 @@ import { toBareValue } from './toBareValue.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 
 type CmcdReportConfigNormalized = CmcdReportConfig & {
-	version: CmcdVersion;
+	version: CmcdVersion
 }
 
-type CmcdEventReportConfigNormalized<C> = CmcdEventReportConfig<C> & CmcdReportConfigNormalized & {
-	events: CmcdEventType[];
-	interval: number;
-	batchSize: number;
-}
+type CmcdEventReportConfigNormalized<C> = CmcdEventReportConfig<C> &
+	CmcdReportConfigNormalized & {
+		events: CmcdEventType[]
+		interval: number
+		batchSize: number
+	}
 
-type CmcdReporterConfigNormalized<C> = CmcdReporterConfig<C> & CmcdReportConfigNormalized & {
-	sid: string;
-	eventTargets: CmcdEventReportConfigNormalized<C>[];
-	sessionRetention: number;
-}
+type CmcdReporterConfigNormalized<C> = CmcdReporterConfig<C> &
+	CmcdReportConfigNormalized & {
+		sid: string
+		eventTargets: CmcdEventReportConfigNormalized<C>[]
+		sessionRetention: number
+	}
 
-function createEncodingOptions(reportingMode: CmcdReportingMode, config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>, baseUrl?: string): CmcdEncodeOptions {
+function createEncodingOptions(
+	reportingMode: CmcdReportingMode,
+	config: CmcdReportConfig & Pick<CmcdRequestReportConfig, 'customHeaderMap'>,
+	baseUrl?: string,
+): CmcdEncodeOptions {
 	const enabledKeySet = new Set(config.enabledKeys ?? [])
 
 	return {
@@ -94,7 +107,8 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 		const ai = a[i]
 		const bi = b[i]
 		if (ai === bi) continue
-		if ((typeof ai === 'number' ? ai : ai.value) !== (typeof bi === 'number' ? bi : bi.value)) return false
+		if ((typeof ai === 'number' ? ai : ai.value) !== (typeof bi === 'number' ? bi : bi.value))
+			return false
 
 		// ExclusiveRecord: params (when defined) has exactly one key
 		const ap = typeof ai === 'number' ? undefined : ai.params
@@ -102,7 +116,14 @@ function cmcdObjectTypeListEqual(a: CmcdObjectTypeList, b: CmcdObjectTypeList): 
 		const ak = ap && Object.keys(ap)[0]
 		const bk = bp && Object.keys(bp)[0]
 		if (ak !== bk) return false
-		if (ak !== undefined && bk !== undefined && ap && bp && ap[ak as keyof typeof ap] !== bp[bk as keyof typeof bp]) return false
+		if (
+			ak !== undefined &&
+			bk !== undefined &&
+			ap &&
+			bp &&
+			ap[ak as keyof typeof ap] !== bp[bk as keyof typeof bp]
+		)
+			return false
 	}
 
 	return true
@@ -140,7 +161,7 @@ const STATE_FIELDS: readonly StateFieldEntry[] = /* @__PURE__ */ Array.from(
 				event,
 				field,
 				equal: brEqual,
-				snapshot: (v) => Array.isArray(v) ? v.slice() : copyItemValue(v),
+				snapshot: v => (Array.isArray(v) ? v.slice() : copyItemValue(v)),
 			}
 		}
 		return { event, field: field as StateField, equal, snapshot: identity }
@@ -165,7 +186,8 @@ function buildRequiredEventKeys(): ReadonlyMap<CmcdEventType, CmcdKey> {
  * beyond `e` and `ts`. Built from the state-change table plus the three
  * event types whose required key is event data, not player state.
  */
-const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ buildRequiredEventKeys()
+const CMCD_REQUIRED_EVENT_KEYS: ReadonlyMap<CmcdEventType, CmcdKey> =
+	/* @__PURE__ */ buildRequiredEventKeys()
 
 /**
  * Copies a value with the `SfItem` structure, including its `params` record
@@ -181,7 +203,10 @@ function copyItemValue(value: unknown): unknown {
 		return value
 	}
 
-	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as { params?: unknown; value?: unknown; }
+	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as {
+		params?: unknown
+		value?: unknown
+	}
 
 	if (copy.params !== null && typeof copy.params === 'object') {
 		copy.params = { ...copy.params }
@@ -221,8 +246,7 @@ function copyReportValues(data: Cmcd): Cmcd {
 			}
 
 			record[key] = copy
-		}
-		else if (value !== null && typeof value === 'object') {
+		} else if (value !== null && typeof value === 'object') {
 			record[key] = copyItemValue(value)
 		}
 	}
@@ -240,9 +264,10 @@ function copyReportValues(data: Cmcd): Cmcd {
  * response then reports its derived keys over the session's data alone.
  */
 function decodeSnapshot(provenance: unknown): Cmcd {
-	const encoded = (provenance !== null && typeof provenance === 'object')
-		? (provenance as { data?: unknown; }).data
-		: undefined
+	const encoded =
+		provenance !== null && typeof provenance === 'object'
+			? (provenance as { data?: unknown }).data
+			: undefined
 
 	if (typeof encoded !== 'string' || !encoded) {
 		return {}
@@ -250,8 +275,7 @@ function decodeSnapshot(provenance: unknown): Cmcd {
 
 	try {
 		return decodeCmcd(encoded, { useSymbol: false }) as Cmcd
-	}
-	catch {
+	} catch {
 		return {}
 	}
 }
@@ -266,12 +290,14 @@ function mintProvenance(sid: string, cid: string | undefined): CmcdRequestProven
 	return Object.freeze(typeof cid === 'string' && cid ? { sid, cid } : { sid })
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
+function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 	return fetch(url, init)
 }
 
-function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): CmcdReporterConfigNormalized<C> {
+function createCmcdReporterConfig<C>(
+	config: Partial<CmcdReporterConfig<C>>,
+): CmcdReporterConfigNormalized<C> {
 	// Apply top-level config defaults
 	const {
 		version = CMCD_V2,
@@ -312,8 +338,8 @@ function createCmcdReporterConfig<C>(config: Partial<CmcdReporterConfig<C>>): Cm
 }
 
 type CmcdTarget = {
-	sn: number;
-	msdSent: boolean;
+	sn: number
+	msdSent: boolean
 }
 
 type CmcdEventTarget = CmcdTarget & {
@@ -322,8 +348,8 @@ type CmcdEventTarget = CmcdTarget & {
 	 * time, so a value that cannot serialize throws inside the recording call.
 	 * Later mutation of the source values cannot change a queued line.
 	 */
-	queue: string[];
-	disposed: boolean;
+	queue: string[]
+	disposed: boolean
 }
 
 /**
@@ -334,7 +360,7 @@ type CmcdEventTarget = CmcdTarget & {
  * session's.
  */
 type CmcdSession<C> = {
-	sid: string;
+	sid: string
 	/**
 	 * Frozen base provenance record for this session: its `sid` and the
 	 * `cid` current at creation time. The reporter writes the record under
@@ -345,12 +371,12 @@ type CmcdSession<C> = {
 	 * requests keep their record. Attribution reads the record's `sid` (see
 	 * `resolveSession()`).
 	 */
-	provenance: CmcdRequestProvenance;
-	data: Cmcd;
-	msd: number;
-	lastEmitted: Partial<Pick<Cmcd, StateField>>;
-	eventTargets: Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>;
-	requestTarget: CmcdTarget;
+	provenance: CmcdRequestProvenance
+	data: Cmcd
+	msd: number
+	lastEmitted: Partial<Pick<Cmcd, StateField>>
+	eventTargets: Map<CmcdEventReportConfigNormalized<C>, CmcdEventTarget>
+	requestTarget: CmcdTarget
 }
 
 /**
@@ -369,7 +395,8 @@ type CmcdSession<C> = {
  * @public
  */
 export class CmcdReporter<C = Record<string, unknown>> {
-	private timeOrigin = performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
+	private timeOrigin =
+		performance.timeOrigin || performance.timing?.fetchStart || Date.now() - performance.now()
 	private config: CmcdReporterConfigNormalized<C>
 
 	/**
@@ -390,7 +417,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	private intervals = new Map<CmcdEventReportConfigNormalized<C>, ReturnType<typeof setInterval>>()
 	private started = false
 
-	private requester: (request: HttpRequest) => Promise<{ status: number; }>
+	private requester: (request: HttpRequest) => Promise<{ status: number }>
 
 	/**
 	 * Creates a new CMCD reporter.
@@ -400,7 +427,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *                    The default is a simple wrapper around the
 	 *                    native `fetch` API.
 	 */
-	constructor(config: Partial<CmcdReporterConfig<C>>, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester) {
+	constructor(
+		config: Partial<CmcdReporterConfig<C>>,
+		requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+	) {
 		this.config = createCmcdReporterConfig(config)
 		this.session = this.createSession(this.config.sid, {
 			cid: this.config.cid,
@@ -460,7 +490,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// have their intervals armed and would report nothing for the session,
 		// and a retried start() would fail on the same target again. Same
 		// continue-then-rethrow contract as `emitEvent()`.
-		let failure: { error: unknown; } | undefined
+		let failure: { error: unknown } | undefined
 
 		// The fan-out is pinned to the session that was current when start()
 		// was called: a transform can synchronously rotate the session, and
@@ -483,8 +513,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			try {
 				this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
 				this.processEventTargets()
-			}
-			catch (error) {
+			} catch (error) {
 				failure ??= { error }
 			}
 		})
@@ -505,15 +534,18 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return false
 		}
 
-		this.intervals.set(config, setInterval(() => {
-			const session = this.session
-			const target = session.eventTargets.get(config)
+		this.intervals.set(
+			config,
+			setInterval(() => {
+				const session = this.session
+				const target = session.eventTargets.get(config)
 
-			if (target) {
-				this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
-				this.processEventTargets()
-			}
-		}, config.interval * 1000))
+				if (target) {
+					this.recordTargetEvent(session, target, config, CMCD_EVENT_TIME_INTERVAL)
+					this.processEventTargets()
+				}
+			}, config.interval * 1000),
+		)
 
 		return true
 	}
@@ -629,7 +661,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// (not the pre-merge value) ensures correctness after a session change,
 		// and unifies the comparison basis with recordEvent's internal dedup.
 		for (const entry of STATE_FIELDS) {
-			if (entry.field in data && !entry.equal(session.data[entry.field], session.lastEmitted[entry.field])) {
+			if (
+				entry.field in data &&
+				!entry.equal(session.data[entry.field], session.lastEmitted[entry.field])
+			) {
 				this.recordEvent(entry.event)
 			}
 		}
@@ -745,7 +780,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *                  parameter, which the reporter passes to each target's
 	 *                  `transform`.
 	 */
-	private emitEvent(session: CmcdSession<C>, type: CmcdEventType, data: Partial<Cmcd>, request?: HttpRequest): void {
+	private emitEvent(
+		session: CmcdSession<C>,
+		type: CmcdEventType,
+		data: Partial<Cmcd>,
+		request?: HttpRequest,
+	): void {
 		const entry = STATE_FIELDS_BY_EVENT.get(type)
 		if (entry) {
 			const field = entry.field
@@ -775,13 +815,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// above is already committed and is never rolled back, so aborting here
 		// would strand the transition: targets after the throwing one would
 		// never receive it, and the caller's retry would be deduped away.
-		let failure: { error: unknown; } | undefined
+		let failure: { error: unknown } | undefined
 
 		session.eventTargets.forEach((target, config) => {
 			try {
 				this.recordTargetEvent(session, target, config, type, data, request)
-			}
-			catch (error) {
+			} catch (error) {
 				failure ??= { error }
 			}
 		})
@@ -809,7 +848,14 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param request - The media request that triggered the event, when
 	 *                  one exists. The target's `transform` receives it.
 	 */
-	private recordTargetEvent(session: CmcdSession<C>, target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, type: CmcdEventType, data: Partial<Cmcd> = {}, request?: HttpRequest): void {
+	private recordTargetEvent(
+		session: CmcdSession<C>,
+		target: CmcdEventTarget,
+		config: CmcdEventReportConfigNormalized<C>,
+		type: CmcdEventType,
+		data: Partial<Cmcd> = {},
+		request?: HttpRequest,
+	): void {
 		if (target.disposed || !config.events.includes(type)) {
 			return
 		}
@@ -864,7 +910,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			report.ts = ts
 		}
 
-		if (requiredKey && isValid(requiredValue) && !isValid((report as Record<string, unknown>)[requiredKey])) {
+		if (
+			requiredKey &&
+			isValid(requiredValue) &&
+			!isValid((report as Record<string, unknown>)[requiredKey])
+		) {
 			Object.assign(report, { [requiredKey]: requiredValue })
 		}
 
@@ -886,7 +936,13 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param report - The finished report data.
 	 * @param type - The type of event being reported.
 	 */
-	private queueTargetEvent(session: CmcdSession<C>, target: CmcdEventTarget, config: CmcdEventReportConfigNormalized<C>, report: Cmcd, type: CmcdEventType): void {
+	private queueTargetEvent(
+		session: CmcdSession<C>,
+		target: CmcdEventTarget,
+		config: CmcdEventReportConfigNormalized<C>,
+		report: Cmcd,
+		type: CmcdEventType,
+	): void {
 		report.e = type
 		report.sn = target.sn++
 		report.sid = session.sid
@@ -900,8 +956,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		if (!isNaN(session.msd) && !target.msdSent && config.enabledKeys?.includes('msd')) {
 			report.msd = session.msd
 			target.msdSent = true
-		}
-		else {
+		} else {
 			delete report.msd
 		}
 
@@ -962,7 +1017,12 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *               The reporter ignores session-owned keys (`sid`, `msd`)
 	 *               supplied here.
 	 */
-	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(response: HttpResponse<HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance }>>, data: Partial<Cmcd> = {}): void {
+	recordResponseReceived<RD extends CmcdReporterCustomData<C> = C>(
+		response: HttpResponse<
+			HttpRequest<RD & { cmcd?: Cmcd; [CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance }>
+		>,
+		data: Partial<Cmcd> = {},
+	): void {
 		const { request } = response
 
 		const url = data.url ?? request?.url
@@ -978,13 +1038,14 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return
 		}
 
-		const cmcd = provenance === undefined ? { ...request.customData?.cmcd } : decodeSnapshot(provenance)
+		const cmcd =
+			provenance === undefined ? { ...request.customData?.cmcd } : decodeSnapshot(provenance)
 
 		// The record's cid is the content the request was issued under. It
 		// overrides the session store's current value so a response landing
 		// after a mid-session content change keeps its meaning, and it
 		// yields to the decoded snapshot and per-call data above it.
-		const { cid } = (provenance ?? {}) as { cid?: unknown; }
+		const { cid } = (provenance ?? {}) as { cid?: unknown }
 
 		const derived: Partial<Cmcd> = {
 			url: replaceCmcdParam(url),
@@ -1007,12 +1068,17 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			}
 		}
 
-		this.emitEvent(session, CMCD_EVENT_RESPONSE_RECEIVED, {
-			...(typeof cid === 'string' && cid ? { cid } : undefined),
-			...cmcd,
-			...derived,
-			...data,
-		}, request)
+		this.emitEvent(
+			session,
+			CMCD_EVENT_RESPONSE_RECEIVED,
+			{
+				...(typeof cid === 'string' && cid ? { cid } : undefined),
+				...cmcd,
+				...derived,
+				...data,
+			},
+			request,
+		)
 	}
 
 	/**
@@ -1029,7 +1095,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			return undefined
 		}
 
-		const { sid } = provenance as { sid?: unknown; }
+		const { sid } = provenance as { sid?: unknown }
 
 		return typeof sid === 'string' ? this.sessions.get(sid) : undefined
 	}
@@ -1066,7 +1132,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * and reports derived keys over session data, matching the tolerance of
 	 * `decodeSnapshot()` when reading.
 	 */
-	private createRequestProvenance(data: Partial<Cmcd> | undefined, baseUrl: string | undefined): CmcdRequestProvenance {
+	private createRequestProvenance(
+		data: Partial<Cmcd> | undefined,
+		baseUrl: string | undefined,
+	): CmcdRequestProvenance {
 		const base = this.session.provenance
 
 		if (!data) {
@@ -1081,8 +1150,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 			})
 
 			return encoded ? Object.freeze({ ...base, data: encoded }) : base
-		}
-		catch {
+		} catch {
 			return base
 		}
 	}
@@ -1105,7 +1173,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 *               persistent data.
 	 * @returns The request with the CMCD request report applied.
 	 */
-	createRequestReport<R extends HttpRequest<CmcdReporterCustomData<C>> = HttpRequest<C>>(request: R, data?: Partial<Cmcd>): R & CmcdRequestReport<R['customData']> {
+	createRequestReport<R extends HttpRequest<CmcdReporterCustomData<C>> = HttpRequest<C>>(
+		request: R,
+		data?: Partial<Cmcd>,
+	): R & CmcdRequestReport<R['customData']> {
 		const { customData = {}, headers = {}, ...rest } = request
 		const report = {
 			...rest,
@@ -1167,8 +1238,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		if (sendMsd) {
 			cmcdData.msd = session.msd
-		}
-		else {
+		} else {
 			delete cmcdData.msd
 		}
 
@@ -1180,7 +1250,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// shared array would leak mutation into the store. The reporter never
 		// reads it back; the response path works from the encoded snapshot on
 		// the provenance record.
-		const cmcd = report.customData.cmcd = copyReportValues(prepareCmcdData(cmcdData, options))
+		const cmcd = (report.customData.cmcd = copyReportValues(prepareCmcdData(cmcdData, options)))
 
 		if (sendMsd && cmcd.msd !== undefined) {
 			session.requestTarget.msdSent = true
@@ -1214,7 +1284,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		// Oldest session first, so an archived session's late reports leave
 		// ahead of current traffic.
-		this.sessions.forEach((session) => {
+		this.sessions.forEach(session => {
 			// An archived session receives no further regular events, so its
 			// queues could never fill a batch again; its remainders are always
 			// drain-eligible, preserving the pre-existing behavior of unsent
@@ -1259,7 +1329,11 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * @param config - The target config to send the event report to.
 	 * @param data - The encoded report lines to send in the event report.
 	 */
-	private async sendEventReport(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>, data: string[]): Promise<void> {
+	private async sendEventReport(
+		session: CmcdSession<C>,
+		config: CmcdEventReportConfigNormalized<C>,
+		data: string[],
+	): Promise<void> {
 		const response = await this.requester({
 			url: config.url,
 			method: 'POST',
@@ -1300,7 +1374,10 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * current session, the method also cancels those configs' timers. A session
 	 * started after the disposal gets new target state and is unaffected.
 	 */
-	private disposeEventTarget(session: CmcdSession<C>, config: CmcdEventReportConfigNormalized<C>): void {
+	private disposeEventTarget(
+		session: CmcdSession<C>,
+		config: CmcdEventReportConfigNormalized<C>,
+	): void {
 		session.eventTargets.forEach((target, sibling) => {
 			if (sibling.url !== config.url || target.disposed) {
 				return

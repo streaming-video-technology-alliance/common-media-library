@@ -18,6 +18,5 @@ const CMCD_REQUEST_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_R
  * {@includeCode ../test/isCmcdRequestKey.test.ts#example}
  */
 export function isCmcdRequestKey(key: string): key is keyof Cmcd {
-	return CMCD_REQUEST_KEY_SET.has(key) ||
-		isCmcdCustomKey(key as CmcdKey)
+	return CMCD_REQUEST_KEY_SET.has(key) || isCmcdCustomKey(key as CmcdKey)
 }

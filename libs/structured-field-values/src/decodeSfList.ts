@@ -19,8 +19,7 @@ export function decodeSfList(input: string, options?: SfDecodeOptions): SfMember
 			throw parseError(src, LIST)
 		}
 		return value
-	}
-	catch (cause) {
+	} catch (cause) {
 		throw parseError(input, LIST, cause)
 	}
 }

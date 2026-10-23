@@ -11,7 +11,7 @@ const NO_TOLERANCE = 0
 
 // The seconds that the rung at `position` needs to download one segment at `SAFE_THROUGHPUT`.
 function downloadSeconds(position: number): number {
-	return L1_BANDWIDTHS[position] * SEGMENT_DURATION / SAFE_THROUGHPUT
+	return (L1_BANDWIDTHS[position] * SEGMENT_DURATION) / SAFE_THROUGHPUT
 }
 
 function guard(index: number, budget: number, tolerance = NO_TOLERANCE): number {

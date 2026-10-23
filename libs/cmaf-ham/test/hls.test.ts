@@ -13,7 +13,6 @@ import ham1 from './data/ham-samples/fromHls/ham1.json' with { type: 'json' }
 import ham2 from './data/ham-samples/fromHls/ham2.json' with { type: 'json' }
 import ham3 from './data/ham-samples/fromHls/ham3.json' with { type: 'json' }
 
-
 describe('hlsToHam', () => {
 	it('converts hls1 to ham1', () => {
 		const convertedHam = hlsToHam(hlsMain1, hlsPlaylist1)

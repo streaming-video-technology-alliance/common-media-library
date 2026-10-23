@@ -12,4 +12,4 @@
  *
  * @public
  */
-export type CmcdReporterCustomData<C> = Record<string, unknown> extends C ? any : C;
+export type CmcdReporterCustomData<C> = Record<string, unknown> extends C ? any : C

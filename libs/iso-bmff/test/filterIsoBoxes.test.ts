@@ -36,7 +36,10 @@ describe('filterIsoBoxes', function () {
 		const box1 = createBox('ftyp')
 		const box2 = createBox('mdat')
 		const box3 = createBox('moov')
-		const result = filterIsoBoxes([box1, box2, box3], box => box.type === 'mdat' || box.type === 'moov')
+		const result = filterIsoBoxes(
+			[box1, box2, box3],
+			box => box.type === 'mdat' || box.type === 'moov',
+		)
 		assert.strictEqual(result.length, 2)
 		assert.strictEqual(result[0].type, 'mdat')
 		assert.strictEqual(result[1].type, 'moov')
@@ -107,7 +110,9 @@ describe('filterIsoBoxes', function () {
 		const container2 = createContainer('trak', [child2])
 
 		// Depth-first order
-		const depthFirstResult = filterIsoBoxes([container1, container2], () => true, { depthFirst: true })
+		const depthFirstResult = filterIsoBoxes([container1, container2], () => true, {
+			depthFirst: true,
+		})
 		assert.strictEqual(depthFirstResult.length, 4)
 		assert.strictEqual(depthFirstResult[0].type, 'meta')
 		assert.strictEqual(depthFirstResult[1].type, 'child1')
@@ -115,7 +120,9 @@ describe('filterIsoBoxes', function () {
 		assert.strictEqual(depthFirstResult[3].type, 'child2')
 
 		// Breadth-first order
-		const breadthFirstResult = filterIsoBoxes([container1, container2], () => true, { depthFirst: false })
+		const breadthFirstResult = filterIsoBoxes([container1, container2], () => true, {
+			depthFirst: false,
+		})
 		assert.strictEqual(breadthFirstResult.length, 4)
 		assert.strictEqual(breadthFirstResult[0].type, 'meta')
 		assert.strictEqual(breadthFirstResult[1].type, 'trak')
@@ -129,7 +136,10 @@ describe('filterIsoBoxes', function () {
 		const box3 = { type: 'trak', size: 300 } as ParsedIsoBox
 		const box4 = { type: 'mdat', size: 400 } as ParsedIsoBox
 
-		const result = filterIsoBoxes([box1, box2, box3, box4], box => box.type === 'trak' && box.size > 150)
+		const result = filterIsoBoxes(
+			[box1, box2, box3, box4],
+			box => box.type === 'trak' && box.size > 150,
+		)
 		assert.strictEqual(result.length, 2)
 		assert.strictEqual(result[0], box2)
 		assert.strictEqual(result[1], box3)

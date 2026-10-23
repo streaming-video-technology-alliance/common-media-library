@@ -23,4 +23,4 @@ export const WidevineRobustness = {
  *
  * @public
  */
-export type WidevineRobustness = ValueOf<typeof WidevineRobustness>;
+export type WidevineRobustness = ValueOf<typeof WidevineRobustness>

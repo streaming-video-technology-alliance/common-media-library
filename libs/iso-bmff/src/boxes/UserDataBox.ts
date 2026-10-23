@@ -3,7 +3,7 @@
  *
  * @public
  */
-export type UserDataBoxChild = any;
+export type UserDataBoxChild = any
 
 /**
  * User Data Box - 'udta' - Container
@@ -11,6 +11,6 @@ export type UserDataBoxChild = any;
  * @public
  */
 export type UserDataBox = {
-	type: 'udta';
-	boxes: UserDataBoxChild[];
-};
+	type: 'udta'
+	boxes: UserDataBoxChild[]
+}

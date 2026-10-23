@@ -2,7 +2,7 @@ import type { PathwayClone } from '@svta/cml-content-steering'
 
 export const PATHWAY_CLONE: PathwayClone = {
 	'BASE-ID': 'pathway1',
-	'ID': 'clone1',
+	ID: 'clone1',
 	'URI-REPLACEMENT': {
 		HOST: 'example.com',
 		PARAMS: {

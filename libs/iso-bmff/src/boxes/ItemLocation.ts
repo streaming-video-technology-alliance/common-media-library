@@ -6,9 +6,9 @@ import type { ItemExtent } from './ItemExtent.ts'
  * @public
  */
 export type ItemLocation = {
-	itemId: number;
-	constructionMethod?: number;
-	dataReferenceIndex: number;
-	baseOffset: number;
-	extents: ItemExtent[];
-};
+	itemId: number
+	constructionMethod?: number
+	dataReferenceIndex: number
+	baseOffset: number
+	extents: ItemExtent[]
+}

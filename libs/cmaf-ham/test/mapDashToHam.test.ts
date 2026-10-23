@@ -33,11 +33,7 @@ describe('map segments', () => {
 
 	describe('mapSegmentTemplate', () => {
 		it('maps Representation and SegmentTemplate to Segments[]', () => {
-			const res = mapSegmentTemplate(
-				representationTemplate,
-				duration,
-				segmentTemplate,
-			)
+			const res = mapSegmentTemplate(representationTemplate, duration, segmentTemplate)
 			deepStrictEqual(res, expectedSegmentTemplate)
 		})
 	})
@@ -48,11 +44,7 @@ describe('map segments', () => {
 				$: { segmentAlignment: '' },
 				Representation: [representationBase],
 			}
-			const res = mapSegments(
-				adaptationSet,
-				representationBase,
-				duration,
-			)
+			const res = mapSegments(adaptationSet, representationBase, duration)
 			deepStrictEqual(res, expectedSegmentBase)
 		})
 
@@ -61,11 +53,7 @@ describe('map segments', () => {
 				$: { segmentAlignment: '' },
 				Representation: [representationList],
 			}
-			const res = mapSegments(
-				adaptationSet,
-				representationList,
-				duration,
-			)
+			const res = mapSegments(adaptationSet, representationList, duration)
 			deepStrictEqual(res, expectedSegmentList)
 		})
 
@@ -75,11 +63,7 @@ describe('map segments', () => {
 				Representation: [representationTemplate],
 				SegmentTemplate: [segmentTemplate],
 			}
-			const res = mapSegments(
-				adaptationSet,
-				representationTemplate,
-				duration,
-			)
+			const res = mapSegments(adaptationSet, representationTemplate, duration)
 			deepStrictEqual(res, expectedSegmentTemplate)
 		})
 	})

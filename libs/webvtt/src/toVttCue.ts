@@ -26,8 +26,7 @@ export function toVttCue(cue: WebVttCue): VTTCue {
 	// Safari still uses the old middle value and won't accept center
 	try {
 		vttCue.align = 'center'
-	}
-	catch (e) {
+	} catch (e) {
 		vttCue.align = 'middle' as AlignSetting
 	}
 

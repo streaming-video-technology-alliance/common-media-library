@@ -3,7 +3,12 @@ import { describe, it } from 'node:test'
 
 import type { AudioTrack } from '@svta/cml-cmaf-ham'
 
-import { encodeByteRange, getPlaylistData, getSegments, getUrlInitialization } from '@svta/cml-cmaf-ham'
+import {
+	encodeByteRange,
+	getPlaylistData,
+	getSegments,
+	getUrlInitialization,
+} from '@svta/cml-cmaf-ham'
 
 import { getAudioTrack } from './data/hlsData.ts'
 
@@ -46,12 +51,12 @@ describe('getSegments', () => {
 		equal(
 			res,
 			'#EXTINF:4.011,\n' +
-			'#EXT-X-BYTERANGE:123@456\n' +
-			'\n' +
-			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4\n' +
-			'#EXTINF:3.989,\n' +
-			'\n' +
-			'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
+				'#EXT-X-BYTERANGE:123@456\n' +
+				'\n' +
+				'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s1.mp4\n' +
+				'#EXTINF:3.989,\n' +
+				'\n' +
+				'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/a-eng-0384k-aac-6c-s2.mp4',
 		)
 	})
 })

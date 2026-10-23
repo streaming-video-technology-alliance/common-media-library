@@ -19,7 +19,7 @@ describe('findIsoBox', function () {
 		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
 			readers: {
 				ftyp: readFtyp,
-			}
+			},
 		})
 
 		const ftyp = findIsoBox(boxes, box => box.type === 'ftyp')

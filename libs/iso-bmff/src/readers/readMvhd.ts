@@ -15,7 +15,7 @@ export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 	const { readUint, readTemplate, readArray } = view
 
 	const { version, flags } = view.readFullBox()
-	const size = (version == 1) ? 8 : 4
+	const size = version == 1 ? 8 : 4
 
 	return {
 		type: 'mvhd',
@@ -33,4 +33,4 @@ export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 		preDefined: readArray(UINT, 4, 6),
 		nextTrackId: readUint(4),
 	}
-};
+}

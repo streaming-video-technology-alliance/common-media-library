@@ -9,5 +9,10 @@ import type { ResourceTiming } from '@svta/cml-utils'
 export function isValidSample(sample: ResourceTiming): boolean {
 	const { encodedBodySize, duration } = sample
 
-	return Number.isFinite(encodedBodySize) && encodedBodySize > 0 && Number.isFinite(duration) && duration > 0
+	return (
+		Number.isFinite(encodedBodySize) &&
+		encodedBodySize > 0 &&
+		Number.isFinite(duration) &&
+		duration > 0
+	)
 }

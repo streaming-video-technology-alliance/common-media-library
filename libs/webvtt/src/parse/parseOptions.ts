@@ -1,6 +1,11 @@
 // Helper function to parse input into groups separated by 'groupDelim', and
 // interpet each group as a key/value pair separated by 'keyValueDelim'.
-export function parseOptions(input: string, callback: (k: string, v: string) => void, keyValueDelim: string | RegExp, groupDelim?: string | RegExp): void {
+export function parseOptions(
+	input: string,
+	callback: (k: string, v: string) => void,
+	keyValueDelim: string | RegExp,
+	groupDelim?: string | RegExp,
+): void {
 	// TODO: Optimize parsing to avoid creating new arrays and strings.
 	const groups = groupDelim ? input.split(groupDelim) : [input]
 

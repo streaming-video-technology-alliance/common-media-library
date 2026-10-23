@@ -13,7 +13,10 @@ import { resolveImportAlgorithm } from '../cose/resolveImportAlgorithm.ts'
 import { bytesToHex, isKeyExpired } from '../utils.ts'
 import type { SegmentValidationResult } from './SegmentValidation.ts'
 
-function findSessionKey(sessionKeys: readonly ValidatedSessionKey[], kidHex: string | null): ValidatedSessionKey | null {
+function findSessionKey(
+	sessionKeys: readonly ValidatedSessionKey[],
+	kidHex: string | null,
+): ValidatedSessionKey | null {
 	if (!kidHex || sessionKeys.length === 0) return null
 	return sessionKeys.find(k => k.kid === kidHex) ?? null
 }
@@ -49,7 +52,10 @@ export async function validateC2paSegment(
 	segmentBytes: Uint8Array,
 	sessionKeys: readonly ValidatedSessionKey[],
 	sequenceState: SequenceState = createSequenceState(),
-): Promise<{ readonly result: SegmentValidationResult; readonly nextSequenceState: SequenceState } | null> {
+): Promise<{
+	readonly result: SegmentValidationResult
+	readonly nextSequenceState: SequenceState
+} | null> {
 	const emsgBox = extractVsiEmsgBox(segmentBytes)
 	if (!emsgBox) return null
 

@@ -8,8 +8,8 @@ import type { SegmentHls } from './SegmentHls.ts'
  * @alpha
  */
 export type HlsManifest = {
-	playlists: PlayList[];
-	mediaGroups: MediaGroups;
-	segments: SegmentHls[];
-	targetDuration?: number;
-};
+	playlists: PlayList[]
+	mediaGroups: MediaGroups
+	segments: SegmentHls[]
+	targetDuration?: number
+}

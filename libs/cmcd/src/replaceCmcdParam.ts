@@ -32,8 +32,7 @@ export function replaceCmcdParam(url: string, value?: string): string {
 	for (const item of start < end ? url.slice(start + 1, end).split('&') : []) {
 		if (!isCmcdParam(item)) {
 			params.push(item)
-		}
-		else {
+		} else {
 			found = true
 
 			if (param) {
@@ -49,8 +48,7 @@ export function replaceCmcdParam(url: string, value?: string): string {
 		}
 
 		params.push(param)
-	}
-	else if (!found) {
+	} else if (!found) {
 		return url
 	}
 

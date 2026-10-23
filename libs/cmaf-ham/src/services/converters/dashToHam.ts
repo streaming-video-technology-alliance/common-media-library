@@ -3,7 +3,6 @@ import type { Presentation } from '../../types/model/Presentation.ts'
 import { DashMapper } from '../../mapper/dash/DashMapper.ts'
 import { MapperContext } from '../../mapper/MapperContext.ts'
 
-
 /**
  * Convert dash manifest into a ham object.
  *

@@ -26,23 +26,16 @@ export function getFrameRate(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
 ): FrameRate {
-	const frameRateDash: string =
-		representation.$.frameRate ?? adaptationSet.$.frameRate ?? ''
+	const frameRateDash: string = representation.$.frameRate ?? adaptationSet.$.frameRate ?? ''
 	if (!frameRateDash) {
-		console.error(
-			`Representation ${representation.$.id} has no frame rate`,
-		)
+		console.error(`Representation ${representation.$.id} has no frame rate`)
 	}
 	const frameRate = frameRateDash.split(FRAME_RATE_SEPARATOR)
 	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '')
 	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '')
 
 	return {
-		frameRateNumerator: isNaN(frameRateNumerator)
-			? FRAME_RATE_NUMERATOR_30
-			: frameRateNumerator,
-		frameRateDenominator: isNaN(frameRateDenominator)
-			? ZERO
-			: frameRateDenominator,
+		frameRateNumerator: isNaN(frameRateNumerator) ? FRAME_RATE_NUMERATOR_30 : frameRateNumerator,
+		frameRateDenominator: isNaN(frameRateDenominator) ? ZERO : frameRateDenominator,
 	} as FrameRate
 }

@@ -3,4 +3,4 @@
  *
  * @public
  */
-export type IsoBoxType = `${string}${string}${string}${string}`;
+export type IsoBoxType = `${string}${string}${string}${string}`

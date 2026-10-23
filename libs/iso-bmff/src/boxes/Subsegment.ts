@@ -6,6 +6,6 @@ import type { SubsegmentRange } from './SubsegmentRange.ts'
  * @public
  */
 export type Subsegment = {
-	rangesCount: number;
-	ranges: SubsegmentRange[];
-};
+	rangesCount: number
+	ranges: SubsegmentRange[]
+}

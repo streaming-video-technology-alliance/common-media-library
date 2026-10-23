@@ -13,6 +13,9 @@ import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
  *
  * @public
  */
-export function writeAvc4(box: VisualSampleEntryBox<'avc4'>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeAvc4(
+	box: VisualSampleEntryBox<'avc4'>,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	return writeVisualSampleEntryBox(box, config)
 }

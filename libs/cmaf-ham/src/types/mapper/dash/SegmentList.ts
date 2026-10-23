@@ -8,9 +8,9 @@ import type { SegmentURL } from './SegmentUrl.ts'
  */
 export type SegmentList = {
 	$: {
-		duration: string;
-		timescale: string;
-	};
-	Initialization: Initialization[];
-	SegmentURL?: SegmentURL[];
-};
+		duration: string
+		timescale: string
+	}
+	Initialization: Initialization[]
+	SegmentURL?: SegmentURL[]
+}

@@ -142,7 +142,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		}
 
 		params = next
-		bandwidths = ladder.map((rung) => rung.bandwidth)
+		bandwidths = ladder.map(rung => rung.bandwidth)
 		bufferTarget = target
 
 		return next
@@ -175,7 +175,11 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		return { index: rungParams.positions[position], delay, state, placeholder }
 	}
 
-	function selectInStartup(rungParams: BolaParams, bufferLevel: number, safeThroughput: number): BolaDecision {
+	function selectInStartup(
+		rungParams: BolaParams,
+		bufferLevel: number,
+		safeThroughput: number,
+	): BolaDecision {
 		const position = Number.isNaN(safeThroughput) ? 0 : findRung(rungParams.rungs, safeThroughput)
 
 		placeholder = Math.max(0, rungParams.thresholds[position] - bufferLevel)
@@ -188,7 +192,13 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	}
 
 	// The conversion of a rebuild needs the elapsed time in the placeholder, so the call adds the time first.
-	function selectInSteadyState(input: BitrateSelectorInput, rungParams: BolaParams, previousParams: BolaParams | undefined, bufferLevel: number, throughput: number): BolaDecision {
+	function selectInSteadyState(
+		input: BitrateSelectorInput,
+		rungParams: BolaParams,
+		previousParams: BolaParams | undefined,
+		bufferLevel: number,
+		throughput: number,
+	): BolaDecision {
 		consumeElapsedTime(input.now)
 
 		if (previousParams && previousParams !== rungParams) {
@@ -219,25 +229,50 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	}
 
 	// The rung with the best score for the effective buffer, limited by the oscillation guard when the throughput is known.
-	function pickByBuffer(rungParams: BolaParams, effectiveBuffer: number, throughput: number): number {
+	function pickByBuffer(
+		rungParams: BolaParams,
+		effectiveBuffer: number,
+		throughput: number,
+	): number {
 		const position = selectRungByBuffer(rungParams, effectiveBuffer)
 
 		if (Number.isNaN(throughput)) {
 			return position
 		}
 
-		return limitUpwardSwitch(position, currentPosition(rungParams), findRung(rungParams.rungs, throughput * safetyFactor))
+		return limitUpwardSwitch(
+			position,
+			currentPosition(rungParams),
+			findRung(rungParams.rungs, throughput * safetyFactor),
+		)
 	}
 
 	// The starvation guard has one pass, and rung 0 is its fallback. It needs a positive `segmentDuration`, a known throughput, and enough finished samples.
-	function limitStarvation(rungParams: BolaParams, position: number, input: BitrateSelectorInput, bufferLevel: number, throughput: number): number {
-		if (finishedSampleCount < STARVATION_GUARD_SAMPLE_COUNT || Number.isNaN(throughput) || !isPositiveFinite(input.segmentDuration)) {
+	function limitStarvation(
+		rungParams: BolaParams,
+		position: number,
+		input: BitrateSelectorInput,
+		bufferLevel: number,
+		throughput: number,
+	): number {
+		if (
+			finishedSampleCount < STARVATION_GUARD_SAMPLE_COUNT ||
+			Number.isNaN(throughput) ||
+			!isPositiveFinite(input.segmentDuration)
+		) {
 			return position
 		}
 
 		const playbackRate = isPositiveFinite(input.playbackRate) ? input.playbackRate : 1
 
-		return applyStarvationGuard(rungParams.rungs, position, input.segmentDuration, throughput * starvationSafetyFactor, bufferLevel / playbackRate, NO_TOLERANCE)
+		return applyStarvationGuard(
+			rungParams.rungs,
+			position,
+			input.segmentDuration,
+			throughput * starvationSafetyFactor,
+			bufferLevel / playbackRate,
+			NO_TOLERANCE,
+		)
 	}
 
 	// A stall empties the placeholder and the time bases.
@@ -310,11 +345,17 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 			const rungParams = syncParams(input.ladder, target)
 
 			if (rungParams.rungs.length === 1) {
-				return { index: rungParams.positions[0], delay: 0, state: BolaState.STARTUP, placeholder: 0 }
+				return {
+					index: rungParams.positions[0],
+					delay: 0,
+					state: BolaState.STARTUP,
+					placeholder: 0,
+				}
 			}
 
 			// NaN stands for an unknown throughput. A throughput of 0 is a measurement.
-			const throughput = Number.isFinite(input.throughput) && input.throughput >= 0 ? input.throughput : NaN
+			const throughput =
+				Number.isFinite(input.throughput) && input.throughput >= 0 ? input.throughput : NaN
 
 			return state === BolaState.STARTUP
 				? selectInStartup(rungParams, bufferLevel, throughput * safetyFactor)

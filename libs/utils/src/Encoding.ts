@@ -21,4 +21,4 @@ export const Encoding = {
  *
  * @public
  */
-export type Encoding = ValueOf<typeof Encoding>;
+export type Encoding = ValueOf<typeof Encoding>

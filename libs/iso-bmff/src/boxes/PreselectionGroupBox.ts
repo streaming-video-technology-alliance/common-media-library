@@ -7,7 +7,7 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 // TODO: Find documentation on what children are allowed
-export type PreselectionGroupBoxChild = any;
+export type PreselectionGroupBoxChild = any
 
 /**
  * ISO/IEC 14496-12:202x - 8.18.4.1 Preselection group box
@@ -15,19 +15,19 @@ export type PreselectionGroupBoxChild = any;
  * @public
  */
 export type PreselectionGroupBox = FullBox & {
-	type: 'prsl';
+	type: 'prsl'
 
 	/** Group ID */
-	groupId: number;
+	groupId: number
 
 	/** Number of entities in group */
-	numEntitiesInGroup: number;
+	numEntitiesInGroup: number
 
 	/** Entities */
-	entities: Entity[];
+	entities: Entity[]
 
-	preselectionTag?: string;
-	selectionPriority?: number;
-	interleavingTag?: string;
-	boxes: PreselectionGroupBoxChild[];
-};
+	preselectionTag?: string
+	selectionPriority?: number
+	interleavingTag?: string
+	boxes: PreselectionGroupBoxChild[]
+}

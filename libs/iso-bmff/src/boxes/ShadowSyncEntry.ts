@@ -4,6 +4,6 @@
  * @public
  */
 export type ShadowSyncEntry = {
-	shadowedSampleNumber: number;
-	syncSampleNumber: number;
-};
+	shadowedSampleNumber: number
+	syncSampleNumber: number
+}

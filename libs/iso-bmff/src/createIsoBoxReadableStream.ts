@@ -15,6 +15,9 @@ import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
  *
  * @public
  */
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array> {
+export function createIsoBoxReadableStream(
+	boxes: Iterable<IsoBoxStreamable>,
+	config: IsoBoxWriteViewConfig,
+): ReadableStream<Uint8Array> {
 	return new IsoBoxReadableStream(boxes, config)
 }

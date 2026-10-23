@@ -21,7 +21,10 @@ export function getSvtaErrorCategory(code: number): SvtaErrorCategory | undefine
 
 	const category = Math.floor(code / 1000)
 
-	if ((category >= SvtaErrorCategory.UNKNOWN && category <= SvtaErrorCategory.ADVERTISING) || category === SvtaErrorCategory.CUSTOM) {
+	if (
+		(category >= SvtaErrorCategory.UNKNOWN && category <= SvtaErrorCategory.ADVERTISING) ||
+		category === SvtaErrorCategory.CUSTOM
+	) {
 		return category as SvtaErrorCategory
 	}
 

@@ -22,11 +22,9 @@ export function writeBox(box: IsoBoxStreamable, config: IsoBoxWriteViewConfig): 
 		if (writer) {
 			// TODO: Find a better way to do this without casting to any
 			view = writer(box as any, config)
-		}
-		else if (isContainer(box)) {
+		} else if (isContainer(box)) {
 			view = writeContainerBox(box, config)
-		}
-		else if ('view' in box) {
+		} else if ('view' in box) {
 			view = box.view
 		}
 

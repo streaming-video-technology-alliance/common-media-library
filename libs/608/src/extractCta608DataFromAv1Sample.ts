@@ -26,7 +26,11 @@ import { parseCta608DataFromMetadataObu, readObu } from './utils/obuHelpers.ts'
  *
  * @public
  */
-export function extractCta608DataFromAv1Sample(raw: DataView, startPos: number, sampleSize: number): number[][] {
+export function extractCta608DataFromAv1Sample(
+	raw: DataView,
+	startPos: number,
+	sampleSize: number,
+): number[][] {
 	const fieldData: number[][] = [[], []]
 
 	// One mp4 sample is one temporal unit: OBUs in the low-overhead format, each sized by

@@ -13,7 +13,10 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @public
  */
-export function writeStsd(box: SampleDescriptionBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeStsd(
+	box: SampleDescriptionBox,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

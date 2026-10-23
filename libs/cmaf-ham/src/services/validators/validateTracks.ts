@@ -36,9 +36,7 @@ export function validateTracks(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = switchingSetId
-		? ` in the switching set with id = ${switchingSetId}`
-		: '.'
+	const moreInformation = switchingSetId ? ` in the switching set with id = ${switchingSetId}` : '.'
 	let tracksDuration: number
 
 	tracks.forEach((track: Track) => {
@@ -47,9 +45,7 @@ export function validateTracks(
 		}
 		if (tracksDuration !== track.duration) {
 			validation.status = false
-			validation.errorMessages.push(
-				`All the tracks must have the same duration${moreInformation}`,
-			)
+			validation.errorMessages.push(`All the tracks must have the same duration${moreInformation}`)
 		}
 		validateTrack(track, switchingSetId, validation)
 	})

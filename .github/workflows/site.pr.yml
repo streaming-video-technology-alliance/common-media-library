@@ -3,21 +3,21 @@ name: Site
 on:
   pull_request:
     paths:
-      - "site/**"
-      - "libs/*/src/**"
-      - "libs/*/test/**"
-      - "libs/*/docs/**"
-      - "libs/*/README.md"
-      - "libs/*/CHANGELOG.md"
-      - "libs/*/package.json"
-      - "libs/*/config/**"
-      - "scripts/agentDocs.ts"
-      - "scripts/projects.ts"
-      - "scripts/workspaces.ts"
-      - "tsconfig.typedoc.json"
-      - "package.json"
-      - "package-lock.json"
-      - ".github/workflows/site.pr.yml"
+      - 'site/**'
+      - 'libs/*/src/**'
+      - 'libs/*/test/**'
+      - 'libs/*/docs/**'
+      - 'libs/*/README.md'
+      - 'libs/*/CHANGELOG.md'
+      - 'libs/*/package.json'
+      - 'libs/*/config/**'
+      - 'scripts/agentDocs.ts'
+      - 'scripts/projects.ts'
+      - 'scripts/workspaces.ts'
+      - 'tsconfig.typedoc.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/site.pr.yml'
 
 permissions:
   contents: read
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install
         run: npm ci

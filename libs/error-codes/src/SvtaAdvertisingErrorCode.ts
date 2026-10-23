@@ -275,7 +275,8 @@ export const SvtaAdvertisingErrorCode = {
 	/**
 	 * Invalid VAST schema
 	 */
-	VAST_SCHEMA_VALIDATION_ERROR: SVTA_VAST_SCHEMA_VALIDATION_ERROR as typeof SVTA_VAST_SCHEMA_VALIDATION_ERROR,
+	VAST_SCHEMA_VALIDATION_ERROR:
+		SVTA_VAST_SCHEMA_VALIDATION_ERROR as typeof SVTA_VAST_SCHEMA_VALIDATION_ERROR,
 
 	/**
 	 * VAST response version not supported
@@ -365,7 +366,8 @@ export const SvtaAdvertisingErrorCode = {
 	/**
 	 * Could not execute creative defined in interactiveCreativeFile
 	 */
-	INTERACTIVE_CREATIVE_ERROR: SVTA_INTERACTIVE_CREATIVE_ERROR as typeof SVTA_INTERACTIVE_CREATIVE_ERROR,
+	INTERACTIVE_CREATIVE_ERROR:
+		SVTA_INTERACTIVE_CREATIVE_ERROR as typeof SVTA_INTERACTIVE_CREATIVE_ERROR,
 
 	/**
 	 * Could not execute code in verification node
@@ -380,7 +382,8 @@ export const SvtaAdvertisingErrorCode = {
 	/**
 	 * Non-linear ad dimensions did not match display area
 	 */
-	NONLINEAR_DIMENSION_MISMATCH: SVTA_NONLINEAR_DIMENSION_MISMATCH as typeof SVTA_NONLINEAR_DIMENSION_MISMATCH,
+	NONLINEAR_DIMENSION_MISMATCH:
+		SVTA_NONLINEAR_DIMENSION_MISMATCH as typeof SVTA_NONLINEAR_DIMENSION_MISMATCH,
 
 	/**
 	 * Unable to fetch non-linear ad resource
@@ -400,12 +403,14 @@ export const SvtaAdvertisingErrorCode = {
 	/**
 	 * Companion ad dimensions did not match display area
 	 */
-	COMPANION_DIMENSION_MISMATCH: SVTA_COMPANION_DIMENSION_MISMATCH as typeof SVTA_COMPANION_DIMENSION_MISMATCH,
+	COMPANION_DIMENSION_MISMATCH:
+		SVTA_COMPANION_DIMENSION_MISMATCH as typeof SVTA_COMPANION_DIMENSION_MISMATCH,
 
 	/**
 	 * Unable to display required companion ad
 	 */
-	REQUIRED_COMPANION_AD_ERROR: SVTA_REQUIRED_COMPANION_AD_ERROR as typeof SVTA_REQUIRED_COMPANION_AD_ERROR,
+	REQUIRED_COMPANION_AD_ERROR:
+		SVTA_REQUIRED_COMPANION_AD_ERROR as typeof SVTA_REQUIRED_COMPANION_AD_ERROR,
 
 	/**
 	 * Unable to fetch companion ad resource

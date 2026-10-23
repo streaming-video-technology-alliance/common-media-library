@@ -18,8 +18,10 @@ import { toBareValue } from './toBareValue.ts'
 import { toTokenString } from './toTokenString.ts'
 
 function hasKey(spec: CmcdKeySpec, reportingMode: CmcdReportingMode, isV1: boolean): boolean {
-	return (spec.mode === undefined || spec.mode === reportingMode)
-		&& (spec.version === undefined || (spec.version === 1) === isV1)
+	return (
+		(spec.mode === undefined || spec.mode === reportingMode) &&
+		(spec.version === undefined || (spec.version === 1) === isV1)
+	)
 }
 
 function isRequired(spec: CmcdKeySpec, event: string | undefined): boolean {
@@ -45,7 +47,11 @@ function needsV1ObjectType(obj: Record<string, any>, filter: CmcdEncodeOptions['
 }
 
 function allowsObjectType(spec: CmcdKeySpec, objectType: string | undefined): boolean {
-	if (objectType === undefined || (spec.type !== 'integer' && spec.type !== 'ot-list') || spec.ot === undefined) {
+	if (
+		objectType === undefined ||
+		(spec.type !== 'integer' && spec.type !== 'ot-list') ||
+		spec.ot === undefined
+	) {
 		return true
 	}
 
@@ -67,14 +73,22 @@ function insertKey(keys: string[], specs: CmcdKeySpec[], key: string): void {
 	specs.splice(index, 0, CMCD_KEY_SPECS[key])
 }
 
-function prepareValue(key: string, value: unknown, spec: CmcdKeySpec, options: CmcdEncodeOptions, formatterOptions: CmcdFormatterOptions): unknown {
+function prepareValue(
+	key: string,
+	value: unknown,
+	spec: CmcdKeySpec,
+	options: CmcdEncodeOptions,
+	formatterOptions: CmcdFormatterOptions,
+): unknown {
 	const formatter = options.formatters?.[key as CmcdKey]
 
 	if (typeof formatter !== 'function') {
 		return value == null ? undefined : normalizeValue(value, spec, formatterOptions)
 	}
 
-	const formatted: unknown = isValid(value) ? formatter(value as CmcdValue, formatterOptions) : value
+	const formatted: unknown = isValid(value)
+		? formatter(value as CmcdValue, formatterOptions)
+		: value
 
 	if (!isValid(formatted) && !(formatted === false && spec.type === 'boolean')) {
 		return undefined
@@ -111,11 +125,15 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 		return results as Cmcd
 	}
 
-	const version = options.version || toBareValue(obj['v']) as CmcdVersion || CMCD_V2
+	const version = options.version || (toBareValue(obj['v']) as CmcdVersion) || CMCD_V2
 	const reportingMode = options.reportingMode || CMCD_REQUEST_MODE
 	const isV1 = version === 1
 	const isEventReport = !isV1 && reportingMode === CMCD_EVENT_MODE
-	const formatterOptions: CmcdFormatterOptions = { version, reportingMode, baseUrl: options.baseUrl }
+	const formatterOptions: CmcdFormatterOptions = {
+		version,
+		reportingMode,
+		baseUrl: options.baseUrl,
+	}
 	const filter = options.filter
 
 	let objectTypeValue: unknown
@@ -127,7 +145,9 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	}
 
 	const data = isV1 ? downConvertToV1(obj, objectType) : obj
-	const eventValue = isEventReport ? prepareValue('e', data['e'], CMCD_KEY_SPECS['e'], options, formatterOptions) : undefined
+	const eventValue = isEventReport
+		? prepareValue('e', data['e'], CMCD_KEY_SPECS['e'], options, formatterOptions)
+		: undefined
 	const event = toTokenString(eventValue)
 	const keys: string[] = []
 	const specs: CmcdKeySpec[] = []
@@ -143,8 +163,7 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		if (typeof filter !== 'function' || filter(key as CmcdKey)) {
 			passed = true
-		}
-		else if (!isRequired(spec, event)) {
+		} else if (!isRequired(spec, event)) {
 			continue
 		}
 
@@ -165,7 +184,13 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 	}
 
 	if (needsObjectType && !isV1) {
-		objectTypeValue = prepareValue('ot', data['ot'], CMCD_KEY_SPECS['ot'], options, formatterOptions)
+		objectTypeValue = prepareValue(
+			'ot',
+			data['ot'],
+			CMCD_KEY_SPECS['ot'],
+			options,
+			formatterOptions,
+		)
 		objectType = toTokenString(objectTypeValue)
 	}
 
@@ -193,14 +218,11 @@ export function prepareCmcdData(obj: Record<string, any>, options: CmcdEncodeOpt
 
 		if (key === 'v') {
 			values[i] = version
-		}
-		else if (key === 'ot') {
+		} else if (key === 'ot') {
 			values[i] = objectTypeValue
-		}
-		else if (key === 'e') {
+		} else if (key === 'e') {
 			values[i] = eventValue
-		}
-		else if (isV1 || allowsObjectType(spec, objectType)) {
+		} else if (isV1 || allowsObjectType(spec, objectType)) {
 			values[i] = prepareValue(key, data[key], spec, options, formatterOptions)
 		}
 

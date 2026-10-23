@@ -3,7 +3,6 @@ import type { Validation } from '../../types/mapper/Validation.ts'
 
 import { validateSwitchingSets } from './validateSwitchingSets.ts'
 
-
 /**
  * Validate a selection set.
  * It validates in cascade, calling each child validation method.
@@ -40,22 +39,14 @@ export function validateSelectionSet(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = presentationId
-		? ` in the presentation with id = ${presentationId}`
-		: '.'
+	const moreInformation = presentationId ? ` in the presentation with id = ${presentationId}` : '.'
 
 	if (!selectionSet.id) {
 		validation.status = false
-		validation.errorMessages.push(
-			`SelectionSet id is undefined${moreInformation}`,
-		)
+		validation.errorMessages.push(`SelectionSet id is undefined${moreInformation}`)
 	}
 
-	validateSwitchingSets(
-		selectionSet.switchingSets,
-		selectionSet.id,
-		validation,
-	)
+	validateSwitchingSets(selectionSet.switchingSets, selectionSet.id, validation)
 
 	return validation
 }

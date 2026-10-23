@@ -28,8 +28,5 @@ export function parseItem(src: string, options?: SfDecodeOptions): ParsedValue<S
 	const parsedParameters = parseParameters(src, options)
 	src = parsedParameters.src
 
-	return parsedValue(
-		new SfItem(parsedBareItem.value, parsedParameters.value),
-		src,
-	)
+	return parsedValue(new SfItem(parsedBareItem.value, parsedParameters.value), src)
 }

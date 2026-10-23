@@ -17,6 +17,6 @@ export function readMehd(view: IsoBoxReadView): MovieExtendsHeaderBox {
 		type: 'mehd',
 		version,
 		flags,
-		fragmentDuration: view.readUint((version === 1) ? 8 : 4),
+		fragmentDuration: view.readUint(version === 1 ? 8 : 4),
 	}
-};
+}

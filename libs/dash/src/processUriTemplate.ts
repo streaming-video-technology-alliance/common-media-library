@@ -67,7 +67,7 @@ export function processUriTemplate(
 		let valueString: string
 
 		switch (format) {
-			case undefined:  // Happens if there is no format specifier.
+			case undefined: // Happens if there is no format specifier.
 			case 'd':
 			case 'i':
 			case 'u':

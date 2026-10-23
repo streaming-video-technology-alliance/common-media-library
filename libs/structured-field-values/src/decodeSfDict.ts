@@ -19,8 +19,7 @@ export function decodeSfDict(input: string, options?: SfDecodeOptions): SfDictio
 			throw parseError(src, DICT)
 		}
 		return value
-	}
-	catch (cause) {
+	} catch (cause) {
 		throw parseError(input, DICT, cause)
 	}
 }

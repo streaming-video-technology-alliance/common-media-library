@@ -6,7 +6,6 @@ import type { Segment } from '../../../types/model/Segment.ts'
 import type { TextTrack } from '../../../types/model/TextTrack.ts'
 import type { VideoTrack } from '../../../types/model/VideoTrack.ts'
 
-
 import { getChannels } from './utils/getChannels.ts'
 import { getCodec } from './utils/getCodec.ts'
 import { getContentType } from './utils/getContentType.ts'
@@ -62,8 +61,7 @@ export function mapTracks(
 			},
 			baseUrls: [],
 		} as VideoTrack
-	}
-	else if (type === 'audio') {
+	} else if (type === 'audio') {
 		return {
 			url: '',
 			bandwidth: +(representation.$.bandwidth ?? 0),
@@ -81,8 +79,7 @@ export function mapTracks(
 			},
 			baseUrls: [],
 		} as AudioTrack
-	}
-	else {
+	} else {
 		// if (type === 'text')
 		return {
 			url: '',

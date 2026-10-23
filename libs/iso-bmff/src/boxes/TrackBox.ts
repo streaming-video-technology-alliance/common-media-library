@@ -9,7 +9,7 @@ import type { UserDataBox } from './UserDataBox.ts'
  *
  * @public
  */
-export type TrackBoxChild = TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox;
+export type TrackBoxChild = TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox
 
 /**
  * Track Box - 'trak' - Container
@@ -17,6 +17,6 @@ export type TrackBoxChild = TrackHeaderBox | TrackReferenceBox | EditBox | Media
  * @public
  */
 export type TrackBox = {
-	type: 'trak';
-	boxes: TrackBoxChild[];
-};
+	type: 'trak'
+	boxes: TrackBoxChild[]
+}

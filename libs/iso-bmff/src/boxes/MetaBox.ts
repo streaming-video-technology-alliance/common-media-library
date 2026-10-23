@@ -13,7 +13,15 @@ import type { PrimaryItemBox } from './PrimaryItemBox.ts'
  *
  * @public
  */
-export type MetaBoxChild = HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox | GroupsListBox;
+export type MetaBoxChild =
+	| HandlerReferenceBox
+	| PrimaryItemBox
+	| DataInformationBox
+	| ItemLocationBox
+	| ItemProtectionBox
+	| ItemInfoBox
+	| ItemReferenceBox
+	| GroupsListBox
 
 /**
  * ISO/IEC 14496-12:202x - 8.11.1 Meta box
@@ -21,6 +29,6 @@ export type MetaBoxChild = HandlerReferenceBox | PrimaryItemBox | DataInformatio
  * @public
  */
 export type MetaBox = FullBox & {
-	type: 'meta';
-	boxes: MetaBoxChild[];
-};
+	type: 'meta'
+	boxes: MetaBoxChild[]
+}

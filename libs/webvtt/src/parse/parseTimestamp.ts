@@ -19,13 +19,11 @@ export function parseTimeStamp(input: string): number | null {
 	if (m[3]) {
 		// Timestamp takes the form of [hours]:[minutes]:[seconds].[milliseconds]
 		return computeSeconds(first, second, third, fourth)
-	}
-	else if (first > 59) {
+	} else if (first > 59) {
 		// Timestamp takes the form of [hours]:[minutes].[milliseconds]
 		// First position is hours as it's over 59.
 		return computeSeconds(first, second, 0, fourth)
-	}
-	else {
+	} else {
 		// Timestamp takes the form of [minutes]:[seconds].[milliseconds]
 		return computeSeconds(0, first, second, fourth)
 	}

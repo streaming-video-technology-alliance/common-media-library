@@ -7,4 +7,4 @@ import type { SfItem } from './SfItem.ts'
  *
  * @public
  */
-export type SfMember = SfItem | SfInnerList | SfBareItem;
+export type SfMember = SfItem | SfInnerList | SfBareItem

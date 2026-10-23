@@ -12,7 +12,7 @@ export type CmcdV1 = {
 	 *
 	 * Integer milliseconds
 	 */
-	bl?: number;
+	bl?: number
 
 	/**
 	 * Encoded bitrate
@@ -23,7 +23,7 @@ export type CmcdV1 = {
 	 *
 	 * Integer kbps
 	 */
-	br?: number;
+	br?: number
 
 	/**
 	 * Measured throughput
@@ -36,7 +36,7 @@ export type CmcdV1 = {
 	 *
 	 * Integer kbps
 	 */
-	mtp?: number;
+	mtp?: number
 
 	/**
 	 * Next object request
@@ -52,7 +52,7 @@ export type CmcdV1 = {
 	 * are converted to paths relative to that base. Already-relative values are not converted. They are still
 	 * URL-encoded when emitted, as CMCD version 1 requires.
 	 */
-	nor?: string;
+	nor?: string
 
 	/**
 	 * Next range request
@@ -61,7 +61,7 @@ export type CmcdV1 = {
 	 *
 	 * String
 	 */
-	nrr?: string;
+	nrr?: string
 
 	/**
 	 * Top bitrate
@@ -71,6 +71,5 @@ export type CmcdV1 = {
 	 *
 	 * Integer kbps
 	 */
-	tb?: number;
-
+	tb?: number
 }

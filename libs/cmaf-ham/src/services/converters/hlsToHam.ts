@@ -21,15 +21,12 @@ import { MapperContext } from '../../mapper/MapperContext.ts'
  *
  * @alpha
  */
-export function hlsToHam(
-	manifest: string,
-	ancillaryManifests: string[],
-): Presentation[] {
+export function hlsToHam(manifest: string, ancillaryManifests: string[]): Presentation[] {
 	const mapperContext = MapperContext.getInstance()
 	mapperContext.setStrategy(new HlsMapper())
 	return mapperContext.getHamFormat({
 		manifest,
-		ancillaryManifests: ancillaryManifests.map((ancillaryManifest) => ({
+		ancillaryManifests: ancillaryManifests.map(ancillaryManifest => ({
 			manifest: ancillaryManifest,
 			type: 'hls',
 		})),

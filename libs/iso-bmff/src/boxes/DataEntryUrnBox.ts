@@ -6,12 +6,12 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type DataEntryUrnBox = FullBox & {
-	type: 'urn ';
-	name: string;
-	location: string;
-};
+	type: 'urn '
+	name: string
+	location: string
+}
 
 /**
  * @public
  */
-export type urn = DataEntryUrnBox;
+export type urn = DataEntryUrnBox

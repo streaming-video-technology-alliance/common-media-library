@@ -7,11 +7,11 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type DecodingTimeToSampleBox = FullBox & {
-	type: 'stts';
+	type: 'stts'
 
 	/** A 32-bit integer that specifies the number of entries in the decoding time-to-sample table. */
-	entryCount: number;
+	entryCount: number
 
 	/** An array of decoding time-to-sample entries. */
-	entries: DecodingTimeSample[];
-};
+	entries: DecodingTimeSample[]
+}

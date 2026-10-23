@@ -3,7 +3,21 @@ import { describe, it } from 'node:test'
 
 import type { AdaptationSet, Period, Representation, SegmentTemplate } from '@svta/cml-cmaf-ham'
 
-import { calculateDuration, getChannels, getCodec, getContentType, getFrameRate, getGroup, getLanguage, getNumberOfSegments, getPresentationId, getSampleRate, getSar, getTrackDuration, getUrlFromTemplate } from '@svta/cml-cmaf-ham'
+import {
+	calculateDuration,
+	getChannels,
+	getCodec,
+	getContentType,
+	getFrameRate,
+	getGroup,
+	getLanguage,
+	getNumberOfSegments,
+	getPresentationId,
+	getSampleRate,
+	getSar,
+	getTrackDuration,
+	getUrlFromTemplate,
+} from '@svta/cml-cmaf-ham'
 
 describe('calculateDuration', () => {
 	it('returns 1 when duration is 1 and timescale is 1', () => {
@@ -29,8 +43,7 @@ describe('getChannels', () => {
 				AudioChannelConfiguration: [
 					{
 						$: {
-							schemeIdUri:
-								'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
+							schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
 							value: '2',
 						},
 					},
@@ -41,8 +54,7 @@ describe('getChannels', () => {
 				AudioChannelConfiguration: [
 					{
 						$: {
-							schemeIdUri:
-								'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
+							schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
 							value: '3',
 						},
 					},
@@ -60,8 +72,7 @@ describe('getChannels', () => {
 				AudioChannelConfiguration: [
 					{
 						$: {
-							schemeIdUri:
-								'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
+							schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
 							value: '3',
 						},
 					},
@@ -110,10 +121,7 @@ describe('getCodec', () => {
 	})
 
 	it('returns empty string if Representation and AdaptationSet have no codecs', () => {
-		const res = getCodec(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getCodec({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		equal(res, '')
 	})
 })
@@ -243,10 +251,7 @@ describe('getFrameRate', () => {
 	})
 
 	it('returns default frame rate if there is no frameRate', () => {
-		const res = getFrameRate(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getFrameRate({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		deepStrictEqual(res, {
 			frameRateNumerator: 30,
 			frameRateDenominator: 0,
@@ -322,10 +327,7 @@ describe('getSampleRate', () => {
 	})
 
 	it('returns 0 if there is no audioSamplingRate', () => {
-		const res = getSampleRate(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getSampleRate({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		equal(res, 0)
 	})
 })
@@ -340,18 +342,12 @@ describe('getSar', () => {
 	})
 
 	it('returns sar from adaptationSet if it exists and representation does not have sar', () => {
-		const res = getSar(
-			{ $: { sar: '1:1' } } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getSar({ $: { sar: '1:1' } } as AdaptationSet, { $: {} } as Representation)
 		equal(res, '1:1')
 	})
 
 	it('returns empty string if there is no sar', () => {
-		const res = getSar(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getSar({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		equal(res, '')
 	})
 })

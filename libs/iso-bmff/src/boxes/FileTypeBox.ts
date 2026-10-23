@@ -5,4 +5,4 @@ import type { TypeBox } from './TypeBox.ts'
  *
  * @public
  */
-export type FileTypeBox = TypeBox<'ftyp'>;
+export type FileTypeBox = TypeBox<'ftyp'>

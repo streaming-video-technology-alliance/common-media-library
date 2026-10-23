@@ -6,10 +6,10 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SampleAuxiliaryInformationSizesBox = FullBox & {
-	type: 'saiz';
-	auxInfoType?: number;
-	auxInfoTypeParameter?: number;
-	defaultSampleInfoSize: number;
-	sampleCount: number;
-	sampleInfoSize?: number[];
-};
+	type: 'saiz'
+	auxInfoType?: number
+	auxInfoTypeParameter?: number
+	defaultSampleInfoSize: number
+	sampleCount: number
+	sampleInfoSize?: number[]
+}
