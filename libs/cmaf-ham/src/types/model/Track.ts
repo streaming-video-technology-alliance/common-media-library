@@ -15,7 +15,8 @@ import type { TrackType } from './TrackType.ts'
 export type Track = Ham &
 	Base &
 	Duration &
-	AddressableObject & {
+	Omit<AddressableObject, 'url'> & {
+		url?: string
 		type: TrackType
 		codecs: string[]
 		mimeType: string

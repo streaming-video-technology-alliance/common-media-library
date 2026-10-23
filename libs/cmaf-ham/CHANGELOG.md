@@ -10,7 +10,8 @@ and this project adheres to
 
 ### Changed
 
-- The HLS mapper types describe the fields the mapper reads. `PlayList.attributes` adds `LANGUAGE` and `FRAME-RATE`, the `MediaGroups` items add `uri`, and `HlsManifest` adds `version` and `mediaSequence`. `audioGroupsToSwitchingSets` and `subtitleGroupsToSwitchingSets` take the typed media groups instead of `any`. `Mapper.getManifestMetadata` and `HlsMapper.getManifestMetadata` return `JSON | undefined`, the type that `DashMapper` and `MapperContext` already declare.
+- `Track.url` is optional. An HLS audio rendition without a `URI` attribute maps to a track without a URL, and the HLS writer already falls back to `<id>.m3u8` for that case.
+- The HLS mapper types describe the fields the mapper reads. `PlayList.attributes` adds `LANGUAGE` and `FRAME-RATE`, the `MediaGroups` items add `uri` (optional for audio), and `HlsManifest` adds `version` and `mediaSequence`. `audioGroupsToSwitchingSets` and `subtitleGroupsToSwitchingSets` take the typed media groups instead of `any`. `Mapper.getManifestMetadata` and `HlsMapper.getManifestMetadata` return `JSON | undefined`, the type that `DashMapper` and `MapperContext` already declare.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [0.24.8] - 2026-10-18
