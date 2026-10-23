@@ -44,6 +44,6 @@ export function loadAdopters(file: string, folders: Set<string>): Adopter[] {
 			fail(index, 'note must be a string')
 		}
 
-		return note === undefined ? { name, url, packages } :{ name, url, packages, note }
+		return note === undefined ? { name, url, packages } : { name, url, packages, note }
 	})
 }
