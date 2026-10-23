@@ -8,3 +8,8 @@ RELEASE.md
 *.db-wal
 *.db-shm
 .claude/settings.local.json
+site/api/
+site/api-entry.json
+site/packages/
+site/releases/
+site/.vitepress/cache/

@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The documentation site moved to the `site` workspace. It serves the landing page, package guides, API reference, and releases feed. Old API reference URLs redirect to the new pages.
+
 ## [0.18.1] - 2025-10-01
 
 ### Fixed

@@ -6,7 +6,7 @@ Open source players such as [hls.js](https://github.com/video-dev/hls.js/), [das
 
 ## Project structure
 
-This project is a monorepo with three workspaces: `libs`, `docs`, and `dev`. The `libs` workspace contains the individual libraries, which are published to npm. The `docs` workspace contains the documentation for all the libraries. The documentation is published as one site on GitHub Pages. The `dev` workspace is a private development server. The available libraries are:
+This project is a monorepo with three workspaces: `libs`, `site`, and `dev`. The `libs` workspace contains the individual libraries, which are published to npm. The `site` workspace contains the website: the landing page, the package guides, and the API reference. The site is published on GitHub Pages. The `dev` workspace is a private development server. The available libraries are:
 
 - `@svta/cml-abr`
 - `@svta/cml-cmcd`
