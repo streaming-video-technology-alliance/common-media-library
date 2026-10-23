@@ -1,4 +1,4 @@
-import { deepEqual, equal } from 'node:assert'
+import { deepEqual, equal, ok } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	describe,
@@ -149,5 +149,24 @@ describe('writeIsoBoxes', function () {
 	it('should exit if boxes are empty', async function () {
 		const bytes = writeIsoBoxes([], defaultWriterConfig())
 		equal(bytes.length, 0)
+	})
+
+	it('should copy a box given as a view over a SharedArrayBuffer', function () {
+		const bytes = [0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65]
+		const shared = new Uint8Array(new SharedArrayBuffer(bytes.length))
+		shared.set(bytes)
+
+		const [result] = writeIsoBoxes([shared], defaultWriterConfig())
+
+		ok(result.buffer instanceof ArrayBuffer)
+		deepEqual([...result], bytes)
+	})
+
+	it('should not copy a box given as a view over an ArrayBuffer', function () {
+		const plain = new Uint8Array([0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65])
+
+		const [result] = writeIsoBoxes([plain], defaultWriterConfig())
+
+		equal(result.buffer, plain.buffer)
 	})
 })
