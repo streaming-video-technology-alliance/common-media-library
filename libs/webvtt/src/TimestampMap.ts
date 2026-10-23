@@ -6,6 +6,6 @@
  * @see {@link https://datatracker.ietf.org/doc/html/rfc8216#section-3.5 | RFC 8216}
  */
 export type TimestampMap = {
-	MPEGTS: number;
-	LOCAL: number;
-};
+	MPEGTS: number
+	LOCAL: number
+}

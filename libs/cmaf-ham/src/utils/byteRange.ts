@@ -4,9 +4,9 @@
  */
 
 export type ByteRangeObject = {
-	start: number;
-	end: number;
-};
+	start: number
+	end: number
+}
 
 /**
  * Parses a byteRange string in either HLS format (`length@offset`) or DASH format (`start-end`)
@@ -23,7 +23,9 @@ export type ByteRangeObject = {
  *
  * @alpha
  */
-export function parseByteRangeString(byteRangeString: string | undefined): ByteRangeObject | undefined {
+export function parseByteRangeString(
+	byteRangeString: string | undefined,
+): ByteRangeObject | undefined {
 	if (!byteRangeString) {
 		return undefined
 	}
@@ -118,7 +120,9 @@ export function byteRangeToDashString(byteRange: ByteRangeObject | undefined): s
  *
  * @alpha
  */
-export function hlsByterangeToByteRangeObject(byterange: { length: number; offset: number } | undefined): ByteRangeObject | undefined {
+export function hlsByterangeToByteRangeObject(
+	byterange: { length: number; offset: number } | undefined,
+): ByteRangeObject | undefined {
 	if (!byterange) {
 		return undefined
 	}

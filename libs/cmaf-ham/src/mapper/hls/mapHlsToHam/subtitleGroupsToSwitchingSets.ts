@@ -22,9 +22,7 @@ export function subtitleGroupsToSwitchingSets(
 		for (const subtitle in encodings) {
 			const attributes = encodings[subtitle]
 			const { language, uri } = attributes
-			const subtitleParsed = parseHlsManifest(
-				manifestPlaylists.shift()?.manifest,
-			)
+			const subtitleParsed = parseHlsManifest(manifestPlaylists.shift()?.manifest)
 			const segments = formatSegments(subtitleParsed?.segments)
 
 			const codec = getHlsCodec('text')

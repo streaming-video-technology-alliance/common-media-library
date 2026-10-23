@@ -17,7 +17,10 @@ import type { WebVttRegion } from './WebVttRegion.ts'
  * @example
  * {@includeCode ../test/parseWebVtt.test.ts#example}
  */
-export async function parseWebVtt(text: string, options?: WebVttParserOptions): Promise<WebVttParseResult> {
+export async function parseWebVtt(
+	text: string,
+	options?: WebVttParserOptions,
+): Promise<WebVttParseResult> {
 	const parser = new WebVttParser(options)
 	const cues: WebVttCue[] = []
 	const regions: WebVttRegion[] = []

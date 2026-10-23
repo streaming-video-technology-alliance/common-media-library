@@ -38,8 +38,5 @@ export function parseToken(src: string, options?: SfDecodeOptions): ParsedValue<
 	const value = (re.exec(src) as any)[1]
 	src = src.substring(re.lastIndex)
 
-	return parsedValue(
-		options?.useSymbol === false ? new SfToken(value) : Symbol.for(value),
-		src,
-	)
+	return parsedValue(options?.useSymbol === false ? new SfToken(value) : Symbol.for(value), src)
 }

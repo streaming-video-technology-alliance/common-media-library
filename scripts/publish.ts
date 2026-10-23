@@ -6,16 +6,16 @@ import { viewPublished, viewPublishedPeers } from './npmView.ts'
 import { projects } from './projects.ts'
 import { satisfiesRange } from './satisfiesRange.ts'
 
-type PackageName = string;
-type PackageFolder = string;
-type PackageFile = string;
+type PackageName = string
+type PackageFolder = string
+type PackageFile = string
 type PackageJson = {
-	name: PackageName;
-	version: string;
-	peerDependencies: Record<string, string>;
-};
-type Package = [PackageFolder, PackageFile, PackageJson];
-type Packages = Record<PackageName, Package>;
+	name: PackageName
+	version: string
+	peerDependencies: Record<string, string>
+}
+type Package = [PackageFolder, PackageFile, PackageJson]
+type Packages = Record<PackageName, Package>
 
 async function loadPackage(folder: string): Promise<Package> {
 	console.log(`Loading ${folder}...`)
@@ -25,11 +25,10 @@ async function loadPackage(folder: string): Promise<Package> {
 }
 
 async function loadPackages(): Promise<Packages> {
-	return (await Promise.all(projects.map(loadPackage)))
-		.reduce((result, pkg) => {
-			result[pkg[2].name] = pkg
-			return result
-		}, {} as Packages)
+	return (await Promise.all(projects.map(loadPackage))).reduce((result, pkg) => {
+		result[pkg[2].name] = pkg
+		return result
+	}, {} as Packages)
 }
 
 const tagRegex = /^\d+\.\d+\.\d+(.*$)/
@@ -50,11 +49,17 @@ async function createRelease(folder: string, json: PackageJson): Promise<void> {
 	const notesFile = path.join(tmpdir(), `release-notes-${folderName}.md`)
 	await writeFile(notesFile, notes)
 	const prerelease = json.version.replace(tagRegex, '$1') ? '--prerelease' : ''
-	await cmd(`gh release create "${tag}" --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`)
+	await cmd(
+		`gh release create "${tag}" --target main --title "${title}" --notes-file "${notesFile}" ${prerelease}`,
+	)
 }
 
 // Check for updates and resolve wildcard peer dependencies to caret ranges
-async function processPackage(name: PackageName, pkg: Package, packages: Packages): Promise<string> {
+async function processPackage(
+	name: PackageName,
+	pkg: Package,
+	packages: Packages,
+): Promise<string> {
 	console.log(`Processing ${name}...`)
 	const [folder, file, packageJson] = pkg
 	const { version, peerDependencies = {} } = packageJson
@@ -96,7 +101,9 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 			const currentPeer = packages[dep][2].version
 
 			if (!satisfiesRange(currentPeer, range)) {
-				throw new Error(`Package ${name} (${version}) needs a version bump. Its published release accepts ${dep}@${range}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`)
+				throw new Error(
+					`Package ${name} (${version}) needs a version bump. Its published release accepts ${dep}@${range}, and ${dep} is now ${currentPeer}. Run "npm run prepare-release".`,
+				)
 			}
 		}
 	}
@@ -106,12 +113,10 @@ async function processPackage(name: PackageName, pkg: Package, packages: Package
 
 const packages = await loadPackages()
 const needsPublish: [PackageJson, string][] = await Promise.all(
-	Object
-		.entries(packages)
-		.map(async ([name, pkg]) => {
-			const result = await processPackage(name, pkg, packages)
-			return [pkg[2], result]
-		})
+	Object.entries(packages).map(async ([name, pkg]) => {
+		const result = await processPackage(name, pkg, packages)
+		return [pkg[2], result]
+	}),
 )
 
 // Publish the packages
@@ -123,6 +128,8 @@ for (const pkg of needsPublish) {
 	}
 
 	const tag = json.version.replace(tagRegex, '$1')
-	await cmd(`npm publish --provenance --access public -w ${folder} ${tag ? `--tag prerelease` : ''}`)
+	await cmd(
+		`npm publish --provenance --access public -w ${folder} ${tag ? `--tag prerelease` : ''}`,
+	)
 	await createRelease(folder, json)
 }

@@ -8,13 +8,13 @@ import type { Period } from './Period.ts'
 export type DashManifest = {
 	MPD: {
 		$?: {
-			maxSegmentDuration?: string;
-			mediaPresentationDuration?: string;
-			minBufferTime?: string;
-			profiles?: string;
-			type?: string;
-			xmlns?: string;
-		};
-		Period: Period[];
-	};
-};
+			maxSegmentDuration?: string
+			mediaPresentationDuration?: string
+			minBufferTime?: string
+			profiles?: string
+			type?: string
+			xmlns?: string
+		}
+		Period: Period[]
+	}
+}

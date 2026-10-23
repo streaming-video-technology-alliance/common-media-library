@@ -36,11 +36,18 @@ export function createBolaParams(ladder: readonly LadderRung[], bufferTarget: nu
 	const lowestBandwidthLog = Math.log(rungs[0].bandwidth)
 
 	if (rungs.length === 1) {
-		return { rungs, positions, thresholds: [0], maximumBuffers: [0], utilityScale: 0, lowestBandwidthLog }
+		return {
+			rungs,
+			positions,
+			thresholds: [0],
+			maximumBuffers: [0],
+			utilityScale: 0,
+			lowestBandwidthLog,
+		}
 	}
 
 	const bufferTime = Math.max(bufferTarget, MINIMUM_BUFFER + MINIMUM_BUFFER_PER_RUNG * rungs.length)
-	const utilities = rungs.map((rung) => Math.log(rung.bandwidth) - lowestBandwidthLog)
+	const utilities = rungs.map(rung => Math.log(rung.bandwidth) - lowestBandwidthLog)
 	const utilityScale = (bufferTime - MINIMUM_BUFFER) / utilities[utilities.length - 1]
 	const gamma = MINIMUM_BUFFER / utilityScale
 
@@ -50,12 +57,13 @@ export function createBolaParams(ladder: readonly LadderRung[], bufferTarget: nu
 		}
 
 		const lower = rungs[i - 1].bandwidth
-		const crossing = (rung.bandwidth * utilities[i - 1] - lower * utilities[i]) / (rung.bandwidth - lower)
+		const crossing =
+			(rung.bandwidth * utilities[i - 1] - lower * utilities[i]) / (rung.bandwidth - lower)
 
 		return Math.max(0, utilityScale * (gamma + crossing))
 	})
 
-	const maximumBuffers = utilities.map((utility) => utilityScale * (utility + gamma))
+	const maximumBuffers = utilities.map(utility => utilityScale * (utility + gamma))
 
 	return { rungs, positions, thresholds, maximumBuffers, utilityScale, lowestBandwidthLog }
 }

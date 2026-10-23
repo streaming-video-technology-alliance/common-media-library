@@ -10,10 +10,7 @@ import type { Representation } from '../../../../types/mapper/dash/Representatio
  * @param representation - Representation to try to get the channels from
  * @returns Channels value
  */
-export function getChannels(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-): number {
+export function getChannels(adaptationSet: AdaptationSet, representation: Representation): number {
 	const channels: number = +(
 		adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ??
 		representation.AudioChannelConfiguration?.at(0)?.$.value ??

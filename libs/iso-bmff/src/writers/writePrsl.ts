@@ -14,13 +14,14 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @public
  */
-export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
-	const preselectionTagBytes = (box.flags & 0x1000) && box.preselectionTag
-		? encodeText(box.preselectionTag)
-		: null
-	const interleavingTagBytes = (box.flags & 0x4000) && box.interleavingTag
-		? encodeText(box.interleavingTag)
-		: null
+export function writePrsl(
+	box: PreselectionGroupBox,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
+	const preselectionTagBytes =
+		box.flags & 0x1000 && box.preselectionTag ? encodeText(box.preselectionTag) : null
+	const interleavingTagBytes =
+		box.flags & 0x4000 && box.interleavingTag ? encodeText(box.interleavingTag) : null
 
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -28,12 +29,20 @@ export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConf
 	const numEntitiesInGroupSize = 4
 	const entitiesSize = box.numEntitiesInGroup * 4
 	const preselectionTagSize = preselectionTagBytes ? preselectionTagBytes.length + 1 : 0
-	const selectionPrioritySize = (box.flags & 0x2000) ? 1 : 0
+	const selectionPrioritySize = box.flags & 0x2000 ? 1 : 0
 	const interleavingTagSize = interleavingTagBytes ? interleavingTagBytes.length + 1 : 0
 	const { bytes, size } = writeChildBoxes(box.boxes, config)
 
-	const totalSize = headerSize + fullBoxSize + groupIdSize + numEntitiesInGroupSize +
-		entitiesSize + preselectionTagSize + selectionPrioritySize + interleavingTagSize + size
+	const totalSize =
+		headerSize +
+		fullBoxSize +
+		groupIdSize +
+		numEntitiesInGroupSize +
+		entitiesSize +
+		preselectionTagSize +
+		selectionPrioritySize +
+		interleavingTagSize +
+		size
 
 	const writer = new IsoBoxWriteView('prsl', totalSize)
 	writer.writeFullBox(box.version, box.flags)

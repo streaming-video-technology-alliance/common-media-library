@@ -14,8 +14,7 @@ export function encodeByteRange(track: VideoTrack | AudioTrack): string {
 		// Track initialization byteRange is now an object {start, end}
 		const initByteRange = track.initialization.byteRange
 		return `BYTERANGE:${initByteRange.end - initByteRange.start + 1}@${initByteRange.start}\n`
-	}
-	else if (track.segments?.at(0)?.byteRange) {
+	} else if (track.segments?.at(0)?.byteRange) {
 		// Segment byteRange is now an object {start, end}
 		const firstSegmentByteRange = track.segments.at(0)?.byteRange
 		if (firstSegmentByteRange) {

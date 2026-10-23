@@ -21,4 +21,4 @@ export const InitializationDataType = {
  *
  * @public
  */
-export type InitializationDataType = ValueOf<typeof InitializationDataType>;
+export type InitializationDataType = ValueOf<typeof InitializationDataType>

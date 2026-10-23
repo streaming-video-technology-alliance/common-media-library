@@ -40,7 +40,7 @@ export function serializeXml(xml: XmlNode): string {
 		}
 	}
 
-	const close = (!children) ? ' />' : `>${children}</${nodeName}>`
+	const close = !children ? ' />' : `>${children}</${nodeName}>`
 	result += close
 
 	return result

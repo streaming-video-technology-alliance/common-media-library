@@ -48,20 +48,26 @@ describe('readC2paManifest', () => {
 		doesNotThrow(() => readC2paManifest(bytes))
 
 		const { manifest } = readC2paManifest(bytes)
-		const liveVideoAssertion = manifest.assertions.find((a: C2paAssertion) => a.label === 'c2pa.livevideo.segment')
+		const liveVideoAssertion = manifest.assertions.find(
+			(a: C2paAssertion) => a.label === 'c2pa.livevideo.segment',
+		)
 
 		ok(liveVideoAssertion !== undefined, 'c2pa.livevideo.segment assertion should be present')
 	})
 
 	it('throws when no C2PA UUID box is present', () => {
 		const emptyMp4 = new Uint8Array([
-			0x00, 0x00, 0x00, 0x08, 0x66, 0x74, 0x79, 0x70, // ftyp box, 8 bytes
+			0x00,
+			0x00,
+			0x00,
+			0x08,
+			0x66,
+			0x74,
+			0x79,
+			0x70, // ftyp box, 8 bytes
 		])
 
-		throws(
-			() => readC2paManifest(emptyMp4),
-			/No C2PA UUID box/,
-		)
+		throws(() => readC2paManifest(emptyMp4), /No C2PA UUID box/)
 	})
 
 	it('returns instanceId when present in the claim', () => {
@@ -96,9 +102,11 @@ describe('readC2paManifest', () => {
 	})
 
 	it('reads a JSON assertion and a binary assertion without taggedData', () => {
-		const manifest = buildJumb('urn:uuid:test-manifest',
+		const manifest = buildJumb(
+			'urn:uuid:test-manifest',
 			buildJumb('c2pa.claim', buildBox('cbor', Uint8Array.of(0xa0))),
-			buildJumb('c2pa.assertions',
+			buildJumb(
+				'c2pa.assertions',
 				buildJumb('com.example.json', buildBox('json', TEXT_ENCODER.encode('{"kind":"json"}'))),
 				buildJumb('com.example.binary', buildBox('bidb', Uint8Array.of(0xff, 0xd8))),
 			),
@@ -106,17 +114,23 @@ describe('readC2paManifest', () => {
 
 		const { assertions } = readC2paManifest(buildInitSegmentWithManifest(manifest))
 
-		deepStrictEqual(assertions.map(a => [a.label, a.data, a.taggedData]), [
-			['com.example.json', { kind: 'json' }, undefined],
-			['com.example.binary', Uint8Array.of(0xff, 0xd8), undefined],
-		])
+		deepStrictEqual(
+			assertions.map(a => [a.label, a.data, a.taggedData]),
+			[
+				['com.example.json', { kind: 'json' }, undefined],
+				['com.example.binary', Uint8Array.of(0xff, 0xd8), undefined],
+			],
+		)
 	})
 
 	function manifestWithClaim(claimCbor: Uint8Array): Uint8Array {
-		return buildInitSegmentWithManifest(buildJumb('urn:uuid:test-manifest',
-			buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
-			buildJumb('c2pa.assertions'),
-		))
+		return buildInitSegmentWithManifest(
+			buildJumb(
+				'urn:uuid:test-manifest',
+				buildJumb('c2pa.claim', buildBox('cbor', claimCbor)),
+				buildJumb('c2pa.assertions'),
+			),
+		)
 	}
 
 	it('reports no claim code for a claim box that holds a map', () => {
@@ -134,7 +148,9 @@ describe('readC2paManifest', () => {
 
 	for (const [description, claimCbor] of CLAIMS_THAT_ARE_NOT_MAPS) {
 		it(`reports CLAIM_MALFORMED for a claim box that holds ${description}`, () => {
-			const { claimCode, claimCborBytes, claimAssertionRefs, manifest } = readC2paManifest(manifestWithClaim(claimCbor))
+			const { claimCode, claimCborBytes, claimAssertionRefs, manifest } = readC2paManifest(
+				manifestWithClaim(claimCbor),
+			)
 
 			strictEqual(claimCode, 'claim.malformed')
 			strictEqual(claimCode, C2paStatusCode.CLAIM_MALFORMED)

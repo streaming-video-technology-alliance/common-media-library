@@ -1,9 +1,4 @@
-import type {
-	AudioTrack,
-	Presentation,
-	Segment,
-	VideoTrack,
-} from '@svta/cml-cmaf-ham'
+import type { AudioTrack, Presentation, Segment, VideoTrack } from '@svta/cml-cmaf-ham'
 
 export const videoSegments: Segment[] = [
 	{
@@ -128,7 +123,6 @@ export const videoTrack: VideoTrack = {
 	},
 	baseUrls: [],
 } as VideoTrack
-
 
 // @ts-expect-error - Invalid video track
 export const invalidVideoTrack: VideoTrack = {

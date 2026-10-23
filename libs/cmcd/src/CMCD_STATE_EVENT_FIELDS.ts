@@ -31,10 +31,12 @@ import type { CmcdKey } from './CmcdKey.ts'
  *
  * @internal
  */
-export const CMCD_STATE_EVENT_FIELDS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map([
-	[CMCD_EVENT_PLAY_STATE, 'sta'],
-	[CMCD_EVENT_PLAYBACK_RATE, 'pr'],
-	[CMCD_EVENT_CONTENT_ID, 'cid'],
-	[CMCD_EVENT_BACKGROUNDED_MODE, 'bg'],
-	[CMCD_EVENT_BITRATE_CHANGE, 'br'],
-])
+export const CMCD_STATE_EVENT_FIELDS: ReadonlyMap<CmcdEventType, CmcdKey> = /* @__PURE__ */ new Map(
+	[
+		[CMCD_EVENT_PLAY_STATE, 'sta'],
+		[CMCD_EVENT_PLAYBACK_RATE, 'pr'],
+		[CMCD_EVENT_CONTENT_ID, 'cid'],
+		[CMCD_EVENT_BACKGROUNDED_MODE, 'bg'],
+		[CMCD_EVENT_BITRATE_CHANGE, 'br'],
+	],
+)

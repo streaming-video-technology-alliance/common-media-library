@@ -9,7 +9,15 @@ function fixture(folder: string, guides: Record<string, string> = {}): string {
 	const libs = mkdtempSync(path.join(tmpdir(), 'cml-site-'))
 	const dir = path.join(libs, folder)
 	mkdirSync(dir, { recursive: true })
-	writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: `@svta/cml-${folder}`, version: '1.2.3', description: 'Does things', peerDependencies: { '@svta/cml-utils': '*', 'cbor-x': '^1' } }))
+	writeFileSync(
+		path.join(dir, 'package.json'),
+		JSON.stringify({
+			name: `@svta/cml-${folder}`,
+			version: '1.2.3',
+			description: 'Does things',
+			peerDependencies: { '@svta/cml-utils': '*', 'cbor-x': '^1' },
+		}),
+	)
 
 	for (const [file, title] of Object.entries(guides)) {
 		mkdirSync(path.join(dir, 'docs'), { recursive: true })
@@ -21,7 +29,10 @@ function fixture(folder: string, guides: Record<string, string> = {}): string {
 
 describe('loadPackage', () => {
 	it('reads the manifest and the guide titles in file order', () => {
-		const libs = fixture('cmcd', { 'user-guide.md': 'User Guide', 'validation-guide.md': 'Validation Guide' })
+		const libs = fixture('cmcd', {
+			'user-guide.md': 'User Guide',
+			'validation-guide.md': 'Validation Guide',
+		})
 		deepEqual(loadPackage(libs, 'cmcd'), {
 			folder: 'cmcd',
 			name: '@svta/cml-cmcd',
@@ -52,8 +63,24 @@ describe('loadPackage', () => {
 describe('renderPackageIndex', () => {
 	it('renders one section per group in group order', () => {
 		const packages: PackageInfo[] = [
-			{ folder: 'utils', name: '@svta/cml-utils', version: '1.0.0', description: 'Utilities', group: 'Core', guides: [], peers: [] },
-			{ folder: 'cmcd', name: '@svta/cml-cmcd', version: '2.0.0', description: 'CMCD', group: 'Delivery', guides: [], peers: [] },
+			{
+				folder: 'utils',
+				name: '@svta/cml-utils',
+				version: '1.0.0',
+				description: 'Utilities',
+				group: 'Core',
+				guides: [],
+				peers: [],
+			},
+			{
+				folder: 'cmcd',
+				name: '@svta/cml-cmcd',
+				version: '2.0.0',
+				description: 'CMCD',
+				group: 'Delivery',
+				guides: [],
+				peers: [],
+			},
 		]
 		const text = renderPackageIndex(packages)
 		equal(text.indexOf('## Delivery') < text.indexOf('## Core'), true)

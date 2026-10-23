@@ -34,9 +34,7 @@ export function audioGroupsToSwitchingSets(
 		for (const audio in encodings) {
 			const attributes: any = encodings[audio]
 			const { language, uri } = attributes
-			const audioParsed = parseHlsManifest(
-				manifestPlaylists.shift()?.manifest,
-			)
+			const audioParsed = parseHlsManifest(manifestPlaylists.shift()?.manifest)
 			const map = audioParsed?.segments[0]?.map
 			const segments = formatSegments(audioParsed?.segments)
 

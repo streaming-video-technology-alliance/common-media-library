@@ -29,4 +29,4 @@ export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox {
 		subsegmentCount,
 		subsegments,
 	}
-};
+}

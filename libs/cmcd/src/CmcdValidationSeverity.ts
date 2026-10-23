@@ -29,4 +29,4 @@ export const CmcdValidationSeverity = {
  *
  * @public
  */
-export type CmcdValidationSeverity = ValueOf<typeof CmcdValidationSeverity>;
+export type CmcdValidationSeverity = ValueOf<typeof CmcdValidationSeverity>

@@ -59,16 +59,10 @@ export class PenState {
 	}
 
 	setStyles(styles: Partial<PenStyles>): void {
-		const attribs = [
-			'foreground',
-			'underline',
-			'italics',
-			'background',
-			'flash',
-		]
+		const attribs = ['foreground', 'underline', 'italics', 'background', 'flash']
 		for (const style of attribs) {
 			if (Object.prototype.hasOwnProperty.call(styles, style)) {
-				(this as any)[style] = (styles as any)[style]
+				;(this as any)[style] = (styles as any)[style]
 			}
 		}
 	}

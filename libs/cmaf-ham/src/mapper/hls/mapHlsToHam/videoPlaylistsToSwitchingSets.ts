@@ -22,9 +22,7 @@ export function videoPlaylistsToSwitchingSets(
 	let videoTrackId = 0
 
 	playlists.map((playlist: any) => {
-		const parsedHlsManifest = parseHlsManifest(
-			manifestPlaylists.shift()?.manifest,
-		)
+		const parsedHlsManifest = parseHlsManifest(manifestPlaylists.shift()?.manifest)
 		const segments: Segment[] = formatSegments(parsedHlsManifest?.segments)
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes
 		const map = parsedHlsManifest?.segments?.at(0)?.map
@@ -43,9 +41,7 @@ export function videoPlaylistsToSwitchingSets(
 			width: playlist.attributes.RESOLUTION.width,
 			height: playlist.attributes.RESOLUTION.height,
 			frameRate: {
-				frameRateNumerator:
-					playlist.attributes['FRAME-RATE'] ??
-					FRAME_RATE_NUMERATOR_30,
+				frameRateNumerator: playlist.attributes['FRAME-RATE'] ?? FRAME_RATE_NUMERATOR_30,
 				frameRateDenominator: ZERO,
 			},
 			par: '',

@@ -19,4 +19,4 @@ export function readTenc(view: IsoBoxReadView): TrackEncryptionBox {
 		defaultIvSize: view.readUint(1),
 		defaultKid: view.readArray(UINT, 1, 16),
 	}
-};
+}

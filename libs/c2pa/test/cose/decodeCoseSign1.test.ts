@@ -17,7 +17,9 @@ describe('decodeCoseSign1', () => {
 		//   unprotected: {}  = 0xa0
 		//   payload: bstr "hello" = 0x45 68 65 6c 6c 6f
 		//   signature: bstr empty = 0x40
-		const minimal = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
+		const minimal = new Uint8Array([
+			0xd2, 0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40,
+		])
 		const result = decodeCoseSign1(minimal)
 		ok(result.payload instanceof Uint8Array, 'payload should be Uint8Array')
 		ok(result.signature instanceof Uint8Array, 'signature should be Uint8Array')
@@ -44,7 +46,9 @@ describe('decodeCoseSign1', () => {
 
 	it('throws on non-Uint8Array fields in COSE_Sign1', () => {
 		// 18([protected="", {}, "hello", ""]): 0x65 = text(5) "hello" instead of a byte string
-		const withTextPayload = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x65, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
+		const withTextPayload = new Uint8Array([
+			0xd2, 0x84, 0x40, 0xa0, 0x65, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40,
+		])
 		throws(() => decodeCoseSign1(withTextPayload), /Failed to decode COSE_Sign1/)
 	})
 
@@ -57,13 +61,38 @@ describe('decodeCoseSign1', () => {
 	// RFC 9052 section 3: a message with a label that appears twice in a header map is malformed
 	it('throws on a protected header with a duplicate label', () => {
 		// 18([<<{1: -7, 1: -7}>>, {}, nil, ""]): 0x45 = a byte string of 5 bytes around the protected header map
-		const withDuplicateAlg = Uint8Array.of(0xd2, 0x84, 0x45, 0xa2, 0x01, 0x26, 0x01, 0x26, 0xa0, 0xf6, 0x40)
+		const withDuplicateAlg = Uint8Array.of(
+			0xd2,
+			0x84,
+			0x45,
+			0xa2,
+			0x01,
+			0x26,
+			0x01,
+			0x26,
+			0xa0,
+			0xf6,
+			0x40,
+		)
 		throws(() => decodeCoseSign1(withDuplicateAlg), /Duplicate CBOR map key/)
 	})
 
 	it('throws on an unprotected header with a duplicate label', () => {
 		// 18([h'', {4: h'01', 4: h'02'}, nil, ""]): two kid labels
-		const withDuplicateKid = Uint8Array.of(0xd2, 0x84, 0x40, 0xa2, 0x04, 0x41, 0x01, 0x04, 0x41, 0x02, 0xf6, 0x40)
+		const withDuplicateKid = Uint8Array.of(
+			0xd2,
+			0x84,
+			0x40,
+			0xa2,
+			0x04,
+			0x41,
+			0x01,
+			0x04,
+			0x41,
+			0x02,
+			0xf6,
+			0x40,
+		)
 		throws(() => decodeCoseSign1(withDuplicateKid), /Duplicate CBOR map key/)
 	})
 })

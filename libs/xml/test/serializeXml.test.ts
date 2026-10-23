@@ -48,7 +48,10 @@ describe('serializeXml', () => {
 			],
 		}
 
-		equal(serializeXml(xml), '<?xml version="1.0" encoding="UTF-8"?><root><child hello="world">text</child><ns:tag>content</ns:tag></root>')
+		equal(
+			serializeXml(xml),
+			'<?xml version="1.0" encoding="UTF-8"?><root><child hello="world">text</child><ns:tag>content</ns:tag></root>',
+		)
 		//#endregion example
 	})
 })

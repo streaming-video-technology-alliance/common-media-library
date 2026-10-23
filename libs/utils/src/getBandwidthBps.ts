@@ -10,6 +10,6 @@ import type { ResourceTiming } from './ResourceTiming.ts'
  */
 export function getBandwidthBps(sample: ResourceTiming): number {
 	const durationSeconds = sample.duration / 1000
-	const bandwidthBps = sample.encodedBodySize * 8 / durationSeconds
+	const bandwidthBps = (sample.encodedBodySize * 8) / durationSeconds
 	return bandwidthBps
 }

@@ -13,7 +13,10 @@ describe('unescapeHtml', () => {
 
 	it('handles special characters', () => {
 		equal(unescapeHtml('hello &amp; world'), 'hello & world')
-		equal(unescapeHtml(`&amp;,&lt;,&gt;,&quot;,&apos;,&nbsp;,&lrm;,&rlm;`), `&,<,>,",',\u{a0},\u{200e},\u{200f}`)
+		equal(
+			unescapeHtml(`&amp;,&lt;,&gt;,&quot;,&apos;,&nbsp;,&lrm;,&rlm;`),
+			`&,<,>,",',\u{a0},\u{200e},\u{200f}`,
+		)
 	})
 
 	it('handles decimal special characters', () => {

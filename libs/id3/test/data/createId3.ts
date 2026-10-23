@@ -4,12 +4,7 @@ import { ID3_BYTES, ID3_VERSION_BYTES } from './ID3.ts'
 function createId3Size(size: number) {
 	// size is stored as a sequence of four 7-bit integers with the
 	// high bit of each byte set to zero
-	return [
-		(size >>> 21) & 0x7f,
-		(size >>> 14) & 0x7f,
-		(size >>> 7) & 0x7f,
-		size & 0x7f,
-	]
+	return [(size >>> 21) & 0x7f, (size >>> 14) & 0x7f, (size >>> 7) & 0x7f, size & 0x7f]
 }
 
 export function createId3(type: string, data: Uint8Array): Uint8Array {
@@ -41,7 +36,8 @@ export function createId3(type: string, data: Uint8Array): Uint8Array {
 		...createId3Size(data.byteLength),
 
 		// Flags (2 bytes)
-		0x00, 0x00,
+		0x00,
+		0x00,
 
 		// Payload
 		...data,

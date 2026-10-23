@@ -23,7 +23,7 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	/**
 	 * The URL where the reporter sends CMCD event reports.
 	 */
-	url: string;
+	url: string
 
 	/**
 	 * The events to report. If the caller provides no events,
@@ -31,7 +31,7 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 *
 	 * @defaultValue `undefined`
 	 */
-	events?: CmcdEventType[];
+	events?: CmcdEventType[]
 
 	/**
 	 * When the time interval event is sent, the interval in seconds at
@@ -41,14 +41,14 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 *
 	 * @see {@link CMCD_DEFAULT_TIME_INTERVAL}
 	 */
-	interval?: number;
+	interval?: number
 
 	/**
 	 * The number of events to batch before sending the report.
 	 *
 	 * @defaultValue `1`
 	 */
-	batchSize?: number;
+	batchSize?: number
 
 	/**
 	 * Transform applied to each of this target's event reports before
@@ -64,5 +64,5 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 * @example
 	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
 	 */
-	transform?: CmcdEventReportTransform<C>;
-};
+	transform?: CmcdEventReportTransform<C>
+}

@@ -20,11 +20,23 @@ import type { SegmentSample } from './SegmentSample.ts'
  * @param bufferLevel - The real buffer level when the download finished, in seconds. The value is 0 or more.
  * @returns The placeholder buffer after the sample, in seconds
  */
-export function placeholderAfterSample(params: BolaParams, placeholder: number, segment: SegmentSample, bufferLevel: number): number {
-	const requestSeconds = Number.isFinite(segment.timing.duration) ? segment.timing.duration / MILLISECONDS_PER_SECOND : 0
+export function placeholderAfterSample(
+	params: BolaParams,
+	placeholder: number,
+	segment: SegmentSample,
+	bufferLevel: number,
+): number {
+	const requestSeconds = Number.isFinite(segment.timing.duration)
+		? segment.timing.duration / MILLISECONDS_PER_SECOND
+		: 0
 	const bufferAtRequestStart = bufferLevel + requestSeconds
 	const maximumBuffer = params.maximumBuffers[findRung(params.rungs, segment.bandwidth)]
-	const decayed = Math.min(placeholder * PLACEHOLDER_DECAY, Math.max(0, maximumBuffer - bufferAtRequestStart))
+	const decayed = Math.min(
+		placeholder * PLACEHOLDER_DECAY,
+		Math.max(0, maximumBuffer - bufferAtRequestStart),
+	)
 
-	return segment.isReplacement && isPositiveFinite(segment.duration) ? decayed + segment.duration : decayed
+	return segment.isReplacement && isPositiveFinite(segment.duration)
+		? decayed + segment.duration
+		: decayed
 }

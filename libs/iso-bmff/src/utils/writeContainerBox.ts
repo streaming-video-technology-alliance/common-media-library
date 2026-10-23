@@ -17,7 +17,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  */
 export function writeContainerBox<T extends IsoBoxContainer>(
 	box: T,
-	config: IsoBoxWriteViewConfig
+	config: IsoBoxWriteViewConfig,
 ): IsoBoxWriteView {
 	const headerSize = 8
 	// TODO: Is there a way to avoid creating the intermediate Uint8Arrays?

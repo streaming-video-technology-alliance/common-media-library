@@ -33,11 +33,12 @@ export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView {
 	// Encode ISO-639-2/T language code as 3 5-bit integers in a 16-bit value
 	// Format: bits 14-10 (char1), bits 9-5 (char2), bits 4-0 (char3)
 	// Each character code is (charCode - 0x60) to convert from ASCII to 5-bit value
-	const lang = box.language.length >= 3
-		? (((box.language.charCodeAt(0) - 0x60) & 0x1F) << 10) |
-		(((box.language.charCodeAt(1) - 0x60) & 0x1F) << 5) |
-		((box.language.charCodeAt(2) - 0x60) & 0x1F)
-		: 0 // Default to "und" (undefined) if invalid
+	const lang =
+		box.language.length >= 3
+			? (((box.language.charCodeAt(0) - 0x60) & 0x1f) << 10) |
+				(((box.language.charCodeAt(1) - 0x60) & 0x1f) << 5) |
+				((box.language.charCodeAt(2) - 0x60) & 0x1f)
+			: 0 // Default to "und" (undefined) if invalid
 	writer.writeUint(lang, 2)
 
 	writer.writeUint(box.preDefined, 2)

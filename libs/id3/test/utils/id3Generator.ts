@@ -1,9 +1,6 @@
 import { toUint8 } from '@svta/cml-id3'
 
-export function generateId3(
-	frames: Uint8Array,
-	extendedHeader: boolean = false,
-): Uint8Array {
+export function generateId3(frames: Uint8Array, extendedHeader: boolean = false): Uint8Array {
 	let result = concat(
 		stringToInts('ID3'),
 		new Uint8Array([
@@ -93,8 +90,7 @@ function concat(...varArgs: BufferSource[]) {
 	for (const value of varArgs) {
 		if (value instanceof Uint8Array) {
 			result.set(value, offset)
-		}
-		else {
+		} else {
 			result.set(toUint8(value), offset)
 		}
 		offset += value.byteLength

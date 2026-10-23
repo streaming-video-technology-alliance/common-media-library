@@ -2,13 +2,16 @@ import type { HttpRequest } from '@svta/cml-utils'
 import type { CmcdRequestDeliver, CmcdTransportAdapter } from './CmcdTransportAdapter.ts'
 
 type XhrInstance = XMLHttpRequest & {
-	_cmcdMethod?: string;
-	_cmcdUrl?: string;
-	_cmcdHeaders?: Record<string, string>;
+	_cmcdMethod?: string
+	_cmcdUrl?: string
+	_cmcdHeaders?: Record<string, string>
 }
 
 async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<void> {
-	const text = await response.clone().text().catch(() => '')
+	const text = await response
+		.clone()
+		.text()
+		.catch(() => '')
 	const ProgressEventCtor: typeof ProgressEvent | typeof Event =
 		typeof ProgressEvent !== 'undefined' ? ProgressEvent : Event
 
@@ -38,10 +41,16 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 			target['response'] = text
 			target['responseText'] = text
 			if (typeof xhr.onload === 'function') {
-				xhr.onload.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('load') as ProgressEvent<EventTarget>)
+				xhr.onload.call(
+					xhr as unknown as XMLHttpRequest,
+					new ProgressEventCtor('load') as ProgressEvent<EventTarget>,
+				)
 			}
 			if (typeof xhr.onloadend === 'function') {
-				xhr.onloadend.call(xhr as unknown as XMLHttpRequest, new ProgressEventCtor('loadend') as ProgressEvent<EventTarget>)
+				xhr.onloadend.call(
+					xhr as unknown as XMLHttpRequest,
+					new ProgressEventCtor('loadend') as ProgressEvent<EventTarget>,
+				)
 			}
 		}
 	})
@@ -58,7 +67,9 @@ export function createXhrTransport(): CmcdTransportAdapter {
 		attach(deliver: CmcdRequestDeliver): () => void {
 			const Xhr = globalThis.XMLHttpRequest
 			if (!Xhr) {
-				return () => { /* no XHR to detach */ }
+				return () => {
+					/* no XHR to detach */
+				}
 			}
 			const origOpen = Xhr.prototype.open
 			const origSetRequestHeader = Xhr.prototype.setRequestHeader
@@ -72,19 +83,29 @@ export function createXhrTransport(): CmcdTransportAdapter {
 				return origOpen.apply(this, arguments as unknown as Parameters<typeof origOpen>)
 			}
 
-			Xhr.prototype.setRequestHeader = function (this: XhrInstance, name: string, value: string): void {
+			Xhr.prototype.setRequestHeader = function (
+				this: XhrInstance,
+				name: string,
+				value: string,
+			): void {
 				if (this._cmcdHeaders) {
 					this._cmcdHeaders[name.toLowerCase()] = value
 				}
 				return origSetRequestHeader.apply(this, [name, value])
 			}
 
-			Xhr.prototype.send = function (this: XhrInstance, body?: Document | XMLHttpRequestBodyInit | null): void {
+			Xhr.prototype.send = function (
+				this: XhrInstance,
+				body?: Document | XMLHttpRequestBodyInit | null,
+			): void {
 				const httpRequest: HttpRequest = {
 					url: this._cmcdUrl ?? '',
 					method: (this._cmcdMethod ?? 'GET').toUpperCase(),
 					headers: this._cmcdHeaders ?? {},
-					body: (typeof Document !== 'undefined' && body instanceof Document ? undefined : body as BodyInit | null | undefined) ?? undefined,
+					body:
+						(typeof Document !== 'undefined' && body instanceof Document
+							? undefined
+							: (body as BodyInit | null | undefined)) ?? undefined,
 				}
 
 				const synthetic = deliver(httpRequest)

@@ -6,5 +6,5 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SubtitleMediaHeaderBox = FullBox & {
-	type: 'sthd';
-};
+	type: 'sthd'
+}

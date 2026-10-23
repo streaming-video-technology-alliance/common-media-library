@@ -6,7 +6,7 @@ import type { CaptionScreen } from './CaptionScreen.ts'
  * @public
  */
 export type CueHandler = {
-	newCue(startTime: number, endTime: number, screen: CaptionScreen): void;
-	reset?(): void;
-	dispatchCue?(): void;
-};
+	newCue(startTime: number, endTime: number, screen: CaptionScreen): void
+	reset?(): void
+	dispatchCue?(): void
+}

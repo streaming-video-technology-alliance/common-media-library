@@ -5,7 +5,11 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { options } from './options.ts'
 
-export async function expectCuesEqualAll(vttFile: string, jsonFile: string, message?: string): Promise<void> {
+export async function expectCuesEqualAll(
+	vttFile: string,
+	jsonFile: string,
+	message?: string,
+): Promise<void> {
 	const [vttText, json] = await Promise.all([
 		readFile(path.resolve(vttFile), 'utf-8'),
 		readFile(path.resolve(jsonFile), 'utf-8').then(text => JSON.parse(text)),

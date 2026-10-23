@@ -5,7 +5,7 @@
  */
 export type AudioChannelConfiguration = {
 	$: {
-		schemeIdUri: string;
-		value: string;
-	};
-};
+		schemeIdUri: string
+		value: string
+	}
+}

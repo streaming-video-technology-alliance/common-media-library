@@ -62,7 +62,7 @@ export async function validateAssertionHashes(
 		else boxesByLabel.set(assertion.label, [assertion])
 	}
 
-	const hashChecks = claimRefs.map(async (ref) => {
+	const hashChecks = claimRefs.map(async ref => {
 		const label = extractLabelFromUrl(ref.url)
 		const boxes = boxesByLabel.get(label)
 
@@ -73,9 +73,7 @@ export async function validateAssertionHashes(
 
 		const assertion = boxes[0]
 		const alg = ref.alg ? normalizeAlgorithmName(ref.alg) : 'SHA-256'
-		const computedHash = new Uint8Array(
-			await crypto.subtle.digest(alg, assertion.rawBoxPayload),
-		)
+		const computedHash = new Uint8Array(await crypto.subtle.digest(alg, assertion.rawBoxPayload))
 
 		if (!hashesEqual(computedHash, ref.hash)) {
 			return { code: C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH, verified: null }

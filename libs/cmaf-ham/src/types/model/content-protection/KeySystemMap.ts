@@ -5,6 +5,9 @@ import type { KeySystem } from './KeySystem.ts'
  *
  * @alpha
  */
-export type KeySystemMap = Record<KeySystem, {
-	pssh: string;
-}>;
+export type KeySystemMap = Record<
+	KeySystem,
+	{
+		pssh: string
+	}
+>

@@ -10,5 +10,5 @@ export type SfEncodeOptions = {
 	 *
 	 * @defaultValue `true`
 	 */
-	whitespace?: boolean;
-};
+	whitespace?: boolean
+}

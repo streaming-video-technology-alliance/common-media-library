@@ -24,22 +24,16 @@ export function validateSegment(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = trackId
-		? ` in the track with id = ${trackId}`
-		: '.'
+	const moreInformation = trackId ? ` in the track with id = ${trackId}` : '.'
 
 	if (!segment.duration) {
 		validation.status = false
-		validation.errorMessages.push(
-			`Segment duration is undefined${moreInformation}`,
-		)
+		validation.errorMessages.push(`Segment duration is undefined${moreInformation}`)
 	}
 
 	if (!segment.url) {
 		validation.status = false
-		validation.errorMessages.push(
-			`Segment url is undefined${moreInformation}`,
-		)
+		validation.errorMessages.push(`Segment url is undefined${moreInformation}`)
 	}
 
 	return validation

@@ -5,4 +5,4 @@ import type { CMCD_HEADER_MAP } from './CMCD_HEADER_MAP.ts'
  *
  * @public
  */
-export type CmcdHeaderKey = keyof typeof CMCD_HEADER_MAP;
+export type CmcdHeaderKey = keyof typeof CMCD_HEADER_MAP

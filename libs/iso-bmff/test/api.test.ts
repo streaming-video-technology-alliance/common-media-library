@@ -1,5 +1,20 @@
 import { readFile } from 'fs/promises'
-import { assert, createAudioSampleEntryReader, createVisualSampleEntryReader, describe, filterIsoBoxes, findIsoBox, IsoBoxWriteView, it, readIsoBoxes, readStsd, writeIsoBoxes, writeStsd, writeVisualSampleEntryBox, type IsoBoxReadView } from './util/box.ts'
+import {
+	assert,
+	createAudioSampleEntryReader,
+	createVisualSampleEntryReader,
+	describe,
+	filterIsoBoxes,
+	findIsoBox,
+	IsoBoxWriteView,
+	it,
+	readIsoBoxes,
+	readStsd,
+	writeIsoBoxes,
+	writeStsd,
+	writeVisualSampleEntryBox,
+	type IsoBoxReadView,
+} from './util/box.ts'
 
 describe('API', function () {
 	it('should handle advanced use cases', async () => {
@@ -37,7 +52,7 @@ describe('API', function () {
 					return view
 				},
 				stsd: writeStsd,
-			}
+			},
 		})
 
 		const size = stream.reduce((acc, chunk) => acc + chunk.byteLength, 0)

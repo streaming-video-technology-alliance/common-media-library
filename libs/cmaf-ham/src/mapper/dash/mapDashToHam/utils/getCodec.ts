@@ -10,10 +10,7 @@ import type { Representation } from '../../../../types/mapper/dash/Representatio
  * @param representation - Representation to try to get the codec from
  * @returns Content codec
  */
-export function getCodec(
-	adaptationSet: AdaptationSet,
-	representation: Representation,
-): string {
+export function getCodec(adaptationSet: AdaptationSet, representation: Representation): string {
 	const codec = representation.$.codecs ?? adaptationSet.$.codecs ?? ''
 	if (!codec) {
 		console.error(`Representation ${representation.$.id} has no codecs`)

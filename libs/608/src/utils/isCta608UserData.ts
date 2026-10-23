@@ -13,8 +13,10 @@
  * @returns true when the 8 bytes at `pos` identify CTA-608 caption data
  */
 export function isCta608UserData(raw: DataView, pos: number): boolean {
-	return raw.getUint8(pos) === 0xB5
-		&& raw.getUint16(pos + 1) === 0x0031
-		&& raw.getUint32(pos + 3) === 0x47413934
-		&& raw.getUint8(pos + 7) === 0x03
+	return (
+		raw.getUint8(pos) === 0xb5 &&
+		raw.getUint16(pos + 1) === 0x0031 &&
+		raw.getUint32(pos + 3) === 0x47413934 &&
+		raw.getUint8(pos + 7) === 0x03
+	)
 }

@@ -8,7 +8,10 @@ import type { LadderRung } from './LadderRung.ts'
  * @param bandwidths - The bandwidths that a selector stored from an earlier call
  * @returns Whether the two have equal bandwidths
  */
-export function isSameLadder(ladder: readonly LadderRung[], bandwidths: readonly number[]): boolean {
+export function isSameLadder(
+	ladder: readonly LadderRung[],
+	bandwidths: readonly number[],
+): boolean {
 	if (ladder.length !== bandwidths.length) {
 		return false
 	}

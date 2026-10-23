@@ -42,7 +42,10 @@ for (const project of projects) {
 		mkdirSync(guides, { recursive: true })
 
 		for (const guide of pkg.guides) {
-			copyFileSync(path.join(source, 'docs', `${guide.slug}.md`), path.join(guides, `${guide.slug}.md`))
+			copyFileSync(
+				path.join(source, 'docs', `${guide.slug}.md`),
+				path.join(guides, `${guide.slug}.md`),
+			)
 		}
 	}
 
@@ -53,6 +56,9 @@ for (const project of projects) {
 writeFileSync(path.join(packagesDir, 'packages.json'), `${JSON.stringify(packages, null, '\t')}\n`)
 writeFileSync(path.join(packagesDir, 'index.md'), renderPackageIndex(packages))
 writeFileSync(path.join(releasesDir, 'index.md'), renderReleases(releases))
-writeFileSync(path.join(siteDir, 'api-entry.json'), `${JSON.stringify({ entryPoints: projects.map(project => `../${project}`) }, null, '\t')}\n`)
+writeFileSync(
+	path.join(siteDir, 'api-entry.json'),
+	`${JSON.stringify({ entryPoints: projects.map(project => `../${project}`) }, null, '\t')}\n`,
+)
 
 console.log(`Prepared ${packages.length} packages and ${releases.length} releases`)

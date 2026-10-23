@@ -4,6 +4,6 @@
  * @public
  */
 export type SampleToGroupEntry = {
-	sampleCount: number;
-	groupDescriptionIndex: number;
-};
+	sampleCount: number
+	groupDescriptionIndex: number
+}

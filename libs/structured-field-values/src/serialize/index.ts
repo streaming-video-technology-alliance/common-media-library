@@ -18,4 +18,3 @@ export * from './serializeList.ts'
 export * from './serializeParams.ts'
 export * from './serializeString.ts'
 export * from './serializeToken.ts'
-

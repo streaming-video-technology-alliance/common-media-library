@@ -4,6 +4,6 @@
  * @public
  */
 export type WebVttCueIdBox = {
-	type: 'iden';
-	cueId: string;
-};
+	type: 'iden'
+	cueId: string
+}

@@ -13,28 +13,27 @@ import { parseByteRangeString } from '../../../utils/byteRange.ts'
  * @param duration - Duration of the segment
  * @returns list of ham segments
  */
-export function mapSegmentBase(
-	representation: Representation,
-	duration: number,
-): Segment[] {
+export function mapSegmentBase(representation: Representation, duration: number): Segment[] {
 	let cumulativeTime = 0
-	return representation.SegmentBase?.map((segment: SegmentBase, index: number) => {
-		const startTime = cumulativeTime
-		cumulativeTime += duration
-		const byteRange = parseByteRangeString(segment.$.indexRange)
+	return (
+		representation.SegmentBase?.map((segment: SegmentBase, index: number) => {
+			const startTime = cumulativeTime
+			cumulativeTime += duration
+			const byteRange = parseByteRangeString(segment.$.indexRange)
 
-		const result: Segment = {
-			id: `${representation.$.id}-segment-${index}`,
-			duration,
-			url: representation.BaseURL?.[0] ?? '',
-			startTime,
-		} as Segment
+			const result: Segment = {
+				id: `${representation.$.id}-segment-${index}`,
+				duration,
+				url: representation.BaseURL?.[0] ?? '',
+				startTime,
+			} as Segment
 
-		// Only include byteRange if it exists
-		if (byteRange !== undefined) {
-			result.byteRange = byteRange
-		}
+			// Only include byteRange if it exists
+			if (byteRange !== undefined) {
+				result.byteRange = byteRange
+			}
 
-		return result
-	}) ?? []
+			return result
+		}) ?? []
+	)
 }

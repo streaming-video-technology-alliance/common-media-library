@@ -19,9 +19,7 @@ export class DashMapper implements Mapper {
 	}
 
 	toHam(manifest: ManifestFile): Presentation[] {
-		const dashManifest: DashManifest | undefined = parseDashManifest(
-			manifest.manifest,
-		)
+		const dashManifest: DashManifest | undefined = parseDashManifest(manifest.manifest)
 
 		if (!dashManifest) {
 			return []

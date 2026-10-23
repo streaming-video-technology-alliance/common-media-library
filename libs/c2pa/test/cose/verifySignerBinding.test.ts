@@ -3,7 +3,11 @@ import { Encoder } from 'cbor-x/encode'
 import { ok, strictEqual } from 'node:assert'
 import { before, describe, it } from 'node:test'
 import { createTestSigner } from '../testSigner.ts'
-import { createTestSessionKey, encodeSignerBinding, type TestSessionKey } from '../vsi/vsiTestUtils.ts'
+import {
+	createTestSessionKey,
+	encodeSignerBinding,
+	type TestSessionKey,
+} from '../vsi/vsiTestUtils.ts'
 
 // Byte strings without CBOR tag 64.
 const CBOR = new Encoder({ tagUint8Array: false })
@@ -16,12 +20,14 @@ describe('verifySignerBinding', () => {
 
 		// Export the public key as JWK to build a COSE key structure
 		const jwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey)
-		const xBytes = Uint8Array.from(atob((jwk.x ?? '').replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0))
+		const xBytes = Uint8Array.from(atob((jwk.x ?? '').replace(/-/g, '+').replace(/_/g, '/')), c =>
+			c.charCodeAt(0),
+		)
 
 		// Build a minimal COSE key (kty=1 OKP, crv=6 Ed25519) with the shape that the CBOR reader decodes
 		const sessionCoseKey = {
-			1: 1,     // kty: OKP
-			[-1]: 6,  // crv: Ed25519
+			1: 1, // kty: OKP
+			[-1]: 6, // crv: Ed25519
 			[-2]: xBytes,
 		}
 
@@ -36,7 +42,9 @@ describe('verifySignerBinding', () => {
 
 	it('throws for an unsupported COSE key type', async () => {
 		const invalidKey = { 1: 99 }
-		const minimal = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40])
+		const minimal = new Uint8Array([
+			0xd2, 0x84, 0x40, 0xa0, 0x45, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x40,
+		])
 		try {
 			await verifySignerBinding(minimal, invalidKey, new Uint8Array(4))
 			ok(false, 'should have thrown')
@@ -87,7 +95,11 @@ describe('verifySignerBinding', () => {
 		})
 
 		it('accepts a binding that embeds the signed certificate encoded as a CBOR byte string', async () => {
-			const binding = await encodeSignerBinding(sessionKey, certificateByteString, certificateByteString)
+			const binding = await encodeSignerBinding(
+				sessionKey,
+				certificateByteString,
+				certificateByteString,
+			)
 
 			strictEqual(await verifySignerBinding(binding, coseKey, certificate), true)
 		})

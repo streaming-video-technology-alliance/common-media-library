@@ -23,8 +23,7 @@ export function getContentType(
 	}
 	if (adaptationSet.$.mimeType || representation?.$.mimeType) {
 		const type =
-			adaptationSet.$.mimeType?.split('/')[0] ||
-			representation?.$.mimeType?.split('/')[0]
+			adaptationSet.$.mimeType?.split('/')[0] || representation?.$.mimeType?.split('/')[0]
 		if (type === 'audio' || type === 'video' || type === 'text') {
 			return type
 		}
@@ -36,11 +35,8 @@ export function getContentType(
 		return 'video'
 	}
 	const adaptationRef =
-		adaptationSet.$.id ??
-		`group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`
-	console.error(
-		`Could not find contentType from adaptationSet ${adaptationRef}`,
-	)
+		adaptationSet.$.id ?? `group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`
+	console.error(`Could not find contentType from adaptationSet ${adaptationRef}`)
 	console.info('Using "text" as default contentType')
 	return 'text'
 }

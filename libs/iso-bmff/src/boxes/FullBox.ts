@@ -4,6 +4,6 @@
  * @public
  */
 export type FullBox = {
-	version: number;
-	flags: number;
-};
+	version: number
+	flags: number
+}

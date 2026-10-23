@@ -7,12 +7,12 @@ import { parseCta608DataFromSei } from '../src/utils/seiHelpers.ts'
 /**
  * The 8-byte ATSC A/53 user identifier that prefixes every `cc_data()` payload.
  */
-const GA94 = [0xB5, 0x00, 0x31, 0x47, 0x41, 0x39, 0x34, 0x03]
+const GA94 = [0xb5, 0x00, 0x31, 0x47, 0x41, 0x39, 0x34, 0x03]
 
 /**
  * A cc construct header with cc_valid set and cc_type 0 (field 1).
  */
-const VALID_FIELD_1 = 0xFC
+const VALID_FIELD_1 = 0xfc
 
 function toView(bytes: number[]): DataView {
 	return new DataView(new Uint8Array(bytes).buffer)
@@ -23,9 +23,14 @@ describe('parseCcData bounds', () => {
 	it('should read no further than the cc constructs that fit within endPos', () => {
 		// cc_count claims 5 constructs, but endPos admits only the first one.
 		const raw = toView([
-			0x05, 0xFF, // cc_count = 5, em_data
-			VALID_FIELD_1, 0x41, 0x42, // "AB"
-			VALID_FIELD_1, 0x43, 0x44, // "CD" — beyond endPos
+			0x05,
+			0xff, // cc_count = 5, em_data
+			VALID_FIELD_1,
+			0x41,
+			0x42, // "AB"
+			VALID_FIELD_1,
+			0x43,
+			0x44, // "CD" — beyond endPos
 		])
 		const fieldData: number[][] = [[], []]
 
@@ -61,12 +66,19 @@ describe('parseCta608DataFromSei bounds', () => {
 
 	it('should not let a wrong cc_count consume the SEI message that follows', () => {
 		const sei = toView([
-			0x04, 0x0D, // payloadType 4, payloadSize 13
+			0x04,
+			0x0d, // payloadType 4, payloadSize 13
 			...GA94,
-			0x05, 0xFF, // cc_count = 5, but only one construct is inside this payload
-			VALID_FIELD_1, 0x41, 0x42, // "AB"
-			0x05, 0x03, // next message: payloadType 5, payloadSize 3
-			VALID_FIELD_1, 0x43, 0x44, // its payload, which is not caption data
+			0x05,
+			0xff, // cc_count = 5, but only one construct is inside this payload
+			VALID_FIELD_1,
+			0x41,
+			0x42, // "AB"
+			0x05,
+			0x03, // next message: payloadType 5, payloadSize 3
+			VALID_FIELD_1,
+			0x43,
+			0x44, // its payload, which is not caption data
 			0x80, // rbsp_trailing_bits
 		])
 		const fieldData: number[][] = [[], []]
@@ -82,9 +94,14 @@ describe('extractCta608Data bounds', () => {
 	it('should not read past the payload the range describes', () => {
 		const raw = toView([
 			...GA94,
-			0x05, 0xFF, // cc_count = 5, but only one construct is inside the payload
-			VALID_FIELD_1, 0x41, 0x42, // "AB"
-			VALID_FIELD_1, 0x43, 0x44, // "CD" — outside the range
+			0x05,
+			0xff, // cc_count = 5, but only one construct is inside the payload
+			VALID_FIELD_1,
+			0x41,
+			0x42, // "AB"
+			VALID_FIELD_1,
+			0x43,
+			0x44, // "CD" — outside the range
 		])
 
 		// findCta608Nalus returns [pos, payloadSize]; this payload is 13 bytes from 0.

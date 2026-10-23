@@ -13,8 +13,6 @@ import type { Id3Frame } from './Id3Frame.ts'
  */
 export function isId3TimestampFrame(frame: Id3Frame): frame is DecodedId3Frame<ArrayBufferLike> {
 	return (
-		frame &&
-		frame.key === 'PRIV' &&
-		frame.info === 'com.apple.streaming.transportStreamTimestamp'
+		frame && frame.key === 'PRIV' && frame.info === 'com.apple.streaming.transportStreamTimestamp'
 	)
 }

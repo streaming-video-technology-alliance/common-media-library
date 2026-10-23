@@ -3,4 +3,4 @@
  *
  * @public
  */
-export type IsoBoxData = ArrayBufferLike | ArrayBufferView;
+export type IsoBoxData = ArrayBufferLike | ArrayBufferView

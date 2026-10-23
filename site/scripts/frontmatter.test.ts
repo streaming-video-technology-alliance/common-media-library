@@ -4,7 +4,9 @@ import { parseFrontmatter } from './frontmatter.ts'
 
 describe('parseFrontmatter', () => {
 	it('returns the attributes and the body', () => {
-		const result = parseFrontmatter('---\ntitle: User Guide\ndescription: How to use it\n---\n\n# Heading\n')
+		const result = parseFrontmatter(
+			'---\ntitle: User Guide\ndescription: How to use it\n---\n\n# Heading\n',
+		)
 		deepEqual(result.attributes, { title: 'User Guide', description: 'How to use it' })
 		equal(result.body, '\n# Heading\n')
 	})

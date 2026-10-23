@@ -13,7 +13,9 @@ const X5CHAIN_COSE_HEADER = 33
  *
  * @internal
  */
-export function extractCertificateFromSignatureBytes(signatureBytes: Uint8Array): Uint8Array | null {
+export function extractCertificateFromSignatureBytes(
+	signatureBytes: Uint8Array,
+): Uint8Array | null {
 	try {
 		const cose = decodeCoseSign1(signatureBytes)
 		const x5chain = (cose.protectedHeader[X5CHAIN_COSE_HEADER] ??

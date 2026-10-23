@@ -9,28 +9,27 @@ import type { CmcdRecordedRequestType } from './CmcdRecordedRequestType.ts'
  * @public
  */
 export type CmcdRecordedReport = {
-
 	/**
 	 * The captured request that contained the CMCD report, normalized to
 	 * {@link @svta/cml-utils!HttpRequest | HttpRequest}. Headers are
 	 * lowercase-keyed. Bodies are eagerly read as strings.
 	 */
-	readonly request: HttpRequest;
+	readonly request: HttpRequest
 
 	/**
 	 * Classification of the underlying request (manifest / segment / event / unknown).
 	 */
-	readonly type: CmcdRecordedRequestType;
+	readonly type: CmcdRecordedRequestType
 
 	/**
 	 * Reporting mode under which the CMCD data was transmitted:
 	 * `'query'` for `CMCD=` URL parameter, `'header'` for `CMCD-*`
 	 * HTTP headers, `'event'` for an event-target POST body.
 	 */
-	readonly reportingMode: CmcdRecordedReportMode;
+	readonly reportingMode: CmcdRecordedReportMode
 
 	/**
 	 * Wall-clock millisecond timestamp from `Date.now()` at capture time.
 	 */
-	readonly timestamp: number;
+	readonly timestamp: number
 }

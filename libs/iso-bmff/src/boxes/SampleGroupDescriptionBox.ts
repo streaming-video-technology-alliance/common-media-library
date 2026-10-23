@@ -6,9 +6,9 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SampleGroupDescriptionBox = FullBox & {
-	type: 'sgpd';
-	groupingType: number;
-	defaultLength?: number;
-	entryCount: number;
-	entries: any[];
-};
+	type: 'sgpd'
+	groupingType: number
+	defaultLength?: number
+	entryCount: number
+	entries: any[]
+}

@@ -8,30 +8,54 @@ describe('urlToRelativePath', () => {
 	})
 
 	it('produces a relative path when at the same folder level', () => {
-		equal(urlToRelativePath('http://test.com/base/1.mp4', 'http://test.com/base/manifest.mpd'), '1.mp4')
+		equal(
+			urlToRelativePath('http://test.com/base/1.mp4', 'http://test.com/base/manifest.mpd'),
+			'1.mp4',
+		)
 	})
 
 	it('produces a relative path when base is lower', () => {
-		equal(urlToRelativePath('http://test.com/base/segments/video/1.mp4', 'http://test.com/manifest.mpd'), 'base/segments/video/1.mp4')
+		equal(
+			urlToRelativePath(
+				'http://test.com/base/segments/video/1.mp4',
+				'http://test.com/manifest.mpd',
+			),
+			'base/segments/video/1.mp4',
+		)
 	})
 
 	it('produces a relative path when base is higher', () => {
-		equal(urlToRelativePath('http://test.com/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '../../1.mp4')
+		equal(
+			urlToRelativePath('http://test.com/1.mp4', 'http://test.com/base/manifest/manifest.mpd'),
+			'../../1.mp4',
+		)
 	})
 
 	it('produces a relative path when base and url are different', () => {
 		//#region example
-		equal(urlToRelativePath('http://test.com/base/segments/video/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '../segments/video/1.mp4')
+		equal(
+			urlToRelativePath(
+				'http://test.com/base/segments/video/1.mp4',
+				'http://test.com/base/manifest/manifest.mpd',
+			),
+			'../segments/video/1.mp4',
+		)
 		//#endregion example
 	})
 
 	it('returns url when origins are different', () => {
-		equal(urlToRelativePath('http://foo.com/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), 'http://foo.com/1.mp4')
+		equal(
+			urlToRelativePath('http://foo.com/1.mp4', 'http://test.com/base/manifest/manifest.mpd'),
+			'http://foo.com/1.mp4',
+		)
 	})
 
 	it('returns url unchanged when it is already a relative path', () => {
 		equal(urlToRelativePath('1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '1.mp4')
-		equal(urlToRelativePath('../segments/1.mp4', 'http://test.com/base/manifest/manifest.mpd'), '../segments/1.mp4')
+		equal(
+			urlToRelativePath('../segments/1.mp4', 'http://test.com/base/manifest/manifest.mpd'),
+			'../segments/1.mp4',
+		)
 	})
 
 	it('returns url unchanged when it has no scheme', () => {
@@ -41,13 +65,16 @@ describe('urlToRelativePath', () => {
 		equal(urlToRelativePath('/a/b', base), '/a/b')
 	})
 
-	it('does not throw internally when url has no scheme', (t) => {
+	it('does not throw internally when url has no scheme', t => {
 		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
 		const urlSpy = t.mock.method(globalThis, 'URL')
 		urlToRelativePath('seg-2.m4s', base)
 		urlToRelativePath('//cdn/x', base)
 		urlToRelativePath('/a/b', base)
-		deepEqual(urlSpy.mock.calls.filter(call => call.error !== undefined).map(call => call.arguments[0]), [])
+		deepEqual(
+			urlSpy.mock.calls.filter(call => call.error !== undefined).map(call => call.arguments[0]),
+			[],
+		)
 	})
 
 	it('returns url unchanged when it has a scheme but is not a valid URL', () => {
@@ -63,15 +90,27 @@ describe('urlToRelativePath', () => {
 	})
 
 	it('maintains query parameters and hash in the relative path', () => {
-		equal(urlToRelativePath('http://test.com/base/segments/video/1.mp4?param=foo&another=bar#hash=baz', 'http://test.com/base/manifest/manifest.mpd'), '../segments/video/1.mp4?param=foo&another=bar#hash=baz')
+		equal(
+			urlToRelativePath(
+				'http://test.com/base/segments/video/1.mp4?param=foo&another=bar#hash=baz',
+				'http://test.com/base/manifest/manifest.mpd',
+			),
+			'../segments/video/1.mp4?param=foo&another=bar#hash=baz',
+		)
 	})
 
 	it('produces a relative path when only query params are different', () => {
-		equal(urlToRelativePath('http://test.com/file.mp4?i=1', 'http://test.com/file.mp4?i=0'), 'file.mp4?i=1')
+		equal(
+			urlToRelativePath('http://test.com/file.mp4?i=1', 'http://test.com/file.mp4?i=0'),
+			'file.mp4?i=1',
+		)
 	})
 
 	it('produces a relative path when only hash params are different', () => {
-		equal(urlToRelativePath('http://test.com/file.mp4#i=1', 'http://test.com/file.mp4#i=0'), 'file.mp4#i=1')
+		equal(
+			urlToRelativePath('http://test.com/file.mp4#i=1', 'http://test.com/file.mp4#i=0'),
+			'file.mp4#i=1',
+		)
 	})
 
 	it('resolves a target in the same one-segment base directory', () => {
@@ -101,17 +140,26 @@ describe('urlToRelativePath', () => {
 
 	it('returns url unchanged when a same-shaped path is cross-origin', () => {
 		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
-		equal(urlToRelativePath('https://other.example.com/v/1080p/seg-2.m4s', base), 'https://other.example.com/v/1080p/seg-2.m4s')
+		equal(
+			urlToRelativePath('https://other.example.com/v/1080p/seg-2.m4s', base),
+			'https://other.example.com/v/1080p/seg-2.m4s',
+		)
 	})
 
 	it('preserves query and hash for a target in a two-segment base directory', () => {
 		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
-		equal(urlToRelativePath('https://cdn.example.com/v/1080p/seg-2.m4s?a=1&b=2#frag', base), 'seg-2.m4s?a=1&b=2#frag')
+		equal(
+			urlToRelativePath('https://cdn.example.com/v/1080p/seg-2.m4s?a=1&b=2#frag', base),
+			'seg-2.m4s?a=1&b=2#frag',
+		)
 	})
 
 	it('resolves a target that diverges and matches again at a deeper segment', () => {
 		const base = getBaseUrl('https://cdn.example.com/v/1080p/init/seg-1.m4s')
-		equal(urlToRelativePath('https://cdn.example.com/v/720p/init/seg-2.m4s', base), '../../720p/init/seg-2.m4s')
+		equal(
+			urlToRelativePath('https://cdn.example.com/v/720p/init/seg-2.m4s', base),
+			'../../720p/init/seg-2.m4s',
+		)
 	})
 
 	it('prefixes ./ when the first segment contains a colon', () => {

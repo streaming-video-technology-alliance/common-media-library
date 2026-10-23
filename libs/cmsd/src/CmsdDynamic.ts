@@ -11,10 +11,10 @@ export type CmsdDynamic = {
 	/**
 	 * The server name.
 	 */
-	value: string;
+	value: string
 
 	/**
 	 * The CMSD dynamic parameters.
 	 */
 	params: CmsdDynamicParams
-};
+}

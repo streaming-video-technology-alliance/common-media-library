@@ -14,10 +14,10 @@ import type { Track } from './Track.ts'
  * @alpha
  */
 export type VideoTrack = Track & {
-	width: number;
-	height: number;
-	frameRate: FrameRate;
-	par: string;
-	sar: string;
-	scanType: string;
-};
+	width: number
+	height: number
+	frameRate: FrameRate
+	par: string
+	sar: string
+	scanType: string
+}

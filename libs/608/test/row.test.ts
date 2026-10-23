@@ -40,7 +40,6 @@ describe('Row Tests', () => {
 		for (let i = 0; i < newRow.chars.length; i++) {
 			equal(newRow.chars[i].equals(row.chars[i]), true)
 		}
-
 	})
 
 	it('isEmpty method', () => {

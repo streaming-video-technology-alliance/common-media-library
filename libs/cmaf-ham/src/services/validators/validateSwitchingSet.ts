@@ -39,15 +39,11 @@ export function validateSwitchingSet(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = selectionSetId
-		? ` in the selection set with id = ${selectionSetId}`
-		: '.'
+	const moreInformation = selectionSetId ? ` in the selection set with id = ${selectionSetId}` : '.'
 
 	if (!switchingSet.id) {
 		validation.status = false
-		validation.errorMessages.push(
-			`SwitchingSet id is undefined${moreInformation}`,
-		)
+		validation.errorMessages.push(`SwitchingSet id is undefined${moreInformation}`)
 	}
 
 	validateTracks(switchingSet.tracks, switchingSet.id, validation)

@@ -18,7 +18,8 @@ export function writeStsz(box: SampleSizeBox): IsoBoxWriteView {
 	const sampleSizeFieldSize = 4
 	const sampleCountFieldSize = 4
 	const entrySizeSize = box.sampleSize === 0 ? box.sampleCount * 4 : 0
-	const totalSize = headerSize + fullBoxSize + sampleSizeFieldSize + sampleCountFieldSize + entrySizeSize
+	const totalSize =
+		headerSize + fullBoxSize + sampleSizeFieldSize + sampleCountFieldSize + entrySizeSize
 
 	const writer = new IsoBoxWriteView('stsz', totalSize)
 	writer.writeFullBox(box.version, box.flags)

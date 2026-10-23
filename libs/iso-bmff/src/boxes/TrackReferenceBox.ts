@@ -5,7 +5,7 @@ import type { TrackReferenceTypeBox } from './TrackReferenceTypeBox.ts'
  *
  * @public
  */
-export type TrackReferenceBoxChild = TrackReferenceTypeBox;
+export type TrackReferenceBoxChild = TrackReferenceTypeBox
 
 /**
  * Track Reference Box - 'tref' - Container
@@ -13,6 +13,6 @@ export type TrackReferenceBoxChild = TrackReferenceTypeBox;
  * @public
  */
 export type TrackReferenceBox = {
-	type: 'tref';
-	boxes: TrackReferenceBoxChild[];
-};
+	type: 'tref'
+	boxes: TrackReferenceBoxChild[]
+}

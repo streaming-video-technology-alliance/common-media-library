@@ -3,4 +3,4 @@
  *
  * @public
  */
-export type SupportedField = 1 | 3;
+export type SupportedField = 1 | 3

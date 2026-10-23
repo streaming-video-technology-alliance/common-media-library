@@ -16,4 +16,4 @@ export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox {
 		imdaIdentifier: view.readUint(4),
 		data: view.readData(-1),
 	}
-};
+}

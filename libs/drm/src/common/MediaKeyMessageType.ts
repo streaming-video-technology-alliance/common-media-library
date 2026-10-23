@@ -21,4 +21,4 @@ export const MediaKeyMessageType = {
  *
  * @public
  */
-export type MediaKeyMessageType = ValueOf<typeof MediaKeyMessageType>;
+export type MediaKeyMessageType = ValueOf<typeof MediaKeyMessageType>

@@ -15,11 +15,9 @@ export function decodeCmsdStatic(cmsd: string): CmsdStatic {
 		return {}
 	}
 
-	return Object
-		.entries(decodeSfDict(cmsd))
-		.reduce((acc, [key, item]) => {
-			const { value }: any = item
-			acc[key as any] = (typeof value === 'symbol' ? symbolToStr(value) : value) as any
-			return acc
-		}, {} as CmsdStatic)
+	return Object.entries(decodeSfDict(cmsd)).reduce((acc, [key, item]) => {
+		const { value }: any = item
+		acc[key as any] = (typeof value === 'symbol' ? symbolToStr(value) : value) as any
+		return acc
+	}, {} as CmsdStatic)
 }

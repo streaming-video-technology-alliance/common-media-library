@@ -16,4 +16,4 @@ import type { CmcdResponse } from './CmcdResponse.ts'
  *
  * @public
  */
-export type Cmcd = CmcdRequest & CmcdResponse & CmcdEvent;
+export type Cmcd = CmcdRequest & CmcdResponse & CmcdEvent

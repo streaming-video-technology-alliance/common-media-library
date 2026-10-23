@@ -9,10 +9,10 @@ export type DecodeTextOptions = {
 	/**
 	 * The encoding to use. If omitted, the function tries to detect the encoding from the BOM.
 	 */
-	encoding?: Encoding;
+	encoding?: Encoding
 
 	/**
 	 * Whether to exit on the first null byte.
 	 */
 	// exitOnNull?: boolean;
-};
+}

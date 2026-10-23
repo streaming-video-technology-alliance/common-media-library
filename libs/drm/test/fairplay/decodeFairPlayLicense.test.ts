@@ -17,4 +17,3 @@ describe('decodeFairPlayLicense', () => {
 		deepStrictEqual(new Uint8Array(buffer), result)
 	})
 })
-

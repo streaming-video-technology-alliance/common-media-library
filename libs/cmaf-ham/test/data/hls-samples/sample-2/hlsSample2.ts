@@ -1,19 +1,10 @@
 import { readFileSync } from 'fs'
 
-const hlsMain2: string = readFileSync(
-	new URL('./main.m3u8', import.meta.url),
-	'utf8',
-)
+const hlsMain2: string = readFileSync(new URL('./main.m3u8', import.meta.url), 'utf8')
 
-const aac_64k = readFileSync(
-	new URL('./tears-of-steel-aac-64k.m3u8', import.meta.url),
-	'utf8',
-)
+const aac_64k = readFileSync(new URL('./tears-of-steel-aac-64k.m3u8', import.meta.url), 'utf8')
 
-const aac_128k = readFileSync(
-	new URL('./tears-of-steel-aac-128k.m3u8', import.meta.url),
-	'utf8',
-)
+const aac_128k = readFileSync(new URL('./tears-of-steel-aac-128k.m3u8', import.meta.url), 'utf8')
 
 const hev1_1100k = readFileSync(
 	new URL('./tears-of-steel-hev1-1100k.m3u8', import.meta.url),

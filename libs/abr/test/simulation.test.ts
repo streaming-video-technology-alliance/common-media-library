@@ -4,7 +4,11 @@ import { deepEqual, equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { bandwidthsOf, L1, L2 } from './helpers/ladders.ts'
 import type { SimulationResult } from './helpers/simulatePlayback.ts'
-import { createConstantTrace, createRandomWalkTrace, simulatePlayback } from './helpers/simulatePlayback.ts'
+import {
+	createConstantTrace,
+	createRandomWalkTrace,
+	simulatePlayback,
+} from './helpers/simulatePlayback.ts'
 
 const SEGMENT_DURATION = 4
 const SEGMENT_COUNT = 75
@@ -18,7 +22,7 @@ const LAST_SEGMENTS = 5
 // The top rung of L1 needs 6 Mbps. A link of 2 Mbps sustains its third rung.
 const STEADY_LINK_RUNG = L1[2].bandwidth
 
-type Setup = { name: string, ladder: LadderRung[], bufferCap: number }
+type Setup = { name: string; ladder: LadderRung[]; bufferCap: number }
 
 // The buffer time of BOLA is 20 s for L1 and 30 s for L2. Two setups use a cap below that time.
 const SETUPS: Setup[] = [
@@ -35,7 +39,12 @@ const SELECTORS: [string, () => BitrateSelector][] = [
 	['the throughput selector', createThroughput],
 ]
 
-function play(createSelector: () => BitrateSelector, setup: Setup, seed: number, omitSegmentDuration = false): SimulationResult {
+function play(
+	createSelector: () => BitrateSelector,
+	setup: Setup,
+	seed: number,
+	omitSegmentDuration = false,
+): SimulationResult {
 	return simulatePlayback(createSelector(), {
 		ladder: setup.ladder,
 		trace: createRandomWalkTrace(seed, MINIMUM_BANDWIDTH, MAXIMUM_BANDWIDTH),
@@ -61,13 +70,22 @@ function average(values: readonly number[]): number {
 }
 
 // The stalls of all the seeds. A player that omits `segmentDuration` makes a selector skip its starvation guard.
-function totalStalls(createSelector: () => BitrateSelector, setup: Setup, omitSegmentDuration = false): number {
-	return Array.from({ length: SEED_COUNT }, (_, index) => play(createSelector, setup, index + 1, omitSegmentDuration).stallCount).reduce((sum, count) => sum + count, 0)
+function totalStalls(
+	createSelector: () => BitrateSelector,
+	setup: Setup,
+	omitSegmentDuration = false,
+): number {
+	return Array.from(
+		{ length: SEED_COUNT },
+		(_, index) => play(createSelector, setup, index + 1, omitSegmentDuration).stallCount,
+	).reduce((sum, count) => sum + count, 0)
 }
 
 // The mean bandwidth of the rungs that a selector used, averaged over the seeds.
 function averageBandwidth(createSelector: () => BitrateSelector, setup: Setup): number {
-	const perSeed = Array.from({ length: SEED_COUNT }, (_, index) => average(play(createSelector, setup, index + 1).bandwidths))
+	const perSeed = Array.from({ length: SEED_COUNT }, (_, index) =>
+		average(play(createSelector, setup, index + 1).bandwidths),
+	)
 
 	return average(perSeed)
 }
@@ -89,8 +107,14 @@ describe('playback simulation', () => {
 					const context = `${selectorName}, ${setup.name}, seed ${seed}`
 
 					equal(result.bandwidths.length, SEGMENT_COUNT, context)
-					ok(result.bandwidths.every((bandwidth) => bandwidths.has(bandwidth)), `${context}: every rung is in the ladder`)
-					ok(result.delays.every((delay) => Number.isFinite(delay) && delay >= 0), `${context}: every delay is finite and not negative`)
+					ok(
+						result.bandwidths.every(bandwidth => bandwidths.has(bandwidth)),
+						`${context}: every rung is in the ladder`,
+					)
+					ok(
+						result.delays.every(delay => Number.isFinite(delay) && delay >= 0),
+						`${context}: every delay is finite and not negative`,
+					)
 					equal(result.repeatedDelays, 0, `${context}: the call after a wait returns no delay`)
 				}
 			}
@@ -100,7 +124,10 @@ describe('playback simulation', () => {
 	// The higher bitrate comes with more stalls, even with the starvation guard. The analysis of the RFC lists both numbers.
 	it('picks a higher average rung than the throughput selector on the same traces', () => {
 		for (const setup of SETUPS) {
-			ok(averageBandwidth(createBola, setup) > averageBandwidth(createThroughput, setup), setup.name)
+			ok(
+				averageBandwidth(createBola, setup) > averageBandwidth(createThroughput, setup),
+				setup.name,
+			)
 		}
 	})
 
@@ -115,7 +142,11 @@ describe('playback simulation', () => {
 			const top = setup.ladder[setup.ladder.length - 1].bandwidth
 			const result = playOnLink(setup, FAST_LINK)
 
-			deepEqual(result.bandwidths.slice(-LAST_SEGMENTS), new Array(LAST_SEGMENTS).fill(top), setup.name)
+			deepEqual(
+				result.bandwidths.slice(-LAST_SEGMENTS),
+				new Array(LAST_SEGMENTS).fill(top),
+				setup.name,
+			)
 			equal(result.stallCount, 0, setup.name)
 		}
 	})
@@ -133,7 +164,10 @@ describe('playback simulation', () => {
 	it('settles on the rung that a steady link sustains without a stall', () => {
 		const result = playOnLink(SETUPS[0], STEADY_LINK)
 
-		deepEqual(result.bandwidths.slice(-LAST_SEGMENTS), new Array(LAST_SEGMENTS).fill(STEADY_LINK_RUNG))
+		deepEqual(
+			result.bandwidths.slice(-LAST_SEGMENTS),
+			new Array(LAST_SEGMENTS).fill(STEADY_LINK_RUNG),
+		)
 		equal(result.stallCount, 0)
 	})
 })

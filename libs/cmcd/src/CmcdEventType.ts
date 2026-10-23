@@ -230,4 +230,4 @@ export const CmcdEventType = {
 /**
  * @public
  */
-export type CmcdEventType = ValueOf<typeof CmcdEventType>;
+export type CmcdEventType = ValueOf<typeof CmcdEventType>

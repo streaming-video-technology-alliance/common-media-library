@@ -4,6 +4,6 @@
  * @public
  */
 export type SubsampleEncryption = {
-	bytesOfClearData: number;
-	bytesOfProtectedData: number;
-};
+	bytesOfClearData: number
+	bytesOfProtectedData: number
+}

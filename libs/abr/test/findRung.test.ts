@@ -2,7 +2,7 @@ import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 import { findRung } from '../src/findRung.ts'
 
-const ladder = [300_000, 750_000, 1_500_000, 3_000_000, 6_000_000].map((bandwidth) => ({ bandwidth }))
+const ladder = [300_000, 750_000, 1_500_000, 3_000_000, 6_000_000].map(bandwidth => ({ bandwidth }))
 
 describe('findRung', () => {
 	it('returns the position of the highest rung at or below the bandwidth', () => {
@@ -22,7 +22,13 @@ describe('findRung', () => {
 	})
 
 	it('returns the highest position of equal rungs', () => {
-		equal(findRung([300_000, 750_000, 750_000, 1_500_000].map((bandwidth) => ({ bandwidth })), 750_000), 2)
+		equal(
+			findRung(
+				[300_000, 750_000, 750_000, 1_500_000].map(bandwidth => ({ bandwidth })),
+				750_000,
+			),
+			2,
+		)
 	})
 
 	it('returns 0 for a ladder with one rung', () => {

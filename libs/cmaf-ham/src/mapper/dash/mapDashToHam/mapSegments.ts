@@ -30,20 +30,16 @@ export function mapSegments(
 	duration: number,
 ): Segment[] {
 	const segmentTemplate: SegmentTemplate | undefined =
-		adaptationSet.SegmentTemplate?.at(0) ??
-		representation.SegmentTemplate?.at(0)
+		adaptationSet.SegmentTemplate?.at(0) ?? representation.SegmentTemplate?.at(0)
 	const segmentList: SegmentList[] | undefined =
 		adaptationSet.SegmentList ?? representation.SegmentList
 	if (representation.SegmentBase) {
 		return mapSegmentBase(representation, duration)
-	}
-	else if (segmentList) {
+	} else if (segmentList) {
 		return mapSegmentList(segmentList)
-	}
-	else if (segmentTemplate) {
+	} else if (segmentTemplate) {
 		return mapSegmentTemplate(representation, duration, segmentTemplate)
-	}
-	else {
+	} else {
 		console.error(`Representation ${representation.$.id} has no segments`)
 		return [] as Segment[]
 	}

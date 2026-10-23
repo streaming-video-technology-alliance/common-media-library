@@ -13,7 +13,12 @@ describe('SvtaContentProtectionErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaContentProtectionErrorCode, SvtaErrorCategory.CONTENT_PROTECTION, 22, 'SVTA_CONTENT_PROTECTION')
+		assertCatalogInvariants(
+			SvtaContentProtectionErrorCode,
+			SvtaErrorCategory.CONTENT_PROTECTION,
+			22,
+			'SVTA_CONTENT_PROTECTION',
+		)
 	})
 
 	it('matches the spec table', () => {

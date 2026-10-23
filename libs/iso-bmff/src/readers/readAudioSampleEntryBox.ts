@@ -13,7 +13,10 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  *
  * @public
  */
-export function readAudioSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView): AudioSampleEntryBox<T> {
+export function readAudioSampleEntryBox<T extends IsoBoxType>(
+	type: T,
+	view: IsoBoxReadView,
+): AudioSampleEntryBox<T> {
 	const { readArray, readUint, readTemplate, readBoxes } = view
 
 	return {
@@ -26,6 +29,6 @@ export function readAudioSampleEntryBox<T extends IsoBoxType>(type: T, view: Iso
 		preDefined: readUint(2),
 		reserved3: readUint(2),
 		samplerate: readTemplate(4),
-		boxes: readBoxes<AudioSampleEntryBoxChild>()
+		boxes: readBoxes<AudioSampleEntryBoxChild>(),
 	}
-};
+}

@@ -1,6 +1,12 @@
 import { deepEqual, equal } from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { parseReleases, renderReleases, retitleChangelog, sortReleases, type Release } from './changelog.ts'
+import {
+	parseReleases,
+	renderReleases,
+	retitleChangelog,
+	sortReleases,
+	type Release,
+} from './changelog.ts'
 
 const pkg = { name: '@svta/cml-cmcd', folder: 'cmcd' }
 
@@ -48,7 +54,10 @@ describe('sortReleases', () => {
 			{ package: '@svta/cml-cmcd', folder: 'cmcd', version: '2.0.0', date: '2026-10-18' },
 			{ package: '@svta/cml-abr', folder: 'abr', version: '0.2.0', date: '2026-10-18' },
 		]
-		deepEqual(sortReleases(releases).map(r => r.package), ['@svta/cml-abr', '@svta/cml-cmcd', '@svta/cml-utils'])
+		deepEqual(
+			sortReleases(releases).map(r => r.package),
+			['@svta/cml-abr', '@svta/cml-cmcd', '@svta/cml-utils'],
+		)
 	})
 })
 
@@ -59,13 +68,19 @@ describe('renderReleases', () => {
 		])
 		equal(text.startsWith('# Releases\n'), true)
 		equal(text.includes('| Date | Package | Version |'), true)
-		equal(text.includes('| 2026-10-18 | [@svta/cml-cmcd](/packages/cmcd/changelog) | 2.8.3 |'), true)
+		equal(
+			text.includes('| 2026-10-18 | [@svta/cml-cmcd](/packages/cmcd/changelog) | 2.8.3 |'),
+			true,
+		)
 	})
 })
 
 describe('retitleChangelog', () => {
 	it('names the package in the heading', () => {
-		equal(retitleChangelog('# Changelog\n\nAll notable changes.\n', '@svta/cml-cmcd'), '# @svta/cml-cmcd changelog\n\nAll notable changes.\n')
+		equal(
+			retitleChangelog('# Changelog\n\nAll notable changes.\n', '@svta/cml-cmcd'),
+			'# @svta/cml-cmcd changelog\n\nAll notable changes.\n',
+		)
 	})
 
 	it('leaves another heading unchanged', () => {

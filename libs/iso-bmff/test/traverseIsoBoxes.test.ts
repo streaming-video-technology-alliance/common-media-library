@@ -203,4 +203,3 @@ describe('traverseIsoBoxes', function () {
 		assert.strictEqual(result[2].type, 'trak')
 	})
 })
-

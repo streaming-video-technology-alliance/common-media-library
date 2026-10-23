@@ -8,7 +8,7 @@ import type { UserDataBox } from './UserDataBox.ts'
  *
  * @public
  */
-export type MovieBoxChild = MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox;
+export type MovieBoxChild = MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox
 
 /**
  * Movie Box - 'moov' - Container
@@ -16,6 +16,6 @@ export type MovieBoxChild = MovieHeaderBox | TrackBox | MovieExtendsBox | UserDa
  * @public
  */
 export type MovieBox = {
-	type: 'moov';
-	boxes: MovieBoxChild[];
-};
+	type: 'moov'
+	boxes: MovieBoxChild[]
+}

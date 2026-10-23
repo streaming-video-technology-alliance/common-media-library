@@ -6,9 +6,9 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type HandlerReferenceBox = FullBox & {
-	type: 'hdlr';
-	preDefined: number;
-	handlerType: string;
-	reserved: number[];
-	name: string;
-};
+	type: 'hdlr'
+	preDefined: number
+	handlerType: string
+	reserved: number[]
+	name: string
+}

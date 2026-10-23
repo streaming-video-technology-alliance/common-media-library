@@ -6,11 +6,17 @@
  * sliced when `appendComment` is undefined.
  */
 export type XmlBuilder<T> = {
-	createDocument: () => T;
-	createElement: (parent: T, name: string, attributes: Record<string, string>, localName: string, prefix: string | null) => T;
-	appendChild?: (parent: T, child: T) => void;
-	appendText?: (parent: T, text: string) => void;
-	appendCdata?: (parent: T, text: string) => void;
-	appendComment?: (parent: T, text: string) => void;
-	appendDoctype?: (parent: T, text: string) => void;
-};
+	createDocument: () => T
+	createElement: (
+		parent: T,
+		name: string,
+		attributes: Record<string, string>,
+		localName: string,
+		prefix: string | null,
+	) => T
+	appendChild?: (parent: T, child: T) => void
+	appendText?: (parent: T, text: string) => void
+	appendCdata?: (parent: T, text: string) => void
+	appendComment?: (parent: T, text: string) => void
+	appendDoctype?: (parent: T, text: string) => void
+}

@@ -20,4 +20,4 @@ export const VerboseLevel = {
 /**
  * @public
  */
-export type VerboseLevel = ValueOf<typeof VerboseLevel>;
+export type VerboseLevel = ValueOf<typeof VerboseLevel>

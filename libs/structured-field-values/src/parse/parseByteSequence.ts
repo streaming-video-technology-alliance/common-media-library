@@ -62,8 +62,5 @@ export function parseByteSequence(src: string): ParsedValue<Uint8Array> {
 	src = src.substring(re.lastIndex)
 
 	// pass b64_content char check step 6
-	return parsedValue(
-		decodeBase64(b64_content),
-		src,
-	)
+	return parsedValue(decodeBase64(b64_content), src)
 }

@@ -4,6 +4,6 @@
  * @public
  */
 export type WebVttSourceLabelBox = {
-	type: 'vlab';
-	sourceLabel: string;
-};
+	type: 'vlab'
+	sourceLabel: string
+}

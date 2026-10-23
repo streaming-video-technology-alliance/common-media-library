@@ -16,7 +16,6 @@ import { parseJumbfLabel } from './jumbf/parseJumbfLabel.ts'
 import { asString, findC2paUuidBox, stripJumbfUuidPrefix } from './utils.ts'
 import { extractCertificateInfo } from './x509/extractCertificateInfo.ts'
 
-
 const MAX_JUMBF_NESTING_DEPTH = 20
 const X5CHAIN_HEADER_LABEL = 33
 
@@ -48,7 +47,10 @@ type SignatureReference = {
 
 // §8.4.2.1: the claim `signature` field is a JUMBF URI. A URI that starts with a slash is relative to the
 // manifest store and names the JUMBF label of the manifest. Any other URI is relative to the current manifest.
-function resolveSignatureReference(label: string | null, claimData: Record<string, unknown>): SignatureReference {
+function resolveSignatureReference(
+	label: string | null,
+	claimData: Record<string, unknown>,
+): SignatureReference {
 	const uri = asString(claimData['signature'])
 	if (!uri?.startsWith(JUMBF_URI_PREFIX)) return { resolves: false, namesLabel: false }
 	const path = uri.slice(JUMBF_URI_PREFIX.length)
@@ -89,7 +91,12 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 		if (!label) continue
 
 		const contentBox = inner.find(
-			b => b.type === 'cbor' || b.type === 'json' || b.type === 'jumc' || b.type === 'jp2c' || b.type === 'bidb',
+			b =>
+				b.type === 'cbor' ||
+				b.type === 'json' ||
+				b.type === 'jumc' ||
+				b.type === 'jp2c' ||
+				b.type === 'bidb',
 		)
 
 		let data: unknown = null
@@ -104,16 +111,14 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 					data = contentBox.data
 					code = C2paStatusCode.ASSERTION_CBOR_INVALID
 				}
-			}
-			else if (contentBox.type === 'json') {
+			} else if (contentBox.type === 'json') {
 				try {
 					data = JSON.parse(TEXT_DECODER.decode(contentBox.data)) as unknown
 				} catch {
 					data = contentBox.data
 					code = C2paStatusCode.ASSERTION_JSON_INVALID
 				}
-			}
-			else {
+			} else {
 				data = contentBox.data
 			}
 		}
@@ -124,11 +129,15 @@ function parseAssertionsInternal(assertionStoreBoxes: JumbfBox[]): InternalAsser
 	return assertions
 }
 
-function parseSignatureInfo(signatureBytes: Uint8Array | null): { issuer: string | null; certNotBefore: string | null } {
+function parseSignatureInfo(signatureBytes: Uint8Array | null): {
+	issuer: string | null
+	certNotBefore: string | null
+} {
 	if (!signatureBytes) return { issuer: null, certNotBefore: null }
 	try {
 		const cose = decodeCoseSign1(signatureBytes)
-		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ?? cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as Uint8Array | Uint8Array[] | null | undefined
+		const x5chain = (cose.protectedHeader[X5CHAIN_HEADER_LABEL] ??
+			cose.unprotectedHeader[X5CHAIN_HEADER_LABEL]) as Uint8Array | Uint8Array[] | null | undefined
 		if (!x5chain) return { issuer: null, certNotBefore: null }
 
 		const certDER = Array.isArray(x5chain) ? x5chain[0] : x5chain
@@ -155,7 +164,11 @@ function readClaim(bytes: Uint8Array): Claim {
 	} catch {
 		return { data: null, code: C2paStatusCode.CLAIM_CBOR_INVALID }
 	}
-	if (value === null || typeof value !== 'object' || Object.getPrototypeOf(value) !== Object.prototype) {
+	if (
+		value === null ||
+		typeof value !== 'object' ||
+		Object.getPrototypeOf(value) !== Object.prototype
+	) {
 		return { data: null, code: C2paStatusCode.CLAIM_MALFORMED }
 	}
 	return { data: projectCborTags(value) as Record<string, unknown>, code: null }
@@ -207,7 +220,10 @@ function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAss
  *
  * @internal
  */
-export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBox[]): InternalManifestData {
+export function readC2paManifest(
+	bytes: Uint8Array,
+	preParsedBoxes?: ParsedIsoBox[],
+): InternalManifestData {
 	const boxes = preParsedBoxes ?? readIsoBoxes(bytes)
 	const uuidBox = findC2paUuidBox(boxes)
 
@@ -257,12 +273,10 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 				claimData = claim.data
 				claimCode = claim.code
 			}
-		}
-		else if (label === 'c2pa.assertions') {
+		} else if (label === 'c2pa.assertions') {
 			assertionStores++
 			internalAssertions = parseAssertionsInternal(inner)
-		}
-		else if (label === 'c2pa.signature') {
+		} else if (label === 'c2pa.signature') {
 			signatureBoxes++
 			const contentBox = inner.find(b => b.type === 'cbor' || b.type === 'jumc')
 			if (contentBox) signatureBytes = contentBox.data
@@ -292,7 +306,10 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 
 	const claimAssertionRefs = claimData ? extractClaimAssertionRefs(claimData) : []
 
-	const assertions: C2paAssertion[] = internalAssertions.map(a => ({ label: a.label, data: a.data }))
+	const assertions: C2paAssertion[] = internalAssertions.map(a => ({
+		label: a.label,
+		data: a.data,
+	}))
 
 	// The JUMBF label is outside the signed claim. The label counts as the manifest identifier only when the
 	// signed `signature` URI names it, so a changed label cannot take the identity of another manifest.
@@ -312,9 +329,11 @@ export function readC2paManifest(bytes: Uint8Array, preParsedBoxes?: ParsedIsoBo
 		claimAssertionRefs,
 		claimCborBytes,
 		claimCode,
-		signatureUriCode: signatureReference && !signatureReference.resolves ? C2paStatusCode.CLAIM_SIGNATURE_MISSING : null,
+		signatureUriCode:
+			signatureReference && !signatureReference.resolves
+				? C2paStatusCode.CLAIM_SIGNATURE_MISSING
+				: null,
 		signatureBytes,
 		assertions: internalAssertions,
 	}
 }
-

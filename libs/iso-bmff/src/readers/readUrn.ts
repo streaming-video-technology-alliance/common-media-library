@@ -17,4 +17,4 @@ export function readUrn(view: IsoBoxReadView): DataEntryUrnBox {
 		name: view.readString(-1),
 		location: view.readString(-1),
 	}
-};
+}

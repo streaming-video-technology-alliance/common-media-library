@@ -29,9 +29,9 @@ export function readUint(dataView: DataView, offset: number, size: number): numb
 			// This will give unexpected results for integers >= 2^53
 			s1 = dataView.getUint32(cursor)
 			s2 = dataView.getUint32(cursor + 4)
-			value = (s1 * Math.pow(2, 32)) + s2
+			value = s1 * Math.pow(2, 32) + s2
 			break
 	}
 
 	return value
-};
+}

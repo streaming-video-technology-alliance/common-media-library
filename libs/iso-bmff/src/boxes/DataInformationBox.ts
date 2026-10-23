@@ -5,7 +5,7 @@ import type { DataReferenceBox } from './DataReferenceBox.ts'
  *
  * @public
  */
-export type DataInformationBoxChild = DataReferenceBox;
+export type DataInformationBoxChild = DataReferenceBox
 
 /**
  * Data Information Box - 'dinf' - Container
@@ -13,6 +13,6 @@ export type DataInformationBoxChild = DataReferenceBox;
  * @public
  */
 export type DataInformationBox = {
-	type: 'dinf';
-	boxes: DataInformationBoxChild[];
-};
+	type: 'dinf'
+	boxes: DataInformationBoxChild[]
+}

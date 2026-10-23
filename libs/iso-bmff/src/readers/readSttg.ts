@@ -15,4 +15,4 @@ export function readSttg(view: IsoBoxReadView): WebVttSettingsBox {
 		type: 'sttg',
 		settings: view.readUtf8(-1),
 	}
-};
+}

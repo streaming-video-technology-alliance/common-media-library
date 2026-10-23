@@ -37,7 +37,14 @@ export function serializeKey(value: string): string {
 	// lcalpha / DIGIT / "_" / "-" / "." / "*"
 	for (let i = 1; i < value.length; i++) {
 		code = value.charCodeAt(i)
-		if ((code < 0x61 || code > 0x7a) && (code < 0x30 || code > 0x39) && code !== 0x5f && code !== 0x2d && code !== 0x2e && code !== 0x2a) {
+		if (
+			(code < 0x61 || code > 0x7a) &&
+			(code < 0x30 || code > 0x39) &&
+			code !== 0x5f &&
+			code !== 0x2d &&
+			code !== 0x2e &&
+			code !== 0x2a
+		) {
 			throw serializeError(value, KEY)
 		}
 	}

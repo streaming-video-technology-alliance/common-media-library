@@ -138,7 +138,11 @@ describe('EwmaEstimator', () => {
 		for (const encodedBodySize of [0, -125, NaN, Infinity]) {
 			estimator.sample({ startTime: 6000, encodedBodySize, duration: 1000 })
 
-			equal(estimator.getEstimate(), 285, `expected the estimate to ignore a body size of ${encodedBodySize}`)
+			equal(
+				estimator.getEstimate(),
+				285,
+				`expected the estimate to ignore a body size of ${encodedBodySize}`,
+			)
 		}
 	})
 

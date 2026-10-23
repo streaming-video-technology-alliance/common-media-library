@@ -4,11 +4,17 @@ import { rewriteReadmeLinks } from './links.ts'
 
 describe('rewriteReadmeLinks', () => {
 	it('points a docs link at the guides folder', () => {
-		equal(rewriteReadmeLinks('[Reading boxes](docs/reading-boxes.md)'), '[Reading boxes](guides/reading-boxes.md)')
+		equal(
+			rewriteReadmeLinks('[Reading boxes](docs/reading-boxes.md)'),
+			'[Reading boxes](guides/reading-boxes.md)',
+		)
 	})
 
 	it('accepts a leading ./ and keeps the anchor', () => {
-		equal(rewriteReadmeLinks('[Keys](./docs/user-guide.md#custom-keys)'), '[Keys](guides/user-guide.md#custom-keys)')
+		equal(
+			rewriteReadmeLinks('[Keys](./docs/user-guide.md#custom-keys)'),
+			'[Keys](guides/user-guide.md#custom-keys)',
+		)
 	})
 
 	it('leaves other links unchanged', () => {

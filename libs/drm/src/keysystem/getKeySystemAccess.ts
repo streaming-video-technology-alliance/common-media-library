@@ -14,8 +14,7 @@ export async function getKeySystemAccess(
 	for (const { keySystem, configurations } of requests) {
 		try {
 			return await navigator.requestMediaKeySystemAccess(keySystem, configurations)
-		}
-		catch {
+		} catch {
 			// legacy approach could be used here
 		}
 	}

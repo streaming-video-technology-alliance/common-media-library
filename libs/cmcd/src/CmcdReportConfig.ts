@@ -12,7 +12,7 @@ export type CmcdReportConfig = {
 	 *
 	 * @defaultValue `CMCD_V2`
 	 */
-	version?: CmcdVersion;
+	version?: CmcdVersion
 
 	/**
 	 * The list of CMCD keys to include in the report. If omitted, no keys
@@ -22,5 +22,5 @@ export type CmcdReportConfig = {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	enabledKeys?: CmcdKey[];
+	enabledKeys?: CmcdKey[]
 }

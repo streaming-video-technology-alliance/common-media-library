@@ -5,7 +5,7 @@ import type { EditListBox } from './EditListBox.ts'
  *
  * @public
  */
-export type EditBoxChild = EditListBox;
+export type EditBoxChild = EditListBox
 
 /**
  * Edit Box - 'edts' - Container
@@ -13,6 +13,6 @@ export type EditBoxChild = EditListBox;
  * @public
  */
 export type EditBox = {
-	type: 'edts';
-	boxes: EditBoxChild[];
-};
+	type: 'edts'
+	boxes: EditBoxChild[]
+}

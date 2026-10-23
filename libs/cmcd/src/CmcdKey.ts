@@ -6,4 +6,4 @@ import type { CmcdV1 } from './CmcdV1.ts'
  *
  * @public
  */
-export type CmcdKey = keyof Cmcd | keyof CmcdV1;
+export type CmcdKey = keyof Cmcd | keyof CmcdV1

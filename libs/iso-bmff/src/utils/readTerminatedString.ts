@@ -15,4 +15,4 @@ export function readTerminatedString(dataView: DataView, offset: number): string
 	}
 
 	return str
-};
+}

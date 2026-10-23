@@ -33,11 +33,13 @@ export function formatList(expected: any): SfItem[] {
 }
 
 export function formatDict(expected: any): Record<string, SfItem> {
-	return Object.fromEntries(expected.map(([name, [value, params]]: any[]) => {
-		value = formatValue(value)
-		params = formatParams(params)
-		return [name, new SfItem(value, params)]
-	}))
+	return Object.fromEntries(
+		expected.map(([name, [value, params]]: any[]) => {
+			value = formatValue(value)
+			params = formatParams(params)
+			return [name, new SfItem(value, params)]
+		}),
+	)
 }
 
 function formatValue(value: any) {

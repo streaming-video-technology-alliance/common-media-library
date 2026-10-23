@@ -27,4 +27,4 @@ export const MediaKeyStatus = {
  *
  * @public
  */
-export type MediaKeyStatus = ValueOf<typeof MediaKeyStatus>;
+export type MediaKeyStatus = ValueOf<typeof MediaKeyStatus>

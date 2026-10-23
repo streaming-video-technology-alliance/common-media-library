@@ -4,8 +4,8 @@
  * @public
  */
 export type Subsample = {
-	subsampleSize: number;
-	subsamplePriority: number;
-	discardable: number;
-	codecSpecificParameters: number;
-};
+	subsampleSize: number
+	subsamplePriority: number
+	discardable: number
+	codecSpecificParameters: number
+}

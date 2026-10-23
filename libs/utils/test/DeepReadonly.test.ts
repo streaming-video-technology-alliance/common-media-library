@@ -6,9 +6,9 @@ describe('DeepReadonly', () => {
 	it('provides a valid example', () => {
 		//#region example
 		type PlayerData = {
-			requestType: string;
-			timing: { start: number; };
-		};
+			requestType: string
+			timing: { start: number }
+		}
 
 		const data: DeepReadonly<PlayerData> = {
 			requestType: 'segment',
@@ -28,7 +28,7 @@ describe('DeepReadonly', () => {
 	})
 
 	it('makes arrays readonly at every depth', () => {
-		type WithList = { tags: { name: string; }[]; };
+		type WithList = { tags: { name: string }[] }
 
 		const data: DeepReadonly<WithList> = { tags: [{ name: 'a' }] }
 
@@ -42,7 +42,7 @@ describe('DeepReadonly', () => {
 	})
 
 	it('leaves functions callable', () => {
-		type WithFn = { onDone: (n: number) => number; };
+		type WithFn = { onDone: (n: number) => number }
 
 		const data: DeepReadonly<WithFn> = { onDone: n => n + 1 }
 

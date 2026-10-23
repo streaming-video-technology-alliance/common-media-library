@@ -20,7 +20,10 @@ export type Asn1Element = {
 	readonly totalSize: number
 }
 
-export function readLength(bytes: Uint8Array, offset: number): { length: number; bytesRead: number } {
+export function readLength(
+	bytes: Uint8Array,
+	offset: number,
+): { length: number; bytesRead: number } {
 	if (offset >= bytes.length) return { length: 0, bytesRead: 0 }
 	const first = bytes[offset] ?? 0
 	if (first < ASN1_LONG_FORM_FLAG) return { length: first, bytesRead: 1 }

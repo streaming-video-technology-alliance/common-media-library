@@ -14,16 +14,9 @@ import { calculateDuration } from './calculateDuration.ts'
  * @param duration - Total duration of the content
  * @returns Number of segments
  */
-export function getNumberOfSegments(
-	segmentTemplate: SegmentTemplate,
-	duration: number,
-): number {
+export function getNumberOfSegments(segmentTemplate: SegmentTemplate, duration: number): number {
 	// FIXME: This equation may be wrong
 	return Math.round(
-		duration /
-		calculateDuration(
-			segmentTemplate.$.duration,
-			segmentTemplate.$.timescale,
-		),
+		duration / calculateDuration(segmentTemplate.$.duration, segmentTemplate.$.timescale),
 	)
 }

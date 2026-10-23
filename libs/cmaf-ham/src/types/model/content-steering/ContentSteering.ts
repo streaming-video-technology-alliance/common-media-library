@@ -6,6 +6,6 @@ import type { ContentSteeringPathway } from './ContentSteeringPathway.ts'
  * @alpha
  */
 export type ContentSteering = {
-	url: string;
-	pathways: ContentSteeringPathway[];
-};
+	url: string
+	pathways: ContentSteeringPathway[]
+}

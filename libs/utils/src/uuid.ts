@@ -13,8 +13,7 @@ import { arrayBufferToUuid } from './arrayBufferToUuid.ts'
 export function uuid(): string {
 	try {
 		return crypto.randomUUID()
-	}
-	catch (error) {
+	} catch (error) {
 		try {
 			const bytes = crypto.getRandomValues(new Uint8Array(16))
 
@@ -23,8 +22,7 @@ export function uuid(): string {
 			bytes[8] = (bytes[8] & 0x3f) | 0x80
 
 			return arrayBufferToUuid(bytes.buffer)
-		}
-		catch (error) {
+		} catch (error) {
 			const url = URL.createObjectURL(new Blob())
 			const uuid = url.toString()
 			URL.revokeObjectURL(url)

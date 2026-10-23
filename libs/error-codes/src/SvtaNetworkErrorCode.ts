@@ -157,7 +157,8 @@ export const SvtaNetworkErrorCode = {
 	/**
 	 * Invalid HTTP content type value
 	 */
-	INVALID_HTTP_CONTENT_TYPE: SVTA_INVALID_HTTP_CONTENT_TYPE as typeof SVTA_INVALID_HTTP_CONTENT_TYPE,
+	INVALID_HTTP_CONTENT_TYPE:
+		SVTA_INVALID_HTTP_CONTENT_TYPE as typeof SVTA_INVALID_HTTP_CONTENT_TYPE,
 } as const
 
 /**

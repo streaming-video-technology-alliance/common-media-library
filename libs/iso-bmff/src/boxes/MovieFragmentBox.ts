@@ -6,7 +6,7 @@ import type { TrackFragmentBox } from './TrackFragmentBox.ts'
  *
  * @public
  */
-export type MovieFragmentBoxChild = MovieFragmentHeaderBox | TrackFragmentBox;
+export type MovieFragmentBoxChild = MovieFragmentHeaderBox | TrackFragmentBox
 
 /**
  * Movie Fragment Box - 'moof' - Container
@@ -14,6 +14,6 @@ export type MovieFragmentBoxChild = MovieFragmentHeaderBox | TrackFragmentBox;
  * @public
  */
 export type MovieFragmentBox = {
-	type: 'moof';
-	boxes: MovieFragmentBoxChild[];
-};
+	type: 'moof'
+	boxes: MovieFragmentBoxChild[]
+}

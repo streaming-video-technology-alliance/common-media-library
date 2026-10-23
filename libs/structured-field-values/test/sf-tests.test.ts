@@ -1,4 +1,11 @@
-import { decodeSfDict, decodeSfItem, decodeSfList, encodeSfDict, encodeSfItem, encodeSfList } from '@svta/cml-structured-field-values'
+import {
+	decodeSfDict,
+	decodeSfItem,
+	decodeSfList,
+	encodeSfDict,
+	encodeSfItem,
+	encodeSfList,
+} from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
 import test, { describe } from 'node:test'
 import { formatDict, formatItem, formatList } from './util/format.ts'
@@ -27,7 +34,7 @@ describe('structured_field_tests', async () => {
 		read(`token`),
 	])
 
-	suites.flat().forEach((suite) => {
+	suites.flat().forEach(suite => {
 		const ignore = [
 			// number.json
 			`negative zero`, // -0 & +0 are no equal in deepStrictEqual
@@ -68,12 +75,14 @@ describe('structured_field_tests', async () => {
 					assert.deepStrictEqual(decoded, obj, suite.name)
 
 					// encode
-					if ([
-						// 1.0 is 1 in JS
-						`single item parameterised list`,
-						`missing parameter value parameterised list`,
-						`missing terminal parameter value parameterised list`,
-					].includes(suite.name)) {
+					if (
+						[
+							// 1.0 is 1 in JS
+							`single item parameterised list`,
+							`missing parameter value parameterised list`,
+							`missing terminal parameter value parameterised list`,
+						].includes(suite.name)
+					) {
 						return
 					}
 
@@ -88,11 +97,13 @@ describe('structured_field_tests', async () => {
 					assert.deepStrictEqual(decoded, obj, suite.name)
 
 					// encode
-					if ([
-						// 1.0 is 1 in JS
-						`single item parameterised dict`,
-						`list item parameterised dictionary`,
-					].includes(suite.name)) {
+					if (
+						[
+							// 1.0 is 1 in JS
+							`single item parameterised dict`,
+							`list item parameterised dictionary`,
+						].includes(suite.name)
+					) {
 						return
 					}
 
@@ -100,11 +111,9 @@ describe('structured_field_tests', async () => {
 					const encoded = encodeSfDict(obj)
 					assert.deepStrictEqual(str, encoded, suite.name)
 				}
-			}
-			catch (error: any) {
+			} catch (error: any) {
 				assert.deepStrictEqual(suite.must_fail, true, error)
 			}
 		})
 	})
 })
-

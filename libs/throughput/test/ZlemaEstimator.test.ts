@@ -43,7 +43,11 @@ describe('ZlemaEstimator', () => {
 		for (const encodedBodySize of [0, -125, NaN, Infinity]) {
 			estimator.sample({ startTime: 6000, encodedBodySize, duration: 1000 })
 
-			equal(roundToEven(estimator.getEstimate(), 2), 324.07, `expected the estimate to ignore a body size of ${encodedBodySize}`)
+			equal(
+				roundToEven(estimator.getEstimate(), 2),
+				324.07,
+				`expected the estimate to ignore a body size of ${encodedBodySize}`,
+			)
 		}
 	})
 
@@ -67,7 +71,11 @@ describe('ZlemaEstimator', () => {
 		for (const duration of [0, -1000, NaN, Infinity]) {
 			estimator.sample({ startTime: 6000, encodedBodySize: 125, duration })
 
-			equal(roundToEven(estimator.getEstimate(), 2), 324.07, `expected the estimate to ignore a duration of ${duration}`)
+			equal(
+				roundToEven(estimator.getEstimate(), 2),
+				324.07,
+				`expected the estimate to ignore a duration of ${duration}`,
+			)
 		}
 	})
 

@@ -1,12 +1,28 @@
-import { CMCD_KEY_TYPE_BOOLEAN, CMCD_KEY_TYPE_INTEGER, CMCD_KEY_TYPE_NUMBER, CMCD_KEY_TYPE_NUMBER_LIST, CMCD_KEY_TYPE_STRING, CMCD_KEY_TYPE_STRING_LIST, CMCD_KEY_TYPE_TOKEN, CMCD_KEY_TYPES, CMCD_V1_KEY_TYPE_OVERRIDES } from './CMCD_KEY_TYPES.ts'
-import { CMCD_CUSTOM_KEY_VALUE_MAX_LENGTH, CMCD_STRING_LENGTH_LIMITS } from './CMCD_STRING_LENGTH_LIMITS.ts'
+import {
+	CMCD_KEY_TYPE_BOOLEAN,
+	CMCD_KEY_TYPE_INTEGER,
+	CMCD_KEY_TYPE_NUMBER,
+	CMCD_KEY_TYPE_NUMBER_LIST,
+	CMCD_KEY_TYPE_STRING,
+	CMCD_KEY_TYPE_STRING_LIST,
+	CMCD_KEY_TYPE_TOKEN,
+	CMCD_KEY_TYPES,
+	CMCD_V1_KEY_TYPE_OVERRIDES,
+} from './CMCD_KEY_TYPES.ts'
+import {
+	CMCD_CUSTOM_KEY_VALUE_MAX_LENGTH,
+	CMCD_STRING_LENGTH_LIMITS,
+} from './CMCD_STRING_LENGTH_LIMITS.ts'
 import { CMCD_TOKEN_VALUES } from './CMCD_TOKEN_VALUES.ts'
 import { CMCD_V1 } from './CMCD_V1.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdValidationIssue } from './CmcdValidationIssue.ts'
 import type { CmcdValidationOptions } from './CmcdValidationOptions.ts'
 import type { CmcdValidationResult } from './CmcdValidationResult.ts'
-import { CMCD_VALIDATION_SEVERITY_ERROR, CMCD_VALIDATION_SEVERITY_WARNING } from './CmcdValidationSeverity.ts'
+import {
+	CMCD_VALIDATION_SEVERITY_ERROR,
+	CMCD_VALIDATION_SEVERITY_WARNING,
+} from './CmcdValidationSeverity.ts'
 import { isCmcdCustomKey } from './isCmcdCustomKey.ts'
 import { resolveVersion } from './resolveVersion.ts'
 import { toBareValue } from './toBareValue.ts'
@@ -29,7 +45,13 @@ function isInteger(value: unknown): value is number {
 }
 
 // CTA-5004 Table 1 states every rounding rule with MUST. CTA-5004-B Table 1 uses SHOULD for bl and tbl.
-function validateRounding(key: string, value: number, version: number, issues: CmcdValidationIssue[], index?: number): void {
+function validateRounding(
+	key: string,
+	value: number,
+	version: number,
+	issues: CmcdValidationIssue[],
+	index?: number,
+): void {
 	const unit = HUNDRED_ROUNDING_UNITS[key]
 	if (!unit || value % 100 === 0) {
 		return
@@ -39,16 +61,21 @@ function validateRounding(key: string, value: number, version: number, issues: C
 	issues.push({
 		key,
 		message: `${target} ${should ? 'should' : 'must'} be rounded to the nearest 100 ${unit}. Received ${value}.`,
-		severity: should ? CMCD_VALIDATION_SEVERITY_WARNING : CMCD_VALIDATION_SEVERITY_ERROR
+		severity: should ? CMCD_VALIDATION_SEVERITY_WARNING : CMCD_VALIDATION_SEVERITY_ERROR,
 	})
 }
 
-function validateListValue(key: string, value: unknown, version: number, issues: CmcdValidationIssue[]): void {
+function validateListValue(
+	key: string,
+	value: unknown,
+	version: number,
+	issues: CmcdValidationIssue[],
+): void {
 	if (!Array.isArray(value)) {
 		issues.push({
 			key,
 			message: `Key "${key}" must be an array.`,
-			severity: CMCD_VALIDATION_SEVERITY_ERROR
+			severity: CMCD_VALIDATION_SEVERITY_ERROR,
 		})
 		return
 	}
@@ -58,21 +85,24 @@ function validateListValue(key: string, value: unknown, version: number, issues:
 			issues.push({
 				key,
 				message: `Key "${key}" array element [${i}] must be a finite integer.`,
-				severity: CMCD_VALIDATION_SEVERITY_ERROR
+				severity: CMCD_VALIDATION_SEVERITY_ERROR,
 			})
-		}
-		else {
+		} else {
 			validateRounding(key, element, version, issues, i)
 		}
 	}
 }
 
-function validateStringArrayValue(key: string, value: unknown, issues: CmcdValidationIssue[]): void {
+function validateStringArrayValue(
+	key: string,
+	value: unknown,
+	issues: CmcdValidationIssue[],
+): void {
 	if (!Array.isArray(value)) {
 		issues.push({
 			key,
 			message: `Key "${key}" must be an array.`,
-			severity: CMCD_VALIDATION_SEVERITY_ERROR
+			severity: CMCD_VALIDATION_SEVERITY_ERROR,
 		})
 		return
 	}
@@ -81,7 +111,7 @@ function validateStringArrayValue(key: string, value: unknown, issues: CmcdValid
 			issues.push({
 				key,
 				message: `Key "${key}" array element [${i}] must be a string.`,
-				severity: CMCD_VALIDATION_SEVERITY_ERROR
+				severity: CMCD_VALIDATION_SEVERITY_ERROR,
 			})
 		}
 	}
@@ -101,7 +131,10 @@ function validateStringArrayValue(key: string, value: unknown, issues: CmcdValid
  *
  * @public
  */
-export function validateCmcdValues(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult {
+export function validateCmcdValues(
+	data: Record<string, unknown>,
+	options?: CmcdValidationOptions,
+): CmcdValidationResult {
 	const version = resolveVersion(data, options)
 	const issues: CmcdValidationIssue[] = []
 
@@ -113,14 +146,13 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 				issues.push({
 					key,
 					message: `Custom key "${key}" value must be a string or token.`,
-					severity: CMCD_VALIDATION_SEVERITY_ERROR
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
 				})
-			}
-			else if (value.length > CMCD_CUSTOM_KEY_VALUE_MAX_LENGTH) {
+			} else if (value.length > CMCD_CUSTOM_KEY_VALUE_MAX_LENGTH) {
 				issues.push({
 					key,
 					message: `Custom key "${key}" value exceeds maximum length of ${CMCD_CUSTOM_KEY_VALUE_MAX_LENGTH}.`,
-					severity: CMCD_VALIDATION_SEVERITY_ERROR
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
 				})
 			}
 			continue
@@ -132,7 +164,7 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 				issues.push({
 					key,
 					message: `Key "v" must be 1 or 2.`,
-					severity: CMCD_VALIDATION_SEVERITY_ERROR
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
 				})
 			}
 			continue
@@ -154,10 +186,9 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 					issues.push({
 						key,
 						message: `Key "${key}" must be a finite integer.`,
-						severity: CMCD_VALIDATION_SEVERITY_ERROR
+						severity: CMCD_VALIDATION_SEVERITY_ERROR,
 					})
-				}
-				else {
+				} else {
 					validateRounding(key, value, version, issues)
 				}
 				break
@@ -167,7 +198,7 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 					issues.push({
 						key,
 						message: `Key "${key}" must be a finite number.`,
-						severity: CMCD_VALIDATION_SEVERITY_ERROR
+						severity: CMCD_VALIDATION_SEVERITY_ERROR,
 					})
 				}
 				break
@@ -177,7 +208,7 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 					issues.push({
 						key,
 						message: `Key "${key}" must be a boolean.`,
-						severity: CMCD_VALIDATION_SEVERITY_ERROR
+						severity: CMCD_VALIDATION_SEVERITY_ERROR,
 					})
 				}
 				break
@@ -187,14 +218,16 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 					issues.push({
 						key,
 						message: `Key "${key}" must be a string.`,
-						severity: CMCD_VALIDATION_SEVERITY_ERROR
+						severity: CMCD_VALIDATION_SEVERITY_ERROR,
 					})
-				}
-				else if (key in CMCD_STRING_LENGTH_LIMITS && value.length > CMCD_STRING_LENGTH_LIMITS[key]) {
+				} else if (
+					key in CMCD_STRING_LENGTH_LIMITS &&
+					value.length > CMCD_STRING_LENGTH_LIMITS[key]
+				) {
 					issues.push({
 						key,
 						message: `Key "${key}" exceeds maximum length of ${CMCD_STRING_LENGTH_LIMITS[key]}.`,
-						severity: CMCD_VALIDATION_SEVERITY_ERROR
+						severity: CMCD_VALIDATION_SEVERITY_ERROR,
 					})
 				}
 				break
@@ -206,7 +239,7 @@ export function validateCmcdValues(data: Record<string, unknown>, options?: Cmcd
 					issues.push({
 						key,
 						message: `Key "${key}" has invalid token value "${token ?? String(value)}". Expected one of: ${validValues.join(', ')}.`,
-						severity: CMCD_VALIDATION_SEVERITY_ERROR
+						severity: CMCD_VALIDATION_SEVERITY_ERROR,
 					})
 				}
 				break

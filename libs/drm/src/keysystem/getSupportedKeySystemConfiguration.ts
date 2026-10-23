@@ -1,9 +1,11 @@
 // The pure IIFE keeps this module-scope MediaKeys read from being retained by
 // consumer bundlers when this function is unused (unknown global reads are
 // treated as side effects).
-const isTypeSupported: (keySystem: string, type: string) => boolean | undefined = /* @__PURE__ */ (() =>
-	(typeof MediaKeys !== 'undefined' && typeof (MediaKeys as any).isTypeSupported === 'function') ? (MediaKeys as any).isTypeSupported : undefined
-)()
+const isTypeSupported: (keySystem: string, type: string) => boolean | undefined =
+	/* @__PURE__ */ (() =>
+		typeof MediaKeys !== 'undefined' && typeof (MediaKeys as any).isTypeSupported === 'function'
+			? (MediaKeys as any).isTypeSupported
+			: undefined)()
 
 /**
  * Filters and returns the supported key system configuration for a given system string.
@@ -17,7 +19,10 @@ const isTypeSupported: (keySystem: string, type: string) => boolean | undefined 
 export function getSupportedKeySystemConfiguration(
 	keySystem: string,
 	configs: Iterable<MediaKeySystemConfiguration>,
-): { supportedAudio: MediaKeySystemMediaCapability[]; supportedVideo: MediaKeySystemMediaCapability[] } {
+): {
+	supportedAudio: MediaKeySystemMediaCapability[]
+	supportedVideo: MediaKeySystemMediaCapability[]
+} {
 	if (!configs || typeof isTypeSupported === 'undefined') {
 		return { supportedAudio: [], supportedVideo: [] }
 	}
@@ -26,8 +31,12 @@ export function getSupportedKeySystemConfiguration(
 		const audios = config.audioCapabilities || []
 		const videos = config.videoCapabilities || []
 
-		const supportedAudio = audios.filter(audio => isTypeSupported(keySystem, audio.contentType ?? ''))
-		const supportedVideo = videos.filter(video => isTypeSupported(keySystem, video.contentType ?? ''))
+		const supportedAudio = audios.filter(audio =>
+			isTypeSupported(keySystem, audio.contentType ?? ''),
+		)
+		const supportedVideo = videos.filter(video =>
+			isTypeSupported(keySystem, video.contentType ?? ''),
+		)
 
 		const hasAudio = supportedAudio.length > 0
 		const hasVideo = supportedVideo.length > 0

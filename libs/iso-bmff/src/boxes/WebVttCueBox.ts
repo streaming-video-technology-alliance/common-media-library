@@ -6,7 +6,7 @@ import type { WebVttCuePayloadBox } from './WebVttCuePayloadBox.ts'
  *
  * @public
  */
-export type WebVttCueChild = WebVttCueIdBox | WebVttCuePayloadBox;
+export type WebVttCueChild = WebVttCueIdBox | WebVttCuePayloadBox
 
 /**
  * WebVttCueBox - 'vttc' - Container
@@ -14,6 +14,6 @@ export type WebVttCueChild = WebVttCueIdBox | WebVttCuePayloadBox;
  * @public
  */
 export type WebVttCueBox = {
-	type: 'vttc';
-	boxes: WebVttCueChild[];
-};
+	type: 'vttc'
+	boxes: WebVttCueChild[]
+}

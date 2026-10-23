@@ -20,7 +20,8 @@ export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
 	const handlerTypeSize = 4
 	const reservedSize = 12 // 3 x 4 bytes
 	const nameSize = box.name.length + 1 // null-terminated string
-	const totalSize = headerSize + fullBoxSize + preDefinedSize + handlerTypeSize + reservedSize + nameSize
+	const totalSize =
+		headerSize + fullBoxSize + preDefinedSize + handlerTypeSize + reservedSize + nameSize
 
 	const writer = new IsoBoxWriteView('hdlr', totalSize)
 	writer.writeFullBox(box.version, box.flags)

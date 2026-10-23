@@ -48,11 +48,15 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 	validateFactor('upgradeFactor', upgradeFactor)
 
 	if (upgradeFactor > safetyFactor) {
-		throw new RangeError(`Invalid upgradeFactor: expected a value at or below safetyFactor ${safetyFactor}, received ${upgradeFactor}`)
+		throw new RangeError(
+			`Invalid upgradeFactor: expected a value at or below safetyFactor ${safetyFactor}, received ${upgradeFactor}`,
+		)
 	}
 
 	if (!Number.isFinite(starvationTolerance) || starvationTolerance < 0) {
-		throw new RangeError(`Invalid starvationTolerance: expected a finite number of 0 or more, received ${starvationTolerance}`)
+		throw new RangeError(
+			`Invalid starvationTolerance: expected a finite number of 0 or more, received ${starvationTolerance}`,
+		)
 	}
 
 	// The bandwidth, in bits per second, of the last sample that was not aborted. NaN before the first sample.
@@ -85,7 +89,14 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 				const budget = bufferLevel / playbackRate
 				const tolerance = Math.min(segmentDuration, starvationTolerance)
 
-				index = applyStarvationGuard(ladder, index, segmentDuration, throughput * safetyFactor, budget, tolerance)
+				index = applyStarvationGuard(
+					ladder,
+					index,
+					segmentDuration,
+					throughput * safetyFactor,
+					budget,
+					tolerance,
+				)
 			}
 
 			return { index, delay: 0 }

@@ -27,9 +27,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: "npm"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@svta"
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@svta'
 
       - name: Install
         run: npm ci

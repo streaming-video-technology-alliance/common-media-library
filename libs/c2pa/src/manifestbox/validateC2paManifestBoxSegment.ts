@@ -3,7 +3,13 @@ import type { C2paManifest } from '../C2paManifest.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { readC2paManifest } from '../readC2paManifest.ts'
-import { asUnsignedInteger, bytesToHex, hashesEqual, normalizeAlgorithmName, toUint8Array } from '../utils.ts'
+import {
+	asUnsignedInteger,
+	bytesToHex,
+	hashesEqual,
+	normalizeAlgorithmName,
+	toUint8Array,
+} from '../utils.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import { parseExclusions } from '../bmff/parseExclusions.ts'
 import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
@@ -66,7 +72,13 @@ type BmffHashFields = {
 	malformed: boolean
 }
 
-const EMPTY_BMFF_HASH: BmffHashFields = { hashBytes: null, hashHex: null, exclusions: [], alg: null, malformed: false }
+const EMPTY_BMFF_HASH: BmffHashFields = {
+	hashBytes: null,
+	hashHex: null,
+	exclusions: [],
+	alg: null,
+	malformed: false,
+}
 
 function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashFields {
 	const assertion = assertions.find(a => a.label === BMFF_HASH_ASSERTION_LABEL)
@@ -80,7 +92,13 @@ function parseBmffHashAssertion(assertions: readonly C2paAssertion[]): BmffHashF
 	const hashHex = hashBytes ? bytesToHex(hashBytes) : null
 	const exclusions = parseExclusions(data['exclusions'])
 	const alg = typeof data['alg'] === 'string' ? normalizeAlgorithmName(data['alg']) : null
-	return { hashBytes, hashHex, exclusions: exclusions ?? [], alg, malformed: hashBytes === null || exclusions === null }
+	return {
+		hashBytes,
+		hashHex,
+		exclusions: exclusions ?? [],
+		alg,
+		malformed: hashBytes === null || exclusions === null,
+	}
 }
 
 // --- Manifest parsing ---
@@ -146,7 +164,10 @@ async function validateContinuity(
 
 	const custom = options?.continuityValidator
 	if (custom?.method !== method || !manifest || !liveVideo) {
-		return [LiveVideoStatusCode.CONTINUITY_METHOD_INVALID, LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED]
+		return [
+			LiveVideoStatusCode.CONTINUITY_METHOD_INVALID,
+			LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED,
+		]
 	}
 
 	const ok = await Promise.resolve()
@@ -216,7 +237,9 @@ export async function validateC2paManifestBoxSegment(
 		(sequenceNumber !== null && sequenceNumber > state.lastSequenceNumber)
 
 	// §19.3.1: the manifest of each segment has a c2pa.hash.bmff.v3 assertion. Without it, nothing binds the segment content.
-	const bmffHashMissing = internalData !== null && !internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
+	const bmffHashMissing =
+		internalData !== null &&
+		!internalData.assertions.some(a => a.label === BMFF_HASH_ASSERTION_LABEL)
 	let bmffHashMatches = !bmffHashMissing
 	if (bmff.hashBytes !== null) {
 		// §18.6.2: the flat v2/v3 hash covers offset || data for every non-excluded root
@@ -231,30 +254,46 @@ export async function validateC2paManifestBoxSegment(
 
 	const continuityCodes = await validateContinuity(manifest, liveVideo, lastManifestId, options)
 
-	const liveVideoCodes = [...new Set([
-		...collectErrorCodes(
-			manifest !== null, liveVideo !== null,
-			streamIdValid, sequenceNumberValid, bmffHashMatches,
-		),
-		...continuityCodes,
-	])]
+	const liveVideoCodes = [
+		...new Set([
+			...collectErrorCodes(
+				manifest !== null,
+				liveVideo !== null,
+				streamIdValid,
+				sequenceNumberValid,
+				bmffHashMatches,
+			),
+			...continuityCodes,
+		]),
+	]
 
 	const integrityCodes: readonly C2paStatusCode[] = integrity?.codes ?? []
 
-	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [...liveVideoCodes, ...integrityCodes]
+	const errorCodes: (LiveVideoStatusCode | C2paStatusCode)[] = [
+		...liveVideoCodes,
+		...integrityCodes,
+	]
 	if (bmff.malformed) errorCodes.push(C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED)
 
 	// §19.3: previousManifestId holds the manifest identifier, the JUMBF label of the manifest. Only a claim
 	// `signature` URI that names the label authenticates it (§15.7). Without it the manifestId chain cannot be
 	// verified, so a manifest that passes every integrity check fails, whatever lastManifestId the caller passes.
 	const currentManifestId = internalData?.manifestId ?? null
-	const manifestIdUnverified = integrity !== null && integrity.codes.length === 0 && currentManifestId === null
+	const manifestIdUnverified =
+		integrity !== null && integrity.codes.length === 0 && currentManifestId === null
 	if (manifestIdUnverified && !errorCodes.includes(LiveVideoStatusCode.SEGMENT_INVALID)) {
 		errorCodes.push(LiveVideoStatusCode.SEGMENT_INVALID)
 	}
 
 	// The continuity check does not gate the advance.
-	const authentic = manifest !== null && liveVideo !== null && integrity !== null && integrity.codes.length === 0 && bmffHashMatches && !bmff.malformed && currentManifestId !== null
+	const authentic =
+		manifest !== null &&
+		liveVideo !== null &&
+		integrity !== null &&
+		integrity.codes.length === 0 &&
+		bmffHashMatches &&
+		!bmff.malformed &&
+		currentManifestId !== null
 	const advance = authentic && streamIdValid && sequenceNumberValid
 
 	return {

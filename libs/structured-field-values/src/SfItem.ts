@@ -5,11 +5,7 @@ import type { SfBareItem } from './SfBareItem.ts'
  *
  * @public
  */
-export class SfItem<
-	V extends SfBareItem = SfBareItem,
-	P = Record<string, any>
-> {
-
+export class SfItem<V extends SfBareItem = SfBareItem, P = Record<string, any>> {
 	/**
 	 * The value of the item.
 	 */
@@ -28,7 +24,7 @@ export class SfItem<
 	 */
 	constructor(value: any, params?: P) {
 		if (Array.isArray(value)) {
-			value = value.map((v) => (v instanceof SfItem) ? v : new SfItem(v))
+			value = value.map(v => (v instanceof SfItem ? v : new SfItem(v)))
 		}
 
 		this.value = value

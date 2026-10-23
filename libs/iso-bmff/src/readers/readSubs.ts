@@ -17,7 +17,7 @@ export function readSubs(view: IsoBoxReadView): SubsampleInformationBox {
 		const sampleDelta = view.readUint(4)
 		const subsampleCount = view.readUint(2)
 		const subsamples = view.readEntries(subsampleCount, () => ({
-			subsampleSize: view.readUint((version === 1) ? 4 : 2),
+			subsampleSize: view.readUint(version === 1 ? 4 : 2),
 			subsamplePriority: view.readUint(1),
 			discardable: view.readUint(1),
 			codecSpecificParameters: view.readUint(4),
@@ -37,4 +37,4 @@ export function readSubs(view: IsoBoxReadView): SubsampleInformationBox {
 		entryCount,
 		entries,
 	}
-};
+}

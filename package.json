@@ -32,10 +32,10 @@
 		"DRM"
 	],
 	"scripts": {
-		"format": "npm run lint -- --fix",
+		"format": "vp lint --fix . && vp fmt .",
 		"lint": "vp lint .",
 		"build": "node scripts/buildAll.ts",
-		"pretest": "npm run lint && npm run build && npm run typecheck",
+		"pretest": "npm run lint && vp fmt --check . && npm run build && npm run typecheck",
 		"test": "node --no-warnings --test scripts/*.test.ts && npm test --workspaces --if-present",
 		"start": "npm start -w dev",
 		"prepare-release": "node scripts/prepareRelease.ts",

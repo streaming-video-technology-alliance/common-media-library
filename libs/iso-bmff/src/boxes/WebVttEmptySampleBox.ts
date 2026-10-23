@@ -4,5 +4,5 @@
  * @public
  */
 export type WebVttEmptySampleBox = {
-	type: 'vtte';
-};
+	type: 'vtte'
+}

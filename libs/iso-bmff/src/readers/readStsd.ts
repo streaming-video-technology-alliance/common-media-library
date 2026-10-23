@@ -13,7 +13,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E> {
+export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox>(
+	view: IsoBoxReadView,
+): SampleDescriptionBox<E> {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 
@@ -24,4 +26,4 @@ export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | Visual
 		entryCount,
 		entries: view.readBoxes<E>(entryCount),
 	}
-};
+}

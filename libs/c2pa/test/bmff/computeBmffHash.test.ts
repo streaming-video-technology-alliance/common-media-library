@@ -1,7 +1,13 @@
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { describe, it } from 'node:test'
-import { buildBox, buildLargesizeBox, concatBytes, encodeBoxOffset, sha256 } from '../merkle/merkleTestUtils.ts'
+import {
+	buildBox,
+	buildLargesizeBox,
+	concatBytes,
+	encodeBoxOffset,
+	sha256,
+} from '../merkle/merkleTestUtils.ts'
 
 function buildMinimalBox(type: string, payload: Uint8Array = new Uint8Array(0)): Uint8Array {
 	const size = 8 + payload.length
@@ -37,7 +43,10 @@ describe('computeBmffHash', () => {
 		const hashWith = await computeBmffHash(segment)
 
 		ok(hashWithout.length === 32)
-		ok(!hashWithout.every((b: number, i: number) => b === hashWith[i]), 'hashes should differ when a box is excluded')
+		ok(
+			!hashWithout.every((b: number, i: number) => b === hashWith[i]),
+			'hashes should differ when a box is excluded',
+		)
 	})
 
 	it('produces different hashes with and without offset prefix', async () => {
@@ -68,8 +77,12 @@ describe('computeBmffHash', () => {
 		}
 
 		// The §18.6.2 hash input: the 8-byte offset of each root box followed by the box bytes.
-		async function expectedHash(boxes: readonly (readonly [offset: number, bytes: Uint8Array])[]): Promise<Uint8Array> {
-			return sha256(concatBytes(...boxes.flatMap(([offset, bytes]) => [encodeBoxOffset(offset), bytes])))
+		async function expectedHash(
+			boxes: readonly (readonly [offset: number, bytes: Uint8Array])[],
+		): Promise<Uint8Array> {
+			return sha256(
+				concatBytes(...boxes.flatMap(([offset, bytes]) => [encodeBoxOffset(offset), bytes])),
+			)
 		}
 
 		it('hashes a root box with a largesize header', async () => {
@@ -77,7 +90,13 @@ describe('computeBmffHash', () => {
 
 			const hash = await computeBmffHash(segment, { offsetPrefixSize: 8 })
 
-			deepStrictEqual(hash, await expectedHash([[0, ftyp], [ftyp.length, largesizeMoov]]))
+			deepStrictEqual(
+				hash,
+				await expectedHash([
+					[0, ftyp],
+					[ftyp.length, largesizeMoov],
+				]),
+			)
 		})
 
 		it('hashes a last root box with a size of 0 to the end of the segment', async () => {
@@ -87,29 +106,65 @@ describe('computeBmffHash', () => {
 
 			const hash = await computeBmffHash(segment, { offsetPrefixSize: 8 })
 
-			deepStrictEqual(hash, await expectedHash([[0, moof], [moof.length, mdat]]))
+			deepStrictEqual(
+				hash,
+				await expectedHash([
+					[0, moof],
+					[moof.length, mdat],
+				]),
+			)
 		})
 
 		it('excludes a largesize box by xpath', async () => {
 			const segment = concatBytes(ftyp, largesizeMoov, free)
 
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/moov' }], offsetPrefixSize: 8 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/moov' }],
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hash, await expectedHash([[0, ftyp], [ftyp.length + largesizeMoov.length, free]]))
+			deepStrictEqual(
+				hash,
+				await expectedHash([
+					[0, ftyp],
+					[ftyp.length + largesizeMoov.length, free],
+				]),
+			)
 		})
 
 		// The data offsets of an exclusion count from the start of the box header, so the payload of a largesize box starts at 16.
 		it('matches a data constraint at the first payload byte of a largesize box', async () => {
 			const segment = concatBytes(ftyp, largesizeMoov, free)
 			const freeOffset = ftyp.length + largesizeMoov.length
-			const matching = [{ xpath: '/moov', data: [{ offset: 16, value: moovPayload.subarray(0, 4) }] }]
+			const matching = [
+				{ xpath: '/moov', data: [{ offset: 16, value: moovPayload.subarray(0, 4) }] },
+			]
 			const other = [{ xpath: '/moov', data: [{ offset: 16, value: TEXT_ENCODER.encode('mvhd') }] }]
 
-			const hashWithMatch = await computeBmffHash(segment, { exclusions: matching, offsetPrefixSize: 8 })
-			const hashWithoutMatch = await computeBmffHash(segment, { exclusions: other, offsetPrefixSize: 8 })
+			const hashWithMatch = await computeBmffHash(segment, {
+				exclusions: matching,
+				offsetPrefixSize: 8,
+			})
+			const hashWithoutMatch = await computeBmffHash(segment, {
+				exclusions: other,
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hashWithMatch, await expectedHash([[0, ftyp], [freeOffset, free]]))
-			deepStrictEqual(hashWithoutMatch, await expectedHash([[0, ftyp], [ftyp.length, largesizeMoov], [freeOffset, free]]))
+			deepStrictEqual(
+				hashWithMatch,
+				await expectedHash([
+					[0, ftyp],
+					[freeOffset, free],
+				]),
+			)
+			deepStrictEqual(
+				hashWithoutMatch,
+				await expectedHash([
+					[0, ftyp],
+					[ftyp.length, largesizeMoov],
+					[freeOffset, free],
+				]),
+			)
 		})
 
 		// A malformed header stops the walk. The hash covers the boxes before the malformed box.
@@ -147,27 +202,60 @@ describe('computeBmffHash', () => {
 		}
 
 		it('excludes a nested box and keeps the rest of the root box with its offset', async () => {
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/moov/udta' }], offsetPrefixSize: 8 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/moov/udta' }],
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moovHeader, mvhd))
+			deepStrictEqual(
+				hash,
+				await expectedHash(
+					encodeBoxOffset(0),
+					ftyp,
+					encodeBoxOffset(ftyp.length),
+					moovHeader,
+					mvhd,
+				),
+			)
 		})
 
 		it('omits the offset of a root box with a nested exclusion when offsetPrefixSize is 0', async () => {
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/moov/udta' }], offsetPrefixSize: 0 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/moov/udta' }],
+				offsetPrefixSize: 0,
+			})
 
 			deepStrictEqual(hash, await expectedHash(ftyp, moovHeader, mvhd))
 		})
 
 		it('selects a nested box by the index of its parent', async () => {
-			const trak1 = buildBox('trak', concatBytes(buildBox('tkhd', Uint8Array.of(1)), buildBox('udta', Uint8Array.of(1))))
+			const trak1 = buildBox(
+				'trak',
+				concatBytes(buildBox('tkhd', Uint8Array.of(1)), buildBox('udta', Uint8Array.of(1))),
+			)
 			const tkhd2 = buildBox('tkhd', Uint8Array.of(2))
 			const trak2 = buildBox('trak', concatBytes(tkhd2, buildBox('udta', Uint8Array.of(2))))
 			const moov = buildBox('moov', concatBytes(mvhd, trak1, trak2))
 			const segment = concatBytes(ftyp, moov)
 
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/moov/trak[2]/udta' }], offsetPrefixSize: 8 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/moov/trak[2]/udta' }],
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov.subarray(0, BOX_HEADER_SIZE), mvhd, trak1, trak2.subarray(0, BOX_HEADER_SIZE), tkhd2))
+			deepStrictEqual(
+				hash,
+				await expectedHash(
+					encodeBoxOffset(0),
+					ftyp,
+					encodeBoxOffset(ftyp.length),
+					moov.subarray(0, BOX_HEADER_SIZE),
+					mvhd,
+					trak1,
+					trak2.subarray(0, BOX_HEADER_SIZE),
+					tkhd2,
+				),
+			)
 		})
 
 		it('excludes only the root box with the index of the xpath', async () => {
@@ -176,9 +264,20 @@ describe('computeBmffHash', () => {
 			const free = buildBox('free')
 			const segment = concatBytes(uuid1, uuid2, free)
 
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/uuid[2]' }], offsetPrefixSize: 8 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/uuid[2]' }],
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), uuid1, encodeBoxOffset(uuid1.length + uuid2.length), free))
+			deepStrictEqual(
+				hash,
+				await expectedHash(
+					encodeBoxOffset(0),
+					uuid1,
+					encodeBoxOffset(uuid1.length + uuid2.length),
+					free,
+				),
+			)
 		})
 
 		describe('subset of a root box', () => {
@@ -189,24 +288,53 @@ describe('computeBmffHash', () => {
 			// Subset offsets count from the start of the box header. A length of 0 runs to the end of the box.
 			// Bytes beyond the end of the box are never hashed.
 			for (const [description, subset, kept] of [
-				['two ranges, the last one to the end of the box', [{ offset: 8, length: 4 }, { offset: 20, length: 0 }], [moov.subarray(0, 8), moov.subarray(12, 20)]],
-				['a range that runs past the end of the box', [{ offset: 24, length: 100 }], [moov.subarray(0, 24)]],
+				[
+					'two ranges, the last one to the end of the box',
+					[
+						{ offset: 8, length: 4 },
+						{ offset: 20, length: 0 },
+					],
+					[moov.subarray(0, 8), moov.subarray(12, 20)],
+				],
+				[
+					'a range that runs past the end of the box',
+					[{ offset: 24, length: 100 }],
+					[moov.subarray(0, 24)],
+				],
 				['a range that starts past the end of the box', [{ offset: 40, length: 4 }], [moov]],
 			] as const) {
 				it(`keeps the offset and the bytes outside ${description}`, async () => {
-					const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/moov', subset }], offsetPrefixSize: 8 })
+					const hash = await computeBmffHash(segment, {
+						exclusions: [{ xpath: '/moov', subset }],
+						offsetPrefixSize: 8,
+					})
 
-					deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), ...kept))
+					deepStrictEqual(
+						hash,
+						await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), ...kept),
+					)
 				})
 			}
 		})
 
 		it('counts each byte once when the ranges of two exclusions overlap', async () => {
-			const exclusions = [{ xpath: '/moov', subset: [{ offset: 8, length: 8 }] }, { xpath: '/moov/mvhd' }]
+			const exclusions = [
+				{ xpath: '/moov', subset: [{ offset: 8, length: 8 }] },
+				{ xpath: '/moov/mvhd' },
+			]
 
 			const hash = await computeBmffHash(segment, { exclusions, offsetPrefixSize: 8 })
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moovHeader, udta))
+			deepStrictEqual(
+				hash,
+				await expectedHash(
+					encodeBoxOffset(0),
+					ftyp,
+					encodeBoxOffset(ftyp.length),
+					moovHeader,
+					udta,
+				),
+			)
 		})
 
 		it('narrows a nested exclusion with a data constraint', async () => {
@@ -214,20 +342,40 @@ describe('computeBmffHash', () => {
 			const udta2 = buildBox('udta', TEXT_ENCODER.encode('u2'))
 			const moov = buildBox('moov', concatBytes(udta1, udta2))
 			const segment = concatBytes(ftyp, moov)
-			const exclusions = [{ xpath: '/moov/udta', data: [{ offset: 8, value: TEXT_ENCODER.encode('u2') }] }]
+			const exclusions = [
+				{ xpath: '/moov/udta', data: [{ offset: 8, value: TEXT_ENCODER.encode('u2') }] },
+			]
 
 			const hash = await computeBmffHash(segment, { exclusions, offsetPrefixSize: 8 })
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov.subarray(0, BOX_HEADER_SIZE), udta1))
+			deepStrictEqual(
+				hash,
+				await expectedHash(
+					encodeBoxOffset(0),
+					ftyp,
+					encodeBoxOffset(ftyp.length),
+					moov.subarray(0, BOX_HEADER_SIZE),
+					udta1,
+				),
+			)
 		})
 
 		it('excludes nothing for a nested xpath through a box whose payload is not a box list', async () => {
-			const mdat = buildBox('mdat', Uint8Array.of(0xff, 0xff, 0xff, 0xff, 0x78, 0x78, 0x78, 0x78, 1))
+			const mdat = buildBox(
+				'mdat',
+				Uint8Array.of(0xff, 0xff, 0xff, 0xff, 0x78, 0x78, 0x78, 0x78, 1),
+			)
 			const segment = concatBytes(ftyp, mdat)
 
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/mdat/xxxx' }], offsetPrefixSize: 8 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/mdat/xxxx' }],
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), mdat))
+			deepStrictEqual(
+				hash,
+				await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), mdat),
+			)
 		})
 
 		// A uuid box puts a 16-byte usertype before its children (ISO/IEC 14496-12 section 4.2).
@@ -239,11 +387,37 @@ describe('computeBmffHash', () => {
 			const uuidHeader = uuid.subarray(0, BOX_HEADER_SIZE + usertype.length)
 			const moov = buildBox('moov', concatBytes(mvhd, uuid))
 
-			const nested = await computeBmffHash(concatBytes(ftyp, moov), { exclusions: [{ xpath: '/moov/uuid/CNCV' }], offsetPrefixSize: 8 })
-			deepStrictEqual(nested, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov.subarray(0, BOX_HEADER_SIZE), mvhd, uuidHeader, cndm))
+			const nested = await computeBmffHash(concatBytes(ftyp, moov), {
+				exclusions: [{ xpath: '/moov/uuid/CNCV' }],
+				offsetPrefixSize: 8,
+			})
+			deepStrictEqual(
+				nested,
+				await expectedHash(
+					encodeBoxOffset(0),
+					ftyp,
+					encodeBoxOffset(ftyp.length),
+					moov.subarray(0, BOX_HEADER_SIZE),
+					mvhd,
+					uuidHeader,
+					cndm,
+				),
+			)
 
-			const root = await computeBmffHash(concatBytes(ftyp, uuid), { exclusions: [{ xpath: '/uuid/CNCV' }], offsetPrefixSize: 8 })
-			deepStrictEqual(root, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), uuidHeader, cndm))
+			const root = await computeBmffHash(concatBytes(ftyp, uuid), {
+				exclusions: [{ xpath: '/uuid/CNCV' }],
+				offsetPrefixSize: 8,
+			})
+			deepStrictEqual(
+				root,
+				await expectedHash(
+					encodeBoxOffset(0),
+					ftyp,
+					encodeBoxOffset(ftyp.length),
+					uuidHeader,
+					cndm,
+				),
+			)
 		})
 
 		it('finds a nested box with a largesize header', async () => {
@@ -252,9 +426,21 @@ describe('computeBmffHash', () => {
 			const moov = buildBox('moov', concatBytes(largesizeUdta, free))
 			const segment = concatBytes(ftyp, moov)
 
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/moov/udta' }], offsetPrefixSize: 8 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/moov/udta' }],
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov.subarray(0, BOX_HEADER_SIZE), free))
+			deepStrictEqual(
+				hash,
+				await expectedHash(
+					encodeBoxOffset(0),
+					ftyp,
+					encodeBoxOffset(ftyp.length),
+					moov.subarray(0, BOX_HEADER_SIZE),
+					free,
+				),
+			)
 		})
 
 		it('keeps the hash of exclusions with root-only xpaths', async () => {
@@ -262,9 +448,15 @@ describe('computeBmffHash', () => {
 			const free = buildBox('free')
 			const segment = concatBytes(ftyp, moov, uuid, free)
 
-			const hash = await computeBmffHash(segment, { exclusions: [{ xpath: '/uuid' }, { xpath: '/free' }], offsetPrefixSize: 8 })
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/uuid' }, { xpath: '/free' }],
+				offsetPrefixSize: 8,
+			})
 
-			deepStrictEqual(hash, await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov))
+			deepStrictEqual(
+				hash,
+				await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov),
+			)
 		})
 	})
 })

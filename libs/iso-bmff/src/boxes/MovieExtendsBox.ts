@@ -6,7 +6,7 @@ import type { TrackExtendsBox } from './TrackExtendsBox.ts'
  *
  * @public
  */
-export type MovieExtendsBoxChild = MovieExtendsHeaderBox | TrackExtendsBox;
+export type MovieExtendsBoxChild = MovieExtendsHeaderBox | TrackExtendsBox
 
 /**
  * Movie Extends Box - 'mvex' - Container
@@ -14,6 +14,6 @@ export type MovieExtendsBoxChild = MovieExtendsHeaderBox | TrackExtendsBox;
  * @public
  */
 export type MovieExtendsBox = {
-	type: 'mvex';
-	boxes: MovieExtendsBoxChild[];
-};
+	type: 'mvex'
+	boxes: MovieExtendsBoxChild[]
+}

@@ -4,6 +4,6 @@
  * @public
  */
 export type WebVttSettingsBox = {
-	type: 'sttg';
-	settings: string;
-};
+	type: 'sttg'
+	settings: string
+}

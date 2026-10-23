@@ -6,4 +6,4 @@ import type { TimestampMap } from './TimestampMap.ts'
  *
  * @public
  */
-export type WebVttTimestampMapResult = TypedResult<'timestampmap', TimestampMap>;
+export type WebVttTimestampMapResult = TypedResult<'timestampmap', TimestampMap>

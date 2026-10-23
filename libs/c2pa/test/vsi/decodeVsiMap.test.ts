@@ -22,11 +22,13 @@ describe('decodeVsiMap', () => {
 	// #endregion example
 
 	function encodeVsiMapWithSequenceNumber(sequenceNumber: unknown): Uint8Array {
-		return new Uint8Array(encodeCbor({
-			sequenceNumber,
-			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
-			manifestId: 'urn:c2pa:12345',
-		}))
+		return new Uint8Array(
+			encodeCbor({
+				sequenceNumber,
+				bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
+				manifestId: 'urn:c2pa:12345',
+			}),
+		)
 	}
 
 	it('decodes a sequenceNumber of 2^32 or more to a number', () => {
@@ -60,10 +62,12 @@ describe('decodeVsiMap', () => {
 
 	it('names the supported range and the received value in the sequenceNumber error', () => {
 		throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber(BigInt(2 ** 53))), {
-			message: 'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got 9007199254740992',
+			message:
+				'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got 9007199254740992',
 		})
 		throws(() => decodeVsiMap(encodeVsiMapWithSequenceNumber('7')), {
-			message: 'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got string',
+			message:
+				'VSI map sequenceNumber must be an unsigned integer up to 9007199254740991, got string',
 		})
 	})
 
@@ -82,11 +86,15 @@ describe('decodeVsiMap', () => {
 	})
 
 	it('throws for a VSI map with a second sequenceNumber key', () => {
-		const vsiCbor = encodeCborMapWithEntry({
-			sequenceNumber: 1,
-			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
-			manifestId: 'urn:c2pa:12345',
-		}, 'sequenceNumber', 2)
+		const vsiCbor = encodeCborMapWithEntry(
+			{
+				sequenceNumber: 1,
+				bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [] },
+				manifestId: 'urn:c2pa:12345',
+			},
+			'sequenceNumber',
+			2,
+		)
 		throws(() => decodeVsiMap(vsiCbor), { name: 'RangeError', message: 'Duplicate CBOR map key' })
 	})
 
@@ -102,7 +110,11 @@ describe('decodeVsiMap', () => {
 	it('throws for an exclusion constraint whose value is not a byte string', () => {
 		const vsiCbor = encodeCbor({
 			sequenceNumber: 1,
-			bmffHash: { hash: new Uint8Array([0x01]), alg: 'sha256', exclusions: [{ xpath: '/mdat', data: [{ offset: 8, value: [1] }] }] },
+			bmffHash: {
+				hash: new Uint8Array([0x01]),
+				alg: 'sha256',
+				exclusions: [{ xpath: '/mdat', data: [{ offset: 8, value: [1] }] }],
+			},
 			manifestId: 'urn:c2pa:12345',
 		})
 		throws(() => decodeVsiMap(new Uint8Array(vsiCbor)), /exclusions/)

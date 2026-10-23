@@ -55,7 +55,10 @@ function unwrapValue(value: unknown, ot: string | undefined): unknown {
  *
  * @internal
  */
-export function downConvertToV1(obj: Record<string, any>, ot: string | undefined): Record<string, any> {
+export function downConvertToV1(
+	obj: Record<string, any>,
+	ot: string | undefined,
+): Record<string, any> {
 	const result: Record<string, any> = {}
 
 	for (const [key, value] of Object.entries(obj)) {
@@ -73,15 +76,12 @@ export function downConvertToV1(obj: Record<string, any>, ot: string | undefined
 				if (first.params?.r) {
 					result['nrr'] = first.params.r
 				}
-			}
-			else {
+			} else {
 				result['nor'] = first
 			}
-		}
-		else if (CMCD_INNER_LIST_KEYS.has(key)) {
+		} else if (CMCD_INNER_LIST_KEYS.has(key)) {
 			result[key] = unwrapValue(value, ot)
-		}
-		else {
+		} else {
 			result[key] = value
 		}
 	}

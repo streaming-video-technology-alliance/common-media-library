@@ -14,8 +14,8 @@ import type { CmcdRequestProvenance } from './CmcdRequestProvenance.ts'
  */
 export type CmcdRequestReport<D = unknown> = HttpRequest & {
 	customData: {
-		cmcd: Cmcd;
-		[CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance;
-	} & D;
-	headers: Record<string, string>;
+		cmcd: Cmcd
+		[CMCD_REQUEST_PROVENANCE]?: CmcdRequestProvenance
+	} & D
+	headers: Record<string, string>
 }

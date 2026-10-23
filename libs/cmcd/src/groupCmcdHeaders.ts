@@ -6,12 +6,16 @@ import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
 import type { CmcdHeaderValue } from './CmcdHeaderValue.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 
-function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdHeaderKey, CmcdHeaderField> {
-	return Object.keys(headerMap)
-		.reduce((acc, field) => {
-			headerMap[field as CmcdHeaderField]?.forEach(key => acc[key] = field as CmcdHeaderField)
+function createHeaderMap(
+	headerMap: Partial<CmcdHeaderMap>,
+): Record<CmcdHeaderKey, CmcdHeaderField> {
+	return Object.keys(headerMap).reduce(
+		(acc, field) => {
+			headerMap[field as CmcdHeaderField]?.forEach(key => (acc[key] = field as CmcdHeaderField))
 			return acc
-		}, {} as Record<CmcdKey, CmcdHeaderField>)
+		},
+		{} as Record<CmcdKey, CmcdHeaderField>,
+	)
 }
 
 /**
@@ -26,7 +30,10 @@ function createHeaderMap(headerMap: Partial<CmcdHeaderMap>): Record<CmcdHeaderKe
  *
  * @public
  */
-export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeaderMap>): Record<CmcdHeaderField, CmcdHeaderValue> {
+export function groupCmcdHeaders(
+	cmcd: Cmcd,
+	customHeaderMap?: Partial<CmcdHeaderMap>,
+): Record<CmcdHeaderField, CmcdHeaderValue> {
 	const result = {} as Record<CmcdHeaderField, CmcdHeaderValue>
 
 	if (!cmcd) {
@@ -34,12 +41,14 @@ export function groupCmcdHeaders(cmcd: Cmcd, customHeaderMap?: Partial<CmcdHeade
 	}
 
 	const keys = Object.keys(cmcd) as CmcdHeaderKey[]
-	const custom: Partial<Record<CmcdHeaderKey, CmcdHeaderField>> = customHeaderMap ? createHeaderMap(customHeaderMap) : {}
+	const custom: Partial<Record<CmcdHeaderKey, CmcdHeaderField>> = customHeaderMap
+		? createHeaderMap(customHeaderMap)
+		: {}
 
 	for (const key of keys) {
 		const field = CMCD_HEADER_MAP[key] || custom[key] || CmcdHeaderField.REQUEST
-		const data = result[field] ??= {};
-		(data as Record<string, unknown>)[key] = (cmcd as Record<string, unknown>)[key]
+		const data = (result[field] ??= {})
+		;(data as Record<string, unknown>)[key] = (cmcd as Record<string, unknown>)[key]
 	}
 
 	return result

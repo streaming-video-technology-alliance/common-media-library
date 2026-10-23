@@ -15,10 +15,24 @@ function parentElementOf(parent: XmlNode): XmlNode | null {
 /**
  * Creates a builder that produces the `XmlNode` tree
  */
-function createTreeBuilder(keepComments: boolean, includeParentElement: boolean): XmlBuilder<XmlNode> {
+function createTreeBuilder(
+	keepComments: boolean,
+	includeParentElement: boolean,
+): XmlBuilder<XmlNode> {
 	const createLeaf = includeParentElement
-		? (parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({ nodeName, nodeValue, attributes: {}, childNodes: [], parentElement: parentElementOf(parent) })
-		: (_parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({ nodeName, nodeValue, attributes: {}, childNodes: [] })
+		? (parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({
+				nodeName,
+				nodeValue,
+				attributes: {},
+				childNodes: [],
+				parentElement: parentElementOf(parent),
+			})
+		: (_parent: XmlNode, nodeName: string, nodeValue: string): XmlNode => ({
+				nodeName,
+				nodeValue,
+				attributes: {},
+				childNodes: [],
+			})
 
 	const appendLeaf = (parent: XmlNode, nodeName: string, nodeValue: string): void => {
 		parent.childNodes.push(createLeaf(parent, nodeName, nodeValue))
@@ -26,17 +40,40 @@ function createTreeBuilder(keepComments: boolean, includeParentElement: boolean)
 
 	return {
 		createDocument: includeParentElement
-			? (): XmlNode => ({ nodeName: '#document', nodeValue: null, childNodes: [], attributes: {}, parentElement: null })
+			? (): XmlNode => ({
+					nodeName: '#document',
+					nodeValue: null,
+					childNodes: [],
+					attributes: {},
+					parentElement: null,
+				})
 			: (): XmlNode => ({ nodeName: '#document', nodeValue: null, childNodes: [], attributes: {} }),
 		createElement: includeParentElement
-			? (parent, nodeName, attributes, localName, prefix): XmlNode => ({ nodeName, nodeValue: null, attributes, childNodes: [], prefix, localName, parentElement: parentElementOf(parent) })
-			: (_parent, nodeName, attributes, localName, prefix): XmlNode => ({ nodeName, nodeValue: null, attributes, childNodes: [], prefix, localName }),
+			? (parent, nodeName, attributes, localName, prefix): XmlNode => ({
+					nodeName,
+					nodeValue: null,
+					attributes,
+					childNodes: [],
+					prefix,
+					localName,
+					parentElement: parentElementOf(parent),
+				})
+			: (_parent, nodeName, attributes, localName, prefix): XmlNode => ({
+					nodeName,
+					nodeValue: null,
+					attributes,
+					childNodes: [],
+					prefix,
+					localName,
+				}),
 		appendChild: (parent, child) => {
 			parent.childNodes.push(child)
 		},
 		appendText: (parent, text) => appendLeaf(parent, '#text', text),
 		appendCdata: (parent, text) => appendLeaf(parent, '#cdata', text),
-		appendComment: keepComments ? (parent, text) => appendLeaf(parent, '#comment', text) : undefined,
+		appendComment: keepComments
+			? (parent, text) => appendLeaf(parent, '#comment', text)
+			: undefined,
 		appendDoctype: (parent, text) => appendLeaf(parent, '#doctype', text),
 	}
 }
@@ -67,7 +104,8 @@ const TREE_BUILDERS: XmlBuilder<XmlNode>[] = [
  * {@includeCode ../test/parseXml.test.ts#example}
  */
 export function parseXml(input: string, options: XmlParseOptions = {}): XmlNode {
-	const builder = TREE_BUILDERS[(options.keepComments ? 1 : 0) | (options.includeParentElement ? 2 : 0)]
+	const builder =
+		TREE_BUILDERS[(options.keepComments ? 1 : 0) | (options.includeParentElement ? 2 : 0)]
 	const document = builder.createDocument()
 
 	scan(input, options.pos || 0, !!options.keepWhitespace, builder, [document], [''])

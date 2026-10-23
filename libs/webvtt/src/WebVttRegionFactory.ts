@@ -5,4 +5,4 @@ import type { WebVttRegion } from './WebVttRegion.ts'
  *
  * @public
  */
-export type WebVttRegionFactory = () => WebVttRegion;
+export type WebVttRegionFactory = () => WebVttRegion

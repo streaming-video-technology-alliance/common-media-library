@@ -24,4 +24,4 @@ export function readTfhd(view: IsoBoxReadView): TrackFragmentHeaderBox {
 		defaultSampleSize: flags & 0x10 ? view.readUint(4) : undefined,
 		defaultSampleFlags: flags & 0x20 ? view.readUint(4) : undefined,
 	}
-};
+}

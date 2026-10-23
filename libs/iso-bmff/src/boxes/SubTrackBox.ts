@@ -3,7 +3,7 @@
  *
  * @public
  */
-export type SubTrackBoxChild = any;
+export type SubTrackBoxChild = any
 
 /**
  * Sub track box - 'strk'
@@ -11,6 +11,6 @@ export type SubTrackBoxChild = any;
  * @public
  */
 export type SubTrackBox = {
-	type: 'strk';
-	boxes: SubTrackBoxChild[];
-};
+	type: 'strk'
+	boxes: SubTrackBoxChild[]
+}

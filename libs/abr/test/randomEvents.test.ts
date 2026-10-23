@@ -1,5 +1,16 @@
-import type { BitrateSelectorInput, BolaDecision, BolaSelector, LadderRung, SegmentSample } from '@svta/cml-abr'
-import { BOLA_DEFAULT_BUFFER_TARGET, BolaState, createBolaSelector, DEFAULT_STARVATION_SAFETY_FACTOR } from '@svta/cml-abr'
+import type {
+	BitrateSelectorInput,
+	BolaDecision,
+	BolaSelector,
+	LadderRung,
+	SegmentSample,
+} from '@svta/cml-abr'
+import {
+	BOLA_DEFAULT_BUFFER_TARGET,
+	BolaState,
+	createBolaSelector,
+	DEFAULT_STARVATION_SAFETY_FACTOR,
+} from '@svta/cml-abr'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'node:test'
 import { L1, L2, rungs, withoutRung, withRung } from './helpers/ladders.ts'
@@ -46,8 +57,16 @@ const LADDERS: LadderRung[][] = [
 	rungs(ONE_BANDWIDTH),
 	rungs(ONE_BANDWIDTH, ONE_BANDWIDTH),
 ]
-const BUFFER_TARGETS = [BOLA_DEFAULT_BUFFER_TARGET / 2, BOLA_DEFAULT_BUFFER_TARGET, BOLA_DEFAULT_BUFFER_TARGET * 2]
-const STARVATION_SAFETY_FACTORS = [DEFAULT_STARVATION_SAFETY_FACTOR / 2, DEFAULT_STARVATION_SAFETY_FACTOR, 1]
+const BUFFER_TARGETS = [
+	BOLA_DEFAULT_BUFFER_TARGET / 2,
+	BOLA_DEFAULT_BUFFER_TARGET,
+	BOLA_DEFAULT_BUFFER_TARGET * 2,
+]
+const STARVATION_SAFETY_FACTORS = [
+	DEFAULT_STARVATION_SAFETY_FACTOR / 2,
+	DEFAULT_STARVATION_SAFETY_FACTOR,
+	1,
+]
 const KNOWN_STATES: string[] = Object.values(BolaState)
 
 type Random = () => number
@@ -57,10 +76,23 @@ function pick<T>(random: Random, values: readonly T[]): T {
 }
 
 // Checks what every decision promises, whatever the events before it were.
-function checkDecision(decision: BolaDecision, ladder: readonly LadderRung[], context: string): void {
-	ok(Number.isInteger(decision.index) && decision.index >= 0 && decision.index < ladder.length, `${context}: index ${decision.index} is in the ladder`)
-	ok(Number.isFinite(decision.delay) && decision.delay >= 0, `${context}: delay ${decision.delay} is finite and not negative`)
-	ok(Number.isFinite(decision.placeholder) && decision.placeholder >= 0, `${context}: placeholder ${decision.placeholder} is finite and not negative`)
+function checkDecision(
+	decision: BolaDecision,
+	ladder: readonly LadderRung[],
+	context: string,
+): void {
+	ok(
+		Number.isInteger(decision.index) && decision.index >= 0 && decision.index < ladder.length,
+		`${context}: index ${decision.index} is in the ladder`,
+	)
+	ok(
+		Number.isFinite(decision.delay) && decision.delay >= 0,
+		`${context}: delay ${decision.delay} is finite and not negative`,
+	)
+	ok(
+		Number.isFinite(decision.placeholder) && decision.placeholder >= 0,
+		`${context}: placeholder ${decision.placeholder} is finite and not negative`,
+	)
 	ok(KNOWN_STATES.includes(decision.state), `${context}: state ${decision.state} is known`)
 
 	if (decision.delay > 0) {
@@ -74,13 +106,24 @@ function isPositiveNumber(value: number | undefined): value is number {
 }
 
 // When the starvation guard ran, the pick is the lowest rung, or its download fits in the real buffer.
-function checkStarvationGuard(decision: BolaDecision, ladder: readonly LadderRung[], input: BitrateSelectorInput, segmentDuration: number, starvationSafetyFactor: number, context: string): void {
+function checkStarvationGuard(
+	decision: BolaDecision,
+	ladder: readonly LadderRung[],
+	input: BitrateSelectorInput,
+	segmentDuration: number,
+	starvationSafetyFactor: number,
+	context: string,
+): void {
 	const bufferLevel = isPositiveNumber(input.bufferLevel) ? input.bufferLevel : 0
 	const playbackRate = isPositiveNumber(input.playbackRate) ? input.playbackRate : 1
 	const bandwidth = ladder[decision.index].bandwidth
-	const downloadSeconds = bandwidth * segmentDuration / (input.throughput * starvationSafetyFactor)
+	const downloadSeconds =
+		(bandwidth * segmentDuration) / (input.throughput * starvationSafetyFactor)
 
-	ok(bandwidth === ladder[0].bandwidth || downloadSeconds <= bufferLevel / playbackRate, `${context}: the guard left rung ${decision.index}, which downloads in ${downloadSeconds} s`)
+	ok(
+		bandwidth === ladder[0].bandwidth || downloadSeconds <= bufferLevel / playbackRate,
+		`${context}: the guard left rung ${decision.index}, which downloads in ${downloadSeconds} s`,
+	)
 }
 
 // Plays one random sequence of player events against a selector. The player calls select and then reports the download.
@@ -117,7 +160,13 @@ function playSequence(seed: number): void {
 			bufferTarget = pick(random, BUFFER_TARGETS)
 		}
 
-		bufferLevel = random() < STALL_PROBABILITY ? 0 : Math.min(MAXIMUM_BUFFER_LEVEL, Math.max(0, bufferLevel + (random() - 0.5) * BUFFER_STEP_SPREAD))
+		bufferLevel =
+			random() < STALL_PROBABILITY
+				? 0
+				: Math.min(
+						MAXIMUM_BUFFER_LEVEL,
+						Math.max(0, bufferLevel + (random() - 0.5) * BUFFER_STEP_SPREAD),
+					)
 
 		const input: BitrateSelectorInput = {
 			ladder,
@@ -126,17 +175,32 @@ function playSequence(seed: number): void {
 			now: clock,
 			bufferTarget: usesBufferTarget ? bufferTarget : undefined,
 			segmentDuration: random() < SEGMENT_DURATION_PASS_PROBABILITY ? SEGMENT_DURATION : undefined,
-			playbackRate: random() < PLAYBACK_RATE_PASS_PROBABILITY ? MINIMUM_PLAYBACK_RATE + random() * PLAYBACK_RATE_SPREAD : undefined,
+			playbackRate:
+				random() < PLAYBACK_RATE_PASS_PROBABILITY
+					? MINIMUM_PLAYBACK_RATE + random() * PLAYBACK_RATE_SPREAD
+					: undefined,
 		}
 		const decision = selector.select(input)
-		const distinctCount = new Set(ladder.map((rung) => rung.bandwidth)).size
+		const distinctCount = new Set(ladder.map(rung => rung.bandwidth)).size
 
 		checkDecision(decision, ladder, context)
 
-		const isGuardActive = previousState === BolaState.STEADY && previousDistinctCount > 1 && distinctCount > 1 && finishedSamples >= FINISHED_SAMPLES_FOR_GUARD && Number.isFinite(input.throughput)
+		const isGuardActive =
+			previousState === BolaState.STEADY &&
+			previousDistinctCount > 1 &&
+			distinctCount > 1 &&
+			finishedSamples >= FINISHED_SAMPLES_FOR_GUARD &&
+			Number.isFinite(input.throughput)
 
 		if (isGuardActive && isPositiveNumber(input.segmentDuration)) {
-			checkStarvationGuard(decision, ladder, input, input.segmentDuration, starvationSafetyFactor, context)
+			checkStarvationGuard(
+				decision,
+				ladder,
+				input,
+				input.segmentDuration,
+				starvationSafetyFactor,
+				context,
+			)
 		}
 
 		previousState = decision.state

@@ -7,7 +7,7 @@ import type { ShadowSyncEntry } from './ShadowSyncEntry.ts'
  * @public
  */
 export type ShadowSyncSampleBox = FullBox & {
-	type: 'stsh';
-	entryCount: number;
-	entries: ShadowSyncEntry[];
-};
+	type: 'stsh'
+	entryCount: number
+	entries: ShadowSyncEntry[]
+}

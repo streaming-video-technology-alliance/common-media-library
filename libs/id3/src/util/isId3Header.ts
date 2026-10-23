@@ -24,11 +24,7 @@ export function isId3Header(data: Uint8Array, offset: number): boolean {
 	 */
 	if (offset + 10 <= data.length) {
 		// look for 'ID3' identifier
-		if (
-			data[offset] === 0x49 &&
-			data[offset + 1] === 0x44 &&
-			data[offset + 2] === 0x33
-		) {
+		if (data[offset] === 0x49 && data[offset + 1] === 0x44 && data[offset + 2] === 0x33) {
 			// check version is within range
 			if (data[offset + 3] < 0xff && data[offset + 4] < 0xff) {
 				// check size is within range

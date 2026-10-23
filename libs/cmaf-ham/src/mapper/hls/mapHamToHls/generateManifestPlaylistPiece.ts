@@ -7,9 +7,9 @@ import { getPlaylistData } from './utils/getPlaylistData.ts'
 import { getSegments } from './utils/getSegments.ts'
 
 type ManifestPlaylistPiece = {
-	mainRef: string;
-	playlist: string;
-};
+	mainRef: string
+	playlist: string
+}
 
 export function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPiece {
 	const mediaSequence = 0 //TODO : save mediaSequence in the model.
@@ -22,13 +22,11 @@ export function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPie
 		const videoTrack = track as VideoTrack
 		mainRef += `#EXT-X-STREAM-INF:BANDWIDTH=${videoTrack.bandwidth},CODECS="${videoTrack.codecs?.join(',') ?? ''}",RESOLUTION=${videoTrack.width}x${videoTrack.height}\n${trackFileName}\n`
 		playlist += getPlaylistData(videoTrack)
-	}
-	else if (track.type.toLowerCase() === 'audio') {
+	} else if (track.type.toLowerCase() === 'audio') {
 		const audioTrack = track as AudioTrack
 		mainRef += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"\n`
 		playlist += getPlaylistData(audioTrack)
-	}
-	else if (track.type.toLowerCase() === 'text') {
+	} else if (track.type.toLowerCase() === 'text') {
 		const textTrack = track as TextTrack
 		mainRef += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="${textTrack.id}",NAME="${textTrack.id}",LANGUAGE="${textTrack.language}",URI="${trackFileName}"\n`
 	}

@@ -46,12 +46,18 @@ type ClaimSignatureCheck = {
  * is reported as a failure. A manifest with more than one claim box reports `CLAIM_MULTIPLE`
  * through `claimCode` (§15.6.1), so no signature check runs.
  */
-async function validateClaimSignature({ claimCborBytes, claimCode, signatureUriCode, signatureBytes }: InternalManifestData): Promise<ClaimSignatureCheck> {
+async function validateClaimSignature({
+	claimCborBytes,
+	claimCode,
+	signatureUriCode,
+	signatureBytes,
+}: InternalManifestData): Promise<ClaimSignatureCheck> {
 	const certificate = signatureBytes ? extractCertificateFromSignatureBytes(signatureBytes) : null
 
 	if (claimCode === Code.CLAIM_MULTIPLE) return { code: null, certificate }
 	if (!claimCborBytes) return { code: Code.CLAIM_MISSING, certificate }
-	if (!signatureBytes || signatureUriCode) return { code: Code.CLAIM_SIGNATURE_MISSING, certificate }
+	if (!signatureBytes || signatureUriCode)
+		return { code: Code.CLAIM_SIGNATURE_MISSING, certificate }
 	if (!certificate) return { code: Code.CLAIM_SIGNATURE_MISMATCH, certificate }
 
 	const signatureValid = await verifyClaimSignature(signatureBytes, claimCborBytes, certificate)
@@ -77,13 +83,18 @@ async function validateClaimSignature({ claimCborBytes, claimCode, signatureUriC
  *
  * @internal
  */
-export async function validateManifestIntegrity(internal: InternalManifestData): Promise<ManifestIntegrity> {
+export async function validateManifestIntegrity(
+	internal: InternalManifestData,
+): Promise<ManifestIntegrity> {
 	const [assertionHashes, signature] = await Promise.all([
 		validateAssertionHashes(internal.claimAssertionRefs, internal.assertions),
 		validateClaimSignature(internal),
 	])
 
-	const codes: C2paStatusCode[] = [...assertionHashes.codes, ...validateActionIngredients(internal.assertions)]
+	const codes: C2paStatusCode[] = [
+		...assertionHashes.codes,
+		...validateActionIngredients(internal.assertions),
+	]
 
 	// §15.10.3.1: an assertion with CBOR that is not well-formed (RFC 8949 Appendix C) or JSON that does not conform (RFC 8259) fails the claim
 	for (const assertion of internal.assertions) {
@@ -94,7 +105,8 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 	// instance such as c2pa.hash.bmff.v3__1 counts the same as its base label (§6.4).
 	let hardBindingCount = 0
 	for (const assertion of internal.assertions) {
-		if (HARD_BINDING_LABELS.has(assertion.label.replace(ASSERTION_INSTANCE_SUFFIX, ''))) hardBindingCount++
+		if (HARD_BINDING_LABELS.has(assertion.label.replace(ASSERTION_INSTANCE_SUFFIX, '')))
+			hardBindingCount++
 	}
 	if (hardBindingCount > 1) {
 		codes.push(Code.ASSERTION_MULTIPLE_HARD_BINDINGS)
@@ -105,7 +117,9 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 	// missing or malformed claim reports only its own code.
 	if (internal.claimCborBytes && !internal.claimCode) {
 		if (hardBindingCount === 0) codes.push(Code.CLAIM_HARD_BINDINGS_MISSING)
-		const referencedLabels = new Set(internal.claimAssertionRefs.map(ref => extractLabelFromUrl(ref.url)))
+		const referencedLabels = new Set(
+			internal.claimAssertionRefs.map(ref => extractLabelFromUrl(ref.url)),
+		)
 		if (internal.assertions.some(assertion => !referencedLabels.has(assertion.label))) {
 			codes.push(Code.ASSERTION_UNDECLARED)
 		}
@@ -118,5 +132,9 @@ export async function validateManifestIntegrity(internal: InternalManifestData):
 		codes.push(internal.claimCode)
 	}
 
-	return { codes: [...new Set(codes)], certificate: signature.certificate, verifiedAssertions: assertionHashes.verified }
+	return {
+		codes: [...new Set(codes)],
+		certificate: signature.certificate,
+		verifiedAssertions: assertionHashes.verified,
+	}
 }

@@ -16,7 +16,10 @@ describe('IsoBoxReadableStream in a runtime without ReadableStream', () => {
 			const { fourCcToUint32, IsoBoxReadableStream } = await import('@svta/cml-iso-bmff')
 
 			equal(typeof IsoBoxReadableStream, 'function')
-			throws(() => new IsoBoxReadableStream([], { writers: {} }), /ReadableStream is not available in this environment/)
+			throws(
+				() => new IsoBoxReadableStream([], { writers: {} }),
+				/ReadableStream is not available in this environment/,
+			)
 
 			// Non-stream exports remain fully usable
 			equal(fourCcToUint32('ftyp'), 0x66747970)

@@ -1,9 +1,6 @@
 import type { Segment } from '../../../../types/model/Segment.ts'
 
-import {
-	WHITE_SPACE,
-	WHITE_SPACE_ENCODED,
-} from '../../../../utils/constants.ts'
+import { WHITE_SPACE, WHITE_SPACE_ENCODED } from '../../../../utils/constants.ts'
 import { byteRangeToHlsString } from '../../../../utils/byteRange.ts'
 
 /**
@@ -20,10 +17,7 @@ export function getSegments(segments: Segment[]): string {
 			const byteRangeStr: string = segment.byteRange
 				? `#EXT-X-BYTERANGE:${byteRangeToHlsString(segment.byteRange)}\n`
 				: ''
-			const url: string = segment.url.replaceAll(
-				WHITE_SPACE,
-				WHITE_SPACE_ENCODED,
-			)
+			const url: string = segment.url.replaceAll(WHITE_SPACE, WHITE_SPACE_ENCODED)
 			return `#EXTINF:${segment.duration},\n${byteRangeStr}\n${url}`
 		})
 		.join('\n')

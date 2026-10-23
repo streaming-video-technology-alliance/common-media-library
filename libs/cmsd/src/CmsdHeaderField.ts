@@ -27,4 +27,4 @@ export const CmsdHeaderField = {
 /**
  * @public
  */
-export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>;
+export type CmsdHeaderField = ValueOf<typeof CmsdHeaderField>

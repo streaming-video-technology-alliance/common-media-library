@@ -52,8 +52,18 @@ describe('placeholderAfterSample', () => {
 
 	it('uses the highest rung at or below the bandwidth of the sample', () => {
 		const exact = placeholderAfterSample(PARAMS, LARGE_PLACEHOLDER, sampleAt(1), HIGH_BUFFER_LEVEL)
-		const between = placeholderAfterSample(PARAMS, LARGE_PLACEHOLDER, sampleAt(1, { bandwidth: (L1_BANDWIDTHS[1] + L1_BANDWIDTHS[2]) / 2 }), HIGH_BUFFER_LEVEL)
-		const below = placeholderAfterSample(PARAMS, LARGE_PLACEHOLDER, sampleAt(0, { bandwidth: L1_BANDWIDTHS[0] / 2 }), HIGH_BUFFER_LEVEL)
+		const between = placeholderAfterSample(
+			PARAMS,
+			LARGE_PLACEHOLDER,
+			sampleAt(1, { bandwidth: (L1_BANDWIDTHS[1] + L1_BANDWIDTHS[2]) / 2 }),
+			HIGH_BUFFER_LEVEL,
+		)
+		const below = placeholderAfterSample(
+			PARAMS,
+			LARGE_PLACEHOLDER,
+			sampleAt(0, { bandwidth: L1_BANDWIDTHS[0] / 2 }),
+			HIGH_BUFFER_LEVEL,
+		)
 		const lowest = placeholderAfterSample(PARAMS, LARGE_PLACEHOLDER, sampleAt(0), HIGH_BUFFER_LEVEL)
 
 		equal(between, exact)
@@ -61,30 +71,65 @@ describe('placeholderAfterSample', () => {
 	})
 
 	it('counts a request duration that is not finite as 0', () => {
-		const unknown = placeholderAfterSample(PARAMS, LARGE_PLACEHOLDER, sampleAt(0, { timing: { startTime: 0, encodedBodySize: 1, duration: NaN } }), HIGH_BUFFER_LEVEL)
+		const unknown = placeholderAfterSample(
+			PARAMS,
+			LARGE_PLACEHOLDER,
+			sampleAt(0, { timing: { startTime: 0, encodedBodySize: 1, duration: NaN } }),
+			HIGH_BUFFER_LEVEL,
+		)
 
 		closeTo(unknown, MAXIMUM_BUFFERS[0] - HIGH_BUFFER_LEVEL, TOLERANCE)
 	})
 
 	it('adds the media duration of a replacement segment after the decay and the cap', () => {
-		const decayed = placeholderAfterSample(PARAMS, SMALL_PLACEHOLDER, sampleAt(1, { isReplacement: true }), LOW_BUFFER_LEVEL)
-		const capped = placeholderAfterSample(PARAMS, LARGE_PLACEHOLDER, sampleAt(0, { isReplacement: true }), HIGH_BUFFER_LEVEL)
+		const decayed = placeholderAfterSample(
+			PARAMS,
+			SMALL_PLACEHOLDER,
+			sampleAt(1, { isReplacement: true }),
+			LOW_BUFFER_LEVEL,
+		)
+		const capped = placeholderAfterSample(
+			PARAMS,
+			LARGE_PLACEHOLDER,
+			sampleAt(0, { isReplacement: true }),
+			HIGH_BUFFER_LEVEL,
+		)
 
 		closeTo(decayed, SMALL_PLACEHOLDER * PLACEHOLDER_DECAY + SEGMENT_DURATION, TOLERANCE)
-		closeTo(capped, MAXIMUM_BUFFERS[0] - (HIGH_BUFFER_LEVEL + REQUEST_SECONDS) + SEGMENT_DURATION, TOLERANCE)
+		closeTo(
+			capped,
+			MAXIMUM_BUFFERS[0] - (HIGH_BUFFER_LEVEL + REQUEST_SECONDS) + SEGMENT_DURATION,
+			TOLERANCE,
+		)
 	})
 
 	it('adds nothing for a segment that is not a replacement', () => {
 		const plain = placeholderAfterSample(PARAMS, SMALL_PLACEHOLDER, sampleAt(1), LOW_BUFFER_LEVEL)
 
-		equal(placeholderAfterSample(PARAMS, SMALL_PLACEHOLDER, sampleAt(1, { isReplacement: false }), LOW_BUFFER_LEVEL), plain)
+		equal(
+			placeholderAfterSample(
+				PARAMS,
+				SMALL_PLACEHOLDER,
+				sampleAt(1, { isReplacement: false }),
+				LOW_BUFFER_LEVEL,
+			),
+			plain,
+		)
 	})
 
 	it('adds nothing for a replacement segment whose duration is not a positive finite number', () => {
 		const plain = placeholderAfterSample(PARAMS, SMALL_PLACEHOLDER, sampleAt(1), LOW_BUFFER_LEVEL)
 
 		for (const duration of [0, -SEGMENT_DURATION, NaN, Infinity]) {
-			equal(placeholderAfterSample(PARAMS, SMALL_PLACEHOLDER, sampleAt(1, { isReplacement: true, duration }), LOW_BUFFER_LEVEL), plain)
+			equal(
+				placeholderAfterSample(
+					PARAMS,
+					SMALL_PLACEHOLDER,
+					sampleAt(1, { isReplacement: true, duration }),
+					LOW_BUFFER_LEVEL,
+				),
+				plain,
+			)
 		}
 	})
 })

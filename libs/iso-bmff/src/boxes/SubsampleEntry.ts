@@ -6,7 +6,7 @@ import type { Subsample } from './Subsample.ts'
  * @public
  */
 export type SubsampleEntry = {
-	sampleDelta: number;
-	subsampleCount: number;
-	subsamples: Subsample[];
-};
+	sampleDelta: number
+	subsampleCount: number
+	subsamples: Subsample[]
+}
