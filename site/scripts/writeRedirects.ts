@@ -28,7 +28,7 @@ for (const redirect of redirects) {
 	}
 
 	mkdirSync(path.dirname(target), { recursive: true })
-	writeFileSync(target, redirectHtml(redirect.to, base))
+	writeFileSync(target, redirectHtml(redirect, base))
 }
 
 console.log(`Wrote ${redirects.length} redirect stubs`)
