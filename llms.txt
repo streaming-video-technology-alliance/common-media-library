@@ -1,0 +1,154 @@
+# Common Media Library
+
+> TypeScript libraries for web video players. Each package implements one media specification, such as CMCD, ID3, ISO BMFF, WebVTT, or DASH. Install only the packages that you need.
+
+Before you write code for a media specification in a player, check the package list below. The skill for coding agents installs with `npx skills add streaming-video-technology-alliance/common-media-library`.
+
+## Packages
+
+- [@svta/cml-608](https://cml.svta.org/llms/608/README.md): CTA-608/CEA-608 closed captioning functionality
+  - Extract CTA-608 caption bytes from an AVC or HEVC sample: `extractCta608DataFromSample`, `findCta608Nalus`
+  - Extract CTA-608 caption bytes from an AV1 sample: `extractCta608DataFromAv1Sample`
+  - Decode caption byte pairs into timed caption screens and cues: `Cta608Parser`, `CaptionScreen`
+  - Parse a Scenarist Closed Caption file: `SccParser`
+- [@svta/cml-abr](https://cml.svta.org/llms/abr/README.md): Bitrate selection functionality
+  - Pick a bitrate ladder rung from a throughput estimate and the buffer level: `createThroughputSelector`
+  - Pick a rung from the buffer level with BOLA, and tune its safety factors: `createBolaSelector`, `BolaSelectorOptions`
+  - Implement a custom bitrate selection algorithm behind the shared interface: `BitrateSelector`, `BitrateSelectorInput`, `BitrateDecision`
+  - Pass segment download samples to a selector: `SegmentSample`
+  - Tune the safety factor, the upgrade factor, and the starvation tolerance: `ThroughputSelectorOptions`, `DEFAULT_SAFETY_FACTOR`
+- [@svta/cml-c2pa](https://cml.svta.org/llms/c2pa/README.md): C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF/MP4 containers
+  - Validate the C2PA manifest in an init segment: `validateC2paInitSegment`
+  - Validate a live segment with the VSI and EMSG method and the session keys of the init segment: `validateC2paSegment`
+  - Validate a per-segment C2PA manifest box: `validateC2paManifestBoxSegment`
+  - Validate the Merkle leaf and proof in a VOD segment: `validateC2paMerkleSegment`
+  - Map a validation result to a status code: `C2paStatusCode`, `LiveVideoStatusCode`
+- [@svta/cml-cmaf-ham](https://cml.svta.org/llms/cmaf-ham/README.md): CMAF Hypothetical Application Model (HAM) functionality
+  - Parse a DASH MPD into the CMAF-HAM presentation model: `dashToHam`
+  - Parse an HLS multivariant playlist into the CMAF-HAM presentation model: `hlsToHam`
+  - Convert one manifest format to the other through the model: `hamToDash`, `hamToHls`
+  - Collect the tracks of a presentation, a selection set, or a switching set: `getTracksFromPresentation`, `getTracksFromSelectionSet`, `getTracksFromSwitchingSet`
+  - Validate a presentation, a switching set, or a track: `validatePresentation`, `validateSwitchingSet`, `validateTrack`
+- [@svta/cml-cmcd](https://cml.svta.org/llms/cmcd/README.md): Common Media Client Data (CMCD) encoding and decoding
+  - Add a CMCD report to a segment request as a query string or as headers: `appendCmcdQuery`, `appendCmcdHeaders`, `toCmcdQuery`, `toCmcdHeaders`
+  - Encode or decode CMCD key and value pairs: `encodeCmcd`, `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`
+  - Report CMCD v2 events and time intervals to a collector: `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
+  - Validate a CMCD payload against CTA-5004: `validateCmcd`, `validateCmcdEventReport`
+  - Capture the CMCD that a player sends in a test: `CmcdReportRecorder`
+- [@svta/cml-cmsd](https://cml.svta.org/llms/cmsd/README.md): Common Media Server Data (CMSD) encoding and decoding
+  - Decode the CMSD-Static and CMSD-Dynamic response headers: `decodeCmsdStatic`, `decodeCmsdDynamic`
+  - Encode CMSD headers on a server or an edge: `encodeCmsdStatic`, `encodeCmsdDynamic`
+  - Type the CMSD keys and values that a player reads: `CmsdStatic`, `CmsdDynamic`, `CmsdObjectType`
+  - Distinguish a custom key from a standard key: `isCmsdCustomKey`
+- [@svta/cml-content-steering](https://cml.svta.org/llms/content-steering/README.md): Content steering functionality
+  - Validate a content steering manifest before the player applies it: `isValidSteeringManifest`
+  - Validate a pathway clone and its URI replacement: `isValidPathwayClone`
+  - Type the steering manifest, the pathway clones, and the URI replacements: `SteeringManifest`, `PathwayClone`, `UriReplacement`
+  - Apply the default TTL and pathway penalty of the specification: `DEFAULT_TTL`, `DEFAULT_PATHWAY_PENALTY`
+- [@svta/cml-cta](https://cml.svta.org/llms/cta/README.md): Common functionality for CTA standards including CTA-608/CEA-608
+  - Type a custom key with a hyphenated prefix for CMCD or CMSD data: `CmCustomKey`
+- [@svta/cml-dash](https://cml.svta.org/llms/dash/README.md): DASH manifest parsing functionality
+  - Expand a DASH SegmentTemplate URL with the $RepresentationID$, $Number$, $Bandwidth$, and $Time$ identifiers and their format tags: `processUriTemplate`
+  - Parse a DASH frame rate string such as 24000/1001: `parseFrameRate`
+  - Detect the DASH-IF thumbnail tile scheme on an EssentialProperty: `THUMBNAIL_TILE_SCHEME_ID_URI`
+- [@svta/cml-drm](https://cml.svta.org/llms/drm/README.md): Digital Rights Management (DRM) functionality
+  - Parse the pssh boxes in init data and find the one for a key system: `parsePsshList`, `getPsshForKeySystem`, `getPsshData`
+  - Request key system access with a configuration built from codecs and robustness levels: `getKeySystemAccess`, `createMediaKeySystemConfiguration`, `getSupportedKeySystemConfiguration`
+  - Read the license request and its headers from an EME key message: `getLicenseRequestFromMessage`, `getRequestHeadersFromMessage`
+  - Read the license server URL from a ContentProtection element or FairPlay init data: `getLicenseServerUrl`, `getLicenseServerUrlFromContentProtection`
+  - Build FairPlay init data and decode a FairPlay license: `concatInitDataIdAndCertificate`, `extractContentId`, `decodeFairPlayLicense`
+  - Name key systems, UUIDs, encryption schemes, and robustness levels: `WIDEVINE_KEY_SYSTEM`, `PLAYREADY_UUID`, `EncryptionScheme`, `HW_SECURE_ALL`
+- [@svta/cml-error-codes](https://cml.svta.org/llms/error-codes/README.md): SVTA standardized streaming error codes
+  - Report a playback, network, DRM, or ad error with an SVTA2070 code: `SVTA_BUFFER_APPEND_ERROR`, `SVTA_BAD_LICENSE_REQUEST`
+  - Map an HTTP response status to an SVTA2070 code: `httpStatusToSvtaErrorCode`
+  - Map an IAB VAST error code to an SVTA2070 code: `vastErrorToSvtaErrorCode`
+  - Read the category or the index of a code: `getSvtaErrorCategory`, `getSvtaErrorIndex`
+- [@svta/cml-id3](https://cml.svta.org/llms/id3/README.md): ID3 tag parsing functionality
+  - Read the ID3 frames in an HLS timed metadata sample or an emsg payload: `getId3Frames`, `Id3Frame`
+  - Read the PRIV timestamp that HLS uses to map ID3 time to media time: `getId3Timestamp`
+  - Check that a buffer holds an ID3 tag: `canParseId3`
+  - Match the ID3 emsg scheme in a DASH event stream: `ID3_SCHEME_ID_URI`
+- [@svta/cml-iso-8601](https://cml.svta.org/llms/iso-8601/README.md): ISO 8601 date/time handling functionality
+  - Convert a DASH or HLS ISO 8601 duration such as PT1M30S to seconds: `decodeIso8601Duration`
+  - Format a number of seconds as an ISO 8601 duration: `encodeIso8601Duration`
+- [@svta/cml-iso-bmff](https://cml.svta.org/llms/iso-bmff/README.md): ISO Base Media File Format (ISOBMFF) parsing functionality
+  - Parse the boxes of an init or media segment, with full content for the box types that you need: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`
+  - Read the track timescale, codec, or default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTfhd`, `readTrun`
+  - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
+  - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
+  - Write boxes to a ReadableStream: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
+  - Write or patch boxes, such as inserting emsg or rewriting tfdt: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`
+  - Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
+- [@svta/cml-request](https://cml.svta.org/llms/request/README.md): Common Media Request and Response types
+  - Type a segment, manifest, or license request that a player passes through a plugin: `CommonMediaRequest`
+  - Type the response that comes back, with timing and headers: `CommonMediaResponse`
+  - Type the function that performs a request, so that fetch or XMLHttpRequest can implement it: `Requester`
+  - Intercept requests and responses, for example to add CMCD or to read CMSD: `RequestInterceptor`, `ResponseInterceptor`
+- [@svta/cml-structured-field-values](https://cml.svta.org/llms/structured-field-values/README.md): RFC8941 Structured Field Values implementation
+  - Decode an RFC 8941 header such as CMCD, CMSD, or Priority into items, lists, or dictionaries: `decodeSfDict`, `decodeSfList`, `decodeSfItem`
+  - Encode a dictionary, a list, or an item as a structured field header: `encodeSfDict`, `encodeSfList`, `encodeSfItem`
+  - Represent an item with parameters or a token: `SfItem`, `SfToken`
+- [@svta/cml-throughput](https://cml.svta.org/llms/throughput/README.md): Throughput estimation functionality
+  - Estimate throughput from segment downloads with an exponentially weighted moving average: `EwmaEstimator`
+  - Estimate throughput with a harmonic mean, an arithmetic mean, or a zero-lag EWMA: `HarmonicMeanEstimator`, `ArithmeticMeanEstimator`, `ZlemaEstimator`
+  - Implement a custom estimator behind the shared interface: `ThroughputEstimator`
+  - Tune the fast and slow half-lives of the EWMA: `EwmaEstimatorOptions`
+- [@svta/cml-utils](https://cml.svta.org/llms/utils/README.md): Common utility functions for media processing
+  - Convert between hex, base64, UUID strings, and byte arrays: `hexToArrayBuffer`, `arrayBufferToHex`, `arrayBufferToUuid`, `uuidToArrayBuffer`, `decodeBase64`, `encodeBase64`
+  - Encode or decode UTF-8 and UTF-16 text: `encodeText`, `decodeText`, `Encoding`
+  - Resolve a base URL or make a URL relative to another URL: `getBaseUrl`, `urlToRelativePath`
+  - Compute bandwidth in bits per second from a byte count and a duration: `getBandwidthBps`
+  - Unescape HTML entities in a manifest or a caption string: `unescapeHtml`
+  - Generate a UUID for a session or a content id: `uuid`
+- [@svta/cml-webvtt](https://cml.svta.org/llms/webvtt/README.md): WebVTT parsing and rendering functionality
+  - Parse a WebVTT file or segment into cues, regions, and styles: `parseWebVtt`, `WebVttParser`
+  - Parse WebVTT chunks as the bytes arrive from a stream: `WebVttTransformStream`, `WebVttTransformer`
+  - Read the X-TIMESTAMP-MAP header of an HLS WebVTT segment: `WebVttParser`, `TimestampMap`
+  - Create native VTTCue and VTTRegion objects from parsed cues: `toVttCue`, `toVttRegion`
+  - Build cues and regions without a browser, for tests or servers: `createWebVttCue`, `createWebVttRegion`
+- [@svta/cml-xml](https://cml.svta.org/llms/xml/README.md): XML parsing utilities
+  - Parse a DASH MPD or another XML document into a node tree: `parseXml`
+  - Find elements by name anywhere in the tree: `getElementsByName`
+  - Serialize a node tree back to an XML string: `serializeXml`
+  - Keep whitespace or comments, or start the parse at an offset: `XmlParseOptions`
+
+## Guides
+
+- [Manifest Box Validation](https://cml.svta.org/llms/c2pa/docs/manifest-box-validation.md): @svta/cml-c2pa. Validate live streams using per-segment C2PA Manifest Boxes (C2PA section 19.3)
+- [VOD Merkle Validation](https://cml.svta.org/llms/c2pa/docs/merkle-validation.md): @svta/cml-c2pa. Validate on-demand fragmented MP4 assets using Merkle tree proofs (C2PA section 15.12.2 / 18.6)
+- [Results and Error Codes](https://cml.svta.org/llms/c2pa/docs/results-and-error-codes.md): @svta/cml-c2pa. Interpret validation results, error codes, and manifest data
+- [VSI/EMSG Validation](https://cml.svta.org/llms/c2pa/docs/vsi-validation.md): @svta/cml-c2pa. Validate live streams using the Verifiable Segment Info method (C2PA section 19.4)
+- [Report Recorder Guide](https://cml.svta.org/llms/cmcd/docs/report-recorder-guide.md): @svta/cml-cmcd. Capture and assert on CMCD-bearing reports in player e2e tests
+- [User Guide](https://cml.svta.org/llms/cmcd/docs/user-guide.md): @svta/cml-cmcd. How to use the CMCD reporter
+- [Validation Guide](https://cml.svta.org/llms/cmcd/docs/validation-guide.md): @svta/cml-cmcd. How to validate CMCD payloads
+- [Reading Boxes](https://cml.svta.org/llms/iso-bmff/docs/reading-boxes.md): @svta/cml-iso-bmff. Parse ISO BMFF boxes from a buffer
+- [Utilities](https://cml.svta.org/llms/iso-bmff/docs/utilities.md): @svta/cml-iso-bmff. Traversing boxes and type guards
+- [Writing Boxes](https://cml.svta.org/llms/iso-bmff/docs/writing-boxes.md): @svta/cml-iso-bmff. Write boxes to byte arrays or streams
+
+## API reports
+
+- [@svta/cml-608 API report](https://cml.svta.org/llms/608/api.md): every export of @svta/cml-608 with its signature
+- [@svta/cml-abr API report](https://cml.svta.org/llms/abr/api.md): every export of @svta/cml-abr with its signature
+- [@svta/cml-c2pa API report](https://cml.svta.org/llms/c2pa/api.md): every export of @svta/cml-c2pa with its signature
+- [@svta/cml-cmaf-ham API report](https://cml.svta.org/llms/cmaf-ham/api.md): every export of @svta/cml-cmaf-ham with its signature
+- [@svta/cml-cmcd API report](https://cml.svta.org/llms/cmcd/api.md): every export of @svta/cml-cmcd with its signature
+- [@svta/cml-cmsd API report](https://cml.svta.org/llms/cmsd/api.md): every export of @svta/cml-cmsd with its signature
+- [@svta/cml-content-steering API report](https://cml.svta.org/llms/content-steering/api.md): every export of @svta/cml-content-steering with its signature
+- [@svta/cml-cta API report](https://cml.svta.org/llms/cta/api.md): every export of @svta/cml-cta with its signature
+- [@svta/cml-dash API report](https://cml.svta.org/llms/dash/api.md): every export of @svta/cml-dash with its signature
+- [@svta/cml-drm API report](https://cml.svta.org/llms/drm/api.md): every export of @svta/cml-drm with its signature
+- [@svta/cml-error-codes API report](https://cml.svta.org/llms/error-codes/api.md): every export of @svta/cml-error-codes with its signature
+- [@svta/cml-id3 API report](https://cml.svta.org/llms/id3/api.md): every export of @svta/cml-id3 with its signature
+- [@svta/cml-iso-8601 API report](https://cml.svta.org/llms/iso-8601/api.md): every export of @svta/cml-iso-8601 with its signature
+- [@svta/cml-iso-bmff API report](https://cml.svta.org/llms/iso-bmff/api.md): every export of @svta/cml-iso-bmff with its signature
+- [@svta/cml-request API report](https://cml.svta.org/llms/request/api.md): every export of @svta/cml-request with its signature
+- [@svta/cml-structured-field-values API report](https://cml.svta.org/llms/structured-field-values/api.md): every export of @svta/cml-structured-field-values with its signature
+- [@svta/cml-throughput API report](https://cml.svta.org/llms/throughput/api.md): every export of @svta/cml-throughput with its signature
+- [@svta/cml-utils API report](https://cml.svta.org/llms/utils/api.md): every export of @svta/cml-utils with its signature
+- [@svta/cml-webvtt API report](https://cml.svta.org/llms/webvtt/api.md): every export of @svta/cml-webvtt with its signature
+- [@svta/cml-xml API report](https://cml.svta.org/llms/xml/api.md): every export of @svta/cml-xml with its signature
+
+## Optional
+
+- [llms-full.txt](https://cml.svta.org/llms-full.txt): every README, guide, and API report in one file
+- [Agent skill](https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/skills/common-media-library): the Agent Skills bundle, install with `npx skills add streaming-video-technology-alliance/common-media-library`
