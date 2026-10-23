@@ -20,9 +20,9 @@ test('encodeSfItem', () => {
 	// @ts-expect-error - This is a test
 	assert.throws(() => encodeSfItem([1, 2]), /as Bare Item/)
 
-	// @ts-expect-error - This is a test
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	assert.throws(
+		// @ts-expect-error - This is a test
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		() => encodeSfItem(function () {}),
 		/failed to serialize "function \(\) \{\}" as Bare Item/,
 	)

@@ -12,8 +12,8 @@ test('serializeByteSequence', () => {
 		`:cHJldGVuZCB0aGlzIGlzIGJpbmFyeSBjb250ZW50Lg==:`,
 	)
 
-	// @ts-expect-error - This is a test
 	assert.throws(
+		// @ts-expect-error - This is a test
 		() => serializeByteSequence([1, 2, 3]),
 		/failed to serialize "\[1,2,3\]" as Byte Sequence/,
 	)

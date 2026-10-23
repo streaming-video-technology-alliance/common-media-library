@@ -33,8 +33,8 @@ describe('encodeCmcd', () => {
 	})
 
 	it('ignore invalid values', () => {
-		// @ts-expect-error - This is a test
 		equal(
+			// @ts-expect-error - This is a test
 			encodeCmcd({ mtp: NaN, br: Infinity, nor: '', sid: undefined, cid: null, su: false }),
 			'v=2',
 		)
