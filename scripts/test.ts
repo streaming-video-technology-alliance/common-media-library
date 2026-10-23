@@ -6,4 +6,4 @@ import { cmd } from './cmd.ts'
 const root = path.resolve(import.meta.dirname, '..')
 const target = path.relative(root, process.cwd())
 
-await cmd(`vp test --run ${target}`, undefined, { cwd: root })
+await cmd(`vp test --run --passWithNoTests ${target}`, undefined, { cwd: root })
