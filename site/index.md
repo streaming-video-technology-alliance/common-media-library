@@ -5,6 +5,9 @@ hero:
   name: Common Media Library
   text: Shared libraries for web video players
   tagline: TypeScript implementations of CMCD, CMSD, ISO BMFF, captions, DRM, C2PA, and more. Maintained by the Streaming Video Technology Alliance.
+  image:
+    src: /cml-mark.svg
+    alt: The CML mark
   actions:
     - theme: brand
       text: Get started
