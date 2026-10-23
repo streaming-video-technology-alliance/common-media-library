@@ -25,7 +25,7 @@ import {
 	STARVATION_GUARD_SAMPLE_COUNT,
 	THRESHOLD_TOLERANCE,
 } from '../src/BOLA_CONSTANTS.ts'
-import { FIRST_BYTE_WAIT_SAMPLE_COUNT } from '../src/FIRST_BYTE_WAIT_SAMPLE_COUNT.ts'
+import { TIME_TO_FIRST_BYTE_SAMPLE_COUNT } from '../src/TIME_TO_FIRST_BYTE_SAMPLE_COUNT.ts'
 import {
 	bolaMaximumBuffers,
 	bolaThresholds,
@@ -83,10 +83,10 @@ const VERY_SHORT_BUFFER_LEVEL = 0.5
 const RECOVERED_BUFFER_LEVEL = 10
 const STRICT_STARVATION_FACTOR = 0.5
 const RELAXED_STARVATION_FACTOR = 0.9
-// A first-byte wait that makes the download of rung 3 exceed `WAIT_BUFFER_LEVEL`. Without the wait, the download fits.
-const FIRST_BYTE_WAIT_MS = 300
-const LONG_FIRST_BYTE_WAIT_MS = 20_000
-const WAIT_BUFFER_LEVEL = 5.3
+// A time to first byte that makes the download of rung 3 exceed `TIME_TO_FIRST_BYTE_BUFFER_LEVEL`. Without it, the download fits.
+const TIME_TO_FIRST_BYTE_MS = 300
+const LONG_TIME_TO_FIRST_BYTE_MS = 20_000
+const TIME_TO_FIRST_BYTE_BUFFER_LEVEL = 5.3
 const FAST_PLAYBACK_RATE = 2
 const INVALID_PLAYBACK_RATES = [0, -1, NaN, Infinity]
 
@@ -138,13 +138,13 @@ function load(
 	})
 }
 
-// Reports `FIRST_BYTE_WAIT_SAMPLE_COUNT` finished segments of rung 3 that waited `FIRST_BYTE_WAIT_MS` for the first byte.
-function loadWaits(selector: BitrateSelector): void {
-	for (let i = 0; i < FIRST_BYTE_WAIT_SAMPLE_COUNT; i++) {
-		load(selector, L1_BANDWIDTHS[3], WAIT_BUFFER_LEVEL, 0, {
+// Reports `TIME_TO_FIRST_BYTE_SAMPLE_COUNT` finished segments of rung 3 with a time to first byte of `TIME_TO_FIRST_BYTE_MS`.
+function loadTimeToFirstByteSamples(selector: BitrateSelector): void {
+	for (let i = 0; i < TIME_TO_FIRST_BYTE_SAMPLE_COUNT; i++) {
+		load(selector, L1_BANDWIDTHS[3], TIME_TO_FIRST_BYTE_BUFFER_LEVEL, 0, {
 			timing: {
 				startTime: 0,
-				responseStart: FIRST_BYTE_WAIT_MS,
+				responseStart: TIME_TO_FIRST_BYTE_MS,
 				duration: DOWNLOAD_DURATION,
 				encodedBodySize: 1,
 			},
@@ -800,65 +800,65 @@ describe('createBolaSelector', () => {
 			equal(decide(HEALTHY_BUFFER_LEVEL, { throughput: 0 }).index, 0)
 		})
 
-		it('adds the mean first-byte wait of the last four finished samples to the download time', () => {
-			// At the default factor, rung 3 needs 5.1 s to download one segment. The wait makes it 5.4 s.
+		it('adds the mean time to first byte of the last four finished samples to the download time', () => {
+			// At the default factor, rung 3 needs 5.1 s to download one segment. The time to first byte makes it 5.4 s.
 			const selector = createEmptyPlaceholderSelector()
 
-			loadWaits(selector)
+			loadTimeToFirstByteSamples(selector)
 
-			const elapsed = GUARD_BUFFER_LEVEL - WAIT_BUFFER_LEVEL
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
 			const decision = selector.select({
 				ladder: L1,
-				bufferLevel: WAIT_BUFFER_LEVEL,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
 				throughput: throughputFor(3),
 				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
 				segmentDuration: SEGMENT_DURATION,
 			})
 
-			equal(decide(WAIT_BUFFER_LEVEL).index, 3)
+			equal(decide(TIME_TO_FIRST_BYTE_BUFFER_LEVEL).index, 3)
 			equal(decision.index, 2)
 		})
 
-		it('ignores the first-byte wait of an aborted sample', () => {
+		it('ignores the time to first byte of an aborted sample', () => {
 			const selector = createEmptyPlaceholderSelector()
 
-			loadWaits(selector)
-			// An aborted download of rung 4 that waited 20 s. Rung 3 replaces it as the current rung.
-			load(selector, L1_BANDWIDTHS[4], WAIT_BUFFER_LEVEL, 0, {
+			loadTimeToFirstByteSamples(selector)
+			// An aborted download of rung 4 with a time to first byte of 20 s. Rung 3 replaces it as the current rung.
+			load(selector, L1_BANDWIDTHS[4], TIME_TO_FIRST_BYTE_BUFFER_LEVEL, 0, {
 				timing: {
 					startTime: 0,
-					responseStart: LONG_FIRST_BYTE_WAIT_MS,
-					duration: LONG_FIRST_BYTE_WAIT_MS + DOWNLOAD_DURATION,
+					responseStart: LONG_TIME_TO_FIRST_BYTE_MS,
+					duration: LONG_TIME_TO_FIRST_BYTE_MS + DOWNLOAD_DURATION,
 					encodedBodySize: 1,
 				},
 				aborted: true,
 			})
 
-			const elapsed = GUARD_BUFFER_LEVEL - WAIT_BUFFER_LEVEL
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
 			const decision = selector.select({
 				ladder: L1,
-				bufferLevel: WAIT_BUFFER_LEVEL,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
 				throughput: throughputFor(3),
-				now: LONG_FIRST_BYTE_WAIT_MS + DOWNLOAD_DURATION + elapsed * MILLISECONDS_PER_SECOND,
+				now: LONG_TIME_TO_FIRST_BYTE_MS + DOWNLOAD_DURATION + elapsed * MILLISECONDS_PER_SECOND,
 				segmentDuration: SEGMENT_DURATION,
 			})
 
 			equal(decision.index, 2)
 		})
 
-		it('forgets the first-byte waits after a reset', () => {
+		it('forgets the time to first byte samples after a reset', () => {
 			const selector = createEmptyPlaceholderSelector()
 
-			loadWaits(selector)
+			loadTimeToFirstByteSamples(selector)
 			selector.reset()
 			reachSteadyState(selector, throughputFor(1))
 			selector.select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: requestEnd(0) })
-			load(selector, L1_BANDWIDTHS[3], WAIT_BUFFER_LEVEL)
+			load(selector, L1_BANDWIDTHS[3], TIME_TO_FIRST_BYTE_BUFFER_LEVEL)
 
-			const elapsed = GUARD_BUFFER_LEVEL - WAIT_BUFFER_LEVEL
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
 			const decision = selector.select({
 				ladder: L1,
-				bufferLevel: WAIT_BUFFER_LEVEL,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
 				throughput: throughputFor(3),
 				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
 				segmentDuration: SEGMENT_DURATION,
