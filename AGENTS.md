@@ -70,9 +70,10 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Every published package README needs a `## When to use` section: one to eight task bullets with their entry-point exports, then a closing paragraph. `scripts/agentDocs.ts` reads the section. The root build regenerates `skills/common-media-library` from it. Commit the result.
 - Use `{@includeCode ../test/<file>.test.ts#example}` in TSDoc to reference test examples.
 - Mark example regions in tests with `// #region example` and `// #endregion example`.
-- Every fenced TypeScript block in a README or guide must typecheck on its own. Import every library name the block uses. Declare values that the reader's code provides with `declare const` or `declare function`. No pseudocode.
+- Every fenced TypeScript block in a README or guide must typecheck. Import every library name the block uses. No pseudocode.
+- A block may use a value that the reader's code provides, such as a player or a request. Declare that value in `<guide>.context.d.ts` next to the guide. The check prepends the declarations to every block of the guide that does not declare the name. Write types as `import('@svta/cml-cmcd').CmcdReporter`, with no import statements.
 - A block that shows a compile error marks the line with `// @ts-expect-error`.
-- TSDoc examples that `{@includeCode}` a test region compile with the test file. The standalone rule does not apply to those examples.
+- TSDoc examples that `{@includeCode}` a test region compile with the test file. The rule does not apply to those examples.
 - The package build regenerates the public API report `libs/<package>/config/cml-<package>.api.md`. Review its diff to confirm that every API change is intentional.
 
 ## Writing Style
