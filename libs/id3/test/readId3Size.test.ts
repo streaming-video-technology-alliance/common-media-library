@@ -1,6 +1,6 @@
 import { readId3Size } from '@svta/cml-id3'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('readId3Size', () => {
 	const mockID3SizeData = Uint8Array.from([73, 68, 51, 4, 0, 0, 0, 7, 1, 0])

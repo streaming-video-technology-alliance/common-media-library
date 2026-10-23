@@ -1,6 +1,6 @@
 import { decodeBase64 } from '@svta/cml-utils'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('decodeBase64', () => {
 	it('provides a valid example', async () => {

@@ -16,7 +16,7 @@ describe('traverseIsoBoxes', function () {
 
 	it('should provide an example', async function () {
 		// #region example
-		const isoFile = await readFile('test/fixtures/captions.mp4')
+		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 		const boxes = readIsoBoxes(new Uint8Array(isoFile))
 
 		for (const box of traverseIsoBoxes(boxes)) {

@@ -1,6 +1,6 @@
 import { encodeSfItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test, { describe } from 'node:test'
+import { describe, test } from 'vitest'
 import { formatItem } from './util/format.ts'
 import { read } from './util/read.ts'
 

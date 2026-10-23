@@ -1,7 +1,7 @@
 import { concatInitDataIdAndCertificate } from '@svta/cml-drm'
 import { base64decode, convertUint8ToUint16 } from '@svta/cml-utils'
 import { deepStrictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 // initData and CKC appCertData from Apple's FairPlay example
 const mockInitDataBase64 = `AAAAAgAAAACIiMWpQhMDI6pMnx2nfIiIMoaz9xQolnPlrBsRFKyANk3mGrJ0R1rb476dlbP7gfY5RHrSdUdvEMIMIbCl3hrGj96RIuGb4MDZqIWAo2FGwODnjP7FqW00fMY9kWRiTPngKU3dY3agBnZ8glOEskarDrEQak`

@@ -1,13 +1,13 @@
 import { findCta608Nalus } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { parseSegment, verifyGa94Identifier } from './utils/helpers.ts'
 
 describe('findCta608Nalus', () => {
 	// #region example
 	it('should find CTA-608 NAL unit ranges in an H.264 sample', async () => {
-		const file = await readFile('test/fixtures/608_h264.m4s')
+		const file = await readFile(new URL('./fixtures/608_h264.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// First sample (keyframe) contains CTA-608 SEI NALUs
@@ -25,7 +25,7 @@ describe('findCta608Nalus', () => {
 	// #endregion example
 
 	it('should find CTA-608 NAL unit ranges in an H.265 sample', async () => {
-		const file = await readFile('test/fixtures/608_h265.m4s')
+		const file = await readFile(new URL('./fixtures/608_h265.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// First sample (keyframe) contains CTA-608 SEI NALUs
@@ -40,7 +40,7 @@ describe('findCta608Nalus', () => {
 	})
 
 	it('should find CTA-608 ranges in all caption-bearing H.264 samples', async () => {
-		const file = await readFile('test/fixtures/608_h264.m4s')
+		const file = await readFile(new URL('./fixtures/608_h264.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		let cursor = mdatBodyStart
@@ -69,7 +69,7 @@ describe('findCta608Nalus', () => {
 	})
 
 	it('should find CTA-608 ranges in all caption-bearing H.265 samples', async () => {
-		const file = await readFile('test/fixtures/608_h265.m4s')
+		const file = await readFile(new URL('./fixtures/608_h265.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		let cursor = mdatBodyStart
@@ -97,7 +97,7 @@ describe('findCta608Nalus', () => {
 	})
 
 	it('should return empty array for H.264 samples without CTA-608 data', async () => {
-		const file = await readFile('test/fixtures/608_h264.m4s')
+		const file = await readFile(new URL('./fixtures/608_h264.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// Sample index 1 is a non-keyframe without captions
@@ -108,7 +108,7 @@ describe('findCta608Nalus', () => {
 	})
 
 	it('should return empty array for H.265 samples without CTA-608 data', async () => {
-		const file = await readFile('test/fixtures/608_h265.m4s')
+		const file = await readFile(new URL('./fixtures/608_h265.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// Sample index 1 is a non-keyframe without captions

@@ -1,6 +1,6 @@
 import { decodeIso8601Duration } from '@svta/cml-iso-8601'
 import assert, { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 const HUGE_NUMBER_STRING = new Array(500).join('7')
 

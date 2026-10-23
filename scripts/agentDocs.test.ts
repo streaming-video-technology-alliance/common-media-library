@@ -2,7 +2,7 @@ import { deepEqual, equal, throws } from 'node:assert/strict'
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import {
 	checkExports,
 	indexEnd,

@@ -1,7 +1,7 @@
 import { validateCmcdValues } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, match } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('validateCmcdValues', () => {
 	it('provides a valid example', () => {

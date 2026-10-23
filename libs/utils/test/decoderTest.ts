@@ -1,4 +1,4 @@
-import { after, before, describe } from 'node:test'
+import { afterAll as after, beforeAll as before, describe } from 'vitest'
 
 const NativeTextDecoder = TextDecoder
 

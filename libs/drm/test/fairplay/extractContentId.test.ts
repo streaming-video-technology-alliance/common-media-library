@@ -1,7 +1,7 @@
 import { extractContentId } from '@svta/cml-drm'
 import { UTF_8 } from '@svta/cml-utils'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('extractContentId', () => {
 	it('extracts contentId from UTF-16LE payload', () => {

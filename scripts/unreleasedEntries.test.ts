@@ -1,5 +1,5 @@
 import { deepEqual } from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { unreleasedEntries } from './unreleasedEntries.ts'
 
 const header = `# Changelog

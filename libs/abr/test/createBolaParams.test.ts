@@ -1,5 +1,5 @@
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { MINIMUM_BUFFER, MINIMUM_BUFFER_PER_RUNG } from '../src/BOLA_CONSTANTS.ts'
 import { BOLA_DEFAULT_BUFFER_TARGET } from '../src/BOLA_DEFAULT_BUFFER_TARGET.ts'
 import { createBolaParams } from '../src/createBolaParams.ts'

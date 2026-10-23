@@ -1,6 +1,6 @@
 import { validatePresentation, validateSegments, validateTrack } from '@svta/cml-cmaf-ham'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import {
 	audioTrack,
 	invalidAudioTrack,

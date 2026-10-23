@@ -1,6 +1,6 @@
 import { getPsshForKeySystem } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { samplePsshBox } from '../common/samplePsshBox.ts'
 
 describe('getPsshForKeySystem', () => {

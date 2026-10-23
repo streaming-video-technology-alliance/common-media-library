@@ -1,6 +1,6 @@
 import { parseParameters } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vitest'
 
 test('parseParameters', () => {
 	assert.deepStrictEqual(parseParameters(`;a=0`), { value: { a: 0 }, src: `` })

@@ -1,5 +1,5 @@
 import { deepStrictEqual, ok, strictEqual, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { Tag } from 'cbor-x'
 import { encode, Encoder } from 'cbor-x/encode'
 import { CborTag, decodeCbor, readCborItem } from '../../src/cbor/readCborItem.ts'

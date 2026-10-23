@@ -25,7 +25,7 @@ import {
 describe('createIsoBoxReadableStream', function () {
 	it('should write from a parsed file', async function () {
 		// #region example
-		const isoFile = await readFile('test/fixtures/captions.mp4')
+		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 
 		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
 			readers: {
@@ -148,7 +148,7 @@ describe('createIsoBoxReadableStream', function () {
 			},
 		})
 
-		const isoFile = await readFile('test/fixtures/subsample.m4s')
+		const isoFile = await readFile(new URL('./fixtures/subsample.m4s', import.meta.url))
 		const copy = join(tmpdir(), 'subsample.mp4')
 		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
 

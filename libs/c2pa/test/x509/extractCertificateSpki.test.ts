@@ -2,7 +2,7 @@ import { extractCertificateSpki } from '../../src/x509/extractCertificateSpki.ts
 import { extractManifestCertificate } from '../../src/extractManifestCertificate.ts'
 import { ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 function loadFixture(name: string): Uint8Array {
 	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))

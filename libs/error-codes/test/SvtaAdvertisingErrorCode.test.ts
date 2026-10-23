@@ -1,6 +1,6 @@
 import { SvtaAdvertisingErrorCode, SvtaErrorCategory } from '@svta/cml-error-codes'
 import assert, { ok, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { assertCatalogInvariants } from './data/assertCatalogInvariants.ts'
 
 describe('SvtaAdvertisingErrorCode', () => {

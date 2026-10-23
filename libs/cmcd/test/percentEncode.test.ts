@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { percentEncode } from '../src/percentEncode.ts'
 
 describe('percentEncode', () => {

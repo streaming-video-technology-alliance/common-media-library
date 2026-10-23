@@ -2,7 +2,7 @@ import type { CaptionScreen } from '@svta/cml-608'
 import { Cta608Parser, extractCta608DataFromAv1Sample } from '@svta/cml-608'
 import { deepEqual, equal, ok } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { parseSegment } from './utils/helpers.ts'
 
 /**
@@ -52,7 +52,7 @@ const expectedPairs = [
 describe('extractCta608DataFromAv1Sample', () => {
 	// #region example
 	it('should extract CTA-608 field data from an AV1 metadata OBU', async () => {
-		const file = await readFile('test/fixtures/608_av1.mp4')
+		const file = await readFile(new URL('./fixtures/608_av1.mp4', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// The first sample carries the RCL control pair that opens the caption
@@ -63,7 +63,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 	// #endregion example
 
 	it('should extract every injected field 1 pair in sample order', async () => {
-		const file = await readFile('test/fixtures/608_av1.mp4')
+		const file = await readFile(new URL('./fixtures/608_av1.mp4', import.meta.url))
 		const results = parseAv1Samples(file)
 
 		equal(results.length, expectedPairs.length)
@@ -76,7 +76,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 	})
 
 	it('should return empty field data for AV1 samples without CTA-608 data', async () => {
-		const file = await readFile('test/fixtures/608_av1.mp4')
+		const file = await readFile(new URL('./fixtures/608_av1.mp4', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// Frames 14-29 sit between the caption and its erase command
@@ -219,7 +219,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 	})
 
 	it('should render the injected caption through Cta608Parser', async () => {
-		const file = await readFile('test/fixtures/608_av1.mp4')
+		const file = await readFile(new URL('./fixtures/608_av1.mp4', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		const cues: string[] = []
@@ -249,7 +249,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 	it('should carry the same payload as the SEI path', async () => {
 		// The A/53 cc_data() bytes are identical for AV1 and AVC/HEVC; only the envelope
 		// differs. Both fixtures use the same doubled control codes and character pairs.
-		const file = await readFile('test/fixtures/608_av1.mp4')
+		const file = await readFile(new URL('./fixtures/608_av1.mp4', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// Locate the metadata OBU payload in sample 0 and confirm the identifier bytes

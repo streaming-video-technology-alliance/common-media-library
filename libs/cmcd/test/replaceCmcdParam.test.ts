@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { replaceCmcdParam } from '../src/replaceCmcdParam.ts'
 
 describe('replaceCmcdParam', () => {

@@ -1,6 +1,6 @@
 import { uuidToArrayBuffer } from '@svta/cml-utils'
 import { deepEqual } from 'assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('uuidToArrayBuffer', () => {
 	// #region example

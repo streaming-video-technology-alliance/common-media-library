@@ -1,5 +1,5 @@
 import { equal, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 // This file must not import @svta/cml-iso-bmff statically: the module has to be
 // evaluated for the first time after ReadableStream has been removed to

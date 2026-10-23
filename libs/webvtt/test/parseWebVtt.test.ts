@@ -1,6 +1,6 @@
 import { parseWebVtt } from '@svta/cml-webvtt'
 import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import './utils/pollyfill.ts'
 
 describe('parseWebVtt examples', () => {

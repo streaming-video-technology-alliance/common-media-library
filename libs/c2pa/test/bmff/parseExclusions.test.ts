@@ -1,6 +1,6 @@
 import { parseExclusions } from '../../src/bmff/parseExclusions.ts'
 import { deepStrictEqual, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('parseExclusions', () => {
 	// #region example

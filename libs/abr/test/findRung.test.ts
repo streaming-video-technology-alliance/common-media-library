@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { findRung } from '../src/findRung.ts'
 
 const ladder = [300_000, 750_000, 1_500_000, 3_000_000, 6_000_000].map(bandwidth => ({ bandwidth }))

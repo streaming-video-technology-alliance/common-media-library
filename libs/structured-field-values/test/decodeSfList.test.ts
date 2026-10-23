@@ -1,6 +1,6 @@
 import { decodeSfList, SfItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('decodeSfList', () => {
 	it('handles an empty string', () => {

@@ -1,6 +1,6 @@
 import { serializeBareItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vitest'
 
 test('serializeBareItem', () => {
 	assert.throws(() => serializeBareItem([]), /failed to serialize "\[\]" as Bare Item/)

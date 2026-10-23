@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 import { decodeSfDict, SfItem, SfToken } from '@svta/cml-structured-field-values'
 

@@ -1,5 +1,5 @@
 import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { filterBoxes } from './filterBoxes.ts'
 import { findBox } from './findBox.ts'
 import { parseBox } from './parseBox.ts'

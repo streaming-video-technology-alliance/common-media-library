@@ -1,7 +1,7 @@
 import type { PACData } from '@svta/cml-608'
 import { Cta608Parser } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
-import { beforeEach, describe, it, mock } from 'node:test'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 describe('Cea608Parser Tests', () => {
 	let parser: any
@@ -14,11 +14,11 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		mock.method(parser, 'parseCmd', () => true)
-		const parseMidrow = mock.method(parser, 'parseMidrow')
-		const parsePAC = mock.method(parser, 'parsePAC')
-		const parseBackgroundAttributes = mock.method(parser, 'parseBackgroundAttributes')
-		const parseChars = mock.method(parser, 'parseChars')
+		vi.spyOn(parser, 'parseCmd').mockImplementation(() => true)
+		const parseMidrow = vi.spyOn(parser, 'parseMidrow')
+		const parsePAC = vi.spyOn(parser, 'parsePAC')
+		const parseBackgroundAttributes = vi.spyOn(parser, 'parseBackgroundAttributes')
+		const parseChars = vi.spyOn(parser, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -32,11 +32,11 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = mock.method(parser, 'parseCmd', () => false)
-		mock.method(parser, 'parseMidrow', () => true)
-		const parsePAC = mock.method(parser, 'parsePAC')
-		const parseBackgroundAttributes = mock.method(parser, 'parseBackgroundAttributes')
-		const parseChars = mock.method(parser, 'parseChars')
+		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
+		vi.spyOn(parser, 'parseMidrow').mockImplementation(() => true)
+		const parsePAC = vi.spyOn(parser, 'parsePAC')
+		const parseBackgroundAttributes = vi.spyOn(parser, 'parseBackgroundAttributes')
+		const parseChars = vi.spyOn(parser, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -50,11 +50,11 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = mock.method(parser, 'parseCmd', () => false)
-		const parseMidrow = mock.method(parser, 'parseMidrow', () => false)
-		const parsePAC = mock.method(parser, 'parsePAC', () => true)
-		const parseBackgroundAttributes = mock.method(parser, 'parseBackgroundAttributes')
-		const parseChars = mock.method(parser, 'parseChars')
+		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
+		const parseMidrow = vi.spyOn(parser, 'parseMidrow').mockImplementation(() => false)
+		const parsePAC = vi.spyOn(parser, 'parsePAC').mockImplementation(() => true)
+		const parseBackgroundAttributes = vi.spyOn(parser, 'parseBackgroundAttributes')
+		const parseChars = vi.spyOn(parser, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -69,11 +69,13 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = mock.method(parser, 'parseCmd', () => false)
-		const parseMidrow = mock.method(parser, 'parseMidrow', () => false)
-		const parsePAC = mock.method(parser, 'parsePAC', () => false)
-		const parseBackgroundAttributes = mock.method(parser, 'parseBackgroundAttributes', () => true)
-		const parseChars = mock.method(parser, 'parseChars')
+		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
+		const parseMidrow = vi.spyOn(parser, 'parseMidrow').mockImplementation(() => false)
+		const parsePAC = vi.spyOn(parser, 'parsePAC').mockImplementation(() => false)
+		const parseBackgroundAttributes = vi
+			.spyOn(parser, 'parseBackgroundAttributes')
+			.mockImplementation(() => true)
+		const parseChars = vi.spyOn(parser, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -88,11 +90,13 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = mock.method(parser, 'parseCmd', () => false)
-		const parseMidrow = mock.method(parser, 'parseMidrow', () => false)
-		const parsePAC = mock.method(parser, 'parsePAC', () => false)
-		const parseBackgroundAttributes = mock.method(parser, 'parseBackgroundAttributes', () => false)
-		const parseChars = mock.method(parser, 'parseChars', () => true)
+		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
+		const parseMidrow = vi.spyOn(parser, 'parseMidrow').mockImplementation(() => false)
+		const parsePAC = vi.spyOn(parser, 'parsePAC').mockImplementation(() => false)
+		const parseBackgroundAttributes = vi
+			.spyOn(parser, 'parseBackgroundAttributes')
+			.mockImplementation(() => false)
+		const parseChars = vi.spyOn(parser, 'parseChars').mockImplementation(() => true)
 
 		parser.addData(time, byteList)
 

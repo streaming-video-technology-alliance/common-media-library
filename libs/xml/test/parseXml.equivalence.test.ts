@@ -3,7 +3,7 @@ import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { before, describe, it } from 'node:test'
+import { beforeAll as before, describe, it } from 'vitest'
 import { generateMpd } from '../bench/generate.ts'
 import { runParseWorker, type ParseOutcome } from './parseXmlWorker.ts'
 
@@ -16,10 +16,11 @@ import { runParseWorker, type ParseOutcome } from './parseXmlWorker.ts'
  * Regenerate the fixture from the parser under test with `UPDATE_FIXTURES=1 npm test -w libs/xml`.
  */
 
-const FIXTURE_PATH = resolve('./test/fixtures/parseXml.equivalence.json')
+const FIXTURE_PATH = resolve(import.meta.dirname, 'fixtures', 'parseXml.equivalence.json')
 const INLINE_LIMIT = 2000
 
-const fixture = (name: string): string => readFileSync(resolve('./test/fixtures/', name), 'utf8')
+const fixture = (name: string): string =>
+	readFileSync(resolve(import.meta.dirname, 'fixtures', name), 'utf8')
 
 const CORPUS: Record<string, string> = {
 	// Manifests

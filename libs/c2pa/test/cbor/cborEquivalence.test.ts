@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual, throws } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { Tag } from 'cbor-x'
 import { decode as decodeWithCborX } from 'cbor-x/decode'
 import { projectCborTags } from '../../src/cbor/projectCborTags.ts'
@@ -233,7 +233,7 @@ describe('projectCborTags', () => {
 
 describe('readCborItem equivalence with cbor-x', () => {
 	for (const { name, items } of FIXTURES) {
-		it(`decodes every CBOR item of ${name} like cbor-x`, t => {
+		it(`decodes every CBOR item of ${name} like cbor-x`, () => {
 			const manifest = readC2paManifest(loadFixture(name))
 			ok(manifest.claimCborBytes, 'claim box')
 			ok(manifest.signatureBytes, 'signature box')
@@ -254,7 +254,6 @@ describe('readCborItem equivalence with cbor-x', () => {
 				count += 1 + compareNested(decoded.value, path)
 			}
 
-			t.diagnostic(`${count} CBOR items`)
 			strictEqual(count, items)
 		})
 	}

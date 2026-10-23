@@ -1,6 +1,6 @@
 import { SvtaAdvertisingErrorCode, vastErrorToSvtaErrorCode } from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('vastErrorToSvtaErrorCode', () => {
 	it('provides a valid example', () => {

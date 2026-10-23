@@ -1,6 +1,6 @@
 import { SvtaCustomErrorCode, SvtaErrorCategory } from '@svta/cml-error-codes'
 import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { assertCatalogInvariants } from './data/assertCatalogInvariants.ts'
 
 describe('SvtaCustomErrorCode', () => {

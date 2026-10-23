@@ -1,6 +1,6 @@
 import { encodeSfDict, SfItem, SfToken } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('encodeSfDict', () => {
 	it('handles empty objects', () => {

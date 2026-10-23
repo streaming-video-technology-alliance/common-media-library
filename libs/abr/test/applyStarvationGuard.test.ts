@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { applyStarvationGuard } from '../src/applyStarvationGuard.ts'
 import { L1, L1_BANDWIDTHS } from './helpers/ladders.ts'
 

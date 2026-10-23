@@ -1,7 +1,7 @@
 import type { CmcdCustomKey, CmcdHeaderMap } from '@svta/cml-cmcd'
 import { CmcdHeaderField, CmcdReportingMode, toCmcdHeaders } from '@svta/cml-cmcd'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { CMCD_HEADERS } from './data/CMCD_HEADERS.ts'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
 

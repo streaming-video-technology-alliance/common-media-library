@@ -1,6 +1,6 @@
 import { CMCD_REQUEST_KEYS, isCmcdRequestKey } from '@svta/cml-cmcd'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('isCmcdRequestKey', () => {
 	it('provides a valid example', () => {

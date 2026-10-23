@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { NEGLIGIBLE_DELAY } from '../src/BOLA_CONSTANTS.ts'
 import { computeDelay } from '../src/computeDelay.ts'
 import { closeTo } from './helpers/closeTo.ts'

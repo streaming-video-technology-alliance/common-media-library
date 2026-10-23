@@ -3,7 +3,7 @@ import './init.ts'
 import type { Presentation } from '@svta/cml-cmaf-ham'
 import { dashToHam, hamToDash } from '@svta/cml-cmaf-ham'
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 import jsonHam0 from './data/ham-samples/fromDash/ham0.json' with { type: 'json' }
 import jsonHam1 from './data/ham-samples/fromDash/ham1.json' with { type: 'json' }

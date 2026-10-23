@@ -1,6 +1,6 @@
 import { getLicenseServerUrlFromContentProtection, type ContentProtection } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { beforeEach, describe, it } from 'node:test'
+import { beforeEach, describe, it } from 'vitest'
 
 describe('getLicenseServerUrlFromContentProtection', () => {
 	let contentProtection: ContentProtection[]

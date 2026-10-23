@@ -1,6 +1,6 @@
 import { serializeDecimal } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vitest'
 
 test('serializeDecimal', () => {
 	assert.deepStrictEqual(serializeDecimal(0), '0.0')

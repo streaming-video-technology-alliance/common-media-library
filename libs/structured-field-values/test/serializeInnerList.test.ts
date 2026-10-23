@@ -1,6 +1,6 @@
 import { serializeInnerList, SfItem, SfToken } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vitest'
 
 test('serializeInnerList', () => {
 	assert.deepStrictEqual(serializeInnerList({ value: [1, 2], params: { a: 1 } }), '(1 2);a=1')

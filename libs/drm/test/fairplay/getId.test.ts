@@ -1,7 +1,7 @@
 import { getId } from '@svta/cml-drm'
 import { stringToUint16 } from '@svta/cml-utils'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('getId', () => {
 	it('extracts contentId from skd:// format', () => {

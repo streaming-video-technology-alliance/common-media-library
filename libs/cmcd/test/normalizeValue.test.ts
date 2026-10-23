@@ -1,7 +1,7 @@
 import type { CmcdFormatterOptions } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { CMCD_KEY_SPECS } from '../src/CMCD_KEY_SPECS.ts'
 import type { CmcdKeySpec } from '../src/CmcdKeySpec.ts'
 import { getKeySpec } from '../src/getKeySpec.ts'

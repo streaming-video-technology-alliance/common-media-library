@@ -1,6 +1,6 @@
 import { parsePsshList } from '@svta/cml-drm'
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { samplePsshBox } from '../common/samplePsshBox.ts'
 
 describe('parsePsshList', () => {

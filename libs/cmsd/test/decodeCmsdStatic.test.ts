@@ -1,6 +1,6 @@
 import { decodeCmsdStatic } from '@svta/cml-cmsd'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { CMSD_STATIC_OBJ } from './data/CMSD_STATIC_OBJ.ts'
 import { CMSD_STATIC_STRING } from './data/CMSD_STATIC_STRING.ts'
 

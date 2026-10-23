@@ -1,6 +1,6 @@
 import { validateCmcdKeys } from '@svta/cml-cmcd'
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('validateCmcdKeys', () => {
 	it('provides a valid example', () => {

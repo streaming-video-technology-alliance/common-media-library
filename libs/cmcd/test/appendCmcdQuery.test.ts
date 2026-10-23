@@ -1,6 +1,6 @@
 import { appendCmcdQuery } from '@svta/cml-cmcd'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 
 describe('appendCmcdQuery', () => {
 	const url = 'https://test.com'

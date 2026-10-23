@@ -1,6 +1,6 @@
 import { parseItem, SfItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vitest'
 
 test('test parseItem', () => {
 	assert.deepStrictEqual(parseItem(`123;a=1;b`), {

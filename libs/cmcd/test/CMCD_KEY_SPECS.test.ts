@@ -9,7 +9,7 @@ import {
 	CmcdReportingMode,
 } from '@svta/cml-cmcd'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { CMCD_KEY_SPECS } from '../src/CMCD_KEY_SPECS.ts'
 import { CMCD_STATE_EVENT_FIELDS } from '../src/CMCD_STATE_EVENT_FIELDS.ts'
 

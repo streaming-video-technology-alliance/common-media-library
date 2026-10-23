@@ -1,6 +1,6 @@
 import { parseInitDataFromContentProtection } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { beforeEach, describe, it } from 'node:test'
+import { beforeEach, describe, it } from 'vitest'
 
 describe('parseInitDataFromContentProtection', () => {
 	let cpData: any

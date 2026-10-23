@@ -1,6 +1,6 @@
 import { extractCta608Data } from '@svta/cml-608'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { parseCcData } from '../src/utils/parseCcData.ts'
 import { parseCta608DataFromSei } from '../src/utils/seiHelpers.ts'
 

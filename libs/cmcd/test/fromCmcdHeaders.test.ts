@@ -1,6 +1,6 @@
 import { fromCmcdHeaders } from '@svta/cml-cmcd'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { CMCD_HEADERS } from './data/CMCD_HEADERS.ts'
 import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.ts'
 

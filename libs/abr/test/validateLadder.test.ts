@@ -1,5 +1,5 @@
 import { doesNotThrow, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { validateLadder } from '../src/validateLadder.ts'
 
 function rungs(...bandwidths: number[]): { bandwidth: number }[] {

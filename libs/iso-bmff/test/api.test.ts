@@ -18,7 +18,7 @@ import {
 
 describe('API', function () {
 	it('should handle advanced use cases', async () => {
-		const isoFile = await readFile('test/fixtures/hvc1_init.mp4')
+		const isoFile = await readFile(new URL('./fixtures/hvc1_init.mp4', import.meta.url))
 		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
 			readers: {
 				stsd: readStsd,

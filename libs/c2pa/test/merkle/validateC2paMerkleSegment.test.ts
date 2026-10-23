@@ -1,6 +1,6 @@
 import { validateC2paMerkleSegment, type MerkleMap } from '@svta/cml-c2pa'
 import { notStrictEqual, ok, strictEqual } from 'node:assert'
-import { before, describe, it } from 'node:test'
+import { beforeAll as before, describe, it } from 'vitest'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import {
 	buildMalformedMerkleAuxBox,
