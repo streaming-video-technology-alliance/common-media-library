@@ -1,5 +1,5 @@
 import { equal } from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { searchExcerpt } from './searchExcerpt.ts'
 
 const page = `# Function: encodeCmcd()

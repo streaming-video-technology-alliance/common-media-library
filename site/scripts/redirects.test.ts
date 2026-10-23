@@ -1,5 +1,5 @@
 import { deepEqual, equal, ok } from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vitest'
 import { runInNewContext } from 'node:vm'
 import type { PackageInfo } from './packages.ts'
 import {
