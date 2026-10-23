@@ -15,6 +15,7 @@ const config: ViteUserConfig = defineConfig({
 	},
 	test: {
 		restoreMocks: true,
+		silent: 'passed-only',
 	},
 	lint: {
 		plugins: ['typescript'],
