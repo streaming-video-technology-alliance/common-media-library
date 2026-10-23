@@ -1,6 +1,6 @@
 import { deepEqual, equal } from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { parseReleases, renderReleases, sortReleases, type Release } from './changelog.ts'
+import { parseReleases, renderReleases, retitleChangelog, sortReleases, type Release } from './changelog.ts'
 
 const pkg = { name: '@svta/cml-cmcd', folder: 'cmcd' }
 
@@ -60,5 +60,19 @@ describe('renderReleases', () => {
 		equal(text.startsWith('# Releases\n'), true)
 		equal(text.includes('| Date | Package | Version |'), true)
 		equal(text.includes('| 2026-10-18 | [@svta/cml-cmcd](/packages/cmcd/changelog) | 2.8.3 |'), true)
+	})
+})
+
+describe('retitleChangelog', () => {
+	it('names the package in the heading', () => {
+		equal(retitleChangelog('# Changelog\n\nAll notable changes.\n', '@svta/cml-cmcd'), '# @svta/cml-cmcd changelog\n\nAll notable changes.\n')
+	})
+
+	it('leaves another heading unchanged', () => {
+		equal(retitleChangelog('# History\n', '@svta/cml-cmcd'), '# History\n')
+	})
+
+	it('leaves a file without a heading unchanged', () => {
+		equal(retitleChangelog('No heading\n', '@svta/cml-cmcd'), 'No heading\n')
 	})
 })
