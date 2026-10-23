@@ -21,6 +21,8 @@ There are four main validation functions, each for a different aspect of CMCD co
 All validators return a `CmcdValidationResult`:
 
 ```typescript
+import type { CmcdValidationSeverity } from "@svta/cml-cmcd";
+
 type CmcdValidationResult = {
 	valid: boolean; // true if zero errors (warnings are OK)
 	issues: CmcdValidationIssue[];

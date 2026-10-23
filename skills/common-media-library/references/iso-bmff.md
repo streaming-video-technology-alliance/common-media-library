@@ -87,9 +87,7 @@ The `traverseIsoBoxes` function traverses box iterators and returns a generator 
 ```typescript
 import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
 
-declare const bytes: Uint8Array;
-
-const boxes = readIsoBoxes(bytes);
+const boxes = readIsoBoxes(buffer);
 
 for (const box of traverseIsoBoxes(boxes)) {
 	console.log(box.type);
@@ -141,13 +139,7 @@ If you provide raw box objects, also provide a configuration object that names t
 If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer:
 
 ```typescript
-import {
-	defaultWriterConfig,
-	writeIsoBoxes,
-	type IsoBoxStreamable,
-} from "@svta/cml-iso-bmff";
-
-declare const sourceBuffer: SourceBuffer;
+import { defaultWriterConfig, writeIsoBoxes, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
 
 const boxes: IsoBoxStreamable[] = [
 	{
@@ -178,14 +170,7 @@ for (const byteArray of byteArrays) {
 For optimal bundle size with tree shaking, import only the writers you need:
 
 ```typescript
-import {
-	writeFtyp,
-	writeIsoBoxes,
-	writeMdat,
-	type IsoBoxStreamable,
-} from "@svta/cml-iso-bmff";
-
-declare const sourceBuffer: SourceBuffer;
+import { writeFtyp, writeIsoBoxes, writeMdat, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
 
 const boxes: IsoBoxStreamable[] = [
 	{
@@ -230,8 +215,6 @@ import {
 	defaultWriterConfig,
 	type IsoBoxStreamable,
 } from "@svta/cml-iso-bmff";
-
-declare const transport: WebTransport;
 
 const boxes: IsoBoxStreamable[] = [
 	{

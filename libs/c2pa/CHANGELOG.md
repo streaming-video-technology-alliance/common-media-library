@@ -17,7 +17,7 @@ and this project adheres to
 
 ### Changed
 
-- Every code example in the guides now typechecks on its own. Each example declares the values that the player provides with `declare const` ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+- Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 
 ### Changed
 
