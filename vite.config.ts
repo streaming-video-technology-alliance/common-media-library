@@ -69,6 +69,7 @@ const config: ViteUserConfig = defineConfig({
 				{
 					caughtErrors: 'none',
 					ignoreRestSiblings: true,
+					reportVarsOnlyUsedAsTypes: true,
 				},
 			],
 			'no-useless-backreference': 'error',
