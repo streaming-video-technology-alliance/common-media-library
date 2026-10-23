@@ -18,6 +18,7 @@ and this project adheres to
 ### Changed
 
 - The manifest box guide states that `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` appears only for a manifest with a claim that decodes.
+- The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 
 ## [1.6.0] - 2026-10-21
 

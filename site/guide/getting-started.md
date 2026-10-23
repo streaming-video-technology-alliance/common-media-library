@@ -26,7 +26,7 @@ console.log(cmcdUrl);
 
 ## Peer dependencies
 
-Some packages depend on other CML packages and declare them as peer dependencies. npm 7 and later installs peer dependencies for you. The `peerDependencies` field of each package lists them.
+Some packages depend on other CML packages and declare them as peer dependencies. npm 7 and later installs peer dependencies for you. Each package page lists them under Peer dependencies.
 
 ## Next steps
 

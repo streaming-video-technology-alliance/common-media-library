@@ -3,7 +3,7 @@ import { describe, it } from 'node:test'
 import type { PackageInfo } from './packages.ts'
 import { buildSidebar, packageSidebar, type SidebarItem } from './sidebar.ts'
 
-const utils: PackageInfo = { folder: 'utils', name: '@svta/cml-utils', version: '1.0.0', description: 'Utilities', group: 'Core', guides: [] }
+const utils: PackageInfo = { folder: 'utils', name: '@svta/cml-utils', version: '1.0.0', description: 'Utilities', group: 'Core', guides: [], peers: [] }
 const cmcd: PackageInfo = {
 	folder: 'cmcd',
 	name: '@svta/cml-cmcd',
@@ -11,6 +11,7 @@ const cmcd: PackageInfo = {
 	description: 'CMCD',
 	group: 'Delivery',
 	guides: [{ slug: 'user-guide', title: 'User Guide' }],
+	peers: [],
 }
 const apiSidebar: SidebarItem[] = [
 	{ text: 'cmcd', link: '/api/cmcd/', collapsed: true, items: [{ text: 'Functions', items: [{ text: 'encodeCmcd', link: '/api/cmcd/functions/encodeCmcd.md' }] }] },

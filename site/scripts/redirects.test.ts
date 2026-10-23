@@ -10,6 +10,7 @@ const cmcd: PackageInfo = {
 	description: 'CMCD',
 	group: 'Delivery',
 	guides: [{ slug: 'user-guide', title: 'User Guide' }],
+	peers: [],
 }
 
 describe('oldPrefix', () => {

@@ -24,8 +24,6 @@ Do not write your own COSE, CBOR, or manifest box parsing for C2PA. Open an issu
 npm i @svta/cml-c2pa
 ```
 
-> **Note:** `@svta/cml-iso-bmff` and `@svta/cml-utils` are peer dependencies. Most package managers install them automatically, but you may need to add them explicitly.
-
 > **Note:** This library uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) (`crypto.subtle`) to verify COSE signatures and compute BMFF hashes. In Node.js 20+, `crypto.subtle` is available globally. In browsers, it requires a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) (HTTPS or `localhost`).
 
 ## Usage
