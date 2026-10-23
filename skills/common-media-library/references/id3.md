@@ -92,7 +92,7 @@ export function readId3Size(data: Uint8Array, offset: number): number;
 export function toArrayBuffer(view: ArrayBufferLike | TypedArray): ArrayBufferLike;
 
 // @internal (undocumented)
-export function toUint8(data: BufferSource, offset?: number, length?: number): Uint8Array;
+export function toUint8(data: AllowSharedBufferSource, offset?: number, length?: number): Uint8Array;
 
 // @internal (undocumented)
 export type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | Uint8ClampedArray;

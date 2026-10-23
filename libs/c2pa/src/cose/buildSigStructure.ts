@@ -55,7 +55,7 @@ export function buildSigStructure(
 	protectedBytes: Uint8Array,
 	payload: Uint8Array,
 	externalAad: Uint8Array = new Uint8Array(0),
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
 	const totalLength =
 		1 + // array header
 		1 +

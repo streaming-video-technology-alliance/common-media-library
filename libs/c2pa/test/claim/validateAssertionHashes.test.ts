@@ -5,7 +5,7 @@ import type { InternalAssertionData } from '../../src/claim/InternalManifestData
 import { deepStrictEqual, strictEqual } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
-async function sha256(data: Uint8Array): Promise<Uint8Array> {
+async function sha256(data: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
 	return new Uint8Array(await crypto.subtle.digest('SHA-256', data))
 }
 

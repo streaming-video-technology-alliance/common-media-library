@@ -4,7 +4,7 @@ import { isArrayBufferLike } from '@svta/cml-utils'
  * @internal
  */
 export function toUint8(
-	data: BufferSource,
+	data: AllowSharedBufferSource,
 	offset: number = 0,
 	length: number = Infinity,
 ): Uint8Array {
@@ -12,7 +12,7 @@ export function toUint8(
 }
 
 function view<T extends ArrayBufferView>(
-	data: BufferSource,
+	data: AllowSharedBufferSource,
 	offset: number,
 	length: number,
 	Type: new (buffer: ArrayBufferLike, byteOffset: number, length: number) => T,
@@ -33,7 +33,7 @@ function view<T extends ArrayBufferView>(
 	return new Type(buffer as ArrayBuffer, start, end - start)
 }
 
-function unsafeGetArrayBuffer(view: BufferSource) {
+function unsafeGetArrayBuffer(view: AllowSharedBufferSource) {
 	if (isArrayBufferLike(view)) {
 		return view
 	} else {

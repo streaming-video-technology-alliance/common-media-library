@@ -52,7 +52,13 @@ describe('extractCertificateSpki', () => {
 			{ name: 'Ed25519' },
 		] as (AlgorithmIdentifier | EcKeyImportParams)[]) {
 			try {
-				const key = await crypto.subtle.importKey('spki', spki, algorithm, true, ['verify'])
+				const key = await crypto.subtle.importKey(
+					'spki',
+					spki as Uint8Array<ArrayBuffer>,
+					algorithm,
+					true,
+					['verify'],
+				)
 				ok(key, 'key should be importable')
 				imported = true
 				break
