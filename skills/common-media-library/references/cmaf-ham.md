@@ -380,7 +380,7 @@ export type MediaGroups = {
     }>>;
     SUBTITLES: Record<string, Record<string, {
         language: string;
-        uri: string;
+        uri?: string;
     }>>;
 };
 

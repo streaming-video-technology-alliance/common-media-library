@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Changed
 
-- `PenState.foreground` is `string | null`, the type of `PenStyles.foreground`. A PAC without a color already set it to `null`. `setStyles` assigns each style directly and no longer allocates an object per style.
+- `PenState.foreground` is `string | null`, the type of `PenStyles.foreground`. A PAC without a color already set it to `null`. TypeScript consumers that read `foreground` as a `string` need to handle `null`. `setStyles` assigns the five styles directly, with no allocation per call. A style key that is present with the value `undefined` keeps the previous value instead of storing `undefined`.
 - `SccParser` types its `processor` as `Pick<Cta608Parser, 'addData'>` and its `field` as `number`. Both were `any`.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 

@@ -1,5 +1,3 @@
-import type { Cta608Parser } from './Cta608Parser.ts'
-
 /**
  * The copyright in this software is being made available under the BSD License,
  * included below. This software may be subject to other third party and contributor
@@ -30,6 +28,8 @@ import type { Cta608Parser } from './Cta608Parser.ts'
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  *  POSSIBILITY OF SUCH DAMAGE.
  */
+
+import type { Cta608Parser } from './Cta608Parser.ts'
 
 /**
  * SCC Parser

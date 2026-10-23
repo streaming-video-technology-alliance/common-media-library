@@ -20,4 +20,14 @@ test('decodeSfItem', () => {
 			return true
 		},
 	)
+	assert.throws(
+		() => decodeSfItem(`:aGVs\nbG8=:`),
+		(error: unknown) => {
+			assert.ok(error instanceof Error)
+			assert.deepStrictEqual(error.message, `failed to parse ":aGVs\nbG8=:" as Item`)
+			assert.ok(error.cause instanceof Error)
+			assert.deepStrictEqual(error.cause.message, `failed to parse "aGVs\nbG8=:" as Byte Sequence`)
+			return true
+		},
+	)
 })

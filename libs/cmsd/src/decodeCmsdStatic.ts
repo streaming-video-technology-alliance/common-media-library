@@ -1,4 +1,4 @@
-import { decodeSfDict, SfItem, symbolToStr } from '@svta/cml-structured-field-values'
+import { decodeSfDict, symbolToStr, type SfItem } from '@svta/cml-structured-field-values'
 import type { CmsdStatic } from './CmsdStatic.ts'
 
 /**
@@ -17,11 +17,10 @@ export function decodeCmsdStatic(cmsd: string): CmsdStatic {
 
 	const result: Record<string, unknown> = {}
 
-	const dict = decodeSfDict(cmsd)
-	const entries = dict instanceof Map ? dict.entries() : Object.entries(dict)
+	const dict = decodeSfDict(cmsd) as Record<string, SfItem>
 
-	for (const [key, item] of entries) {
-		const value = item instanceof SfItem ? item.value : item
+	for (const [key, item] of Object.entries(dict)) {
+		const { value } = item
 		result[key] = typeof value === 'symbol' ? symbolToStr(value) : value
 	}
 

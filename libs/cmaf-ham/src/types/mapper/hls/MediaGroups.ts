@@ -20,7 +20,7 @@ export type MediaGroups = {
 			string,
 			{
 				language: string
-				uri: string
+				uri?: string
 			}
 		>
 	>

@@ -10,10 +10,10 @@ export function addMetadataToHls(
 	if (!manifest.metadata) {
 		manifest.metadata = new Map<string, string>()
 	}
-	if (!manifestParsed.version) {
+	if (manifestParsed.version !== undefined) {
 		manifest.metadata.set('version', String(manifestParsed.version))
 	}
-	if (!manifestParsed.mediaSequence) {
+	if (manifestParsed.mediaSequence !== undefined) {
 		manifest.metadata.set('mediaSequence', String(manifestParsed.mediaSequence))
 	}
 	return manifest
