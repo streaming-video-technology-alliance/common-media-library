@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import path from 'node:path'
 
 const distDir = path.resolve(import.meta.dirname, '..', 'dist')
@@ -20,6 +20,7 @@ const required = [
 	'modules.html',
 	'modules/_svta_cml-cmcd.html',
 	'enums/_svta_cml-cmcd.CmcdObjectType.html',
+	'classes/_svta_cml-cmcd.CmcdReporter.html',
 	'documents/_svta_cml-cmcd.User_Guide.html',
 ]
 
@@ -27,6 +28,13 @@ const missing = required.filter(file => !existsSync(path.join(distDir, file)))
 
 if (missing.length > 0) {
 	console.error(`site/dist is missing:\n- ${missing.join('\n- ')}`)
+	process.exit(1)
+}
+
+const stub = readFileSync(path.join(distDir, 'classes/_svta_cml-cmcd.CmcdReporter.html'), 'utf8')
+
+if (!stub.includes('location.replace(')) {
+	console.error('The redirect stubs have no script, so they drop the URL fragment.')
 	process.exit(1)
 }
 
