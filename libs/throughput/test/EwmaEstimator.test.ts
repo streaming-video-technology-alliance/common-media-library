@@ -1,5 +1,5 @@
 import { EwmaEstimator } from '@svta/cml-throughput'
-import { equal } from 'node:assert'
+import { equal, ok } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 describe('EwmaEstimator', () => {
@@ -178,5 +178,60 @@ describe('EwmaEstimator', () => {
 
 		equal(estimator.getEstimate(), 285)
 		//#endregion example
+	})
+})
+
+describe('EwmaEstimator transfer duration', () => {
+	it('measures the rate and the weight over the transfer when the sample has responseStart', () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		// 112 kB that waited 800 ms for the first byte and transferred in 50 ms: 17.92 Mbps.
+		estimator.sample({ startTime: 0, responseStart: 800, duration: 850, encodedBodySize: 112_000 })
+
+		equal(estimator.getEstimate(), 17_920_000)
+	})
+
+	it('gives a sample with a long first-byte wait no more weight than its transfer', () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		// A 1 s transfer at 16 Mbps, then four 50 ms transfers at 2 Mbps after 800 ms waits.
+		estimator.sample({ startTime: 0, responseStart: 0, duration: 1000, encodedBodySize: 2_000_000 })
+		for (let i = 1; i <= 4; i++) {
+			estimator.sample({
+				startTime: i * 1000,
+				responseStart: i * 1000 + 800,
+				duration: 850,
+				encodedBodySize: 12_500,
+			})
+		}
+
+		// The four short transfers weigh 0.2 s against 1 s, so the estimate stays near 16 Mbps.
+		ok(
+			estimator.getEstimate() > 12_000_000,
+			`expected above 12 Mbps, got ${estimator.getEstimate()}`,
+		)
+	})
+
+	it('ignores a sample whose transfer is shorter than minTransferDuration', () => {
+		const estimator = new EwmaEstimator({
+			fastHalfLife: 2,
+			slowHalfLife: 5,
+			minTransferDuration: 5,
+		})
+
+		// 500 bps over a 2 s transfer, then a cache hit: 125 bytes in 2 ms.
+		estimator.sample({ startTime: 0, encodedBodySize: 125, duration: 2000 })
+		estimator.sample({ startTime: 2000, responseStart: 2000, duration: 2, encodedBodySize: 125 })
+
+		equal(estimator.getEstimate(), 500)
+	})
+
+	it('ignores a sample whose body arrived with its first byte', () => {
+		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
+
+		estimator.sample({ startTime: 0, encodedBodySize: 125, duration: 2000 })
+		estimator.sample({ startTime: 2000, responseStart: 2850, duration: 850, encodedBodySize: 125 })
+
+		equal(estimator.getEstimate(), 500)
 	})
 })

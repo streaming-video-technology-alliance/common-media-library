@@ -24,12 +24,22 @@ export type EwmaEstimatorOptions = {
 	/**
 	 * The smallest `encodedBodySize`, in bytes, that counts as a sample.
 	 * A sample with an `encodedBodySize` of 0 never counts.
-	 * The estimator ignores smaller responses, because the time to first byte dominates their duration.
+	 * The estimator ignores smaller responses, because their transfer is too short to measure.
 	 * shaka-player uses 16000.
 	 *
 	 * @defaultValue `0`
 	 */
 	minBodySize?: number
+
+	/**
+	 * The shortest transfer, in milliseconds, that counts as a sample.
+	 * The transfer runs from `responseStart` to the end of the response when the sample has `responseStart`, and over `duration` otherwise.
+	 * A body that arrives within a few milliseconds of its headers came from a cache, and its rate says nothing about the network.
+	 * shaka-player uses 5 as `cacheLoadThreshold`.
+	 *
+	 * @defaultValue `0`
+	 */
+	minTransferDuration?: number
 
 	/**
 	 * The half-life of the fast moving average, in seconds.
