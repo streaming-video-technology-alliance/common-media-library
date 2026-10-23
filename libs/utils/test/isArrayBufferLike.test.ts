@@ -1,6 +1,6 @@
 import { isArrayBufferLike } from '@svta/cml-utils'
 import { equal } from 'assert/strict'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('isArrayBufferLike', () => {
 	it('should return true for ArrayBuffer', () => {

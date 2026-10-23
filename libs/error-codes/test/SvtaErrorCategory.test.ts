@@ -1,7 +1,7 @@
 import * as errorCodes from '@svta/cml-error-codes'
 import { SvtaErrorCategory } from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('SvtaErrorCategory', () => {
 	it('provides a valid example', () => {

@@ -3,7 +3,7 @@ import './init.ts'
 import type { Presentation } from '@svta/cml-cmaf-ham'
 import { hamToHls, hlsToHam } from '@svta/cml-cmaf-ham'
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 import { hlsMain1, hlsPlaylist1 } from './data/hls-samples/sample-1/hlsSample1.ts'
 import { hlsMain2, hlsPlaylist2 } from './data/hls-samples/sample-2/hlsSample2.ts'

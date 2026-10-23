@@ -1,6 +1,6 @@
 import { parseJumbfLabel } from '../../src/jumbf/parseJumbfLabel.ts'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 function buildJumdData(label: string, toggles: number = 0x03): Uint8Array {
 	const labelBytes = new TextEncoder().encode(label)

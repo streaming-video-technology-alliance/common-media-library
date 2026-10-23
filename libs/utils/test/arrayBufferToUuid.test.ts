@@ -1,6 +1,6 @@
 import { arrayBufferToUuid } from '@svta/cml-utils'
 import { equal } from 'assert/strict'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('arrayBufferToUuid', () => {
 	function hexStringToArrayBuffer(hex: string): ArrayBuffer {

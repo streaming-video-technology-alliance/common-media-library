@@ -1,7 +1,7 @@
 import { Ewma } from '@svta/cml-throughput'
 import { roundToEven } from '@svta/cml-utils'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('Ewma', () => {
 	it('returns 0 before the first sample', async () => {

@@ -10,7 +10,7 @@ import {
 import { SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 const NUMERIC_LIST_KEYS = [
 	'ab',

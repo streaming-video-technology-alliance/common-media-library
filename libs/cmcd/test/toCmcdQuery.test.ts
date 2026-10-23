@@ -1,6 +1,6 @@
 import { CmcdReportingMode, toCmcdQuery, toCmcdValue } from '@svta/cml-cmcd'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
 import { CMCD_QUERY } from './data/CMCD_QUERY.ts'
 

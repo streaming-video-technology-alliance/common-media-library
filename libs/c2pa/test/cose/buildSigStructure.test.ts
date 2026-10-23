@@ -1,6 +1,6 @@
 import { buildSigStructure } from '../../src/cose/buildSigStructure.ts'
 import { ok, strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('buildSigStructure', () => {
 	// #region example

@@ -1,6 +1,6 @@
 import { appendCmcdHeaders } from '@svta/cml-cmcd'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('appendCmcdHeaders', () => {
 	const headers = {

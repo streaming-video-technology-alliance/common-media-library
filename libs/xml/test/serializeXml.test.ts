@@ -1,6 +1,6 @@
 import { serializeXml } from '@svta/cml-xml'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('serializeXml', () => {
 	it('provides a valid example', async () => {

@@ -1,6 +1,6 @@
 import { decodeBase64, encodeBase64 } from '@svta/cml-utils'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('encodeBase64', () => {
 	//#region example

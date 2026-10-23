@@ -1,7 +1,7 @@
 import type { BitrateSelector, LadderRung } from '@svta/cml-abr'
 import { createBolaSelector, createThroughputSelector } from '@svta/cml-abr'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { bandwidthsOf, L1, L2 } from './helpers/ladders.ts'
 import type { SimulationResult } from './helpers/simulatePlayback.ts'
 import {

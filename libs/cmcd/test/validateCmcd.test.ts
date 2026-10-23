@@ -1,6 +1,6 @@
 import { validateCmcd } from '@svta/cml-cmcd'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('validateCmcd', () => {
 	it('provides a valid example', () => {

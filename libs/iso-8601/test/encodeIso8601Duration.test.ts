@@ -1,6 +1,6 @@
 import { encodeIso8601Duration } from '@svta/cml-iso-8601'
 import assert, { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('encodeIso8601Duration', () => {
 	it('provides a valid example', async () => {

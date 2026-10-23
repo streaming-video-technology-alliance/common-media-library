@@ -1,5 +1,5 @@
 import { doesNotThrow, throws } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { validateBufferTarget } from '../src/validateBufferTarget.ts'
 
 describe('validateBufferTarget', () => {

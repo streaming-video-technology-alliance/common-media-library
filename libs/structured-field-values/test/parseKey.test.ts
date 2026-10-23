@@ -1,6 +1,6 @@
 import { parseKey } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('parseKey', () => {
 	assert.deepStrictEqual(parseKey(`a123_-.*`), { value: `a123_-.*`, src: `` })

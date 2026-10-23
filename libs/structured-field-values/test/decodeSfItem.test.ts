@@ -1,6 +1,6 @@
 import { decodeSfItem, SfItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('decodeSfItem', () => {
 	assert.deepStrictEqual(decodeSfItem(`"a"`), new SfItem('a'))

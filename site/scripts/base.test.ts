@@ -1,5 +1,5 @@
 import { equal, throws } from 'node:assert/strict'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { siteBase } from './base.ts'
 
 describe('siteBase', () => {

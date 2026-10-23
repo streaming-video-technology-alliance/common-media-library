@@ -1,6 +1,6 @@
 import { unescapeHtml } from '@svta/cml-utils'
 import assert, { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('unescapeHtml', () => {
 	it('provides a valid example', async () => {

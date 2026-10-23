@@ -1,6 +1,6 @@
 import { getId3Timestamp } from '@svta/cml-id3'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { PTS } from './data/PTS.ts'
 
 describe('getId3Timestamp', () => {

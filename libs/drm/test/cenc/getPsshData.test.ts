@@ -1,6 +1,6 @@
 import { getPsshData } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { samplePsshBox } from '../common/samplePsshBox.ts'
 
 describe('getPsshData', () => {

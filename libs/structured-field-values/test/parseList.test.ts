@@ -1,6 +1,6 @@
 import { parseList, SfItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { describe, test } from 'vitest'
+import { describe, test } from 'vite-plus/test'
 
 describe('parseList', () => {
 	test('string list', () => {

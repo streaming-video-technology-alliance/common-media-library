@@ -1,7 +1,7 @@
 import { decodeCoseSign1 } from '../../src/cose/decodeCoseSign1.ts'
 import { verifyCoseSign1 } from '../../src/cose/verifyCoseSign1.ts'
 import { ok, strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('verifyCoseSign1', () => {
 	// #region example

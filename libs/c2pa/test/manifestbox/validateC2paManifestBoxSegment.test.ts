@@ -1,7 +1,7 @@
 import { validateC2paManifestBoxSegment, C2paStatusCode, LiveVideoStatusCode } from '@svta/cml-c2pa'
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { beforeAll as before, describe, it } from 'vitest'
+import { beforeAll as before, describe, it } from 'vite-plus/test'
 import { Tag } from 'cbor-x'
 import { encodeCbor } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'

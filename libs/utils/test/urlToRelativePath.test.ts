@@ -1,6 +1,6 @@
 import { getBaseUrl, urlToRelativePath } from '@svta/cml-utils'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it, vi } from 'vitest'
+import { describe, it, vi } from 'vite-plus/test'
 
 describe('urlToRelativePath', () => {
 	it('produces a relative path when at root', () => {

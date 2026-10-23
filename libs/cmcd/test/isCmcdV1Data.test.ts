@@ -1,7 +1,7 @@
 import type { CmcdData, CmcdV1Data } from '@svta/cml-cmcd'
 import { isCmcdV1Data } from '@svta/cml-cmcd'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('isCmcdV1Data', () => {
 	it('provides a valid example', () => {

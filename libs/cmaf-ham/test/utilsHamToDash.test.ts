@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 import type { AudioTrack, Track } from '@svta/cml-cmaf-ham'
 

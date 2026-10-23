@@ -15,7 +15,7 @@ import {
 	DEFAULT_STARVATION_SAFETY_FACTOR,
 } from '@svta/cml-abr'
 import { deepEqual, equal, ok, throws } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import {
 	MINIMUM_BUFFER,
 	MINIMUM_BUFFER_PER_RUNG,

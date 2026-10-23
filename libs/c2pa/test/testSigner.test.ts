@@ -1,6 +1,6 @@
 import { deepStrictEqual, strictEqual } from 'node:assert'
 import { X509Certificate } from 'node:crypto'
-import { beforeAll as before, describe, it } from 'vitest'
+import { beforeAll as before, describe, it } from 'vite-plus/test'
 import { verifyClaimSignature } from '../src/claim/verifyClaimSignature.ts'
 import { decodeCoseSign1 } from '../src/cose/decodeCoseSign1.ts'
 import { extractCertificateFromSignatureBytes } from '../src/extractManifestCertificate.ts'

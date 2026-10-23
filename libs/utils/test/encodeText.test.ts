@@ -1,6 +1,6 @@
 import { encodeText } from '@svta/cml-utils'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('encodeText', () => {
 	it('converts string to Uint8Array', () => {

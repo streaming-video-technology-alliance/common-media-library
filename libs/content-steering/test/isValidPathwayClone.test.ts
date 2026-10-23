@@ -1,6 +1,6 @@
 import { isValidPathwayClone } from '@svta/cml-content-steering'
 import assert, { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { PATHWAY_CLONE } from './PATHWAY_CLONE.ts'
 
 describe('isValidPathwayClone', () => {

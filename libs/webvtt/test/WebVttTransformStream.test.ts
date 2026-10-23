@@ -3,7 +3,7 @@ import { equal } from 'node:assert'
 import { createReadStream } from 'node:fs'
 import { resolve } from 'node:path'
 import { Readable } from 'node:stream'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import './utils/pollyfill.ts'
 
 // NOTE: This "polyfill" is here to make the example look like a browser fetch.

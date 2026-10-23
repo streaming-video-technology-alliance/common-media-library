@@ -1,6 +1,6 @@
 import { arrayBufferToHex } from '@svta/cml-utils'
 import { equal } from 'assert/strict'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('arrayBufferToHex', () => {
 	it('should convert ArrayBuffer to hex string', () => {

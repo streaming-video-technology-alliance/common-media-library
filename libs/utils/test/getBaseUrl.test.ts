@@ -1,6 +1,6 @@
 import { getBaseUrl } from '@svta/cml-utils'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('getBaseUrl', () => {
 	it('returns the base URL from a string URL', () => {

@@ -1,6 +1,6 @@
 import { EwmaEstimator } from '@svta/cml-throughput'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('EwmaEstimator', () => {
 	it('returns NaN when there are no entries', async () => {

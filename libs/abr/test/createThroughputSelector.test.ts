@@ -6,7 +6,7 @@ import {
 	DEFAULT_UPGRADE_FACTOR,
 } from '@svta/cml-abr'
 import { deepEqual, equal, throws } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 function rungs(...bandwidths: number[]): LadderRung[] {
 	return bandwidths.map(bandwidth => ({ bandwidth }))

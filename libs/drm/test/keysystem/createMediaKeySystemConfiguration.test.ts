@@ -1,6 +1,6 @@
 import { createMediaKeySystemConfiguration, SW_SECURE_DECODE } from '@svta/cml-drm'
 import { deepStrictEqual, strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('createMediaKeySystemConfiguration', () => {
 	const audioCaps: MediaKeySystemMediaCapability[] = [

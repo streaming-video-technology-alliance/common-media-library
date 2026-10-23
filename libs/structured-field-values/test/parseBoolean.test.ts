@@ -1,6 +1,6 @@
 import { parseBoolean } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('parseBoolean', () => {
 	assert.deepStrictEqual(parseBoolean(`?0`), { value: false, src: `` })

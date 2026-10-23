@@ -1,6 +1,6 @@
 import { isId3TimestampFrame } from '@svta/cml-id3'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { PTS_FRAME } from './data/PTS.ts'
 
 describe('isId3TimestampFrame', () => {

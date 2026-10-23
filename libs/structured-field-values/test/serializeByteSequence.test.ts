@@ -1,6 +1,6 @@
 import { serializeByteSequence } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('serializeByteSequence', () => {
 	const value = Uint8Array.from([

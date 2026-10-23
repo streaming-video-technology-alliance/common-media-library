@@ -1,5 +1,5 @@
 import { deepStrictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 import { mapSegmentBase, mapSegmentList, mapSegments, mapSegmentTemplate } from '@svta/cml-cmaf-ham'
 

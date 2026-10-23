@@ -1,6 +1,6 @@
 import { httpStatusToSvtaErrorCode, SvtaNetworkErrorCode } from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('httpStatusToSvtaErrorCode', () => {
 	it('provides a valid example', () => {

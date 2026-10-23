@@ -1,6 +1,6 @@
 import { decodeFairPlayLicense } from '@svta/cml-drm'
 import { deepStrictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('decodeFairPlayLicense', () => {
 	it('decodes base64 string to Uint8Array', () => {

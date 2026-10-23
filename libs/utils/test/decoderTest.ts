@@ -1,4 +1,4 @@
-import { afterAll as after, beforeAll as before, describe } from 'vitest'
+import { afterAll as after, beforeAll as before, describe } from 'vite-plus/test'
 
 const NativeTextDecoder = TextDecoder
 

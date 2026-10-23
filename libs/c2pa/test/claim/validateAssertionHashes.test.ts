@@ -3,7 +3,7 @@ import { validateAssertionHashes } from '../../src/claim/validateAssertionHashes
 import type { ClaimAssertionRef } from '../../src/claim/ClaimAssertionRef.ts'
 import type { InternalAssertionData } from '../../src/claim/InternalManifestData.ts'
 import { deepStrictEqual, strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 async function sha256(data: Uint8Array): Promise<Uint8Array> {
 	return new Uint8Array(await crypto.subtle.digest('SHA-256', data))

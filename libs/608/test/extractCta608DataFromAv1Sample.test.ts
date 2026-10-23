@@ -2,7 +2,7 @@ import type { CaptionScreen } from '@svta/cml-608'
 import { Cta608Parser, extractCta608DataFromAv1Sample } from '@svta/cml-608'
 import { deepEqual, equal, ok } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { parseSegment } from './utils/helpers.ts'
 
 /**

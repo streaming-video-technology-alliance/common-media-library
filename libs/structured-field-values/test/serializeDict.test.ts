@@ -1,6 +1,6 @@
 import { serializeDict } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('serializeDict', () => {
 	assert.deepStrictEqual(serializeDict(new Map()), '')

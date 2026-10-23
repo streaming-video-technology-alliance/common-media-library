@@ -1,5 +1,5 @@
 import { deepEqual, equal, ok, rejects, throws } from 'node:assert/strict'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { loadWorkspaces, runWorkspaces, sortWorkspaces, type Workspace } from './workspaces.ts'
 
 function workspace(folder: string, peers: string[] = []): Workspace {

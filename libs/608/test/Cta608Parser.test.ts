@@ -1,7 +1,7 @@
 import type { PACData } from '@svta/cml-608'
 import { Cta608Parser } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
-import { beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vite-plus/test'
 
 describe('Cea608Parser Tests', () => {
 	let parser: any

@@ -7,7 +7,7 @@ import {
 	type ValidatedSessionKey,
 } from '@svta/cml-c2pa'
 import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
-import { beforeAll as before, describe, it, vi } from 'vitest'
+import { beforeAll as before, describe, it, vi } from 'vite-plus/test'
 import { createTestSigner } from '../testSigner.ts'
 import {
 	buildSessionKeysInitSegment,

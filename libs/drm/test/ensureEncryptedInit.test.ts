@@ -1,7 +1,7 @@
 import { ensureEncryptedInit } from '@svta/cml-drm'
 import { hexToArrayBuffer } from '@svta/cml-utils'
 import { equal } from 'assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 const original = new Uint8Array(
 	hexToArrayBuffer(

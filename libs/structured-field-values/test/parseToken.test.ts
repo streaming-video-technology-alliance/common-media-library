@@ -1,6 +1,6 @@
 import { parseToken } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('parseToken', () => {
 	assert.deepStrictEqual(parseToken(`*foo123/456`), { value: Symbol.for(`*foo123/456`), src: `` })

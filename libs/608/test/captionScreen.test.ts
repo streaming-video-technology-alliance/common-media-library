@@ -1,6 +1,6 @@
 import { CaptionScreen, Row } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
-import { beforeEach, describe, it, vi } from 'vitest'
+import { beforeEach, describe, it, vi } from 'vite-plus/test'
 
 describe('CaptionScreen Tests', () => {
 	const NR_ROWS = 15

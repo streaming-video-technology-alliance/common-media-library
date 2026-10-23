@@ -1,6 +1,6 @@
 import { resolveAlgorithmFromCoseAlg } from '../../src/cose/resolveAlgorithmFromCoseAlg.ts'
 import { deepStrictEqual, throws } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('resolveAlgorithmFromCoseAlg', () => {
 	// #region example

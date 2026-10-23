@@ -7,7 +7,7 @@ import {
 	encodeSfList,
 } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { describe, test } from 'vitest'
+import { describe, test } from 'vite-plus/test'
 import { formatDict, formatItem, formatList } from './util/format.ts'
 import { read } from './util/read.ts'
 

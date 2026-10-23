@@ -1,6 +1,6 @@
 import { SfItem } from '@svta/cml-structured-field-values'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { toBareValue } from '../src/toBareValue.ts'
 
 describe('toBareValue', () => {

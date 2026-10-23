@@ -1,5 +1,5 @@
 import { deepStrictEqual } from 'node:assert'
-import { beforeEach, describe, it } from 'vitest'
+import { beforeEach, describe, it } from 'vite-plus/test'
 
 import type { Presentation, SelectionSet } from '@svta/cml-cmaf-ham'
 import { getTracksFromSelectionSet, validateTracks } from '@svta/cml-cmaf-ham'

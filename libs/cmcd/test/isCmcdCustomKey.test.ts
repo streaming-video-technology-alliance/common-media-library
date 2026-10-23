@@ -1,7 +1,7 @@
 import type { CmcdKey } from '@svta/cml-cmcd'
 import { isCmcdCustomKey } from '@svta/cml-cmcd'
 import { equal, ok } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('isCmcdCustomKey', () => {
 	it('provides a valid example', () => {

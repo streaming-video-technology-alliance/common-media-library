@@ -1,5 +1,5 @@
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { CMCD_KEY_SPECS } from '../src/CMCD_KEY_SPECS.ts'
 import { getKeySpec } from '../src/getKeySpec.ts'
 

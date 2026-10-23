@@ -1,6 +1,6 @@
 import { stringToUint16 } from '@svta/cml-utils'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('stringToUint16', () => {
 	it('provides a valid example', async () => {

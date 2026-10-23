@@ -2,7 +2,7 @@ import { parseXml } from '@svta/cml-xml'
 import assert, { deepStrictEqual, equal, rejects, strictEqual, throws } from 'node:assert'
 import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { parseXmlGuarded, runParseWorker } from './parseXmlWorker.ts'
 
 describe('parseXml', () => {

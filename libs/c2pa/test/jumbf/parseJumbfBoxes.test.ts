@@ -1,6 +1,6 @@
 import { parseJumbfBoxes } from '../../src/jumbf/parseJumbfBoxes.ts'
 import { deepStrictEqual, strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 function buildBox(type: string, payload: Uint8Array): Uint8Array {
 	const size = 8 + payload.length

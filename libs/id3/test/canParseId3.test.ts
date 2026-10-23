@@ -1,6 +1,6 @@
 import { canParseId3 } from '@svta/cml-id3'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { PTS } from './data/PTS.ts'
 
 describe('canParseId3', () => {

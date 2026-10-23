@@ -1,5 +1,5 @@
 import { equal } from 'node:assert/strict'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import type { PackageInfo } from './packages.ts'
 import { renderPeers } from './peers.ts'
 

@@ -1,6 +1,6 @@
 import { encodeCmsdDynamic } from '@svta/cml-cmsd'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.ts'
 import { CMSD_DYNAMIC_OBJ } from './data/CMSD_DYNAMIC_OBJ.ts'
 import { CMSD_DYNAMIC_SINGLE } from './data/CMSD_DYNAMIC_SINGLE.ts'

@@ -1,6 +1,6 @@
 import type { DeepReadonly } from '@svta/cml-utils'
 import { ok } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('DeepReadonly', () => {
 	it('provides a valid example', () => {

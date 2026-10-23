@@ -3,7 +3,7 @@ import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { beforeAll as before, describe, it } from 'vitest'
+import { beforeAll as before, describe, it } from 'vite-plus/test'
 import { generateMpd } from '../bench/generate.ts'
 import { runParseWorker, type ParseOutcome } from './parseXmlWorker.ts'
 

@@ -1,6 +1,6 @@
 import { deepStrictEqual, ok, strictEqual, throws } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { Tag } from 'cbor-x'
 import { decode as decodeWithCborX } from 'cbor-x/decode'
 import { projectCborTags } from '../../src/cbor/projectCborTags.ts'

@@ -1,7 +1,7 @@
 import { extractCta608DataFromSample } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { parseSegment } from './utils/helpers.ts'
 
 /**

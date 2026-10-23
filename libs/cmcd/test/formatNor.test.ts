@@ -1,6 +1,6 @@
 import { SfItem } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { formatNor } from '../src/formatNor.ts'
 
 const BASE_URL = 'https://a.test/x/seg1.m4s'

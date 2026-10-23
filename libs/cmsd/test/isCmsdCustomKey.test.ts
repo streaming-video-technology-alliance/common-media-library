@@ -1,6 +1,6 @@
 import { isCmsdCustomKey } from '@svta/cml-cmsd'
 import { equal, ok } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('isCmsdCustomKey', () => {
 	it('provides a valid example', () => {

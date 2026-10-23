@@ -1,6 +1,6 @@
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import {
 	buildBox,
 	buildLargesizeBox,

@@ -1,6 +1,6 @@
 import { deepEqual, equal, ok } from 'node:assert/strict'
 import path from 'node:path'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import {
 	checkExamples,
 	extractExampleBlocks,

@@ -1,7 +1,7 @@
 import type { CueHandler } from '@svta/cml-608'
 import { CaptionScreen, Cta608Channel } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
-import { beforeEach, describe, it } from 'vitest'
+import { beforeEach, describe, it } from 'vite-plus/test'
 
 describe('Cea608Channel Tests', () => {
 	const channelNumber = 1

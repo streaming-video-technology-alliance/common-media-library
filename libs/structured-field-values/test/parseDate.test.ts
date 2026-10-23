@@ -1,6 +1,6 @@
 import { parseDate } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import { test } from 'vitest'
+import { test } from 'vite-plus/test'
 
 test('parseDate', () => {
 	assert.deepStrictEqual(parseDate(`@1659578233`), { value: new Date(1659578233000), src: `` })

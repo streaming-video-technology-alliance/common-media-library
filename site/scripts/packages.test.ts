@@ -2,7 +2,7 @@ import { deepEqual, equal, throws } from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { loadPackage, renderPackageIndex, type PackageInfo } from './packages.ts'
 
 function fixture(folder: string, guides: Record<string, string> = {}): string {

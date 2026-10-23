@@ -1,6 +1,6 @@
 import { extractVsiEmsgBox } from '../../src/emsg/extractVsiEmsgBox.ts'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('extractVsiEmsgBox', () => {
 	// #region example

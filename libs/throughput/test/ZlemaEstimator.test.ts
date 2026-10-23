@@ -1,7 +1,7 @@
 import { ZlemaEstimator } from '@svta/cml-throughput'
 import { roundToEven } from '@svta/cml-utils'
 import { equal } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('ZlemaEstimator', () => {
 	it('returns NaN when there are no entries', async () => {

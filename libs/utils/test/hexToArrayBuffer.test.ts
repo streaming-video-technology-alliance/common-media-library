@@ -1,6 +1,6 @@
 import { hexToArrayBuffer } from '@svta/cml-utils'
 import { deepEqual } from 'assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('hexToArrayBuffer', () => {
 	it('should convert hex string to ArrayBuffer', () => {

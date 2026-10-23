@@ -19,7 +19,7 @@ import {
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, notEqual, ok, throws } from 'node:assert'
-import { describe, it, vi } from 'vitest'
+import { describe, it, vi } from 'vite-plus/test'
 
 function createMockRequester(status: number = 200) {
 	const requests: HttpRequest[] = []

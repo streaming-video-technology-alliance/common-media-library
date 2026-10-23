@@ -1,7 +1,7 @@
 import { findCta608Nalus } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 import { parseSegment, verifyGa94Identifier } from './utils/helpers.ts'
 
 describe('findCta608Nalus', () => {

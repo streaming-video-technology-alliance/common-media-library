@@ -1,6 +1,6 @@
 import { convertCoseKeyToJwk } from '../../src/cose/convertCoseKeyToJwk.ts'
 import { ok, strictEqual, throws } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 // Each COSE key has the shape that the CBOR reader decodes: a plain object with the integer labels as keys.
 describe('convertCoseKeyToJwk', () => {

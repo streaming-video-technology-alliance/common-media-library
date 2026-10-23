@@ -1,6 +1,6 @@
 import { getLicenseServerUrl } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 describe('getLicenseServerUrl', () => {
 	it('extracts URL from initData when skd:// is present', () => {

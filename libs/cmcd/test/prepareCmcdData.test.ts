@@ -8,7 +8,7 @@ import {
 } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it, vi } from 'vitest'
+import { describe, it, vi } from 'vite-plus/test'
 import {
 	CMCD_KEY_TYPE_INTEGER,
 	CMCD_KEY_TYPE_NUMBER,

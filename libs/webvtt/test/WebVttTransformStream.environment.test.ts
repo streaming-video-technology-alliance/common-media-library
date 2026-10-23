@@ -1,5 +1,5 @@
 import { equal, throws } from 'node:assert'
-import { describe, it } from 'vitest'
+import { describe, it } from 'vite-plus/test'
 
 // This file must not import @svta/cml-webvtt statically: the module has to be
 // evaluated for the first time after TransformStream has been removed to
