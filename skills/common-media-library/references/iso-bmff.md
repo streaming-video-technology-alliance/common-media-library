@@ -85,9 +85,13 @@ description: Traversing boxes and type guards
 The `traverseIsoBoxes` function traverses box iterators and returns a generator of boxes. It takes an iterable of boxes and two optional arguments: depth-first traversal and maximum depth. By default, the function traverses depth-first with a maximum depth of infinity. A maximum depth of 0 traverses only the root boxes.
 
 ```typescript
-import { traverseIsoBoxes } from "@svta/cml-iso-bmff";
+import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
 
-const boxes = traverseIsoBoxes(buffer);
+const boxes = readIsoBoxes(buffer);
+
+for (const box of traverseIsoBoxes(boxes)) {
+	console.log(box.type);
+}
 ```
 
 ## Type guards
@@ -97,9 +101,9 @@ The library provides type guards that check whether a box is a container box or 
 `isContainer` checks whether a box is a container box.
 
 ```typescript
-import { isContainer } from "@svta/cml-iso-bmff";
+import { isContainer, type IsoBox } from "@svta/cml-iso-bmff";
 
-const box = { type: "meta", boxes: [] };
+const box: IsoBox = { type: "meta", version: 0, flags: 0, boxes: [] };
 const container = isContainer(box);
 ```
 
@@ -135,9 +139,9 @@ If you provide raw box objects, also provide a configuration object that names t
 If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer:
 
 ```typescript
-import { defaultWriterConfig, writeIsoBoxes } from "@svta/cml-iso-bmff";
+import { defaultWriterConfig, writeIsoBoxes, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
 
-const boxes = [
+const boxes: IsoBoxStreamable[] = [
 	{
 		type: "ftyp",
 		majorBrand: "isom",
@@ -156,7 +160,7 @@ const boxes = [
 const byteArrays = writeIsoBoxes(boxes, defaultWriterConfig());
 
 for (const byteArray of byteArrays) {
-	sourceBuffer.appendBuffer(byteArray.buffer);
+	sourceBuffer.appendBuffer(byteArray);
 	// wait for updateend event
 }
 ```
@@ -166,9 +170,9 @@ for (const byteArray of byteArrays) {
 For optimal bundle size with tree shaking, import only the writers you need:
 
 ```typescript
-import { writeFtyp, writeIsoBoxes, writeMdat } from "@svta/cml-iso-bmff";
+import { writeFtyp, writeIsoBoxes, writeMdat, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
 
-const boxes = [
+const boxes: IsoBoxStreamable[] = [
 	{
 		type: "ftyp",
 		majorBrand: "isom",
@@ -196,7 +200,7 @@ const byteArrays = writeIsoBoxes(boxes, {
 });
 
 for (const byteArray of byteArrays) {
-	sourceBuffer.appendBuffer(byteArray.buffer);
+	sourceBuffer.appendBuffer(byteArray);
 	// wait for updateend event
 }
 ```
@@ -209,9 +213,10 @@ The `createIsoBoxReadableStream` function writes boxes to a readable stream. It 
 import {
 	createIsoBoxReadableStream,
 	defaultWriterConfig,
+	type IsoBoxStreamable,
 } from "@svta/cml-iso-bmff";
 
-const boxes = [
+const boxes: IsoBoxStreamable[] = [
 	{
 		type: "ftyp",
 		majorBrand: "isom",
@@ -229,8 +234,8 @@ const boxes = [
 
 const readableStream = createIsoBoxReadableStream(boxes, defaultWriterConfig());
 
-const stream = await webTransport.createBidirectionalStream();
-readableStream.pipeTo(transport.writable);
+const stream = await transport.createBidirectionalStream();
+readableStream.pipeTo(stream.writable);
 ```
 
 ## Type safety
