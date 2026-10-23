@@ -23,6 +23,24 @@ describe('extractExampleBlocks', () => {
 		const markdown = '```typescript\nconst a = 1\n\nconst b = 2\n```\n'
 		deepEqual(extractExampleBlocks(markdown, 'f.md'), [{ file: 'f.md', line: 1, code: 'const a = 1\n\nconst b = 2\n' }])
 	})
+
+	it('accepts a closing fence that is longer than the opening fence', () => {
+		const markdown = '```typescript\nconst a: number = "x"\n````\n\n```ts\nconst b = 2\n```\n'
+		deepEqual(extractExampleBlocks(markdown, 'f.md'), [
+			{ file: 'f.md', line: 1, code: 'const a: number = "x"\n' },
+			{ file: 'f.md', line: 5, code: 'const b = 2\n' },
+		])
+	})
+
+	it('does not close a block with a shorter fence', () => {
+		const markdown = '````typescript\n```\nconst a = 1\n```\n````\n'
+		deepEqual(extractExampleBlocks(markdown, 'f.md'), [{ file: 'f.md', line: 1, code: '```\nconst a = 1\n```\n' }])
+	})
+
+	it('returns a block that the document ends without closing', () => {
+		const markdown = 'text\n\n```typescript\nconst a = 1\n'
+		deepEqual(extractExampleBlocks(markdown, 'f.md'), [{ file: 'f.md', line: 3, code: 'const a = 1\n' }])
+	})
 })
 
 describe('listExampleFiles', () => {

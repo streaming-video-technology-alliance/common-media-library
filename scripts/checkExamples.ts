@@ -37,9 +37,14 @@ export type ExampleDiagnostic = {
 };
 
 const openFence = /^(`{3,})(\S*)/
+const closeFence = /^(`{3,})\s*$/
 const exampleLanguages = new Set(['ts', 'typescript'])
 
-/** Returns the `ts` and `typescript` fenced blocks of `markdown`. Fences must start at column 0. */
+/**
+ * Returns the `ts` and `typescript` fenced blocks of `markdown`. Fences must start at column 0. A closing
+ * fence has at least as many backticks as the opening fence. A block that the document ends without closing
+ * runs to the end of the document.
+ */
 export function extractExampleBlocks(markdown: string, file: string): ExampleBlock[] {
 	const blocks: ExampleBlock[] = []
 	const lines = markdown.split('\n')
@@ -62,7 +67,8 @@ export function extractExampleBlocks(markdown: string, file: string): ExampleBlo
 			continue
 		}
 
-		if (text.trimEnd() === fence) {
+		const close = closeFence.exec(text)
+		if (close && close[1].length >= fence.length) {
 			if (exampleLanguages.has(language)) {
 				blocks.push({ file, line: start + 1, code: `${code.join('\n')}\n` })
 			}
@@ -71,6 +77,13 @@ export function extractExampleBlocks(markdown: string, file: string): ExampleBlo
 		}
 
 		code.push(text)
+	}
+
+	if (fence !== '' && exampleLanguages.has(language)) {
+		if (code.at(-1) === '') {
+			code.pop()
+		}
+		blocks.push({ file, line: start + 1, code: `${code.join('\n')}\n` })
 	}
 
 	return blocks
@@ -176,6 +189,11 @@ export function readExampleBlocks(repoRoot: string): ExampleBlock[] {
 /** The folder, under the repo root, that holds the virtual block modules. It does not exist on disk. */
 const virtualFolder = '.example-check'
 
+/** TypeScript passes forward-slash paths to the compiler host, also on Windows. */
+function slash(file: string): string {
+	return file.replace(/\\/g, '/')
+}
+
 type Header = {
 	text: string;
 	/** Lines that the header adds before the block code. */
@@ -244,14 +262,14 @@ type Origin = { block: ExampleBlock; header: Header }
 /** Typechecks every block as its own ES module. Package imports resolve to the built `dist/` folders. */
 export function checkExamples(blocks: ExampleBlock[], repoRoot: string): ExampleDiagnostic[] {
 	const options = exampleCompilerOptions(repoRoot)
-	const base = path.join(repoRoot, virtualFolder)
+	const base = slash(path.join(repoRoot, virtualFolder))
 	const virtual = new Map<string, string>()
 	const origin = new Map<string, Origin>()
 
-	virtual.set(path.join(base, 'package.json'), '{"type":"module"}')
+	virtual.set(`${base}/package.json`, '{"type":"module"}')
 
 	blocks.forEach((block, index) => {
-		const name = path.join(base, `${block.file}.${index}.ts`)
+		const name = `${base}/${block.file}.${index}.ts`
 		const header = contextHeader(block)
 		virtual.set(name, header.text + block.code)
 		origin.set(name, { block, header })
@@ -260,10 +278,10 @@ export function checkExamples(blocks: ExampleBlock[], repoRoot: string): Example
 	const host = ts.createCompilerHost(options)
 	const { fileExists, readFile, getSourceFile } = host
 
-	host.fileExists = file => virtual.has(file) || fileExists.call(host, file)
-	host.readFile = file => virtual.get(file) ?? readFile.call(host, file)
+	host.fileExists = file => virtual.has(slash(file)) || fileExists.call(host, file)
+	host.readFile = file => virtual.get(slash(file)) ?? readFile.call(host, file)
 	host.getSourceFile = (file, languageVersion, onError, shouldCreateNewSourceFile) => {
-		const code = virtual.get(file)
+		const code = virtual.get(slash(file))
 		return code === undefined
 			? getSourceFile.call(host, file, languageVersion, onError, shouldCreateNewSourceFile)
 			: ts.createSourceFile(file, code, languageVersion, true)
@@ -276,7 +294,7 @@ export function checkExamples(blocks: ExampleBlock[], repoRoot: string): Example
 
 function locate(diagnostic: ts.Diagnostic, origin: Map<string, Origin>): ExampleDiagnostic {
 	const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')
-	const found = diagnostic.file ? origin.get(diagnostic.file.fileName) : undefined
+	const found = diagnostic.file ? origin.get(slash(diagnostic.file.fileName)) : undefined
 
 	if (!diagnostic.file || !found || diagnostic.start === undefined) {
 		return { file: diagnostic.file?.fileName ?? '', line: 0, code: diagnostic.code, message }
