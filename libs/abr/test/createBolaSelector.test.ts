@@ -25,6 +25,7 @@ import {
 	STARVATION_GUARD_SAMPLE_COUNT,
 	THRESHOLD_TOLERANCE,
 } from '../src/BOLA_CONSTANTS.ts'
+import { FIRST_BYTE_WAIT_SAMPLE_COUNT } from '../src/FIRST_BYTE_WAIT_SAMPLE_COUNT.ts'
 import {
 	bolaMaximumBuffers,
 	bolaThresholds,
@@ -82,6 +83,9 @@ const VERY_SHORT_BUFFER_LEVEL = 0.5
 const RECOVERED_BUFFER_LEVEL = 10
 const STRICT_STARVATION_FACTOR = 0.5
 const RELAXED_STARVATION_FACTOR = 0.9
+// A first-byte wait that makes the download of rung 3 exceed `WAIT_BUFFER_LEVEL`. Without the wait, the download fits.
+const FIRST_BYTE_WAIT_MS = 300
+const WAIT_BUFFER_LEVEL = 5.3
 const FAST_PLAYBACK_RATE = 2
 const INVALID_PLAYBACK_RATES = [0, -1, NaN, Infinity]
 
@@ -779,6 +783,34 @@ describe('createBolaSelector', () => {
 
 		it('treats a throughput of 0 as a measurement', () => {
 			equal(decide(HEALTHY_BUFFER_LEVEL, { throughput: 0 }).index, 0)
+		})
+
+		it('adds the mean first-byte wait of the last four finished samples to the download time', () => {
+			// At the default factor, rung 3 needs 5.1 s to download one segment. The wait makes it 5.4 s.
+			const selector = createEmptyPlaceholderSelector()
+
+			for (let i = 0; i < FIRST_BYTE_WAIT_SAMPLE_COUNT; i++) {
+				load(selector, L1_BANDWIDTHS[3], WAIT_BUFFER_LEVEL, 0, {
+					timing: {
+						startTime: 0,
+						responseStart: FIRST_BYTE_WAIT_MS,
+						duration: DOWNLOAD_DURATION,
+						encodedBodySize: 1,
+					},
+				})
+			}
+
+			const elapsed = GUARD_BUFFER_LEVEL - WAIT_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: WAIT_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decide(WAIT_BUFFER_LEVEL).index, 3)
+			equal(decision.index, 2)
 		})
 
 		it('does not run in the startup state, even after two finished samples', () => {

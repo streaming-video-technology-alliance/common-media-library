@@ -8,6 +8,7 @@ const TOP = L1.length - 1
 // The top rung of L1 downloads in one segment duration at this throughput. Each lower rung downloads in less time.
 const SAFE_THROUGHPUT = L1_BANDWIDTHS[TOP]
 const NO_TOLERANCE = 0
+const NO_WAIT = 0
 
 // The seconds that the rung at `position` needs to download one segment at `SAFE_THROUGHPUT`.
 function downloadSeconds(position: number): number {
@@ -15,7 +16,15 @@ function downloadSeconds(position: number): number {
 }
 
 function guard(index: number, budget: number, tolerance = NO_TOLERANCE): number {
-	return applyStarvationGuard(L1, index, SEGMENT_DURATION, SAFE_THROUGHPUT, budget, tolerance)
+	return applyStarvationGuard(
+		L1,
+		index,
+		SEGMENT_DURATION,
+		SAFE_THROUGHPUT,
+		NO_WAIT,
+		budget,
+		tolerance,
+	)
 }
 
 describe('applyStarvationGuard', () => {
@@ -51,6 +60,47 @@ describe('applyStarvationGuard', () => {
 	})
 
 	it('treats a throughput of 0 as a download that never ends', () => {
-		equal(applyStarvationGuard(L1, TOP, SEGMENT_DURATION, 0, downloadSeconds(TOP), NO_TOLERANCE), 0)
+		equal(
+			applyStarvationGuard(
+				L1,
+				TOP,
+				SEGMENT_DURATION,
+				0,
+				NO_WAIT,
+				downloadSeconds(TOP),
+				NO_TOLERANCE,
+			),
+			0,
+		)
+	})
+
+	it('adds the first-byte wait to the download time', () => {
+		// Rung 2 downloads in 1 s and rung 1 in 0.5 s. A wait of 0.4 s needs 0.4 s more of budget for each rung.
+		const wait = 0.4
+
+		equal(
+			applyStarvationGuard(
+				L1,
+				2,
+				SEGMENT_DURATION,
+				SAFE_THROUGHPUT,
+				wait,
+				downloadSeconds(2),
+				NO_TOLERANCE,
+			),
+			1,
+		)
+		equal(
+			applyStarvationGuard(
+				L1,
+				2,
+				SEGMENT_DURATION,
+				SAFE_THROUGHPUT,
+				wait,
+				downloadSeconds(2) + wait,
+				NO_TOLERANCE,
+			),
+			2,
+		)
 	})
 })

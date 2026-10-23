@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - `getTransferDurationMs` returns the milliseconds from `responseStart` to the end of a `ResourceTiming` sample, or `duration` when the sample has no `responseStart` ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- `getTimeToFirstByteMs` returns the milliseconds from `startTime` to `responseStart` of a `ResourceTiming` sample, or `NaN` when the sample has no `responseStart` inside the response. The result and `getTransferDurationMs` add up to `duration` ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
 
 ### Changed
 
