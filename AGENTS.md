@@ -15,7 +15,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 
 ## Repo Setup
 
-- Development requires Node >= 24. `npm install` fails on older versions. Repo scripts are TypeScript files that `node` runs directly.
+- Development requires Node >= 24.11. `npm install` fails on older versions. Repo scripts are TypeScript files that `node` runs directly.
 - Fresh clones and git worktrees must run `git submodule update --init`. The structured-field-values tests need the `structured-field-tests` submodule.
 
 ## Build Commands
@@ -25,7 +25,8 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies.
 - `npm test`: Full validation at the root. It runs lint, build all, typecheck, then every package's tests. The PR checks run this command.
 - `npm run format`: Run the linter with auto-fix
-- `npm run docs`: Start the website dev server. `npm run build -w site` builds the website into `site/dist`. The build fails on dead links in any README or guide.
+- `npm run site`: Start the website dev server. `npm run build -w site` builds the website into `site/dist`. The build fails on dead links in any README or guide.
+- Lint and package builds run through Vite+: `vp lint` and `vp pack`. The configuration is `vite.config.ts` at the root.
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
 - `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the dependent packages. A dependent needs the bump when the peer range in the published package rejects the new version. Packages declare workspace peers as `*`. The Publish workflow rewrites `*` to a caret range of the current peer version. A cascade therefore happens when the new peer version falls outside that caret range, such as a major bump. The command also warns about packages that have unreleased changelog entries and no version change.
 
@@ -54,6 +55,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 ## Workflow
 
 - Typecheck the entire project after code changes
+- The root `npm test` typechecks every example block of the READMEs and guides. Run the command after a README or guide change.
 - Prefer builds and tests at the workspace level
 - Create tests for new public API members
 - For every change, add a note under the `## [Unreleased]` heading in the affected package's `CHANGELOG.md`.
@@ -70,7 +72,10 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Every published package README needs a `## When to use` section: one to eight task bullets with their entry-point exports, then a closing paragraph. `scripts/agentDocs.ts` reads the section. The root build regenerates `skills/common-media-library` from it. Commit the result.
 - Use `{@includeCode ../test/<file>.test.ts#example}` in TSDoc to reference test examples.
 - Mark example regions in tests with `// #region example` and `// #endregion example`.
-- All code examples must be complete and runnable: no pseudocode and no missing imports.
+- Every fenced TypeScript block in a README or guide must typecheck. Import every library name the block uses. No pseudocode.
+- A block may use a value that the reader's code provides, such as a player or a request. Declare that value in `<guide>.context.d.ts` next to the guide. The check prepends the declarations to every block of the guide that does not declare the name. Write types as `import('@svta/cml-cmcd').CmcdReporter`, with no import statements.
+- A block that shows a compile error marks the line with `// @ts-expect-error`.
+- TSDoc examples that `{@includeCode}` a test region compile with the test file. The rule does not apply to those examples.
 - The package build regenerates the public API report `libs/<package>/config/cml-<package>.api.md`. Review its diff to confirm that every API change is intentional.
 - The website copies every published package's `README.md`, `docs/*.md`, and `CHANGELOG.md` at build time. Link to a guide from a README as `docs/<file>.md`. Link between guides as sibling files, for example `other-guide.md#anchor`.
 - Every published package needs an entry in `site/scripts/groups.ts`. The site build fails without one.

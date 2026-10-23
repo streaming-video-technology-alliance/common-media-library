@@ -263,6 +263,8 @@ The specification allows implementers to define their own continuity methods (§
 To validate a custom method, register a validator for its label in the `options` parameter. A stream uses one continuity method, so one validator is registered at a time:
 
 ```ts
+import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
+
 const { result } = await validateC2paManifestBoxSegment(bytes, lastManifestId, state, {
   continuityValidator: {
     method: 'com.example.anchor-chain',

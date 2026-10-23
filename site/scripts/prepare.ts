@@ -1,4 +1,4 @@
-import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { parseReleases, renderReleases, retitleChangelog, type Release } from './changelog.ts'
 import { rewriteReadmeLinks } from './links.ts'
@@ -38,7 +38,12 @@ for (const project of projects) {
 	writeFileSync(path.join(target, 'changelog.md'), retitleChangelog(changelog, pkg.name))
 
 	if (pkg.guides.length > 0) {
-		cpSync(path.join(source, 'docs'), path.join(target, 'guides'), { recursive: true })
+		const guides = path.join(target, 'guides')
+		mkdirSync(guides, { recursive: true })
+
+		for (const guide of pkg.guides) {
+			copyFileSync(path.join(source, 'docs', `${guide.slug}.md`), path.join(guides, `${guide.slug}.md`))
+		}
 	}
 
 	packages.push(pkg)

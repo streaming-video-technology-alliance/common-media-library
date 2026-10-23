@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+- The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
+
+## [1.7.0] - 2026-10-22
+
 ### Fixed
 
 - `validateC2paInitSegment`, `validateC2paSegment`, `validateC2paManifestBoxSegment`, and `validateC2paMerkleSegment` now hash a root box with a `largesize` header or a size of 0. The content hash also covers every root box after such a box ([#566](https://github.com/streaming-video-technology-alliance/common-media-library/issues/566)).
@@ -18,7 +25,7 @@ and this project adheres to
 ### Changed
 
 - The manifest box guide states that `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` appears only for a manifest with a claim that decodes.
-- The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.6.0] - 2026-10-21
 
@@ -38,7 +45,6 @@ and this project adheres to
 ### Changed
 
 - `validateC2paManifestBoxSegment` now reports a missing hard binding only for a manifest with a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` no longer also reports `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING` ([#552](https://github.com/streaming-video-technology-alliance/common-media-library/issues/552)).
-- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.5.0] - 2026-10-21
 
@@ -230,7 +236,8 @@ and this project adheres to
 - `validateC2paManifestBoxSegment(bytes, lastId, state?)` — validate manifest-box segment (§19.7.2)
 - All validation results return `isValid` + `errorCodes` with C2PA failure codes
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.6.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.7.0...HEAD
+[1.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.6.0...c2pa-v1.7.0
 [1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.5.0...c2pa-v1.6.0
 [1.5.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.1...c2pa-v1.5.0
 [1.4.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/c2pa-v1.4.0...c2pa-v1.4.1
