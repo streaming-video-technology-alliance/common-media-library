@@ -29,6 +29,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { Cta608Parser } from './Cta608Parser.ts'
+
 /**
  * SCC Parser
  *
@@ -37,10 +39,10 @@
 export class SccParser {
 	hasHeader: boolean = false
 	nrLinesParsed: number = 0
-	processor: any
-	field: number | any
+	processor: Pick<Cta608Parser, 'addData'>
+	field: number
 
-	constructor(processor: any, field: number | any = 1) {
+	constructor(processor: Pick<Cta608Parser, 'addData'>, field: number = 1) {
 		this.processor = processor
 		this.field = field
 	}
@@ -109,7 +111,7 @@ export class SccParser {
 		return this.hasHeader
 	}
 
-	getField(): number | any {
+	getField(): number {
 		return this.field
 	}
 

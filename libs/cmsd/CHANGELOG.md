@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `CmsdValue` no longer lists `CmsdObjectType`, `CmsdStreamingFormat`, and `CmsdStreamType`. `string` already covers the three, so the type is unchanged.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.1.2] - 2026-10-18

@@ -41,16 +41,10 @@ async function completeXhrWith(xhr: XhrInstance, response: Response): Promise<vo
 			target['response'] = text
 			target['responseText'] = text
 			if (typeof xhr.onload === 'function') {
-				xhr.onload.call(
-					xhr as unknown as XMLHttpRequest,
-					new ProgressEventCtor('load') as ProgressEvent<EventTarget>,
-				)
+				xhr.onload.call(xhr, new ProgressEventCtor('load') as ProgressEvent<EventTarget>)
 			}
 			if (typeof xhr.onloadend === 'function') {
-				xhr.onloadend.call(
-					xhr as unknown as XMLHttpRequest,
-					new ProgressEventCtor('loadend') as ProgressEvent<EventTarget>,
-				)
+				xhr.onloadend.call(xhr, new ProgressEventCtor('loadend') as ProgressEvent<EventTarget>)
 			}
 		}
 	})
@@ -71,9 +65,11 @@ export function createXhrTransport(): CmcdTransportAdapter {
 					/* no XHR to detach */
 				}
 			}
+			/* oxlint-disable typescript/unbound-method */
 			const origOpen = Xhr.prototype.open
 			const origSetRequestHeader = Xhr.prototype.setRequestHeader
 			const origSend = Xhr.prototype.send
+			/* oxlint-enable typescript/unbound-method */
 
 			Xhr.prototype.open = function (this: XhrInstance, method: string, url: string | URL): void {
 				this._cmcdMethod = method
@@ -111,7 +107,7 @@ export function createXhrTransport(): CmcdTransportAdapter {
 				const synthetic = deliver(httpRequest)
 
 				if (synthetic) {
-					completeXhrWith(this, synthetic)
+					void completeXhrWith(this, synthetic)
 					return
 				}
 

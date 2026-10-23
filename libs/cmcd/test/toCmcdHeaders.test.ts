@@ -66,6 +66,7 @@ describe('toCmcdHeaders', () => {
 	})
 
 	it('handles null data object', () => {
-		deepEqual(toCmcdHeaders(null as any), {})
+		// @ts-expect-error - This is a test
+		deepEqual(toCmcdHeaders(null), {})
 	})
 })

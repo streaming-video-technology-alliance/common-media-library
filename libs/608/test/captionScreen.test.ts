@@ -5,7 +5,7 @@ import { beforeEach, describe, it, vi } from 'vite-plus/test'
 describe('CaptionScreen Tests', () => {
 	const NR_ROWS = 15
 
-	let captionScreen: any
+	let captionScreen: CaptionScreen
 
 	beforeEach(() => {
 		captionScreen = new CaptionScreen()

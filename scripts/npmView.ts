@@ -20,7 +20,10 @@ export async function viewPublishedPeers(name: string): Promise<Record<string, s
 		return {}
 	}
 
-	const parsed = JSON.parse(json)
+	const parsed: unknown = JSON.parse(json)
 	// npm 12 wraps the `--json` output of a single field in an array. npm 11 prints the object.
-	return (Array.isArray(parsed) ? parsed[0] : parsed) ?? {}
+	return ((Array.isArray(parsed) ? (parsed as unknown[])[0] : parsed) ?? {}) as Record<
+		string,
+		string
+	>
 }

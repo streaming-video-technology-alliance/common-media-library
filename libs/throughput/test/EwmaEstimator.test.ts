@@ -3,13 +3,13 @@ import { equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 describe('EwmaEstimator', () => {
-	it('returns NaN when there are no entries', async () => {
+	it('returns NaN when there are no entries', () => {
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 
 		equal(estimator.getEstimate(), NaN)
 	})
 
-	it('returns default estimate when below min total bytes', async () => {
+	it('returns default estimate when below min total bytes', () => {
 		const estimator = new EwmaEstimator({
 			fastHalfLife: 2,
 			slowHalfLife: 5,
@@ -27,7 +27,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 1e6)
 	})
 
-	it('returns the default estimate before the first sample', async () => {
+	it('returns the default estimate before the first sample', () => {
 		const estimator = new EwmaEstimator({
 			fastHalfLife: 3,
 			slowHalfLife: 9,
@@ -37,7 +37,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 1e6)
 	})
 
-	it('returns the measured rate after the first sample', async () => {
+	it('returns the measured rate after the first sample', () => {
 		const estimator = new EwmaEstimator({
 			fastHalfLife: 3,
 			slowHalfLife: 9,
@@ -54,7 +54,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 6e6)
 	})
 
-	it('ignores a sample with a zero duration', async () => {
+	it('ignores a sample with a zero duration', () => {
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 
 		// 500 bps
@@ -80,7 +80,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 285)
 	})
 
-	it('ignores a sample with a negative duration', async () => {
+	it('ignores a sample with a negative duration', () => {
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 
 		// 500 bps
@@ -106,7 +106,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), 285)
 	})
 
-	it('returns NaN when the only sample has a zero duration', async () => {
+	it('returns NaN when the only sample has a zero duration', () => {
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 
 		estimator.sample({
@@ -118,7 +118,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), NaN)
 	})
 
-	it('ignores a sample with a body size of 0 or less', async () => {
+	it('ignores a sample with a body size of 0 or less', () => {
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 
 		// 500 bps
@@ -146,7 +146,7 @@ describe('EwmaEstimator', () => {
 		}
 	})
 
-	it('returns NaN when the only sample has a body size of 0', async () => {
+	it('returns NaN when the only sample has a body size of 0', () => {
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 
 		estimator.sample({
@@ -158,7 +158,7 @@ describe('EwmaEstimator', () => {
 		equal(estimator.getEstimate(), NaN)
 	})
 
-	it('returns positive number when there are at least 2 entries', async () => {
+	it('returns positive number when there are at least 2 entries', () => {
 		//#region example
 		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5 })
 

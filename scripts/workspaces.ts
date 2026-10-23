@@ -20,7 +20,9 @@ export function loadWorkspaces(dir: string): Workspace[] {
 		.filter(entry => entry.isDirectory() && existsSync(path.join(dir, entry.name, 'package.json')))
 		.map(entry => {
 			const folder = `${dir}/${entry.name}`
-			const json: PackageJson = JSON.parse(readFileSync(path.join(folder, 'package.json'), 'utf8'))
+			const json = JSON.parse(
+				readFileSync(path.join(folder, 'package.json'), 'utf8'),
+			) as PackageJson
 			const peers = Object.keys(json.peerDependencies ?? {}).filter(peer => peer.startsWith(scope))
 			return { folder, name: json.name, peers }
 		})
@@ -102,7 +104,7 @@ export function runWorkspaces(
 					},
 					error => {
 						failed = true
-						reject(error)
+						reject(error instanceof Error ? error : new Error(String(error)))
 					},
 				)
 			}

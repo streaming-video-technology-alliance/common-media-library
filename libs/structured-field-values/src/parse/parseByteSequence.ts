@@ -58,7 +58,12 @@ export function parseByteSequence(src: string): ParsedValue<Uint8Array> {
 	}
 
 	const re = /(^.*?)(:)/g
-	const b64_content = (re.exec(src) as any)[1]
+	const match = re.exec(src)
+	if (!match) {
+		throw parseError(src, BYTES)
+	}
+
+	const b64_content = match[1]
 	src = src.substring(re.lastIndex)
 
 	// pass b64_content char check step 6

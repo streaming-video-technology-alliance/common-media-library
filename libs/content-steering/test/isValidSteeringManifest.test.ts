@@ -4,7 +4,7 @@ import { describe, it } from 'vite-plus/test'
 import { MANIFEST } from './MANIFEST.ts'
 
 describe('isValidSteeringManifest', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const manifest = {
 			VERSION: 1,

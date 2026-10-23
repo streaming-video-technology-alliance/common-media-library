@@ -141,7 +141,7 @@ export function buildMerkleAuxBox(
 	prefix.set(purposeBytes, 4)
 	return buildUuidBox(
 		JUMBF_UUID,
-		concatBytes(prefix, encodeCbor(map) as Uint8Array, new Uint8Array(paddingBytes)),
+		concatBytes(prefix, encodeCbor(map), new Uint8Array(paddingBytes)),
 	)
 }
 

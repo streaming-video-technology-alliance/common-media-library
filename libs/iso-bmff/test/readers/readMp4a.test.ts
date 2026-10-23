@@ -1,11 +1,19 @@
-import { assert, describe, filterBoxes, it, readMp4a, readStsd } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	filterBoxes,
+	it,
+	readMp4a,
+	readStsd,
+	type IsoTypedParsedBox,
+} from '../util/box.ts'
 
 describe('readMp4a', function () {
 	it('should correctly parse the box', function () {
-		const container = filterBoxes<any>('240fps_go_pro_hero_4.mp4', 'stsd', {
+		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', {
 			readers: { stsd: readStsd, mp4a: readMp4a },
 		})
-		const box = container[1].entries[0]
+		const box = container[1].entries[0] as IsoTypedParsedBox<'mp4a'>
 
 		assert.strictEqual(box.type, 'mp4a')
 		assert.strictEqual(box.size, 86)

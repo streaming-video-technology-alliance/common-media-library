@@ -9,12 +9,12 @@ export function parseOptions(
 	// TODO: Optimize parsing to avoid creating new arrays and strings.
 	const groups = groupDelim ? input.split(groupDelim) : [input]
 
-	for (const i in groups) {
-		if (typeof groups[i] !== 'string') {
+	for (const group of groups) {
+		if (typeof group !== 'string') {
 			continue
 		}
 
-		const kv = groups[i].split(keyValueDelim)
+		const kv = group.split(keyValueDelim)
 		if (kv.length !== 2) {
 			continue
 		}

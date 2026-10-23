@@ -62,9 +62,9 @@ if (baseline !== undefined) {
 	variants.unshift({
 		name: `parseXml (${baseline})`,
 		load: async () => {
-			const module: { parseXml: ParseFunction } = await import(
-				pathToFileURL(resolve(baseline)).href
-			)
+			const module = (await import(pathToFileURL(resolve(baseline)).href)) as {
+				parseXml: ParseFunction
+			}
 			return module.parseXml
 		},
 	})
@@ -178,7 +178,7 @@ function drive(): void {
 				throw new Error(proc.stderr)
 			}
 			const lines = proc.stdout.trim().split('\n')
-			return JSON.parse(lines[lines.length - 1])
+			return JSON.parse(lines[lines.length - 1]) as WorkerResult
 		})
 
 		console.log(

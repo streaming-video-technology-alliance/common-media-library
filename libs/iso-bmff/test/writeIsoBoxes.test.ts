@@ -146,7 +146,7 @@ describe('writeIsoBoxes', function () {
 		deepEqual(isoFile, reduceUint8Arrays(bytes))
 	})
 
-	it('should exit if boxes are empty', async function () {
+	it('should exit if boxes are empty', function () {
 		const bytes = writeIsoBoxes([], defaultWriterConfig())
 		equal(bytes.length, 0)
 	})

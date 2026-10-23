@@ -35,6 +35,7 @@ describe('DeepReadonly', () => {
 		ok(data.tags[0].name === 'a')
 
 		// @ts-expect-error - the array itself is readonly
+		// oxlint-disable-next-line typescript/no-unsafe-call
 		data.tags.push({ name: 'b' })
 
 		// @ts-expect-error - the array's elements are readonly

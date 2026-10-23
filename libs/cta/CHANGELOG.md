@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `CmValue` no longer lists `CmObjectType`, `CmStreamingFormat`, and `CmStreamType`. `string` already covers the three, so the type is unchanged.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.0.10] - 2026-10-18

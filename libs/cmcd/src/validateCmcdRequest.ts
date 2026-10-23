@@ -77,7 +77,7 @@ export function validateCmcdRequest(
 					severity: CMCD_VALIDATION_SEVERITY_ERROR,
 				},
 			],
-			data: {} as CmcdData,
+			data: {},
 		}
 	}
 
@@ -93,7 +93,7 @@ export function validateCmcdRequest(
 					severity: CMCD_VALIDATION_SEVERITY_ERROR,
 				},
 			],
-			data: {} as CmcdData,
+			data: {},
 		}
 	}
 

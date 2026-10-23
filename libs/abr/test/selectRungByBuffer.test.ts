@@ -58,7 +58,7 @@ describe('selectRungByBuffer', () => {
 				equal(
 					selectRungByBuffer(params, effectiveBuffer),
 					model.best(effectiveBuffer),
-					`ladder ${bandwidths} target ${bufferTarget} buffer ${effectiveBuffer}`,
+					`ladder ${bandwidths.join(',')} target ${bufferTarget} buffer ${effectiveBuffer}`,
 				)
 			}
 		}

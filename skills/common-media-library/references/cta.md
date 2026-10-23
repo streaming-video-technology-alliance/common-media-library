@@ -70,7 +70,7 @@ export const CmStreamType: {
 export type CmStreamType = ValueOf<typeof CmStreamType>;
 
 // @internal
-export type CmValue = CmObjectType | CmStreamingFormat | CmStreamType | string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
+export type CmValue = string | string[] | number | number[] | boolean | symbol | SfToken | SfItem | SfItem[];
 
 // @internal
 export function isTokenField(key: string): boolean;

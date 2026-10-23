@@ -244,14 +244,14 @@ function contextHeader(block: ExampleBlock): Header {
 /** The root tsconfig options, adjusted for a noEmit check of standalone blocks. */
 export function exampleCompilerOptions(repoRoot: string): ts.CompilerOptions {
 	const configPath = path.join(repoRoot, 'tsconfig.json')
-	const config = ts.readConfigFile(configPath, ts.sys.readFile)
+	const config = ts.readConfigFile(configPath, path => ts.sys.readFile(path))
 
 	if (config.error) {
 		throw new Error(ts.flattenDiagnosticMessageText(config.error.messageText, '\n'))
 	}
 
 	const { options, errors } = ts.convertCompilerOptionsFromJson(
-		config.config.compilerOptions,
+		(config.config as { compilerOptions: Record<string, unknown> }).compilerOptions,
 		repoRoot,
 	)
 
@@ -302,6 +302,7 @@ export function checkExamples(blocks: ExampleBlock[], repoRoot: string): Example
 	})
 
 	const host = ts.createCompilerHost(options)
+	// oxlint-disable-next-line typescript/unbound-method
 	const { fileExists, readFile, getSourceFile } = host
 
 	host.fileExists = file => virtual.has(slash(file)) || fileExists.call(host, file)

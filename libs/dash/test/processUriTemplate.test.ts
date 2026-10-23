@@ -3,7 +3,7 @@ import assert, { equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 describe('processUriTemplate', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const result = processUriTemplate(
 			'http://example.com/$RepresentationID$/$Number$/$SubNumber$/$Bandwidth$/$Time%02d$/$$',

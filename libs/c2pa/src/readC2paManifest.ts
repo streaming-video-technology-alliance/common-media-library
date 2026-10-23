@@ -231,7 +231,7 @@ export function readC2paManifest(
 		throw new Error('No C2PA UUID box found in the provided bytes')
 	}
 
-	const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
+	const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
 	const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
 	if (!jumbfPayload) {
 		throw new Error('Invalid JUMBF UUID prefix in C2PA box')

@@ -66,7 +66,7 @@ export function validateCmcdEvents(
 			decodedLines.push(data)
 			lineResults.push(validateCmcd(data, opts))
 		} catch {
-			decodedLines.push({} as CmcdData)
+			decodedLines.push({})
 			lineResults.push({
 				valid: false,
 				issues: [

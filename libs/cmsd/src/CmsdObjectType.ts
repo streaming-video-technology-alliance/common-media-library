@@ -8,7 +8,7 @@ import { CmObjectType } from '@svta/cml-cta'
  *
  * @public
  */
-export const CmsdObjectType = CmObjectType as typeof CmObjectType
+export const CmsdObjectType: typeof CmObjectType = CmObjectType
 
 /**
  * @public

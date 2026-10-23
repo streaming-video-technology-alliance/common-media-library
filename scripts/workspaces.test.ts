@@ -99,11 +99,9 @@ describe('runWorkspaces', () => {
 		const workspaces = [workspace('utils'), workspace('a', ['utils']), workspace('b', ['a'])]
 
 		await rejects(
-			runWorkspaces(workspaces, 1, async w => {
-				if (w.folder === 'libs/a') {
-					throw new Error('libs/a failed')
-				}
-			}),
+			runWorkspaces(workspaces, 1, w =>
+				w.folder === 'libs/a' ? Promise.reject(new Error('libs/a failed')) : Promise.resolve(),
+			),
 			/libs\/a failed/,
 		)
 

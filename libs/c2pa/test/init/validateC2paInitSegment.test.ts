@@ -872,18 +872,21 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		],
 		[
 			'COSE key',
-			async () => ({
-				...activeEntry(key002),
-				fields: { key: Array.from(encodeCbor(key002.coseKey)) },
-			}),
+			() =>
+				Promise.resolve({
+					...activeEntry(key002),
+					fields: { key: Array.from(encodeCbor(key002.coseKey)) },
+				}),
 		],
 		[
 			'kid',
-			async () =>
-				activeEntry({
-					...key002,
-					coseKey: new Map([...key002.coseKey, [COSE_KEY_KID, Array.from(key002.kid)]]),
-				}),
+			() =>
+				Promise.resolve(
+					activeEntry({
+						...key002,
+						coseKey: new Map([...key002.coseKey, [COSE_KEY_KID, Array.from(key002.kid)]]),
+					}),
+				),
 		],
 	]
 

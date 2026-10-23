@@ -8,5 +8,5 @@
  * @internal
  */
 export function isTokenField(key: string): boolean {
-	return ['ot', 'sf', 'st', 'e', 'sta'].includes(key as any)
+	return ['ot', 'sf', 'st', 'e', 'sta'].includes(key)
 }

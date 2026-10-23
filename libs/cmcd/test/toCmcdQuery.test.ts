@@ -27,7 +27,8 @@ describe('toCmcdQuery', () => {
 	})
 
 	it('handles null data object', () => {
-		equal(toCmcdQuery(null as any), '')
+		// @ts-expect-error - This is a test
+		equal(toCmcdQuery(null), '')
 	})
 
 	it('returns encoded query string', () => {

@@ -6,7 +6,6 @@ import type { Representation } from '../../../types/mapper/dash/Representation.t
 import type { Presentation } from '../../../types/model/Presentation.ts'
 import type { Segment } from '../../../types/model/Segment.ts'
 import type { SelectionSet } from '../../../types/model/SelectionSet.ts'
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 import type { Track } from '../../../types/model/Track.ts'
 
 import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts'
@@ -60,7 +59,7 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 				id: adaptationSet.$.id ?? adaptationSet.ContentComponent?.at(0)?.$.id ?? group,
 				tracks,
 				baseUrls: [],
-			} as SwitchingSet)
+			})
 		})
 
 		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups)
@@ -72,6 +71,6 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 			startTime: 0,
 			endTime: duration,
 			baseUrls: [],
-		} as Presentation
+		}
 	})
 }

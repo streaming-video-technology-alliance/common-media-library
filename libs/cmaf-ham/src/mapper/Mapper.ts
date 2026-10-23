@@ -6,5 +6,5 @@ export type Mapper = {
 
 	toManifest(presentation: Presentation[]): ManifestFile
 
-	getManifestMetadata(): any | undefined
+	getManifestMetadata(): JSON | undefined
 }

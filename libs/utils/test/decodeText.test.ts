@@ -31,26 +31,26 @@ decoderTest('decodeText', () => {
 	it('handles special characters in UTF-8', () => {
 		const str = 'Special chars: !@#$%^&*()_+{}|:"<>?'
 		const utf8 = new TextEncoder().encode(str)
-		equal(decodeText(utf8.buffer as ArrayBuffer, { encoding: UTF_8 }), str)
+		equal(decodeText(utf8.buffer, { encoding: UTF_8 }), str)
 	})
 
 	it('auto detects UTF-8 encoding, no BOM', () => {
 		const data = new Uint8Array([0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64])
 		const str = 'hello world'
-		equal(decodeText(data.buffer as ArrayBuffer), str)
+		equal(decodeText(data.buffer), str)
 	})
 
 	it('auto detects UTF-8 encoding, with BOM', () => {
 		const data = new Uint8Array([
 			0xef, 0xbb, 0xbf, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64,
 		])
-		equal(decodeText(data.buffer as ArrayBuffer), 'hello world')
+		equal(decodeText(data.buffer), 'hello world')
 	})
 
 	it('handles multi-byte UTF-8 characters', () => {
 		const str = 'aZ!©₿😀🚀🌟'
 		const utf8Bytes = new TextEncoder().encode(str)
-		equal(decodeText(utf8Bytes.buffer as ArrayBuffer, { encoding: UTF_8 }), str)
+		equal(decodeText(utf8Bytes.buffer, { encoding: UTF_8 }), str)
 	})
 
 	it('auto detects UTF-16 big endian encoding', () => {
@@ -58,7 +58,7 @@ decoderTest('decodeText', () => {
 			0xfe, 0xff, 0x00, 0x68, 0x00, 0x65, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x20, 0x00,
 			0x77, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x6c, 0x00, 0x64,
 		])
-		equal(decodeText(data.buffer as ArrayBuffer), 'hello world')
+		equal(decodeText(data.buffer), 'hello world')
 	})
 
 	it('auto detects UTF-16 little endian encoding', () => {
@@ -66,7 +66,7 @@ decoderTest('decodeText', () => {
 			0xff, 0xfe, 0x68, 0x00, 0x65, 0x00, 0x6c, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x20, 0x00, 0x77,
 			0x00, 0x6f, 0x00, 0x72, 0x00, 0x6c, 0x00, 0x64, 0x00,
 		])
-		equal(decodeText(data.buffer as ArrayBuffer), 'hello world')
+		equal(decodeText(data.buffer), 'hello world')
 	})
 
 	it('Handles UTF-8 DataView with byte offset and length', () => {

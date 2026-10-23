@@ -13,7 +13,7 @@ const toBytes = (hex: string): Uint8Array =>
 const loadFixture = (name: string): Uint8Array =>
 	new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
 const nestedArrays = (levels: number): Uint8Array =>
-	Uint8Array.from([...Array(levels - 1).fill(0x81), 0x80])
+	Uint8Array.from([...Array<number>(levels - 1).fill(0x81), 0x80])
 
 const MAX_SAFE_INTEGER = BigInt(Number.MAX_SAFE_INTEGER)
 

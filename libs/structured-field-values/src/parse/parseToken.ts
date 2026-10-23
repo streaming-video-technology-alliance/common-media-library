@@ -35,7 +35,12 @@ export function parseToken(src: string, options?: SfDecodeOptions): ParsedValue<
 	}
 
 	const re = /^([!#$%&'*+\-.^_`|~\w:/]+)/g
-	const value = (re.exec(src) as any)[1]
+	const match = re.exec(src)
+	if (!match) {
+		throw parseError(src, TOKEN)
+	}
+
+	const value = match[1]
 	src = src.substring(re.lastIndex)
 
 	return parsedValue(options?.useSymbol === false ? new SfToken(value) : Symbol.for(value), src)

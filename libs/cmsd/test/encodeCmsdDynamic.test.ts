@@ -1,4 +1,4 @@
-import { encodeCmsdDynamic } from '@svta/cml-cmsd'
+import { encodeCmsdDynamic, type CmsdDynamic } from '@svta/cml-cmsd'
 import { equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 import { CMSD_DYNAMIC_LIST } from './data/CMSD_DYNAMIC_LIST.ts'
@@ -22,6 +22,6 @@ describe('encodeCmsdDynamic', () => {
 
 	it('encodes a single object', () => {
 		const { value, params } = CMSD_DYNAMIC_OBJ[0]
-		equal(encodeCmsdDynamic(value as string, params as any), CMSD_DYNAMIC_SINGLE)
+		equal(encodeCmsdDynamic(value as string, params as CmsdDynamic), CMSD_DYNAMIC_SINGLE)
 	})
 })

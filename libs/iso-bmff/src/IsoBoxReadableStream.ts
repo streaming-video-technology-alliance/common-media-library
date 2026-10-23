@@ -39,12 +39,12 @@ export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
 			const desiredSize = controller.desiredSize ?? 0
 
 			for (let i = 0; i < desiredSize; i++) {
-				const { value, done } = iterator.next()
+				const next = iterator.next()
 
-				if (done) {
+				if (next.done) {
 					controller.close()
 				} else {
-					controller.enqueue(writeIsoBox(value, cfg))
+					controller.enqueue(writeIsoBox(next.value, cfg))
 				}
 			}
 		}

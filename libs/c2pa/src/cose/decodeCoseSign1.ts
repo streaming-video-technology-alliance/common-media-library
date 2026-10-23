@@ -56,8 +56,8 @@ export function decodeCoseSign1(coseBytes: Uint8Array): CoseSign1 {
 
 		return {
 			protectedBytes,
-			protectedHeader: protectedHeader as Readonly<Record<number, unknown>>,
-			unprotectedHeader: unprotectedHeader as Readonly<Record<number, unknown>>,
+			protectedHeader: protectedHeader,
+			unprotectedHeader: unprotectedHeader,
 			payload: payloadRaw == null ? null : toUint8Array(payloadRaw),
 			signature: toUint8Array(signatureRaw),
 			kid,

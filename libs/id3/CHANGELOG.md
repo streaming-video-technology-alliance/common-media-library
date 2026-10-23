@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `toUint8` accepts `AllowSharedBufferSource`, the type that `TextDecoder.decode` uses. The view check uses `ArrayBuffer.isView`, so a view created in another realm keeps its `byteOffset`.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.0.10] - 2026-10-18

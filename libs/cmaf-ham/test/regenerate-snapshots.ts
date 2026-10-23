@@ -31,11 +31,11 @@ setHlsParser((text: string) => {
 	const parser = new Parser()
 	parser.push(text)
 	parser.end()
-	const parsedHlsManifest = parser.manifest as any
+	const parsedHlsManifest = parser.manifest as unknown as HlsManifest
 	if (!parsedHlsManifest) {
 		throw new Error()
 	}
-	return parsedHlsManifest as HlsManifest
+	return parsedHlsManifest
 })
 
 setDashSerializer((manifest: DashManifest) => {

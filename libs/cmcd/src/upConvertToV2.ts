@@ -19,9 +19,9 @@ export function upConvertToV2(obj: Record<string, any>): Record<string, any> {
 		return obj
 	}
 
-	const result: Record<string, any> = {}
+	const result: Record<string, unknown> = {}
 
-	for (const [key, value] of Object.entries(obj)) {
+	for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
 		if (value == null) {
 			result[key] = value
 			continue

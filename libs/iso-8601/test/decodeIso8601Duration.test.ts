@@ -5,7 +5,7 @@ import { describe, it } from 'vite-plus/test'
 const HUGE_NUMBER_STRING = new Array(500).join('7')
 
 describe('decodeIso8601Duration', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const result = decodeIso8601Duration('PT1H1M1S')
 

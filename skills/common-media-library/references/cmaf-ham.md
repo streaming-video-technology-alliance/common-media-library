@@ -307,6 +307,8 @@ export type HlsManifest = {
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
     targetDuration?: number;
+    version?: number;
+    mediaSequence?: number;
 };
 
 // @internal (undocumented)
@@ -374,9 +376,11 @@ export function mapSegmentTemplate(representation: Representation, duration: num
 export type MediaGroups = {
     AUDIO: Record<string, Record<string, {
         language: string;
+        uri?: string;
     }>>;
     SUBTITLES: Record<string, Record<string, {
         language: string;
+        uri?: string;
     }>>;
 };
 
@@ -407,6 +411,8 @@ export type PlayList = {
     uri: string;
     attributes: {
         FRAME_RATE: number;
+        "FRAME-RATE"?: number;
+        LANGUAGE?: string;
         CODECS: string;
         BANDWIDTH: number;
         RESOLUTION: {
@@ -563,7 +569,8 @@ type TextTrack_2 = Track;
 export { TextTrack_2 as TextTrack }
 
 // @alpha
-export type Track = Ham & Base & Duration & AddressableObject & {
+export type Track = Ham & Base & Duration & Omit<AddressableObject, "url"> & {
+    url?: string;
     type: TrackType;
     codecs: string[];
     mimeType: string;

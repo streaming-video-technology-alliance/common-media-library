@@ -2,7 +2,6 @@ import { encodeSfDict } from '@svta/cml-structured-field-values'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdHeaderField } from './CmcdHeaderField.ts'
 import type { CmcdHeaderMap } from './CmcdHeaderMap.ts'
-import type { CmcdHeaderValue } from './CmcdHeaderValue.ts'
 import { groupCmcdHeaders } from './groupCmcdHeaders.ts'
 
 /**
@@ -22,7 +21,7 @@ export function toPreparedCmcdHeaders(
 	const shards = groupCmcdHeaders(data, customHeaderMap)
 
 	for (const [field, value] of Object.entries(shards)) {
-		const shard = encodeSfDict(value as CmcdHeaderValue, { whitespace: false })
+		const shard = encodeSfDict(value, { whitespace: false })
 		if (shard) {
 			result[field as CmcdHeaderField] = shard
 		}

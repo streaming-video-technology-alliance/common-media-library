@@ -303,7 +303,7 @@ describe('parseXml equivalence', () => {
 			})
 			writeFileSync(FIXTURE_PATH, formatFixtures(fixtures))
 		} else {
-			fixtures = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8'))
+			fixtures = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8')) as Record<string, CaseFixture>
 		}
 	})
 

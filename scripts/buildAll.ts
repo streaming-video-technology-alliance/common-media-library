@@ -46,8 +46,8 @@ function buildWorkspace(workspace: Workspace): Promise<void> {
 		const output: Buffer[] = []
 
 		children.add(child)
-		child.stdout.on('data', chunk => output.push(chunk))
-		child.stderr.on('data', chunk => output.push(chunk))
+		child.stdout.on('data', (chunk: Buffer) => output.push(chunk))
+		child.stderr.on('data', (chunk: Buffer) => output.push(chunk))
 		child.on('error', reject)
 		child.on('close', (code, signal) => {
 			children.delete(child)

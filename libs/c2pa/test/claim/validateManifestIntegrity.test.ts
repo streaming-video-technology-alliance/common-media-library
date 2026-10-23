@@ -86,11 +86,8 @@ describe('validateManifestIntegrity', () => {
 
 		const { codes } = await validateManifestIntegrity(readC2paManifest(initBytes))
 
-		// The fixture has known generator-side bugs, so we expect errors
-		ok(Array.isArray(codes), 'codes should be an array')
-
 		// Verify the codes are valid C2paStatusCode values
-		const validCodes = new Set([
+		const validCodes = new Set<C2paStatusCode>([
 			C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH,
 			C2paStatusCode.ASSERTION_MISSING,
 			C2paStatusCode.ASSERTION_ACTION_INGREDIENT_MISMATCH,

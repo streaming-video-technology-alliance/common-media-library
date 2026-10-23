@@ -12,4 +12,6 @@ export type HlsManifest = {
 	mediaGroups: MediaGroups
 	segments: SegmentHls[]
 	targetDuration?: number
+	version?: number
+	mediaSequence?: number
 }

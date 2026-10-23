@@ -1,3 +1,4 @@
+import type { IsoBox } from '../IsoBox.ts'
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
 import type { AudioSampleEntryType } from '../boxes/AudioSampleEntryType.ts'
 import { UINT } from '../IsoBoxFields.ts'
@@ -31,7 +32,7 @@ export function writeAudioSampleEntryBox<T extends AudioSampleEntryType = AudioS
 	const reserved3Size = 2
 	const samplerateSize = 4
 
-	const { bytes, size } = writeChildBoxes(box.boxes, config)
+	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox[], config)
 
 	const totalSize =
 		headerSize +

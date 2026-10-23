@@ -22,7 +22,7 @@ type PackageInfo = {
 
 async function loadCurrentPackage(folder: string): Promise<PackageJson> {
 	const file = path.resolve(folder, 'package.json')
-	return JSON.parse(await readFile(file, 'utf8'))
+	return JSON.parse(await readFile(file, 'utf8')) as PackageJson
 }
 
 async function loadPackages(): Promise<PackageInfo[]> {

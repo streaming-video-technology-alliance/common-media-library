@@ -13,19 +13,34 @@ import {
 	writeTenc,
 	writeVisualSampleEntryBox,
 	type AudioSampleEntryBox,
+	type IsoBoxReaderMap,
+	type IsoBoxType,
+	type IsoBoxWriterMap,
 	type VisualSampleEntryBox,
 } from '@svta/cml-iso-bmff'
 
-const audioTypes = ['mp4a', 'ac-3', 'ec-3', 'ac-4', 'fLaC', 'Opus']
+const audioTypes: IsoBoxType[] = ['mp4a', 'ac-3', 'ec-3', 'ac-4', 'fLaC', 'Opus']
 
-const videoTypes = ['dvh1', 'dvhe', 'hev1', 'hvc1', 'avc1', 'avc3', 'dvav', 'dva1', 'dvc1', 'dvi1']
+const videoTypes: IsoBoxType[] = [
+	'dvh1',
+	'dvhe',
+	'hev1',
+	'hvc1',
+	'avc1',
+	'avc3',
+	'dvav',
+	'dva1',
+	'dvc1',
+	'dvi1',
+]
 
 const readers = /* @__PURE__ */ (() => {
 	const map = {
 		stsd: readStsd,
 	}
-	audioTypes.forEach(type => ((map as any)[type] = createAudioSampleEntryReader(type)))
-	videoTypes.forEach(type => ((map as any)[type] = createVisualSampleEntryReader(type)))
+	const dynamic: IsoBoxReaderMap = map
+	audioTypes.forEach(type => (dynamic[type] = createAudioSampleEntryReader(type)))
+	videoTypes.forEach(type => (dynamic[type] = createVisualSampleEntryReader(type)))
 	return map
 })()
 
@@ -38,8 +53,9 @@ const writers = /* @__PURE__ */ (() => {
 		encv: writeVisualSampleEntryBox,
 		enca: writeAudioSampleEntryBox,
 	}
-	audioTypes.forEach(type => ((map as any)[type] = writeAudioSampleEntryBox))
-	videoTypes.forEach(type => ((map as any)[type] = writeVisualSampleEntryBox))
+	const dynamic: IsoBoxWriterMap = map
+	audioTypes.forEach(type => (dynamic[type] = writeAudioSampleEntryBox))
+	videoTypes.forEach(type => (dynamic[type] = writeVisualSampleEntryBox))
 	return map
 })()
 

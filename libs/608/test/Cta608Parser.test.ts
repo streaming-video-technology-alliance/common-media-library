@@ -3,22 +3,33 @@ import { Cta608Parser } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
 import { beforeEach, describe, it, vi } from 'vite-plus/test'
 
+type ParserInternals = {
+	parseCmd(a: number, b: number): boolean
+	parseMidrow(a: number, b: number): boolean
+	parsePAC(a: number, b: number): boolean
+	interpretPAC(row: number, byte: number): PACData
+	parseChars(a: number, b: number): number[]
+	parseBackgroundAttributes(a: number, b: number): boolean
+}
+
 describe('Cea608Parser Tests', () => {
-	let parser: any
+	let parser: Cta608Parser
+	let internals: ParserInternals
 
 	beforeEach(() => {
 		parser = new Cta608Parser(1, null, null)
+		internals = parser as unknown as ParserInternals
 	})
 
 	it('adds data correctly, parseCmd', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		vi.spyOn(parser, 'parseCmd').mockImplementation(() => true)
-		const parseMidrow = vi.spyOn(parser, 'parseMidrow')
-		const parsePAC = vi.spyOn(parser, 'parsePAC')
-		const parseBackgroundAttributes = vi.spyOn(parser, 'parseBackgroundAttributes')
-		const parseChars = vi.spyOn(parser, 'parseChars')
+		vi.spyOn(internals, 'parseCmd').mockImplementation(() => true)
+		const parseMidrow = vi.spyOn(internals, 'parseMidrow')
+		const parsePAC = vi.spyOn(internals, 'parsePAC')
+		const parseBackgroundAttributes = vi.spyOn(internals, 'parseBackgroundAttributes')
+		const parseChars = vi.spyOn(internals, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -32,11 +43,11 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
-		vi.spyOn(parser, 'parseMidrow').mockImplementation(() => true)
-		const parsePAC = vi.spyOn(parser, 'parsePAC')
-		const parseBackgroundAttributes = vi.spyOn(parser, 'parseBackgroundAttributes')
-		const parseChars = vi.spyOn(parser, 'parseChars')
+		const parseCmd = vi.spyOn(internals, 'parseCmd').mockImplementation(() => false)
+		vi.spyOn(internals, 'parseMidrow').mockImplementation(() => true)
+		const parsePAC = vi.spyOn(internals, 'parsePAC')
+		const parseBackgroundAttributes = vi.spyOn(internals, 'parseBackgroundAttributes')
+		const parseChars = vi.spyOn(internals, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -50,11 +61,11 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
-		const parseMidrow = vi.spyOn(parser, 'parseMidrow').mockImplementation(() => false)
-		const parsePAC = vi.spyOn(parser, 'parsePAC').mockImplementation(() => true)
-		const parseBackgroundAttributes = vi.spyOn(parser, 'parseBackgroundAttributes')
-		const parseChars = vi.spyOn(parser, 'parseChars')
+		const parseCmd = vi.spyOn(internals, 'parseCmd').mockImplementation(() => false)
+		const parseMidrow = vi.spyOn(internals, 'parseMidrow').mockImplementation(() => false)
+		const parsePAC = vi.spyOn(internals, 'parsePAC').mockImplementation(() => true)
+		const parseBackgroundAttributes = vi.spyOn(internals, 'parseBackgroundAttributes')
+		const parseChars = vi.spyOn(internals, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -69,13 +80,13 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
-		const parseMidrow = vi.spyOn(parser, 'parseMidrow').mockImplementation(() => false)
-		const parsePAC = vi.spyOn(parser, 'parsePAC').mockImplementation(() => false)
+		const parseCmd = vi.spyOn(internals, 'parseCmd').mockImplementation(() => false)
+		const parseMidrow = vi.spyOn(internals, 'parseMidrow').mockImplementation(() => false)
+		const parsePAC = vi.spyOn(internals, 'parsePAC').mockImplementation(() => false)
 		const parseBackgroundAttributes = vi
-			.spyOn(parser, 'parseBackgroundAttributes')
+			.spyOn(internals, 'parseBackgroundAttributes')
 			.mockImplementation(() => true)
-		const parseChars = vi.spyOn(parser, 'parseChars')
+		const parseChars = vi.spyOn(internals, 'parseChars')
 
 		parser.addData(time, byteList)
 
@@ -90,13 +101,13 @@ describe('Cea608Parser Tests', () => {
 		const time = 123456
 		const byteList = [0x19, 0x50]
 
-		const parseCmd = vi.spyOn(parser, 'parseCmd').mockImplementation(() => false)
-		const parseMidrow = vi.spyOn(parser, 'parseMidrow').mockImplementation(() => false)
-		const parsePAC = vi.spyOn(parser, 'parsePAC').mockImplementation(() => false)
+		const parseCmd = vi.spyOn(internals, 'parseCmd').mockImplementation(() => false)
+		const parseMidrow = vi.spyOn(internals, 'parseMidrow').mockImplementation(() => false)
+		const parsePAC = vi.spyOn(internals, 'parsePAC').mockImplementation(() => false)
 		const parseBackgroundAttributes = vi
-			.spyOn(parser, 'parseBackgroundAttributes')
+			.spyOn(internals, 'parseBackgroundAttributes')
 			.mockImplementation(() => false)
-		const parseChars = vi.spyOn(parser, 'parseChars').mockImplementation(() => true)
+		const parseChars = vi.spyOn(internals, 'parseChars').mockImplementation(() => [])
 
 		parser.addData(time, byteList)
 
@@ -110,7 +121,7 @@ describe('Cea608Parser Tests', () => {
 	it('parse CMD method', () => {
 		const byteCanParseByCmd = 0x17
 		const byteCantParseByCmd = 0x20
-		equal(parser.parseCmd(byteCanParseByCmd, byteCantParseByCmd), false)
+		equal(internals.parseCmd(byteCanParseByCmd, byteCantParseByCmd), false)
 	})
 
 	it('interpretPAC method', () => {
@@ -125,7 +136,7 @@ describe('Cea608Parser Tests', () => {
 			row: row,
 		}
 
-		deepEqual(parser.interpretPAC(row, byteToChangeIndent), defaultPacData)
+		deepEqual(internals.interpretPAC(row, byteToChangeIndent), defaultPacData)
 	})
 
 	it('interpretPAC method', () => {
@@ -140,6 +151,6 @@ describe('Cea608Parser Tests', () => {
 			row: row,
 		}
 
-		deepEqual(parser.interpretPAC(row, byteToUnderlineStyles), pacDataUnderline)
+		deepEqual(internals.interpretPAC(row, byteToUnderlineStyles), pacDataUnderline)
 	})
 })

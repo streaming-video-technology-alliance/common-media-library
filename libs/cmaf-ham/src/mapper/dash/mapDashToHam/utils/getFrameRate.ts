@@ -37,5 +37,5 @@ export function getFrameRate(
 	return {
 		frameRateNumerator: isNaN(frameRateNumerator) ? FRAME_RATE_NUMERATOR_30 : frameRateNumerator,
 		frameRateDenominator: isNaN(frameRateDenominator) ? ZERO : frameRateDenominator,
-	} as FrameRate
+	}
 }

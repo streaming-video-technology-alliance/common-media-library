@@ -7,6 +7,7 @@ import {
 	readIden,
 	readIsoBoxes,
 	readMdat,
+	type WebVttCueIdBox,
 } from '../util/box.ts'
 
 describe('readIden', function () {
@@ -14,6 +15,6 @@ describe('readIden', function () {
 		const { data } = findBox('vttc.mp4', 'mdat', { readers: { mdat: readMdat } })
 		const boxes = readIsoBoxes(data, { readers: { iden: readIden } })
 		assert(isContainer(boxes[0]))
-		assert.strictEqual(boxes[0].boxes[0].cueId, '70')
+		assert.strictEqual((boxes[0].boxes[0] as WebVttCueIdBox).cueId, '70')
 	})
 })

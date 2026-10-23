@@ -673,12 +673,14 @@ describe('createXhrTransport', () => {
 	it('detach restores the original XHR prototype methods', () => {
 		installXhrShim()
 		try {
+			/* oxlint-disable typescript/unbound-method */
 			const origOpen = MockXhr.prototype.open
 			const recorder = new CmcdReportRecorder()
 			recorder.attach({ transports: [createXhrTransport()] })
 			ok(MockXhr.prototype.open !== origOpen, 'open should have been patched')
 			recorder.detach()
 			equal(MockXhr.prototype.open, origOpen, 'open should be restored')
+			/* oxlint-enable typescript/unbound-method */
 		} finally {
 			restoreXhrShim()
 		}
@@ -759,7 +761,7 @@ describe('default transports', () => {
 		const origXhr = globalThis.XMLHttpRequest
 		const origFetch = globalThis.fetch
 		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = MockXhr
-		globalThis.fetch = async () => new Response('', { status: 200 })
+		globalThis.fetch = () => Promise.resolve(new Response('', { status: 200 }))
 
 		try {
 			const recorder = new CmcdReportRecorder()
@@ -788,7 +790,7 @@ describe('default transports', () => {
 		const origXhr = globalThis.XMLHttpRequest
 		const origFetch = globalThis.fetch
 		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = MockXhr
-		globalThis.fetch = async () => new Response('', { status: 200 })
+		globalThis.fetch = () => Promise.resolve(new Response('', { status: 200 }))
 
 		try {
 			//#region example
@@ -814,7 +816,7 @@ describe('default transports', () => {
 		const origXhr = globalThis.XMLHttpRequest
 		const origFetch = globalThis.fetch
 		;(globalThis as { XMLHttpRequest: unknown }).XMLHttpRequest = MockXhr
-		globalThis.fetch = async () => new Response('', { status: 200 })
+		globalThis.fetch = () => Promise.resolve(new Response('', { status: 200 }))
 
 		try {
 			//#region example-on-report
@@ -847,7 +849,7 @@ describe('createFetchTransport', () => {
 
 	function installFetchStub(): void {
 		origFetch = globalThis.fetch
-		globalThis.fetch = async () => new Response('', { status: 200 })
+		globalThis.fetch = () => Promise.resolve(new Response('', { status: 200 }))
 	}
 
 	function restoreFetchStub(): void {
@@ -938,9 +940,9 @@ describe('createFetchTransport', () => {
 	it('returns a synthetic 204 when URL matches eventTargetUrls and does not call the underlying fetch', async () => {
 		let underlyingCalls = 0
 		const origFetch = globalThis.fetch
-		globalThis.fetch = async () => {
+		globalThis.fetch = () => {
 			underlyingCalls += 1
-			return new Response('', { status: 200 })
+			return Promise.resolve(new Response('', { status: 200 }))
 		}
 
 		try {

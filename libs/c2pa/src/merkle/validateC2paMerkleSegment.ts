@@ -44,7 +44,7 @@ function extractMerkleAuxBoxes(segmentBytes: Uint8Array): Uint8Array[] {
 		const usertype = uuidBox.usertype ?? []
 		if (!matchesUuid(usertype, JUMBF_UUID)) continue
 
-		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
+		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
 		const payload = readAuxPayload(rawPayload)
 		if (payload !== 'other') payloads.push(payload)
 	}

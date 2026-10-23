@@ -5,7 +5,7 @@ import { describe, it } from 'vite-plus/test'
 import './utils/pollyfill.ts'
 
 describe('WebVttParser examples', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const vtt = `WEBVTT\n\nREGION\nid:test\n\nSTYLE\n::cue {}\n\nCUE_1\n00:00:00.000 --> 00:00:35.000\nWevVTT Sample\n`
 		const cues = [] as WebVttCue[]

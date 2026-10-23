@@ -13,9 +13,9 @@ if (!existsSync(distDir)) {
 	throw new Error(`${distDir} does not exist. Run "vitepress build" first.`)
 }
 
-const packages: PackageInfo[] = JSON.parse(
+const packages = JSON.parse(
 	readFileSync(path.join(siteDir, 'packages', 'packages.json'), 'utf8'),
-)
+) as PackageInfo[]
 const apiFiles = readdirSync(apiDir, { recursive: true })
 	.map(file => String(file).split(path.sep).join('/'))
 	.filter(file => file.endsWith('.md'))

@@ -1,4 +1,3 @@
-import type { AudioChannelConfiguration } from '../../../types/mapper/dash/AudioChannelConfiguration.ts'
 import type { Representation } from '../../../types/mapper/dash/Representation.ts'
 
 import type { AudioTrack } from '../../../types/model/AudioTrack.ts'
@@ -19,7 +18,7 @@ export function tracksToRepresentation(tracks: Track[]): Representation[] {
 			},
 			SegmentBase: trackToSegmentBase(track),
 			SegmentList: trackToSegmentList(track),
-		} as Representation
+		}
 		representation.$.mimeType = track.mimeType ?? `${track.type}/mp4`
 		if (track.type === 'video') {
 			const videoTrack = track as VideoTrack
@@ -47,7 +46,7 @@ export function tracksToRepresentation(tracks: Track[]): Representation[] {
 						schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011', // hardcoded value
 						value: audioTrack.channels.toString() ?? '',
 					},
-				} as AudioChannelConfiguration,
+				},
 			]
 		}
 		if (track.segments[0]?.byteRange) {

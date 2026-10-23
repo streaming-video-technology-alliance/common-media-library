@@ -1,5 +1,4 @@
 import type { AudioTrack } from '../../../types/model/AudioTrack.ts'
-import type { TextTrack } from '../../../types/model/TextTrack.ts'
 import type { Track } from '../../../types/model/Track.ts'
 import type { VideoTrack } from '../../../types/model/VideoTrack.ts'
 
@@ -27,7 +26,7 @@ export function generateManifestPlaylistPiece(track: Track): ManifestPlaylistPie
 		mainRef += `#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.id}",LANGUAGE="${audioTrack.language}",NAME="${audioTrack.id}",URI="${trackFileName}"\n`
 		playlist += getPlaylistData(audioTrack)
 	} else if (track.type.toLowerCase() === 'text') {
-		const textTrack = track as TextTrack
+		const textTrack = track
 		mainRef += `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="${textTrack.id}",NAME="${textTrack.id}",LANGUAGE="${textTrack.language}",URI="${trackFileName}"\n`
 	}
 

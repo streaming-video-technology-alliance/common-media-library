@@ -39,7 +39,7 @@ export function getLicenseRequestFromMessage(
 	const challengeValue = challengeNode?.childNodes[0]?.nodeValue
 
 	if (challengeValue) {
-		return decodeBase64(challengeValue).buffer as ArrayBuffer
+		return decodeBase64(challengeValue).buffer
 	}
 
 	return message

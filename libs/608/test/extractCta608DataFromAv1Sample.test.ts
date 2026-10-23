@@ -88,7 +88,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 		deepEqual(extractCta608DataFromAv1Sample(view, cursor, samples[20].size), [[], []])
 	})
 
-	it('should not mistake a non-metadata OBU for caption data', async () => {
+	it('should not mistake a non-metadata OBU for caption data', () => {
 		// A minimal temporal unit: a temporal delimiter (type 2, empty) then a frame OBU
 		// (type 6) whose payload happens to begin with the A/53 identifier bytes.
 		const bytes = new Uint8Array([
@@ -112,7 +112,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 		deepEqual(extractCta608DataFromAv1Sample(view, 0, bytes.length), [[], []])
 	})
 
-	it('should skip a metadata OBU that is not ITU-T T.35', async () => {
+	it('should skip a metadata OBU that is not ITU-T T.35', () => {
 		// OBU_METADATA carrying METADATA_TYPE_HDR_CLL (1) rather than ITUT_T35 (4).
 		const bytes = new Uint8Array([
 			0x2a,
@@ -127,7 +127,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 		deepEqual(extractCta608DataFromAv1Sample(view, 0, bytes.length), [[], []])
 	})
 
-	it('should stop cleanly on a truncated OBU rather than read out of bounds', async () => {
+	it('should stop cleanly on a truncated OBU rather than read out of bounds', () => {
 		// obu_size claims 32 bytes but only 2 follow.
 		const bytes = new Uint8Array([0x2a, 0x20, 0x04, 0xb5])
 		const view = new DataView(bytes.buffer)
@@ -135,7 +135,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 		deepEqual(extractCta608DataFromAv1Sample(view, 0, bytes.length), [[], []])
 	})
 
-	it('should read a metadata OBU that carries an extension byte', async () => {
+	it('should read a metadata OBU that carries an extension byte', () => {
 		// obu_extension_flag set: a temporal_id / spatial_id byte precedes obu_size.
 		const bytes = new Uint8Array([
 			0x2e,
@@ -162,7 +162,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 		deepEqual(extractCta608DataFromAv1Sample(view, 0, bytes.length), [[0x94, 0x20], []])
 	})
 
-	it('should read a final OBU that omits obu_size', async () => {
+	it('should read a final OBU that omits obu_size', () => {
 		// obu_has_size_field clear: the OBU runs to the end of the temporal unit.
 		const bytes = new Uint8Array([
 			0x28, // OBU_METADATA, no size field
@@ -187,7 +187,7 @@ describe('extractCta608DataFromAv1Sample', () => {
 		deepEqual(extractCta608DataFromAv1Sample(view, 0, bytes.length), [[0x94, 0x2c], []])
 	})
 
-	it('should extract both fields from one cc_data structure', async () => {
+	it('should extract both fields from one cc_data structure', () => {
 		const bytes = new Uint8Array([
 			0x2a,
 			0x12, // OBU_METADATA, has_size_field, obu_size = 18

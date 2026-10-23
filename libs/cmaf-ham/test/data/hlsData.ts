@@ -47,7 +47,7 @@ function getAudioTrack({
 			...(byteRange && { byteRange }),
 		},
 		baseUrls: [],
-	} as AudioTrack
+	}
 }
 
 function getSegments(): SegmentHls[] {

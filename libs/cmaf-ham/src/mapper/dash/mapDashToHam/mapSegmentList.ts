@@ -31,7 +31,7 @@ export function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 					url: segmentURL.$.media ?? '',
 					// byteRange not included - SegmentList typically doesn't include byteRange info
 					startTime,
-				} as Segment)
+				})
 			})
 		}
 	})

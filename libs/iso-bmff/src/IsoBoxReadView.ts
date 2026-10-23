@@ -111,7 +111,7 @@ export class IsoBoxReadView {
 		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this
 
-		let result: any
+		let result: unknown
 		let cursor = size
 
 		switch (type) {
@@ -129,22 +129,26 @@ export class IsoBoxReadView {
 
 			case STRING:
 				if (size === -1) {
-					result = readTerminatedString(dataView, offset)
-					cursor = result.length + 1
+					const text = readTerminatedString(dataView, offset)
+					result = text
+					cursor = text.length + 1
 				} else {
 					result = readString(dataView, offset, size)
 				}
 				break
 
-			case DATA:
-				result = readData(dataView, offset, size)
-				cursor = result.length
+			case DATA: {
+				const data = readData(dataView, offset, size)
+				result = data
+				cursor = data.length
 				break
+			}
 
 			case UTF8:
 				if (size === -1) {
-					result = readUtf8TerminatedString(dataView, offset)
-					cursor = result.length + 1
+					const text = readUtf8TerminatedString(dataView, offset)
+					result = text
+					cursor = text.length + 1
 				} else {
 					result = readUtf8String(dataView, offset)
 				}
@@ -156,7 +160,7 @@ export class IsoBoxReadView {
 
 		this.offset += cursor
 
-		return result
+		return result as IsoFieldTypeMap[T]
 	}
 
 	/**
@@ -250,7 +254,7 @@ export class IsoBoxReadView {
 			value.push(this.read(type, size))
 		}
 
-		return value as IsoFieldTypeMap[T][]
+		return value
 	}
 
 	/**

@@ -25,6 +25,8 @@ import { performance, PerformanceObserver } from 'node:perf_hooks'
 import { pathToFileURL } from 'node:url'
 import base32 from 'hi-base32'
 import { type EncoderApi, type Input, makeInputs } from './inputs.ts'
+import type { RawBareItem, RawDict, RawItem, RawList, RawParams } from '../test/util/format.ts'
+import type { SfTestCase } from '../test/util/read.ts'
 
 type Variant = {
 	name: string
@@ -171,7 +173,7 @@ async function drive(): Promise<void> {
 				throw new Error(proc.stderr)
 			}
 			const lines = proc.stdout.trim().split('\n')
-			return JSON.parse(lines[lines.length - 1])
+			return JSON.parse(lines[lines.length - 1]) as WorkerResult
 		}),
 	)
 
@@ -208,24 +210,24 @@ async function drive(): Promise<void> {
 function makeCorpusCases(api: EncoderApi): Input[] {
 	const { SfItem } = api
 
-	const format = (value: any): any => {
-		if (Array.isArray(value)) {
-			return value.map(format)
+	const format = (value: RawBareItem): unknown => {
+		if (typeof value !== 'object') {
+			return value
 		}
-		switch (value?.__type) {
+		switch (value.__type) {
 			case 'binary':
 				return Uint8Array.from(value.value === '' ? [] : base32.decode.asBytes(value.value))
 			case 'token':
 				return Symbol.for(value.value)
 			case 'date':
 				return new Date(value.value * 1000)
-			default:
-				return value
 		}
 	}
-	const formatParams = (params: any[]): Record<string, any> | undefined =>
-		params.length === 0 ? undefined : Object.fromEntries(params.map(format))
-	const formatItem = ([value, params]: any[]): any =>
+	const formatParams = (params: RawParams): Record<string, unknown> | undefined =>
+		params.length === 0
+			? undefined
+			: Object.fromEntries(params.map(([key, value]) => [key, format(value)]))
+	const formatItem = ([value, params]: RawItem): InstanceType<typeof SfItem> =>
 		new SfItem(Array.isArray(value) ? value.map(formatItem) : format(value), formatParams(params))
 
 	const files = [
@@ -239,7 +241,7 @@ function makeCorpusCases(api: EncoderApi): Input[] {
 	const cases: Input[] = []
 
 	for (const file of files) {
-		for (const suite of JSON.parse(readFileSync(file, 'utf8'))) {
+		for (const suite of JSON.parse(readFileSync(file, 'utf8')) as SfTestCase[]) {
 			if (
 				suite.expected === undefined ||
 				JSON.stringify(suite.expected).includes('displaystring')
@@ -248,17 +250,18 @@ function makeCorpusCases(api: EncoderApi): Input[] {
 			}
 			const name = `${basename(file)}: ${suite.name}`
 			if (suite.header_type === 'item') {
-				cases.push({ name, call: () => api.encodeSfItem(formatItem(suite.expected)) })
+				const expected = suite.expected as RawItem
+				cases.push({ name, call: () => api.encodeSfItem(formatItem(expected)) })
 			} else if (suite.header_type === 'list') {
-				cases.push({ name, call: () => api.encodeSfList(suite.expected.map(formatItem)) })
+				const expected = suite.expected as RawList
+				cases.push({ name, call: () => api.encodeSfList(expected.map(formatItem)) })
 			} else if (suite.header_type === 'dictionary') {
+				const expected = suite.expected as RawDict
 				cases.push({
 					name,
 					call: () =>
 						api.encodeSfDict(
-							Object.fromEntries(
-								suite.expected.map(([key, entry]: any[]) => [key, formatItem(entry)]),
-							),
+							Object.fromEntries(expected.map(([key, entry]) => [key, formatItem(entry)])),
 						),
 				})
 			}

@@ -40,6 +40,7 @@ import { CaptionsLogger } from './CaptionsLogger.ts'
 import type { Channels } from './Channels.ts'
 import type { CmdHistory } from './CmdHistory.ts'
 import { Cta608Channel } from './Cta608Channel.ts'
+import type { CueHandler } from './CueHandler.ts'
 import type { PACData } from './PACData.ts'
 import type { PenStyles } from './PenStyles.ts'
 import type { SupportedField } from './SupportedField.ts'
@@ -71,8 +72,8 @@ export class Cta608Parser {
 		const logger = (this.logger = new CaptionsLogger())
 		this.channels = [
 			null,
-			new Cta608Channel(field, out1, logger),
-			new Cta608Channel(field + 1, out2, logger),
+			new Cta608Channel(field, out1 as CueHandler, logger),
+			new Cta608Channel(field + 1, out2 as CueHandler, logger),
 		]
 	}
 
@@ -104,9 +105,9 @@ export class Cta608Parser {
 					VerboseLevel.DATA,
 					() =>
 						'[' +
-						numArrayToHexArray([byteList[i], byteList[i + 1]]) +
+						numArrayToHexArray([byteList[i], byteList[i + 1]]).join(',') +
 						'] -> (' +
-						numArrayToHexArray([a, b]) +
+						numArrayToHexArray([a, b]).join(',') +
 						')',
 				)
 			}
@@ -119,7 +120,7 @@ export class Cta608Parser {
 					setLastCmd(null, null, cmdHistory)
 					this.logger.log(
 						VerboseLevel.DEBUG,
-						() => 'Repeated command (' + numArrayToHexArray([a, b]) + ') is dropped',
+						() => 'Repeated command (' + numArrayToHexArray([a, b]).join(',') + ') is dropped',
 					)
 					continue
 				}
@@ -159,9 +160,9 @@ export class Cta608Parser {
 					VerboseLevel.WARNING,
 					() =>
 						"Couldn't parse cleaned data " +
-						numArrayToHexArray([a, b]) +
+						numArrayToHexArray([a, b]).join(',') +
 						' orig: ' +
-						numArrayToHexArray([byteList[i], byteList[i + 1]]),
+						numArrayToHexArray([byteList[i], byteList[i + 1]]).join(','),
 				)
 			}
 		}
@@ -253,7 +254,10 @@ export class Cta608Parser {
 				return false
 			}
 			channel.ccMIDROW(b)
-			this.logger.log(VerboseLevel.DEBUG, () => 'MIDROW (' + numArrayToHexArray([a, b]) + ')')
+			this.logger.log(
+				VerboseLevel.DEBUG,
+				() => 'MIDROW (' + numArrayToHexArray([a, b]).join(',') + ')',
+			)
 			return true
 		}
 		return false
