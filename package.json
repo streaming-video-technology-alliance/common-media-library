@@ -44,7 +44,7 @@
 		"ver": "node scripts/version.ts",
 		"site": "npm start -w site",
 		"notes": "node scripts/createReleaseNotes.ts",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "vp lint --type-aware --type-check ."
 	},
 	"workspaces": [
 		"site",

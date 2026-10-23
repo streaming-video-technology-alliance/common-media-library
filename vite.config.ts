@@ -44,7 +44,7 @@ const config: ViteUserConfig = defineConfig({
 		env: {
 			builtin: true,
 		},
-		ignorePatterns: ['**/dist'],
+		ignorePatterns: ['**/dist', '**/*.context.d.ts', 'dev/', '**/samples/'],
 		rules: {
 			'constructor-super': 'error',
 			'for-direction': 'error',
