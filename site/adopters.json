@@ -17,7 +17,7 @@
 	},
 	{
 		"name": "Video.js",
-		"url": "https://github.com/videojs/video.js",
+		"url": "https://videojs.org",
 		"packages": ["cmcd"],
 		"note": "Uses CML in its spf package."
 	},
