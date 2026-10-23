@@ -57,4 +57,12 @@ if (bytes > limit) {
 	process.exit(1)
 }
 
+const theme = readdirSync(chunksDir).find(file => file.startsWith('theme.'))
+const themeCode = theme ? readFileSync(path.join(chunksDir, theme), 'utf8') : ''
+
+if (!themeCode.includes('Page not found') || !themeCode.includes('Browse the packages')) {
+	console.error('The theme chunk does not contain the custom not-found page')
+	process.exit(1)
+}
+
 console.log(`site/dist OK. Search index ${Math.round(bytes / 1024)} KB.`)
