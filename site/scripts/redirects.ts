@@ -1,22 +1,22 @@
 import type { PackageInfo } from './packages.ts'
 
 export type Redirect = {
-	from: string;
-	to: string;
+	from: string
+	to: string
 	// The old site gave every signature its own anchor, `member-1`. The new page has one heading per member.
-	signatures?: boolean;
+	signatures?: boolean
 	// Old heading id to new heading id, for headings whose id changed.
-	anchors?: Record<string, string>;
+	anchors?: Record<string, string>
 }
 
 // Markdown folder name to the folder name of the old HTML site.
 const kindDirs: Record<string, string> = {
-	'classes': 'classes',
-	'enumerations': 'enums',
-	'functions': 'functions',
-	'interfaces': 'interfaces',
+	classes: 'classes',
+	enumerations: 'enums',
+	functions: 'functions',
+	interfaces: 'interfaces',
 	'type-aliases': 'types',
-	'variables': 'variables',
+	variables: 'variables',
 }
 
 const signatureKinds = new Set(['classes', 'interfaces', 'type-aliases'])
@@ -34,13 +34,14 @@ export const documentAnchors: Record<string, Record<string, string>> = {
 	'documents/_svta_cml-cmcd.User_Guide.html': {
 		'absolute-urls-for': 'absolute-urls-for-nor',
 		'complete-requestresponse-flow': 'complete-request-response-flow',
-		'do-not-pair-with--for-the-same-state-change-field': 'do-not-pair-update-with-recordevent-for-the-same-state-change-field',
-		'typing': 'typing-customdata',
-		'using': 'using-recordevent',
+		'do-not-pair-with--for-the-same-state-change-field':
+			'do-not-pair-update-with-recordevent-for-the-same-state-change-field',
+		typing: 'typing-customdata',
+		using: 'using-recordevent',
 	},
 	'documents/_svta_cml-cmcd.Validation_Guide.html': {
 		'parsing-and-validating-manually': 'parsing-and-validating-application-cmcd-manually',
-		'using': 'using-validatecmcdevents',
+		using: 'using-validatecmcdevents',
 		'using-1': 'using-validatecmcdrequest',
 	},
 }
@@ -104,11 +105,11 @@ export function redirectHtml(redirect: Redirect, base: string): string {
 	}
 
 	if (redirect.signatures) {
-		steps.push('h = h.replace(/-\\d+$/, \'\')')
+		steps.push("h = h.replace(/-\\d+$/, '')")
 	}
 
 	steps.push(
-		'h = h.replace(/_/g, \'-\').replace(/^-+|-+$/g, \'\')',
+		"h = h.replace(/_/g, '-').replace(/^-+|-+$/g, '')",
 		`location.replace(${JSON.stringify(url)} + (h ? '#' + h : ''))`,
 	)
 

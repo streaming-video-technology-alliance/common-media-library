@@ -4,23 +4,23 @@ import { parseFrontmatter } from './frontmatter.ts'
 import { groupOrder, groups, type PackageGroup } from './groups.ts'
 
 export type GuideInfo = {
-	slug: string;
-	title: string;
+	slug: string
+	title: string
 }
 
 export type PackageInfo = {
-	folder: string;
-	name: string;
-	version: string;
-	description: string;
-	group: PackageGroup;
-	guides: GuideInfo[];
+	folder: string
+	name: string
+	version: string
+	description: string
+	group: PackageGroup
+	guides: GuideInfo[]
 }
 
 type Manifest = {
-	name: string;
-	version: string;
-	description?: string;
+	name: string
+	version: string
+	description?: string
 }
 
 function loadGuides(docsDir: string): GuideInfo[] {
@@ -31,7 +31,7 @@ function loadGuides(docsDir: string): GuideInfo[] {
 	return readdirSync(docsDir)
 		.filter(file => file.endsWith('.md'))
 		.sort()
-		.map((file) => {
+		.map(file => {
 			const slug = file.slice(0, -'.md'.length)
 			const { attributes } = parseFrontmatter(readFileSync(path.join(docsDir, file), 'utf8'))
 			return { slug, title: attributes['title'] ?? slug }
@@ -44,7 +44,9 @@ export function loadPackage(libsDir: string, folder: string): PackageInfo {
 	const group = groups[folder]
 
 	if (!group) {
-		throw new Error(`site/scripts/groups.ts has no group for "${folder}". Add it to one of: ${groupOrder.join(', ')}.`)
+		throw new Error(
+			`site/scripts/groups.ts has no group for "${folder}". Add it to one of: ${groupOrder.join(', ')}.`,
+		)
 	}
 
 	return {
@@ -60,11 +62,14 @@ export function loadPackage(libsDir: string, folder: string): PackageInfo {
 export function renderPackageIndex(packages: PackageInfo[]): string {
 	const sections = groupOrder
 		.filter(group => packages.some(pkg => pkg.group === group))
-		.map((group) => {
+		.map(group => {
 			const rows = packages
 				.filter(pkg => pkg.group === group)
 				.sort((a, b) => a.folder.localeCompare(b.folder))
-				.map(pkg => `| [${pkg.name}](/packages/${pkg.folder}/) | ${pkg.version} | ${pkg.description} |`)
+				.map(
+					pkg =>
+						`| [${pkg.name}](/packages/${pkg.folder}/) | ${pkg.version} | ${pkg.description} |`,
+				)
 
 			return `## ${group}\n\n| Package | Version | Description |\n| --- | --- | --- |\n${rows.join('\n')}\n`
 		})
