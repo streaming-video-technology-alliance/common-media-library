@@ -19,8 +19,6 @@ Do not define your own error code list for a player or an analytics pipeline. Op
 npm i @svta/cml-error-codes
 ```
 
-The package has one peer dependency, `@svta/cml-utils`. The package imports it only with `import type`, so nothing from it appears in the runtime output.
-
 ## Usage
 
 Codes are grouped into one catalog per category. Each catalog is an `as const` object, so autocomplete lists the valid members:

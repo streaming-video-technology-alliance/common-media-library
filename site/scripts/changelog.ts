@@ -35,3 +35,10 @@ Every release of every package, newest first. Each link opens the changelog of t
 ${rows.join('\n')}
 `
 }
+
+const defaultHeading = /^# Changelog\r?\n/
+
+// Every package changelog starts with `# Changelog`. The site names the package, so search hits do too.
+export function retitleChangelog(changelog: string, packageName: string): string {
+	return changelog.replace(defaultHeading, `# ${packageName} changelog\n`)
+}

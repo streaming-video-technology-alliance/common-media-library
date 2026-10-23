@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 
 ## [0.2.0] - 2026-10-21
 

@@ -1,8 +1,9 @@
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { parseReleases, renderReleases, type Release } from './changelog.ts'
+import { parseReleases, renderReleases, retitleChangelog, type Release } from './changelog.ts'
 import { rewriteReadmeLinks } from './links.ts'
 import { loadPackage, renderPackageIndex, type PackageInfo } from './packages.ts'
+import { renderPeers } from './peers.ts'
 
 const siteDir = path.resolve(import.meta.dirname, '..')
 const root = path.resolve(siteDir, '..')
@@ -31,10 +32,10 @@ for (const project of projects) {
 	mkdirSync(target, { recursive: true })
 
 	const readme = readFileSync(path.join(source, 'README.md'), 'utf8')
-	writeFileSync(path.join(target, 'index.md'), rewriteReadmeLinks(readme))
+	writeFileSync(path.join(target, 'index.md'), rewriteReadmeLinks(readme) + renderPeers(pkg))
 
 	const changelog = readFileSync(path.join(source, 'CHANGELOG.md'), 'utf8')
-	writeFileSync(path.join(target, 'changelog.md'), changelog)
+	writeFileSync(path.join(target, 'changelog.md'), retitleChangelog(changelog, pkg.name))
 
 	if (pkg.guides.length > 0) {
 		const guides = path.join(target, 'guides')
