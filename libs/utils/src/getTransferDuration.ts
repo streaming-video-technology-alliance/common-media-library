@@ -8,14 +8,14 @@ import type { ResourceTiming } from './ResourceTiming.ts'
  * is not part of the transfer. Otherwise the function returns `duration`.
  *
  * @example
- * {@includeCode ../test/getTransferDurationMs.test.ts#example}
+ * {@includeCode ../test/getTransferDuration.test.ts#example}
  *
  * @param sample - A ResourceTiming sample
  * @returns The transfer duration in milliseconds
  *
  * @public
  */
-export function getTransferDurationMs(sample: ResourceTiming): number {
+export function getTransferDuration(sample: ResourceTiming): number {
 	const { startTime, duration, responseStart } = sample
 	const responseEnd = startTime + duration
 

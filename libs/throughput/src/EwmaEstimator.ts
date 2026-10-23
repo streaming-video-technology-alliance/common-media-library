@@ -1,5 +1,5 @@
 import type { ResourceTiming } from '@svta/cml-utils'
-import { getBandwidthBps, getTransferDurationMs } from '@svta/cml-utils'
+import { getBandwidthBps, getTransferDuration } from '@svta/cml-utils'
 import { Ewma } from './Ewma.ts'
 import type { EwmaEstimatorOptions } from './EwmaEstimatorOptions.ts'
 import { isValidSample } from './isValidSample.ts'
@@ -17,7 +17,7 @@ export class EwmaEstimator implements ThroughputEstimator {
 	private defaultEstimate: number
 	private minTotalBytes: number
 	private minBodySize: number
-	private minTransferMs: number
+	private minTransferDuration: number
 	private totalBytes: number = 0
 	private hasSamples: boolean = false
 	private fastEwma: Ewma
@@ -26,7 +26,7 @@ export class EwmaEstimator implements ThroughputEstimator {
 	public constructor(options: EwmaEstimatorOptions) {
 		this.minTotalBytes = options.minTotalBytes || 0
 		this.minBodySize = options.minBodySize || 0
-		this.minTransferMs = options.minTransferMs || 0
+		this.minTransferDuration = options.minTransferDuration || 0
 		this.defaultEstimate = options.defaultEstimate ?? NaN
 
 		this.slowEwma = new Ewma(halfLifeToAlpha(options.slowHalfLife))
@@ -41,9 +41,9 @@ export class EwmaEstimator implements ThroughputEstimator {
 		}
 
 		// The transfer, not the wait for the first byte, is the evidence about the link.
-		const transferMs = getTransferDurationMs(sample)
+		const transferDuration = getTransferDuration(sample)
 
-		if (transferMs < this.minTransferMs) {
+		if (transferDuration < this.minTransferDuration) {
 			return
 		}
 
@@ -51,8 +51,8 @@ export class EwmaEstimator implements ThroughputEstimator {
 		this.totalBytes += encodedBodySize
 		this.hasSamples = true
 
-		this.slowEwma.sample(transferMs / 1000, bandwidthBps)
-		this.fastEwma.sample(transferMs / 1000, bandwidthBps)
+		this.slowEwma.sample(transferDuration / 1000, bandwidthBps)
+		this.fastEwma.sample(transferDuration / 1000, bandwidthBps)
 	}
 
 	public getEstimate(): number {
