@@ -85,6 +85,7 @@ const STRICT_STARVATION_FACTOR = 0.5
 const RELAXED_STARVATION_FACTOR = 0.9
 // A first-byte wait that makes the download of rung 3 exceed `WAIT_BUFFER_LEVEL`. Without the wait, the download fits.
 const FIRST_BYTE_WAIT_MS = 300
+const LONG_FIRST_BYTE_WAIT_MS = 20_000
 const WAIT_BUFFER_LEVEL = 5.3
 const FAST_PLAYBACK_RATE = 2
 const INVALID_PLAYBACK_RATES = [0, -1, NaN, Infinity]
@@ -135,6 +136,20 @@ function load(
 		bufferLevel,
 		...extra,
 	})
+}
+
+// Reports `FIRST_BYTE_WAIT_SAMPLE_COUNT` finished segments of rung 3 that waited `FIRST_BYTE_WAIT_MS` for the first byte.
+function loadWaits(selector: BitrateSelector): void {
+	for (let i = 0; i < FIRST_BYTE_WAIT_SAMPLE_COUNT; i++) {
+		load(selector, L1_BANDWIDTHS[3], WAIT_BUFFER_LEVEL, 0, {
+			timing: {
+				startTime: 0,
+				responseStart: FIRST_BYTE_WAIT_MS,
+				duration: DOWNLOAD_DURATION,
+				encodedBodySize: 1,
+			},
+		})
+	}
 }
 
 // Moves a selector from the startup state to the steady state. One segment is loaded and the buffer holds one segment.
@@ -789,16 +804,7 @@ describe('createBolaSelector', () => {
 			// At the default factor, rung 3 needs 5.1 s to download one segment. The wait makes it 5.4 s.
 			const selector = createEmptyPlaceholderSelector()
 
-			for (let i = 0; i < FIRST_BYTE_WAIT_SAMPLE_COUNT; i++) {
-				load(selector, L1_BANDWIDTHS[3], WAIT_BUFFER_LEVEL, 0, {
-					timing: {
-						startTime: 0,
-						responseStart: FIRST_BYTE_WAIT_MS,
-						duration: DOWNLOAD_DURATION,
-						encodedBodySize: 1,
-					},
-				})
-			}
+			loadWaits(selector)
 
 			const elapsed = GUARD_BUFFER_LEVEL - WAIT_BUFFER_LEVEL
 			const decision = selector.select({
@@ -811,6 +817,54 @@ describe('createBolaSelector', () => {
 
 			equal(decide(WAIT_BUFFER_LEVEL).index, 3)
 			equal(decision.index, 2)
+		})
+
+		it('ignores the first-byte wait of an aborted sample', () => {
+			const selector = createEmptyPlaceholderSelector()
+
+			loadWaits(selector)
+			// An aborted download of rung 4 that waited 20 s. Rung 3 replaces it as the current rung.
+			load(selector, L1_BANDWIDTHS[4], WAIT_BUFFER_LEVEL, 0, {
+				timing: {
+					startTime: 0,
+					responseStart: LONG_FIRST_BYTE_WAIT_MS,
+					duration: LONG_FIRST_BYTE_WAIT_MS + DOWNLOAD_DURATION,
+					encodedBodySize: 1,
+				},
+				aborted: true,
+			})
+
+			const elapsed = GUARD_BUFFER_LEVEL - WAIT_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: WAIT_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: LONG_FIRST_BYTE_WAIT_MS + DOWNLOAD_DURATION + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decision.index, 2)
+		})
+
+		it('forgets the first-byte waits after a reset', () => {
+			const selector = createEmptyPlaceholderSelector()
+
+			loadWaits(selector)
+			selector.reset()
+			reachSteadyState(selector, throughputFor(1))
+			selector.select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: requestEnd(0) })
+			load(selector, L1_BANDWIDTHS[3], WAIT_BUFFER_LEVEL)
+
+			const elapsed = GUARD_BUFFER_LEVEL - WAIT_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: WAIT_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decision.index, 3)
 		})
 
 		it('does not run in the startup state, even after two finished samples', () => {

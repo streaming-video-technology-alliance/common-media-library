@@ -1,6 +1,5 @@
-import { deepEqual, equal } from 'node:assert'
+import { deepEqual } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
-import { averageFirstByteWait } from '../src/averageFirstByteWait.ts'
 import { FIRST_BYTE_WAIT_SAMPLE_COUNT } from '../src/FIRST_BYTE_WAIT_SAMPLE_COUNT.ts'
 import { recordFirstByteWait } from '../src/recordFirstByteWait.ts'
 
@@ -11,6 +10,13 @@ function timing(waitMs: number) {
 		responseStart: 1000 + waitMs,
 		duration: waitMs + 100,
 		encodedBodySize: 1,
+	}
+}
+
+// The waits of `count` timings of 100, 200, ... milliseconds.
+function recordWaits(waits: number[], count: number): void {
+	for (let i = 1; i <= count; i++) {
+		recordFirstByteWait(waits, timing(i * 100))
 	}
 }
 
@@ -33,6 +39,18 @@ describe('recordFirstByteWait', () => {
 			duration: 100,
 			encodedBodySize: 1,
 		})
+		recordFirstByteWait(waits, {
+			startTime: 1000,
+			responseStart: 1101,
+			duration: 100,
+			encodedBodySize: 1,
+		})
+		recordFirstByteWait(waits, {
+			startTime: 1000,
+			responseStart: 1050,
+			duration: NaN,
+			encodedBodySize: 1,
+		})
 
 		deepEqual(waits, [])
 	})
@@ -40,20 +58,17 @@ describe('recordFirstByteWait', () => {
 	it('keeps the last four waits', () => {
 		const waits: number[] = []
 
-		for (let i = 1; i <= FIRST_BYTE_WAIT_SAMPLE_COUNT + 2; i++) {
-			recordFirstByteWait(waits, timing(i * 100))
-		}
+		recordWaits(waits, FIRST_BYTE_WAIT_SAMPLE_COUNT + 2)
 
 		deepEqual(waits, [0.3, 0.4, 0.5, 0.6])
 	})
-})
 
-describe('averageFirstByteWait', () => {
-	it('returns 0 without waits', () => {
-		equal(averageFirstByteWait([]), 0)
-	})
+	it('keeps a full window when a timing without a usable responseStart arrives', () => {
+		const waits: number[] = []
 
-	it('returns the mean of the waits', () => {
-		equal(averageFirstByteWait([0.25, 0.5, 0.75]), 0.5)
+		recordWaits(waits, FIRST_BYTE_WAIT_SAMPLE_COUNT)
+		recordFirstByteWait(waits, { startTime: 1000, duration: 100, encodedBodySize: 1 })
+
+		deepEqual(waits, [0.1, 0.2, 0.3, 0.4])
 	})
 })

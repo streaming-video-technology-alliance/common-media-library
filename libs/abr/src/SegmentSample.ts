@@ -8,7 +8,7 @@ import type { ResourceTiming } from '@svta/cml-utils'
 export type SegmentSample = {
 	/**
 	 * The timing of the download. The player passes the same object to the throughput estimator.
-	 * The starvation guard reads the first-byte wait from `responseStart`.
+	 * The starvation guard reads the first-byte wait from `responseStart`, when `responseStart` is inside the response.
 	 */
 	timing: ResourceTiming
 

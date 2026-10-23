@@ -100,7 +100,7 @@ describe('ArithmeticMeanEstimator', () => {
 })
 
 describe('ArithmeticMeanEstimator transfer duration', () => {
-	it('measures a sample over its transfer when the sample has responseStart', async () => {
+	it('measures a sample over its transfer when the sample has responseStart', () => {
 		const estimator = new ArithmeticMeanEstimator()
 
 		// 112 kB that waited 800 ms for the first byte and transferred in 50 ms: 17.92 Mbps.
