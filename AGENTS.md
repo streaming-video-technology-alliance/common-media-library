@@ -54,6 +54,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Actionable error messages: include parameter name, expected value(s), and received value.
 - Minimal API surface: do not add a public export unless it serves a clear use case.
 - Follow the naming and structural patterns of the other packages: `encode`/`decode`, options objects, and the const enum pattern.
+- The type declarations need TypeScript 5.7 or later, and the root README states that minimum. A function that allocates its result returns `Uint8Array<ArrayBuffer>`, so adopters can pass the result to Web APIs without a cast. A function that returns a view over its input returns `Uint8Array`. Never narrow an input type: parameters accept `Uint8Array` and `ArrayBufferLike`. Newer TypeScript syntax in a public signature raises the minimum, so document it when you add one.
 
 ## Workflow
 

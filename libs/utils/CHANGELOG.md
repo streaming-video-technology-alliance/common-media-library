@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Changed
 
-- `decodeBase64` and `encodeText` now return `Uint8Array<ArrayBuffer>`. The result passes to Web APIs such as `crypto.subtle.digest` without a cast under TypeScript 6 and later. Reading the type needs TypeScript 5.7 or later.
+- `decodeBase64` and `encodeText` now return `Uint8Array<ArrayBuffer>`. The result passes to Web APIs such as `crypto.subtle.digest` without a cast under TypeScript 6 and later. The type declarations now need TypeScript 5.7 or later.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.6.2] - 2026-10-18
