@@ -26,13 +26,22 @@ export default defineConfig({
 	cleanUrls: true,
 	outDir: 'dist',
 	srcExclude: ['**/node_modules/**'],
-	head: [['link', { rel: 'icon', type: 'image/png', href: `${base}favicon.png` }]],
+	head: [
+		['link', { rel: 'icon', type: 'image/svg+xml', href: `${base}cml-mark.svg` }],
+		['link', { rel: 'icon', type: 'image/png', sizes: '64x64', href: `${base}favicon.png` }],
+		['link', { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` }],
+	],
 	themeConfig: {
+		logo: {
+			light: '/cml-lockup-light.svg',
+			dark: '/cml-lockup-dark.svg',
+			alt: 'Common Media Library',
+		},
+		siteTitle: false,
 		nav: [
 			{ text: 'Guide', link: '/guide/getting-started' },
 			{ text: 'Packages', link: '/packages/', activeMatch: '^/(packages|api)/' },
 			{ text: 'Releases', link: '/releases/' },
-			{ text: 'LLMs', link: `${base}llms.txt`, target: '_self' },
 		],
 		sidebar,
 		socialLinks: [

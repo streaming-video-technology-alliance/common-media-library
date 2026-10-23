@@ -1,3 +1,29 @@
+:root {
+	--vp-c-brand-1: #a8501a;
+	--vp-c-brand-2: #9a4817;
+	--vp-c-brand-3: #a8501a;
+	--vp-button-brand-bg: #a8501a;
+	--vp-button-brand-text: #ffffff;
+	--vp-button-brand-hover-bg: #9a4817;
+	--vp-button-brand-hover-text: #ffffff;
+	--vp-button-brand-active-bg: #9a4817;
+	--vp-home-hero-name-color: transparent;
+	--vp-home-hero-name-background: linear-gradient(120deg, #b5581a 30%, #da6f25);
+	--vp-nav-logo-height: 36px;
+}
+
+.dark {
+	--vp-c-brand-1: #f39a5b;
+	--vp-c-brand-2: #f28a45;
+	--vp-c-brand-3: #f28a45;
+	--vp-button-brand-bg: #f28a45;
+	--vp-button-brand-text: #1b1b1f;
+	--vp-button-brand-hover-bg: #f39a5b;
+	--vp-button-brand-hover-text: #1b1b1f;
+	--vp-button-brand-active-bg: #da6f25;
+	--vp-home-hero-name-background: linear-gradient(120deg, #f28a45 30%, #fdbb4a);
+}
+
 pre,
 code {
 	tab-size: 2;
