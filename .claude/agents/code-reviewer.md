@@ -59,7 +59,7 @@ Video players consume this library. Every unnecessary byte costs end users.
 - **`export type` and `export`**: Use `export type`, and `export type *` in barrels, for types, interfaces, and type aliases. This rule is critical for `verbatimModuleSyntax` and ensures that types are erased.
 - **No `any`**: Use `unknown` and narrow, or use generics. `any` is acceptable only in test files, or in internal type assertions with a comment that explains why.
 - **Index signature access**: Use bracket notation (`obj['key']`), not dot notation, for index signatures. `noPropertyAccessFromIndexSignature` requires it.
-- **Type definitions**: Use the `type` keyword, not `interface`, as the ESLint config requires.
+- **Type definitions**: Use the `type` keyword, not `interface`, as the lint config requires.
 - **`as const` assertions**: Use on literal values and objects that should have narrow types.
 
 ### 5. Documentation & Testing
