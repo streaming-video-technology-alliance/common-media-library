@@ -1,6 +1,6 @@
 import { parseFrameRate } from '@svta/cml-dash'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('parseFramerate', () => {
 	it('provides a valid example', async () => {

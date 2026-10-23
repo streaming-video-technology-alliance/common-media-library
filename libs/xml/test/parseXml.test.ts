@@ -2,7 +2,7 @@ import { parseXml } from '@svta/cml-xml'
 import assert, { deepStrictEqual, equal, rejects, strictEqual, throws } from 'node:assert'
 import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { parseXmlGuarded, runParseWorker } from './parseXmlWorker.ts'
 
 describe('parseXml', () => {
@@ -24,7 +24,7 @@ describe('parseXml', () => {
 	})
 
 	it('parses DASH manifest', async () => {
-		const xml = await fs.readFile(resolve('./test/fixtures/bbb_30fps.mpd'), 'utf8')
+		const xml = await fs.readFile(resolve(import.meta.dirname, 'fixtures', 'bbb_30fps.mpd'), 'utf8')
 		const doc = parseXml(xml)
 		const { childNodes } = doc
 
@@ -43,7 +43,10 @@ describe('parseXml', () => {
 	})
 
 	it('parses all node types', async () => {
-		const xml = await fs.readFile(resolve('./test/fixtures/node_types.xml'), 'utf8')
+		const xml = await fs.readFile(
+			resolve(import.meta.dirname, 'fixtures', 'node_types.xml'),
+			'utf8',
+		)
 		const doc = parseXml(xml)
 		const { childNodes } = doc
 		equal(childNodes.length, 2)
@@ -442,8 +445,8 @@ describe('parseXml', () => {
 		})
 
 		it('terminates on every truncation of the fixtures', async () => {
-			for (const fixture of ['./test/fixtures/node_types.xml', './test/fixtures/bbb_30fps.mpd']) {
-				const xml = await fs.readFile(resolve(fixture), 'utf8')
+			for (const fixture of ['node_types.xml', 'bbb_30fps.mpd']) {
+				const xml = await fs.readFile(resolve(import.meta.dirname, 'fixtures', fixture), 'utf8')
 				const outcomes = await runParseWorker({ prefixesOf: xml })
 
 				equal(outcomes.length, xml.length + 1)

@@ -1,6 +1,6 @@
 import { parseByteSequence } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vite-plus/test'
 
 test('parseByteSequence', () => {
 	const value = Uint8Array.from([

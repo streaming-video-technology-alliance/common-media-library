@@ -1,6 +1,6 @@
 import { isId3Header } from '@svta/cml-id3'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 const LEADING_BYTE_SIZE = 8
 const TRAILING_BYTE_SIZE = 8

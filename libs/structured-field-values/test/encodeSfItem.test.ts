@@ -1,6 +1,6 @@
 import { encodeSfItem, SfItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vite-plus/test'
 
 test('encodeSfItem', () => {
 	assert.deepStrictEqual(encodeSfItem('a'), `"a"`)
@@ -24,7 +24,7 @@ test('encodeSfItem', () => {
 		// @ts-expect-error - This is a test
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		() => encodeSfItem(function () {}),
-		/failed to serialize "function \(\) \{\}" as Bare Item/,
+		/failed to serialize "function ?\(\) \{\}" as Bare Item/,
 	)
 	// @ts-expect-error - This is a test
 	// eslint-disable-next-line @typescript-eslint/no-empty-function

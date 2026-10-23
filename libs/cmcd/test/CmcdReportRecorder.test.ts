@@ -7,7 +7,7 @@ import {
 } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 /**
  * Minimal XMLHttpRequest shim sufficient for createXhrTransport tests.

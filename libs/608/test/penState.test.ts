@@ -1,6 +1,6 @@
 import { PenState } from '@svta/cml-608'
 import { deepEqual, equal, notDeepEqual } from 'node:assert'
-import { beforeEach, describe, it } from 'node:test'
+import { beforeEach, describe, it } from 'vite-plus/test'
 
 describe('PenState Tests', () => {
 	let penState: PenState

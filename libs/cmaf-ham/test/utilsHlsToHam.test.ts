@@ -1,5 +1,5 @@
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 import type { HlsManifest } from '@svta/cml-cmaf-ham'
 import { decodeByteRange, formatSegments, getDuration, getHlsCodec } from '@svta/cml-cmaf-ham'

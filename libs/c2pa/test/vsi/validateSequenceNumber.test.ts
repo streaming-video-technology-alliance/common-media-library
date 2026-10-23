@@ -2,7 +2,7 @@ import { createSequenceState } from '../../src/vsi/createSequenceState.ts'
 import { SequenceValidationReason } from '../../src/vsi/SequenceState.ts'
 import { validateSequenceNumber } from '../../src/vsi/validateSequenceNumber.ts'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('validateSequenceNumber', () => {
 	// #region example

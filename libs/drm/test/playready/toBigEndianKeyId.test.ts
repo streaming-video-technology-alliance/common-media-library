@@ -1,7 +1,7 @@
 import { toBigEndianKeyId } from '@svta/cml-drm'
 import { arrayBufferToUuid, uuidToArrayBuffer } from '@svta/cml-utils'
 import { equal } from 'assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('toBigEndianKeyId', () => {
 	it('should convert little-endian key ID to big-endian format', () => {

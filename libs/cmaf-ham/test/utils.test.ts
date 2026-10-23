@@ -1,5 +1,5 @@
 import { equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 import { iso8601DurationToNumber, numberToIso8601Duration } from '@svta/cml-cmaf-ham'
 

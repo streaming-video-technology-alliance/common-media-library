@@ -1,6 +1,6 @@
 import { ArithmeticMeanEstimator } from '@svta/cml-throughput'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('ArithmeticMeanEstimator', () => {
 	it('returns NaN when there are no entries', async () => {

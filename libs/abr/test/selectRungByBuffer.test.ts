@@ -1,5 +1,5 @@
 import { equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { THRESHOLD_TOLERANCE } from '../src/BOLA_CONSTANTS.ts'
 import { BOLA_DEFAULT_BUFFER_TARGET } from '../src/BOLA_DEFAULT_BUFFER_TARGET.ts'
 import { createBolaParams } from '../src/createBolaParams.ts'

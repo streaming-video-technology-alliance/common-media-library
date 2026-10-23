@@ -1,7 +1,7 @@
 import { readRootBoxes } from '../../src/bmff/readRootBoxes.ts'
 import { shouldExcludeBox } from '../../src/bmff/shouldExcludeBox.ts'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { buildBox, buildLargesizeBox, concatBytes } from '../merkle/merkleTestUtils.ts'
 
 describe('shouldExcludeBox', () => {

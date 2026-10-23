@@ -2,7 +2,7 @@ import { deepEqual, throws } from 'node:assert/strict'
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { loadAdopters } from './adopters.ts'
 
 const folders = new Set(['cmcd', 'utils'])

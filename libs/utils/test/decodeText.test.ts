@@ -1,6 +1,6 @@
 import { decodeText, stringToUint16, UTF_16, UTF_8 } from '@svta/cml-utils'
 import { equal } from 'node:assert'
-import { it } from 'node:test'
+import { it } from 'vite-plus/test'
 import { decoderTest } from './decoderTest.ts'
 import { strToCodes } from './strToCodes.ts'
 

@@ -1,7 +1,7 @@
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { validateBmffHash } from '../../src/bmff/validateBmffHash.ts'
 import { ok, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { buildBox, concatBytes, encodeBoxOffset, sha256 } from '../merkle/merkleTestUtils.ts'
 
 function buildMinimalBox(type: string): Uint8Array {

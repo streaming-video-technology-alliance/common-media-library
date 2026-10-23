@@ -8,13 +8,17 @@ import {
 } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { afterEach, describe, it, vi } from 'vite-plus/test'
 import { toCmcdValue } from '@svta/cml-cmcd'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
 import { CMCD_STRING_EVENT } from './data/CMCD_STRING_EVENT.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
 import { CMCD_STRING_RESPONSE } from './data/CMCD_STRING_RESPONSE.ts'
 import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('encodeCmcd', () => {
 	it('provides a valid example', () => {
@@ -146,8 +150,8 @@ describe('encodeCmcd', () => {
 		equal(encodeCmcd(input), 'v=2')
 	})
 
-	it('replaces a ts that is not a number with the current time', context => {
-		context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+	it('replaces a ts that is not a number with the current time', () => {
+		vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 		const input = {
 			e: CmcdEventType.PLAY_STATE,
 			sta: CmcdPlayerState.PLAYING,
@@ -185,8 +189,8 @@ describe('encodeCmcd', () => {
 			)
 		})
 
-		it("doesn't filter e key in event mode", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter e key in event mode", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.TIME_INTERVAL, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -195,8 +199,8 @@ describe('encodeCmcd', () => {
 			ok(output.includes('e=t'), 'e key must not be filtered out in event mode')
 		})
 
-		it("doesn't filter ts key in event mode", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter ts key in event mode", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.TIME_INTERVAL, ts: 1640995200000, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -205,8 +209,8 @@ describe('encodeCmcd', () => {
 			ok(output.includes('ts='), 'ts key must not be filtered out in event mode')
 		})
 
-		it("doesn't filter cen key in event mode when event type is ce", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter cen key in event mode when event type is ce", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.CUSTOM_EVENT, cen: 'my-custom-event', cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -218,8 +222,8 @@ describe('encodeCmcd', () => {
 			)
 		})
 
-		it("doesn't filter sta key in event mode when event type is ps", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter sta key in event mode when event type is ps", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -228,8 +232,8 @@ describe('encodeCmcd', () => {
 			ok(output.includes('sta='), 'sta key must not be filtered out in event mode when e=ps')
 		})
 
-		it("doesn't filter pr key in event mode when event type is pr", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter pr key in event mode when event type is pr", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1.5, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -238,8 +242,8 @@ describe('encodeCmcd', () => {
 			ok(output.includes('pr='), 'pr key must not be filtered out in event mode when e=pr')
 		})
 
-		it("doesn't filter cid key in event mode when event type is c", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter cid key in event mode when event type is c", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.CONTENT_ID, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -248,8 +252,8 @@ describe('encodeCmcd', () => {
 			ok(output.includes('cid='), 'cid key must not be filtered out in event mode when e=c')
 		})
 
-		it("doesn't filter bg key in event mode when event type is b", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter bg key in event mode when event type is b", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.BACKGROUNDED_MODE, bg: true, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -258,8 +262,8 @@ describe('encodeCmcd', () => {
 			ok(output.includes('bg'), 'bg key must not be filtered out in event mode when e=b')
 		})
 
-		it('encodes bg=?0 in event mode when bg is false', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('encodes bg=?0 in event mode when bg is false', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.BACKGROUNDED_MODE, bg: false, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -278,8 +282,8 @@ describe('encodeCmcd', () => {
 			)
 		})
 
-		it('still strips bg=false in non-b event mode', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('still strips bg=false in non-b event mode', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = {
 				e: CmcdEventType.RESPONSE_RECEIVED,
 				bg: false,
@@ -293,8 +297,8 @@ describe('encodeCmcd', () => {
 			)
 		})
 
-		it('still strips sta="" in event mode when event type is ps', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('still strips sta="" in event mode when event type is ps', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.PLAY_STATE, sta: '' as any, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -303,8 +307,8 @@ describe('encodeCmcd', () => {
 			equal(output.includes('sta='), false, 'sta="" is a caller bug and should not be carved out')
 		})
 
-		it('still strips cid=false in event mode when event type is c', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('still strips cid=false in event mode when event type is c', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.CONTENT_ID, cid: false as any, sid: 'session-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -317,8 +321,8 @@ describe('encodeCmcd', () => {
 			)
 		})
 
-		it("doesn't filter br key in event mode when event type is bc", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't filter br key in event mode when event type is bc", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.BITRATE_CHANGE, br: [3000], cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -327,8 +331,8 @@ describe('encodeCmcd', () => {
 			ok(output.includes('br='), 'br key must not be filtered out in event mode when e=bc')
 		})
 
-		it("doesn't force-include sta when value is undefined", context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it("doesn't force-include sta when value is undefined", () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.PLAY_STATE, cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
@@ -351,8 +355,8 @@ describe('encodeCmcd', () => {
 			equal(output.includes('sta='), false, 'sta should be filtered out in request mode')
 		})
 
-		it('preserves pr=1 in event mode when event type is pr', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('preserves pr=1 in event mode when event type is pr', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.PLAYBACK_RATE, pr: 1, cid: 'content-id' }
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
 			ok(output.includes('pr=1'), 'pr=1 must be preserved when event type is pr')
@@ -364,8 +368,8 @@ describe('encodeCmcd', () => {
 			equal(output.includes('pr=1'), false, 'pr=1 should still be skipped in request mode')
 		})
 
-		it('still skips pr=1 in non-pr event mode', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('still skips pr=1 in non-pr event mode', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = { e: CmcdEventType.RESPONSE_RECEIVED, pr: 1, url: 'https://example.com/v.mp4' }
 			const output = encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT })
 			equal(output.includes('pr=1'), false, 'pr=1 should still be skipped when e is not pr')
@@ -499,8 +503,8 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(input, { reportingMode: CmcdReportingMode.EVENT }), output)
 		})
 
-		it('appends timestamp in response received', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('appends timestamp in response received', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = Object.assign({}, CMCD_INPUT)
 			input.e = CmcdEventType.RESPONSE_RECEIVED
 			delete input.ts
@@ -513,8 +517,8 @@ describe('encodeCmcd', () => {
 			equal(encodeCmcd(CMCD_INPUT, { reportingMode: CmcdReportingMode.EVENT }), CMCD_STRING_EVENT)
 		})
 
-		it('appends timestamp in event mode', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('appends timestamp in event mode', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const input = Object.assign({}, CMCD_INPUT)
 			delete input.ts
 

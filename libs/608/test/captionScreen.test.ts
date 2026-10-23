@@ -1,6 +1,6 @@
 import { CaptionScreen, Row } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
-import { beforeEach, describe, it, mock } from 'node:test'
+import { beforeEach, describe, it, vi } from 'vite-plus/test'
 
 describe('CaptionScreen Tests', () => {
 	const NR_ROWS = 15
@@ -21,7 +21,7 @@ describe('CaptionScreen Tests', () => {
 	it('getDisplayText correctly', () => {
 		const myText = 'This is a test'
 		const expectedText = "[Row 1: 'This is a test']"
-		mock.method(captionScreen.rows[0], 'getTextString', () => myText)
+		vi.spyOn(captionScreen.rows[0], 'getTextString').mockImplementation(() => myText)
 		equal(captionScreen.getDisplayText(true), expectedText)
 	})
 })

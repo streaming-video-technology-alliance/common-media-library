@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { isSameLadder } from '../src/isSameLadder.ts'
 import { bandwidthsOf, L1, L1_BANDWIDTHS, rungs, withRung } from './helpers/ladders.ts'
 

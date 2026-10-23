@@ -1,4 +1,4 @@
-import { defineConfig, type ViteUserConfig } from 'vite-plus'
+import { configDefaults, defineConfig, type ViteUserConfig } from 'vite-plus'
 
 const config: ViteUserConfig = defineConfig({
 	fmt: {
@@ -12,6 +12,29 @@ const config: ViteUserConfig = defineConfig({
 	pack: {
 		// Keep the output names dist/index.js and dist/index.d.ts.
 		fixedExtension: false,
+	},
+	test: {
+		restoreMocks: true,
+		silent: 'passed-only',
+		projects: [
+			{
+				extends: true,
+				test: {
+					name: 'unit',
+					isolate: false,
+					exclude: [...configDefaults.exclude, '**/*.environment.test.ts'],
+				},
+			},
+			{
+				// These files remove a global and then import the package for the first time.
+				// They need a worker of their own with a fresh module cache.
+				extends: true,
+				test: {
+					name: 'environment',
+					include: ['**/*.environment.test.ts'],
+				},
+			},
+		],
 	},
 	lint: {
 		plugins: ['typescript'],

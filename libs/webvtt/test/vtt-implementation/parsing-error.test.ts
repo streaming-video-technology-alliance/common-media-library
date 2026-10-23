@@ -1,4 +1,4 @@
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { expectError } from '../utils/expectError.ts'
 
 describe('parsing error tests', function () {

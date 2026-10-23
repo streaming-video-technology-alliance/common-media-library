@@ -7,7 +7,7 @@ import {
 	type ValidatedSessionKey,
 } from '@svta/cml-c2pa'
 import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
-import { before, describe, it, type TestContext } from 'node:test'
+import { afterEach, beforeAll as before, describe, it, vi } from 'vite-plus/test'
 import { createTestSigner } from '../testSigner.ts'
 import {
 	buildSessionKeysInitSegment,
@@ -16,6 +16,10 @@ import {
 	type TestSessionKey,
 	type TestSessionKeyEntry,
 } from '../vsi/vsiTestUtils.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('validateC2paSegment', () => {
 	// #region example
@@ -57,29 +61,29 @@ describe('validateC2paSegment', () => {
 		})
 
 		// Validates the init segment before key_002 is active, then the segment at `segmentTime`.
-		async function validateSegmentAt(context: TestContext, segmentTime: number) {
-			context.mock.timers.enable({ apis: ['Date'], now: INIT_VALIDATION_TIME })
+		async function validateSegmentAt(segmentTime: number) {
+			vi.useFakeTimers({ now: INIT_VALIDATION_TIME, toFake: ['Date'] })
 			const { sessionKeys } = await validateC2paInitSegment(init)
-			context.mock.timers.setTime(segmentTime)
+			vi.setSystemTime(segmentTime)
 			return validateC2paSegment(segment, sessionKeys)
 		}
 
-		it('rejects a segment signed with a session key that is not yet active', async context => {
-			const validated = await validateSegmentAt(context, Date.parse(KEY_002_CREATED_AT) - 1)
+		it('rejects a segment signed with a session key that is not yet active', async () => {
+			const validated = await validateSegmentAt(Date.parse(KEY_002_CREATED_AT) - 1)
 
 			strictEqual(validated?.result.isValid, false)
 			deepStrictEqual(validated?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
 		})
 
-		it('accepts the same segment once the session key is active', async context => {
-			const validated = await validateSegmentAt(context, Date.parse(KEY_002_CREATED_AT))
+		it('accepts the same segment once the session key is active', async () => {
+			const validated = await validateSegmentAt(Date.parse(KEY_002_CREATED_AT))
 
 			strictEqual(validated?.result.isValid, true)
 			deepStrictEqual(validated?.result.errorCodes, [])
 		})
 
-		it('rejects a segment signed with an expired session key', async context => {
-			const validated = await validateSegmentAt(context, Date.parse(KEY_002_EXPIRES_AT) + 1)
+		it('rejects a segment signed with an expired session key', async () => {
+			const validated = await validateSegmentAt(Date.parse(KEY_002_EXPIRES_AT) + 1)
 
 			strictEqual(validated?.result.isValid, false)
 			deepStrictEqual(validated?.result.errorCodes, [LiveVideoStatusCode.SEGMENT_INVALID])
@@ -109,13 +113,13 @@ describe('validateC2paSegment', () => {
 			])
 		})
 
-		async function validateInitAtNow(context: TestContext, initSegment: Uint8Array = init) {
-			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		async function validateInitAtNow(initSegment: Uint8Array = init) {
+			vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 			return (await validateC2paInitSegment(initSegment)).sessionKeys
 		}
 
-		it('accepts a segment with a sequenceNumber of 2^32', async context => {
-			const sessionKeys = await validateInitAtNow(context)
+		it('accepts a segment with a sequenceNumber of 2^32', async () => {
+			const sessionKeys = await validateInitAtNow()
 
 			const validated = await validateC2paSegment(
 				await buildVsiSegment(key, BigInt(2 ** 32)),
@@ -127,8 +131,8 @@ describe('validateC2paSegment', () => {
 			deepStrictEqual(validated?.result.errorCodes, [])
 		})
 
-		it('detects no gap when the sequenceNumber passes 2^32', async context => {
-			const sessionKeys = await validateInitAtNow(context)
+		it('detects no gap when the sequenceNumber passes 2^32', async () => {
+			const sessionKeys = await validateInitAtNow()
 			const reasons = []
 			let sequenceState: SequenceState | undefined
 
@@ -150,8 +154,8 @@ describe('validateC2paSegment', () => {
 		})
 
 		// Number() converts both 2^53 and 2^53 + 1 to 2^53.
-		it('does not accept a segment below a minSequenceNumber above 2^53 - 1', async context => {
-			const sessionKeys = await validateInitAtNow(context, unsafeMinimumInit)
+		it('does not accept a segment below a minSequenceNumber above 2^53 - 1', async () => {
+			const sessionKeys = await validateInitAtNow(unsafeMinimumInit)
 
 			await rejects(
 				validateC2paSegment(await buildVsiSegment(key, BigInt(2 ** 53)), sessionKeys),
@@ -270,9 +274,9 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		deepStrictEqual(tampered?.nextSequenceState, state1)
 	})
 
-	it('leaves the sequence state unchanged for a segment signed with an expired session key', async context => {
+	it('leaves the sequence state unchanged for a segment signed with an expired session key', async () => {
 		const state1 = await afterFirstSegment()
-		context.mock.timers.enable({ apis: ['Date'], now: AFTER_KEY_EXPIRED })
+		vi.useFakeTimers({ now: AFTER_KEY_EXPIRED, toFake: ['Date'] })
 
 		const expired = await validateC2paSegment(await buildVsiSegment(key, 2), sessionKeys, state1)
 
@@ -280,9 +284,9 @@ describe('validateC2paSegment — sequence state advances only from authentic se
 		deepStrictEqual(expired?.nextSequenceState, state1)
 	})
 
-	it('leaves the sequence state unchanged for a segment signed with a session key that is not yet active', async context => {
+	it('leaves the sequence state unchanged for a segment signed with a session key that is not yet active', async () => {
 		const state1 = await afterFirstSegment()
-		context.mock.timers.enable({ apis: ['Date'], now: BEFORE_KEY_CREATED_AT })
+		vi.useFakeTimers({ now: BEFORE_KEY_CREATED_AT, toFake: ['Date'] })
 
 		const early = await validateC2paSegment(await buildVsiSegment(key, 2), sessionKeys, state1)
 

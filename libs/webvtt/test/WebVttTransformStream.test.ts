@@ -3,12 +3,14 @@ import { equal } from 'node:assert'
 import { createReadStream } from 'node:fs'
 import { resolve } from 'node:path'
 import { Readable } from 'node:stream'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import './utils/pollyfill.ts'
 
 // NOTE: This "polyfill" is here to make the example look like a browser fetch.
 function fetch(path: string): Promise<{ body: ReadableStream<any> }> {
-	const body = Readable.toWeb(createReadStream(resolve(path))) as ReadableStream<any>
+	const body = Readable.toWeb(
+		createReadStream(resolve(import.meta.dirname, '..', path)),
+	) as ReadableStream<any>
 	return Promise.resolve({ body })
 }
 

@@ -1,5 +1,5 @@
 import { equal, throws } from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { satisfiesRange } from './satisfiesRange.ts'
 
 describe('satisfiesRange', () => {

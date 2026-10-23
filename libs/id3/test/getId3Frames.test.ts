@@ -1,6 +1,6 @@
 import { getId3Frames, toArrayBuffer } from '@svta/cml-id3'
 import { deepEqual, deepStrictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { DATA, DATA_BYTES, DATA_UINT8 } from './data/DATA.ts'
 import { INFO, INFO_BYTES } from './data/INFO.ts'
 import { createId3 } from './data/createId3.ts'

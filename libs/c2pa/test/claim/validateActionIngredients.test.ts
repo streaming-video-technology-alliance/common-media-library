@@ -1,7 +1,7 @@
 import { C2paStatusCode } from '@svta/cml-c2pa'
 import { validateActionIngredients } from '../../src/claim/validateActionIngredients.ts'
 import { deepStrictEqual, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('validateActionIngredients', () => {
 	// #region example

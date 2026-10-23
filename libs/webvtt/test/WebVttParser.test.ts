@@ -1,7 +1,7 @@
 import type { WebVttCue, WebVttParsingError, WebVttRegion } from '@svta/cml-webvtt'
 import { WebVttParser } from '@svta/cml-webvtt'
 import assert from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import './utils/pollyfill.ts'
 
 describe('WebVttParser examples', () => {

@@ -1,6 +1,6 @@
 import { extractNalUnitType, isSeiNalUnitType } from '../src/utils/seiHelpers.ts'
 import { equal, deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('isSeiNalUnitType Tests', () => {
 	// #region example

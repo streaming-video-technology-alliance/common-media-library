@@ -6,7 +6,7 @@ import {
 } from '@svta/cml-c2pa'
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { before, describe, it } from 'node:test'
+import { afterEach, beforeAll as before, describe, it, vi } from 'vite-plus/test'
 import { encodeCbor, encodeCborMapWithEntry } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
@@ -37,6 +37,10 @@ import {
 	type TestSessionKey,
 	type TestSessionKeyEntry,
 } from '../vsi/vsiTestUtils.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('validateC2paInitSegment', () => {
 	// #region example
@@ -84,8 +88,8 @@ describe('validateC2paInitSegment', () => {
 			])
 		})
 
-		it('keeps a session key that is not yet active', async context => {
-			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2025-07-29T10:30:00Z') })
+		it('keeps a session key that is not yet active', async () => {
+			vi.useFakeTimers({ now: Date.parse('2025-07-29T10:30:00Z'), toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -96,8 +100,8 @@ describe('validateC2paInitSegment', () => {
 			deepStrictEqual(result.errorCodes, [])
 		})
 
-		it('drops an expired session key', async context => {
-			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2025-07-29T11:30:00Z') })
+		it('drops an expired session key', async () => {
+			vi.useFakeTimers({ now: Date.parse('2025-07-29T11:30:00Z'), toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -107,8 +111,8 @@ describe('validateC2paInitSegment', () => {
 			)
 		})
 
-		it('keeps the session key of an init segment from an independent signer', async context => {
-			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-09-21T00:00:00Z') })
+		it('keeps the session key of an init segment from an independent signer', async () => {
+			vi.useFakeTimers({ now: Date.parse('2026-09-21T00:00:00Z'), toFake: ['Date'] })
 			const bytes = new Uint8Array(
 				readFileSync(new URL('../fixtures/vsi_init_with_signer_binding.mp4', import.meta.url)),
 			)
@@ -122,8 +126,8 @@ describe('validateC2paInitSegment', () => {
 			deepStrictEqual(result.errorCodes, [])
 		})
 
-		it('withholds the session keys of an init segment whose content hash does not match', async context => {
-			context.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-09-21T00:00:00Z') })
+		it('withholds the session keys of an init segment whose content hash does not match', async () => {
+			vi.useFakeTimers({ now: Date.parse('2026-09-21T00:00:00Z'), toFake: ['Date'] })
 			const bytes = Buffer.from(
 				readFileSync(new URL('../fixtures/vsi_init_with_signer_binding.mp4', import.meta.url)),
 			)
@@ -526,12 +530,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		return { key, minSequenceNumber: 0, createdAt: '2025-07-29T09:00:00Z', validityPeriod: 600 }
 	}
 
-	it('accepts an assertion in which every session key is valid', async context => {
+	it('accepts an assertion in which every session key is valid', async () => {
 		const init = await buildSessionKeysInitSegment(signer, [
 			activeEntry(key001),
 			activeEntry(key002),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -543,7 +547,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
-	it('accepts a minSequenceNumber and a validityPeriod of 2^32 or more', async context => {
+	it('accepts a minSequenceNumber and a validityPeriod of 2^32 or more', async () => {
 		// A BigInt encodes as a CBOR unsigned integer of 8 bytes, which decodes to a number up to 2^53 - 1.
 		const entryWithLargeIntegers = {
 			...activeEntry(key002),
@@ -554,7 +558,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 			activeEntry(key001),
 			entryWithLargeIntegers,
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -569,12 +573,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
-	it('accepts a createdAt with a fraction of a second and a time offset', async context => {
+	it('accepts a createdAt with a fraction of a second and a time offset', async () => {
 		const init = await buildSessionKeysInitSegment(signer, [
 			activeEntry(key001),
 			{ ...activeEntry(key002), createdAt: '2025-07-29T12:00:00.5+02:00' },
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -588,13 +592,13 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		deepStrictEqual(result.errorCodes, [])
 	})
 
-	it('accepts an assertion with CBOR maps and arrays of indefinite length', async context => {
+	it('accepts an assertion with CBOR maps and arrays of indefinite length', async () => {
 		const init = await buildSessionKeysInitSegment(
 			signer,
 			[activeEntry(key001), activeEntry(key002)],
 			true,
 		)
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -608,14 +612,14 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		deepStrictEqual(result.errorCodes, [])
 	})
 
-	it('accepts an assertion that ends with an integer', async context => {
+	it('accepts an assertion that ends with an integer', async () => {
 		// In deterministic key order, the last byte of the assertion belongs to the minSequenceNumber of key_002.
 		const entries = [
 			{ ...activeEntry(key001), deterministicKeyOrder: true },
 			{ ...activeEntry(key002), deterministicKeyOrder: true },
 		]
 		const init = await buildSessionKeysInitSegment(signer, entries)
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -627,12 +631,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
-	it('excludes an expired session key from sessionKeys without SESSIONKEY_INVALID', async context => {
+	it('excludes an expired session key from sessionKeys without SESSIONKEY_INVALID', async () => {
 		const init = await buildSessionKeysInitSegment(signer, [
 			activeEntry(key001),
 			expiredEntry(key002),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -644,12 +648,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
-	it('returns no session keys and no SESSIONKEY_INVALID if every session key has expired', async context => {
+	it('returns no session keys and no SESSIONKEY_INVALID if every session key has expired', async () => {
 		const init = await buildSessionKeysInitSegment(signer, [
 			expiredEntry(key001),
 			expiredEntry(key002),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -658,12 +662,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
-	it('treats a session key with a validityPeriod of 0 as expired, without SESSIONKEY_INVALID', async context => {
+	it('treats a session key with a validityPeriod of 0 as expired, without SESSIONKEY_INVALID', async () => {
 		const init = await buildSessionKeysInitSegment(signer, [
 			activeEntry(key001),
 			{ ...activeEntry(key002), validityPeriod: 0 },
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -675,7 +679,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, true)
 	})
 
-	it('fails with SESSIONKEY_INVALID if a session key has no minSequenceNumber value', async context => {
+	it('fails with SESSIONKEY_INVALID if a session key has no minSequenceNumber value', async () => {
 		// The assertion encodes minSequenceNumber as CBOR undefined.
 		const entryWithoutMinSequenceNumber = {
 			...activeEntry(key002),
@@ -685,7 +689,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 			activeEntry(key001),
 			entryWithoutMinSequenceNumber,
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -693,7 +697,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, false)
 	})
 
-	it('fails with SESSIONKEY_INVALID if a session key has no kid', async context => {
+	it('fails with SESSIONKEY_INVALID if a session key has no kid', async () => {
 		const keyWithoutKid = {
 			...key002,
 			coseKey: new Map([...key002.coseKey].filter(([label]) => label !== COSE_KEY_KID)),
@@ -702,7 +706,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 			activeEntry(key001),
 			activeEntry(keyWithoutKid),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -710,7 +714,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, false)
 	})
 
-	it('fails with SESSIONKEY_INVALID if a session key has a kid only outside its COSE key', async context => {
+	it('fails with SESSIONKEY_INVALID if a session key has a kid only outside its COSE key', async () => {
 		const keyWithoutKid = {
 			...key002,
 			coseKey: new Map([...key002.coseKey].filter(([label]) => label !== COSE_KEY_KID)),
@@ -719,7 +723,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 			activeEntry(key001),
 			{ ...activeEntry(keyWithoutKid), topLevelKid: key002.kid },
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -763,13 +767,13 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	]
 
 	for (const [description, fields] of NONCONFORMING_FIELDS) {
-		it(`fails with SESSIONKEY_INVALID if a session key has ${description}`, async context => {
+		it(`fails with SESSIONKEY_INVALID if a session key has ${description}`, async () => {
 			const nonconformingEntry = { ...activeEntry(key002), ...fields } as TestSessionKeyEntry
 			const init = await buildSessionKeysInitSegment(signer, [
 				activeEntry(key001),
 				nonconformingEntry,
 			])
-			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+			vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -782,14 +786,14 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		})
 	}
 
-	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key does not verify', async context => {
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key does not verify', async () => {
 		// The private key of key_001 signs the signerBinding of key_002.
 		const keyWithWrongBinding = { ...key002, privateKey: key001.privateKey }
 		const init = await buildSessionKeysInitSegment(signer, [
 			activeEntry(key001),
 			activeEntry(keyWithWrongBinding),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -801,14 +805,14 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, false)
 	})
 
-	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key embeds a payload other than the certificate', async context => {
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key embeds a payload other than the certificate', async () => {
 		// The signature covers the certificate of the signer, but the signerBinding embeds another certificate.
 		const otherCertificate = (await createTestSigner('Other Signer')).certificateDER
 		const init = await buildSessionKeysInitSegment(signer, [
 			activeEntry(key001),
 			{ ...activeEntry(key002), signerBindingPayload: otherCertificate },
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -820,13 +824,13 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, false)
 	})
 
-	it('fails with SESSIONKEY_INVALID if the signerBinding of an expired session key does not verify', async context => {
+	it('fails with SESSIONKEY_INVALID if the signerBinding of an expired session key does not verify', async () => {
 		const keyWithWrongBinding = { ...key002, privateKey: key001.privateKey }
 		const init = await buildSessionKeysInitSegment(signer, [
 			activeEntry(key001),
 			expiredEntry(keyWithWrongBinding),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -834,7 +838,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		strictEqual(result.isValid, false)
 	})
 
-	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key cannot be verified', async context => {
+	it('fails with SESSIONKEY_INVALID if the signerBinding of a session key cannot be verified', async () => {
 		// The library does not support COSE key type 3 (RSA).
 		const keyWithRsaType = {
 			...key002,
@@ -844,7 +848,7 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 			activeEntry(key001),
 			activeEntry(keyWithRsaType),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -884,12 +888,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	]
 
 	for (const [field, buildEntry] of BYTE_STRING_FIELDS_AS_ARRAYS) {
-		it(`fails with SESSIONKEY_INVALID if the ${field} of a session key is a CBOR array of integers`, async context => {
+		it(`fails with SESSIONKEY_INVALID if the ${field} of a session key is a CBOR array of integers`, async () => {
 			const init = await buildSessionKeysInitSegment(signer, [
 				activeEntry(key001),
 				await buildEntry(),
 			])
-			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+			vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -941,12 +945,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 		return encodeCbor({ exclusions: [{ xpath: '/uuid' }], merkle })
 	}
 
-	it('returns the session keys and Merkle maps of an init with a matching Merkle initHash', async context => {
+	it('returns the session keys and Merkle maps of an init with a matching Merkle initHash', async () => {
 		const init = await buildSignedInitSegment(signer, [
 			{ label: 'c2pa.hash.bmff.v3', cbor: await merkleAssertionCbor() },
 			await buildSessionKeysAssertion(signer, [activeEntry(key001)]),
 		])
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -977,12 +981,12 @@ describe('validateC2paInitSegment — session keys assertion (§19.7.3)', () => 
 	]
 
 	for (const [description, merkle] of FAILING_MERKLE_FIELDS) {
-		it(`withholds the session keys and Merkle maps of an init with ${description}`, async context => {
+		it(`withholds the session keys and Merkle maps of an init with ${description}`, async () => {
 			const init = await buildSignedInitSegment(signer, [
 				{ label: 'c2pa.hash.bmff.v3', cbor: merkleOnlyCbor(merkle) },
 				await buildSessionKeysAssertion(signer, [activeEntry(key001)]),
 			])
-			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+			vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -1215,9 +1219,9 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 	}
 
 	for (const [description, cbor] of ILL_FORMED_CBOR) {
-		it(`fails with ASSERTION_CBOR_INVALID if an assertion has ${description}`, async context => {
+		it(`fails with ASSERTION_CBOR_INVALID if an assertion has ${description}`, async () => {
 			const init = await buildInit({ label: 'c2pa.actions.v2', cbor })
-			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+			vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -1228,9 +1232,9 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 	}
 
 	for (const [description, cbor] of DUPLICATE_KEYS) {
-		it(`fails with ASSERTION_CBOR_INVALID if an assertion map has ${description}`, async context => {
+		it(`fails with ASSERTION_CBOR_INVALID if an assertion map has ${description}`, async () => {
 			const init = await buildInit({ label: 'c2pa.actions.v2', cbor })
-			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+			vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -1240,12 +1244,12 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		})
 	}
 
-	it('fails with ASSERTION_CBOR_INVALID if an assertion with a label outside the C2PA namespace is not well-formed CBOR', async context => {
+	it('fails with ASSERTION_CBOR_INVALID if an assertion with a label outside the C2PA namespace is not well-formed CBOR', async () => {
 		const init = await buildInit({
 			label: 'com.example.custom',
 			cbor: Uint8Array.of(0xa1, 0x61, 0x61),
 		})
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -1253,13 +1257,13 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		strictEqual(result.isValid, false)
 	})
 
-	it('accepts an assertion with CBOR that is well-formed but not deterministic', async context => {
+	it('accepts an assertion with CBOR that is well-formed but not deterministic', async () => {
 		// {_ "b": 1_0, "a": 2}: a map of indefinite length, keys out of order, and an integer in a longer form than necessary
 		const init = await buildInit({
 			label: 'c2pa.actions.v2',
 			cbor: Uint8Array.of(0xbf, 0x61, 0x62, 0x18, 0x01, 0x61, 0x61, 0x02, 0xff),
 		})
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -1272,9 +1276,9 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 	})
 
 	for (const [description, json] of NONCONFORMING_JSON) {
-		it(`fails with ASSERTION_JSON_INVALID if a JSON assertion has ${description}`, async context => {
+		it(`fails with ASSERTION_JSON_INVALID if a JSON assertion has ${description}`, async () => {
 			const init = await buildInit({ label: 'c2pa.metadata', json })
-			context.mock.timers.enable({ apis: ['Date'], now: NOW })
+			vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 			const result = await validateC2paInitSegment(init)
 
@@ -1284,12 +1288,12 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		})
 	}
 
-	it('fails with ASSERTION_JSON_INVALID if a JSON assertion with a label outside the C2PA namespace does not parse', async context => {
+	it('fails with ASSERTION_JSON_INVALID if a JSON assertion with a label outside the C2PA namespace does not parse', async () => {
 		const init = await buildInit({
 			label: 'com.example.custom',
 			json: TEXT_ENCODER.encode('{"a":'),
 		})
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -1297,14 +1301,14 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		strictEqual(result.isValid, false)
 	})
 
-	it('accepts a JSON assertion', async context => {
+	it('accepts a JSON assertion', async () => {
 		const init = await buildInit({
 			label: 'c2pa.metadata',
 			json: TEXT_ENCODER.encode(
 				'{ "@context": { "dc": "http://purl.org/dc/elements/1.1/" }, "dc:title": "Café" }',
 			),
 		})
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 
@@ -1316,13 +1320,13 @@ describe('validateC2paInitSegment — assertion content (§15.10.3.1)', () => {
 		strictEqual(result.isValid, true)
 	})
 
-	it('accepts a JSON assertion with a leading byte order mark', async context => {
+	it('accepts a JSON assertion with a leading byte order mark', async () => {
 		// RFC 8259 section 8.1: a parser may ignore a byte order mark
 		const init = await buildInit({
 			label: 'c2pa.metadata',
 			json: Uint8Array.of(0xef, 0xbb, 0xbf, ...TEXT_ENCODER.encode('{ "dc:title": "Café" }')),
 		})
-		context.mock.timers.enable({ apis: ['Date'], now: NOW })
+		vi.useFakeTimers({ now: NOW, toFake: ['Date'] })
 
 		const result = await validateC2paInitSegment(init)
 

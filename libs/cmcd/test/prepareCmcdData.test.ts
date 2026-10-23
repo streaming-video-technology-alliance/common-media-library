@@ -8,7 +8,7 @@ import {
 } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { afterEach, describe, it, vi } from 'vite-plus/test'
 import {
 	CMCD_KEY_TYPE_INTEGER,
 	CMCD_KEY_TYPE_NUMBER,
@@ -22,6 +22,10 @@ function countCalls(calls: string[], key: string): CmcdFormatter {
 		return value as ReturnType<CmcdFormatter>
 	}
 }
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('prepareCmcdData', () => {
 	it('provides a valid example', () => {
@@ -90,8 +94,8 @@ describe('prepareCmcdData', () => {
 			equal(data['v'], 2)
 		})
 
-		it('force-includes e, ts and cen for filtered custom events', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('force-includes e, ts and cen for filtered custom events', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.CUSTOM_EVENT, cen: 'my-event', cid: 'content-id', sid: 'session-id' },
 				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
@@ -104,8 +108,8 @@ describe('prepareCmcdData', () => {
 			ok(!('sid' in data))
 		})
 
-		it('does not force-include cen for non-custom events', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('does not force-include cen for non-custom events', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.ERROR, cen: 'my-event', cid: 'content-id' },
 				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
@@ -113,8 +117,8 @@ describe('prepareCmcdData', () => {
 			ok(!('cen' in data))
 		})
 
-		it('force-includes ec for filtered error events', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('force-includes ec for filtered error events', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.ERROR, ec: ['E100'], cid: 'content-id' },
 				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
@@ -122,8 +126,8 @@ describe('prepareCmcdData', () => {
 			ok('ec' in data)
 		})
 
-		it('does not force-include ec for non-error events', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('does not force-include ec for non-error events', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.CUSTOM_EVENT, cen: 'my-event', ec: ['E100'], cid: 'content-id' },
 				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
@@ -131,8 +135,8 @@ describe('prepareCmcdData', () => {
 			ok(!('ec' in data))
 		})
 
-		it('force-includes url for filtered response received events', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('force-includes url for filtered response received events', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{
 					e: CmcdEventType.RESPONSE_RECEIVED,
@@ -145,8 +149,8 @@ describe('prepareCmcdData', () => {
 			ok('url' in data)
 		})
 
-		it('force-includes the required field of a filtered state-change event', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('force-includes the required field of a filtered state-change event', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.PLAY_STATE, sta: CmcdPlayerState.PLAYING, cid: 'content-id' },
 				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
@@ -156,8 +160,8 @@ describe('prepareCmcdData', () => {
 	})
 
 	describe('response received keys', () => {
-		it('strips response received keys from non-rr events', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('strips response received keys from non-rr events', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{
 					e: CmcdEventType.CUSTOM_EVENT,
@@ -175,8 +179,8 @@ describe('prepareCmcdData', () => {
 			equal(data['com.example-detail'], 'q3')
 		})
 
-		it('keeps response received keys on rr events', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('keeps response received keys on rr events', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.RESPONSE_RECEIVED, url: 'https://example.com/seg.mp4', rc: 200 },
 				{ reportingMode: CmcdReportingMode.EVENT },
@@ -192,8 +196,8 @@ describe('prepareCmcdData', () => {
 			ok(!('pr' in data))
 		})
 
-		it('preserves pr=1 on a playback rate event', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('preserves pr=1 on a playback rate event', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.PLAYBACK_RATE, pr: 1 },
 				{ reportingMode: CmcdReportingMode.EVENT },
@@ -206,8 +210,8 @@ describe('prepareCmcdData', () => {
 			ok(!('bg' in data))
 		})
 
-		it('preserves bg=false on a backgrounded mode event', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('preserves bg=false on a backgrounded mode event', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.BACKGROUNDED_MODE, bg: false },
 				{ reportingMode: CmcdReportingMode.EVENT },
@@ -273,8 +277,8 @@ describe('prepareCmcdData', () => {
 	})
 
 	describe('custom keys', () => {
-		it('passes custom keys through in event mode', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('passes custom keys through in event mode', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.ERROR, 'com.example-hello': 'world' },
 				{ reportingMode: CmcdReportingMode.EVENT },
@@ -540,8 +544,8 @@ describe('prepareCmcdData', () => {
 			equal((data['ot'] as SfToken).description, 'x')
 		})
 
-		it('sends h on an h event when the filter removes h', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('sends h on an h event when the filter removes h', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data: Record<string, unknown> = prepareCmcdData(
 				{ e: 'h', h: 'cdn.example.com', cid: 'content-id' },
 				{ reportingMode: CmcdReportingMode.EVENT, filter: key => key === 'cid' },
@@ -549,8 +553,8 @@ describe('prepareCmcdData', () => {
 			equal(data['h'], 'cdn.example.com')
 		})
 
-		it('drops the response keys from an event report without e', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('drops the response keys from an event report without e', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ rc: 200, url: 'https://example.com/seg.m4s', cid: 'content-id' },
 				{ reportingMode: CmcdReportingMode.EVENT },
@@ -560,8 +564,8 @@ describe('prepareCmcdData', () => {
 			equal(data['cid'], 'content-id')
 		})
 
-		it('reads the event type after the e formatter', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('reads the event type after the e formatter', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: 'custom', cen: 'my-event' },
 				{ reportingMode: CmcdReportingMode.EVENT, formatters: { e: () => 'ce' } },
@@ -569,8 +573,8 @@ describe('prepareCmcdData', () => {
 			equal(data['cen'], 'my-event')
 		})
 
-		it('keeps a ts with parameters in an event report', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('keeps a ts with parameters in an event report', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const ts = prepareCmcdData(
 				{ e: CmcdEventType.TIME_INTERVAL, ts: new SfItem(1700000000000, { x: true }) },
 				{ reportingMode: CmcdReportingMode.EVENT },
@@ -592,8 +596,8 @@ describe('prepareCmcdData', () => {
 			ok(!('com.example-x' in data))
 		})
 
-		it('keeps a default value with parameters on the event that requires the key', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('keeps a default value with parameters on the event that requires the key', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			ok(
 				(prepareCmcdData(
 					{ e: CmcdEventType.PLAYBACK_RATE, pr: new SfItem(1, { x: true }) },
@@ -683,8 +687,8 @@ describe('prepareCmcdData', () => {
 			deepEqual(calls, ['ot'])
 		})
 
-		it('sorts the generated ts and v with the other keys', context => {
-			context.mock.timers.enable({ apis: ['Date'], now: 1234 })
+		it('sorts the generated ts and v with the other keys', () => {
+			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
 			const data = prepareCmcdData(
 				{ e: CmcdEventType.RESPONSE_RECEIVED, url: 'https://example.com/seg.m4s', rc: 200 },
 				{ reportingMode: CmcdReportingMode.EVENT },

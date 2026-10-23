@@ -1,6 +1,6 @@
 import { isValidSteeringManifest } from '@svta/cml-content-steering'
 import assert, { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { MANIFEST } from './MANIFEST.ts'
 
 describe('isValidSteeringManifest', () => {

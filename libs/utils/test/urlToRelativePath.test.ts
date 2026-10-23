@@ -1,6 +1,6 @@
 import { getBaseUrl, urlToRelativePath } from '@svta/cml-utils'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it, vi } from 'vite-plus/test'
 
 describe('urlToRelativePath', () => {
 	it('produces a relative path when at root', () => {
@@ -65,14 +65,16 @@ describe('urlToRelativePath', () => {
 		equal(urlToRelativePath('/a/b', base), '/a/b')
 	})
 
-	it('does not throw internally when url has no scheme', t => {
+	it('does not throw internally when url has no scheme', () => {
 		const base = getBaseUrl('https://cdn.example.com/v/1080p/seg-1.m4s')
-		const urlSpy = t.mock.method(globalThis, 'URL')
+		const urlSpy = vi.spyOn(globalThis, 'URL')
 		urlToRelativePath('seg-2.m4s', base)
 		urlToRelativePath('//cdn/x', base)
 		urlToRelativePath('/a/b', base)
 		deepEqual(
-			urlSpy.mock.calls.filter(call => call.error !== undefined).map(call => call.arguments[0]),
+			urlSpy.mock.results.flatMap((result, i) =>
+				result.type === 'throw' ? [urlSpy.mock.calls[i][0]] : [],
+			),
 			[],
 		)
 	})

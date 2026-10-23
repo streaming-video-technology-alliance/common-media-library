@@ -1,6 +1,6 @@
 import { equal, ok } from 'node:assert/strict'
 import type { Readable } from 'node:stream'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { killTree, spawnTree } from './processTree.ts'
 
 // Starts a grandchild that shares the output pipes and never exits on its own.

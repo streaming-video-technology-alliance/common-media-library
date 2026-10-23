@@ -1,5 +1,5 @@
 import { deepStrictEqual, ok, strictEqual, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { decodeCoseSign1 } from '../../src/cose/decodeCoseSign1.ts'
 
 // COSE_Sign1 = [protected_bytes, {}, payload_bytes, signature_bytes]

@@ -19,7 +19,7 @@ import {
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, notEqual, ok, throws } from 'node:assert'
-import { describe, it, mock } from 'node:test'
+import { afterEach, describe, it, vi } from 'vite-plus/test'
 
 function createMockRequester(status: number = 200) {
 	const requests: HttpRequest[] = []
@@ -66,6 +66,10 @@ function createConfig(overrides: Partial<CmcdReporterConfig> = {}): Partial<Cmcd
 		...overrides,
 	}
 }
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('CmcdReporter', () => {
 	it('provides a valid example', () => {
@@ -3948,8 +3952,7 @@ describe('CmcdReporter', () => {
 		})
 
 		it('includes a persistent custom key in time interval reports', () => {
-			const timers = mock.timers
-			timers.enable({ apis: ['setInterval'] })
+			vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
 
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(
@@ -3975,7 +3978,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string)?.includes('com.example-foo="bar"'))
 
 			reporter.stop()
-			timers.reset()
+			vi.useRealTimers()
 		})
 
 		it('does not persist a custom key passed as per-event data', async () => {
@@ -4527,8 +4530,7 @@ describe('CmcdReporter', () => {
 
 	describe('start and stop', () => {
 		it('starts and stops the time interval', () => {
-			const timers = mock.timers
-			timers.enable({ apis: ['setInterval'] })
+			vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
 
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(
@@ -4551,21 +4553,20 @@ describe('CmcdReporter', () => {
 			// The first time interval event is sent immediately
 			equal(requests.length, 1)
 
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			equal(requests.length, 2)
 
 			reporter.stop()
 
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			// No more events after stop
 			equal(requests.length, 2)
 
-			timers.reset()
+			vi.useRealTimers()
 		})
 
 		it('sends time interval events only to the target that owns the timer', () => {
-			const timers = mock.timers
-			timers.enable({ apis: ['setInterval'] })
+			vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
 
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(
@@ -4598,7 +4599,7 @@ describe('CmcdReporter', () => {
 			equal(requests[1].url, 'https://example.com/cmcd-ti-2')
 
 			// After one interval tick, each target fires once more
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			equal(requests.length, 4)
 			equal(requests[2].url, 'https://example.com/cmcd-ti-1')
 			equal(requests[3].url, 'https://example.com/cmcd-ti-2')
@@ -4610,12 +4611,11 @@ describe('CmcdReporter', () => {
 			ok((requests[3].body as string)?.includes('sn=1'))
 
 			reporter.stop()
-			timers.reset()
+			vi.useRealTimers()
 		})
 
 		it('does not send time interval events to targets without TIME_INTERVAL configured', () => {
-			const timers = mock.timers
-			timers.enable({ apis: ['setInterval'] })
+			vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
 
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(
@@ -4645,7 +4645,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			equal(requests[0].url, 'https://example.com/cmcd-ti')
 
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			equal(requests.length, 2)
 			equal(requests[1].url, 'https://example.com/cmcd-ti')
 
@@ -4655,12 +4655,11 @@ describe('CmcdReporter', () => {
 			equal(requests[2].url, 'https://example.com/cmcd-other')
 
 			reporter.stop()
-			timers.reset()
+			vi.useRealTimers()
 		})
 
 		it('does not start interval if TIME_INTERVAL event is not configured', () => {
-			const timers = mock.timers
-			timers.enable({ apis: ['setInterval'] })
+			vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
 
 			const { requester, requests } = createMockRequester()
 			const reporter = new CmcdReporter(
@@ -4680,11 +4679,11 @@ describe('CmcdReporter', () => {
 
 			reporter.start()
 
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			equal(requests.length, 0)
 
 			reporter.stop()
-			timers.reset()
+			vi.useRealTimers()
 		})
 
 		it('flushes pending events when stop(true) is called', async () => {
@@ -4795,10 +4794,8 @@ describe('CmcdReporter', () => {
 			ok((requests[1].body as string).includes('sn=0'))
 		})
 
-		it('re-arms a disposed target interval on session change while started', async t => {
-			const timers = mock.timers
-			timers.enable({ apis: ['setInterval'] })
-			t.after(() => timers.reset())
+		it('re-arms a disposed target interval on session change while started', async () => {
+			vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
 
 			const { requester, requests } = createMockRequester(410)
 			const reporter = new CmcdReporter(
@@ -4821,24 +4818,22 @@ describe('CmcdReporter', () => {
 			await new Promise(resolve => setTimeout(resolve, 10))
 
 			// The 410 disposed the target: the interval is dead.
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			equal(requests.length, 1)
 
 			reporter.update({ sid: 'new-session' })
 			// Restoration does not fire an immediate report; the next tick does.
 			equal(requests.length, 1)
 
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			equal(requests.length, 2)
 			ok((requests[1].body as string).includes('sid="new-session"'))
 
 			reporter.stop()
 		})
 
-		it('does not re-arm restored targets when the reporter is stopped', async t => {
-			const timers = mock.timers
-			timers.enable({ apis: ['setInterval'] })
-			t.after(() => timers.reset())
+		it('does not re-arm restored targets when the reporter is stopped', async () => {
+			vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
 
 			const { requester, requests } = createMockRequester(410)
 			const reporter = new CmcdReporter(
@@ -4863,7 +4858,7 @@ describe('CmcdReporter', () => {
 			reporter.stop()
 			reporter.update({ sid: 'new-session' })
 
-			timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			equal(requests.length, 1)
 		})
 
@@ -4962,9 +4957,9 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 		})
 
-		it('clears the interval when target is removed via 410', async t => {
-			const setIntervalSpy = t.mock.method(globalThis, 'setInterval')
-			const clearIntervalSpy = t.mock.method(globalThis, 'clearInterval')
+		it('clears the interval when target is removed via 410', async () => {
+			const setIntervalSpy = vi.spyOn(globalThis, 'setInterval')
+			const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval')
 			const { requester, requests } = createMockRequester(410)
 
 			const reporter = new CmcdReporter(
@@ -4987,15 +4982,15 @@ describe('CmcdReporter', () => {
 
 			equal(requests.length, 1)
 			equal(setIntervalSpy.mock.calls.length, 1)
-			const intervalId = setIntervalSpy.mock.calls[0].result
-			ok(clearIntervalSpy.mock.calls.some(c => c.arguments[0] === intervalId))
+			const intervalId = setIntervalSpy.mock.results[0].value
+			ok(clearIntervalSpy.mock.calls.some(c => c[0] === intervalId))
 		})
 	})
 
 	describe('start lifecycle', () => {
-		it('disarms existing intervals when start() is called multiple times', t => {
-			const setIntervalSpy = t.mock.method(globalThis, 'setInterval')
-			const clearIntervalSpy = t.mock.method(globalThis, 'clearInterval')
+		it('disarms existing intervals when start() is called multiple times', () => {
+			const setIntervalSpy = vi.spyOn(globalThis, 'setInterval')
+			const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval')
 			const { requester } = createMockRequester()
 
 			const reporter = new CmcdReporter(
@@ -5015,10 +5010,10 @@ describe('CmcdReporter', () => {
 
 			reporter.start()
 			equal(setIntervalSpy.mock.calls.length, 1)
-			const firstId = setIntervalSpy.mock.calls[0].result
+			const firstId = setIntervalSpy.mock.results[0].value
 
 			reporter.start()
-			ok(clearIntervalSpy.mock.calls.some(c => c.arguments[0] === firstId))
+			ok(clearIntervalSpy.mock.calls.some(c => c[0] === firstId))
 
 			reporter.stop()
 		})

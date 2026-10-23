@@ -1,7 +1,7 @@
 import { parseBareItem } from '@svta/cml-structured-field-values'
 import { base64encode } from '@svta/cml-utils'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vite-plus/test'
 
 test('parseBareItem', () => {
 	assert.deepStrictEqual(parseBareItem(`"string"`), { value: 'string', src: `` })

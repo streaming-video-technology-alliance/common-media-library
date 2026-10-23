@@ -1,7 +1,7 @@
 import { CMCD_MIME_TYPE, validateCmcdEventReport } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepStrictEqual, equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('validateCmcdEventReport', () => {
 	it('provides a valid example', () => {

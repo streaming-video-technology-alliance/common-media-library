@@ -1,5 +1,5 @@
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 import type { AdaptationSet, Period, Representation, SegmentTemplate } from '@svta/cml-cmaf-ham'
 

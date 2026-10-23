@@ -2,7 +2,7 @@ import type { Cmcd } from '@svta/cml-cmcd'
 import { decodeCmcd, encodeCmcd } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { CMCD_OUTPUT_REQUEST } from './data/CMCD_OUTPUT_REQUEST.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
 

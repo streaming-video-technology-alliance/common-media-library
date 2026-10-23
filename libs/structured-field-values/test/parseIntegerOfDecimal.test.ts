@@ -1,6 +1,6 @@
 import { parseIntegerOrDecimal } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vite-plus/test'
 
 test('parseIntegerOrDecimal', () => {
 	assert.deepStrictEqual(parseIntegerOrDecimal(`42`), { value: 42, src: `` })

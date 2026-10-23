@@ -1,7 +1,7 @@
 import { extractCta608DataFromSample } from '@svta/cml-608'
 import { deepEqual, equal } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { parseSegment } from './utils/helpers.ts'
 
 /**
@@ -44,7 +44,7 @@ const field2CaptionData2 = [
 describe('extractCta608DataFromSample', () => {
 	// #region example
 	it('should extract CTA-608 field data from an H.264 m4s segment', async () => {
-		const file = await readFile('test/fixtures/608_h264.m4s')
+		const file = await readFile(new URL('./fixtures/608_h264.m4s', import.meta.url))
 		const results = parseSegmentSamples(file)
 
 		// Two samples in this segment contain CTA-608 data
@@ -61,7 +61,7 @@ describe('extractCta608DataFromSample', () => {
 	// #endregion example
 
 	it('should extract CTA-608 field data from an H.265 m4s segment', async () => {
-		const file = await readFile('test/fixtures/608_h265.m4s')
+		const file = await readFile(new URL('./fixtures/608_h265.m4s', import.meta.url))
 		const results = parseSegmentSamples(file)
 
 		// Two samples in this segment contain CTA-608 data
@@ -77,8 +77,8 @@ describe('extractCta608DataFromSample', () => {
 	})
 
 	it('should produce identical CTA-608 data from H.264 and H.265 segments', async () => {
-		const h264File = await readFile('test/fixtures/608_h264.m4s')
-		const h265File = await readFile('test/fixtures/608_h265.m4s')
+		const h264File = await readFile(new URL('./fixtures/608_h264.m4s', import.meta.url))
+		const h265File = await readFile(new URL('./fixtures/608_h265.m4s', import.meta.url))
 
 		const h264Results = parseSegmentSamples(h264File)
 		const h265Results = parseSegmentSamples(h265File)
@@ -91,7 +91,7 @@ describe('extractCta608DataFromSample', () => {
 	})
 
 	it('should return empty field data for H.264 samples without CTA-608 data', async () => {
-		const file = await readFile('test/fixtures/608_h264.m4s')
+		const file = await readFile(new URL('./fixtures/608_h264.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// Advance to sample index 1 (non-keyframe, no captions)
@@ -102,7 +102,7 @@ describe('extractCta608DataFromSample', () => {
 	})
 
 	it('should return empty field data for H.265 samples without CTA-608 data', async () => {
-		const file = await readFile('test/fixtures/608_h265.m4s')
+		const file = await readFile(new URL('./fixtures/608_h265.m4s', import.meta.url))
 		const { view, mdatBodyStart, samples } = parseSegment(file)
 
 		// Advance to sample index 1 (non-keyframe, no captions)

@@ -12,7 +12,7 @@ import {
 	DEFAULT_STARVATION_SAFETY_FACTOR,
 } from '@svta/cml-abr'
 import { equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { L1, L2, rungs, withoutRung, withRung } from './helpers/ladders.ts'
 import { createSeededRandom } from './helpers/seededRandom.ts'
 import { MILLISECONDS_PER_SECOND } from './helpers/units.ts'

@@ -1,6 +1,6 @@
 import { decodeVsiMap } from '../../src/vsi/decodeVsiMap.ts'
 import { deepStrictEqual, strictEqual, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { encodeCbor, encodeCborMapWithEntry } from '../cborTestUtils.ts'
 
 describe('decodeVsiMap', () => {

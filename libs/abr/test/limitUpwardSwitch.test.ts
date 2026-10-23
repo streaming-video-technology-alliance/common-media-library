@@ -1,5 +1,5 @@
 import { equal, ok } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { limitUpwardSwitch } from '../src/limitUpwardSwitch.ts'
 
 const POSITIONS = [0, 1, 2, 3, 4, 5]

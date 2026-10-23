@@ -1,7 +1,7 @@
 import { verifySignerBinding } from '../../src/cose/verifySignerBinding.ts'
 import { Encoder } from 'cbor-x/encode'
 import { ok, strictEqual } from 'node:assert'
-import { before, describe, it } from 'node:test'
+import { beforeAll as before, describe, it } from 'vite-plus/test'
 import { createTestSigner } from '../testSigner.ts'
 import {
 	createTestSessionKey,

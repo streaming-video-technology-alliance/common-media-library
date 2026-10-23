@@ -1,6 +1,6 @@
 import { fromCmcdQuery } from '@svta/cml-cmcd'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { CMCD_OUTPUT } from './data/CMCD_OUTPUT.ts'
 import { CMCD_QUERY } from './data/CMCD_QUERY.ts'
 

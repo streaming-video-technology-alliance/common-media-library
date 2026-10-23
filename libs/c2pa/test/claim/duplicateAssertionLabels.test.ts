@@ -5,7 +5,7 @@ import {
 	LiveVideoStatusCode,
 } from '@svta/cml-c2pa'
 import { deepStrictEqual, ok, strictEqual } from 'node:assert'
-import { before, describe, it } from 'node:test'
+import { beforeAll as before, describe, it } from 'vite-plus/test'
 import { Tag } from 'cbor-x'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { JUMBF_UUID } from '../../src/utils.ts'

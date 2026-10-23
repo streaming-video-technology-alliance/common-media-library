@@ -1,4 +1,4 @@
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { expectCuesEqualAll } from '../../utils/expectCuesEqualAll.ts'
 
 describe('cuetext/languages tests', () => {
