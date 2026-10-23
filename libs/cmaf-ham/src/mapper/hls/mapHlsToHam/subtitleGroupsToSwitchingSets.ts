@@ -48,7 +48,7 @@ export function subtitleGroupsToSwitchingSets(
 		id: 'text',
 		tracks: textTracks,
 		baseUrls: [],
-	} as SwitchingSet)
+	})
 
 	return subtitleSwitchingSets
 }

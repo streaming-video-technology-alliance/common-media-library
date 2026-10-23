@@ -8,7 +8,7 @@ import { CmStreamType } from '@svta/cml-cta'
  *
  * @public
  */
-export const CmsdStreamType = CmStreamType as typeof CmStreamType
+export const CmsdStreamType: typeof CmStreamType = CmStreamType
 
 /**
  * @public

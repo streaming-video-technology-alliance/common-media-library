@@ -88,7 +88,7 @@ async function signCoseSign1(
 	payload: Uint8Array,
 	embeddedPayload: Uint8Array | null,
 ): Promise<Tag> {
-	const toBeSigned = buildSigStructure(ES256_PROTECTED_HEADER, payload) as Uint8Array<ArrayBuffer>
+	const toBeSigned = buildSigStructure(ES256_PROTECTED_HEADER, payload)
 	const signature = new Uint8Array(
 		await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, privateKey, toBeSigned),
 	)

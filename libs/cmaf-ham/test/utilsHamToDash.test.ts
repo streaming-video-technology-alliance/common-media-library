@@ -10,7 +10,7 @@ describe('getTimescale', () => {
 		const res = getTimescale({
 			type: 'audio',
 			sampleRate: 48000,
-		} as AudioTrack as Track)
+		} as AudioTrack)
 		equal(res, 48000)
 	})
 

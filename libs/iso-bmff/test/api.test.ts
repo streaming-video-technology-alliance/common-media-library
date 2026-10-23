@@ -46,7 +46,7 @@ describe('API', function () {
 			writers: {
 				hvc1: writeVisualSampleEntryBox,
 				dvh1: writeVisualSampleEntryBox,
-				test: (box: any) => {
+				test: (box: { type: string; value: number }) => {
 					const view = new IsoBoxWriteView(box.type, 4)
 					view.writeUint(box.value, 4)
 					return view

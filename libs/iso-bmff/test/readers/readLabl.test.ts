@@ -6,23 +6,25 @@ import {
 	readLabl,
 	readMeta,
 	readPrsl,
-	type ParsedIsoBox,
+	type LabelBox,
+	type MetaBox,
+	type PreselectionGroupBox,
 } from '../util/box.ts'
 
 describe('readLabl', function () {
 	it('should correctly parse the box from sample data', function () {
-		const box = findBox('SRMP_AC4.mp4', 'meta', {
+		const meta = findBox('SRMP_AC4.mp4', 'meta', {
 			readers: { meta: readMeta, prsl: readPrsl, labl: readLabl },
-		})
-			// @ts-expect-error: Not sure why this is needed
-			.boxes?.filter((box: ParsedIsoBox) => box.type === 'grpl')[0]
-			// @ts-expect-error: Add type for `boxes` and `groupId` in `grpl` box
-			.boxes?.filter((box: ParsedIsoBox) => box.groupId === 234)[0]
+		}) as MetaBox
+		const grpl = meta.boxes.find(child => child.type === 'grpl')
+		assert.ok(grpl)
 
-		assert.ok(box)
-		assert.ok(box.boxes)
+		const prsl = grpl.boxes.find((child: PreselectionGroupBox) => child.groupId === 234) as
+			| PreselectionGroupBox
+			| undefined
+		assert.ok(prsl)
 
-		const boxes = box.boxes.filter((box: ParsedIsoBox) => box.type === 'labl')
+		const boxes = prsl.boxes.filter((child: LabelBox) => child.type === 'labl') as LabelBox[]
 
 		assert.strictEqual(boxes[0].type, 'labl')
 		assert.strictEqual(boxes[0].isGroupLabel, false)

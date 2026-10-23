@@ -3,7 +3,7 @@ import assert, { equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 describe('unescapeHtml', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const result = unescapeHtml('&quot;&lt;Hello&amp;World&gt;&quot;')
 

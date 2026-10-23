@@ -27,7 +27,7 @@ export class SfItem<V extends SfBareItem = SfBareItem, P = Record<string, any>> 
 			value = value.map(v => (v instanceof SfItem ? v : new SfItem(v)))
 		}
 
-		this.value = value
+		this.value = value as V
 		this.params = params
 	}
 }

@@ -30,7 +30,8 @@ describe('appendCmcdHeaders', () => {
 	})
 
 	it('handles null data object', () => {
-		deepEqual(appendCmcdHeaders(headers, null as any), headers)
+		// @ts-expect-error - This is a test
+		deepEqual(appendCmcdHeaders(headers, null), headers)
 	})
 
 	it('appends headers', () => {

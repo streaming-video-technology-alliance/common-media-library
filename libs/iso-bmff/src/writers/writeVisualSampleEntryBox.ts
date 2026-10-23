@@ -1,3 +1,4 @@
+import type { IsoBox } from '../IsoBox.ts'
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
 import { UINT } from '../IsoBoxFields.ts'
@@ -36,7 +37,7 @@ export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = Visu
 	const compressorNameSize = 32
 	const depthSize = 2
 	const preDefined3Size = 2
-	const { bytes, size } = writeChildBoxes(box.boxes, config)
+	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox[], config)
 	const totalSize =
 		headerSize +
 		reserved1Size +

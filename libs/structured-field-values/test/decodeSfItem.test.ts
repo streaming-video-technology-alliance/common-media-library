@@ -12,8 +12,10 @@ test('decodeSfItem', () => {
 
 	assert.throws(
 		() => decodeSfItem(`1;`),
-		(error: any) => {
+		(error: unknown) => {
+			assert.ok(error instanceof Error)
 			assert.deepStrictEqual(error.message, `failed to parse "1;" as Item`)
+			assert.ok(error.cause instanceof Error)
 			assert.deepStrictEqual(error.cause.message, `failed to parse "" as Key`)
 			return true
 		},

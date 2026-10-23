@@ -34,7 +34,7 @@ function parseSubset(rawSubset: unknown): BmffHashSubset[] | null {
 	const subset: BmffHashSubset[] = []
 	let nextOffset = 0
 	for (let i = 0; i < rawSubset.length; i++) {
-		const rawEntry = rawSubset[i]
+		const rawEntry: unknown = rawSubset[i]
 		if (!isMap(rawEntry)) return null
 		const offset = asUnsignedInteger(rawEntry['offset'])
 		const length = asUnsignedInteger(rawEntry['length'])

@@ -80,10 +80,10 @@ export function validateCmcdHeaders(
 		issues,
 	}
 
-	const merged: Record<string, unknown> = Object.assign(
-		{},
-		...CMCD_HEADER_FIELDS.map(f => decoded[f]).filter(Boolean),
-	)
+	const merged: Record<string, unknown> = {}
+	for (const field of CMCD_HEADER_FIELDS) {
+		Object.assign(merged, decoded[field])
+	}
 	const payloadResult = validateCmcd(merged, { ...options, reportingMode: CMCD_REQUEST_MODE })
 
 	const result = mergeValidationResults(shardResult, payloadResult)

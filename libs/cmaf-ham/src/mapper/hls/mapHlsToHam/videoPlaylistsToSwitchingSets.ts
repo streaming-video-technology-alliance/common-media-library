@@ -59,7 +59,7 @@ export function videoPlaylistsToSwitchingSets(
 		id: `video`,
 		tracks: videoTracks,
 		baseUrls: [],
-	} as SwitchingSet)
+	})
 
 	return switchingSetVideos
 }

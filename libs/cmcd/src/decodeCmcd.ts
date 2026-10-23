@@ -22,7 +22,7 @@ function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): R
 	// a registry symbol, or an SfToken when `useSymbol` is `false`. Both
 	// re-encode as bare tokens, so preserved output round-trips.
 	if (typeof value === 'symbol') {
-		return useSymbol === undefined ? symbolToStr(value) : (value as unknown as ReduceValueOutput)
+		return useSymbol === undefined ? symbolToStr(value) : value
 	}
 
 	if (value instanceof SfItem) {
@@ -73,7 +73,7 @@ export function decodeCmcd<T extends CmcdData = CmcdData>(
 ): T
 export function decodeCmcd(cmcd: string, options?: CmcdDecodeOptions): CmcdData | Cmcd {
 	if (!cmcd) {
-		return {} as CmcdData
+		return {}
 	}
 
 	const sfDict = decodeSfDict(cmcd, options)

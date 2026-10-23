@@ -6,7 +6,7 @@ import { describe, it } from 'vite-plus/test'
 import { parseXmlGuarded, runParseWorker } from './parseXmlWorker.ts'
 
 describe('parseXml', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const obj = parseXml(
 			`<root>

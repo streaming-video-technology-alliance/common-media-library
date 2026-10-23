@@ -17,16 +17,20 @@ describe('decodeSfList', () => {
 	it('throws an error on invalid input', () => {
 		assert.throws(
 			() => decodeSfList(`1,2,3)`),
-			(error: any) => {
+			(error: unknown) => {
+				assert.ok(error instanceof Error)
 				assert.deepStrictEqual(error.message, `failed to parse "1,2,3)" as List`)
+				assert.ok(error.cause instanceof Error)
 				assert.deepStrictEqual(error.cause.message, `failed to parse ")" as List`)
 				return true
 			},
 		)
 		assert.throws(
 			() => decodeSfList(`1,2,`),
-			(error: any) => {
+			(error: unknown) => {
+				assert.ok(error instanceof Error)
 				assert.deepStrictEqual(error.message, `failed to parse "1,2," as List`)
+				assert.ok(error.cause instanceof Error)
 				assert.deepStrictEqual(error.cause.message, `failed to parse "" as List`)
 				return true
 			},

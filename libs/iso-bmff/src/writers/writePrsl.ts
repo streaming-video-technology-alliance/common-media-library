@@ -1,3 +1,4 @@
+import type { IsoBox } from '../IsoBox.ts'
 import { encodeText } from '@svta/cml-utils'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -31,7 +32,7 @@ export function writePrsl(
 	const preselectionTagSize = preselectionTagBytes ? preselectionTagBytes.length + 1 : 0
 	const selectionPrioritySize = box.flags & 0x2000 ? 1 : 0
 	const interleavingTagSize = interleavingTagBytes ? interleavingTagBytes.length + 1 : 0
-	const { bytes, size } = writeChildBoxes(box.boxes, config)
+	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox[], config)
 
 	const totalSize =
 		headerSize +

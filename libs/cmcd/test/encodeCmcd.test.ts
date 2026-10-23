@@ -33,7 +33,8 @@ describe('encodeCmcd', () => {
 	})
 
 	it('handles null data object', () => {
-		equal(encodeCmcd(null as any), '')
+		// @ts-expect-error - This is a test
+		equal(encodeCmcd(null), '')
 	})
 
 	it('ignore invalid values', () => {
@@ -56,17 +57,17 @@ describe('encodeCmcd', () => {
 			'tb=(6000;v 320;a);p=2,v=2',
 			'tbl=(21300;v 8100;a);p=2,v=2',
 		]) {
-			equal(encodeCmcd(decodeCmcd(s, { convertToLatest: true }) as Cmcd), s)
+			equal(encodeCmcd(decodeCmcd(s, { convertToLatest: true })), s)
 		}
 	})
 
 	it('rounds the values inside an inner list with parameters', () => {
 		equal(
-			encodeCmcd(decodeCmcd('tbl=(21349;v 8051;a);p=2,v=2', { convertToLatest: true }) as Cmcd),
+			encodeCmcd(decodeCmcd('tbl=(21349;v 8051;a);p=2,v=2', { convertToLatest: true })),
 			'tbl=(21300;v 8100;a);p=2,v=2',
 		)
 		equal(
-			encodeCmcd(decodeCmcd('br=(3000.4;v 128.6;a);p=2,v=2', { convertToLatest: true }) as Cmcd),
+			encodeCmcd(decodeCmcd('br=(3000.4;v 128.6;a);p=2,v=2', { convertToLatest: true })),
 			'br=(3000;v 129;a);p=2,v=2',
 		)
 	})
@@ -299,7 +300,8 @@ describe('encodeCmcd', () => {
 
 		it('still strips sta="" in event mode when event type is ps', () => {
 			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
-			const input = { e: CmcdEventType.PLAY_STATE, sta: '' as any, cid: 'content-id' }
+			// @ts-expect-error - This is a test
+			const input: Cmcd = { e: CmcdEventType.PLAY_STATE, sta: '', cid: 'content-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
 				filter: key => key === 'cid',
@@ -309,7 +311,8 @@ describe('encodeCmcd', () => {
 
 		it('still strips cid=false in event mode when event type is c', () => {
 			vi.useFakeTimers({ now: 1234, toFake: ['Date'] })
-			const input = { e: CmcdEventType.CONTENT_ID, cid: false as any, sid: 'session-id' }
+			// @ts-expect-error - This is a test
+			const input: Cmcd = { e: CmcdEventType.CONTENT_ID, cid: false, sid: 'session-id' }
 			const output = encodeCmcd(input, {
 				reportingMode: CmcdReportingMode.EVENT,
 				filter: key => key === 'sid',

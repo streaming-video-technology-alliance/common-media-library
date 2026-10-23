@@ -339,7 +339,7 @@ describe('decodeCbor', () => {
 
 		it('decodes 128 nested levels and rejects 129', () => {
 			const nested = (levels: number): Uint8Array =>
-				Uint8Array.from([...Array(levels - 1).fill(0x81), 0x80])
+				Uint8Array.from([...Array<number>(levels - 1).fill(0x81), 0x80])
 			let value = decodeCbor(nested(128))
 			for (let level = 1; level < 128; level++) value = (value as unknown[])[0]
 			deepStrictEqual(value, [])

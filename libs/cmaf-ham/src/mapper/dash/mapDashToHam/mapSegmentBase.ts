@@ -26,7 +26,7 @@ export function mapSegmentBase(representation: Representation, duration: number)
 				duration,
 				url: representation.BaseURL?.[0] ?? '',
 				startTime,
-			} as Segment
+			}
 
 			// Only include byteRange if it exists
 			if (byteRange !== undefined) {

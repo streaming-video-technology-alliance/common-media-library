@@ -38,7 +38,7 @@ export function mapHlsToHam(manifest: ManifestFile): Presentation[] {
 			id: (selectionSetId++).toString(),
 			switchingSets: audioSwitchingSets,
 			type: 'audio',
-		} as SelectionSet)
+		})
 	}
 
 	if (subtitleSwitchingSets.length > 0) {
@@ -46,7 +46,7 @@ export function mapHlsToHam(manifest: ManifestFile): Presentation[] {
 			id: (selectionSetId++).toString(),
 			switchingSets: subtitleSwitchingSets,
 			type: 'text',
-		} as SelectionSet)
+		})
 	}
 
 	if (videoSwitchingSets.length > 0) {
@@ -54,7 +54,7 @@ export function mapHlsToHam(manifest: ManifestFile): Presentation[] {
 			id: (selectionSetId++).toString(),
 			switchingSets: videoSwitchingSets,
 			type: 'video',
-		} as SelectionSet)
+		})
 	}
 
 	// Calculate total duration from the longest track

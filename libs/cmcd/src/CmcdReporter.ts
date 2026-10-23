@@ -203,7 +203,10 @@ function copyItemValue(value: unknown): unknown {
 		return value
 	}
 
-	const copy = Object.assign(Object.create(Object.getPrototypeOf(value)), value) as {
+	const copy = Object.assign(
+		Object.create(Object.getPrototypeOf(value) as object | null) as object,
+		value,
+	) as {
 		params?: unknown
 		value?: unknown
 	}
@@ -1143,7 +1146,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		}
 
 		try {
-			const encoded = encodeCmcd(data as Cmcd, {
+			const encoded = encodeCmcd(data, {
 				version: this.config.version,
 				reportingMode: CMCD_REQUEST_MODE,
 				baseUrl,
@@ -1250,7 +1253,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 		// shared array would leak mutation into the store. The reporter never
 		// reads it back; the response path works from the encoded snapshot on
 		// the provenance record.
-		const cmcd = (report.customData.cmcd = copyReportValues(prepareCmcdData(cmcdData, options)))
+		const cmcd = copyReportValues(prepareCmcdData(cmcdData, options))
+		;(report.customData as { cmcd: Cmcd }).cmcd = cmcd
 
 		if (sendMsd && cmcd.msd !== undefined) {
 			session.requestTarget.msdSent = true

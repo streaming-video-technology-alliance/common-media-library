@@ -16,6 +16,6 @@ export function presentationsToPeriods(presentations: Presentation[]): Period[] 
 				start: 'PT0S',
 			},
 			AdaptationSet: selectionSetsToAdaptationSet(presentation.selectionSets),
-		} as Period
+		}
 	})
 }

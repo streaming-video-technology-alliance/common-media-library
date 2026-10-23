@@ -3,7 +3,7 @@ import { equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 describe('serializeXml', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const xml = {
 			nodeName: '#document',

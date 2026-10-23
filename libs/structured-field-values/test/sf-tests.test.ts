@@ -8,7 +8,14 @@ import {
 } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
 import { describe, test } from 'vite-plus/test'
-import { formatDict, formatItem, formatList } from './util/format.ts'
+import {
+	formatDict,
+	formatItem,
+	formatList,
+	type RawDict,
+	type RawItem,
+	type RawList,
+} from './util/format.ts'
 import { read } from './util/read.ts'
 
 describe('structured_field_tests', async () => {
@@ -59,7 +66,7 @@ describe('structured_field_tests', async () => {
 			try {
 				if (suite.header_type === `item`) {
 					// decode
-					const obj = formatItem(suite.expected)
+					const obj = formatItem(suite.expected as RawItem)
 					const decoded = decodeSfItem(suite.raw[0])
 					assert.deepStrictEqual(decoded, obj, suite.name)
 
@@ -70,7 +77,7 @@ describe('structured_field_tests', async () => {
 				}
 				if (suite.header_type === `list`) {
 					// decode
-					const obj = formatList(suite.expected)
+					const obj = formatList(suite.expected as RawList)
 					const decoded = decodeSfList(suite.raw[0])
 					assert.deepStrictEqual(decoded, obj, suite.name)
 
@@ -92,7 +99,7 @@ describe('structured_field_tests', async () => {
 				}
 				if (suite.header_type === `dictionary`) {
 					// decode
-					const obj = formatDict(suite.expected)
+					const obj = formatDict(suite.expected as RawDict)
 					const decoded = decodeSfDict(suite.raw[0])
 					assert.deepStrictEqual(decoded, obj, suite.name)
 
@@ -111,8 +118,12 @@ describe('structured_field_tests', async () => {
 					const encoded = encodeSfDict(obj)
 					assert.deepStrictEqual(str, encoded, suite.name)
 				}
-			} catch (error: any) {
-				assert.deepStrictEqual(suite.must_fail, true, error)
+			} catch (error) {
+				assert.deepStrictEqual(
+					suite.must_fail,
+					true,
+					error instanceof Error ? error : String(error),
+				)
 			}
 		})
 	})

@@ -16,7 +16,7 @@ describe('getLicenseRequestFromMessage', () => {
 		const message = stringToUtf16Buffer(PLAYREADY_KEY_MESSAGE)
 		//#region example
 		const result = getLicenseRequestFromMessage(message)
-		deepStrictEqual(result, decodeBase64('1beR1c0').buffer as ArrayBuffer)
+		deepStrictEqual(result, decodeBase64('1beR1c0').buffer)
 		//#endregion example
 	})
 })

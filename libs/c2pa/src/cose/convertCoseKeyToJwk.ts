@@ -53,5 +53,5 @@ export function convertCoseKeyToJwk(coseKey: unknown): CoseKeyJwk {
 		return { kty: 'OKP', crv: curveName, x: toBase64Url(x) }
 	}
 
-	throw new Error(`Unsupported COSE key type: ${kty}`)
+	throw new Error(`Unsupported COSE key type: ${String(kty)}`)
 }

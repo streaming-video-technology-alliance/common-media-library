@@ -24,7 +24,8 @@ describe('appendCmcdQuery', () => {
 	})
 
 	it('handles null data object', () => {
-		equal(appendCmcdQuery(url, null as any), url)
+		// @ts-expect-error - This is a test
+		equal(appendCmcdQuery(url, null), url)
 	})
 
 	it('returns the URL unchanged when the data has no keys to send', () => {

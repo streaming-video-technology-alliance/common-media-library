@@ -89,7 +89,7 @@ export const CmsdStreamType: typeof CmStreamType;
 export type CmsdStreamType = CmStreamType;
 
 // @public
-export type CmsdValue = CmsdObjectType | CmsdStreamingFormat | CmsdStreamType | string | number | boolean | symbol | SfToken;
+export type CmsdValue = string | number | boolean | symbol | SfToken;
 
 // @public
 export function decodeCmsdDynamic(cmsd: string): CmsdDynamic[];

@@ -8,7 +8,7 @@ import { CmStreamingFormat } from '@svta/cml-cta'
  *
  * @public
  */
-export const CmsdStreamingFormat = CmStreamingFormat as typeof CmStreamingFormat
+export const CmsdStreamingFormat: typeof CmStreamingFormat = CmStreamingFormat
 
 /**
  * @public

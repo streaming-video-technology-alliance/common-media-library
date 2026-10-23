@@ -4,7 +4,7 @@ import { describe, it } from 'vite-plus/test'
 import { PATHWAY_CLONE } from './PATHWAY_CLONE.ts'
 
 describe('isValidPathwayClone', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const pathwayClone = {
 			'BASE-ID': 'pathway1',

@@ -7,6 +7,7 @@ import {
 	readIsoBoxes,
 	readMdat,
 	readPayl,
+	type WebVttCuePayloadBox,
 } from '../util/box.ts'
 
 describe('readPayl', function () {
@@ -17,7 +18,7 @@ describe('readPayl', function () {
 		const container = boxes[0]
 		assert(isContainer(container))
 
-		const box = container.boxes[0]
+		const box = container.boxes[0] as WebVttCuePayloadBox
 
 		assert.ok(box)
 		assert.strictEqual(box.type, 'payl')

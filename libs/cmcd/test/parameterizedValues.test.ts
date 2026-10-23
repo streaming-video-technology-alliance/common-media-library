@@ -31,7 +31,7 @@ const NUMERIC_LIST_KEYS = [
 const VERSION_1_KEYS: readonly string[] = ['bl', 'br', 'mtp', 'tb']
 
 function decodeToRecord(input: string, options?: CmcdDecodeOptions): Record<string, unknown> {
-	return decodeCmcd(input, options) as unknown as Record<string, unknown>
+	return decodeCmcd(input, options)
 }
 
 function errorsOf(input: string): string[] {
@@ -50,7 +50,7 @@ function bareList(value: unknown): unknown[] {
 	ok(value instanceof SfItem, 'expected an SfItem that wraps a list')
 	const list = value.value as unknown
 	ok(Array.isArray(list), 'expected a list inside the SfItem')
-	return list.map(item => (item instanceof SfItem ? item.value : item))
+	return (list as unknown[]).map(item => (item instanceof SfItem ? (item.value as unknown) : item))
 }
 
 function decodedBr(input: string): Cmcd['br'] {
@@ -60,9 +60,9 @@ function decodedBr(input: string): Cmcd['br'] {
 function createMockRequester() {
 	const requests: HttpRequest[] = []
 
-	const requester = async (request: HttpRequest): Promise<{ status: number }> => {
+	const requester = (request: HttpRequest): Promise<{ status: number }> => {
 		requests.push(request)
-		return { status: 200 }
+		return Promise.resolve({ status: 200 })
 	}
 
 	return { requester, requests }
@@ -75,7 +75,7 @@ describe('values with parameters', () => {
 		// #region example
 		const data = decodeCmcd('br=(3000 6000);p=2,v=2', { convertToLatest: true })
 		equal(encodeCmcd(data), 'br=(3000 6000);p=2,v=2')
-		equal(validateCmcd(data as unknown as Record<string, unknown>).valid, true)
+		equal(validateCmcd(data).valid, true)
 		// #endregion example
 	})
 

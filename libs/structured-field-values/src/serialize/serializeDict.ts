@@ -1,3 +1,4 @@
+import type { SfMember } from '../SfMember.ts'
 import type { SfEncodeOptions } from '../SfEncodeOptions.ts'
 import { DICT } from '../utils/DICT.ts'
 import { serializeDictMember } from './serializeDictMember.ts'
@@ -55,10 +56,10 @@ export function serializeDict(
 	const parts: string[] = []
 
 	if (dict instanceof Map) {
-		dict.forEach((member, key) => parts.push(serializeDictMember(key, member)))
+		dict.forEach((member: unknown, key) => parts.push(serializeDictMember(key, member as SfMember)))
 	} else {
 		for (const key of Object.keys(dict)) {
-			parts.push(serializeDictMember(key, dict[key]))
+			parts.push(serializeDictMember(key, dict[key] as SfMember))
 		}
 	}
 

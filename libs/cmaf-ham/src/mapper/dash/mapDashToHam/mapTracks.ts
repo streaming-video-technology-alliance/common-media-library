@@ -60,7 +60,7 @@ export function mapTracks(
 				url: initializationUrl ?? '',
 			},
 			baseUrls: [],
-		} as VideoTrack
+		}
 	} else if (type === 'audio') {
 		return {
 			url: '',
@@ -78,7 +78,7 @@ export function mapTracks(
 				url: initializationUrl ?? '',
 			},
 			baseUrls: [],
-		} as AudioTrack
+		}
 	} else {
 		// if (type === 'text')
 		return {

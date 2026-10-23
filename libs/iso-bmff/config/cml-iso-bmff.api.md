@@ -298,7 +298,7 @@ export function isContainer<T extends IsoBox | Box<IsoBox["type"]>>(box: T): box
 export function isFullBox(box: any): box is FullBox;
 
 // @public
-export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: any): box is IsoBoxMap[T];
+export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T];
 
 // @public
 export type IsoBox = IsoBoxMap[keyof IsoBoxMap];

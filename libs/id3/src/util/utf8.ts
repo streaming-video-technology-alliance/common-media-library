@@ -30,7 +30,7 @@ function view<T extends ArrayBufferView>(
 	const start = Math.floor(Math.max(0, Math.min(rawStart, dataEnd)))
 	// Absolute end of the result within |buffer|.
 	const end = Math.floor(Math.min(start + Math.max(length, 0), dataEnd))
-	return new Type(buffer as ArrayBuffer, start, end - start)
+	return new Type(buffer, start, end - start)
 }
 
 function unsafeGetArrayBuffer(view: AllowSharedBufferSource) {
@@ -41,11 +41,6 @@ function unsafeGetArrayBuffer(view: AllowSharedBufferSource) {
 	}
 }
 
-function isArrayBufferView(obj: any): obj is ArrayBufferView {
-	return (
-		obj &&
-		isArrayBufferLike(obj.buffer) &&
-		obj.byteLength !== undefined &&
-		obj.byteOffset !== undefined
-	)
+function isArrayBufferView(obj: unknown): obj is ArrayBufferView {
+	return ArrayBuffer.isView(obj)
 }

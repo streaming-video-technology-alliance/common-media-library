@@ -38,11 +38,13 @@ describe('prepareCmcdData', () => {
 	})
 
 	it('returns an empty object for null input', () => {
-		equal(Object.keys(prepareCmcdData(null as any)).length, 0)
+		// @ts-expect-error - This is a test
+		equal(Object.keys(prepareCmcdData(null)).length, 0)
 	})
 
 	it('returns an empty object for non-object input', () => {
-		equal(Object.keys(prepareCmcdData('data' as any)).length, 0)
+		// @ts-expect-error - This is a test
+		equal(Object.keys(prepareCmcdData('data')).length, 0)
 	})
 
 	it('returns an empty object when all keys are filtered out', () => {
@@ -248,7 +250,7 @@ describe('prepareCmcdData', () => {
 				const items = [data[key]].flat()
 				ok(
 					items.every(item => Number.isInteger(item instanceof SfItem ? item.value : item)),
-					`Key "${key}" is prepared as ${items}.`,
+					`Key "${key}" is prepared as ${JSON.stringify(items)}.`,
 				)
 			})
 		}
@@ -271,7 +273,7 @@ describe('prepareCmcdData', () => {
 					{ e: CmcdEventType.RESPONSE_RECEIVED, [key]: value },
 					{ reportingMode: CmcdReportingMode.EVENT },
 				)
-				ok(!(key in data), `Key "${key}" is prepared as ${data[key]}.`)
+				ok(!(key in data), `Key "${key}" is prepared as ${String(data[key])}.`)
 			})
 		}
 	})

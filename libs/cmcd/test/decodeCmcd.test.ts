@@ -74,7 +74,8 @@ describe('decodeCmcd', () => {
 	})
 
 	it('handles null data object', () => {
-		deepEqual(decodeCmcd(null as any), {})
+		// @ts-expect-error - This is a test
+		deepEqual(decodeCmcd(null), {})
 	})
 
 	it('handles empty string', () => {

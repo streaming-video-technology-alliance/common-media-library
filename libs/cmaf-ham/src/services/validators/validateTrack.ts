@@ -59,7 +59,7 @@ export function validateTrack(
 			_validateAudioTrack(track as AudioTrack, switchingSetId, validation)
 			break
 		case 'text':
-			_validateTextTrack(track as TextTrack, switchingSetId, validation)
+			_validateTextTrack(track, switchingSetId, validation)
 			break
 	}
 

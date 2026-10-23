@@ -100,7 +100,7 @@ export function runParseWorker(
 				watch()
 			}
 		})
-		worker.on('error', error => settle(() => fail(error)))
+		worker.on('error', (error: Error) => settle(() => fail(error)))
 		watch()
 	})
 }

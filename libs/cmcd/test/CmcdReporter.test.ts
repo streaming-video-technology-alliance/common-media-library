@@ -24,9 +24,9 @@ import { afterEach, describe, it, vi } from 'vite-plus/test'
 function createMockRequester(status: number = 200) {
 	const requests: HttpRequest[] = []
 
-	const requester = async (request: HttpRequest): Promise<{ status: number }> => {
+	const requester = (request: HttpRequest): Promise<{ status: number }> => {
 		requests.push(request)
-		return { status }
+		return Promise.resolve({ status })
 	}
 
 	return { requester, requests }
@@ -768,11 +768,11 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 2)
 			ok(
 				(requests[0].body as string).includes('cid="c1"'),
-				`expected request-time cid in ${requests[0].body}`,
+				`expected request-time cid in ${requests[0].body as string}`,
 			)
 			ok(
 				(requests[1].body as string).includes('cid="c2"'),
-				`expected re-minted cid in ${requests[1].body}`,
+				`expected re-minted cid in ${requests[1].body as string}`,
 			)
 		})
 
@@ -940,8 +940,11 @@ describe('CmcdReporter', () => {
 			// attribution. The record itself rides the JSON payload, so the
 			// restored value is a revived plain-object copy: classification
 			// is by token value, never object identity.
-			const payload = JSON.parse(JSON.stringify({ request: stale, provenance }))
-			payload.request.customData[PROVENANCE] = payload.provenance
+			const payload = JSON.parse(JSON.stringify({ request: stale, provenance })) as {
+				request: CmcdRequestReport
+				provenance: CmcdRequestProvenance
+			}
+			;(payload.request.customData as Record<symbol, unknown>)[PROVENANCE] = payload.provenance
 			reporter.recordResponseReceived({ status: 200, request: payload.request })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1429,11 +1432,11 @@ describe('CmcdReporter', () => {
 		it('retries a failed batch with the bytes it was queued with', async () => {
 			const requests: HttpRequest[] = []
 			let status = 429
-			const requester = async (request: HttpRequest): Promise<{ status: number }> => {
+			const requester = (request: HttpRequest): Promise<{ status: number }> => {
 				requests.push(request)
 				const current = status
 				status = 200
-				return { status: current }
+				return Promise.resolve({ status: current })
 			}
 
 			const reporter = new CmcdReporter(
@@ -1469,7 +1472,7 @@ describe('CmcdReporter', () => {
 			ok((requests[0].body as string).includes('bl=(25000)'))
 			ok(
 				(requests[1].body as string).includes('bl=(25000)'),
-				`expected retry to keep bl=(25000) in ${requests[1].body}`,
+				`expected retry to keep bl=(25000) in ${requests[1].body as string}`,
 			)
 		})
 
@@ -1511,7 +1514,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			ok(
 				(requests[0].body as string).includes('ec=("500")'),
-				`expected ec 500 in ${requests[0].body}`,
+				`expected ec 500 in ${requests[0].body as string}`,
 			)
 
 			reporter.flush()
@@ -1583,8 +1586,8 @@ describe('CmcdReporter', () => {
 			// JSON strips the SfItem prototype from the player-facing cmcd
 			// object; the report is rebuilt from the record's snapshot, so it
 			// encodes cleanly instead of re-queueing forever.
-			const lossy = JSON.parse(JSON.stringify(stale))
-			lossy.customData[PROVENANCE] = provenance
+			const lossy = JSON.parse(JSON.stringify(stale)) as CmcdRequestReport
+			;(lossy.customData as Record<symbol, unknown>)[PROVENANCE] = provenance
 			reporter.recordResponseReceived({ status: 200, request: lossy })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1592,7 +1595,7 @@ describe('CmcdReporter', () => {
 			equal(requests.length, 1)
 			ok(
 				(requests[0].body as string).includes('tab=(3000)'),
-				`expected tab=(3000) in ${requests[0].body}`,
+				`expected tab=(3000) in ${requests[0].body as string}`,
 			)
 
 			// Nothing poisoned stays queued.
@@ -1633,8 +1636,10 @@ describe('CmcdReporter', () => {
 			// { description } plain objects; the report is rebuilt from the
 			// encoded snapshot instead, so tokens keep their wire type: bare,
 			// never quoted. The record is restored as a revived copy.
-			const lossy = JSON.parse(JSON.stringify(stale))
-			lossy.customData[PROVENANCE] = JSON.parse(JSON.stringify(provenance))
+			const lossy = JSON.parse(JSON.stringify(stale)) as CmcdRequestReport
+			;(lossy.customData as Record<symbol, unknown>)[PROVENANCE] = JSON.parse(
+				JSON.stringify(provenance),
+			)
 			reporter.recordResponseReceived({ status: 200, request: lossy })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1664,7 +1669,7 @@ describe('CmcdReporter', () => {
 			)
 
 			const stale = reporter.createRequestReport({ url: 'https://cdn.example.com/seg1.mp4' })
-			const lossy = JSON.parse(JSON.stringify(stale))
+			const lossy = JSON.parse(JSON.stringify(stale)) as CmcdRequestReport
 			reporter.recordResponseReceived({ status: 200, request: lossy })
 
 			await new Promise(resolve => setTimeout(resolve, 10))
@@ -1902,7 +1907,8 @@ describe('CmcdReporter', () => {
 				{ ot: 'm', d: 4000 },
 			)
 
-			deepEqual(Object.keys(req.customData.cmcd).sort(), ['ot', 'sid', 'v'])
+			const customData = req.customData as { cmcd: Cmcd }
+			deepEqual(Object.keys(customData.cmcd).sort(), ['ot', 'sid', 'v'])
 		})
 
 		it('returns the request unchanged if no enabled keys', () => {
@@ -2038,11 +2044,14 @@ describe('CmcdReporter', () => {
 
 			reporter.update({ br: [5000] })
 
-			const result = reporter.createRequestReport({ url: 'https://example.com/video.mp4' })
-			ok(result.customData)
-			ok(result.customData.cmcd)
-			ok('br' in result.customData.cmcd)
-			ok('v' in result.customData.cmcd)
+			const result = reporter.createRequestReport({
+				url: 'https://example.com/video.mp4',
+			})
+			const customData = result.customData as { cmcd: Cmcd }
+			ok(customData)
+			ok(customData.cmcd)
+			ok('br' in customData.cmcd)
+			ok('v' in customData.cmcd)
 		})
 
 		it('preserves existing customData', () => {
@@ -2062,9 +2071,10 @@ describe('CmcdReporter', () => {
 				customData: { foo: 'bar' },
 			})
 
-			ok(result.customData)
-			equal(result.customData.foo, 'bar')
-			ok(result.customData.cmcd)
+			const customData = result.customData as { foo: string; cmcd: Cmcd }
+			ok(customData)
+			equal(customData.foo, 'bar')
+			ok(customData.cmcd)
 		})
 
 		it('includes msd only once in request reports', () => {
@@ -2152,9 +2162,11 @@ describe('CmcdReporter', () => {
 					requester,
 				)
 
-				const license = reporter.createRequestReport({ url: 'https://example.com/license' })
+				const license = reporter.createRequestReport({
+					url: 'https://example.com/license',
+				})
 				ok(!license.url.includes('CMCD='))
-				deepEqual(license.customData.cmcd, {})
+				deepEqual((license.customData as { cmcd: Cmcd }).cmcd, {})
 
 				const segment = reporter.createRequestReport({ url: 'https://example.com/segment.mp4' })
 				ok(segment.url.includes('CMCD='))
@@ -4197,9 +4209,9 @@ describe('CmcdReporter', () => {
 		it('re-queues events on transport failure and delivers them on retry', async () => {
 			const requests: HttpRequest[] = []
 			let calls = 0
-			const requester = async (request: HttpRequest): Promise<{ status: number }> => {
+			const requester = (request: HttpRequest): Promise<{ status: number }> => {
 				requests.push(request)
-				return { status: calls++ === 0 ? 500 : 200 }
+				return Promise.resolve({ status: calls++ === 0 ? 500 : 200 })
 			}
 
 			const reporter = new CmcdReporter(createConfig(), requester)
@@ -4889,9 +4901,9 @@ describe('CmcdReporter', () => {
 
 		it('disposes every same-URL config in the session on a 410', async () => {
 			const requests: HttpRequest[] = []
-			const requester = async (request: HttpRequest): Promise<{ status: number }> => {
+			const requester = (request: HttpRequest): Promise<{ status: number }> => {
 				requests.push(request)
-				return { status: request.url === 'https://example.com/cmcd' ? 410 : 200 }
+				return Promise.resolve({ status: request.url === 'https://example.com/cmcd' ? 410 : 200 })
 			}
 
 			const reporter = new CmcdReporter(
@@ -4982,7 +4994,7 @@ describe('CmcdReporter', () => {
 
 			equal(requests.length, 1)
 			equal(setIntervalSpy.mock.calls.length, 1)
-			const intervalId = setIntervalSpy.mock.results[0].value
+			const intervalId: unknown = setIntervalSpy.mock.results[0].value
 			ok(clearIntervalSpy.mock.calls.some(c => c[0] === intervalId))
 		})
 	})
@@ -5010,7 +5022,7 @@ describe('CmcdReporter', () => {
 
 			reporter.start()
 			equal(setIntervalSpy.mock.calls.length, 1)
-			const firstId = setIntervalSpy.mock.results[0].value
+			const firstId: unknown = setIntervalSpy.mock.results[0].value
 
 			reporter.start()
 			ok(clearIntervalSpy.mock.calls.some(c => c[0] === firstId))

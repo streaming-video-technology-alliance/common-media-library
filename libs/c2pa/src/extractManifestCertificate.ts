@@ -68,7 +68,7 @@ export function extractManifestCertificate(mp4Bytes: Uint8Array): Uint8Array | n
 		const uuidBox = findC2paUuidBox(boxes)
 		if (!uuidBox) return null
 
-		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
+		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
 		const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
 		if (!jumbfPayload) return null
 		const signatureBytes = findSignatureContentBytes(parseJumbfBoxes(jumbfPayload))

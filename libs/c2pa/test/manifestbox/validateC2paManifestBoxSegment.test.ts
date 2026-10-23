@@ -90,7 +90,7 @@ describe('validateC2paManifestBoxSegment', () => {
 			continuityValidator: {
 				method: CUSTOM_METHOD,
 				validate: (liveVideoAssertion, manifest) => {
-					receivedAssertion = liveVideoAssertion as Record<string, unknown>
+					receivedAssertion = liveVideoAssertion
 					receivedManifest = manifest
 					return true
 				},
@@ -123,7 +123,7 @@ describe('validateC2paManifestBoxSegment', () => {
 		const { result } = await validateC2paManifestBoxSegment(bytes, null, undefined, {
 			continuityValidator: {
 				method: CUSTOM_METHOD,
-				validate: async liveVideoAssertion => liveVideoAssertion['sequenceNumber'] === 1,
+				validate: liveVideoAssertion => Promise.resolve(liveVideoAssertion['sequenceNumber'] === 1),
 			},
 		})
 
@@ -594,9 +594,8 @@ describe('validateC2paManifestBoxSegment — claim signature', () => {
 	it('rejects a signature that carries no certificate with CLAIM_SIGNATURE_MISMATCH', async () => {
 		// COSE_Sign1 with an empty protected header, so there is no x5chain to verify against
 		const noCertificate = new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x40, 0x40])
-		const segment = await buildLiveSegment(
-			chainedLiveVideoData('c2pa.manifestId'),
-			async () => noCertificate,
+		const segment = await buildLiveSegment(chainedLiveVideoData('c2pa.manifestId'), () =>
+			Promise.resolve(noCertificate),
 		)
 
 		const { result } = await validateC2paManifestBoxSegment(segment, PREVIOUS_MANIFEST_ID)

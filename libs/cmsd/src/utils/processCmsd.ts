@@ -5,10 +5,10 @@ import type { CmsdEncodeOptions } from '../CmsdEncodeOptions.ts'
 import type { CmsdStatic } from '../CmsdStatic.ts'
 
 export function processCmsd(obj: CmsdStatic, options?: CmsdEncodeOptions): CmsdStatic {
-	const results: CmsdStatic = {}
+	const results: Record<string, unknown> = {}
 
 	if (obj == null || typeof obj !== 'object') {
-		return results
+		return results as CmsdStatic
 	}
 
 	const keys = Object.keys(obj) as (keyof CmsdStatic)[]
@@ -31,8 +31,8 @@ export function processCmsd(obj: CmsdStatic, options?: CmsdEncodeOptions): CmsdS
 			value = useSymbol ? Symbol.for(value) : new SfToken(value)
 		}
 
-		results[key as any] = value as any
+		results[key] = value
 	})
 
-	return results
+	return results as CmsdStatic
 }

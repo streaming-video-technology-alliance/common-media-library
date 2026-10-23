@@ -67,7 +67,7 @@ export function audioGroupsToSwitchingSets(
 		id: 'audio',
 		tracks: audioTracks,
 		baseUrls: [],
-	} as SwitchingSet)
+	})
 
 	return audioSwitchingSets
 }
