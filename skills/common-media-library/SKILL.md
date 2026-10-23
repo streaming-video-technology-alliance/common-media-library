@@ -308,6 +308,6 @@ Reference: references/xml.md
 
 ## Links
 
-- Docs: https://streaming-video-technology-alliance.github.io/common-media-library/
-- llms.txt: https://streaming-video-technology-alliance.github.io/common-media-library/llms.txt
+- Docs: https://cml.svta.org/
+- llms.txt: https://cml.svta.org/llms.txt
 - Source: https://github.com/streaming-video-technology-alliance/common-media-library

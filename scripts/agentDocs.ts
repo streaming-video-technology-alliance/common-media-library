@@ -3,8 +3,7 @@ import path from 'node:path'
 import { parseArgs } from 'node:util'
 import { projects } from './projects.ts'
 
-export const siteBase =
-	'https://streaming-video-technology-alliance.github.io/common-media-library/'
+export const siteBase = 'https://cml.svta.org/'
 export const sourceBase =
 	'https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/'
 export const skillDir = 'skills/common-media-library'
