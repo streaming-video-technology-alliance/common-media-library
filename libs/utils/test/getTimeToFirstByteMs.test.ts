@@ -69,6 +69,27 @@ describe('getTimeToFirstByteMs', () => {
 		)
 	})
 
+	it('returns NaN for every responseStart that getTransferDurationMs rejects', () => {
+		for (const responseStart of [NaN, Infinity, -Infinity, 999, 1851]) {
+			const sample = { startTime: 1000, responseStart, duration: 850, encodedBodySize: 1 }
+
+			ok(
+				Number.isNaN(getTimeToFirstByteMs(sample)),
+				`expected NaN for responseStart ${responseStart}`,
+			)
+			equal(
+				getTransferDurationMs(sample),
+				850,
+				`expected duration for responseStart ${responseStart}`,
+			)
+		}
+
+		const noDuration = { startTime: 1000, responseStart: 1300, duration: NaN, encodedBodySize: 1 }
+
+		ok(Number.isNaN(getTimeToFirstByteMs(noDuration)))
+		ok(Number.isNaN(getTransferDurationMs(noDuration)))
+	})
+
 	it('adds up with getTransferDurationMs to duration', () => {
 		const sample = { startTime: 1000, responseStart: 1300, duration: 850, encodedBodySize: 1 }
 

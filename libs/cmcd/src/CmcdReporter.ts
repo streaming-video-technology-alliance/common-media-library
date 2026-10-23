@@ -975,7 +975,8 @@ export class CmcdReporter<C = Record<string, unknown>> {
 	 * - `url` - the original requested URL (before any redirects)
 	 * - `rc` - the HTTP response status code
 	 * - `ts` - the request initiation time (from `resourceTiming.startTime`)
-	 * - `ttfb` - time to first byte (from `resourceTiming.responseStart`)
+	 * - `ttfb` - time to first byte (from `resourceTiming.responseStart`, omitted when
+	 *   `responseStart` is outside the response)
 	 * - `ttlb` - time to last byte (from `resourceTiming.duration`)
 	 *
 	 * If the player has additional keys like `ttfbb`, `cmsdd`, `cmsds`, and

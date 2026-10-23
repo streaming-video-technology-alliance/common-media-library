@@ -1,6 +1,7 @@
 /**
  * The number of finished samples whose first-byte waits the starvation guard averages.
- * dash.js uses 4 as `averageLatencySampleAmount`.
+ * dash.js averages 4 latency samples as `averageLatencySampleAmount`, and its rules only log the average.
+ * hls.js adds its first-byte estimate to the fetch time check.
  *
  * @internal
  */

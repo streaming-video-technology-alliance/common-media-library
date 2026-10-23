@@ -58,8 +58,8 @@ import { validateLadder } from './validateLadder.ts'
  * The starvation guard runs when the input has a positive `segmentDuration` and the throughput is known.
  * It waits until two samples have finished since the last reset.
  * It keeps the highest rung, at or below the pick, that downloads within `bufferLevel / playbackRate`.
- * It assumes `throughput * starvationSafetyFactor` for that download, after the mean first-byte wait of the last
- * four finished samples. Rung 0 always passes.
+ * It assumes `throughput * starvationSafetyFactor` for that download.
+ * It adds the mean first-byte wait of the last four finished samples to that download. Rung 0 always passes.
  * A player omits `segmentDuration` to skip the guard, for example near the live edge.
  *
  * The selector reads `timing`, `bandwidth`, `duration`, `bufferLevel`, `isReplacement`, and `aborted` from a sample.
