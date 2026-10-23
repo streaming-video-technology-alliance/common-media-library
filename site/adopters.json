@@ -1,0 +1,34 @@
+[
+	{
+		"name": "hls.js",
+		"url": "https://github.com/video-dev/hls.js",
+		"packages": ["cmcd", "id3", "structured-field-values", "utils"]
+	},
+	{
+		"name": "dash.js",
+		"url": "https://github.com/Dash-Industry-Forum/dash.js",
+		"packages": ["608", "cmcd", "cmsd", "dash", "id3", "request", "xml"]
+	},
+	{
+		"name": "Shaka Player",
+		"url": "https://github.com/shaka-project/shaka-player",
+		"packages": ["cmcd"],
+		"note": "Ports the CMCD code from CML into its own source."
+	},
+	{
+		"name": "Video.js",
+		"url": "https://github.com/videojs/video.js",
+		"packages": ["cmcd"],
+		"note": "In the spf package."
+	},
+	{
+		"name": "Eyevinn warp-player",
+		"url": "https://github.com/Eyevinn/warp-player",
+		"packages": ["608", "iso-bmff"]
+	},
+	{
+		"name": "moq-dev hang",
+		"url": "https://github.com/moq-dev/moq",
+		"packages": ["iso-bmff"]
+	}
+]
