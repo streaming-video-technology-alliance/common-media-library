@@ -36,6 +36,7 @@ export type EwmaEstimatorOptions = {
     defaultEstimate?: number;
     minTotalBytes?: number;
     minBodySize?: number;
+    minTransferMs?: number;
     fastHalfLife: number;
     slowHalfLife: number;
 };

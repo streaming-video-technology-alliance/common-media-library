@@ -8,8 +8,14 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `EwmaEstimatorOptions.minTransferMs`: the shortest transfer, in milliseconds, that counts as a sample. A body that arrives within a few milliseconds of its headers came from a cache. shaka-player uses 5. Default 0 ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+
 ### Changed
 
+- Every estimator measures a sample over its transfer, from `responseStart` to the end of the response, when the sample has `responseStart`. `EwmaEstimator` also weights the sample by that transfer. Before, the rate and the weight included the wait for the first byte, so a 112 kB live segment on a connection with an 800 ms wait measured about 1 Mbps and carried 0.85 s of weight ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- Every estimator ignores a sample whose body arrived with its first byte, a transfer of 0 ms.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.1.0] - 2026-10-18
