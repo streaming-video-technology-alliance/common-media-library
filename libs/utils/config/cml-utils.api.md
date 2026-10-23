@@ -20,7 +20,7 @@ export const base64encode: typeof encodeBase64;
 export function convertUint8ToUint16(input: Uint8Array): Uint16Array;
 
 // @public
-export function decodeBase64(str: string): Uint8Array;
+export function decodeBase64(str: string): Uint8Array<ArrayBuffer>;
 
 // @public
 export function decodeText(data: ArrayBufferLike | ArrayBufferView, options?: DecodeTextOptions): string;
@@ -37,7 +37,7 @@ export type DeepReadonly<T> = T extends ((...args: never[]) => unknown) ? T : T 
 export function encodeBase64(binary: Uint8Array): string;
 
 // @public
-export function encodeText(data: string): Uint8Array;
+export function encodeText(data: string): Uint8Array<ArrayBuffer>;
 
 // @public
 export const Encoding: {

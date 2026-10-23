@@ -137,5 +137,10 @@ export async function verifyCoseSign1(
 	const sigStructure = buildSigStructure(coseSign1.protectedBytes, payload)
 	const algorithm = resolveVerifyAlgorithm(publicKey)
 	const signature = normalizeSignature(coseSign1.signature, publicKey)
-	return crypto.subtle.verify(algorithm, publicKey, signature, sigStructure)
+	return crypto.subtle.verify(
+		algorithm,
+		publicKey,
+		signature as Uint8Array<ArrayBuffer>,
+		sigStructure,
+	)
 }

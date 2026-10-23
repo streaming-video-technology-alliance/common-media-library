@@ -4,12 +4,12 @@ import { createWriterConfig } from './utils/createWriterConfig.ts'
 import { writeBoxes } from './utils/writeBoxes.ts'
 
 /**
- * Writes ISO boxes to a readable stream.
+ * Writes ISO boxes to an array of `Uint8Array`, one per box.
  *
  * @param boxes - The boxes to write
- * @param config - The configuration for the readable stream
+ * @param config - The configuration for the writer
  *
- * @returns A readable stream of the written boxes
+ * @returns The written boxes. A box given as a view over a `SharedArrayBuffer` is copied, so each result is backed by an `ArrayBuffer`.
  *
  * @example
  * {@includeCode ../test/writeIsoBoxes.test.ts#example}
@@ -19,6 +19,6 @@ import { writeBoxes } from './utils/writeBoxes.ts'
 export function writeIsoBoxes(
 	boxes: Iterable<IsoBoxStreamable>,
 	config: IsoBoxWriteViewConfig,
-): Uint8Array[] {
+): Uint8Array<ArrayBuffer>[] {
 	return writeBoxes(boxes, createWriterConfig(config))
 }

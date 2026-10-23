@@ -48,7 +48,7 @@ function buildHashInput(
 	bytes: Uint8Array,
 	exclusions: readonly BmffHashExclusion[],
 	offsetPrefixSize: number,
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
 	if (offsetPrefixSize !== 0 && offsetPrefixSize !== 8) {
 		throw new Error(`offsetPrefixSize must be 0 or 8, got ${offsetPrefixSize}`)
 	}

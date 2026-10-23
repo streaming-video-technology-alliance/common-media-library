@@ -73,7 +73,9 @@ export async function validateAssertionHashes(
 
 		const assertion = boxes[0]
 		const alg = ref.alg ? normalizeAlgorithmName(ref.alg) : 'SHA-256'
-		const computedHash = new Uint8Array(await crypto.subtle.digest(alg, assertion.rawBoxPayload))
+		const computedHash = new Uint8Array(
+			await crypto.subtle.digest(alg, assertion.rawBoxPayload as Uint8Array<ArrayBuffer>),
+		)
 
 		if (!hashesEqual(computedHash, ref.hash)) {
 			return { code: C2paStatusCode.ASSERTION_HASHEDURI_MISMATCH, verified: null }

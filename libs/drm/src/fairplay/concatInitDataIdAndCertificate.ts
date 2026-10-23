@@ -18,7 +18,7 @@ export function concatInitDataIdAndCertificate(
 	initData: Uint16Array,
 	id: Uint16Array | string,
 	cert: Uint8Array,
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
 	if (typeof id === 'string') {
 		id = stringToUint16(id)
 	}

@@ -35,6 +35,8 @@ Install one of the libraries with npm:
 npm i @svta/cml-cmcd
 ```
 
+The type declarations need TypeScript 5.7 or later.
+
 ## Usage
 
 ```typescript

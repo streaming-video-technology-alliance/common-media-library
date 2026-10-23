@@ -21,13 +21,15 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 ## Build Commands
 
 - `npm run build -w libs/<package>`: Build a package. The root `npm run build` builds every package in dependency order.
-- `npm run typecheck`: Run the typechecker
+- `npm run typecheck`: Run the type check. The script runs `vp lint --type-aware --type-check`, so the TypeScript 7 compiler inside tsgolint checks the code. Build first: the test files import the `dist/` output of the packages.
+- tsgolint checks each file with the nearest `tsconfig.json`. The package `tsconfig.json` files cover `src`, the root `tsconfig.json` covers the tests and the scripts. A file outside every `tsconfig.json` gets default compiler options, so the lint ignores `dev/`, `**/samples/`, and the `*.context.d.ts` files of the guides.
+- The `typescript` devDependency is 6.0, the last release with the JavaScript compiler API. typedoc and the README example check use that API, and the TypeScript 7 package does not export it. Keep the explicit `types` list in the root `tsconfig.json`: TypeScript 6 no longer includes every `@types` package by default.
 - `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies. The script passes `--config ../../vite.config.ts --dir .`, because `vp test` inside a package directory does not find the root configuration on its own.
 - Test files share long-lived Vitest workers, so module state carries over between files. A test that removes a global or needs a fresh module cache goes in a file named `*.environment.test.ts`. Those files run in a separate project with one worker per file.
 - `npm test`: Full validation at the root. It runs lint, the format check, build all, typecheck, then every package's tests. The PR checks run this command.
 - `npm run format`: Run the linter with auto-fix, then format the code
 - `npm run site`: Start the website dev server. `npm run build -w site` builds the website into `site/dist`. The build fails on dead links in any README or guide.
-- Lint, format, package builds, and tests run through Vite+: `vp lint`, `vp fmt`, `vp pack`, and `vp test` (Vitest). The configuration is `vite.config.ts` at the root.
+- Lint, format, package builds, tests, and the type check run through Vite+: `vp lint`, `vp fmt`, `vp pack`, `vp test` (Vitest), and `vp lint --type-check` (tsgolint). The configuration is `vite.config.ts` at the root.
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
 - `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the dependent packages. A dependent needs the bump when the peer range in the published package rejects the new version. Packages declare workspace peers as `*`. The Publish workflow rewrites `*` to a caret range of the current peer version. A cascade therefore happens when the new peer version falls outside that caret range, such as a major bump. The command also warns about packages that have unreleased changelog entries and no version change.
 
@@ -52,6 +54,7 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Actionable error messages: include parameter name, expected value(s), and received value.
 - Minimal API surface: do not add a public export unless it serves a clear use case.
 - Follow the naming and structural patterns of the other packages: `encode`/`decode`, options objects, and the const enum pattern.
+- The type declarations need TypeScript 5.7 or later, and the root README states that minimum. A function that allocates its result returns `Uint8Array<ArrayBuffer>`, so adopters can pass the result to Web APIs without a cast. A function that returns a view over its input returns `Uint8Array`. Never narrow an input type: parameters accept `Uint8Array` and `ArrayBufferLike`. Newer TypeScript syntax in a public signature raises the minimum, so document it when you add one.
 
 ## Workflow
 
