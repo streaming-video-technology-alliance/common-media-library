@@ -363,12 +363,15 @@ export class WebVttParser {
 
 					case WebVttParserState.CUE_TEXT:
 						const hasSubstring = line.indexOf('-->') !== -1
+						if (hasSubstring) {
+							alreadyCollectedLine = true
+						}
 
 						// 34 - If we have an empty line then report the cue.
 						// 35 - If we have the special substring '-->' then report the cue,
 						// but do not collect the line as we need to process the current
 						// one as a new cue.
-						if (!line || hasSubstring && (alreadyCollectedLine = true)) {
+						if (!line || hasSubstring) {
 							// We are done parsing this cue.
 							// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 							this.oncue?.(this.cue!)
