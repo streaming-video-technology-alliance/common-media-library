@@ -21,7 +21,7 @@ export function getUrlFromTemplate(
 	segmentId: number,
 ): string {
 	const regexTemplate = /\$(.*?)\$/g
-	return segmentTemplate.$.media.replace(regexTemplate, (match: any) => {
+	return segmentTemplate.$.media.replace(regexTemplate, (match: string) => {
 		if (match.includes('RepresentationID')) {
 			return representation.$.id
 		}
@@ -32,7 +32,7 @@ export function getUrlFromTemplate(
 			return segmentId.toString().padStart(4, '0')
 		}
 		if (match.includes('Number')) {
-			return segmentId
+			return segmentId.toString()
 		}
 		console.error(
 			`Unknown property ${match} from the SegmentTemplate on representation ${representation.$.id}`,

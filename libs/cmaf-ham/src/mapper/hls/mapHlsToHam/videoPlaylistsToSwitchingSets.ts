@@ -21,7 +21,7 @@ export function videoPlaylistsToSwitchingSets(
 	const videoTracks: VideoTrack[] = []
 	let videoTrackId = 0
 
-	playlists.map((playlist: any) => {
+	playlists.map(playlist => {
 		const parsedHlsManifest = parseHlsManifest(manifestPlaylists.shift()?.manifest)
 		const segments: Segment[] = formatSegments(parsedHlsManifest?.segments)
 		const { LANGUAGE, CODECS, BANDWIDTH } = playlist.attributes

@@ -272,6 +272,8 @@ export type HlsManifest = {
     mediaGroups: MediaGroups;
     segments: SegmentHls[];
     targetDuration?: number;
+    version?: number;
+    mediaSequence?: number;
 };
 
 // @internal (undocumented)
@@ -339,9 +341,11 @@ export function mapSegmentTemplate(representation: Representation, duration: num
 export type MediaGroups = {
     AUDIO: Record<string, Record<string, {
         language: string;
+        uri: string;
     }>>;
     SUBTITLES: Record<string, Record<string, {
         language: string;
+        uri: string;
     }>>;
 };
 
@@ -372,6 +376,8 @@ export type PlayList = {
     uri: string;
     attributes: {
         FRAME_RATE: number;
+        "FRAME-RATE"?: number;
+        LANGUAGE?: string;
         CODECS: string;
         BANDWIDTH: number;
         RESOLUTION: {

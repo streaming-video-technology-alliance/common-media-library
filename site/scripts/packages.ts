@@ -44,7 +44,7 @@ function loadGuides(docsDir: string): GuideInfo[] {
 
 export function loadPackage(libsDir: string, folder: string): PackageInfo {
 	const dir = path.join(libsDir, folder)
-	const manifest: Manifest = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8'))
+	const manifest = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8')) as Manifest
 	const group = groups[folder]
 
 	if (!group) {

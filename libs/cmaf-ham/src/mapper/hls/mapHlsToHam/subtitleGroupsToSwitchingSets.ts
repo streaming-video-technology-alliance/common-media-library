@@ -1,3 +1,4 @@
+import type { MediaGroups } from '../../../types/mapper/hls/MediaGroups.ts'
 import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 import type { TextTrack } from '../../../types/model/TextTrack.ts'
 
@@ -10,15 +11,17 @@ import { getDuration } from './utils/getDuration.ts'
 import { getHlsCodec } from './utils/getHlsCodec.ts'
 
 export function subtitleGroupsToSwitchingSets(
-	mediaGroupsSubtitles: any,
+	mediaGroupsSubtitles: MediaGroups['SUBTITLES'] | undefined,
 	manifestPlaylists: ManifestFile[],
 ): SwitchingSet[] {
 	const subtitleSwitchingSets: SwitchingSet[] = []
 	const textTracks: TextTrack[] = []
 
 	// Add selection set of type subtitles
-	for (const subtitleEncodings in mediaGroupsSubtitles) {
-		const encodings = mediaGroupsSubtitles[subtitleEncodings]
+	const groups = mediaGroupsSubtitles ?? {}
+
+	for (const subtitleEncodings in groups) {
+		const encodings = groups[subtitleEncodings]
 		for (const subtitle in encodings) {
 			const attributes = encodings[subtitle]
 			const { language, uri } = attributes

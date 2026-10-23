@@ -78,7 +78,7 @@ describe('dashToHam', () => {
 	})
 })
 
-describe('hamToDash', async () => {
+describe('hamToDash', () => {
 	it('converts ham1 to dash1', () => {
 		const presentations = jsonHam1 as unknown as Presentation[]
 		const convertedDash = hamToDash(presentations)
@@ -122,7 +122,7 @@ describe('hamToDash', async () => {
 
 // Tests skipped because the output is not 100% equal to the original manifest.
 // These tests are useful to compare manually the actual dash with the output.
-describe.skip('dash to ham to dash', async () => {
+describe.skip('dash to ham to dash', () => {
 	it('converts ham1 to dash1 to ham1 again', () => {
 		const convertedHam = dashToHam(dashSample1)
 		const convertedDash = hamToDash(convertedHam)

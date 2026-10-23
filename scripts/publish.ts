@@ -20,7 +20,7 @@ type Packages = Record<PackageName, Package>
 async function loadPackage(folder: string): Promise<Package> {
 	console.log(`Loading ${folder}...`)
 	const file = path.resolve(folder, 'package.json')
-	const packageJson = JSON.parse(await readFile(file, 'utf8'))
+	const packageJson = JSON.parse(await readFile(file, 'utf8')) as PackageJson
 	return [folder, file, packageJson]
 }
 

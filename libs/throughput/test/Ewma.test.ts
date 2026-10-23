@@ -4,14 +4,14 @@ import { equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 describe('Ewma', () => {
-	it('returns 0 before the first sample', async () => {
+	it('returns 0 before the first sample', () => {
 		const ewma = new Ewma(0.5)
 
 		equal(ewma.getEstimate(), 0)
 		equal(ewma.getTotalDuration(), 0)
 	})
 
-	it('returns the value after one sample', async () => {
+	it('returns the value after one sample', () => {
 		const ewma = new Ewma(0.5)
 
 		ewma.sample(2, 100)
@@ -19,7 +19,7 @@ describe('Ewma', () => {
 		equal(ewma.getEstimate(), 100)
 	})
 
-	it('weights the new value by 1 - alpha ^ weight', async () => {
+	it('weights the new value by 1 - alpha ^ weight', () => {
 		const ewma = new Ewma(0.5)
 
 		ewma.sample(2, 100)
@@ -29,7 +29,7 @@ describe('Ewma', () => {
 		equal(ewma.getEstimate(), 260)
 	})
 
-	it('returns the last value when alpha is 0', async () => {
+	it('returns the last value when alpha is 0', () => {
 		const ewma = new Ewma(0)
 
 		ewma.sample(2, 100)
@@ -38,7 +38,7 @@ describe('Ewma', () => {
 		equal(ewma.getEstimate(), 50)
 	})
 
-	it('ignores a sample whose estimate is NaN', async () => {
+	it('ignores a sample whose estimate is NaN', () => {
 		const ewma = new Ewma(0.5)
 
 		ewma.sample(2, 100)
@@ -49,7 +49,7 @@ describe('Ewma', () => {
 		equal(ewma.getTotalDuration(), 2)
 	})
 
-	it('derives alpha from a half-life', async () => {
+	it('derives alpha from a half-life', () => {
 		//#region example
 		// A half-life of 2 seconds
 		const ewma = new Ewma(Math.exp(Math.log(0.5) / 2))

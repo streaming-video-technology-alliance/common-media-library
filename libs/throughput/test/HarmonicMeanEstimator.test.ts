@@ -3,13 +3,13 @@ import { equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 describe('HarmonicMeanEstimator', () => {
-	it('returns NaN when there are no entries', async () => {
+	it('returns NaN when there are no entries', () => {
 		const estimator = new HarmonicMeanEstimator()
 
 		equal(estimator.getEstimate(), NaN)
 	})
 
-	it('returns positive number when there is one entry', async () => {
+	it('returns positive number when there is one entry', () => {
 		const estimator = new HarmonicMeanEstimator()
 
 		// 1000 bps
@@ -22,7 +22,7 @@ describe('HarmonicMeanEstimator', () => {
 		equal(estimator.getEstimate(), 1000)
 	})
 
-	it('ignores a sample with a body size of 0 or less', async () => {
+	it('ignores a sample with a body size of 0 or less', () => {
 		const estimator = new HarmonicMeanEstimator()
 
 		// 500 bps
@@ -50,7 +50,7 @@ describe('HarmonicMeanEstimator', () => {
 		}
 	})
 
-	it('ignores a sample with a duration of 0 or less', async () => {
+	it('ignores a sample with a duration of 0 or less', () => {
 		const estimator = new HarmonicMeanEstimator()
 
 		// 500 bps
@@ -78,7 +78,7 @@ describe('HarmonicMeanEstimator', () => {
 		}
 	})
 
-	it('returns positive number when there are at least 2 entries', async () => {
+	it('returns positive number when there are at least 2 entries', () => {
 		const estimator = new HarmonicMeanEstimator()
 
 		// 500 bps

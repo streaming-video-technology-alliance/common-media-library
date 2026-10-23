@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `SccParser` types its `processor` as `Pick<Cta608Parser, 'addData'>` and its `field` as `number`. Both were `any`.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [1.1.1] - 2026-10-18

@@ -182,6 +182,14 @@ const config: ViteUserConfig = defineConfig({
 		},
 		overrides: [
 			{
+				files: ['**/*.js'],
+				rules: {
+					'typescript/no-unsafe-assignment': 'off',
+					'typescript/no-unsafe-call': 'off',
+					'typescript/no-unsafe-member-access': 'off',
+				},
+			},
+			{
 				files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
 				rules: {
 					'constructor-super': 'off',

@@ -33,12 +33,12 @@ setHlsParser((text: string) => {
 	// This force cast, and the one in the return statement, are necessary
 	// because Typescript cannot reconcile the `Manifest` and `HlsManifest`
 	// types, even though they are the overlap.
-	const parsedHlsManifest = parser.manifest as any
+	const parsedHlsManifest = parser.manifest as unknown as HlsManifest
 	if (!parsedHlsManifest) {
 		throw new Error()
 	}
 
-	return parsedHlsManifest as HlsManifest
+	return parsedHlsManifest
 })
 
 setDashSerializer((manifest: DashManifest) => {

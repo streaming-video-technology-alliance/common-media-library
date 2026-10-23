@@ -1,3 +1,4 @@
+import type { MediaGroups } from '../../../types/mapper/hls/MediaGroups.ts'
 import type { AudioTrack } from '../../../types/model/AudioTrack.ts'
 import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 
@@ -23,16 +24,18 @@ import { getHlsCodec } from './utils/getHlsCodec.ts'
  * @alpha
  */
 export function audioGroupsToSwitchingSets(
-	mediaGroupsAudio: any,
+	mediaGroupsAudio: MediaGroups['AUDIO'] | undefined,
 	manifestPlaylists: ManifestFile[],
 ): SwitchingSet[] {
 	const audioSwitchingSets: SwitchingSet[] = []
 	const audioTracks: AudioTrack[] = []
 
-	for (const audioEncodings in mediaGroupsAudio) {
-		const encodings = mediaGroupsAudio[audioEncodings]
+	const groups = mediaGroupsAudio ?? {}
+
+	for (const audioEncodings in groups) {
+		const encodings = groups[audioEncodings]
 		for (const audio in encodings) {
-			const attributes: any = encodings[audio]
+			const attributes = encodings[audio]
 			const { language, uri } = attributes
 			const audioParsed = parseHlsManifest(manifestPlaylists.shift()?.manifest)
 			const map = audioParsed?.segments[0]?.map

@@ -8,7 +8,7 @@ export class Settings {
 	private values: Record<string, SettingsValue>
 
 	constructor() {
-		this.values = Object.create(null)
+		this.values = Object.create(null) as Record<string, SettingsValue>
 	}
 
 	// Only accept the first assignment to any key.
