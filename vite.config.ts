@@ -14,8 +14,6 @@ const config: ViteUserConfig = defineConfig({
 		fixedExtension: false,
 	},
 	test: {
-		include: ['libs/*/**/*.test.ts', 'scripts/**/*.test.ts', 'site/scripts/**/*.test.ts'],
-		setupFiles: ['./vitest.setup.ts'],
 		restoreMocks: true,
 	},
 	lint: {

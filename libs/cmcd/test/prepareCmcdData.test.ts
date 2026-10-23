@@ -8,7 +8,7 @@ import {
 } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, ok } from 'node:assert'
-import { describe, it, vi } from 'vite-plus/test'
+import { afterEach, describe, it, vi } from 'vite-plus/test'
 import {
 	CMCD_KEY_TYPE_INTEGER,
 	CMCD_KEY_TYPE_NUMBER,
@@ -22,6 +22,10 @@ function countCalls(calls: string[], key: string): CmcdFormatter {
 		return value as ReturnType<CmcdFormatter>
 	}
 }
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('prepareCmcdData', () => {
 	it('provides a valid example', () => {

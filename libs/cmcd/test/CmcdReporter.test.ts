@@ -19,7 +19,7 @@ import {
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, notEqual, ok, throws } from 'node:assert'
-import { describe, it, vi } from 'vite-plus/test'
+import { afterEach, describe, it, vi } from 'vite-plus/test'
 
 function createMockRequester(status: number = 200) {
 	const requests: HttpRequest[] = []
@@ -66,6 +66,10 @@ function createConfig(overrides: Partial<CmcdReporterConfig> = {}): Partial<Cmcd
 		...overrides,
 	}
 }
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('CmcdReporter', () => {
 	it('provides a valid example', () => {

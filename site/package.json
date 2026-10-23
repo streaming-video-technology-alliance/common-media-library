@@ -16,6 +16,6 @@
 		"build": "node scripts/prepare.ts && typedoc && vitepress build && node scripts/writeRedirects.ts && (cd .. && node scripts/agentDocs.ts --site site/dist) && node scripts/check.ts",
 		"dev": "node scripts/prepare.ts && typedoc && vitepress dev",
 		"start": "npm run dev",
-		"test": "node ../scripts/test.ts"
+		"test": "vp test --run --passWithNoTests --config ../vite.config.ts --dir ."
 	}
 }

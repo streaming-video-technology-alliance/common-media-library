@@ -8,13 +8,17 @@ import {
 } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { equal, ok } from 'node:assert'
-import { describe, it, vi } from 'vite-plus/test'
+import { afterEach, describe, it, vi } from 'vite-plus/test'
 import { toCmcdValue } from '@svta/cml-cmcd'
 import { CMCD_INPUT } from './data/CMCD_INPUT.ts'
 import { CMCD_STRING_EVENT } from './data/CMCD_STRING_EVENT.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
 import { CMCD_STRING_RESPONSE } from './data/CMCD_STRING_RESPONSE.ts'
 import { CMCD_STRING_V1 } from './data/CMCD_STRING_V1.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('encodeCmcd', () => {
 	it('provides a valid example', () => {

@@ -6,7 +6,7 @@ import {
 } from '@svta/cml-c2pa'
 import { deepStrictEqual, ok, rejects, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { beforeAll as before, describe, it, vi } from 'vite-plus/test'
+import { afterEach, beforeAll as before, describe, it, vi } from 'vite-plus/test'
 import { encodeCbor, encodeCborMapWithEntry } from '../cborTestUtils.ts'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { Tag } from 'cbor-x'
@@ -37,6 +37,10 @@ import {
 	type TestSessionKey,
 	type TestSessionKeyEntry,
 } from '../vsi/vsiTestUtils.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('validateC2paInitSegment', () => {
 	// #region example

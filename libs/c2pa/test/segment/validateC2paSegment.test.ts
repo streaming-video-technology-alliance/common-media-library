@@ -7,7 +7,7 @@ import {
 	type ValidatedSessionKey,
 } from '@svta/cml-c2pa'
 import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
-import { beforeAll as before, describe, it, vi } from 'vite-plus/test'
+import { afterEach, beforeAll as before, describe, it, vi } from 'vite-plus/test'
 import { createTestSigner } from '../testSigner.ts'
 import {
 	buildSessionKeysInitSegment,
@@ -16,6 +16,10 @@ import {
 	type TestSessionKey,
 	type TestSessionKeyEntry,
 } from '../vsi/vsiTestUtils.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 describe('validateC2paSegment', () => {
 	// #region example

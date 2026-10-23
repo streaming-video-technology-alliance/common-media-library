@@ -37,7 +37,7 @@
 	],
 	"scripts": {
 		"build": "node ../../scripts/build.ts",
-		"test": "node ../../scripts/test.ts",
+		"test": "vp test --run --passWithNoTests --config ../../vite.config.ts --dir .",
 		"bench": "node bench/bench.ts"
 	},
 	"engines": {
