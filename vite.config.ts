@@ -5,10 +5,8 @@ const config: ViteUserConfig = defineConfig({
 		semi: false,
 		singleQuote: true,
 		useTabs: true,
-		printWidth: 120,
 		arrowParens: 'avoid',
-		quoteProps: 'preserve',
-		// Test fixtures, changelogs, and the api-extractor reports stay byte-identical.
+		// Oxfmt does not format test fixtures, changelogs, and the api-extractor reports.
 		ignorePatterns: ['**/*.json', '**/*.md', 'structured-field-tests/'],
 	},
 	pack: {
