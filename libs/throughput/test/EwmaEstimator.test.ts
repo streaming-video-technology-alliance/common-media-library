@@ -212,8 +212,12 @@ describe('EwmaEstimator transfer duration', () => {
 		)
 	})
 
-	it('ignores a sample whose transfer is shorter than minTransferMs', () => {
-		const estimator = new EwmaEstimator({ fastHalfLife: 2, slowHalfLife: 5, minTransferMs: 5 })
+	it('ignores a sample whose transfer is shorter than minTransferDuration', () => {
+		const estimator = new EwmaEstimator({
+			fastHalfLife: 2,
+			slowHalfLife: 5,
+			minTransferDuration: 5,
+		})
 
 		// 500 bps over a 2 s transfer, then a cache hit: 125 bytes in 2 ms.
 		estimator.sample({ startTime: 0, encodedBodySize: 125, duration: 2000 })

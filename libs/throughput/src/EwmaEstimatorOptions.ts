@@ -39,7 +39,7 @@ export type EwmaEstimatorOptions = {
 	 *
 	 * @defaultValue `0`
 	 */
-	minTransferMs?: number
+	minTransferDuration?: number
 
 	/**
 	 * The half-life of the fast moving average, in seconds.

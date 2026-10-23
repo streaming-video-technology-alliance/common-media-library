@@ -1,12 +1,12 @@
-import { getTimeToFirstByteMs, getTransferDurationMs } from '@svta/cml-utils'
+import { getTimeToFirstByte, getTransferDuration } from '@svta/cml-utils'
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
-describe('getTimeToFirstByteMs', () => {
+describe('getTimeToFirstByte', () => {
 	it('returns the time from the start to the first byte when the sample has responseStart', () => {
 		//#region example
 		// 800 ms to the first byte, then a 50 ms transfer.
-		const timeToFirstByteMs = getTimeToFirstByteMs({
+		const timeToFirstByteMs = getTimeToFirstByte({
 			startTime: 1000,
 			responseStart: 1800,
 			duration: 850,
@@ -20,7 +20,7 @@ describe('getTimeToFirstByteMs', () => {
 	it('returns NaN when the sample has no responseStart', () => {
 		ok(
 			Number.isNaN(
-				getTimeToFirstByteMs({ startTime: 1000, duration: 850, encodedBodySize: 112_000 }),
+				getTimeToFirstByte({ startTime: 1000, duration: 850, encodedBodySize: 112_000 }),
 			),
 		)
 	})
@@ -29,7 +29,7 @@ describe('getTimeToFirstByteMs', () => {
 		for (const responseStart of [NaN, Infinity, -Infinity]) {
 			ok(
 				Number.isNaN(
-					getTimeToFirstByteMs({
+					getTimeToFirstByte({
 						startTime: 1000,
 						responseStart,
 						duration: 850,
@@ -45,7 +45,7 @@ describe('getTimeToFirstByteMs', () => {
 		for (const responseStart of [999, 1851]) {
 			ok(
 				Number.isNaN(
-					getTimeToFirstByteMs({
+					getTimeToFirstByte({
 						startTime: 1000,
 						responseStart,
 						duration: 850,
@@ -59,7 +59,7 @@ describe('getTimeToFirstByteMs', () => {
 
 	it('returns 0 when the first byte arrived at the start', () => {
 		equal(
-			getTimeToFirstByteMs({
+			getTimeToFirstByte({
 				startTime: 1000,
 				responseStart: 1000,
 				duration: 850,
@@ -69,16 +69,16 @@ describe('getTimeToFirstByteMs', () => {
 		)
 	})
 
-	it('returns NaN for every responseStart that getTransferDurationMs rejects', () => {
+	it('returns NaN for every responseStart that getTransferDuration rejects', () => {
 		for (const responseStart of [NaN, Infinity, -Infinity, 999, 1851]) {
 			const sample = { startTime: 1000, responseStart, duration: 850, encodedBodySize: 1 }
 
 			ok(
-				Number.isNaN(getTimeToFirstByteMs(sample)),
+				Number.isNaN(getTimeToFirstByte(sample)),
 				`expected NaN for responseStart ${responseStart}`,
 			)
 			equal(
-				getTransferDurationMs(sample),
+				getTransferDuration(sample),
 				850,
 				`expected duration for responseStart ${responseStart}`,
 			)
@@ -86,13 +86,13 @@ describe('getTimeToFirstByteMs', () => {
 
 		const noDuration = { startTime: 1000, responseStart: 1300, duration: NaN, encodedBodySize: 1 }
 
-		ok(Number.isNaN(getTimeToFirstByteMs(noDuration)))
-		ok(Number.isNaN(getTransferDurationMs(noDuration)))
+		ok(Number.isNaN(getTimeToFirstByte(noDuration)))
+		ok(Number.isNaN(getTransferDuration(noDuration)))
 	})
 
-	it('adds up with getTransferDurationMs to duration', () => {
+	it('adds up with getTransferDuration to duration', () => {
 		const sample = { startTime: 1000, responseStart: 1300, duration: 850, encodedBodySize: 1 }
 
-		equal(getTimeToFirstByteMs(sample) + getTransferDurationMs(sample), sample.duration)
+		equal(getTimeToFirstByte(sample) + getTransferDuration(sample), sample.duration)
 	})
 })

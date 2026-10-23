@@ -1,5 +1,5 @@
 import type { ResourceTiming } from '@svta/cml-utils'
-import { getTimeToFirstByteMs } from '@svta/cml-utils'
+import { getTimeToFirstByte } from '@svta/cml-utils'
 import { TIME_TO_FIRST_BYTE_SAMPLE_COUNT } from './TIME_TO_FIRST_BYTE_SAMPLE_COUNT.ts'
 import { MILLISECONDS_PER_SECOND } from './MILLISECONDS_PER_SECOND.ts'
 
@@ -12,7 +12,7 @@ import { MILLISECONDS_PER_SECOND } from './MILLISECONDS_PER_SECOND.ts'
  * @param timing - The timing of the download
  */
 export function recordTimeToFirstByte(samples: number[], timing: ResourceTiming): void {
-	const timeToFirstByteMs = getTimeToFirstByteMs(timing)
+	const timeToFirstByteMs = getTimeToFirstByte(timing)
 
 	if (!Number.isFinite(timeToFirstByteMs)) {
 		return

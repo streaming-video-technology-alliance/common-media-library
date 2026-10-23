@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Added
 
-- `EwmaEstimatorOptions.minTransferMs`: the shortest transfer, in milliseconds, that counts as a sample. A body that arrives within a few milliseconds of its headers came from a cache. shaka-player uses 5. Default 0 ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- `EwmaEstimatorOptions.minTransferDuration`: the shortest transfer, in milliseconds, that counts as a sample. A body that arrives within a few milliseconds of its headers came from a cache. shaka-player uses 5. Default 0 ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
 
 ### Changed
 
