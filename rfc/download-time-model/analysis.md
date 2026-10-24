@@ -24,18 +24,18 @@ The seeded playback simulation of the abr tests, `simulatePlayback`, runs a play
 
 - The wall-clock time of a download is the time to first byte plus the bytes over the trace throughput.
 - The timing of the sample gets `responseStart` at the start time plus the time to first byte. The selector then measures the same wait the player paid.
-- The throughput passed to `select` comes from a local estimate with the half-lives of the README example, fed with the transfer of each download. The estimate measures the transfer, as PR 588 defines.
+- The throughput passed to `select` comes from a local estimate in the test helper. The estimate has the half-lives of the abr README example and measures the transfer of each download, as PR 588 defines.
 
-The runs use the two ladders of the BOLA RFC, L1 with 5 rungs and L2 with 10 rungs. Each scenario runs 100 random walk traces, and each session has 75 segments.
+The runs use the two ladders of the BOLA RFC, L1 with 5 rungs and L2 with 10 rungs. The buffer cap is 18 seconds for both ladders, and a third setup runs L2 with a 30 second cap. The traces walk between 600 kbps and 9 Mbps. Each scenario runs 100 random walk traces, and each session has 75 segments.
 
 ## Scenarios
 
 | Scenario | Time to first byte | Segment duration | Selectors | Option |
 |---|---|---|---|---|
-| Low wait | 100 ms | 4 seconds | Both | Off and on |
-| High wait | 800 ms | 2 seconds | Both | Off and on |
+| Low wait | 100 ms | 4 seconds | Both | Counted and ignored |
+| High wait | 800 ms | 2 seconds | Both | Counted and ignored |
 
-The option off is the proposed behavior. The option on, `ignoreTimeToFirstByte: true`, gives the picks of today for the same traces, so the comparison isolates the bound.
+Counted is the proposed behavior. Ignored, `ignoreTimeToFirstByte: true`, gives the picks of today for the same traces, so the comparison isolates the bound.
 
 ## Metrics
 
@@ -76,4 +76,13 @@ The expectation, before the runs, has two parts. In the low wait scenario, the t
 | 10 rungs, 30 s | High wait, 800 ms, 2 s segments | Throughput | Counted | 0.88 | 0.03 | 4.8 |
 | 10 rungs, 30 s | High wait, 800 ms, 2 s segments | Throughput | Ignored | 1.59 | 16.00 | 6.3 |
 
-Counted means the option `ignoreTimeToFirstByte` is off. Ignored means the option is on, which gives the picks of today. In the low wait scenario, counting the time to first byte lowers the average bitrate in all six comparisons. The fall is about 2 to 3 percent. Counting changes the stalls by at most 0.07 per session. It changes the switches by at most 0.7 per session. Counting never raises the stalls or the switches. The table holds averages only. It does not show whether these differences are within the noise of the traces. In the high wait scenario, counting the time to first byte lowers the stalls and the switches. This holds in all six comparisons. With the option on, BOLA has 0.75 to 0.87 stalls per session. With the option off, it has 0.04 to 0.07. With the option on, the throughput selector has 5.50 to 16.01 stalls per session. With the option off, it has 0.00 to 0.03. The switches per session fall by 9.8 to 11.2 for BOLA. They fall by 1.2 to 1.5 for the throughput selector. The average bitrate also falls. For BOLA, the fall is about 30, 19, and 21 percent in the three setups. For the throughput selector, the fall is about 42, 45, and 45 percent. The Expected outcome section says the bitrate falls by less than the dead-time factor suggests. The factor of 0.6 suggests a fall of 40 percent. The BOLA numbers match this statement. The throughput selector does not match, because its bitrate falls by more than 40 percent.
+The change with the time to first byte counted, as ranges over the three setups:
+
+| Scenario | Selector | Average Mbps | Stalls per session | Switches per session |
+|---|---|---|---|---|
+| Low wait | BOLA | -1.6 to -2.3 percent | 0.12 to 0.41 ignored, 0.11 to 0.34 counted | 6.0 to 11.9 ignored, 5.8 to 11.3 counted |
+| Low wait | Throughput | -3.1 percent | 0.03 to 0.04 ignored, 0.02 to 0.03 counted | 5.5 to 10.5 ignored, 5.3 to 10.5 counted |
+| High wait | BOLA | -18.8 to -29.7 percent | 0.75 to 0.87 ignored, 0.04 to 0.07 counted | 12.7 to 18.4 ignored, 2.9 to 7.4 counted |
+| High wait | Throughput | -41.9 to -44.9 percent | 5.50 to 16.01 ignored, 0.00 to 0.03 counted | 3.4 to 6.3 ignored, 2.2 to 5.0 counted |
+
+In the low wait scenario, the bitrate falls in all six comparisons, and stalls and switches never rise. The table holds averages only. The table therefore neither confirms nor refutes the expectation that the low wait metrics stay within the noise. In the high wait scenario, stalls and switches fall for both selectors, as expected. BOLA loses less bitrate than the dead-time factor suggests, as expected. The throughput selector loses more bitrate than the factor suggests. That result contradicts the Expected outcome section.
