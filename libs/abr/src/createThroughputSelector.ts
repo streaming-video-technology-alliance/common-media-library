@@ -19,10 +19,11 @@ import { validateLadder } from './validateLadder.ts'
  * Creates a rate-based bitrate selector.
  *
  * The selector picks the highest rung whose download fits in one segment.
- * The download time of a rung is the time to first byte plus the transfer of one segment at `throughput * safetyFactor`.
+ * The download time of a rung is the time to first byte plus a transfer time.
+ * The transfer time is one segment at `throughput * safetyFactor`.
  * The download fits when that time is at most `segmentDuration / playbackRate`. Rung 0 is the pick when no rung fits.
  * Without `segmentDuration`, the pick is the highest rung at or below `throughput * safetyFactor / playbackRate`.
- * The time to first byte is the mean of the last four samples, from `responseStart` of their timing.
+ * The time to first byte is the mean of the last four samples, from `responseStart - startTime` of their timing.
  * Two rules refine the pick:
  *
  * - Hysteresis. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`

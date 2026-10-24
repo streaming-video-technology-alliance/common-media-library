@@ -9,8 +9,9 @@
  */
 export type ThroughputSelectorOptions = {
 	/**
-	 * The fraction of the effective throughput that a rung may use.
-	 * The selector picks the highest rung at or below `effectiveThroughput * safetyFactor`.
+	 * The fraction of the throughput that a rung may use.
+	 * The selector picks the highest rung whose download fits in one segment at `throughput * safetyFactor`.
+	 * Without `segmentDuration`, the pick is the highest rung at or below `throughput * safetyFactor / playbackRate`.
 	 * hls.js and shaka-player use 0.95. dash.js uses 0.9.
 	 *
 	 * @defaultValue `DEFAULT_SAFETY_FACTOR`
@@ -18,8 +19,9 @@ export type ThroughputSelectorOptions = {
 	safetyFactor?: number
 
 	/**
-	 * The fraction of the effective throughput that a higher rung may use.
-	 * An upgrade needs the new rung at or below `effectiveThroughput * upgradeFactor`.
+	 * The fraction of the throughput that a higher rung may use.
+	 * An upgrade needs a rung whose download fits in one segment at `throughput * upgradeFactor`.
+	 * Without `segmentDuration`, the upgrade needs a rung at or below `throughput * upgradeFactor / playbackRate`.
 	 * A value equal to `safetyFactor` disables the hysteresis.
 	 * hls.js uses 0.7 for the same rule.
 	 *
