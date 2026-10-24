@@ -64,7 +64,8 @@ import { validateLadder } from './validateLadder.ts'
  * It keeps the highest rung, at or below the pick, that downloads within `bufferLevel / playbackRate`.
  * It assumes `throughput * starvationSafetyFactor` for that download.
  * It adds the mean time to first byte of the last four finished samples to that download. Rung 0 always passes.
- * A call without `segmentDuration` skips the starvation guard and the bound on the startup pick and the oscillation guard.
+ * A call without `segmentDuration` skips the starvation guard.
+ * It also skips the bound on the startup pick and on the oscillation guard.
  *
  * The selector reads `timing`, `bandwidth`, `duration`, `bufferLevel`, `isReplacement`, and `aborted` from a sample.
  * A sample without a positive finite `duration` keeps the selector in the startup state.

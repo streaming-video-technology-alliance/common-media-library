@@ -26,8 +26,8 @@ import { validateLadder } from './validateLadder.ts'
  * The time to first byte is the mean of the last four samples, from `responseStart - startTime` of their timing.
  * Two rules refine the pick:
  *
- * - Hysteresis. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`
- *   and returns the higher of the current rung and that pick.
+ * - Hysteresis. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`.
+ *   It returns the higher of the current rung and that pick.
  * - Starvation guard. When the input has a positive `segmentDuration`, the first pass keeps the highest rung,
  *   at or below the pick, that downloads within `bufferLevel / playbackRate`.
  *   The guard uses the same download time with `throughput * safetyFactor`.

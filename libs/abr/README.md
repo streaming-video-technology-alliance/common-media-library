@@ -177,7 +177,7 @@ The decision has the `index` and the `delay` of every selector. It also has the 
 
 - `delay` is positive when the buffer is above the maximum buffer of the chosen rung. The top rung never has a delay. Wait, and call `select` again. The selector adds the wait to its placeholder buffer. If the buffer drained during the wait, the second call returns a delay of 0. If it did not drain, for example in a paused player, the second call returns the delay again. A player that ignores the delay stays at the selected rung until the real buffer passes the next threshold. The cost is lower quality, not a stall.
 - `bufferTarget` is the buffer level, in seconds, that the player aims for. A larger value spreads the thresholds over a larger range of buffer levels. The default is `BOLA_DEFAULT_BUFFER_TARGET` (18). Pass the field in every call or in none.
-- `segmentDuration` enables the segment bound on the startup pick and the oscillation guard, and the starvation guard. The bound keeps the highest rung whose download fits in one segment. The download time uses the time to first byte of the last four finished samples. The guard lowers the pick when the download of the next segment does not fit in the real buffer. A call without the field skips both, as for the throughput selector.
+- `segmentDuration` enables the segment bound on the startup pick and on the oscillation guard. It also enables the starvation guard. The bound keeps the highest rung whose download fits in one segment. The download time uses the time to first byte of the last four finished samples. The guard lowers the pick when the download of the next segment does not fit in the real buffer. A call without the field skips both, as for the throughput selector.
 - A stall needs no call. The selector treats a `bufferLevel` of 0.3 seconds or less as a stall in the steady state.
 - A selector that never receives a `sample` stays in the startup state. A `sample` without a positive finite `duration` has the same effect.
 - Create one selector for each media type, such as audio and video.
@@ -240,7 +240,7 @@ Pass the ladder and the `bufferTarget` in every call. The selector compares them
 | State | The current rung | The state, the placeholder buffer, and the time bases |
 | Delay | Always 0 | Positive above the maximum buffer of the rung |
 | Starvation guard | Two passes, with `starvationTolerance` | One pass, with `starvationSafetyFactor` |
-| Segment bound | On the safety pick and the upgrade pick | On the startup pick and the oscillation guard |
+| Segment bound | On the pick and on the upgrade pick of the hysteresis | On the startup pick and the oscillation guard |
 
 A seeded simulation ran both selectors on 100 random throughput traces. Each session has 75 segments, and the player passes `segmentDuration`. The BOLA selector uses its default options. The ladders are the five rungs of the examples and a ladder of ten rungs from 235 kbps to 5.8 Mbps.
 
@@ -255,7 +255,7 @@ Every download has a time to first byte of 100 ms, and the selectors count it. T
 | 10 rungs, 30 s | BOLA | 2.25 | 0.11 | 10.1 |
 | 10 rungs, 30 s | Throughput | 1.57 | 0.02 | 10.2 |
 
-With a time to first byte of 800 ms and 2 second segments, the picks are:
+With a time to first byte of 800 ms and 2 second segments, the results are:
 
 | Ladder and buffer cap | Selector | Average Mbps | Stalls per session | Switches per session |
 |---|---|---|---|---|

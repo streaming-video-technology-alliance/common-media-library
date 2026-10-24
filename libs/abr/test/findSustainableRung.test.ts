@@ -33,7 +33,7 @@ describe('findSustainableRung', () => {
 	})
 
 	it('lowers the rung when the time to first byte does not leave room for the transfer', () => {
-		// Rung 3 needs 1.11 s of transfer. With a wait of 1 s the download takes 2.11 s, more than one segment.
+		// Rung 3 needs 1.11 s of transfer. With a time to first byte of 1 s the download takes 2.11 s, more than one segment.
 		equal(
 			findSustainableRung(
 				L1,
@@ -51,6 +51,14 @@ describe('findSustainableRung', () => {
 		equal(
 			findSustainableRung(L1, SAFE_THROUGHPUT, NORMAL_RATE, SEGMENT_DURATION, SEGMENT_DURATION),
 			0,
+		)
+	})
+
+	it('accepts a download that takes exactly the budget', () => {
+		// Rung 4 (6 Mbps) transfers a 2 second segment in exactly 2 seconds at 6 Mbps. 12 / 6 is exact in floating point.
+		equal(
+			findSustainableRung(L1, 6_000_000, NORMAL_RATE, SEGMENT_DURATION, NO_TIME_TO_FIRST_BYTE),
+			4,
 		)
 	})
 

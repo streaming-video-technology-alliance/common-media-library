@@ -586,11 +586,11 @@ describe('createThroughputSelector', () => {
 		})
 	})
 
-	describe('sustainability bound', () => {
+	describe('segment bound', () => {
 		// Rungs between 7.56 Mbps and 12.6 Mbps show the bound of issue 587: 14 Mbps, 800 ms, 2 second segments.
 		const wideLadder = rungs(1_500_000, 3_000_000, 6_000_000, 9_000_000, 12_000_000)
 
-		// Records a 2 second segment of 12 Mbps that waited `timeToFirstByteMs` for its first byte and transferred at 14 Mbps.
+		// Records a 2 second segment of 12 Mbps with a time to first byte of `timeToFirstByteMs` and transferred at 14 Mbps.
 		function loadWideSegment(selector: BitrateSelector, timeToFirstByteMs: number): void {
 			selector.sample({
 				timing: {
@@ -670,6 +670,27 @@ describe('createThroughputSelector', () => {
 			}
 
 			equal(selector.select({ ...input, segmentDuration: 2 }).index, 4)
+		})
+
+		it('divides the segment budget by the playback rate', () => {
+			// At 2x the 4 second segment must arrive in 2 seconds. Rung 3 (3 Mbps) needs 12 / 5.4 = 2.22 s and fails.
+			// Rung 2 (1.5 Mbps) needs 6 / 5.4 = 1.11 s and fits. The buffer of 20 s keeps the guard out of the way.
+			// Without the rate the pick would be rung 3.
+			const selector = createThroughputSelector()
+
+			load(selector, 6_000_000)
+
+			equal(
+				selector.select({
+					ladder,
+					bufferLevel: 20,
+					throughput: 6_000_000,
+					now: 0,
+					segmentDuration: 4,
+					playbackRate: 2,
+				}).index,
+				2,
+			)
 		})
 	})
 
