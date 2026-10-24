@@ -74,7 +74,7 @@ import { validateLadder } from './validateLadder.ts'
  * @example
  * {@includeCode ../test/createBolaSelector.test.ts#example}
  *
- * @param options - The safety factor, the starvation safety factor, and the time to first byte switch
+ * @param options - The safety factor, the starvation safety factor, and whether to ignore the time to first byte
  * @returns The selector
  * @throws RangeError when `safetyFactor` or `starvationSafetyFactor` is not a finite number above 0 and at most 1
  *

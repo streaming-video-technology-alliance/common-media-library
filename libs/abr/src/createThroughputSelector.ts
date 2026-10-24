@@ -36,7 +36,7 @@ import { validateLadder } from './validateLadder.ts'
  * @example
  * {@includeCode ../test/createThroughputSelector.test.ts#example}
  *
- * @param options - The safety factor, the upgrade factor, the starvation tolerance, and the time to first byte switch
+ * @param options - The safety factor, the upgrade factor, the starvation tolerance, and whether to ignore the time to first byte
  * @returns The selector
  * @throws RangeError when a factor is not a finite number above 0 and at most 1, when `upgradeFactor` exceeds
  * `safetyFactor`, or when `starvationTolerance` is not a finite number of 0 or more
