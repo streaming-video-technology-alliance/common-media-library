@@ -15,6 +15,7 @@ import { createBolaParams } from './createBolaParams.ts'
 import { DEFAULT_SAFETY_FACTOR } from './DEFAULT_SAFETY_FACTOR.ts'
 import { DEFAULT_STARVATION_SAFETY_FACTOR } from './DEFAULT_STARVATION_SAFETY_FACTOR.ts'
 import { findRung } from './findRung.ts'
+import { findSustainableRung } from './findSustainableRung.ts'
 import { isPositiveFinite } from './isPositiveFinite.ts'
 import { isSameLadder } from './isSameLadder.ts'
 import type { LadderRung } from './LadderRung.ts'
@@ -36,13 +37,16 @@ import { validateLadder } from './validateLadder.ts'
  * BOLA scores each rung with the effective buffer. The effective buffer is the real buffer level plus a placeholder buffer.
  * A fuller buffer allows a higher rung. The selector has two states:
  *
- * - Startup. The selector picks the highest rung at or below `throughput * safetyFactor`.
+ * - Startup. The selector picks the highest rung whose download fits in one segment at `throughput * safetyFactor`.
+ *   The download time counts the time to first byte of the last four samples. Without `segmentDuration`,
+ *   the pick is the highest rung at or below `throughput * safetyFactor`.
  *   It sets the placeholder so that the effective buffer is at least the threshold of that rung.
  *   It moves to the steady state in the first call after a sample, when the buffer holds one segment.
  *   That call still picks from the throughput.
  * - Steady. The selector picks the rung for the effective buffer and applies two guards.
  *   The oscillation guard limits an upward switch. Suppose the buffer picks a rung above the current rung
- *   and above the rung that the throughput sustains. Then the guard keeps the higher of those two rungs.
+ *   and above the rung whose download fits in one segment at `throughput * safetyFactor`.
+ *   Then the guard keeps the higher of those two rungs.
  *   The starvation guard lowers the pick when the download of the next segment does not fit in the real buffer.
  *
  * A call returns a delay when the effective buffer is above the maximum buffer of the chosen rung.
@@ -186,8 +190,17 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		rungParams: BolaParams,
 		bufferLevel: number,
 		safeThroughput: number,
+		segmentDuration: number | undefined,
 	): BolaDecision {
-		const position = Number.isNaN(safeThroughput) ? 0 : findRung(rungParams.rungs, safeThroughput)
+		const position = Number.isNaN(safeThroughput)
+			? 0
+			: findSustainableRung(
+					rungParams.rungs,
+					safeThroughput,
+					BOLA_PLAYBACK_RATE,
+					segmentDuration,
+					averageTimeToFirstByte(timeToFirstByteSamples),
+				)
 
 		placeholder = Math.max(0, rungParams.thresholds[position] - bufferLevel)
 
@@ -217,7 +230,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		}
 
 		const effectiveBuffer = bufferLevel + placeholder
-		const pick = pickByBuffer(rungParams, effectiveBuffer, throughput)
+		const pick = pickByBuffer(rungParams, effectiveBuffer, throughput, input.segmentDuration)
 		const position = limitStarvation(rungParams, pick, input, bufferLevel, throughput)
 
 		// The guard found the real buffer too short for the download of the pick. A wait would drain the buffer more.
@@ -240,6 +253,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		rungParams: BolaParams,
 		effectiveBuffer: number,
 		throughput: number,
+		segmentDuration: number | undefined,
 	): number {
 		const position = selectRungByBuffer(rungParams, effectiveBuffer)
 
@@ -250,7 +264,13 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		return limitUpwardSwitch(
 			position,
 			currentPosition(rungParams),
-			findRung(rungParams.rungs, throughput * safetyFactor),
+			findSustainableRung(
+				rungParams.rungs,
+				throughput * safetyFactor,
+				BOLA_PLAYBACK_RATE,
+				segmentDuration,
+				averageTimeToFirstByte(timeToFirstByteSamples),
+			),
 		)
 	}
 
@@ -370,7 +390,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 				Number.isFinite(input.throughput) && input.throughput >= 0 ? input.throughput : NaN
 
 			return state === BolaState.STARTUP
-				? selectInStartup(rungParams, bufferLevel, throughput * safetyFactor)
+				? selectInStartup(rungParams, bufferLevel, throughput * safetyFactor, input.segmentDuration)
 				: selectInSteadyState(input, rungParams, previousParams, bufferLevel, throughput)
 		},
 
@@ -394,6 +414,9 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 
 // The seconds that the second pass of the starvation guard adds to the budget. The BOLA guard has one pass.
 const NO_TOLERANCE = 0
+
+// The BOLA rules ignore the playback rate. The starvation guard reads it.
+const BOLA_PLAYBACK_RATE = 1
 
 // The end of the request, in milliseconds on the clock of `now`.
 function getRequestEnd(segment: SegmentSample): number {
