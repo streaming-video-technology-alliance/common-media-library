@@ -31,7 +31,8 @@ export type BolaSelectorOptions = {
 	/**
 	 * When `true`, the selector ignores the time to first byte of every sample.
 	 * The pick and the starvation guard then count the transfer only.
-	 * Set the option when the time to first byte is not time that a download loses.
+	 * Both read the time to first byte only when the input has `segmentDuration`.
+	 * The option fits a time to first byte that is not time a download loses.
 	 * Set the option in these cases.
 	 * The player requests the next segment before the current download ends.
 	 * The value of `responseStart` does not mark the first byte of the body.
