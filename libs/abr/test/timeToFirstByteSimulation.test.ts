@@ -1,9 +1,10 @@
 import type { BitrateSelector, LadderRung } from '@svta/cml-abr'
 import { createBolaSelector, createThroughputSelector } from '@svta/cml-abr'
-import { ok } from 'node:assert'
+import { equal, ok } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 import { L1, L2 } from './helpers/ladders.ts'
 import { createRandomWalkTrace, simulatePlayback } from './helpers/simulatePlayback.ts'
+import { renderTimeToFirstByteReport } from './helpers/timeToFirstByteReport.ts'
 
 const SEGMENT_COUNT = 75
 const SEED_COUNT = 20
@@ -13,8 +14,10 @@ const BUFFER_CAP = 18
 // The high wait scenario of the RFC analysis: 800 ms before the first byte and 2 second segments.
 const HIGH_WAIT = 0.8
 const SHORT_SEGMENT = 2
+// Two header lines and one row for each combination of 3 setups, 2 scenarios, 2 selectors, and 2 option states.
+const REPORT_LINE_COUNT = 26
 
-type Totals = { stalls: number; switches: number; bandwidth: number }
+type Totals = { stalls: number; switches: number }
 
 const SELECTORS: [string, (ignoreTimeToFirstByte: boolean) => BitrateSelector][] = [
 	['the BOLA selector', ignoreTimeToFirstByte => createBolaSelector({ ignoreTimeToFirstByte })],
@@ -30,7 +33,7 @@ function totals(
 	ladder: LadderRung[],
 	ignoreTimeToFirstByte: boolean,
 ): Totals {
-	const result: Totals = { stalls: 0, switches: 0, bandwidth: 0 }
+	const result: Totals = { stalls: 0, switches: 0 }
 
 	for (let seed = 1; seed <= SEED_COUNT; seed++) {
 		const run = simulatePlayback(createSelector(ignoreTimeToFirstByte), {
@@ -44,15 +47,13 @@ function totals(
 
 		result.stalls += run.stallCount
 		result.switches += run.switchCount
-		result.bandwidth +=
-			run.bandwidths.reduce((sum, value) => sum + value, 0) / run.bandwidths.length
 	}
 
 	return result
 }
 
 describe('time to first byte simulation', () => {
-	it('stalls and switches no more with the bound than without it in the high wait scenario', () => {
+	it('stalls and switches less with the bound than without it in the high wait scenario', () => {
 		for (const [name, createSelector] of SELECTORS) {
 			for (const ladder of [L1, L2]) {
 				const bounded = totals(createSelector, ladder, false)
@@ -60,14 +61,18 @@ describe('time to first byte simulation', () => {
 				const context = `${name}, ${ladder.length} rungs`
 
 				ok(
-					bounded.stalls <= unbounded.stalls,
+					bounded.stalls < unbounded.stalls,
 					`${context}: stalls ${bounded.stalls} vs ${unbounded.stalls}`,
 				)
 				ok(
-					bounded.switches <= unbounded.switches,
+					bounded.switches < unbounded.switches,
 					`${context}: switches ${bounded.switches} vs ${unbounded.switches}`,
 				)
 			}
 		}
+	})
+
+	it('renders a report with two header lines and 24 rows', () => {
+		equal(renderTimeToFirstByteReport(1).split('\n').length, REPORT_LINE_COUNT)
 	})
 })
