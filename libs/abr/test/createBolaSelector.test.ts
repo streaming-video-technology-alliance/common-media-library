@@ -1013,7 +1013,7 @@ describe('createBolaSelector', () => {
 		})
 	})
 
-	describe('sustainability bound', () => {
+	describe('segment bound', () => {
 		// A time to first byte of 1 s. With 4 second segments, rung 3 of L1 needs 1 + 12 / 3 = 5 s at a safe throughput of 3 Mbps.
 		const SLOW_TIME_TO_FIRST_BYTE_MS = 1000
 		const input = { ladder: L1, throughput: throughputFor(3), segmentDuration: SEGMENT_DURATION }
@@ -1071,8 +1071,8 @@ describe('createBolaSelector', () => {
 			)
 		})
 
-		it('bounds the oscillation cap', () => {
-			// The guard scenario: the current rung is 1, and the buffer picks rung 3. The throughput sustains rung 3 only without the wait.
+		it('bounds the oscillation guard', () => {
+			// The guard scenario: the current rung is 1, and the buffer picks rung 3. The throughput sustains rung 3 only without the time to first byte.
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
 
 			loadSlowStarts(selector, L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL, SLOW_TIME_TO_FIRST_BYTE_MS)
@@ -1084,6 +1084,21 @@ describe('createBolaSelector', () => {
 			})
 
 			equal(decision.index, 2)
+		})
+
+		it('picks as before without segmentDuration', () => {
+			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
+
+			loadSlowStarts(selector, L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL, SLOW_TIME_TO_FIRST_BYTE_MS)
+
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(SLOW_TIME_TO_FIRST_BYTE_MS),
+			})
+
+			equal(decision.index, 3)
 		})
 
 		it('does not move the buffer-based pick', () => {

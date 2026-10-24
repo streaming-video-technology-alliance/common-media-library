@@ -24,7 +24,7 @@ type SimulationOptions = {
 	segmentCount: number
 	/** The media duration of each segment in seconds. */
 	segmentDuration: number
-	/** When true, the player does not pass `segmentDuration` to `select`, so a selector skips its starvation guard. */
+	/** When true, the player does not pass `segmentDuration` to `select`, so a selector skips its starvation guard and its segment bound. */
 	omitSegmentDuration?: boolean
 	/** The time to first byte of every download, in seconds. The player pays it before the transfer, and the sample timing records it. */
 	timeToFirstByte?: number
