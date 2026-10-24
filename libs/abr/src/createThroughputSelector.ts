@@ -7,6 +7,7 @@ import { DEFAULT_SAFETY_FACTOR } from './DEFAULT_SAFETY_FACTOR.ts'
 import { DEFAULT_STARVATION_TOLERANCE } from './DEFAULT_STARVATION_TOLERANCE.ts'
 import { DEFAULT_UPGRADE_FACTOR } from './DEFAULT_UPGRADE_FACTOR.ts'
 import { findRung } from './findRung.ts'
+import { findSustainableRung } from './findSustainableRung.ts'
 import { isPositiveFinite } from './isPositiveFinite.ts'
 import { recordTimeToFirstByte } from './recordTimeToFirstByte.ts'
 import type { SegmentSample } from './SegmentSample.ts'
@@ -17,11 +18,14 @@ import { validateLadder } from './validateLadder.ts'
 /**
  * Creates a rate-based bitrate selector.
  *
- * The selector divides the throughput by the playback rate to get the effective throughput.
- * It picks the highest rung at or below `effectiveThroughput * safetyFactor`, or rung 0 when no rung fits.
+ * The selector picks the highest rung whose download fits in one segment.
+ * The download time of a rung is the time to first byte plus the transfer of one segment at `throughput * safetyFactor`.
+ * The download fits when that time is at most `segmentDuration / playbackRate`. Rung 0 is the pick when no rung fits.
+ * Without `segmentDuration`, the pick is the highest rung at or below `throughput * safetyFactor / playbackRate`.
+ * The time to first byte is the mean of the last four samples, from `responseStart` of their timing.
  * Two rules refine the pick:
  *
- * - Hysteresis. If the pick is above the current rung, the selector recomputes the pick with `upgradeFactor`
+ * - Hysteresis. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`
  *   and returns the higher of the current rung and that pick.
  * - Starvation guard. When the input has a positive `segmentDuration`, the first pass keeps the highest rung,
  *   at or below the pick, that downloads within `bufferLevel / playbackRate`. The download time of a rung is the
@@ -84,12 +88,27 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 
 			const playbackRate = isPositiveFinite(input.playbackRate) ? input.playbackRate : 1
 			const bufferLevel = isPositiveFinite(input.bufferLevel) ? input.bufferLevel : 0
-			const effectiveThroughput = throughput / playbackRate
+			const timeToFirstByte = averageTimeToFirstByte(timeToFirstByteSamples)
 
-			let index = findRung(ladder, effectiveThroughput * safetyFactor)
+			let index = findSustainableRung(
+				ladder,
+				throughput * safetyFactor,
+				playbackRate,
+				segmentDuration,
+				timeToFirstByte,
+			)
 
 			if (hasCurrent && index > current) {
-				index = Math.max(current, findRung(ladder, effectiveThroughput * upgradeFactor))
+				index = Math.max(
+					current,
+					findSustainableRung(
+						ladder,
+						throughput * upgradeFactor,
+						playbackRate,
+						segmentDuration,
+						timeToFirstByte,
+					),
+				)
 			}
 
 			if (isPositiveFinite(segmentDuration)) {
@@ -101,7 +120,7 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 					index,
 					segmentDuration,
 					throughput * safetyFactor,
-					averageTimeToFirstByte(timeToFirstByteSamples),
+					timeToFirstByte,
 					budget,
 					tolerance,
 				)

@@ -586,6 +586,93 @@ describe('createThroughputSelector', () => {
 		})
 	})
 
+	describe('sustainability bound', () => {
+		// Rungs between 7.56 Mbps and 12.6 Mbps show the bound of issue 587: 14 Mbps, 800 ms, 2 second segments.
+		const wideLadder = rungs(1_500_000, 3_000_000, 6_000_000, 9_000_000, 12_000_000)
+
+		// Records a 2 second segment of 12 Mbps that waited `timeToFirstByteMs` for its first byte and transferred at 14 Mbps.
+		function loadWideSegment(selector: BitrateSelector, timeToFirstByteMs: number): void {
+			selector.sample({
+				timing: {
+					startTime: 0,
+					responseStart: timeToFirstByteMs,
+					duration: timeToFirstByteMs + 1700,
+					encodedBodySize: 3_000_000,
+				},
+				bandwidth: 12_000_000,
+				duration: 2,
+				bufferLevel: 8,
+			})
+		}
+
+		const input = { ladder: wideLadder, bufferLevel: 8, throughput: 14_000_000, now: 10_000 }
+
+		it('keeps the highest rung whose download fits in one segment', () => {
+			// 9 Mbps needs 0.8 + 18 / 12.6 = 2.23 s. 6 Mbps needs 0.8 + 12 / 12.6 = 1.75 s.
+			const selector = createThroughputSelector()
+
+			for (let i = 0; i < 4; i++) {
+				loadWideSegment(selector, 800)
+			}
+
+			equal(selector.select({ ...input, segmentDuration: 2 }).index, 2)
+		})
+
+		it('picks as before with a time to first byte of 0', () => {
+			const selector = createThroughputSelector()
+
+			for (let i = 0; i < 4; i++) {
+				loadWideSegment(selector, 0)
+			}
+
+			equal(selector.select({ ...input, segmentDuration: 2 }).index, 4)
+		})
+
+		it('picks as before without segmentDuration', () => {
+			const selector = createThroughputSelector()
+
+			for (let i = 0; i < 4; i++) {
+				loadWideSegment(selector, 800)
+			}
+
+			equal(selector.select(input).index, 4)
+		})
+
+		it('bounds the upgrade pick', () => {
+			// The current rung is 1.5 Mbps and the estimate is 6 Mbps. The upgrade pick at 4.2 Mbps bounds rung 3:
+			// 0.6 + 6 / 4.2 = 2.03 s, more than one segment. Without the time to first byte the upgrade pick is rung 3.
+			const selector = createThroughputSelector()
+
+			selector.sample({
+				timing: { startTime: 0, responseStart: 600, duration: 1100, encodedBodySize: 375_000 },
+				bandwidth: 1_500_000,
+				duration: 2,
+				bufferLevel: 6,
+			})
+
+			equal(
+				selector.select({
+					ladder,
+					bufferLevel: 6,
+					throughput: 6_000_000,
+					now: 1100,
+					segmentDuration: 2,
+				}).index,
+				2,
+			)
+		})
+
+		it('picks as before when ignoreTimeToFirstByte is set', () => {
+			const selector = createThroughputSelector({ ignoreTimeToFirstByte: true })
+
+			for (let i = 0; i < 4; i++) {
+				loadWideSegment(selector, 800)
+			}
+
+			equal(selector.select({ ...input, segmentDuration: 2 }).index, 4)
+		})
+	})
+
 	describe('reset', () => {
 		it('clears the current rung', () => {
 			const selector = createThroughputSelector()
