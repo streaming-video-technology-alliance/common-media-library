@@ -1,6 +1,6 @@
 /**
  * The default `upgradeFactor` of the throughput selector.
- * An upgrade needs a rung at or below 0.7 times the effective throughput.
+ * An upgrade needs a rung whose download fits in one segment at 0.7 times the throughput.
  *
  * @beta
  */

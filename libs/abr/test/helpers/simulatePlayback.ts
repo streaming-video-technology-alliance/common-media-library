@@ -24,8 +24,10 @@ type SimulationOptions = {
 	segmentCount: number
 	/** The media duration of each segment in seconds. */
 	segmentDuration: number
-	/** When true, the player does not pass `segmentDuration` to `select`, so a selector skips its starvation guard. */
+	/** When true, the player does not pass `segmentDuration` to `select`, so a selector skips its starvation guard and its segment bound. */
 	omitSegmentDuration?: boolean
+	/** The time to first byte of every download, in seconds. The player pays it before the transfer, and the sample timing records it. */
+	timeToFirstByte?: number
 }
 
 export type SimulationResult = {
@@ -37,6 +39,8 @@ export type SimulationResult = {
 	repeatedDelays: number
 	/** The downloads that ended after the buffer was empty. */
 	stallCount: number
+	/** The decisions whose rung differs from the rung of the previous segment. */
+	switchCount: number
 }
 
 /**
@@ -146,8 +150,15 @@ export function simulatePlayback(
 	options: SimulationOptions,
 ): SimulationResult {
 	const { ladder, trace, bufferCap, segmentCount, segmentDuration, omitSegmentDuration } = options
+	const timeToFirstByte = options.timeToFirstByte ?? 0
 	const estimate = createThroughputEstimate()
-	const result: SimulationResult = { bandwidths: [], delays: [], repeatedDelays: 0, stallCount: 0 }
+	const result: SimulationResult = {
+		bandwidths: [],
+		delays: [],
+		repeatedDelays: 0,
+		stallCount: 0,
+		switchCount: 0,
+	}
 
 	let time = 0
 	let buffer = 0
@@ -191,7 +202,8 @@ export function simulatePlayback(
 	// Downloads one segment, drains the buffer, and returns the sample for the selector.
 	function download(bandwidth: number): SegmentSample {
 		const bits = bandwidth * segmentDuration
-		const seconds = downloadSeconds(trace, time, bits)
+		const transferSeconds = downloadSeconds(trace, time + timeToFirstByte, bits)
+		const seconds = timeToFirstByte + transferSeconds
 		const startTime = time * MILLISECONDS_PER_SECOND
 
 		if (isPlaying) {
@@ -209,11 +221,13 @@ export function simulatePlayback(
 
 		buffer += segmentDuration
 		isPlaying = true
-		estimate.sample(seconds, bits / seconds)
+		// The estimate measures the transfer, as the estimators of @svta/cml-throughput do since PR 588.
+		estimate.sample(transferSeconds, bits / transferSeconds)
 
 		return {
 			timing: {
 				startTime,
+				responseStart: startTime + timeToFirstByte * MILLISECONDS_PER_SECOND,
 				encodedBodySize: bits / BITS_PER_BYTE,
 				duration: seconds * MILLISECONDS_PER_SECOND,
 			},
@@ -229,6 +243,11 @@ export function simulatePlayback(
 		}
 
 		const { bandwidth } = ladder[pickRung().index]
+		const previous = result.bandwidths[result.bandwidths.length - 1]
+
+		if (previous !== undefined && previous !== bandwidth) {
+			result.switchCount++
+		}
 
 		selector.sample(download(bandwidth))
 		result.bandwidths.push(bandwidth)
