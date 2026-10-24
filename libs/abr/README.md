@@ -86,10 +86,10 @@ The player follows these rules:
 
 ## Throughput selector
 
-The selector picks the highest rung whose download fits in one segment. The download time of a rung is `timeToFirstByte + bandwidth * segmentDuration / (throughput * safetyFactor)`. The download fits when that time is at most `segmentDuration / playbackRate`. When no rung fits, the pick is rung 0. Without `segmentDuration`, the pick is the highest rung at or below `throughput * safetyFactor / playbackRate`. `timeToFirstByte` is the mean time to first byte, in seconds, over the last four samples that were not aborted. The time to first byte of a sample is `responseStart - startTime` of its `timing`. The selector ignores a sample whose `responseStart` is missing or outside the response. Without such samples, `timeToFirstByte` is 0. dash.js 4 scaled every pick the same way, and dash.js 5 dropped the rule. Two rules refine the pick:
+The selector picks the highest rung whose download fits in one segment. The download time of a rung is `timeToFirstByte + bandwidth * segmentDuration / (throughput * safetyFactor)`. The download fits when that time is at most `segmentDuration / playbackRate`. When no rung fits, the pick is rung 0. Without `segmentDuration`, the pick is the highest rung at or below `throughput * safetyFactor / playbackRate`. `timeToFirstByte` is the mean time to first byte, in seconds, over the last four samples that were not aborted. The time to first byte of a sample is `responseStart - startTime` of its `timing`. The selector ignores a sample whose `responseStart` is missing or outside the response. Without such samples, `timeToFirstByte` is 0. Two rules refine the pick:
 
 - **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor` as the safe throughput. It then returns the higher of the current rung and that pick. The current rung is the bandwidth of the last `sample` that was not aborted. The selector maps that bandwidth to the highest rung at or below it in the ladder of the call. When no rung qualifies, the current rung is rung 0.
-- **Starvation guard.** The guard runs when the player passes `segmentDuration`. The selector estimates the download time of a rung as `timeToFirstByte + bandwidth * segmentDuration / (throughput * safetyFactor)`. hls.js adds its own time to first byte estimate to the same check. The first pass keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. If no rung passes, the second pass adds `min(segmentDuration, starvationTolerance)` to that budget and keeps the highest rung within it. Rung 0 passes the second pass in every case. A call without `segmentDuration` skips the guard and the segment bound.
+- **Starvation guard.** The guard runs when the player passes `segmentDuration`. The selector estimates the download time of a rung as in the opening paragraph. hls.js adds its own time to first byte estimate to the same check. The first pass keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. If no rung passes, the second pass adds `min(segmentDuration, starvationTolerance)` to that budget and keeps the highest rung within it. Rung 0 passes the second pass in every case. A call without `segmentDuration` skips the guard and the segment bound.
 
 When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. A throughput of 0 is a measurement, so the pick is rung 0. The delay is always 0.
 
@@ -129,7 +129,7 @@ const selector = createThroughputSelector({ safetyFactor: 0.95, upgradeFactor: 0
 | `safetyFactor` | `DEFAULT_SAFETY_FACTOR` (0.9) | The fraction of the throughput that a rung may use. |
 | `upgradeFactor` | `DEFAULT_UPGRADE_FACTOR` (0.7) | The fraction of the throughput that a higher rung may use. |
 | `starvationTolerance` | `DEFAULT_STARVATION_TOLERANCE` (4) | The seconds of stall that the second pass of the guard allows, capped at the segment duration. |
-| `ignoreTimeToFirstByte` | `false` | When `true`, the selector ignores the time to first byte in the pick and in the guard. |
+| `ignoreTimeToFirstByte` | `false` | When `true`, the selector ignores the time to first byte in the pick and in the starvation guard. |
 
 Set `ignoreTimeToFirstByte` when the time to first byte is not time that a download loses. Three examples follow. The player requests the next segment before the current download ends. `responseStart` does not mark the first byte of the body. The server sends the response headers before the body exists.
 
@@ -181,7 +181,7 @@ The decision has the `index` and the `delay` of every selector. It also has the 
 - A stall needs no call. The selector treats a `bufferLevel` of 0.3 seconds or less as a stall in the steady state.
 - A selector that never receives a `sample` stays in the startup state. A `sample` without a positive finite `duration` has the same effect.
 - Create one selector for each media type, such as audio and video.
-- The BOLA rules ignore `playbackRate`. The starvation guard reads `segmentDuration` and `playbackRate`.
+- The BOLA rules ignore `playbackRate`. The bound and the starvation guard read `segmentDuration`. Only the starvation guard reads `playbackRate`.
 
 ### How it works
 
@@ -189,7 +189,7 @@ BOLA scores each rung with the effective buffer. The effective buffer is the rea
 
 | State | Behavior |
 |---|---|
-| Startup | Picks the highest rung whose download fits in one segment at `throughput * safetyFactor`, or rung 0 when the estimate is unknown. Sets the placeholder so that the effective buffer is at least the threshold of that rung. Moves to the steady state in the first call after a `sample`, when the buffer holds one segment. That call still picks from the throughput. |
+| Startup | Picks the highest rung whose download fits in one segment at `throughput * safetyFactor`. Picks rung 0 when the estimate is unknown. Sets the placeholder so that the effective buffer is at least the threshold of that rung. Moves to the steady state in the first call after a `sample`, when the buffer holds one segment. That call still picks from the throughput. |
 | Steady | Adds the wall-clock time since the last request ended to the placeholder. Picks the rung for the effective buffer. Applies the oscillation guard and the starvation guard. Returns a delay when the buffer is above the maximum buffer of the rung. |
 
 The oscillation guard is the BOLA-O variant. Suppose the buffer picks a rung above the current rung. Suppose that rung is also above the rung whose download fits in one segment at `throughput * safetyFactor`. Then the selector keeps the higher of the current rung and the rung that fits. The guard never forces a downward switch, and it is skipped when the estimate is unknown.
@@ -221,7 +221,7 @@ The selector reads these fields of a `SegmentSample`:
 | Field | Use |
 |---|---|
 | `bandwidth` | Sets the current rung. For an aborted sample, it locates the aborted rung. The selector ignores a value that is not finite. |
-| `timing` | The end of the request, `startTime + duration`, starts the clock of the placeholder. An aborted request ends at the abort. The request `duration` gives the buffer level at the start of the request. A finished sample adds its time to first byte, `responseStart - startTime`, to the mean that the starvation guard uses. |
+| `timing` | The end of the request, `startTime + duration`, starts the clock of the placeholder. An aborted request ends at the abort. The request `duration` gives the buffer level at the start of the request. A finished sample adds its time to first byte, `responseStart - startTime`, to the mean that the selector uses. |
 | `duration` | Moves the selector to the steady state, and sizes the growth for a replacement segment. A value that is not a positive finite number keeps the startup state. |
 | `bufferLevel` | Decays and caps the placeholder. In the steady state, 0.3 seconds or less is a stall. |
 | `isReplacement` | Adds `duration` to the placeholder. |
@@ -244,7 +244,7 @@ Pass the ladder and the `bufferTarget` in every call. The selector compares them
 
 A seeded simulation ran both selectors on 100 random throughput traces. Each session has 75 segments, and the player passes `segmentDuration`. The BOLA selector uses its default options. The ladders are the five rungs of the examples and a ladder of ten rungs from 235 kbps to 5.8 Mbps.
 
-Every download waits 100 ms for its first byte, and the selectors count that wait. The segments last 4 seconds.
+Every download has a time to first byte of 100 ms, and the selectors count it. The segments last 4 seconds.
 
 | Ladder and buffer cap | Selector | Average Mbps | Stalls per session | Switches per session |
 |---|---|---|---|---|
@@ -255,7 +255,7 @@ Every download waits 100 ms for its first byte, and the selectors count that wai
 | 10 rungs, 30 s | BOLA | 2.25 | 0.11 | 10.1 |
 | 10 rungs, 30 s | Throughput | 1.57 | 0.02 | 10.2 |
 
-With 800 ms before the first byte and 2 second segments, the segment bound changes the picks:
+With a time to first byte of 800 ms and 2 second segments, the picks are:
 
 | Ladder and buffer cap | Selector | Average Mbps | Stalls per session | Switches per session |
 |---|---|---|---|---|
@@ -290,7 +290,7 @@ const selector = createBolaSelector({ safetyFactor: 0.95, starvationSafetyFactor
 |---|---|---|
 | `safetyFactor` | `DEFAULT_SAFETY_FACTOR` (0.9) | The fraction of the throughput that a rung may use. The selector uses it at startup and in the oscillation guard. |
 | `starvationSafetyFactor` | `DEFAULT_STARVATION_SAFETY_FACTOR` (0.7) | The fraction of the throughput that the starvation guard assumes for the download of the next segment. |
-| `ignoreTimeToFirstByte` | `false` | When `true`, the selector ignores the time to first byte in the picks and in the guard. The throughput selector option has the same meaning. |
+| `ignoreTimeToFirstByte` | `false` | When `true`, the selector ignores the time to first byte in the picks and in the starvation guard. The throughput selector option has the same meaning. |
 
 `safetyFactor` has the bounds of the option with the same name of `createThroughputSelector`. `starvationSafetyFactor` has the same bounds. Each factor must be a finite number above 0 and at most 1. `createBolaSelector` throws a `RangeError` for an invalid value.
 
