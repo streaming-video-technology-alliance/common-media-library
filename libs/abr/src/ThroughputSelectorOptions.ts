@@ -35,4 +35,15 @@ export type ThroughputSelectorOptions = {
 	 * @defaultValue `DEFAULT_STARVATION_TOLERANCE`
 	 */
 	starvationTolerance?: number
+
+	/**
+	 * When `true`, the selector ignores the time to first byte of every sample.
+	 * The pick and the starvation guard then count the transfer only.
+	 * Set the option when the time to first byte is not time that a download loses.
+	 * Examples: the player requests the next segment before the current download ends, `responseStart` does not mark
+	 * the first byte of the body, or the server sends the response headers before the body exists.
+	 *
+	 * @defaultValue `false`
+	 */
+	ignoreTimeToFirstByte?: boolean
 }
