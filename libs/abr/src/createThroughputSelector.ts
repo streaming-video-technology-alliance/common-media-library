@@ -21,7 +21,7 @@ import { validateLadder } from './validateLadder.ts'
  * The selector picks the highest rung whose download fits in one segment.
  * The download time of a rung is the time to first byte plus a transfer time.
  * The transfer time is one segment at `throughput * safetyFactor`.
- * The download fits when that time is at most `segmentDuration / playbackRate`. Rung 0 is the pick when no rung fits.
+ * The download fits when the download time is at most `segmentDuration / playbackRate`. Rung 0 is the pick when no rung fits.
  * Without `segmentDuration`, the pick is the highest rung at or below `throughput * safetyFactor / playbackRate`.
  * The time to first byte is the mean of the last four samples, from `responseStart - startTime` of their timing.
  * Two rules refine the pick:
@@ -29,8 +29,8 @@ import { validateLadder } from './validateLadder.ts'
  * - Hysteresis. If the pick is above the current rung, the selector recomputes the pick with `throughput * upgradeFactor`
  *   and returns the higher of the current rung and that pick.
  * - Starvation guard. When the input has a positive `segmentDuration`, the first pass keeps the highest rung,
- *   at or below the pick, that downloads within `bufferLevel / playbackRate`. The download time of a rung is the
- *   mean time to first byte of the last four samples plus the transfer of one segment at `throughput * safetyFactor`.
+ *   at or below the pick, that downloads within `bufferLevel / playbackRate`.
+ *   The guard uses the same download time with `throughput * safetyFactor`.
  *   If no rung passes, the second pass allows `min(segmentDuration, starvationTolerance)` more.
  *   Rung 0 passes the second pass in every case.
  *

@@ -46,7 +46,7 @@ import { validateLadder } from './validateLadder.ts'
  * - Steady. The selector picks the rung for the effective buffer and applies two guards.
  *   The oscillation guard limits an upward switch. Suppose the buffer picks a rung above the current rung.
  *   Suppose that rung is also above the rung whose download fits in one segment at `throughput * safetyFactor`.
- *   Then the guard keeps the higher of those two rungs.
+ *   Then the guard keeps the higher of the current rung and that sustainable rung.
  *   The starvation guard lowers the pick when the download of the next segment does not fit in the real buffer.
  *
  * A call returns a delay when the effective buffer is above the maximum buffer of the chosen rung.
@@ -64,13 +64,13 @@ import { validateLadder } from './validateLadder.ts'
  * It keeps the highest rung, at or below the pick, that downloads within `bufferLevel / playbackRate`.
  * It assumes `throughput * starvationSafetyFactor` for that download.
  * It adds the mean time to first byte of the last four finished samples to that download. Rung 0 always passes.
- * A call without `segmentDuration` skips the guard and the bound on the startup pick and the oscillation cap.
+ * A call without `segmentDuration` skips the starvation guard and the bound on the startup pick and the oscillation guard.
  *
  * The selector reads `timing`, `bandwidth`, `duration`, `bufferLevel`, `isReplacement`, and `aborted` from a sample.
  * A sample without a positive finite `duration` keeps the selector in the startup state.
  * The selector needs the throughput estimate at startup and in both guards.
  * It reads `segmentDuration` at startup, in the oscillation guard, and in the starvation guard.
- * It reads `playbackRate` for the starvation guard only.
+ * The selector reads `playbackRate` for the starvation guard only.
  *
  * BOLA suits a large buffer. In the dash.js follow-up paper, a throughput rule oscillates less than the original BOLA
  * with a buffer of 10 seconds. The original BOLA has no placeholder buffer and no starvation guard.
