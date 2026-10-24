@@ -76,7 +76,7 @@ selector.sample({ timing, bandwidth: ladder[2].bandwidth, duration: 2, bufferLev
 const { index } = selector.select({ ladder, bufferLevel: 6, throughput: estimator.getEstimate(), now: 1100, segmentDuration: 2 })
 ```
 
-A player whose requests overlap ignores the time to first byte. Such a player requests the next segment before the current download ends. The time to first byte of one request runs during the transfer of another and delays nothing.
+A player whose requests overlap can ignore the time to first byte. The next request must start at least the time to first byte before the current download ends. The whole wait then runs during the transfer of the previous segment and delays nothing. The pick and the guard need no term for a wait that delays nothing. A smaller overlap hides part of the wait, and the rest still delays the download. Such a player keeps the default.
 
 ```ts
 import { createBolaSelector } from '@svta/cml-abr'
@@ -84,7 +84,7 @@ import { createBolaSelector } from '@svta/cml-abr'
 const selector = createBolaSelector({ ignoreTimeToFirstByte: true })
 ```
 
-The option also fits two other cases. The `responseStart` of the timing source does not mark the first byte of the body. The server sends the response headers before the body exists. In these cases the measured time to first byte is not the time the download loses. The option keeps the picks of today.
+That overlap is the one condition for the option. The model splits a download at `responseStart`. The time to first byte is the wait before `responseStart`. The throughput passed to `select` must measure the transfer from `responseStart` to the end of the response. The estimators of `@svta/cml-throughput` measure that transfer since PR 588. The two parts then cover the whole download, whatever `responseStart` marks. Early response headers do not justify the option. The wait before the headers is still time the download loses. A player that ignores that wait can pick a rung whose download does not fit in one segment. A server that sends the headers before the body exists has a different problem. The transfer measure then includes the production wait and is not a link measure. The Drawbacks section states that limitation.
 
 ## Reference-level explanation
 
@@ -148,11 +148,11 @@ BOLA passes a playback rate of 1. The BOLA rules ignore `playbackRate`, and the 
 
 ### The time to first byte
 
-PR 588 defines the estimate, and this RFC does not change the estimate. The time to first byte of a finished sample is `responseStart - startTime` of its `timing`, from `getTimeToFirstByteMs` in `@svta/cml-utils`. The selector keeps the last four values and uses the mean, in seconds. A sample whose `responseStart` is missing or outside the response adds nothing. An aborted sample adds nothing. `reset` clears the values. Without values, the time to first byte is 0, and the pick is the pick of today.
+PR 588 defines the estimate, and this RFC does not change the estimate. The time to first byte of a finished sample is `responseStart - startTime` of its `timing`, from `getTimeToFirstByte` in `@svta/cml-utils`. The selector keeps the last four values and uses the mean, in seconds. A sample whose `responseStart` is missing or outside the response adds nothing. An aborted sample adds nothing. `reset` clears the values. Without values, the time to first byte is 0, and the pick is the pick of today.
 
 ### The option
 
-`ignoreTimeToFirstByte` is an optional boolean on `ThroughputSelectorOptions` and `BolaSelectorOptions`. The default is `false`. When the option is `true`, the selector records no time to first byte. The segment bound then holds the pick of today. The guard uses a time to first byte of 0. The TSDoc states the effect first and then the three reasons from the guide. The reasons are overlapping requests, a `responseStart` that is not the first byte, and early response headers.
+`ignoreTimeToFirstByte` is an optional boolean on `ThroughputSelectorOptions` and `BolaSelectorOptions`. The default is `false`. When the option is `true`, the selector records no time to first byte. The segment bound then holds the pick of today. The guard uses a time to first byte of 0. The TSDoc states the effect first and then the condition from the guide. The next request starts at least the time to first byte before the current download ends.
 
 ### Edge cases
 
@@ -197,21 +197,21 @@ One loop over the ladder per pick, with no allocation. A ladder has about 5 to 1
 ### Testing
 
 - Unit tests for `findSustainableRung`: the fallback equals `findRung`. A time to first byte of 0 matches `findRung` away from a boundary. A positive value lowers the rung. A value at the budget returns 0. Equal bandwidths return the highest position. The playback rate scales the budget.
-- Throughput selector: the issue 587 numbers, 14 Mbps, 800 ms, and 2 second segments. The pick is at or below 7.56 Mbps, where today the bound is 12.6 Mbps. The upgrade pick uses the bound. `ignoreTimeToFirstByte` restores the pick and the guard of today. A call without `segmentDuration` is unchanged. Every existing test passes unchanged. No boundary margin was needed.
-- BOLA: the startup pick and the oscillation guard lower with the time to first byte. The buffer-based pick does not move. `ignoreTimeToFirstByte` restores today. A time to first byte at the segment duration gives rung 0 at startup.
-- Simulation: the seeded playback simulation gains a time to first byte per download. The [analysis](./analysis.md) defines the scenarios and the metrics, and the implementation PR fills in the results.
+- Throughput selector: the issue 587 numbers, 14 Mbps, 800 ms, and 2 second segments. The pick is at or below 7.56 Mbps, where today the bound is 12.6 Mbps. The upgrade pick uses the bound. `ignoreTimeToFirstByte` removes the time to first byte from the pick and from the guard. A call without `segmentDuration` is unchanged. Every existing test passes unchanged. No boundary margin was needed.
+- BOLA: the startup pick and the oscillation guard lower with the time to first byte. The buffer-based pick does not move. `ignoreTimeToFirstByte` removes the time to first byte from the picks and from the guard. A time to first byte at the segment duration gives rung 0 at startup.
+- Simulation: the seeded playback simulation gains a time to first byte per download. The [analysis](./analysis.md) defines the scenarios and the metrics and holds the results against the PR 588 baseline.
 
 ### Packaging
 
-The change joins `libs/abr`. The release-prep PR bumps the version to 0.3.0. The changelog gets a Changed entry for the picks and an Added entry for the option. The package needs the `@svta/cml-utils` release with `getTimeToFirstByteMs`, from PR 588. The exports keep `@beta`.
+The change joins `libs/abr`. The release-prep PR bumps the version to 0.3.0. The changelog gets a Changed entry for the picks and an Added entry for the option. The package needs the `@svta/cml-utils` release with `getTimeToFirstByte`, from PR 588. The exports keep `@beta`.
 
 ## Drawbacks
 
 - The picks change for every adopter whose timing has `responseStart`. The change is downward, and the size of the change is the time to first byte over the segment duration. With a time to first byte of 100 ms and 6 second segments, the bound is 1.7 percent lower. This change is inside the safety factor. With a time to first byte of 800 ms and 2 second segments, the bound is 40 percent lower.
-- The model assumes one request at a time per media type. A player with overlapping requests sets `ignoreTimeToFirstByte`, and a player that forgets the option picks too low.
+- The model assumes one request at a time per media type. A player whose request overlap hides the whole time to first byte sets `ignoreTimeToFirstByte`. A player that forgets the option picks too low.
 - The estimate is a mean of four samples. One slow response, such as an origin fetch, lowers the bound for four segments.
 - The bound uses the `segmentDuration` of the call. A playlist with variable segment durations needs the duration of the next segment in each call. The input contract already asks for that duration.
-- In a low-latency stream with chunked transfer, `responseStart` does not mark the first byte. The transfer is not a link measure. Such a player sets the option or omits `segmentDuration`.
+- In a low-latency stream with chunked transfer, the server sends the headers before the body exists. The transfer measure then includes the production wait and is not a link measure. The option does not repair the measure, because the wait before the headers is still time the download loses. Such a player needs a throughput estimate of the link, or omits `segmentDuration`.
 - Before this RFC ships, an adopter removes the time to first byte from the guard only by omitting `responseStart`. The option is public API and waits for this RFC.
 
 ## Rationale and alternatives
@@ -221,7 +221,7 @@ The change joins `libs/abr`. The release-prep PR bumps the version to 0.3.0. The
 - **A time to first byte input on `BitrateSelectorInput`.** The player would estimate the time to first byte and pass the value. CML ships no estimator for the time to first byte. The selector already receives the timing of every download.
 - **A time to first byte estimator in `@svta/cml-throughput`.** This is the hls.js shape. `ThroughputEstimator` keeps one meaning, link throughput, and the selectors need no second estimator object. Listed under future possibilities.
 - **An exponentially weighted estimate.** hls.js keeps a TTFB EWMA with the slow half-life and a default of 100 ms. The hls.js weighting gives a slow response less weight. The estimate feeds a bound and a guard, where a slow sample errs toward safety. The mean of four needs no half-life and no default. dash.js uses the same mean.
-- **Other names for the option.** `overlappingRequests`, `sequentialRequests`, and `prefetch` name one reason. `deadTime` names the dash.js mechanism. `ignoreTimeToFirstByte` names the effect, and the TSDoc lists the reasons, because a developer can have more than one.
+- **Other names for the option.** `overlappingRequests`, `sequentialRequests`, and `prefetch` name one reason. `deadTime` names the dash.js mechanism. `ignoreTimeToFirstByte` names the effect, and the TSDoc states the condition. The name does not bind the option to one reason.
 - **A separate gate for the guard.** A live player could keep the bound and skip the buffer guard near the live edge. One gate, `segmentDuration`, keeps the input as it is. dash.js runs its buffer rule for live too, and the skip near the edge is an hls.js choice. The README drops the advice to omit `segmentDuration` near the live edge.
 
 ## Prior art
@@ -253,6 +253,7 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 
 - v1 (2026-10-23): initial draft.
 - v2 (2026-10-23): names aligned with the implementation, simulation results added to the analysis, prior art records the origin and the unexplained removal of the dash.js scaling.
+- v3 (2026-10-24): the simulation baseline is the PR 588 build. The option has one condition, a request overlap that hides the whole time to first byte.
 
 ## Final Decision
 
