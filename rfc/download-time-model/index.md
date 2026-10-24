@@ -52,7 +52,7 @@ Before [PR 588](https://github.com/streaming-video-technology-alliance/common-me
 
 The transfer measure leaves the pick without the time to first byte. With 2 second segments on that TV, the pick is the highest rung at or below 0.9 times 14 Mbps. A segment of that rung has a time to first byte of 0.8 seconds and transfers in 1.8 seconds. The download takes 2.6 seconds for 2 seconds of media. The buffer drains, the selector drops a rung, the buffer refills, and the selector climbs again. The starvation guard prevents the stall at a low buffer and does nothing about the cycle. The [analysis](./analysis.md) has the numbers.
 
-Other players handle the time to first byte in three ways. video.js keeps the time to first byte inside the throughput measure. shaka-player and dash.js 5 measure the transfer and ignore the time to first byte. hls.js measures the transfer and adds the time to first byte to a buffer check, as PR 588 does. dash.js 4 measured the transfer and scaled every pick by the dead-time ratio. The ratio is one minus the latency over the segment duration. The 5.0 refactor removed that scaling. This RFC takes the dash.js 4 rule and the hls.js rule and derives both from one function.
+Other players handle the time to first byte in three ways. video.js keeps the time to first byte inside the throughput measure. shaka-player and dash.js 5 measure the transfer and ignore the time to first byte. hls.js measures the transfer and adds the time to first byte to a buffer check, as PR 588 does. dash.js 4 measured the transfer and scaled every pick by the dead-time ratio. The ratio is one minus the latency over the segment duration. The 5.0 refactor removed that scaling without a stated reason. This RFC takes the dash.js 4 rule and the hls.js rule and derives both from one function.
 
 ## Guide-level explanation
 
@@ -236,6 +236,8 @@ The change joins `libs/abr`. The release-prep PR bumps the version to 0.3.0. The
 | ExoPlayer | After the response code is read. | No latency input in the bandwidth meter. |
 | CML after PR 588 | First byte to end when the sample has `responseStart`. | In both starvation guards, as the mean of the last four finished samples. |
 
+The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Dash-Industry-Forum/dash.js/issues/1955) (2017) raised that a transfer measure strips the CDN latency from the estimate. [PR 1990](https://github.com/Dash-Industry-Forum/dash.js/pull/1990) added the `useDeadTimeLatency` flag. A player could then switch between the dead-time method and total-time bandwidth and compare the two. [PR 4276](https://github.com/Dash-Industry-Forum/dash.js/pull/4276) removed the scaling together with the `getQualityForBitrate` signature. The PR description, its commits, and its comments give no reason. The flag remains in dash.js 5 and changes the throughput measure only.
+
 ## Unresolved questions
 
 1. **Playback rate in BOLA.** BOLA passes 1 to the search, as its rules ignore the rate today. Should the startup pick and the oscillation guard divide the budget by `playbackRate`?
@@ -250,6 +252,7 @@ The change joins `libs/abr`. The release-prep PR bumps the version to 0.3.0. The
 ## Revision history
 
 - v1 (2026-10-23): initial draft.
+- v2 (2026-10-23): names aligned with the implementation, simulation results added to the analysis, prior art records the origin and the unexplained removal of the dash.js scaling.
 
 ## Final Decision
 
