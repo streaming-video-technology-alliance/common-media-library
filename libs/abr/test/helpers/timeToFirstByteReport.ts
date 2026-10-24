@@ -28,8 +28,9 @@ const SELECTORS: [string, (ignoreTimeToFirstByte: boolean) => BitrateSelector][]
 ]
 
 /**
- * Renders the RFC analysis table: average Mbps, stalls per session, and switches per session,
- * for every setup, scenario, selector, and option state, averaged over `seedCount` traces.
+ * Renders the counted and ignored rows of the RFC analysis table: average Mbps, stalls per session,
+ * and switches per session, for every setup, scenario, and selector, averaged over `seedCount` traces.
+ * The baseline rows of the analysis need the PR 588 build and come from a script outside the repository.
  */
 export function renderTimeToFirstByteReport(seedCount: number): string {
 	const lines = [

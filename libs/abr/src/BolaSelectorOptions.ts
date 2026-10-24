@@ -32,11 +32,10 @@ export type BolaSelectorOptions = {
 	 * When `true`, the selector ignores the time to first byte of every sample.
 	 * The pick and the starvation guard then count the transfer only.
 	 * Both read the time to first byte only when the input has `segmentDuration`.
-	 * The option fits a time to first byte that is not time a download loses.
-	 * Set the option in these cases.
-	 * The player requests the next segment before the current download ends.
-	 * The value of `responseStart` does not mark the first byte of the body.
-	 * The server sends the response headers before the body exists.
+	 * Set the option when the request overlap hides the whole time to first byte.
+	 * The next request must start at least the time to first byte before the current download ends.
+	 * That wait then runs during the transfer of the previous segment and delays nothing.
+	 * Keep the default for a smaller overlap, because the rest of the wait still delays the download.
 	 *
 	 * @defaultValue `false`
 	 */

@@ -131,7 +131,7 @@ const selector = createThroughputSelector({ safetyFactor: 0.95, upgradeFactor: 0
 | `starvationTolerance` | `DEFAULT_STARVATION_TOLERANCE` (4) | The seconds of stall that the second pass of the guard allows, capped at the segment duration. |
 | `ignoreTimeToFirstByte` | `false` | When `true`, the selector ignores the time to first byte in the pick and in the starvation guard. |
 
-Set `ignoreTimeToFirstByte` when the time to first byte is not time that a download loses. Three examples follow. The player requests the next segment before the current download ends. `responseStart` does not mark the first byte of the body. The server sends the response headers before the body exists.
+Set `ignoreTimeToFirstByte` when the request overlap hides the whole time to first byte. The next request must start at least the time to first byte before the current download ends. That wait then runs during the transfer of the previous segment and delays nothing. Keep the default for a smaller overlap, because the rest of the wait still delays the download. The model splits a download at `responseStart`. The time to first byte is the wait before `responseStart`. The throughput passed to `select` must measure the transfer from `responseStart` to the end of the response. The estimators of `@svta/cml-throughput` measure that transfer. The two parts then cover the whole download, whatever `responseStart` marks.
 
 Both factors must be finite numbers above 0 and at most 1. `upgradeFactor` must not exceed `safetyFactor`, because a larger upgrade factor could pass the safe pick and the next call would undo it. Equal factors disable the hysteresis. The tolerance must be a finite number of 0 or more. `createThroughputSelector` throws a `RangeError` for an invalid option.
 

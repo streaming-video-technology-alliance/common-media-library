@@ -27,7 +27,7 @@ const SELECTORS: [string, (ignoreTimeToFirstByte: boolean) => BitrateSelector][]
 	],
 ]
 
-// The totals over the seeds. With `ignoreTimeToFirstByte` the selector picks as before this change.
+// The totals over the seeds. With `ignoreTimeToFirstByte` the selector uses no time to first byte in the pick or in the guard.
 function totals(
 	createSelector: (ignoreTimeToFirstByte: boolean) => BitrateSelector,
 	ladder: LadderRung[],
@@ -53,7 +53,7 @@ function totals(
 }
 
 describe('time to first byte simulation', () => {
-	it('stalls and switches less with the bound than without it in the high wait scenario', () => {
+	it('stalls and switches less with the time to first byte counted than ignored in the high wait scenario', () => {
 		for (const [name, createSelector] of SELECTORS) {
 			for (const ladder of [L1, L2]) {
 				const bounded = totals(createSelector, ladder, false)
