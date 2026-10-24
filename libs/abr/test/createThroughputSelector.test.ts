@@ -572,6 +572,18 @@ describe('createThroughputSelector', () => {
 
 			equal(selector.select({ ...input, bufferLevel: 3 }).index, 3)
 		})
+
+		it('ignores the time to first byte when ignoreTimeToFirstByte is set', () => {
+			// Without the option, four samples with a 1 s time to first byte lower the pick at a buffer of 3 s to rung 2.
+			const selector = createThroughputSelector({ ignoreTimeToFirstByte: true })
+			const input = { ladder, throughput: 6_000_000, now: 0, segmentDuration: 4 }
+
+			for (let i = 0; i < 4; i++) {
+				loadWithTimeToFirstByte(selector, 1000)
+			}
+
+			equal(selector.select({ ...input, bufferLevel: 3 }).index, 3)
+		})
 	})
 
 	describe('reset', () => {

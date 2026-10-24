@@ -74,7 +74,7 @@ import { validateLadder } from './validateLadder.ts'
  * @example
  * {@includeCode ../test/createBolaSelector.test.ts#example}
  *
- * @param options - The safety factor and the starvation safety factor
+ * @param options - The safety factor, the starvation safety factor, and the time to first byte switch
  * @returns The selector
  * @throws RangeError when `safetyFactor` or `starvationSafetyFactor` is not a finite number above 0 and at most 1
  *
@@ -88,6 +88,7 @@ import { validateLadder } from './validateLadder.ts'
 export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector {
 	const safetyFactor = options?.safetyFactor ?? DEFAULT_SAFETY_FACTOR
 	const starvationSafetyFactor = options?.starvationSafetyFactor ?? DEFAULT_STARVATION_SAFETY_FACTOR
+	const ignoreTimeToFirstByte = options?.ignoreTimeToFirstByte ?? false
 
 	validateFactor('safetyFactor', safetyFactor)
 	validateFactor('starvationSafetyFactor', starvationSafetyFactor)
@@ -322,7 +323,10 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	function recordFinishedSample(segment: SegmentSample, bufferLevel: number): void {
 		currentBandwidth = segment.bandwidth
 		finishedSampleCount = Math.min(finishedSampleCount + 1, STARVATION_GUARD_SAMPLE_COUNT)
-		recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
+
+		if (!ignoreTimeToFirstByte) {
+			recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
+		}
 
 		if (isPositiveFinite(segment.duration)) {
 			lastSegmentDuration = segment.duration

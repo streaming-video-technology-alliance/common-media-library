@@ -867,6 +867,24 @@ describe('createBolaSelector', () => {
 			equal(decision.index, 3)
 		})
 
+		it('ignores the time to first byte when ignoreTimeToFirstByte is set', () => {
+			// Without the option, the same samples lower the pick to rung 2.
+			const selector = createEmptyPlaceholderSelector(L1, { ignoreTimeToFirstByte: true })
+
+			loadTimeToFirstByteSamples(selector)
+
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decision.index, 3)
+		})
+
 		it('does not run in the startup state, even after two finished samples', () => {
 			const input = { ladder: L1, throughput: throughputFor(3), segmentDuration: SEGMENT_DURATION }
 			const selector = createBolaSelector()

@@ -36,7 +36,7 @@ import { validateLadder } from './validateLadder.ts'
  * @example
  * {@includeCode ../test/createThroughputSelector.test.ts#example}
  *
- * @param options - The safety factor, the upgrade factor, and the starvation tolerance
+ * @param options - The safety factor, the upgrade factor, the starvation tolerance, and the time to first byte switch
  * @returns The selector
  * @throws RangeError when a factor is not a finite number above 0 and at most 1, when `upgradeFactor` exceeds
  * `safetyFactor`, or when `starvationTolerance` is not a finite number of 0 or more
@@ -47,6 +47,7 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 	const safetyFactor = options?.safetyFactor ?? DEFAULT_SAFETY_FACTOR
 	const upgradeFactor = options?.upgradeFactor ?? DEFAULT_UPGRADE_FACTOR
 	const starvationTolerance = options?.starvationTolerance ?? DEFAULT_STARVATION_TOLERANCE
+	const ignoreTimeToFirstByte = options?.ignoreTimeToFirstByte ?? false
 
 	validateFactor('safetyFactor', safetyFactor)
 	validateFactor('upgradeFactor', upgradeFactor)
@@ -115,7 +116,10 @@ export function createThroughputSelector(options?: ThroughputSelectorOptions): B
 			}
 
 			currentBandwidth = segment.bandwidth
-			recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
+
+			if (!ignoreTimeToFirstByte) {
+				recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
+			}
 		},
 
 		reset(): void {

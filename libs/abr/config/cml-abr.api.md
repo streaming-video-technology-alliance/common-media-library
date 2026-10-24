@@ -49,6 +49,7 @@ export type BolaSelector = Omit<BitrateSelector, "select"> & {
 export type BolaSelectorOptions = {
     safetyFactor?: number;
     starvationSafetyFactor?: number;
+    ignoreTimeToFirstByte?: boolean;
 };
 
 // @beta
@@ -98,6 +99,7 @@ export type ThroughputSelectorOptions = {
     safetyFactor?: number;
     upgradeFactor?: number;
     starvationTolerance?: number;
+    ignoreTimeToFirstByte?: boolean;
 };
 
 // (No @packageDocumentation comment for this package)
