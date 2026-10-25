@@ -39,7 +39,7 @@ Each run has three arms over the same traces:
 
 - Baseline is `@svta/cml-abr` at the head of [PR 588](https://github.com/streaming-video-technology-alliance/common-media-library/pull/588), commit `6192a767b`. That build uses the time to first byte in the starvation guard and in no pick. The comparison of the baseline and the counted arm isolates the bound.
 - Counted is the proposed behavior.
-- Ignored is the proposed behavior with `ignoreTimeToFirstByte: true`. The option removes the time to first byte from the pick and from the guard. The ignored arm is not the baseline, because the PR 588 guard already uses the time to first byte.
+- Ignored is the proposed behavior with samples that omit `responseStart`. The selector then records no time to first byte for the pick or for the guard. For the throughput selector, `ignoreTimeToFirstByte: true` gives the same rows. The ignored arm is not the baseline, because the PR 588 guard already uses the time to first byte.
 
 A script produced the three arms. The script loads the baseline build, the implementation build, and the simulation helper of the implementation branch.
 
