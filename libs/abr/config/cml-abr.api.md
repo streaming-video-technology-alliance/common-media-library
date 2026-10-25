@@ -49,7 +49,6 @@ export type BolaSelector = Omit<BitrateSelector, "select"> & {
 export type BolaSelectorOptions = {
     safetyFactor?: number;
     starvationSafetyFactor?: number;
-    ignoreTimeToFirstByte?: boolean;
 };
 
 // @beta

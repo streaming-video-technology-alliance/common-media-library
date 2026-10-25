@@ -694,6 +694,22 @@ describe('createThroughputSelector', () => {
 		})
 	})
 
+	describe('call order', () => {
+		it('accepts a select call during a download and keeps the last sampled rung as the current rung', () => {
+			// With a current rung of 1.5 Mbps, the hysteresis holds rung 2 at 4.2 Mbps. Without a current rung the pick would be rung 3.
+			const selector = createThroughputSelector()
+			const input = { ladder, bufferLevel: 4, throughput: 4_200_000, now: 0 }
+
+			load(selector, 1_500_000)
+			const first = selector.select(input)
+			// The player requests rung 2 and asks again before that download ends. No sample arrived in between.
+			const during = selector.select({ ...input, now: 1000 })
+
+			equal(first.index, 2)
+			deepEqual(during, first)
+		})
+	})
+
 	describe('reset', () => {
 		it('clears the current rung', () => {
 			const selector = createThroughputSelector()

@@ -94,7 +94,6 @@ import { validateLadder } from './validateLadder.ts'
 export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector {
 	const safetyFactor = options?.safetyFactor ?? DEFAULT_SAFETY_FACTOR
 	const starvationSafetyFactor = options?.starvationSafetyFactor ?? DEFAULT_STARVATION_SAFETY_FACTOR
-	const ignoreTimeToFirstByte = options?.ignoreTimeToFirstByte ?? false
 
 	validateFactor('safetyFactor', safetyFactor)
 	validateFactor('starvationSafetyFactor', starvationSafetyFactor)
@@ -346,9 +345,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		currentBandwidth = segment.bandwidth
 		finishedSampleCount = Math.min(finishedSampleCount + 1, STARVATION_GUARD_SAMPLE_COUNT)
 
-		if (!ignoreTimeToFirstByte) {
-			recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
-		}
+		recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
 
 		if (isPositiveFinite(segment.duration)) {
 			lastSegmentDuration = segment.duration

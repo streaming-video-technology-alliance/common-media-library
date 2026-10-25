@@ -46,6 +46,8 @@ export type ThroughputSelectorOptions = {
 	 * The next request must start at least the time to first byte before the current download ends.
 	 * That wait then runs during the transfer of the previous segment and delays nothing.
 	 * Keep the default for a smaller overlap, because the rest of the wait still delays the download.
+	 * The selector accepts the `select` call for the next request during the current download.
+	 * The current rung is then the rung of the last sample.
 	 *
 	 * @defaultValue `false`
 	 */

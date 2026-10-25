@@ -27,17 +27,4 @@ export type BolaSelectorOptions = {
 	 * @defaultValue `DEFAULT_STARVATION_SAFETY_FACTOR`
 	 */
 	starvationSafetyFactor?: number
-
-	/**
-	 * When `true`, the selector ignores the time to first byte of every sample.
-	 * The pick and the starvation guard then count the transfer only.
-	 * Both read the time to first byte only when the input has `segmentDuration`.
-	 * Set the option when the request overlap hides the whole time to first byte.
-	 * The next request must start at least the time to first byte before the current download ends.
-	 * That wait then runs during the transfer of the previous segment and delays nothing.
-	 * Keep the default for a smaller overlap, because the rest of the wait still delays the download.
-	 *
-	 * @defaultValue `false`
-	 */
-	ignoreTimeToFirstByte?: boolean
 }

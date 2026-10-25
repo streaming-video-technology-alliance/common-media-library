@@ -28,6 +28,8 @@ type SimulationOptions = {
 	omitSegmentDuration?: boolean
 	/** The time to first byte of every download, in seconds. The player pays it before the transfer, and the sample timing records it. */
 	timeToFirstByte?: number
+	/** When true, the sample timing has no `responseStart`, so a selector records no time to first byte. The player still pays it. */
+	omitResponseStart?: boolean
 }
 
 export type SimulationResult = {
@@ -150,6 +152,7 @@ export function simulatePlayback(
 	options: SimulationOptions,
 ): SimulationResult {
 	const { ladder, trace, bufferCap, segmentCount, segmentDuration, omitSegmentDuration } = options
+	const omitResponseStart = options.omitResponseStart ?? false
 	const timeToFirstByte = options.timeToFirstByte ?? 0
 	const estimate = createThroughputEstimate()
 	const result: SimulationResult = {
@@ -224,17 +227,17 @@ export function simulatePlayback(
 		// The estimate measures the transfer, as the estimators of @svta/cml-throughput do since PR 588.
 		estimate.sample(transferSeconds, bits / transferSeconds)
 
-		return {
-			timing: {
-				startTime,
-				responseStart: startTime + timeToFirstByte * MILLISECONDS_PER_SECOND,
-				encodedBodySize: bits / BITS_PER_BYTE,
-				duration: seconds * MILLISECONDS_PER_SECOND,
-			},
-			bandwidth,
-			duration: segmentDuration,
-			bufferLevel,
+		const timing: SegmentSample['timing'] = {
+			startTime,
+			encodedBodySize: bits / BITS_PER_BYTE,
+			duration: seconds * MILLISECONDS_PER_SECOND,
 		}
+
+		if (!omitResponseStart) {
+			timing.responseStart = startTime + timeToFirstByte * MILLISECONDS_PER_SECOND
+		}
+
+		return { timing, bandwidth, duration: segmentDuration, bufferLevel }
 	}
 
 	for (let n = 0; n < segmentCount; n++) {

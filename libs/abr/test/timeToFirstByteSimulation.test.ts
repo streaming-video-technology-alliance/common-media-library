@@ -19,30 +19,28 @@ const REPORT_LINE_COUNT = 26
 
 type Totals = { stalls: number; switches: number }
 
-const SELECTORS: [string, (ignoreTimeToFirstByte: boolean) => BitrateSelector][] = [
-	['the BOLA selector', ignoreTimeToFirstByte => createBolaSelector({ ignoreTimeToFirstByte })],
-	[
-		'the throughput selector',
-		ignoreTimeToFirstByte => createThroughputSelector({ ignoreTimeToFirstByte }),
-	],
+const SELECTORS: [string, () => BitrateSelector][] = [
+	['the BOLA selector', () => createBolaSelector()],
+	['the throughput selector', () => createThroughputSelector()],
 ]
 
-// The totals over the seeds. With `ignoreTimeToFirstByte` the selector uses no time to first byte in the pick or in the guard.
+// The totals over the seeds. Samples without `responseStart` give the selector no time to first byte for the pick or the guard.
 function totals(
-	createSelector: (ignoreTimeToFirstByte: boolean) => BitrateSelector,
+	createSelector: () => BitrateSelector,
 	ladder: LadderRung[],
-	ignoreTimeToFirstByte: boolean,
+	omitResponseStart: boolean,
 ): Totals {
 	const result: Totals = { stalls: 0, switches: 0 }
 
 	for (let seed = 1; seed <= SEED_COUNT; seed++) {
-		const run = simulatePlayback(createSelector(ignoreTimeToFirstByte), {
+		const run = simulatePlayback(createSelector(), {
 			ladder,
 			trace: createRandomWalkTrace(seed, MINIMUM_BANDWIDTH, MAXIMUM_BANDWIDTH),
 			bufferCap: BUFFER_CAP,
 			segmentCount: SEGMENT_COUNT,
 			segmentDuration: SHORT_SEGMENT,
 			timeToFirstByte: HIGH_WAIT,
+			omitResponseStart,
 		})
 
 		result.stalls += run.stallCount

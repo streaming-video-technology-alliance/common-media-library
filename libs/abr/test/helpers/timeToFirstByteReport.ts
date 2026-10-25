@@ -22,14 +22,16 @@ const SCENARIOS: Scenario[] = [
 	{ name: 'High wait, 800 ms, 2 s segments', timeToFirstByte: 0.8, segmentDuration: 2 },
 ]
 
-const SELECTORS: [string, (ignoreTimeToFirstByte: boolean) => BitrateSelector][] = [
-	['BOLA', ignoreTimeToFirstByte => createBolaSelector({ ignoreTimeToFirstByte })],
-	['Throughput', ignoreTimeToFirstByte => createThroughputSelector({ ignoreTimeToFirstByte })],
+const SELECTORS: [string, () => BitrateSelector][] = [
+	['BOLA', () => createBolaSelector()],
+	['Throughput', () => createThroughputSelector()],
 ]
 
 /**
  * Renders the counted and ignored rows of the RFC analysis table: average Mbps, stalls per session,
  * and switches per session, for every setup, scenario, and selector, averaged over `seedCount` traces.
+ * The counted rows carry `responseStart` in every sample. The ignored rows omit it, so neither selector records a time to first byte.
+ * For the throughput selector, `ignoreTimeToFirstByte: true` gives the same rows.
  * The baseline rows of the analysis need the PR 588 build and come from a script outside the repository.
  */
 export function renderTimeToFirstByteReport(seedCount: number): string {
@@ -41,19 +43,20 @@ export function renderTimeToFirstByteReport(seedCount: number): string {
 	for (const setup of SETUPS) {
 		for (const scenario of SCENARIOS) {
 			for (const [selectorName, createSelector] of SELECTORS) {
-				for (const ignoreTimeToFirstByte of [false, true]) {
+				for (const omitResponseStart of [false, true]) {
 					let bandwidth = 0
 					let stalls = 0
 					let switches = 0
 
 					for (let seed = 1; seed <= seedCount; seed++) {
-						const run = simulatePlayback(createSelector(ignoreTimeToFirstByte), {
+						const run = simulatePlayback(createSelector(), {
 							ladder: setup.ladder,
 							trace: createRandomWalkTrace(seed, MINIMUM_BANDWIDTH, MAXIMUM_BANDWIDTH),
 							bufferCap: setup.bufferCap,
 							segmentCount: SEGMENT_COUNT,
 							segmentDuration: scenario.segmentDuration,
 							timeToFirstByte: scenario.timeToFirstByte,
+							omitResponseStart,
 						})
 
 						bandwidth +=
@@ -63,7 +66,7 @@ export function renderTimeToFirstByteReport(seedCount: number): string {
 					}
 
 					lines.push(
-						`| ${setup.name} | ${scenario.name} | ${selectorName} | ${ignoreTimeToFirstByte ? 'Ignored' : 'Counted'} | ` +
+						`| ${setup.name} | ${scenario.name} | ${selectorName} | ${omitResponseStart ? 'Ignored' : 'Counted'} | ` +
 							`${(bandwidth / seedCount / BITS_PER_MEGABIT).toFixed(2)} | ${(stalls / seedCount).toFixed(2)} | ${(switches / seedCount).toFixed(1)} |`,
 					)
 				}

@@ -36,7 +36,8 @@ import { validateLadder } from './validateLadder.ts'
  *
  * The current rung is the bandwidth of the last sample that was not aborted, mapped to the highest rung at or below it
  * in the ladder of the call. When the throughput is unknown, the selector returns the current rung, or rung 0 before
- * the first sample. The delay is always 0.
+ * the first sample. The delay is always 0. The selector keeps no clock and accepts a `select` call during a download.
+ * The current rung is then the rung of the last sample.
  *
  * @example
  * {@includeCode ../test/createThroughputSelector.test.ts#example}
