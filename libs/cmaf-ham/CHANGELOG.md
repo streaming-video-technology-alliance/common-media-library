@@ -16,6 +16,10 @@ and this project adheres to
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The overview in `src/README.md` links the documentation at https://cml.svta.org/.
 
+### Fixed
+
+- `getUrlFromTemplate` pads `$Number$` to the width of any `%0<width>d` format tag. Before, only `%04d` added zeros. `$Number%05d$` gave `1` instead of `00001`. The DASH muxer of FFmpeg uses `$Number%05d$` by default.
+
 ## [0.24.8] - 2026-10-18
 
 ### Changed

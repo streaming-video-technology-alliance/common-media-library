@@ -26,10 +26,11 @@ export function getUrlFromTemplate(
 			return representation.$.id
 		}
 		/**
-		 * Number with 4 digits e.g: 0001
+		 * Number with a width format tag. `$Number%05d$` gives 00001.
 		 */
-		if (match.includes('Number%04d')) {
-			return segmentId.toString().padStart(4, '0')
+		const width = /Number%0(\d+)d/.exec(match)?.[1]
+		if (width) {
+			return segmentId.toString().padStart(Number(width), '0')
 		}
 		if (match.includes('Number')) {
 			return segmentId.toString()

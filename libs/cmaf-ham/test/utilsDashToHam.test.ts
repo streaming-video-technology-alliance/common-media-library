@@ -397,6 +397,17 @@ describe('getUrlFromTemplate', () => {
 		equal(res, 'representation: repId and number: 3')
 	})
 
+	it('replaces Number with a width format tag', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: '0' } } as Representation,
+			{
+				$: { media: 'chunk-$RepresentationID$-$Number%05d$.m4s' },
+			} as SegmentTemplate,
+			3,
+		)
+		equal(res, 'chunk-0-00003.m4s')
+	})
+
 	it('replaces both RepresentationID and Number', () => {
 		const res = getUrlFromTemplate(
 			{ $: { id: 'repId' } } as Representation,
