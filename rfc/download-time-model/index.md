@@ -238,7 +238,7 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 
 ## Unresolved questions
 
-1. **Default of the option.** The default counts the time to first byte. Adopters of the throughput selector with overlapping requests get lower picks until they set the option. Is `false` the right default?
+No open questions remain. The Final Decision section records the two decisions.
 
 ## Future possibilities
 
@@ -255,9 +255,12 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 - v5 (2026-10-26): the analysis adds the results of one device run.
 - v6 (2026-10-26): review fixes. The edge case of an empty buffer is stated per selector. The Motivation presents the drain cycle as the projection of the model. The README decision moves from the unresolved questions to Testing.
 - v7 (2026-10-26): BOLA divides the download-time budget by `playbackRate`. The playback rate question is decided.
+- v8 (2026-10-26): the option default is decided. No open questions remain.
 
 ## Final Decision
 
 The playback rate question was decided on 2026-10-26. BOLA divides the budget of the startup pick and the oscillation guard by `playbackRate`, as the throughput selector does. The two sites are throughput checks and not buffer rules, and the BOLA starvation guard already divides its budget by the rate. With a constant rate of 1, a viewer at 2x gets a startup pick that the link cannot sustain. The picks then cycle through the guard. The implementation PR has the change.
 
-The option default and the acceptance are pending community review.
+The option default was decided on 2026-10-26. `ignoreTimeToFirstByte` defaults to `false`, and the throughput selector counts the time to first byte. PR 588 removed the wait from the rate. This RFC adds the wait once, as time, outside the rate. The default therefore does not restore the whole-request measure. A player that downloads one segment at a time has no hidden wait. A player that forgets the option picks one rung too low. The reverse default repeats the cycle of issue 587 for every player that does not read the option. BOLA always counts the wait, and the PR 588 guard term has no flag.
+
+The acceptance is pending community review.
