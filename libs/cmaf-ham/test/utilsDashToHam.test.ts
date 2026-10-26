@@ -333,7 +333,7 @@ describe('getPeriodDuration', () => {
 		equal(res, 12)
 	})
 
-	it('returns the time to the end of the presentation if the last Period has no duration', () => {
+	it('returns the time to the mediaPresentationDuration if the last Period has no duration', () => {
 		const res = getPeriodDuration(
 			{
 				MPD: {
@@ -344,6 +344,89 @@ describe('getPeriodDuration', () => {
 			1,
 		)
 		equal(res, 18)
+	})
+
+	it('derives the start of a Period without a start from the previous Period', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { duration: 'PT10S' } }, { $: {} }],
+				},
+			} as DashManifest,
+			1,
+		)
+		equal(res, 20)
+	})
+
+	it('derives the start of a middle Period without a start from the previous Period', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { duration: 'PT10S' } }, { $: {} }, { $: { start: 'PT25S' } }],
+				},
+			} as DashManifest,
+			1,
+		)
+		equal(res, 15)
+	})
+
+	it('returns 0 if the start of the next Period is unknown', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT0S' } }, { $: {} }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
+	})
+
+	it('returns 0 for a Period without attributes if the MPD has no mediaPresentationDuration', () => {
+		const res = getPeriodDuration({ MPD: { Period: [{ $: {} }] } } as DashManifest, 0)
+		equal(res, 0)
+	})
+
+	it('returns 0 for the last Period of a dynamic MPD without a mediaPresentationDuration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { type: 'dynamic' },
+					Period: [{ $: { start: 'PT0S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
+	})
+
+	it('returns 0 for the first Period of a dynamic MPD if the Period has no start', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { type: 'dynamic', mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: {} }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
+	})
+
+	it('returns 0 if the Period starts after the mediaPresentationDuration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT40S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
 	})
 })
 
