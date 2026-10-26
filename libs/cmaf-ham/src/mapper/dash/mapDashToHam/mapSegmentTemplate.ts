@@ -24,6 +24,7 @@ export function mapSegmentTemplate(
 ): Segment[] {
 	const numberOfSegments: number = getNumberOfSegments(segmentTemplate, duration)
 	const init: number = +(segmentTemplate.$.startNumber ?? 0)
+	const timescaleDuration: number | undefined = +segmentTemplate.$.duration || undefined
 	const segments: Segment[] = []
 	let cumulativeTime = 0
 
@@ -34,11 +35,12 @@ export function mapSegmentTemplate(
 		)
 		const startTime = cumulativeTime
 		cumulativeTime += segmentDuration
+		const time = timescaleDuration === undefined ? undefined : (id - init) * timescaleDuration
 
 		segments.push({
 			id: `${representation.$.id}-segment-${id}`,
 			duration: segmentDuration,
-			url: getUrlFromTemplate(representation, segmentTemplate, id),
+			url: getUrlFromTemplate(representation, segmentTemplate, id, time),
 			// byteRange not included - SegmentTemplate typically doesn't have byteRange
 			startTime,
 		})

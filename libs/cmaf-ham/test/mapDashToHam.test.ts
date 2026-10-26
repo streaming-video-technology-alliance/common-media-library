@@ -36,6 +36,17 @@ describe('map segments', () => {
 			const res = mapSegmentTemplate(representationTemplate, duration, segmentTemplate)
 			deepStrictEqual(res, expectedSegmentTemplate)
 		})
+
+		it('replaces Time with the start time of each segment in timescale units', () => {
+			const timeTemplate = {
+				$: { ...segmentTemplate.$, media: '$RepresentationID$/$Time$.m4s' },
+			}
+			const res = mapSegmentTemplate(representationTemplate, duration, timeTemplate)
+			deepStrictEqual(
+				res.map(segment => segment.url),
+				['1/0.m4s', '1/96.m4s', '1/192.m4s'],
+			)
+		})
 	})
 
 	describe('mapSegments', () => {
