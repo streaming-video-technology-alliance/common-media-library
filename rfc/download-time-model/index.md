@@ -9,13 +9,13 @@ status: draft
 | **Author** | Casey Occhialini |
 | **Date** | 2026-10-23 |
 | **Package** | `@svta/cml-abr` |
-| **Breaking change** | No (new optional fields, changed picks for samples with `responseStart`) |
+| **Breaking change** | No (one new optional field, changed picks for samples with `responseStart`) |
 
 ## Summary
 
 This RFC proposes one download-time model for both selectors of `@svta/cml-abr`. A rung's download time is the time to first byte plus the transfer of one segment at the safe throughput. The starvation guard already tests that time against the buffer. This RFC also tests that time against the segment duration. A pick must download in less time than one segment plays. A rung that fails that test is not sustainable, and the selector picks the highest rung that passes.
 
-The change lowers the pick when the time to first byte is a large part of the segment duration. Nothing else moves. `ThroughputSelectorOptions` gains `ignoreTimeToFirstByte`. The boolean removes the time to first byte from the pick and from the guard of the throughput selector.
+The change lowers the pick when the time to first byte is a large part of the segment duration. No other rule changes. `ThroughputSelectorOptions` gains `ignoreTimeToFirstByte`. The boolean removes the time to first byte from the pick and from the guard of the throughput selector.
 
 ```ts
 import { createThroughputSelector } from '@svta/cml-abr'
@@ -48,11 +48,11 @@ const { index } = selector.select({ ladder, bufferLevel: 8, throughput: 14_000_0
 
 A segment download has two parts. The player waits for the first byte, and then the body transfers. The time to first byte depends on the round trip, the connection setup, and the server. The transfer depends on the link. The two parts are independent, and a prediction of the next download needs both.
 
-Before [PR 588](https://github.com/streaming-video-technology-alliance/common-media-library/pull/588), the throughput estimators divided the body size by the whole duration. The time to first byte therefore lowered the estimate. [Issue 587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587) measured the effect on an LG webOS 22 TV. The 112 kB segments of a live stream had a time to first byte of about 800 ms. They measured about 1 Mbps. The 1.5 MB segments on the same connection measured 14 Mbps. The estimate stayed at 1 to 2.5 Mbps for a minute. The selector picked the 450 kbps and 730 kbps rungs. PR 588 measures a sample over its transfer and adds the time to first byte to the starvation guard.
+Before [PR 588](https://github.com/streaming-video-technology-alliance/common-media-library/pull/588), the throughput estimators divided the body size by the whole duration. The time to first byte therefore lowered the estimate. [Issue 587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587) measured the effect on an LG webOS 22 TV. The small content segments of a live stream spent most of each download in the wait for the first byte. Those segments measured about 1 Mbps. The large ad segments on the same connection measured 14 Mbps. The selector picked the two lowest rungs for a minute, and no run stalled. PR 588 measures a sample over its transfer and adds the time to first byte to the starvation guard.
 
-The transfer measure leaves the pick without the time to first byte. With 2 second segments on that TV, the pick is the highest rung at or below 0.9 times 14 Mbps. A segment of that rung has a time to first byte of 0.8 seconds and transfers in 1.8 seconds. The download takes 2.6 seconds for 2 seconds of media. The buffer drains, the selector drops a rung, the buffer refills, and the selector climbs again. The starvation guard prevents the stall at a low buffer and does nothing about the cycle. The [analysis](./analysis.md) has the numbers.
+The transfer measure leaves the pick without the time to first byte. The worked example of the [analysis](./analysis.md) applies the measured wait and link of that TV to a ladder with a rung at the safe throughput. The pick without the bound is that rung. One segment of that rung downloads in 2.6 seconds. The segment plays for 2 seconds. In the model, the buffer drains, the selector drops a rung, the buffer refills, and the selector climbs again. The starvation guard prevents the stall at a low buffer and does nothing about the cycle. The simulation of the analysis shows that cycle in the high wait scenario. The content ladder of the TV stops at 2000k, so the device run of the analysis found no cycle and no bound decision.
 
-Other players handle the time to first byte in three ways. video.js keeps the time to first byte inside the throughput measure. shaka-player and dash.js 5 measure the transfer and ignore the time to first byte. hls.js measures the transfer and adds the time to first byte to a buffer check, as PR 588 does. dash.js 4 measured the transfer and scaled every pick by the dead-time ratio. The ratio is one minus the latency over the segment duration. The 5.0 refactor removed that scaling without a stated reason. This RFC takes the dash.js 4 rule and the hls.js rule and derives both from one function.
+Other players handle the time to first byte in three ways. video.js keeps the time to first byte inside the throughput measure. dash.js 5 and the shaka-player fetch plugin measure the transfer and ignore the time to first byte. hls.js measures the transfer and adds the time to first byte to a buffer check, as PR 588 does. dash.js 4 measured the transfer and scaled every pick by the dead-time ratio. The ratio is one minus the latency over the segment duration. The 5.0 refactor removed that scaling without a stated reason. This RFC takes the dash.js 4 rule and the hls.js rule and derives both from one function.
 
 ## Guide-level explanation
 
@@ -71,7 +71,7 @@ const timing = { startTime: 0, responseStart: 600, duration: 1100, encodedBodySi
 estimator.sample(timing)
 selector.sample({ timing, bandwidth: ladder[2].bandwidth, duration: 2, bufferLevel: 6 })
 
-// The estimate is 6 Mbps. The upgrade pick at 0.7 * 6 Mbps bounds rung 3: 0.6 + 6 / 4.2 = 2.03 seconds, more than one segment.
+// The estimate is about 6 Mbps. The upgrade pick at 0.7 * 6 Mbps bounds rung 3: 0.6 + 6 / 4.2 = 2.03 seconds, more than one segment.
 // The pick stays at rung 2. Without this RFC the upgrade pick is rung 3, the highest rung at or below 4.2 Mbps.
 const { index } = selector.select({ ladder, bufferLevel: 6, throughput: estimator.getEstimate(), now: 1100, segmentDuration: 2 })
 ```
@@ -159,10 +159,10 @@ PR 588 defines the estimate, and this RFC does not change the estimate. The time
 ### Edge cases
 
 - Startup with no samples: the time to first byte is 0, and the pick is the pick of today. The first pick of an HLS session has no `segmentDuration`, because the media playlist arrives after the variant choice. That call takes the fallback.
-- Time to first byte at or above `segmentDuration / playbackRate`: no rung passes, and the search returns rung 0. dash.js 4 returned quality 0 in the same case.
-- Unknown throughput, `NaN`: BOLA skips the startup pick and the oscillation guard, as today. The throughput selector returns the current rung, as today.
+- Time to first byte at or above `segmentDuration / playbackRate`: no rung passes, and the search returns rung 0. In BOLA, the oscillation guard then caps every upward switch at the current rung. A BOLA session at rung 0 stays at rung 0 until the time to first byte falls. dash.js 4 returned quality 0 in the same case, and BOLA-O of dash.js 4 had the same cap through `getQualityForBitrate`.
+- Unknown throughput, `NaN`: BOLA picks rung 0 at startup and skips the oscillation guard, as today. The throughput selector returns the current rung, as today.
 - Throughput 0: the download time is infinite, and the pick is rung 0, as today.
-- `segmentDuration` present and `bufferLevel` 0: the search picks the sustainable rung. The guard then lowers the pick to rung 0, as today.
+- `segmentDuration` present and `bufferLevel` 0: the search picks the sustainable rung. In the throughput selector, no rung passes the first pass of the guard. The second pass keeps the highest rung at or below the pick whose download time is within `min(segmentDuration, starvationTolerance)`, as today. With the default tolerance and normal playback, segments of 4 seconds or less keep the sustainable rung. In BOLA, the guard has one pass and no tolerance. When the BOLA guard runs, the pick is rung 0, as today.
 - Ladder change in BOLA: the search runs over the distinct rungs of the rebuilt parameters, where `findRung` runs today.
 - Rounding: with a time to first byte of 0 the loop compares `bandwidth * segmentDuration / safeThroughput <= segmentDuration / playbackRate`. `findRung` compares `bandwidth <= safeThroughput / playbackRate`. The two bounds are equal and round differently. A test on an exact rung boundary needs a margin of 1 bps. The BOLA tests already use that margin.
 
@@ -193,9 +193,9 @@ One loop over the ladder per pick, with no allocation. A ladder has about 5 to 1
 ### Testing
 
 - Unit tests for `findSustainableRung`: the fallback equals `findRung`. A time to first byte of 0 matches `findRung` away from a boundary. A positive value lowers the rung. A value at the budget returns 0. Equal bandwidths return the highest position. The playback rate scales the budget.
-- Throughput selector: the issue 587 numbers, 14 Mbps, 800 ms, and 2 second segments. The pick is at or below 7.56 Mbps, where today the bound is 12.6 Mbps. The upgrade pick uses the bound. `ignoreTimeToFirstByte` removes the time to first byte from the pick and from the guard. A `select` call during a download returns the decision of the last sample. A call without `segmentDuration` is unchanged. Every existing test passes unchanged. No boundary margin was needed.
-- BOLA: the startup pick and the oscillation guard lower with the time to first byte. The buffer-based pick does not move. A time to first byte at the segment duration gives rung 0 at startup.
-- Simulation: the seeded playback simulation gains a time to first byte per download. The [analysis](./analysis.md) defines the scenarios and the metrics and holds the results against the PR 588 baseline. The analysis also holds the results of one run on an LG TV with the implementation branch.
+- Throughput selector: the issue 587 numbers, 14 Mbps, 800 ms, and 2 second segments. The pick is at or below 7.56 Mbps, where today the bound is 12.6 Mbps. The upgrade pick uses the bound. `ignoreTimeToFirstByte` removes the time to first byte from the pick and from the guard. A `select` call during a download treats the rung of the last sample as the current rung. A call without `segmentDuration` is unchanged. Every existing test passes unchanged. No boundary margin was needed.
+- BOLA: the startup pick and the oscillation guard lower with the time to first byte. The buffer-based pick does not change. A time to first byte at the segment duration gives rung 0 at startup.
+- Simulation: the seeded playback simulation gains a time to first byte per download. The [analysis](./analysis.md) defines the scenarios and the metrics and holds the results against the PR 588 baseline. The analysis also holds the results of one run on an LG TV with the implementation branch. The README shows the counted rows of both scenarios and drops the old runs. The analysis file keeps every row.
 
 ### Packaging
 
@@ -203,9 +203,10 @@ The change joins `libs/abr`. The release-prep PR bumps the version to 0.3.0. The
 
 ## Drawbacks
 
-- The picks change for every adopter whose timing has `responseStart`. The change is downward, and the size of the change is the time to first byte over the segment duration. With a time to first byte of 100 ms and 6 second segments, the bound is 1.7 percent lower. This change is inside the safety factor. With a time to first byte of 800 ms and 2 second segments, the bound is 40 percent lower.
+- The picks change for every adopter whose timing has `responseStart`. The change is downward, and the size of the change is the time to first byte over the segment duration. With a time to first byte of 100 ms and 6 second segments, the bound is 1.7 percent lower. That reduction is smaller than the safety margin. With a time to first byte of 800 ms and 2 second segments, the bound is 40 percent lower.
 - The model assumes one request at a time per media type. A player of the throughput selector whose request overlap hides the whole time to first byte sets `ignoreTimeToFirstByte`. A player that forgets the option picks too low. A BOLA player with overlapping requests has no option. The BOLA placeholder needs the `select` call after the previous `sample`.
 - The estimate is a mean of four samples. One slow response, such as an origin fetch, lowers the bound for four segments.
+- The safety factor scales the transfer term only. The time to first byte enters the download time as the mean, with no margin. A wait above the mean takes the difference from the buffer. Only the starvation guard catches that loss, and only at a low buffer.
 - The bound uses the `segmentDuration` of the call. A playlist with variable segment durations needs the duration of the next segment in each call. The input contract already asks for that duration.
 - In a low-latency stream with chunked transfer, the server sends the headers before the body exists. The transfer measure then includes the production wait and is not a link measure. The option does not repair the measure, because the wait before the headers is still time the download loses. Such a player needs a throughput estimate of the link, or omits `segmentDuration`.
 - Before this RFC ships, an adopter removes the time to first byte from the guard only by omitting `responseStart`. The option is public API and waits for this RFC. A BOLA adopter keeps only that path after this RFC.
@@ -213,9 +214,9 @@ The change joins `libs/abr`. The release-prep PR bumps the version to 0.3.0. The
 ## Rationale and alternatives
 
 - **Dead-time factor instead of a time search.** Solving the bound for the bandwidth gives `effectiveThroughput * factor * (1 - timeToFirstByte * playbackRate / segmentDuration)`, floored at 0, as a multiplier before `findRung`. The rung is the same, and the diff is smaller. The time search was chosen so that the pick and the guard call one function in code. The shared model is then visible outside this document.
-- **Keep the time to first byte inside the throughput measure.** This is the video.js model and the CML model before PR 588. The measure then depends on the size of the downloaded segment. A prediction for another rung scales the time to first byte by the bitrate ratio. Issue 587 shows the result.
+- **Keep the time to first byte inside the throughput measure.** That measure is the video.js model and the CML model before PR 588. The measure then depends on the size of the downloaded segment. A prediction for another rung scales the time to first byte by the bitrate ratio. Issue 587 shows the result.
 - **A time to first byte input on `BitrateSelectorInput`.** The player would estimate the time to first byte and pass the value. CML ships no estimator for the time to first byte. The selector already receives the timing of every download.
-- **A time to first byte estimator in `@svta/cml-throughput`.** This is the hls.js shape. `ThroughputEstimator` keeps one meaning, link throughput, and the selectors need no second estimator object. Listed under future possibilities.
+- **A time to first byte estimator in `@svta/cml-throughput`.** That estimator follows the hls.js design. `ThroughputEstimator` keeps one meaning, link throughput, and the selectors need no second estimator object. Listed under future possibilities.
 - **An exponentially weighted estimate.** hls.js keeps a TTFB EWMA with the slow half-life and a default of 100 ms. The hls.js weighting gives a slow response less weight. The estimate feeds a bound and a guard, where a slow sample errs toward safety. The mean of four needs no half-life and no default. dash.js uses the same mean.
 - **Other names for the option.** `overlappingRequests`, `sequentialRequests`, and `prefetch` name one reason. `deadTime` names the dash.js mechanism. `ignoreTimeToFirstByte` names the effect, and the TSDoc states the condition. The name does not bind the option to one reason.
 - **The option on BOLA too.** The draft had the option on both selectors. The one condition for the option needs a `select` call during a download. The BOLA placeholder counts that time as idle time. An option without a supported case invites a toggle for bitrate at the cost of stalls. A later RFC for overlapping requests can add the start time of the request in flight to the input. The option returns with it.
@@ -239,7 +240,6 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 
 1. **Playback rate in BOLA.** BOLA passes 1 to the search, as its rules ignore the rate today. Should the startup pick and the oscillation guard divide the budget by `playbackRate`?
 2. **Default of the option.** The default counts the time to first byte. Adopters of the throughput selector with overlapping requests get lower picks until they set the option. Is `false` the right default?
-3. **The README simulation.** Decided in the implementation: the README shows the counted rows of both scenarios and drops the old runs. The analysis file keeps every row.
 
 ## Future possibilities
 
@@ -254,6 +254,7 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 - v3 (2026-10-24): the simulation baseline is the PR 588 build. The option has one condition, a request overlap that hides the whole time to first byte.
 - v4 (2026-10-24): the option leaves `BolaSelectorOptions`, because BOLA needs the `select` call after the previous `sample`. The throughput selector accepts a call during a download.
 - v5 (2026-10-26): the analysis adds the results of one device run.
+- v6 (2026-10-26): review fixes. The edge case of an empty buffer is stated per selector. The Motivation presents the drain cycle as the projection of the model. The README decision moves from the unresolved questions to Testing.
 
 ## Final Decision
 
