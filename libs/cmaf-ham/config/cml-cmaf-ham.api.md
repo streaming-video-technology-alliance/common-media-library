@@ -293,7 +293,7 @@ export type Initialization = {
     };
 };
 
-// @internal (undocumented)
+// @internal
 export function iso8601DurationToNumber(isoDuration: string): number;
 
 // @alpha
