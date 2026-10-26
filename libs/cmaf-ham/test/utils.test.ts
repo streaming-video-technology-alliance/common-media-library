@@ -59,6 +59,8 @@ describe('iso8601DurationToNumber', () => {
 		equal(iso8601DurationToNumber('1H'), 0)
 		equal(iso8601DurationToNumber('PT1X'), 0)
 		equal(iso8601DurationToNumber('PT1H 2M'), 0)
+		equal(iso8601DurationToNumber('P1H'), 0)
+		equal(iso8601DurationToNumber('PTH1M'), 0)
 	})
 
 	it('ignores whitespace around the duration', () => {
