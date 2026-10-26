@@ -16,7 +16,7 @@ and this project adheres to
 
 - The starvation guard of both selectors adds the time to first byte to the download time of a rung. The value is the mean of `responseStart - startTime` over the last four finished samples. The guard ignores a sample whose `responseStart` is missing or outside the response ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
 - When a call has `segmentDuration`, the throughput selector picks the highest rung whose download fits in one segment. The download time is the time to first byte plus the transfer at `throughput * safetyFactor`. Before, the pick was the highest rung at or below `throughput * safetyFactor / playbackRate`.
-- The BOLA startup pick and oscillation guard bound the pick by the download time of one segment, as the throughput selector does. Before, both used the highest rung at or below `throughput * safetyFactor`. The buffer score, the placeholder, and the delay do not change.
+- The BOLA startup pick and oscillation guard bound the pick by the download time of one segment at `throughput * safetyFactor`, with a budget of `segmentDuration / playbackRate`. Before, both used the highest rung at or below `throughput * safetyFactor` and ignored `playbackRate`. The buffer score, the placeholder, and the delay do not change.
 - The README states that the throughput selector accepts a `select` call during a download and that BOLA does not.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.

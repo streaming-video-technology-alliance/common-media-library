@@ -1068,6 +1068,43 @@ describe('createBolaSelector', () => {
 			equal(decision.index, 2)
 		})
 
+		it('divides the startup budget by the playback rate', () => {
+			// At a safe throughput of 3 Mbps, rung 2 of L1 needs 6 / 3 = 2 s, the playback time of a 4 second segment at 2x. Rung 3 needs 4 s.
+			const decision = createBolaSelector().select({
+				...input,
+				bufferLevel: 0,
+				playbackRate: FAST_PLAYBACK_RATE,
+				now: 0,
+			})
+
+			equal(decision.state, BolaState.STARTUP)
+			equal(decision.index, 2)
+		})
+
+		it('divides the oscillation guard budget by the playback rate', () => {
+			// The guard scenario at 2x: the buffer picks rung 3, and the throughput sustains rung 2 in the playback time of one segment.
+			const decision = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL).select({
+				...input,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				playbackRate: FAST_PLAYBACK_RATE,
+				now: requestEnd(0),
+			})
+
+			equal(decision.index, 2)
+		})
+
+		it('divides the throughput by the playback rate without segmentDuration', () => {
+			const decision = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL).select({
+				ladder: L1,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				playbackRate: FAST_PLAYBACK_RATE,
+				now: requestEnd(0),
+			})
+
+			equal(decision.index, 2)
+		})
+
 		it('picks as before without segmentDuration', () => {
 			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
 
