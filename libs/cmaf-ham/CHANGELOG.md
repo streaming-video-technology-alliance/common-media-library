@@ -18,7 +18,7 @@ and this project adheres to
 
 ### Fixed
 
-- `getUrlFromTemplate` pads `$Number$` to the width of any `%0<width>d` format tag. Before, only `%04d` added zeros. `$Number%05d$` gave `1` instead of `00001`. The DASH muxer of FFmpeg uses `$Number%05d$` by default.
+- `dashToHam` now pads `$Number$` in segment URLs to the width of any `%0<width>d` format tag. `$Number%05d$` gives `00001` instead of `1`.
 
 ## [0.24.8] - 2026-10-18
 

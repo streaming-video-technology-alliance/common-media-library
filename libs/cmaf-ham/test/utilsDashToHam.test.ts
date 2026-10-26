@@ -408,6 +408,15 @@ describe('getUrlFromTemplate', () => {
 		equal(res, 'chunk-0-00003.m4s')
 	})
 
+	it('pads Number to the width of any format tag', () => {
+		const representation = { $: { id: '0' } } as Representation
+		const url = (media: string, segmentId: number) =>
+			getUrlFromTemplate(representation, { $: { media } } as SegmentTemplate, segmentId)
+		equal(url('$Number%04d$', 3), '0003')
+		equal(url('$Number%010d$', 3), '0000000003')
+		equal(url('$Number%02d$', 12345), '12345')
+	})
+
 	it('replaces both RepresentationID and Number', () => {
 		const res = getUrlFromTemplate(
 			{ $: { id: 'repId' } } as Representation,

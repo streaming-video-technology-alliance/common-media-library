@@ -1,6 +1,9 @@
 import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 import type { SegmentTemplate } from '../../../../types/mapper/dash/SegmentTemplate.ts'
 
+const TOKEN_PATTERN = /\$(.*?)\$/g
+const NUMBER_FORMAT_TAG_PATTERN = /Number%0(\d+)d/
+
 /**
  * @internal
  *
@@ -20,15 +23,11 @@ export function getUrlFromTemplate(
 	segmentTemplate: SegmentTemplate,
 	segmentId: number,
 ): string {
-	const regexTemplate = /\$(.*?)\$/g
-	return segmentTemplate.$.media.replace(regexTemplate, (match: string) => {
+	return segmentTemplate.$.media.replace(TOKEN_PATTERN, (match: string) => {
 		if (match.includes('RepresentationID')) {
 			return representation.$.id
 		}
-		/**
-		 * Number with a width format tag. `$Number%05d$` gives 00001.
-		 */
-		const width = /Number%0(\d+)d/.exec(match)?.[1]
+		const width = NUMBER_FORMAT_TAG_PATTERN.exec(match)?.[1]
 		if (width) {
 			return segmentId.toString().padStart(Number(width), '0')
 		}
