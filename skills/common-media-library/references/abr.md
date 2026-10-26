@@ -183,7 +183,7 @@ The decision has the `index` and the `delay` of every selector. It also has the 
 - A stall needs no call. The selector treats a `bufferLevel` of 0.3 seconds or less as a stall in the steady state.
 - A selector that never receives a `sample` stays in the startup state. A `sample` without a positive finite `duration` has the same effect.
 - Create one selector for each media type, such as audio and video.
-- The BOLA rules ignore `playbackRate`. The bound and the starvation guard read `segmentDuration`. Only the starvation guard reads `playbackRate`.
+- The BOLA buffer rules ignore `playbackRate`. The segment bound and the starvation guard divide their budgets by the rate, as the throughput selector does. Without `segmentDuration`, the startup pick and the oscillation guard use the highest rung at or below `throughput * safetyFactor / playbackRate`.
 
 ### How it works
 
@@ -279,7 +279,7 @@ BOLA picks higher rungs. Its average bitrate in the first table is 38% to 47% ab
   - A ladder with many rungs. Each distinct rung adds 2 seconds to the smallest buffer time, which is `10 + 2 * M` seconds for `M` rungs. A test ladder of 20 rungs with equal bandwidth ratios never picks its two lowest rungs.
   - A large `bufferTarget`.
   - Two lowest rungs with close bandwidths. A ladder of two rungs with the default `bufferTarget` always picks the upper rung when the bandwidth ratio is 1.8 or less.
-- **Playback rate.** The BOLA rules ignore `playbackRate`, as dash.js does. The starvation guard divides the buffer level by it.
+- **Playback rate.** The BOLA buffer rules ignore `playbackRate`, as dash.js does. The startup pick, the oscillation guard, and the starvation guard divide their budgets by the rate, as the throughput selector does.
 
 ### BOLA options
 
