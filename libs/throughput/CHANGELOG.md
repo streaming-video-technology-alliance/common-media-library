@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-26
+
 ### Added
 
 - `EwmaEstimatorOptions.minTransferDuration`: the shortest transfer, in milliseconds, that counts as a sample. A body that arrives within a few milliseconds of its headers came from a cache. shaka-player uses 5. Default 0 ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
@@ -110,7 +112,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.1.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.2.0...HEAD
+[1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.1.0...throughput-v1.2.0
 [1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.10...throughput-v1.1.0
 [1.0.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.9...throughput-v1.0.10
 [1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.8...throughput-v1.0.9
