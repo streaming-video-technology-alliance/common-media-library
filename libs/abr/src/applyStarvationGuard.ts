@@ -1,4 +1,5 @@
 import type { LadderRung } from './LadderRung.ts'
+import { downloadTime } from './downloadTime.ts'
 
 /**
  * Applies the starvation guard to a pick.
@@ -43,13 +44,4 @@ export function applyStarvationGuard(
 	}
 
 	return 0
-}
-
-function downloadTime(
-	rung: LadderRung,
-	segmentDuration: number,
-	safeThroughput: number,
-	timeToFirstByte: number,
-): number {
-	return timeToFirstByte + (rung.bandwidth * segmentDuration) / safeThroughput
 }

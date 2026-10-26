@@ -1,6 +1,6 @@
 /**
  * The default `safetyFactor` of the throughput selector.
- * The selector picks the highest rung at or below 0.9 times the effective throughput.
+ * The selector picks the highest rung whose download fits in one segment at 0.9 times the throughput.
  *
  * @beta
  */
