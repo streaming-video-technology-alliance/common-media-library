@@ -12,8 +12,8 @@ const SECONDS_IN_MINUTE = 60
  *
  * The function adds the days, hours, minutes, and seconds of the duration.
  * A year or a month has no fixed length in seconds, so the function ignores
- * the `Y` and `M` designators before the `T`. A string that is not an
- * ISO 8601 duration gives 0.
+ * the `Y` and `M` designators before the `T`. The function ignores whitespace
+ * around the duration. A string that is not an ISO 8601 duration gives 0.
  *
  * @param isoDuration - The ISO 8601 duration, such as `PT1H2M3S` or `P1DT2H`.
  * @returns The duration in seconds.
@@ -21,7 +21,7 @@ const SECONDS_IN_MINUTE = 60
  * @internal
  */
 export function iso8601DurationToNumber(isoDuration: string): number {
-	const match = DURATION_REGEX.exec(isoDuration)
+	const match = DURATION_REGEX.exec(isoDuration.trim())
 	if (!match) {
 		return 0
 	}

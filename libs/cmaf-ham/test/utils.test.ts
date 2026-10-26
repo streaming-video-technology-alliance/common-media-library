@@ -66,6 +66,11 @@ describe('iso8601DurationToNumber', () => {
 		equal(iso8601DurationToNumber('PT1H 2M'), 0)
 	})
 
+	it('ignores whitespace around the duration', () => {
+		equal(iso8601DurationToNumber(' PT60S '), 60)
+		equal(iso8601DurationToNumber('\tPT1M\n'), 60)
+	})
+
 	it('runs in linear time on adversarial input', () => {
 		const start = performance.now()
 		equal(iso8601DurationToNumber(','.repeat(50_000)), 0)
