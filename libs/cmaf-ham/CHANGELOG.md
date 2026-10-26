@@ -16,6 +16,7 @@ and this project adheres to
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The overview in `src/README.md` links the documentation at https://cml.svta.org/.
 - `getUrlFromTemplate` and `getInitializationUrl` resolve the segment URL templates with `processUriTemplate` from `@svta/cml-dash`, a new peer dependency. The templates now resolve `$Bandwidth$`, `$Time$`, `$$`, and a `%0<width>d` tag of any width, so `$Number%05d$` gives `00001` instead of `1`. A token outside the template grammar, such as `$Number%d$`, stays in the URL unchanged instead of becoming the plain number.
+- The DASH and HLS mapper helpers write nothing to the console. `getCodec`, `getSar`, `getContentType`, `getChannels`, `getFrameRate`, `getSampleRate`, `getLanguage`, `mapSegments`, `getDuration`, and `parseHlsManifest` return their documented default for a missing value, without a log. Before, each of these helpers also wrote an error or info line to the console.
 
 ### Fixed
 

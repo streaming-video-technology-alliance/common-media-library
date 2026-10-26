@@ -6,13 +6,8 @@ import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.
  * Get the language from an adaptation set.
  *
  * @param adaptationSet - AdaptationSet to get the language from
- * @returns language of the content
+ * @returns language of the content. In case it is not present, returns `und`.
  */
 export function getLanguage(adaptationSet: AdaptationSet): string {
-	let language = adaptationSet.$.lang
-	if (!language) {
-		console.info(`AdaptationSet ${adaptationSet.$.id} has no lang, using "und" as default`)
-		language = 'und'
-	}
-	return language
+	return adaptationSet.$.lang || 'und'
 }

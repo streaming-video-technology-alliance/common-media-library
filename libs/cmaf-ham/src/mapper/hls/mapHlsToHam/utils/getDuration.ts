@@ -8,14 +8,13 @@ import type { SegmentHls } from '../../../../types/mapper/hls/SegmentHls.ts'
  *
  * @param manifest - Manifest of the track
  * @param segments - Array of segments in a track
- * @returns duration of a track
+ * @returns duration of a track. In case the manifest has no `targetDuration`, returns `null`.
  *
  * @alpha
  */
 export function getDuration(manifest: HlsManifest, segments: SegmentHls[]): number | null {
 	if (!manifest?.targetDuration) {
-		console.error('Could not calculate duration, manifest is undefined.')
 		return null
 	}
-	return manifest?.targetDuration * segments.length
+	return manifest.targetDuration * segments.length
 }

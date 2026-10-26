@@ -8,12 +8,8 @@ import type { Representation } from '../../../../types/mapper/dash/Representatio
  *
  * @param adaptationSet - AdaptationSet to try to get the codec from
  * @param representation - Representation to try to get the codec from
- * @returns Content codec
+ * @returns Content codec. In case it is not present, returns empty string.
  */
 export function getCodec(adaptationSet: AdaptationSet, representation: Representation): string {
-	const codec = representation.$.codecs ?? adaptationSet.$.codecs ?? ''
-	if (!codec) {
-		console.error(`Representation ${representation.$.id} has no codecs`)
-	}
-	return codec
+	return representation.$.codecs ?? adaptationSet.$.codecs ?? ''
 }

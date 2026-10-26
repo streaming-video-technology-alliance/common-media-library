@@ -22,7 +22,7 @@ import { mapSegmentTemplate } from './mapSegmentTemplate.ts'
  * @param adaptationSet - AdaptationSet to get the segments from
  * @param representation - Representation to get the segments from
  * @param duration - Duration of the segments
- * @returns list of ham segments
+ * @returns list of ham segments. In case the representation has no segments, returns an empty list.
  */
 export function mapSegments(
 	adaptationSet: AdaptationSet,
@@ -35,12 +35,12 @@ export function mapSegments(
 		adaptationSet.SegmentList ?? representation.SegmentList
 	if (representation.SegmentBase) {
 		return mapSegmentBase(representation, duration)
-	} else if (segmentList) {
-		return mapSegmentList(segmentList)
-	} else if (segmentTemplate) {
-		return mapSegmentTemplate(representation, duration, segmentTemplate)
-	} else {
-		console.error(`Representation ${representation.$.id} has no segments`)
-		return [] as Segment[]
 	}
+	if (segmentList) {
+		return mapSegmentList(segmentList)
+	}
+	if (segmentTemplate) {
+		return mapSegmentTemplate(representation, duration, segmentTemplate)
+	}
+	return []
 }
