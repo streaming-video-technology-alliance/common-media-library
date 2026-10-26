@@ -133,13 +133,14 @@ The per-request log of the counted soak verifies the model.
 
 | Quantity | Value |
 |---|---|
-| Decisions in the live soak | 428 |
-| Decisions that returned the top content rung | 427 |
+| Decisions in the live soak | 428: 362 on the content ladder and 66 inside ad pods |
+| Content decisions that returned the top content rung | 361 of 362 |
+| Ad pod decisions that returned the top rung of the ad ladder | 66 of 66 |
 | Download time of the top content rung in steady state | 1.8 to 2.6 seconds of a 6.0 second budget |
-| The one guard decision, at 1.2 seconds with a buffer of 2.0 seconds | 2000k needs 2.21 seconds with the time to first byte and 1.57 seconds without. The pick was 1100k for one segment. |
+| The one guard decision: the second decision of the soak, 1.2 seconds after the first, with 2.0 seconds buffered | 2000k needs 2.21 seconds with the time to first byte and 1.57 seconds without. The pick was 1100k for one segment. |
 | Decisions in the VOD soak that returned the top rung | 189 of 189 |
 
-The segment bound decided no pick on this device, because the content ladder stops at 2000k. The starvation guard decided one pick, and the time to first byte was the deciding term. The ignored arm kept the top rung at the same point. The baseline lost the top content rung for 95 seconds of its first soak. The baseline estimate had fallen below the 2.4 Mbps that the rung needs. The counted arm kept the top content rung in every other decision. The ignored arm never left the top content rung after the first segment.
+The segment bound decided no pick on this device, because the content ladder stops at 2000k. The starvation guard decided one pick, a content decision, and the time to first byte was the deciding term. The ignored arm kept the top rung at the same point. The baseline lost the top content rung for 95 seconds of its first soak. The baseline estimate had fallen below the 2.4 Mbps that the rung needs. The counted arm kept the top content rung in every other content decision and the top ad rung in every ad pod decision. The ignored arm never left the top content rung after the first segment.
 
 The run has limits. One soak per arm is a sample of one, and the two baseline soaks differ by five content switches. On a device that plays the 8000k rung, the bound decides picks. The table below shows the download times of two rungs for one example estimate. The run also found a defect of the player at period boundaries, outside this RFC.
 
