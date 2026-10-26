@@ -1,7 +1,13 @@
 import { deepStrictEqual, equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
-import type { AdaptationSet, Period, Representation, SegmentTemplate } from '@svta/cml-cmaf-ham'
+import type {
+	AdaptationSet,
+	DashManifest,
+	Period,
+	Representation,
+	SegmentTemplate,
+} from '@svta/cml-cmaf-ham'
 
 import { getInitializationUrl } from '../src/mapper/dash/mapDashToHam/utils/getInitializationUrl.ts'
 
@@ -14,6 +20,7 @@ import {
 	getGroup,
 	getLanguage,
 	getNumberOfSegments,
+	getPeriodDuration,
 	getPresentationId,
 	getSampleRate,
 	getSar,
@@ -296,6 +303,47 @@ describe('getNumberOfSegments', () => {
 			50,
 		)
 		equal(res, 5)
+	})
+})
+
+describe('getPeriodDuration', () => {
+	it('returns the duration of the Period', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { duration: 'PT10S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 10)
+	})
+
+	it('returns the time to the start of the next Period if the Period has no duration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT0S' } }, { $: { start: 'PT12S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 12)
+	})
+
+	it('returns the time to the end of the presentation if the last Period has no duration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT0S' } }, { $: { start: 'PT12S' } }],
+				},
+			} as DashManifest,
+			1,
+		)
+		equal(res, 18)
 	})
 })
 

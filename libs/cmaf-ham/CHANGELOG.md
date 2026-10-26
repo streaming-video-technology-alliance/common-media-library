@@ -25,6 +25,7 @@ and this project adheres to
 ### Fixed
 
 - `iso8601DurationToNumber` adds the days of a duration and reads the minutes after the `T` designator. Before, `P1DT1H` gave 3600 and `P0Y0M0DT0H1M30.000S` gave 30.
+- `dashToHam` gives the correct duration to a Period without a `duration` attribute. The Period ends at the start of the next Period. The last Period ends at the `mediaPresentationDuration` of the MPD. Before, the duration of such a Period was 0, so a `SegmentTemplate` track had no segments. The DASH muxer of FFmpeg writes a Period without a `duration` attribute.
 
 ## [0.24.8] - 2026-10-18
 

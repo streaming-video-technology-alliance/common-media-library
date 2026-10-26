@@ -213,6 +213,9 @@ export function getLanguage(adaptationSet: AdaptationSet): string;
 // @internal
 export function getNumberOfSegments(segmentTemplate: SegmentTemplate, duration: number): number;
 
+// @internal
+export function getPeriodDuration(dash: DashManifest, index: number): number;
+
 // @alpha
 export function getPlaylistData(track: AudioTrack | VideoTrack): string;
 
