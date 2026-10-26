@@ -17,6 +17,10 @@ and this project adheres to
 - The overview in `src/README.md` links the documentation at https://cml.svta.org/.
 - `getUrlFromTemplate` and `getInitializationUrl` resolve the segment URL templates with `processUriTemplate` from `@svta/cml-dash`, a new peer dependency. The templates now resolve `$Bandwidth$`, `$Time$`, `$$`, and a `%0<width>d` tag of any width, so `$Number%05d$` gives `00001` instead of `1`. A token outside the template grammar, such as `$Number%d$`, stays in the URL unchanged instead of becoming the plain number.
 
+### Fixed
+
+- `iso8601DurationToNumber` adds the days of a duration and reads the minutes after the `T` designator. Before, `P1DT1H` gave 3600 and `P0Y0M0DT0H1M30.000S` gave 30. The function ignores the years and months of a duration.
+
 ## [0.24.8] - 2026-10-18
 
 ### Changed
