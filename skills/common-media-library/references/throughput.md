@@ -45,7 +45,7 @@ console.log(estimator.getEstimate());
 
 ## Samples
 
-A sample needs an `encodedBodySize` above 0 and a `duration` above 0. The estimators ignore every other sample, and the estimate does not change.
+A sample needs an `encodedBodySize` above 0 and a transfer duration above 0. The transfer runs from `responseStart` to the end of the response when the sample has `responseStart`, and over `duration` otherwise. The wait for the first byte is not part of the transfer. `EwmaEstimator` also weights each sample by its transfer. The estimators ignore every other sample, and the estimate does not change.
 
 A player can pass `PerformanceResourceTiming` entries as samples. For a cross-origin segment, the browser decides whether the entry has a body size:
 
@@ -96,6 +96,7 @@ export type EwmaEstimatorOptions = {
     defaultEstimate?: number;
     minTotalBytes?: number;
     minBodySize?: number;
+    minTransferDuration?: number;
     fastHalfLife: number;
     slowHalfLife: number;
 };

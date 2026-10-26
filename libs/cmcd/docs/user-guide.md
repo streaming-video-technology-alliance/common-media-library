@@ -481,7 +481,7 @@ The method accepts a `CommonMediaResponse` object and derives the following keys
 | `url`  | The requested URL (without CMCD) | `response.request.url` (CMCD query param stripped) |
 | `rc`   | HTTP response status code        | `response.status`                                  |
 | `ts`   | Request initiation timestamp     | `response.resourceTiming.startTime`                |
-| `ttfb` | Time to first byte (ms)          | `responseStart - startTime`                        |
+| `ttfb` | Time to first byte (ms)          | `responseStart - startTime`, omitted when `responseStart` is outside the response |
 | `ttlb` | Time to last byte (ms)           | `response.resourceTiming.duration`                 |
 
 ```typescript

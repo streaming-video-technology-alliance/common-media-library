@@ -89,7 +89,7 @@ The player follows these rules:
 The selector divides the throughput by `playbackRate` to get the effective throughput. It picks the highest rung at or below `effectiveThroughput * safetyFactor`. When no rung is at or below that value, the pick is rung 0. Two rules refine the pick:
 
 - **Hysteresis.** An upgrade needs a larger margin than a downgrade. If the pick is above the current rung, the selector recomputes the pick with `effectiveThroughput * upgradeFactor`. It then returns the higher of the current rung and that pick. The current rung is the bandwidth of the last `sample` that was not aborted. The selector maps that bandwidth to the highest rung at or below it in the ladder of the call. When no rung qualifies, the current rung is rung 0.
-- **Starvation guard.** The guard runs when the player passes `segmentDuration`. The selector estimates the download time of a rung as `bandwidth * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. The first pass keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. If no rung passes, the second pass adds `min(segmentDuration, starvationTolerance)` to that budget and keeps the highest rung within it. Rung 0 passes the second pass in every case. A live player omits `segmentDuration` to skip the guard, as hls.js skips the check near the live edge.
+- **Starvation guard.** The guard runs when the player passes `segmentDuration`. The selector estimates the download time of a rung as `timeToFirstByte + bandwidth * segmentDuration / (throughput * safetyFactor)`, with the network throughput and not the effective throughput. `timeToFirstByte` is the mean time to first byte, in seconds, over the last four samples that were not aborted. The time to first byte of a sample is `responseStart - startTime` of its `timing`. The selector ignores a sample whose `responseStart` is missing or outside the response. Without such samples, `timeToFirstByte` is 0. hls.js adds its own time to first byte estimate to the same check. The first pass keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. If no rung passes, the second pass adds `min(segmentDuration, starvationTolerance)` to that budget and keeps the highest rung within it. Rung 0 passes the second pass in every case. A live player omits `segmentDuration` to skip the guard, as hls.js skips the check near the live edge.
 
 When the throughput is unknown, the selector returns the current rung, or rung 0 before the first sample. A throughput of 0 is a measurement, so the pick is rung 0. The delay is always 0.
 
@@ -140,6 +140,7 @@ The defaults follow the players:
 | Upgrade factor | 0.7 | 0.7 (`abrBandWidthUpFactor`) | 0.85 (`bandwidthUpgradeTarget`) | none |
 | Starvation guard | two passes | two passes | no | separate rule |
 | Starvation tolerance | 4 s | 4 s (`maxStarvationDelay`) | none | none |
+| Time to first byte in the guard | mean of 4 samples | EWMA (`getEstimateTTFB`) | none | none |
 | Minimum switch interval | none | none | 8 s (`switchInterval`) | none |
 
 The shaka-player targets are band edges around each rung and do not depend on the current rung. Its hysteresis is the switch interval.
@@ -197,7 +198,7 @@ The starvation guard is the guard of the throughput selector, with one pass. It 
 - The throughput is known.
 - Two samples have finished since the last `reset`. An aborted sample does not count.
 
-The guard estimates the download time of a rung as `bandwidth * segmentDuration / (throughput * starvationSafetyFactor)`. It keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. Rung 0 always passes. The guard never raises a pick. A lowered pick becomes the current rung, and the call returns no delay.
+The guard estimates the download time of a rung as `timeToFirstByte + bandwidth * segmentDuration / (throughput * starvationSafetyFactor)`. `timeToFirstByte` is the mean time to first byte over the last four finished samples, as in the throughput selector. It keeps the highest rung, at or below the pick, whose download time is within `bufferLevel / playbackRate`. Rung 0 always passes. The guard never raises a pick. A lowered pick becomes the current rung, and the call returns no delay.
 
 The guard has its own factor. One download varies more than the smoothed estimate, so the default is 0.7 and not 0.9. The guard binds only when the real buffer is low, so the larger margin costs little bitrate.
 
@@ -216,7 +217,7 @@ The selector reads these fields of a `SegmentSample`:
 | Field | Use |
 |---|---|
 | `bandwidth` | Sets the current rung. For an aborted sample, it locates the aborted rung. The selector ignores a value that is not finite. |
-| `timing` | The end of the request, `startTime + duration`, starts the clock of the placeholder. An aborted request ends at the abort. The request `duration` gives the buffer level at the start of the request. |
+| `timing` | The end of the request, `startTime + duration`, starts the clock of the placeholder. An aborted request ends at the abort. The request `duration` gives the buffer level at the start of the request. A finished sample adds its time to first byte, `responseStart - startTime`, to the mean that the starvation guard uses. |
 | `duration` | Moves the selector to the steady state, and sizes the growth for a replacement segment. A value that is not a positive finite number keeps the startup state. |
 | `bufferLevel` | Decays and caps the placeholder. In the steady state, 0.3 seconds or less is a stall. |
 | `isReplacement` | Adds `duration` to the placeholder. |

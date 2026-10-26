@@ -25,6 +25,7 @@ import {
 	STARVATION_GUARD_SAMPLE_COUNT,
 	THRESHOLD_TOLERANCE,
 } from '../src/BOLA_CONSTANTS.ts'
+import { TIME_TO_FIRST_BYTE_SAMPLE_COUNT } from '../src/TIME_TO_FIRST_BYTE_SAMPLE_COUNT.ts'
 import {
 	bolaMaximumBuffers,
 	bolaThresholds,
@@ -82,6 +83,10 @@ const VERY_SHORT_BUFFER_LEVEL = 0.5
 const RECOVERED_BUFFER_LEVEL = 10
 const STRICT_STARVATION_FACTOR = 0.5
 const RELAXED_STARVATION_FACTOR = 0.9
+// A time to first byte that makes the download of rung 3 exceed `TIME_TO_FIRST_BYTE_BUFFER_LEVEL`. Without it, the download fits.
+const TIME_TO_FIRST_BYTE_MS = 300
+const LONG_TIME_TO_FIRST_BYTE_MS = 20_000
+const TIME_TO_FIRST_BYTE_BUFFER_LEVEL = 5.3
 const FAST_PLAYBACK_RATE = 2
 const INVALID_PLAYBACK_RATES = [0, -1, NaN, Infinity]
 
@@ -131,6 +136,20 @@ function load(
 		bufferLevel,
 		...extra,
 	})
+}
+
+// Reports `TIME_TO_FIRST_BYTE_SAMPLE_COUNT` finished segments of rung 3 with a time to first byte of `TIME_TO_FIRST_BYTE_MS`.
+function loadTimeToFirstByteSamples(selector: BitrateSelector): void {
+	for (let i = 0; i < TIME_TO_FIRST_BYTE_SAMPLE_COUNT; i++) {
+		load(selector, L1_BANDWIDTHS[3], TIME_TO_FIRST_BYTE_BUFFER_LEVEL, 0, {
+			timing: {
+				startTime: 0,
+				responseStart: TIME_TO_FIRST_BYTE_MS,
+				duration: DOWNLOAD_DURATION,
+				encodedBodySize: 1,
+			},
+		})
+	}
 }
 
 // Moves a selector from the startup state to the steady state. One segment is loaded and the buffer holds one segment.
@@ -779,6 +798,73 @@ describe('createBolaSelector', () => {
 
 		it('treats a throughput of 0 as a measurement', () => {
 			equal(decide(HEALTHY_BUFFER_LEVEL, { throughput: 0 }).index, 0)
+		})
+
+		it('adds the mean time to first byte of the last four finished samples to the download time', () => {
+			// At the default factor, rung 3 needs 5.1 s to download one segment. The time to first byte makes it 5.4 s.
+			const selector = createEmptyPlaceholderSelector()
+
+			loadTimeToFirstByteSamples(selector)
+
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decide(TIME_TO_FIRST_BYTE_BUFFER_LEVEL).index, 3)
+			equal(decision.index, 2)
+		})
+
+		it('ignores the time to first byte of an aborted sample', () => {
+			const selector = createEmptyPlaceholderSelector()
+
+			loadTimeToFirstByteSamples(selector)
+			// An aborted download of rung 4 with a time to first byte of 20 s. Rung 3 replaces it as the current rung.
+			load(selector, L1_BANDWIDTHS[4], TIME_TO_FIRST_BYTE_BUFFER_LEVEL, 0, {
+				timing: {
+					startTime: 0,
+					responseStart: LONG_TIME_TO_FIRST_BYTE_MS,
+					duration: LONG_TIME_TO_FIRST_BYTE_MS + DOWNLOAD_DURATION,
+					encodedBodySize: 1,
+				},
+				aborted: true,
+			})
+
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: LONG_TIME_TO_FIRST_BYTE_MS + DOWNLOAD_DURATION + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decision.index, 2)
+		})
+
+		it('forgets the time to first byte samples after a reset', () => {
+			const selector = createEmptyPlaceholderSelector()
+
+			loadTimeToFirstByteSamples(selector)
+			selector.reset()
+			reachSteadyState(selector, throughputFor(1))
+			selector.select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: requestEnd(0) })
+			load(selector, L1_BANDWIDTHS[3], TIME_TO_FIRST_BYTE_BUFFER_LEVEL)
+
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decision.index, 3)
 		})
 
 		it('does not run in the startup state, even after two finished samples', () => {
