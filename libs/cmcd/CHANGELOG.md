@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.8.4] - 2026-10-26
+
 ### Changed
 
 - `recordResponseReceived` derives `ttfb` with `getTimeToFirstByte` from `@svta/cml-utils`. The report omits `ttfb` when `responseStart` is before `startTime` or after the end of the response, or when `duration` is missing. Before, the report held `responseStart - startTime` for any `responseStart` ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587)).
@@ -346,7 +348,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.3...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.4...HEAD
+[2.8.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.3...cmcd-v2.8.4
 [2.8.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.2...cmcd-v2.8.3
 [2.8.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.1...cmcd-v2.8.2
 [2.8.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.0...cmcd-v2.8.1

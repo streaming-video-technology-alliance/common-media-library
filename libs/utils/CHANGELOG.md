@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-26
+
 ### Added
 
 - `getTransferDuration` returns the milliseconds from `responseStart` to the end of a `ResourceTiming` sample, or `duration` when the sample has no `responseStart` ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
@@ -113,7 +115,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...HEAD
+[1.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.2...utils-v1.7.0
 [1.6.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...utils-v1.6.2
 [1.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.6.1
 [1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...utils-v1.6.0

@@ -1,5 +1,7 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-abr@0.3.0
+implementation-pr: https://github.com/streaming-video-technology-alliance/common-media-library/pull/591
 ---
 
 # RFC: Download-time model for the bitrate selectors (`@svta/cml-abr`)
