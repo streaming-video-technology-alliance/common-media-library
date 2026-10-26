@@ -9,13 +9,13 @@ status: draft
 | **Author** | Casey Occhialini |
 | **Date** | 2026-10-23 |
 | **Package** | `@svta/cml-abr` |
-| **Breaking change** | No (one new optional field, changed picks for samples with `responseStart`) |
+| **Breaking change** | No (one new optional field, changed picks for samples with `responseStart` and for BOLA at a playback rate other than 1) |
 
 ## Summary
 
 This RFC proposes one download-time model for both selectors of `@svta/cml-abr`. A rung's download time is the time to first byte plus the transfer of one segment at the safe throughput. The starvation guard already tests that time against the buffer. This RFC also tests that time against the segment duration. A pick must download in less time than one segment plays. A rung that fails that test is not sustainable, and the selector picks the highest rung that passes.
 
-The change lowers the pick when the time to first byte is a large part of the segment duration. No other rule changes. `ThroughputSelectorOptions` gains `ignoreTimeToFirstByte`. The boolean removes the time to first byte from the pick and from the guard of the throughput selector.
+The change lowers the pick when the time to first byte is a large part of the segment duration. BOLA also divides the budget of its startup pick and its oscillation guard by the playback rate. No other rule changes. `ThroughputSelectorOptions` gains `ignoreTimeToFirstByte`. The boolean removes the time to first byte from the pick and from the guard of the throughput selector.
 
 ```ts
 import { createThroughputSelector } from '@svta/cml-abr'
@@ -139,14 +139,14 @@ Without a segment duration the function returns the pick of today, `findRung(lad
 | Throughput | Safety pick | `findRung(ladder, effectiveThroughput * safetyFactor)` | `findSustainableRung(ladder, throughput * safetyFactor, playbackRate, segmentDuration, timeToFirstByte)` |
 | Throughput | Upgrade pick | `findRung(ladder, effectiveThroughput * upgradeFactor)` | The same call with `upgradeFactor` |
 | Throughput | Starvation guard | Download time against the buffer, two passes | Unchanged |
-| BOLA | Startup pick | `findRung(rungs, throughput * safetyFactor)` | `findSustainableRung(rungs, throughput * safetyFactor, 1, segmentDuration, timeToFirstByte)` |
+| BOLA | Startup pick | `findRung(rungs, throughput * safetyFactor)` | `findSustainableRung(rungs, throughput * safetyFactor, playbackRate, segmentDuration, timeToFirstByte)` |
 | BOLA | Oscillation guard | `findRung(rungs, throughput * safetyFactor)` | The same call |
 | BOLA | Starvation guard | Download time against the buffer, one pass | Unchanged |
 | BOLA | Buffer score, placeholder, delay, stalls, aborts | | Unchanged |
 
 The hysteresis of the throughput selector keeps its rule. Above the current rung, the selector keeps the higher of the current rung and the upgrade pick. The search is monotonic in the safe throughput, so the upgrade pick stays at or below the safety pick. The existing `upgradeFactor <= safetyFactor` validation keeps that order.
 
-BOLA passes a playback rate of 1. The BOLA rules ignore `playbackRate`, and the BOLA guard reads the field, both as today. The README states the rule.
+BOLA passes the `playbackRate` of the input to the search. The BOLA buffer rules ignore the rate, as today. Every download-time check of both selectors divides its budget by the rate. Without `segmentDuration`, the BOLA search returns the highest rung at or below `throughput * safetyFactor / playbackRate`. A BOLA pick at a rate other than 1 therefore changes without the segment duration too. The README states the rule.
 
 ### The time to first byte
 
@@ -182,7 +182,7 @@ Nothing else in the API report changes. `findSustainableRung`, `downloadTime`, a
 ### Differences from dash.js 4
 
 - dash.js 4 scaled the bitrate in `getQualityForBitrate`, for every rule. This RFC bounds the pick in the two selectors, at the sites in the table above.
-- dash.js 4 ignored the playback rate. The throughput selector divides the budget by `playbackRate`. BOLA passes 1.
+- dash.js 4 ignored the playback rate. Both selectors divide the budget by `playbackRate`.
 - dash.js averages the latency of the last four requests, and so does this RFC. dash.js 4 applied the scaling only when `useDeadTimeLatency` was true. The CML option has the opposite sense and the same default behavior.
 - dash.js 5 computes the average and uses the average in no rule.
 
@@ -194,7 +194,7 @@ One loop over the ladder per pick, with no allocation. A ladder has about 5 to 1
 
 - Unit tests for `findSustainableRung`: the fallback equals `findRung`. A time to first byte of 0 matches `findRung` away from a boundary. A positive value lowers the rung. A value at the budget returns 0. Equal bandwidths return the highest position. The playback rate scales the budget.
 - Throughput selector: the issue 587 numbers, 14 Mbps, 800 ms, and 2 second segments. The pick is at or below 7.56 Mbps, where today the bound is 12.6 Mbps. The upgrade pick uses the bound. `ignoreTimeToFirstByte` removes the time to first byte from the pick and from the guard. A `select` call during a download treats the rung of the last sample as the current rung. A call without `segmentDuration` is unchanged. Every existing test passes unchanged. No boundary margin was needed.
-- BOLA: the startup pick and the oscillation guard lower with the time to first byte. The buffer-based pick does not change. A time to first byte at the segment duration gives rung 0 at startup.
+- BOLA: the startup pick and the oscillation guard lower with the time to first byte. The buffer-based pick does not change. A time to first byte at the segment duration gives rung 0 at startup. The playback rate divides the budget of the startup pick and the oscillation guard, with and without `segmentDuration`.
 - Simulation: the seeded playback simulation gains a time to first byte per download. The [analysis](./analysis.md) defines the scenarios and the metrics and holds the results against the PR 588 baseline. The analysis also holds the results of one run on an LG TV with the implementation branch. The README shows the counted rows of both scenarios and drops the old runs. The analysis file keeps every row.
 
 ### Packaging
@@ -238,8 +238,7 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 
 ## Unresolved questions
 
-1. **Playback rate in BOLA.** BOLA passes 1 to the search, as its rules ignore the rate today. Should the startup pick and the oscillation guard divide the budget by `playbackRate`?
-2. **Default of the option.** The default counts the time to first byte. Adopters of the throughput selector with overlapping requests get lower picks until they set the option. Is `false` the right default?
+1. **Default of the option.** The default counts the time to first byte. Adopters of the throughput selector with overlapping requests get lower picks until they set the option. Is `false` the right default?
 
 ## Future possibilities
 
@@ -255,7 +254,10 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 - v4 (2026-10-24): the option leaves `BolaSelectorOptions`, because BOLA needs the `select` call after the previous `sample`. The throughput selector accepts a call during a download.
 - v5 (2026-10-26): the analysis adds the results of one device run.
 - v6 (2026-10-26): review fixes. The edge case of an empty buffer is stated per selector. The Motivation presents the drain cycle as the projection of the model. The README decision moves from the unresolved questions to Testing.
+- v7 (2026-10-26): BOLA divides the download-time budget by `playbackRate`. The playback rate question is decided.
 
 ## Final Decision
 
-Pending community review.
+The playback rate question was decided on 2026-10-26. BOLA divides the budget of the startup pick and the oscillation guard by `playbackRate`, as the throughput selector does. The two sites are throughput checks and not buffer rules, and the BOLA starvation guard already divides its budget by the rate. With a constant rate of 1, a viewer at 2x gets a startup pick that the link cannot sustain. The picks then cycle through the guard. The implementation PR has the change.
+
+The option default and the acceptance are pending community review.
