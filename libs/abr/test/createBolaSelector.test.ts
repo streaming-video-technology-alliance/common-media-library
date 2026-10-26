@@ -25,6 +25,7 @@ import {
 	STARVATION_GUARD_SAMPLE_COUNT,
 	THRESHOLD_TOLERANCE,
 } from '../src/BOLA_CONSTANTS.ts'
+import { TIME_TO_FIRST_BYTE_SAMPLE_COUNT } from '../src/TIME_TO_FIRST_BYTE_SAMPLE_COUNT.ts'
 import {
 	bolaMaximumBuffers,
 	bolaThresholds,
@@ -82,8 +83,14 @@ const VERY_SHORT_BUFFER_LEVEL = 0.5
 const RECOVERED_BUFFER_LEVEL = 10
 const STRICT_STARVATION_FACTOR = 0.5
 const RELAXED_STARVATION_FACTOR = 0.9
+// A time to first byte that makes the download of rung 3 exceed `TIME_TO_FIRST_BYTE_BUFFER_LEVEL`. Without it, the download fits.
+const TIME_TO_FIRST_BYTE_MS = 300
+const LONG_TIME_TO_FIRST_BYTE_MS = 20_000
+const TIME_TO_FIRST_BYTE_BUFFER_LEVEL = 5.3
 const FAST_PLAYBACK_RATE = 2
 const INVALID_PLAYBACK_RATES = [0, -1, NaN, Infinity]
+// The number of samples that fill the time to first byte window.
+const FIRST_SAMPLE_COUNT = TIME_TO_FIRST_BYTE_SAMPLE_COUNT
 
 // The ladder change scenario. The selector is at rung 2 of L1. The real buffer is 7 s and the placeholder is 4 s.
 const LADDER_CHANGE_BUFFER_LEVEL = 7
@@ -131,6 +138,20 @@ function load(
 		bufferLevel,
 		...extra,
 	})
+}
+
+// Reports `TIME_TO_FIRST_BYTE_SAMPLE_COUNT` finished segments of rung 3 with a time to first byte of `TIME_TO_FIRST_BYTE_MS`.
+function loadTimeToFirstByteSamples(selector: BitrateSelector): void {
+	for (let i = 0; i < TIME_TO_FIRST_BYTE_SAMPLE_COUNT; i++) {
+		load(selector, L1_BANDWIDTHS[3], TIME_TO_FIRST_BYTE_BUFFER_LEVEL, 0, {
+			timing: {
+				startTime: 0,
+				responseStart: TIME_TO_FIRST_BYTE_MS,
+				duration: DOWNLOAD_DURATION,
+				encodedBodySize: 1,
+			},
+		})
+	}
 }
 
 // Moves a selector from the startup state to the steady state. One segment is loaded and the buffer holds one segment.
@@ -781,6 +802,73 @@ describe('createBolaSelector', () => {
 			equal(decide(HEALTHY_BUFFER_LEVEL, { throughput: 0 }).index, 0)
 		})
 
+		it('adds the mean time to first byte of the last four finished samples to the download time', () => {
+			// At the default factor, rung 3 needs 5.1 s to download one segment. The time to first byte makes it 5.4 s.
+			const selector = createEmptyPlaceholderSelector()
+
+			loadTimeToFirstByteSamples(selector)
+
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decide(TIME_TO_FIRST_BYTE_BUFFER_LEVEL).index, 3)
+			equal(decision.index, 2)
+		})
+
+		it('ignores the time to first byte of an aborted sample', () => {
+			const selector = createEmptyPlaceholderSelector()
+
+			loadTimeToFirstByteSamples(selector)
+			// An aborted download of rung 4 with a time to first byte of 20 s. Rung 3 replaces it as the current rung.
+			load(selector, L1_BANDWIDTHS[4], TIME_TO_FIRST_BYTE_BUFFER_LEVEL, 0, {
+				timing: {
+					startTime: 0,
+					responseStart: LONG_TIME_TO_FIRST_BYTE_MS,
+					duration: LONG_TIME_TO_FIRST_BYTE_MS + DOWNLOAD_DURATION,
+					encodedBodySize: 1,
+				},
+				aborted: true,
+			})
+
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: LONG_TIME_TO_FIRST_BYTE_MS + DOWNLOAD_DURATION + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decision.index, 2)
+		})
+
+		it('forgets the time to first byte samples after a reset', () => {
+			const selector = createEmptyPlaceholderSelector()
+
+			loadTimeToFirstByteSamples(selector)
+			selector.reset()
+			reachSteadyState(selector, throughputFor(1))
+			selector.select({ ladder: L1, bufferLevel: 0, throughput: NaN, now: requestEnd(0) })
+			load(selector, L1_BANDWIDTHS[3], TIME_TO_FIRST_BYTE_BUFFER_LEVEL)
+
+			const elapsed = GUARD_BUFFER_LEVEL - TIME_TO_FIRST_BYTE_BUFFER_LEVEL
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: TIME_TO_FIRST_BYTE_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(0) + elapsed * MILLISECONDS_PER_SECOND,
+				segmentDuration: SEGMENT_DURATION,
+			})
+
+			equal(decision.index, 3)
+		})
+
 		it('does not run in the startup state, even after two finished samples', () => {
 			const input = { ladder: L1, throughput: throughputFor(3), segmentDuration: SEGMENT_DURATION }
 			const selector = createBolaSelector()
@@ -904,6 +992,147 @@ describe('createBolaSelector', () => {
 
 			equal(lowered.index, 2)
 			equal(next.index, 2)
+		})
+	})
+
+	describe('segment bound', () => {
+		// A time to first byte of 1 s. With 4 second segments, rung 3 of L1 needs 1 + 12 / 3 = 5 s at a safe throughput of 3 Mbps.
+		const SLOW_TIME_TO_FIRST_BYTE_MS = 1000
+		const input = { ladder: L1, throughput: throughputFor(3), segmentDuration: SEGMENT_DURATION }
+
+		// Reports `count` finished segments of `bandwidth` with a time to first byte of `timeToFirstByteMs`.
+		function loadSlowStarts(
+			selector: BitrateSelector,
+			bandwidth: number,
+			bufferLevel: number,
+			timeToFirstByteMs: number,
+			count = FIRST_SAMPLE_COUNT,
+		): void {
+			for (let i = 0; i < count; i++) {
+				load(selector, bandwidth, bufferLevel, 0, {
+					timing: {
+						startTime: 0,
+						responseStart: timeToFirstByteMs,
+						duration: DOWNLOAD_DURATION + timeToFirstByteMs,
+						encodedBodySize: 1,
+					},
+				})
+			}
+		}
+
+		it('bounds the startup pick', () => {
+			const selector = createBolaSelector()
+
+			selector.select({ ...input, bufferLevel: 0, throughput: NaN, now: 0 })
+			// The buffer stays at 0, so the selector stays in the startup state.
+			loadSlowStarts(selector, L1_BANDWIDTHS[0], 0, SLOW_TIME_TO_FIRST_BYTE_MS)
+
+			const decision = selector.select({
+				...input,
+				bufferLevel: 0,
+				now: requestEnd(SLOW_TIME_TO_FIRST_BYTE_MS),
+			})
+
+			equal(decision.state, BolaState.STARTUP)
+			equal(decision.index, 2)
+		})
+
+		it('picks rung 0 at startup when the time to first byte reaches the segment duration', () => {
+			const selector = createBolaSelector()
+
+			selector.select({ ...input, bufferLevel: 0, throughput: NaN, now: 0 })
+			loadSlowStarts(selector, L1_BANDWIDTHS[0], 0, SEGMENT_DURATION * MILLISECONDS_PER_SECOND)
+
+			equal(
+				selector.select({
+					...input,
+					bufferLevel: 0,
+					now: requestEnd(SEGMENT_DURATION * MILLISECONDS_PER_SECOND),
+				}).index,
+				0,
+			)
+		})
+
+		it('bounds the oscillation guard', () => {
+			// The guard scenario: the current rung is 1, and the buffer picks rung 3. The throughput sustains rung 3 only without the time to first byte.
+			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
+
+			loadSlowStarts(selector, L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL, SLOW_TIME_TO_FIRST_BYTE_MS)
+
+			const decision = selector.select({
+				...input,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				now: requestEnd(SLOW_TIME_TO_FIRST_BYTE_MS),
+			})
+
+			equal(decision.index, 2)
+		})
+
+		it('divides the startup budget by the playback rate', () => {
+			// At a safe throughput of 3 Mbps, rung 2 of L1 needs 6 / 3 = 2 s, the playback time of a 4 second segment at 2x. Rung 3 needs 4 s.
+			const decision = createBolaSelector().select({
+				...input,
+				bufferLevel: 0,
+				playbackRate: FAST_PLAYBACK_RATE,
+				now: 0,
+			})
+
+			equal(decision.state, BolaState.STARTUP)
+			equal(decision.index, 2)
+		})
+
+		it('divides the oscillation guard budget by the playback rate', () => {
+			// The guard scenario at 2x: the buffer picks rung 3, and the throughput sustains rung 2 in the playback time of one segment.
+			const decision = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL).select({
+				...input,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				playbackRate: FAST_PLAYBACK_RATE,
+				now: requestEnd(0),
+			})
+
+			equal(decision.index, 2)
+		})
+
+		it('divides the throughput by the playback rate without segmentDuration', () => {
+			const decision = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL).select({
+				ladder: L1,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				playbackRate: FAST_PLAYBACK_RATE,
+				now: requestEnd(0),
+			})
+
+			equal(decision.index, 2)
+		})
+
+		it('picks as before without segmentDuration', () => {
+			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
+
+			loadSlowStarts(selector, L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL, SLOW_TIME_TO_FIRST_BYTE_MS)
+
+			const decision = selector.select({
+				ladder: L1,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput: throughputFor(3),
+				now: requestEnd(SLOW_TIME_TO_FIRST_BYTE_MS),
+			})
+
+			equal(decision.index, 3)
+		})
+
+		it('does not move the buffer-based pick', () => {
+			const selector = createSteadySelectorAt(L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL)
+
+			loadSlowStarts(selector, L1_BANDWIDTHS[1], GUARD_BUFFER_LEVEL, SLOW_TIME_TO_FIRST_BYTE_MS)
+
+			const decision = selector.select({
+				...input,
+				bufferLevel: GUARD_BUFFER_LEVEL,
+				throughput: NaN,
+				now: requestEnd(SLOW_TIME_TO_FIRST_BYTE_MS),
+			})
+
+			equal(decision.index, 3)
 		})
 	})
 
