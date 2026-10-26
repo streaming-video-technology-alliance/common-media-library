@@ -16,6 +16,10 @@ and this project adheres to
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The overview in `src/README.md` links the documentation at https://cml.svta.org/.
 
+### Fixed
+
+- `iso8601DurationToNumber` adds the days of a duration and reads the minutes after the `T` designator. Before, `P1DT1H` gave 3600 and `P0Y0M0DT0H1M30.000S` gave 30. The function ignores the years and months of a duration.
+
 ## [0.24.8] - 2026-10-18
 
 ### Changed

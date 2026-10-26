@@ -29,20 +29,53 @@ describe('iso8601DurationToNumber', () => {
 		equal(res, 1.5)
 	})
 
-	it('extracts time components from a full designator', () => {
+	it('converts fractional seconds after minutes', () => {
+		const res = iso8601DurationToNumber('PT1M30.5S')
+		equal(res, 90.5)
+	})
+
+	it('adds the days to the time components', () => {
 		const res = iso8601DurationToNumber('P1DT2H')
-		equal(res, 7200)
+		equal(res, 93600)
+	})
+
+	it('converts a days-only duration', () => {
+		const res = iso8601DurationToNumber('P1D')
+		equal(res, 86400)
+	})
+
+	it('reads the minutes after the T in the long form', () => {
+		const res = iso8601DurationToNumber('P0Y0M0DT0H1M30.000S')
+		equal(res, 90)
+	})
+
+	it('ignores the years and months', () => {
+		const res = iso8601DurationToNumber('P1Y2M3DT4H')
+		equal(res, 3 * 86400 + 4 * 3600)
 	})
 
 	it('returns 0 when no components match', () => {
 		equal(iso8601DurationToNumber(''), 0)
 		equal(iso8601DurationToNumber('P'), 0)
+		equal(iso8601DurationToNumber('PT'), 0)
+	})
+
+	it('returns 0 for a string that is not a duration', () => {
+		equal(iso8601DurationToNumber('1H'), 0)
+		equal(iso8601DurationToNumber('PT1X'), 0)
+		equal(iso8601DurationToNumber('PT1H 2M'), 0)
+	})
+
+	it('ignores whitespace around the duration', () => {
+		equal(iso8601DurationToNumber(' PT60S '), 60)
+		equal(iso8601DurationToNumber('\tPT1M\n'), 60)
 	})
 
 	it('runs in linear time on adversarial input', () => {
-		const evil = ','.repeat(50_000)
 		const start = performance.now()
-		equal(iso8601DurationToNumber(evil), 0)
+		equal(iso8601DurationToNumber(','.repeat(50_000)), 0)
+		equal(iso8601DurationToNumber(`P${'1'.repeat(50_000)}`), 0)
+		equal(iso8601DurationToNumber(`PT${'1.'.repeat(25_000)}S`), 0)
 		ok(performance.now() - start < 500, 'iso8601DurationToNumber took too long')
 	})
 })
