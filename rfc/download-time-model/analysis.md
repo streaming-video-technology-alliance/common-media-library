@@ -1,6 +1,6 @@
 # Download-time model analysis
 
-This file holds the worked example, the simulation method, and the simulation results of the [download-time model RFC](./index.md).
+This file holds the worked example, the simulation method, and the results of the [download-time model RFC](./index.md). The results come from the simulation and from one device run.
 
 ## Worked example
 
@@ -106,3 +106,39 @@ The change from the baseline to the counted arm, as ranges over the three setups
 In the low wait scenario, the bitrate falls in all six comparisons, and stalls and switches never rise. The table holds averages only. The table therefore neither confirms nor refutes the expectation that the low wait metrics stay within the noise. In the high wait scenario, stalls and switches fall for both selectors, as expected. BOLA loses less bitrate than the dead-time factor suggests, as expected. The throughput selector loses about the bitrate that the factor suggests, and not less. That result contradicts the Expected outcome section.
 
 The baseline and the ignored arm differ for the throughput selector in the high wait scenario. The guard term of PR 588 removes most stalls of the ignored arm. The term also nearly doubles the switches. The guard lowers the pick at a low buffer, and the pick climbs when the buffer refills. This is the cycle that the Motivation section of the RFC describes. The bound removes the remaining stalls of the baseline and about halves its switches. For BOLA, the baseline and the ignored arm agree to two decimals in every row. The guard term changed the decisions in 37 of the 600 BOLA sessions and no aggregate.
+
+## Device results
+
+On 2026-10-26, an LG 43NANO75UQA on webOS 22 ran three builds of one player. The assets were a live DASH stream and a VOD asset. The baseline is the shipped ABR of that player, with an estimate over the whole request. The counted arm links `@svta/cml-abr` at commit `6f2e87084` and uses the throughput selector. The ignored arm is the counted build with `ignoreTimeToFirstByte: true`. Each arm ran five startup launches and one 600 second soak per asset. The player passes `safetyFactor` 0.95, `upgradeFactor` 0.85, and the segment duration of the next segment. The report of the run and the raw data stay outside the repository.
+
+| Quantity | Value |
+|---|---|
+| Live content segments | 6.006 seconds |
+| Live ad segments | 2.002 seconds |
+| Content ladder on the device | 450k, 730k, 1100k, 2000k. The device holds back the four rungs above 540p. |
+| Time to first byte of a content segment, median and p90 | 506 ms and 781 ms |
+| Transfer of a content segment, median | 230 ms |
+| Estimate for the same content bytes, whole request against transfer | 5.5 Mbps against 20.7 Mbps |
+
+The time to first byte is 8 percent of the content segment duration. The device therefore sits in the low wait scenario of the simulation. The bound sits inside the safety factor. The soak results count the content rungs only, because the arms spent different time in ad pods.
+
+| Arm | Content bitrate | Content switches | Stalls | Estimate, range of the per-minute means |
+|---|---|---|---|---|
+| Baseline, first soak | 1795k | 5 | 0 | 2.3 to 10.6 Mbps |
+| Baseline, second soak | 2000k | 0 | 0 | 2.8 to 4.8 Mbps |
+| Counted | 1966k | 2 | 0 | 7.3 to 36.4 Mbps |
+| Ignored | 2000k | 0 | 0 | 8.1 to 40.2 Mbps |
+
+The per-request log of the counted soak verifies the model.
+
+| Quantity | Value |
+|---|---|
+| Decisions in the live soak | 428 |
+| Decisions that returned the top content rung | 427 |
+| Download time of the top content rung in steady state | 1.8 to 2.6 seconds of a 6.0 second budget |
+| The one guard decision, at 1.2 seconds with a buffer of 2.0 seconds | 2000k needs 2.21 seconds with the time to first byte and 1.57 seconds without. The pick was 1100k for one segment. |
+| Decisions in the VOD soak that returned the top rung | 189 of 189 |
+
+The segment bound decided no pick on this device. The starvation guard decided one, and the time to first byte was the deciding term. The ignored arm kept the top rung at the same point. The baseline lost the top content rung for 95 seconds of its first soak. Its estimate had fallen below the 2.4 Mbps that the rung needs. The counted and ignored arms never left the top content rung after the first segment.
+
+The run has limits. One soak per arm is a sample of one, and the two baseline soaks differ by five content switches. The 2000k ceiling keeps the bound out of every decision. On a device that plays the 8000k rung, the bound decides picks. At an estimate of 8 Mbps, 8000k needs 7.1 seconds and 6500k needs 5.8 seconds. The run also found a defect of the player at period boundaries, outside this RFC.

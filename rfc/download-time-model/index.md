@@ -195,7 +195,7 @@ One loop over the ladder per pick, with no allocation. A ladder has about 5 to 1
 - Unit tests for `findSustainableRung`: the fallback equals `findRung`. A time to first byte of 0 matches `findRung` away from a boundary. A positive value lowers the rung. A value at the budget returns 0. Equal bandwidths return the highest position. The playback rate scales the budget.
 - Throughput selector: the issue 587 numbers, 14 Mbps, 800 ms, and 2 second segments. The pick is at or below 7.56 Mbps, where today the bound is 12.6 Mbps. The upgrade pick uses the bound. `ignoreTimeToFirstByte` removes the time to first byte from the pick and from the guard. A `select` call during a download returns the decision of the last sample. A call without `segmentDuration` is unchanged. Every existing test passes unchanged. No boundary margin was needed.
 - BOLA: the startup pick and the oscillation guard lower with the time to first byte. The buffer-based pick does not move. A time to first byte at the segment duration gives rung 0 at startup.
-- Simulation: the seeded playback simulation gains a time to first byte per download. The [analysis](./analysis.md) defines the scenarios and the metrics and holds the results against the PR 588 baseline.
+- Simulation: the seeded playback simulation gains a time to first byte per download. The [analysis](./analysis.md) defines the scenarios and the metrics and holds the results against the PR 588 baseline. The analysis also holds the results of one run on an LG TV with the implementation branch.
 
 ### Packaging
 
@@ -253,6 +253,7 @@ The dash.js 4 scaling has a recorded origin. [Issue 1955](https://github.com/Das
 - v2 (2026-10-23): names aligned with the implementation, simulation results added to the analysis, prior art records the origin and the unexplained removal of the dash.js scaling.
 - v3 (2026-10-24): the simulation baseline is the PR 588 build. The option has one condition, a request overlap that hides the whole time to first byte.
 - v4 (2026-10-24): the option leaves `BolaSelectorOptions`, because BOLA needs the `select` call after the previous `sample`. The throughput selector accepts a call during a download.
+- v5 (2026-10-26): the analysis adds the results of one device run.
 
 ## Final Decision
 
