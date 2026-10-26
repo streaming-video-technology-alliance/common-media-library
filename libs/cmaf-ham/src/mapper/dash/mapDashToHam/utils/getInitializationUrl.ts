@@ -1,3 +1,5 @@
+import { processUriTemplate } from '@svta/cml-dash'
+
 import type { AdaptationSet } from '../../../../types/mapper/dash/AdaptationSet.ts'
 import type { Representation } from '../../../../types/mapper/dash/Representation.ts'
 
@@ -27,8 +29,15 @@ export function getInitializationUrl(
 		initializationUrl =
 			adaptationSet.SegmentTemplate?.at(0)?.$.initialization ||
 			representation.SegmentTemplate?.at(0)?.$.initialization
-		if (initializationUrl?.includes('$RepresentationID$')) {
-			initializationUrl = initializationUrl.replace('$RepresentationID$', representation.$.id ?? '')
+		if (initializationUrl) {
+			initializationUrl = processUriTemplate(
+				initializationUrl,
+				representation.$.id,
+				undefined,
+				undefined,
+				+representation.$.bandwidth || undefined,
+				undefined,
+			)
 		}
 	}
 	return initializationUrl
