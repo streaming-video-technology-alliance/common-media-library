@@ -98,6 +98,7 @@ export type ThroughputSelectorOptions = {
     safetyFactor?: number;
     upgradeFactor?: number;
     starvationTolerance?: number;
+    ignoreTimeToFirstByte?: boolean;
 };
 
 // (No @packageDocumentation comment for this package)

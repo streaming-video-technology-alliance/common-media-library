@@ -8,9 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-26
+
+### Added
+
+- `ThroughputSelectorOptions.ignoreTimeToFirstByte`. When `true`, the selector ignores the time to first byte in every pick and in the starvation guard. Default `false`.
+
 ### Changed
 
 - The starvation guard of both selectors adds the time to first byte to the download time of a rung. The value is the mean of `responseStart - startTime` over the last four finished samples. The guard ignores a sample whose `responseStart` is missing or outside the response ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- When a call has `segmentDuration`, the throughput selector picks the highest rung whose download fits in one segment. The download time is the time to first byte plus the transfer at `throughput * safetyFactor`. Before, the pick was the highest rung at or below `throughput * safetyFactor / playbackRate`.
+- The BOLA startup pick and oscillation guard bound the pick by the download time of one segment at `throughput * safetyFactor`, with a budget of `segmentDuration / playbackRate`. Before, both used the highest rung at or below `throughput * safetyFactor` and ignored `playbackRate`. The buffer score, the placeholder, and the delay do not change.
+- The README states that the throughput selector accepts a `select` call during a download and that BOLA does not.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 
@@ -41,7 +50,8 @@ and this project adheres to
 - `createThroughputSelector`, which creates a rate-based selector with a safety factor, an upgrade factor for the hysteresis, and a two-pass starvation guard
 - `DEFAULT_SAFETY_FACTOR` (0.9), `DEFAULT_UPGRADE_FACTOR` (0.7), and `DEFAULT_STARVATION_TOLERANCE` (4)
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.2.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.3.0...HEAD
+[0.3.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.2.0...abr-v0.3.0
 [0.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.1.1...abr-v0.2.0
 [0.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/abr-v0.1.0...abr-v0.1.1
 [0.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/tree/abr-v0.1.0
