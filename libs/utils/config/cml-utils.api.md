@@ -60,6 +60,12 @@ export function getBandwidthBps(sample: ResourceTiming): number;
 export function getBaseUrl(fullUrl: string | URL): string;
 
 // @public
+export function getTimeToFirstByte(sample: ResourceTiming): number;
+
+// @public
+export function getTransferDuration(sample: ResourceTiming): number;
+
+// @public
 export function hexToArrayBuffer(hex: string): ArrayBuffer;
 
 // @public

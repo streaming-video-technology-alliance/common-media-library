@@ -1,6 +1,7 @@
 // Derived from dash.js BolaRule.js, Copyright (c) 2016, Dash Industry Forum, BSD-3-Clause. See NOTICE.md.
 
 import { applyStarvationGuard } from './applyStarvationGuard.ts'
+import { averageTimeToFirstByte } from './averageTimeToFirstByte.ts'
 import type { BitrateSelectorInput } from './BitrateSelectorInput.ts'
 import { STALL_THRESHOLD, STARVATION_GUARD_SAMPLE_COUNT } from './BOLA_CONSTANTS.ts'
 import { BOLA_DEFAULT_BUFFER_TARGET } from './BOLA_DEFAULT_BUFFER_TARGET.ts'
@@ -21,6 +22,7 @@ import { limitUpwardSwitch } from './limitUpwardSwitch.ts'
 import { MILLISECONDS_PER_SECOND } from './MILLISECONDS_PER_SECOND.ts'
 import { placeholderAfterAbort } from './placeholderAfterAbort.ts'
 import { placeholderAfterSample } from './placeholderAfterSample.ts'
+import { recordTimeToFirstByte } from './recordTimeToFirstByte.ts'
 import { remapEffectiveBuffer } from './remapEffectiveBuffer.ts'
 import type { SegmentSample } from './SegmentSample.ts'
 import { selectRungByBuffer } from './selectRungByBuffer.ts'
@@ -56,7 +58,8 @@ import { validateLadder } from './validateLadder.ts'
  * The starvation guard runs when the input has a positive `segmentDuration` and the throughput is known.
  * It waits until two samples have finished since the last reset.
  * It keeps the highest rung, at or below the pick, that downloads within `bufferLevel / playbackRate`.
- * It assumes `throughput * starvationSafetyFactor` for that download. Rung 0 always passes.
+ * It assumes `throughput * starvationSafetyFactor` for that download.
+ * It adds the mean time to first byte of the last four finished samples to that download. Rung 0 always passes.
  * A player omits `segmentDuration` to skip the guard, for example near the live edge.
  *
  * The selector reads `timing`, `bandwidth`, `duration`, `bufferLevel`, `isReplacement`, and `aborted` from a sample.
@@ -103,6 +106,8 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	let lastSegmentDuration = NaN
 	// The number of finished samples since the last reset. It stops at `STARVATION_GUARD_SAMPLE_COUNT`, the number that the starvation guard waits for.
 	let finishedSampleCount = 0
+	// The time to first byte, in seconds, of the last four finished samples.
+	const timeToFirstByteSamples: number[] = []
 	// The time bases of the wall-clock part of the placeholder, in milliseconds on the clock of `now`.
 	// `lastRequestEnd` is the end of the last request. `lastCall` is the time of the last steady call. NaN when cleared.
 	let lastRequestEnd = NaN
@@ -117,6 +122,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 		currentBandwidth = NaN
 		lastSegmentDuration = NaN
 		finishedSampleCount = 0
+		timeToFirstByteSamples.length = 0
 		clearTimeBases()
 	}
 
@@ -270,6 +276,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 			position,
 			input.segmentDuration,
 			throughput * starvationSafetyFactor,
+			averageTimeToFirstByte(timeToFirstByteSamples),
 			bufferLevel / playbackRate,
 			NO_TOLERANCE,
 		)
@@ -315,6 +322,7 @@ export function createBolaSelector(options?: BolaSelectorOptions): BolaSelector 
 	function recordFinishedSample(segment: SegmentSample, bufferLevel: number): void {
 		currentBandwidth = segment.bandwidth
 		finishedSampleCount = Math.min(finishedSampleCount + 1, STARVATION_GUARD_SAMPLE_COUNT)
+		recordTimeToFirstByte(timeToFirstByteSamples, segment.timing)
 
 		if (isPositiveFinite(segment.duration)) {
 			lastSegmentDuration = segment.duration

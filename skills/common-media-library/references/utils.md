@@ -8,7 +8,7 @@ Common utility functions for media processing.
 - Convert between hex, base64, UUID strings, and byte arrays: `hexToArrayBuffer`, `arrayBufferToHex`, `arrayBufferToUuid`, `uuidToArrayBuffer`, `decodeBase64`, `encodeBase64`
 - Encode or decode UTF-8 and UTF-16 text: `encodeText`, `decodeText`, `Encoding`
 - Resolve a base URL or make a URL relative to another URL: `getBaseUrl`, `urlToRelativePath`
-- Compute bandwidth in bits per second from a byte count and a duration: `getBandwidthBps`
+- Compute the time to first byte, the transfer duration, and the bandwidth in bits per second of a `ResourceTiming` sample: `getTimeToFirstByte`, `getTransferDuration`, `getBandwidthBps`
 - Unescape HTML entities in a manifest or a caption string: `unescapeHtml`
 - Generate a UUID for a session or a content id: `uuid`
 
@@ -123,6 +123,12 @@ export function getBandwidthBps(sample: ResourceTiming): number;
 
 // @public
 export function getBaseUrl(fullUrl: string | URL): string;
+
+// @public
+export function getTimeToFirstByte(sample: ResourceTiming): number;
+
+// @public
+export function getTransferDuration(sample: ResourceTiming): number;
 
 // @public
 export function hexToArrayBuffer(hex: string): ArrayBuffer;
