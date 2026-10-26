@@ -94,7 +94,6 @@ export * from './services/validators/validateTracks.ts'
 
 export * from './utils/byteRange.ts'
 export * from './utils/dash/iso8601DurationToNumber.ts'
-export * from './utils/dash/numberToIso8601Duration.ts'
 export * from './utils/dash/parseDashManifest.ts'
 export * from './utils/dash/serializeDashManifest.ts'
 export * from './utils/hls/parseHlsManifest.ts'

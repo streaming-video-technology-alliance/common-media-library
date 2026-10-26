@@ -15,10 +15,15 @@ and this project adheres to
 - The HLS mapper types describe the fields the mapper reads. `PlayList.attributes` adds `LANGUAGE` and `FRAME-RATE`, the `MediaGroups` items add an optional `uri`, and `HlsManifest` adds `version` and `mediaSequence`. `audioGroupsToSwitchingSets` and `subtitleGroupsToSwitchingSets` take the typed media groups instead of `any`. `Mapper.getManifestMetadata` and `HlsMapper.getManifestMetadata` return `JSON | undefined`, the type that `DashMapper` and `MapperContext` already declare.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The overview in `src/README.md` links the documentation at https://cml.svta.org/.
+- `@svta/cml-iso-8601` is a new peer dependency. `iso8601DurationToNumber` trims the value and decodes it with `decodeIso8601Duration` from that package. A year counts as 365 days and a month as 30 days.
+
+### Removed
+
+- `numberToIso8601Duration`. Use `encodeIso8601Duration` from `@svta/cml-iso-8601`, which gives the same string.
 
 ### Fixed
 
-- `iso8601DurationToNumber` adds the days of a duration and reads the minutes after the `T` designator. Before, `P1DT1H` gave 3600 and `P0Y0M0DT0H1M30.000S` gave 30. The function ignores the years and months of a duration.
+- `iso8601DurationToNumber` adds the days of a duration and reads the minutes after the `T` designator. Before, `P1DT1H` gave 3600 and `P0Y0M0DT0H1M30.000S` gave 30.
 
 ## [0.24.8] - 2026-10-18
 

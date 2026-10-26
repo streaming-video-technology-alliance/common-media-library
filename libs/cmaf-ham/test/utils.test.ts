@@ -1,7 +1,7 @@
 import { equal, ok } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
-import { iso8601DurationToNumber, numberToIso8601Duration } from '@svta/cml-cmaf-ham'
+import { iso8601DurationToNumber } from '@svta/cml-cmaf-ham'
 
 describe('iso8601DurationToNumber', () => {
 	it('converts PT5S to 5', () => {
@@ -49,11 +49,6 @@ describe('iso8601DurationToNumber', () => {
 		equal(res, 90)
 	})
 
-	it('ignores the years and months', () => {
-		const res = iso8601DurationToNumber('P1Y2M3DT4H')
-		equal(res, 3 * 86400 + 4 * 3600)
-	})
-
 	it('returns 0 when no components match', () => {
 		equal(iso8601DurationToNumber(''), 0)
 		equal(iso8601DurationToNumber('P'), 0)
@@ -77,22 +72,5 @@ describe('iso8601DurationToNumber', () => {
 		equal(iso8601DurationToNumber(`P${'1'.repeat(50_000)}`), 0)
 		equal(iso8601DurationToNumber(`PT${'1.'.repeat(25_000)}S`), 0)
 		ok(performance.now() - start < 500, 'iso8601DurationToNumber took too long')
-	})
-})
-
-describe('numberToIso8601Duration', () => {
-	it('converts 5 to PT5S', () => {
-		const res = numberToIso8601Duration(5)
-		equal(res, 'PT5S')
-	})
-
-	it('converts 65 to PT1M5S', () => {
-		const res = numberToIso8601Duration(65)
-		equal(res, 'PT1M5S')
-	})
-
-	it('converts 444 to PT7M24S', () => {
-		const res = numberToIso8601Duration(444)
-		equal(res, 'PT7M24S')
 	})
 })
