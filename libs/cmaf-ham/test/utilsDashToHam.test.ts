@@ -3,6 +3,8 @@ import { describe, it } from 'vite-plus/test'
 
 import type { AdaptationSet, Period, Representation, SegmentTemplate } from '@svta/cml-cmaf-ham'
 
+import { getInitializationUrl } from '../src/mapper/dash/mapDashToHam/utils/getInitializationUrl.ts'
+
 import {
 	calculateDuration,
 	getChannels,
@@ -389,7 +391,7 @@ describe('getUrlFromTemplate', () => {
 			{ $: { id: 'repId' } } as Representation,
 			{
 				$: {
-					media: 'representation: $RepresentationID$ and number: $Number_one$',
+					media: 'representation: $RepresentationID$ and number: $Number$',
 				},
 			} as SegmentTemplate,
 			3,
@@ -401,10 +403,79 @@ describe('getUrlFromTemplate', () => {
 		const res = getUrlFromTemplate(
 			{ $: { id: 'repId' } } as Representation,
 			{
-				$: { media: 'number: $Number_one$' },
+				$: { media: 'number: $Number$' },
 			} as SegmentTemplate,
 			3,
 		)
 		equal(res, 'number: 3')
+	})
+
+	it('pads Number to the width of the format tag', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$RepresentationID$/$Number%03d$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/003.m4s')
+	})
+
+	it('replaces Bandwidth', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId', bandwidth: '1500000' } },
+			{ $: { media: '$RepresentationID$/$Bandwidth$/$Number$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/1500000/3.m4s')
+	})
+
+	it('replaces Time with the segment start time', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$RepresentationID$/$Time$.m4s' } } as SegmentTemplate,
+			3,
+			180000,
+		)
+		equal(res, 'repId/180000.m4s')
+	})
+
+	it('leaves Time in the url when the segment has no time', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$RepresentationID$/$Time$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/$Time$.m4s')
+	})
+
+	it('replaces $$ with a single $', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$$$RepresentationID$-$Number$$$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, '$repId-3$.m4s')
+	})
+
+	it('leaves a token outside the template grammar unchanged', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{
+				$: { media: '$RepresentationID$/$Number%d$/$SubNumber$/$Garbage$.m4s' },
+			} as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/$Number%d$/$SubNumber$/$Garbage$.m4s')
+	})
+})
+
+describe('getInitializationUrl', () => {
+	it('replaces RepresentationID and Bandwidth in the SegmentTemplate initialization', () => {
+		const res = getInitializationUrl(
+			{
+				SegmentTemplate: [{ $: { initialization: '$RepresentationID$/$Bandwidth$/init.mp4' } }],
+			} as AdaptationSet,
+			{ $: { id: 'repId', bandwidth: '1500000' } },
+		)
+		equal(res, 'repId/1500000/init.mp4')
 	})
 })

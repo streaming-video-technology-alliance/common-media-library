@@ -279,7 +279,7 @@ export function getTracksFromSelectionSet(selectionSet: SelectionSet, predicate?
 export function getTracksFromSwitchingSet(switchingSet: SwitchingSet, predicate?: (track: Track) => boolean): Track[];
 
 // @internal
-export function getUrlFromTemplate(representation: Representation, segmentTemplate: SegmentTemplate, segmentId: number): string;
+export function getUrlFromTemplate(representation: Representation, segmentTemplate: SegmentTemplate, segmentId: number, time?: number): string;
 
 // @alpha
 export function getUrlInitialization(track: VideoTrack | AudioTrack): string;

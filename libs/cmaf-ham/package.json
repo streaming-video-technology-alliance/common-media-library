@@ -55,6 +55,7 @@
 		}
 	},
 	"peerDependencies": {
+		"@svta/cml-dash": "*",
 		"@svta/cml-drm": "*",
 		"@svta/cml-iso-8601": "*",
 		"@svta/cml-utils": "*"
