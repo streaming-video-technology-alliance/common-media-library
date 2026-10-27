@@ -8,16 +8,12 @@ import type { Representation } from '../../../../types/mapper/dash/Representatio
  *
  * @param adaptationSet - AdaptationSet to try to get the channels from
  * @param representation - Representation to try to get the channels from
- * @returns Channels value
+ * @returns Channels value. In case it is not present, returns 0.
  */
 export function getChannels(adaptationSet: AdaptationSet, representation: Representation): number {
-	const channels: number = +(
+	return +(
 		adaptationSet.AudioChannelConfiguration?.at(0)?.$.value ??
 		representation.AudioChannelConfiguration?.at(0)?.$.value ??
 		0
 	)
-	if (!channels) {
-		console.error(`Representation ${representation.$.id} has no channels`)
-	}
-	return channels
 }

@@ -9,7 +9,7 @@ import type { Representation } from '../../../../types/mapper/dash/Representatio
  *
  * @param adaptationSet - AdaptationSet to get the type from
  * @param representation - Representation to get the type from
- * @returns type of the content
+ * @returns type of the content. In case it cannot be found, returns `text`.
  */
 export function getContentType(
 	adaptationSet: AdaptationSet,
@@ -34,9 +34,5 @@ export function getContentType(
 	if (adaptationSet.$.maxHeight) {
 		return 'video'
 	}
-	const adaptationRef =
-		adaptationSet.$.id ?? `group: ${adaptationSet.$.group}, lang: ${adaptationSet.$.lang}`
-	console.error(`Could not find contentType from adaptationSet ${adaptationRef}`)
-	console.info('Using "text" as default contentType')
 	return 'text'
 }

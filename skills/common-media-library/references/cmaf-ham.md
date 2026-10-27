@@ -393,7 +393,7 @@ export function parseByteRangeString(byteRangeString: string | undefined): ByteR
 // @internal
 export function parseDashManifest(raw: string): DashManifest;
 
-// @internal (undocumented)
+// @internal
 export function parseHlsManifest(text?: string): HlsManifest;
 
 // @alpha

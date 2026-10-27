@@ -2,7 +2,13 @@ import { deepStrictEqual, equal } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 import type { HlsManifest } from '@svta/cml-cmaf-ham'
-import { decodeByteRange, formatSegments, getDuration, getHlsCodec } from '@svta/cml-cmaf-ham'
+import {
+	decodeByteRange,
+	formatSegments,
+	getDuration,
+	getHlsCodec,
+	parseHlsManifest,
+} from '@svta/cml-cmaf-ham'
 
 import { getSegments } from './data/hlsData.ts'
 
@@ -48,6 +54,16 @@ describe('getDuration', () => {
 	it('returns duration if manifest has targetDuration and there are segments', () => {
 		const res = getDuration({ targetDuration: 3 } as HlsManifest, getSegments())
 		equal(res, 6)
+	})
+})
+
+describe('parseHlsManifest', () => {
+	it('returns an empty object if the text is empty', () => {
+		deepStrictEqual(parseHlsManifest(''), {})
+	})
+
+	it('returns an empty object if the text is undefined', () => {
+		deepStrictEqual(parseHlsManifest(undefined), {})
 	})
 })
 

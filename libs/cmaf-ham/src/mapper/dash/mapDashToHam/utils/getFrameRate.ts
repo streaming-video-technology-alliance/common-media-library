@@ -20,16 +20,14 @@ import {
  *
  * @param adaptationSet - To try to get the frameRate from
  * @param representation - To try to get the frameRate from
- * @returns object containing numerator and denominator
+ * @returns object containing numerator and denominator. In case the frame rate is not present,
+ * the numerator is 30 and the denominator is 0.
  */
 export function getFrameRate(
 	adaptationSet: AdaptationSet,
 	representation: Representation,
 ): FrameRate {
 	const frameRateDash: string = representation.$.frameRate ?? adaptationSet.$.frameRate ?? ''
-	if (!frameRateDash) {
-		console.error(`Representation ${representation.$.id} has no frame rate`)
-	}
 	const frameRate = frameRateDash.split(FRAME_RATE_SEPARATOR)
 	const frameRateNumerator = parseInt(frameRate.at(NUMERATOR) ?? '')
 	const frameRateDenominator = parseInt(frameRate.at(DENOMINATOR) ?? '')

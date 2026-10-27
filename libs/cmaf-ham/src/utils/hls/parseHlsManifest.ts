@@ -23,10 +23,14 @@ export function getHlsParser(): HlsParser {
 
 /**
  * @internal
+ *
+ * Parse an HLS manifest with the parser from `setHlsParser`.
+ *
+ * @param text - Text of the manifest
+ * @returns parsed manifest. In case the text is empty, returns an empty object.
  */
 export function parseHlsManifest(text?: string): HlsManifest {
 	if (!text) {
-		console.error("Can't parse empty HLS Manifest")
 		return {} as HlsManifest
 	}
 
