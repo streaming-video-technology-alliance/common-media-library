@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-26
+
 ### Changed
 
 - `Track.url` is optional. An HLS audio rendition without a `URI` attribute maps to a track without a URL, and the HLS writer already falls back to `<id>.m3u8` for that case. TypeScript consumers that read `track.url` as a `string` need to handle `undefined`.
@@ -110,7 +112,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.8...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.25.0...HEAD
+[0.25.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.8...cmaf-ham-v0.25.0
 [0.24.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.7...cmaf-ham-v0.24.8
 [0.24.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.6...cmaf-ham-v0.24.7
 [0.24.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.5...cmaf-ham-v0.24.6
