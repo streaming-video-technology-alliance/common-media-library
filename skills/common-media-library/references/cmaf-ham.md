@@ -384,9 +384,6 @@ export type MediaGroups = {
     }>>;
 };
 
-// @internal (undocumented)
-export function numberToIso8601Duration(duration: number): string;
-
 // @alpha
 export function parseByteRangeString(byteRangeString: string | undefined): ByteRangeObject | undefined;
 

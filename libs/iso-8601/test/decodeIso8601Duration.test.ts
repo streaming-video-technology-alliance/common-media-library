@@ -91,6 +91,15 @@ describe('decodeIso8601Duration', () => {
 		equal(decodeIso8601Duration('abc'), NaN)
 		equal(decodeIso8601Duration(''), NaN)
 
+		// A time designator needs the T.
+		equal(decodeIso8601Duration('P1H'), NaN)
+		equal(decodeIso8601Duration('P1S'), NaN)
+
+		// Every designator needs a number.
+		equal(decodeIso8601Duration('PTH1M'), NaN)
+		equal(decodeIso8601Duration('PT1.S'), NaN)
+		equal(decodeIso8601Duration('PYT1S'), NaN)
+
 		equal(decodeIso8601Duration('P' + HUGE_NUMBER_STRING + 'Y'), NaN)
 		equal(decodeIso8601Duration('P' + HUGE_NUMBER_STRING + 'M'), NaN)
 		equal(decodeIso8601Duration('P' + HUGE_NUMBER_STRING + 'D'), NaN)

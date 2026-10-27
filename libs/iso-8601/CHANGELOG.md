@@ -12,6 +12,10 @@ and this project adheres to
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
+### Fixed
+
+- `decodeIso8601Duration` gives `NaN` for a malformed duration. Before, `P1H` gave 3600 and `PTH1M` gave 60. A time designator needs the `T`, and every designator needs a number.
+
 ## [1.0.2] - 2026-07-21
 
 ### Changed
