@@ -8,11 +8,10 @@ import type { Segment } from '../../../types/model/Segment.ts'
 import type { SelectionSet } from '../../../types/model/SelectionSet.ts'
 import type { Track } from '../../../types/model/Track.ts'
 
-import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts'
-
 import { getContentType } from './utils/getContentType.ts'
 import { getGroup } from './utils/getGroup.ts'
 import { getInitializationUrl } from './utils/getInitializationUrl.ts'
+import { getPeriodDuration } from './utils/getPeriodDuration.ts'
 import { getPresentationId } from './utils/getPresentationId.ts'
 
 import { mapSegments } from './mapSegments.ts'
@@ -27,8 +26,8 @@ import { mapTracks } from './mapTracks.ts'
  * @returns List of presentations in ham
  */
 export function mapDashToHam(dash: DashManifest): Presentation[] {
-	return dash.MPD.Period.map((period: Period) => {
-		const duration: number = iso8601DurationToNumber(period.$.duration)
+	return dash.MPD.Period.map((period: Period, index: number) => {
+		const duration: number = getPeriodDuration(dash, index)
 		const presentationId: string = getPresentationId(period, duration)
 
 		const selectionSetGroups: Record<string, SelectionSet> = {}

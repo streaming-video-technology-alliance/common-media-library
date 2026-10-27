@@ -37,6 +37,28 @@ describe('dashToHam', () => {
 		deepStrictEqual(convertedHam0, jsonHam0)
 	})
 
+	it('uses the mediaPresentationDuration for a Period without a duration', () => {
+		// The DASH muxer of FFmpeg 6.1 wrote this MPD.
+		const manifest = `<?xml version="1.0" encoding="utf-8"?>
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" profiles="urn:mpeg:dash:profile:isoff-live:2011" type="static" mediaPresentationDuration="PT10.0S" maxSegmentDuration="PT2.0S" minBufferTime="PT4.0S">
+	<Period id="0" start="PT0.0S">
+		<AdaptationSet id="0" contentType="video" startWithSAP="1" segmentAlignment="true" bitstreamSwitching="true" frameRate="25/1" maxWidth="320" maxHeight="240" par="4:3" lang="und">
+			<Representation id="0" mimeType="video/mp4" codecs="avc1.64000d" bandwidth="44206" width="320" height="240" sar="1:1">
+				<SegmentTemplate timescale="1000000" duration="2000000" initialization="init-$RepresentationID$.m4s" media="chunk-$RepresentationID$-$Number%05d$.m4s" startNumber="1">
+				</SegmentTemplate>
+			</Representation>
+		</AdaptationSet>
+	</Period>
+</MPD>`
+		const [presentation] = dashToHam(manifest)
+		equal(presentation.duration, 10)
+		const segments = presentation.selectionSets[0].switchingSets[0].tracks[0].segments
+		deepStrictEqual(
+			segments.map(segment => segment.startTime),
+			[0, 2, 4, 6, 8],
+		)
+	})
+
 	it('converts dashSample1 to HAM', () => {
 		const convertedHam1 = dashToHam(dashSample1)
 		deepStrictEqual(convertedHam1, jsonHam1)

@@ -25,6 +25,7 @@ and this project adheres to
 ### Fixed
 
 - `iso8601DurationToNumber` adds the days of a duration and reads the minutes after the `T` designator. Before, `P1DT1H` gave 3600 and `P0Y0M0DT0H1M30.000S` gave 30.
+- `dashToHam` now derives the duration of a Period without a `duration` attribute. The Period ends at the start of the next Period or at the `mediaPresentationDuration` of the MPD. Before, such a Period had duration 0 and a `SegmentTemplate` track had no segments.
 
 ## [0.24.8] - 2026-10-18
 
