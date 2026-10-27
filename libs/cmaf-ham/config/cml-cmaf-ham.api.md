@@ -364,7 +364,7 @@ export function parseHlsManifest(text?: string): HlsManifest;
 // @alpha
 export type Period = {
     $: {
-        duration: string;
+        duration?: string;
         id?: string;
         start?: string;
     };

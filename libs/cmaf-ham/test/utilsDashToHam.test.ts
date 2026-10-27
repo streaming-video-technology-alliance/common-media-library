@@ -428,6 +428,14 @@ describe('getPeriodDuration', () => {
 		)
 		equal(res, 0)
 	})
+
+	it('accepts a Period without a duration attribute', () => {
+		const period: Period = { $: { start: 'PT0S' }, AdaptationSet: [] }
+		const dash: DashManifest = {
+			MPD: { $: { mediaPresentationDuration: 'PT30S' }, Period: [period] },
+		}
+		equal(getPeriodDuration(dash, 0), 30)
+	})
 })
 
 describe('getPresentationId', () => {

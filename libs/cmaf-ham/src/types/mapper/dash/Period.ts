@@ -7,7 +7,7 @@ import type { AdaptationSet } from './AdaptationSet.ts'
  */
 export type Period = {
 	$: {
-		duration: string
+		duration?: string
 		id?: string
 		start?: string
 	}

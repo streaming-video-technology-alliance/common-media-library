@@ -9,7 +9,7 @@ import { serializeDashManifest } from '../../../utils/dash/serializeDashManifest
 
 export function mapHamToDash(hamManifests: Presentation[]): string {
 	const periods: Period[] = presentationsToPeriods(hamManifests)
-	const duration: string = periods[0].$.duration
+	const duration: string | undefined = periods[0].$.duration
 	const manifest: DashManifest = {
 		MPD: {
 			$: {
