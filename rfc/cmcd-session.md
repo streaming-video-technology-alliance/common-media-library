@@ -52,7 +52,7 @@ The state that `CmcdReporter` keeps causes failures in these integrations:
 
 dash.js also needs to route `rr` reports by request type. Its setting `eventTargets[].includeInRequests` limits the `rr` reports of each target, and two targets can share one collector URL. `CmcdReporter` offers `transform` for this case. A transform can rewrite a report. The reporter must therefore copy nested values, restore required keys, and isolate errors for each target. dash.js only needs to choose targets.
 
-RFC 455 proposed a larger session API. The design record compares the options: [analysis](../plans/cmcd-reporting-architecture/analysis.md), [option 1](../plans/cmcd-reporting-architecture/option-1.md), and [option 2](../plans/cmcd-reporting-architecture/option-2.md). This RFC is option 2 with later changes. The largest change deprecates `CmcdReporter` instead of a later decision on its future. [Rationale and alternatives](#rationale-and-alternatives) lists the other changes.
+RFC 455 proposed a larger session API. The design record compares the options: [analysis](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md), [option 1](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/option-1.md), and [option 2](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/option-2.md). This RFC is option 2 with later changes. The largest change deprecates `CmcdReporter` instead of a later decision on its future. [Rationale and alternatives](#rationale-and-alternatives) lists the other changes.
 
 ## Guide-level explanation
 
@@ -238,18 +238,15 @@ Without `enabledKeys`, the session reports every key. In the same case, `CmcdRep
 | Export | Kind |
 |---|---|
 | `createCmcdSession` | function |
-| `CmcdSession`, `CmcdSessionConfig`, `CmcdSnapshot` | types |
+| `CmcdSession`, `CmcdSessionConfig`, `CmcdSessionRequestReportConfig`, `CmcdSessionEventReportConfig`, `CmcdSnapshot` | types |
 | `CmcdReportFilter` | type |
 | `CMCD_EVENT_HOSTNAME`, and `HOSTNAME` in `CmcdEventType` | constant |
 
 CTA-5004-B defines the `h` event for a change of the content host, and the package has no constant for it. The player records the event with the new host in the `h` key.
 
-The session uses the configuration types of `CmcdReporter`. `CmcdRequestReportConfig` holds the request mode settings, and `CmcdEventReportConfig` describes an event target. The release that adds the session changes two existing types:
+The session has its own configuration types. `CmcdSessionRequestReportConfig` holds the settings for request mode, and `CmcdSessionEventReportConfig` describes an event target. Both derive from the types of `CmcdReporter` and reject `transform` with a `never` member. A value typed `CmcdReporterConfig` therefore does not compile as a `CmcdSessionConfig`. The `CmcdReporter` types do not gain `filter`.
 
-| Export | Change |
-|---|---|
-| `CmcdReportConfig` | `enabledKeys` accepts a read-only array. The TSDoc names the default of each API. |
-| `CmcdEventReportConfig` | Gains `filter`. Only the session reads it. |
+The release that adds the session changes one existing type. `CmcdReportConfig.enabledKeys` accepts a read-only array, and the TSDoc names the default of each API.
 
 ### Types
 
@@ -265,7 +262,7 @@ type CmcdReportConfig = {
 type CmcdRequestReportConfig<C> = CmcdReportConfig & {
 	transmissionMode?: CmcdTransmissionMode     // default CMCD_QUERY
 	customHeaderMap?: Partial<CmcdHeaderMap>
-	transform?: CmcdRequestReportTransform<C>   // deprecated. Only CmcdReporter reads it
+	transform?: CmcdRequestReportTransform<C>   // deprecated. CmcdReporter only
 }
 
 type CmcdEventReportConfig<C> = CmcdReportConfig & {
@@ -274,14 +271,23 @@ type CmcdEventReportConfig<C> = CmcdReportConfig & {
 	events?: CmcdEventType[]
 	interval?: number                           // seconds. default CMCD_DEFAULT_TIME_INTERVAL (30). 0 turns t reports off
 	batchSize?: number                          // default 1
-	filter?: CmcdReportFilter                   // new. Only the session reads it
-	transform?: CmcdEventReportTransform<C>     // deprecated. Only CmcdReporter reads it
+	transform?: CmcdEventReportTransform<C>     // deprecated. CmcdReporter only
 }
 
-type CmcdSessionConfig = CmcdRequestReportConfig & {
+// The session types. In the package, each never member has a TSDoc note that names filter.
+type CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, 'transform'> & {
+	transform?: never                           // CmcdReporter only. A session has no transform
+}
+
+type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, 'transform'> & {
+	transform?: never                           // CmcdReporter only. filter selects the reports of the target
+	filter?: CmcdReportFilter
+}
+
+type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	sid?: string                                // default: a new UUID
 	cid?: string                                // used when a report has no cid
-	eventTargets?: readonly CmcdEventReportConfig[]
+	eventTargets?: readonly CmcdSessionEventReportConfig[]
 	snapshot?: () => CmcdSnapshot               // the data of each t report
 }
 
@@ -297,7 +303,7 @@ type CmcdSession = {
 	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void
 	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void
 	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void
-	configure(settings: CmcdRequestReportConfig): void
+	configure(settings: CmcdSessionRequestReportConfig): void
 	start(immediate?: boolean): void
 	stop(): void
 	flush(): void
@@ -306,7 +312,7 @@ type CmcdSession = {
 function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status: number }>): CmcdSession
 ```
 
-The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordResponseReceived`, `enabledKeys`, `eventTargets`, `customHeaderMap`, and the `requester` argument. The configuration types are the types of `CmcdReporter`, so the existing configuration objects of a player type-check against the session. The default requester is `fetch`.
+The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordResponseReceived`, `enabledKeys`, `eventTargets`, `customHeaderMap`, and the `requester` argument. The session types derive from the types of `CmcdReporter`, so a configuration object without `transform` type-checks against both APIs. The default requester is `fetch`.
 
 ### Reports
 
@@ -365,10 +371,10 @@ A target sends its queue when the queue reaches `batchSize`, and on `flush()`. A
 |---|---|
 | 2xx | Done. The wait resets. |
 | 410 | Every target with that URL stops for the life of the session. The session clears their queues and waiting values. It also drops a batch still in flight to that URL. |
-| 429, 5xx, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send |
+| 429, 5xx, status 0, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send |
 | Any other status | The batch is dropped. The wait resets. |
 
-The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new lines join the queue and go out with the retry, also an `e` report. CTA-5004-B recommends this back-off for 429 and 5xx responses. `flush()` sends at once, also during a wait. If a POST is in flight, `flush()` sends after its response. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
+The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new lines join the queue and go out with the retry, also an `e` report. CTA-5004-B recommends this back-off for 429 and 5xx responses. Status 0 means that no response arrived, as from an XMLHttpRequest requester after a network failure. `flush()` sends at once, also during a wait. If a POST is in flight, `flush()` sends after its response. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
 
 ### Errors
 
@@ -397,7 +403,7 @@ The message names the parameter, the valid values, and the received value: `crea
 2. The release that adds `createCmcdSession()` marks the exports and the members in the table `@deprecated`. Each notice links to the migration table.
 3. Until its removal, `CmcdReporter` accepts bug fixes only.
 4. Version 3.0.0 removes the deprecated exports and members. The removal does not wait for the players to migrate.
-5. Version 3.0.0 also reworks the configuration types for the session. It removes their type parameter `C`, and it makes `events` required. The TSDoc of `enabledKeys` then names only the default of the session.
+5. Version 3.0.0 also reworks the configuration types. It removes the type parameter `C`, every `transform` member, and the `never` members of the session types. It makes `events` required. The TSDoc of `enabledKeys` then names only the default of the session.
 
 | Deprecated export or member | Kind |
 |---|---|
@@ -406,7 +412,7 @@ The message names the parameter, the valid values, and the received value: `crea
 | `CMCD_REQUEST_PROVENANCE`, `CmcdRequestProvenance` | constant and type |
 | `transform` in `CmcdRequestReportConfig` and in `CmcdEventReportConfig` | members |
 
-Related exports stay. The session uses `CMCD_DEFAULT_TIME_INTERVAL`, and dash.js imports it. `CmcdRequestReport` is the result type of `createRequestReport()`. `CmcdReportConfig`, `CmcdRequestReportConfig`, and `CmcdEventReportConfig` configure the session. `CmcdReportRecorder` and its transports record HTTP traffic and do not depend on `CmcdReporter`.
+Related exports stay. The session uses `CMCD_DEFAULT_TIME_INTERVAL`, and dash.js imports it. `CmcdRequestReport` is the result type of `createRequestReport()`. The session types derive from `CmcdReportConfig`, `CmcdRequestReportConfig`, and `CmcdEventReportConfig`. `CmcdReportRecorder` and its transports record HTTP traffic and do not depend on `CmcdReporter`.
 
 During a migration, a player must not report one `sid` through both APIs. Each API keeps its own sequence numbers.
 
@@ -423,14 +429,14 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 | `createCmcdSession`, prototype | 12.0 µs | 20.5 KB |
 | `CmcdReporter`, current | 20.2 µs | 32.6 KB |
 
-The prototype writes the same request output as `CmcdReporter`, byte for byte, for the same data. The [design record](../plans/cmcd-reporting-architecture/analysis.md) has the method.
+The prototype writes the same request output as `CmcdReporter`, byte for byte, for the same data. The [design record](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md) has the method.
 
 ## Drawbacks
 
 - Each player must migrate. It replaces the store with its own state object, typed as `CmcdSnapshot`, and adds its own state change checks.
 - Until version 3.0.0, the package keeps two implementations of sequence numbers, the `msd` rule, queues, delivery, and timers. A fix or a spec change lands twice.
 - A player that imports both APIs during a migration pays for both, as the bundle table shows.
-- Until version 3.0.0, each configuration type has a member that one API ignores: `transform` for the session, and `filter` for `CmcdReporter`.
+- Until version 3.0.0, the session types carry a `transform` member typed `never`. The member exists only to reject a `CmcdReporter` configuration.
 - During a long outage of a collector, the queues of its targets grow without a limit. `CmcdReporter` has the same behavior.
 - A target cannot receive data that differs from the data of the other targets. The `bg=?0` opt-in of `CmcdReporter` has no equivalent.
 - The session derives no playback keys. Players keep computing `msd`, `bs`, `su`, and `dl`, as they do today.
@@ -442,7 +448,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **`CmcdReporter` alone, with fixes.** The store and the automatic events stay, together with their failure cases. Per-target routing still needs `transform`.
 - **`transform` instead of `filter`.** About 34 of the 54 transform tests of `CmcdReporter` guard the rewrite rules that the Motivation describes. A predicate needs none of them.
 - **Other names for `filter`.** `accept` suggests the HTTP `Accept` header. `include` is a boolean or an array in CML names. `shouldReport` is longer than the other target options. `CmcdEncodeOptions.filter` already uses `filter` for a predicate that keeps an item on `true`.
-- **Configuration types for the session alone.** Earlier drafts had `CmcdSessionSettings` and `CmcdSessionEventTarget`, which repeat the members of the existing types. `CmcdRequestReportConfig` and `CmcdEventReportConfig` name the request reports and event reports of CTA-5004 and CTA-5004-B. Players know these terms, and their existing configuration objects type-check against the session.
+- **The `CmcdReporter` types for the session, with `filter` added.** An earlier draft added `filter` to `CmcdEventReportConfig`, and the session ignored `transform`. A reporter configuration then compiled as a session configuration. The session dropped the transform without an error. The `never` members reject such a configuration at compile time. `Omit` alone does not. `Omit` removes the member from the type, so a value of a wider type stays assignable. The session types keep the members of the existing types and the terms request report and event report.
 - **Other names for the API.** In CMCD, "client" names the player, so `createCmcdClient()` is ambiguous. `createCmcdDispatcher()` does not describe request decoration. `createCmcdReporter()` would sit next to the deprecated class, with other behavior, until version 3.0.0.
 - **Removal after the players migrate.** It would tie the removal to the schedules of three projects. Until the removal, each fix and each spec change lands twice. A player depends on a fixed version of the package, so version 3.0.0 reaches no player by surprise.
 - **`includeOnce()`, or keys derived from `sta`.** A method for the keys with a destination scope adds a call that the key rules make unnecessary. The session could derive `msd`, `bs`, and `bsd` from the play states. shaka-player reports no starting state, though, and dash.js gives `bs` and `bsd` an object type that `sta` does not show.
