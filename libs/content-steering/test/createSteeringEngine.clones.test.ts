@@ -1,14 +1,33 @@
-import { createSteeringEngine, SteeringErrorType, type PathwayClone, type SteeringError } from '@svta/cml-content-steering'
+import {
+	createSteeringEngine,
+	SteeringErrorType,
+	type PathwayClone,
+	type SteeringError,
+} from '@svta/cml-content-steering'
 import { deepEqual, equal } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
-import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
+import {
+	createStubRequester,
+	flush,
+	manifestResponse,
+	type StubResponse,
+} from './createStubRequester.ts'
 
-function clone(id: string, baseId: string, replacement: PathwayClone['URI-REPLACEMENT'] = { HOST: 'backup.example.com' }): PathwayClone {
+function clone(
+	id: string,
+	baseId: string,
+	replacement: PathwayClone['URI-REPLACEMENT'] = { HOST: 'backup.example.com' },
+): PathwayClone {
 	return { 'BASE-ID': baseId, ID: id, 'URI-REPLACEMENT': replacement }
 }
 
 function manifestWithClones(clones: PathwayClone[], priority: string[]): StubResponse {
-	return manifestResponse({ VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': priority, 'PATHWAY-CLONES': clones })
+	return manifestResponse({
+		VERSION: 1,
+		TTL: 60,
+		'PATHWAY-PRIORITY': priority,
+		'PATHWAY-CLONES': clones,
+	})
 }
 
 async function receive(...responses: StubResponse[]) {
@@ -25,7 +44,7 @@ async function receive(...responses: StubResponse[]) {
 			events.push('manifest')
 			received.push(clones)
 		},
-		onPathwayChange: (pathway) => events.push(`pathway ${pathway}`),
+		onPathwayChange: pathway => events.push(`pathway ${pathway}`),
 	})
 
 	await engine.start()
@@ -45,7 +64,9 @@ describe('createSteeringEngine clones', () => {
 	it('passes the valid clones to onManifest before it selects a clone', async () => {
 		//#region example
 		const valid = clone('CDN-A-CLONE', 'CDN-A')
-		const { engine, events, received } = await receive(manifestWithClones([valid], ['CDN-A-CLONE', 'CDN-A']))
+		const { engine, events, received } = await receive(
+			manifestWithClones([valid], ['CDN-A-CLONE', 'CDN-A']),
+		)
 		engine.stop()
 
 		deepEqual(received, [[valid]])
@@ -59,7 +80,9 @@ describe('createSteeringEngine clones', () => {
 		const second = clone('C2', 'C1')
 		const early = clone('C0', 'C3')
 		const late = clone('C3', 'CDN-B')
-		const { engine, received } = await receive(manifestWithClones([first, second, early, late], ['C0', 'C2']))
+		const { engine, received } = await receive(
+			manifestWithClones([first, second, early, late], ['C0', 'C2']),
+		)
 		engine.stop()
 
 		deepEqual(received[0], [first, second, late])
@@ -79,7 +102,9 @@ describe('createSteeringEngine clones', () => {
 		]
 		const valid = clone('C7', 'CDN-A', { PARAMS: { token: 'x' } })
 		const duplicate = clone('C7', 'CDN-B')
-		const { engine, received } = await receive(manifestWithClones([...invalid, valid, duplicate], ['C1', 'C3', 'C7']))
+		const { engine, received } = await receive(
+			manifestWithClones([...invalid, valid, duplicate], ['C1', 'C3', 'C7']),
+		)
 		engine.stop()
 
 		deepEqual(received[0], [valid])
@@ -97,7 +122,7 @@ describe('createSteeringEngine clones', () => {
 			pathways: ['CDN-A', 'CDN-B'],
 			pathway: 'CDN-A',
 			requester,
-			acceptClone: (candidate) => candidate.ID !== 'C1',
+			acceptClone: candidate => candidate.ID !== 'C1',
 			onManifest: (_manifest, clones) => received.push(clones),
 		})
 
@@ -119,7 +144,7 @@ describe('createSteeringEngine clones', () => {
 			pathways: ['CDN-A', 'CDN-B'],
 			pathway: 'CDN-A',
 			requester,
-			acceptClone: (candidate) => candidate.ID !== 'C1',
+			acceptClone: candidate => candidate.ID !== 'C1',
 			onManifest: (_manifest, clones) => received.push(clones),
 		})
 
@@ -146,7 +171,7 @@ describe('createSteeringEngine clones', () => {
 				throw cause
 			},
 			onManifest: (_manifest, clones) => received.push(clones),
-			onError: (error) => errors.push(error),
+			onError: error => errors.push(error),
 		})
 
 		await engine.start()
@@ -154,7 +179,14 @@ describe('createSteeringEngine clones', () => {
 
 		deepEqual(received, [[]])
 		equal(engine.pathway, 'CDN-A')
-		deepEqual(errors, [{ type: SteeringErrorType.CALLBACK, callback: 'acceptClone', cause, message: 'The acceptClone callback threw.' }])
+		deepEqual(errors, [
+			{
+				type: SteeringErrorType.CALLBACK,
+				callback: 'acceptClone',
+				cause,
+				message: 'The acceptClone callback threw.',
+			},
+		])
 	})
 
 	it('ignores a clone without a valid structure and applies the Steering Manifest', async () => {

@@ -1,4 +1,10 @@
-import { createSteeringEngine, SteeringErrorType, type SteeringEngineConfig, type SteeringError, type SteeringRequester } from '@svta/cml-content-steering'
+import {
+	createSteeringEngine,
+	SteeringErrorType,
+	type SteeringEngineConfig,
+	type SteeringError,
+	type SteeringRequester,
+} from '@svta/cml-content-steering'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
@@ -6,7 +12,10 @@ import { createStubRequester, flush, manifestResponse } from './createStubReques
 
 const MANIFEST = { VERSION: 1, TTL: 300, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
 
-function config(requester: SteeringRequester, overrides: Partial<SteeringEngineConfig> = {}): SteeringEngineConfig {
+function config(
+	requester: SteeringRequester,
+	overrides: Partial<SteeringEngineConfig> = {},
+): SteeringEngineConfig {
 	return {
 		protocol: 'hls',
 		uri: 'https://steering.example.com/manifest.json',
@@ -20,7 +29,7 @@ function config(requester: SteeringRequester, overrides: Partial<SteeringEngineC
 function createDeferredRequester() {
 	const requests: HttpRequest[] = []
 	const answers: ((response: Omit<HttpResponse, 'request'>) => void)[] = []
-	const requester: SteeringRequester = (request) => {
+	const requester: SteeringRequester = request => {
 		requests.push(request)
 		return new Promise(resolve => answers.push(response => resolve({ request, ...response })))
 	}
@@ -45,7 +54,9 @@ describe('createSteeringEngine lifecycle', () => {
 	it('resolves the promise of start() after onManifest', async () => {
 		const events: string[] = []
 		const { requester } = createStubRequester(manifestResponse(MANIFEST))
-		const engine = createSteeringEngine(config(requester, { onManifest: () => events.push('manifest') }))
+		const engine = createSteeringEngine(
+			config(requester, { onManifest: () => events.push('manifest') }),
+		)
 
 		await engine.start()
 		events.push('resolved')
@@ -66,9 +77,11 @@ describe('createSteeringEngine lifecycle', () => {
 	})
 
 	it('resolves the promise of start() when the requester fails', async () => {
-		const engine = createSteeringEngine(config(async () => {
-			throw new Error('offline')
-		}))
+		const engine = createSteeringEngine(
+			config(async () => {
+				throw new Error('offline')
+			}),
+		)
 
 		await engine.start()
 		engine.stop()
@@ -79,7 +92,9 @@ describe('createSteeringEngine lifecycle', () => {
 	it('resolves a pending promise of start() on stop() and ignores the late response', async () => {
 		const { requester, answers } = createDeferredRequester()
 		const changes: string[] = []
-		const engine = createSteeringEngine(config(requester, { onPathwayChange: (pathway) => changes.push(pathway) }))
+		const engine = createSteeringEngine(
+			config(requester, { onPathwayChange: pathway => changes.push(pathway) }),
+		)
 
 		const promise = engine.start()
 		engine.stop()
@@ -94,7 +109,10 @@ describe('createSteeringEngine lifecycle', () => {
 
 	it('waits for the rest of the TTL when it resumes', async () => {
 		//#region example
-		const { requester, requests } = createStubRequester(manifestResponse(MANIFEST), manifestResponse(MANIFEST))
+		const { requester, requests } = createStubRequester(
+			manifestResponse(MANIFEST),
+			manifestResponse(MANIFEST),
+		)
 		const engine = createSteeringEngine(config(requester))
 
 		await engine.start()
@@ -116,7 +134,10 @@ describe('createSteeringEngine lifecycle', () => {
 	})
 
 	it('requests at once when it resumes after the TTL', async () => {
-		const { requester, requests } = createStubRequester(manifestResponse(MANIFEST), manifestResponse(MANIFEST))
+		const { requester, requests } = createStubRequester(
+			manifestResponse(MANIFEST),
+			manifestResponse(MANIFEST),
+		)
 		const engine = createSteeringEngine(config(requester))
 
 		await engine.start()
@@ -132,7 +153,10 @@ describe('createSteeringEngine lifecycle', () => {
 	it('does not send the next request before the full TTL when the TTL exceeds the setTimeout cap', async () => {
 		const MAX_DELAY = 2147483647
 		const longManifest = { VERSION: 1, TTL: 3000000, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
-		const { requester, requests } = createStubRequester(manifestResponse(longManifest), manifestResponse(MANIFEST))
+		const { requester, requests } = createStubRequester(
+			manifestResponse(longManifest),
+			manifestResponse(MANIFEST),
+		)
 		const engine = createSteeringEngine(config(requester))
 
 		await engine.start()
@@ -180,34 +204,48 @@ describe('createSteeringEngine lifecycle', () => {
 		const cause = new Error('player bug')
 		const errors: SteeringError[] = []
 		const { requester } = createStubRequester(manifestResponse(MANIFEST))
-		const engine = createSteeringEngine(config(requester, {
-			onManifest: () => {
-				throw cause
-			},
-			onError: (error) => errors.push(error),
-		}))
+		const engine = createSteeringEngine(
+			config(requester, {
+				onManifest: () => {
+					throw cause
+				},
+				onError: error => errors.push(error),
+			}),
+		)
 
 		await engine.start()
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-B')
-		deepEqual(errors, [{ type: SteeringErrorType.CALLBACK, callback: 'onManifest', cause, message: 'The onManifest callback threw.' }])
+		deepEqual(errors, [
+			{
+				type: SteeringErrorType.CALLBACK,
+				callback: 'onManifest',
+				cause,
+				message: 'The onManifest callback threw.',
+			},
+		])
 	})
 
 	it('throws a callback error to the caller of penalize() after it selects', async () => {
 		const cause = new Error('player bug')
 		const { requester } = createStubRequester(manifestResponse(MANIFEST))
-		const engine = createSteeringEngine(config(requester, {
-			onPathwayChange: (pathway) => {
-				if (pathway === 'CDN-A') {
-					throw cause
-				}
-			},
-		}))
+		const engine = createSteeringEngine(
+			config(requester, {
+				onPathwayChange: pathway => {
+					if (pathway === 'CDN-A') {
+						throw cause
+					}
+				},
+			}),
+		)
 
 		await engine.start()
 
-		throws(() => engine.penalize(), (error) => error === cause)
+		throws(
+			() => engine.penalize(),
+			error => error === cause,
+		)
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-A')
@@ -217,20 +255,25 @@ describe('createSteeringEngine lifecycle', () => {
 		const cause = new Error('player bug')
 		let fail = false
 		const { requester } = createStubRequester(manifestResponse(MANIFEST))
-		const engine = createSteeringEngine(config(requester, {
-			penalty: 1000,
-			onPathwayChange: () => {
-				if (fail) {
-					throw cause
-				}
-			},
-		}))
+		const engine = createSteeringEngine(
+			config(requester, {
+				penalty: 1000,
+				onPathwayChange: () => {
+					if (fail) {
+						throw cause
+					}
+				},
+			}),
+		)
 
 		await engine.start()
 		engine.penalize()
 		fail = true
 
-		throws(() => mock.timers.tick(1000), (error) => error === cause)
+		throws(
+			() => mock.timers.tick(1000),
+			error => error === cause,
+		)
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-B')
@@ -240,32 +283,46 @@ describe('createSteeringEngine lifecycle', () => {
 		const cause = new Error('player bug')
 		const errors: SteeringError[] = []
 		const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
-		const engine = createSteeringEngine(config(requester, {
-			getThroughput: () => {
-				throw cause
-			},
-			onError: (error) => errors.push(error),
-		}))
+		const engine = createSteeringEngine(
+			config(requester, {
+				getThroughput: () => {
+					throw cause
+				},
+				onError: error => errors.push(error),
+			}),
+		)
 
 		await engine.start()
 		engine.stop()
 
 		equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22')
-		deepEqual(errors, [{ type: SteeringErrorType.CALLBACK, callback: 'getThroughput', cause, message: 'The getThroughput callback threw.' }])
+		deepEqual(errors, [
+			{
+				type: SteeringErrorType.CALLBACK,
+				callback: 'getThroughput',
+				cause,
+				message: 'The getThroughput callback threw.',
+			},
+		])
 	})
 
 	it('throws a callback error of start() from a timer callback without onError', async () => {
 		const cause = new Error('player bug')
 		const { requester } = createStubRequester(manifestResponse(MANIFEST))
-		const engine = createSteeringEngine(config(requester, {
-			getThroughput: () => {
-				throw cause
-			},
-		}))
+		const engine = createSteeringEngine(
+			config(requester, {
+				getThroughput: () => {
+					throw cause
+				},
+			}),
+		)
 
 		await engine.start()
 
-		throws(() => mock.timers.tick(1), (error) => error === cause)
+		throws(
+			() => mock.timers.tick(1),
+			error => error === cause,
+		)
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-B')

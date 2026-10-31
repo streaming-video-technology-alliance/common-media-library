@@ -11,7 +11,10 @@
  *
  * @internal
  */
-export function replaceQueryParams(search: string, params: Readonly<Record<string, string>>): string {
+export function replaceQueryParams(
+	search: string,
+	params: Readonly<Record<string, string>>,
+): string {
 	const query = search.startsWith('?') ? search.slice(1) : search
 	const parts = query ? query.split('&') : []
 

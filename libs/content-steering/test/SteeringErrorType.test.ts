@@ -1,4 +1,9 @@
-import { STEERING_ERROR_TYPE_CALLBACK, STEERING_ERROR_TYPE_LOAD, STEERING_ERROR_TYPE_PARSE, SteeringErrorType } from '@svta/cml-content-steering'
+import {
+	STEERING_ERROR_TYPE_CALLBACK,
+	STEERING_ERROR_TYPE_LOAD,
+	STEERING_ERROR_TYPE_PARSE,
+	SteeringErrorType,
+} from '@svta/cml-content-steering'
 import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 

@@ -17,7 +17,11 @@ const PATHWAY_ID = /^[\w.-]+$/
  *
  * @internal
  */
-export function resolveClones(clones: readonly unknown[], pathways: readonly string[], accept: (clone: PathwayClone) => boolean): PathwayClone[] {
+export function resolveClones(
+	clones: readonly unknown[],
+	pathways: readonly string[],
+	accept: (clone: PathwayClone) => boolean,
+): PathwayClone[] {
 	const known = new Set(pathways)
 	const valid: PathwayClone[] = []
 
@@ -30,7 +34,12 @@ export function resolveClones(clones: readonly unknown[], pathways: readonly str
 
 		const id = clone.ID
 
-		if (!PATHWAY_ID.test(id) || known.has(id) || !known.has(clone['BASE-ID']) || !isValidReplacement(clone['URI-REPLACEMENT'])) {
+		if (
+			!PATHWAY_ID.test(id) ||
+			known.has(id) ||
+			!known.has(clone['BASE-ID']) ||
+			!isValidReplacement(clone['URI-REPLACEMENT'])
+		) {
 			continue
 		}
 
@@ -54,5 +63,9 @@ function isValidReplacement({ HOST, PARAMS }: UriReplacement): boolean {
 		return true
 	}
 
-	return typeof PARAMS === 'object' && PARAMS !== null && Object.keys(PARAMS).every(name => name !== '' && typeof PARAMS[name] === 'string')
+	return (
+		typeof PARAMS === 'object' &&
+		PARAMS !== null &&
+		Object.keys(PARAMS).every(name => name !== '' && typeof PARAMS[name] === 'string')
+	)
 }

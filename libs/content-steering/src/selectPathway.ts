@@ -10,6 +10,10 @@
  *
  * @internal
  */
-export function selectPathway(priority: readonly string[], known: ReadonlySet<string>, penalized: ReadonlyMap<string, number>): string | undefined {
+export function selectPathway(
+	priority: readonly string[],
+	known: ReadonlySet<string>,
+	penalized: ReadonlyMap<string, number>,
+): string | undefined {
 	return priority.find(pathway => known.has(pathway) && !penalized.has(pathway))
 }

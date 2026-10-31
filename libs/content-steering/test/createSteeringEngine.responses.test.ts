@@ -1,7 +1,18 @@
-import { createSteeringEngine, DEFAULT_TTL, SteeringErrorType, type SteeringEngineConfig, type SteeringError } from '@svta/cml-content-steering'
+import {
+	createSteeringEngine,
+	DEFAULT_TTL,
+	SteeringErrorType,
+	type SteeringEngineConfig,
+	type SteeringError,
+} from '@svta/cml-content-steering'
 import { deepEqual, equal, ok } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
-import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
+import {
+	createStubRequester,
+	flush,
+	manifestResponse,
+	type StubResponse,
+} from './createStubRequester.ts'
 
 const NOW = Date.parse('Sun, 06 Nov 1994 08:49:37 GMT')
 const MANIFEST = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
@@ -18,12 +29,12 @@ function setup(protocol: 'hls' | 'dash', ...responses: StubResponse[]) {
 		pathways: ['CDN-A', 'CDN-B'],
 		pathway: 'CDN-A',
 		requester: stub.requester,
-		onError: (error) => {
+		onError: error => {
 			if (error.type !== SteeringErrorType.CALLBACK) {
 				errors.push(error)
 			}
 		},
-		onManifest: (manifest) => manifests.push(manifest),
+		onManifest: manifest => manifests.push(manifest),
 	}
 	const engine = createSteeringEngine(config)
 
@@ -47,7 +58,11 @@ describe('createSteeringEngine responses', () => {
 	describe('valid Steering Manifest', () => {
 		it('applies the Steering Manifest and requests again after TTL seconds', async () => {
 			//#region example
-			const { engine, requests, manifests } = setup('hls', manifestResponse(MANIFEST), manifestResponse(MANIFEST))
+			const { engine, requests, manifests } = setup(
+				'hls',
+				manifestResponse(MANIFEST),
+				manifestResponse(MANIFEST),
+			)
 
 			await engine.start()
 
@@ -64,7 +79,11 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('waits at least 1 second before the next request for a TTL below 1 second', async () => {
-			const { engine, requests } = setup('hls', manifestResponse({ ...MANIFEST, TTL: 0.001 }), manifestResponse(MANIFEST))
+			const { engine, requests } = setup(
+				'hls',
+				manifestResponse({ ...MANIFEST, TTL: 0.001 }),
+				manifestResponse(MANIFEST),
+			)
 
 			await engine.start()
 
@@ -77,7 +96,10 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('accepts an empty PATHWAY-CLONES array', async () => {
-			const { engine, errors } = setup('hls', manifestResponse({ ...MANIFEST, 'PATHWAY-CLONES': [] }))
+			const { engine, errors } = setup(
+				'hls',
+				manifestResponse({ ...MANIFEST, 'PATHWAY-CLONES': [] }),
+			)
 
 			await engine.start()
 			engine.stop()
@@ -88,7 +110,10 @@ describe('createSteeringEngine responses', () => {
 
 		it('keeps the first of each pathway ID in PATHWAY-PRIORITY', async () => {
 			// @ts-expect-error - a pathway ID that is not a string
-			const { engine } = setup('hls', manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': ['CDN-B', 7, 'CDN-B', 'CDN-A'] }))
+			const { engine } = setup(
+				'hls',
+				manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': ['CDN-B', 7, 'CDN-B', 'CDN-A'] }),
+			)
 
 			await engine.start()
 			engine.stop()
@@ -112,14 +137,24 @@ describe('createSteeringEngine responses', () => {
 				protocol: 'hls',
 				uri: 'https://steering.example.com/a/manifest.json',
 				pathways: ['CDN-A', 'CDN-B'],
-				requester: async (request) => ({ request, status: 200, url: 'https://cdn.example.com/b/manifest.json', data: JSON.stringify(manifest) }),
+				requester: async request => ({
+					request,
+					status: 200,
+					url: 'https://cdn.example.com/b/manifest.json',
+					data: JSON.stringify(manifest),
+				}),
 				onManifest: (_manifest, _clones, context) => contexts.push(context),
 			})
 
 			await engine.start()
 			engine.stop()
 
-			deepEqual(contexts, [{ url: 'https://cdn.example.com/b/manifest.json', reloadUri: 'https://cdn.example.com/b/next.json' }])
+			deepEqual(contexts, [
+				{
+					url: 'https://cdn.example.com/b/manifest.json',
+					reloadUri: 'https://cdn.example.com/b/next.json',
+				},
+			])
 		})
 
 		it('accepts a body that is already parsed', async () => {
@@ -133,18 +168,29 @@ describe('createSteeringEngine responses', () => {
 
 		it('resolves a relative RELOAD-URI against the response URI', async () => {
 			const manifest = { ...MANIFEST, 'RELOAD-URI': 'next.json?session=1' }
-			const { engine, requests } = setup('hls', manifestResponse(manifest, 'https://cdn.example.com/b/manifest.json'), manifestResponse(MANIFEST))
+			const { engine, requests } = setup(
+				'hls',
+				manifestResponse(manifest, 'https://cdn.example.com/b/manifest.json'),
+				manifestResponse(MANIFEST),
+			)
 
 			await engine.start()
 			await advance(60000)
 			engine.stop()
 
-			equal(requests[1].url, 'https://cdn.example.com/b/next.json?session=1&_HLS_pathway=%22CDN-B%22')
+			equal(
+				requests[1].url,
+				'https://cdn.example.com/b/next.json?session=1&_HLS_pathway=%22CDN-B%22',
+			)
 		})
 
 		it('resolves a relative RELOAD-URI against the request URI without a response URI', async () => {
 			const manifest = { ...MANIFEST, 'RELOAD-URI': '../reload.json' }
-			const { engine, requests } = setup('hls', manifestResponse(manifest), manifestResponse(MANIFEST))
+			const { engine, requests } = setup(
+				'hls',
+				manifestResponse(manifest),
+				manifestResponse(MANIFEST),
+			)
 
 			await engine.start()
 			await advance(60000)
@@ -161,12 +207,17 @@ describe('createSteeringEngine responses', () => {
 				protocol: 'hls',
 				uri,
 				pathways: ['CDN-A', 'CDN-B'],
-				requester: async (request) => ({ request, status: 200, url: request.url, data: JSON.stringify(manifest) }),
-				onError: (error) => {
-			if (error.type !== SteeringErrorType.CALLBACK) {
-				errors.push(error)
-			}
-		},
+				requester: async request => ({
+					request,
+					status: 200,
+					url: request.url,
+					data: JSON.stringify(manifest),
+				}),
+				onError: error => {
+					if (error.type !== SteeringErrorType.CALLBACK) {
+						errors.push(error)
+					}
+				},
 			})
 
 			await engine.start()
@@ -180,7 +231,11 @@ describe('createSteeringEngine responses', () => {
 
 	describe('invalid Steering Manifest', () => {
 		it('reports a parse error for a body that is not JSON and requests again after DEFAULT_TTL', async () => {
-			const { engine, errors, requests } = setup('hls', { status: 200, data: '<html>' }, manifestResponse(MANIFEST))
+			const { engine, errors, requests } = setup(
+				'hls',
+				{ status: 200, data: '<html>' },
+				manifestResponse(MANIFEST),
+			)
 
 			await engine.start()
 
@@ -228,7 +283,11 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('keeps the previous state after an invalid Steering Manifest', async () => {
-			const { engine, errors } = setup('hls', manifestResponse(MANIFEST), manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': [] }))
+			const { engine, errors } = setup(
+				'hls',
+				manifestResponse(MANIFEST),
+				manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': [] }),
+			)
 
 			await engine.start()
 			await advance(60000)
@@ -260,7 +319,11 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('reports a parse error and retries when the DASH response body is a Uint8Array', async () => {
-			const { engine, errors, requests } = setup('dash', { status: 200, data: new Uint8Array([1, 2, 3]) }, manifestResponse(MANIFEST))
+			const { engine, errors, requests } = setup(
+				'dash',
+				{ status: 200, data: new Uint8Array([1, 2, 3]) },
+				manifestResponse(MANIFEST),
+			)
 
 			await engine.start()
 
@@ -275,7 +338,11 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('ends the requests after a VERSION other than 1 for DASH and uses the fallback priority list', async () => {
-			const { engine, errors, requests } = setup('dash', manifestResponse(MANIFEST), manifestResponse({ ...MANIFEST, VERSION: 2 }))
+			const { engine, errors, requests } = setup(
+				'dash',
+				manifestResponse(MANIFEST),
+				manifestResponse({ ...MANIFEST, VERSION: 2 }),
+			)
 
 			await engine.start()
 			equal(engine.pathway, 'CDN-B')
@@ -324,7 +391,11 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('keeps the priority list of the last valid Steering Manifest', async () => {
-			const { engine } = setup('hls', manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': ['CDN-B'] }), { status: 410 })
+			const { engine } = setup(
+				'hls',
+				manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': ['CDN-B'] }),
+				{ status: 410 },
+			)
 
 			await engine.start()
 			await advance(60000)
@@ -371,7 +442,11 @@ describe('createSteeringEngine responses', () => {
 
 	describe('HTTP 429', () => {
 		it('requests again after the Retry-After seconds', async () => {
-			const { engine, errors, requests } = setup('hls', { status: 429, headers: { 'Retry-After': '120' } }, manifestResponse(MANIFEST))
+			const { engine, errors, requests } = setup(
+				'hls',
+				{ status: 429, headers: { 'Retry-After': '120' } },
+				manifestResponse(MANIFEST),
+			)
 
 			await engine.start()
 
@@ -388,7 +463,10 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('requests again at the Retry-After HTTP date', async () => {
-			const { engine, errors } = setup('hls', { status: 429, headers: { 'retry-after': 'Sun, 06 Nov 1994 08:51:37 GMT' } })
+			const { engine, errors } = setup('hls', {
+				status: 429,
+				headers: { 'retry-after': 'Sun, 06 Nov 1994 08:51:37 GMT' },
+			})
 
 			await engine.start()
 			engine.stop()
@@ -397,7 +475,10 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('uses the previous TTL for a Retry-After HTTP date in the past', async () => {
-			const { engine, errors } = setup('hls', { status: 429, headers: { 'retry-after': 'Sun, 06 Nov 1994 08:00:00 GMT' } })
+			const { engine, errors } = setup('hls', {
+				status: 429,
+				headers: { 'retry-after': 'Sun, 06 Nov 1994 08:00:00 GMT' },
+			})
 
 			await engine.start()
 			engine.stop()
@@ -406,7 +487,10 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('ignores a Retry-After with too many digits to be finite', async () => {
-			const { engine, errors } = setup('hls', { status: 429, headers: { 'retry-after': '9'.repeat(400) } })
+			const { engine, errors } = setup('hls', {
+				status: 429,
+				headers: { 'retry-after': '9'.repeat(400) },
+			})
 
 			await engine.start()
 			engine.stop()
@@ -424,7 +508,12 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('does not change the TTL for HLS', async () => {
-			const { engine, errors } = setup('hls', manifestResponse(MANIFEST), { status: 429, headers: { 'retry-after': '5' } }, { status: 500 })
+			const { engine, errors } = setup(
+				'hls',
+				manifestResponse(MANIFEST),
+				{ status: 429, headers: { 'retry-after': '5' } },
+				{ status: 500 },
+			)
 
 			await engine.start()
 			await advance(60000)
@@ -436,7 +525,12 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('replaces the TTL with the Retry-After value for DASH', async () => {
-			const { engine, errors } = setup('dash', manifestResponse(MANIFEST), { status: 429, headers: { 'retry-after': '5' } }, { status: 500 })
+			const { engine, errors } = setup(
+				'dash',
+				manifestResponse(MANIFEST),
+				{ status: 429, headers: { 'retry-after': '5' } },
+				{ status: 500 },
+			)
 
 			await engine.start()
 			await advance(60000)
@@ -448,7 +542,12 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('does not change the TTL for DASH when the Retry-After has too many digits to be finite', async () => {
-			const { engine, errors } = setup('dash', manifestResponse(MANIFEST), { status: 429, headers: { 'retry-after': '9'.repeat(400) } }, { status: 500 })
+			const { engine, errors } = setup(
+				'dash',
+				manifestResponse(MANIFEST),
+				{ status: 429, headers: { 'retry-after': '9'.repeat(400) } },
+				{ status: 500 },
+			)
 
 			await engine.start()
 			await advance(60000)
@@ -460,7 +559,12 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('ignores a Retry-After of 0 for DASH and keeps the previous TTL for retries and penalties', async () => {
-			const { engine, errors, requests } = setup('dash', manifestResponse(MANIFEST), { status: 429, headers: { 'retry-after': '0' } }, { status: 503 })
+			const { engine, errors, requests } = setup(
+				'dash',
+				manifestResponse(MANIFEST),
+				{ status: 429, headers: { 'retry-after': '0' } },
+				{ status: 503 },
+			)
 
 			await engine.start()
 			equal(engine.pathway, 'CDN-B')
@@ -524,7 +628,7 @@ describe('createSteeringEngine responses', () => {
 				pathway: 'CDN-A',
 				// @ts-expect-error - a requester that forgets to return a response
 				requester: async () => undefined,
-				onError: (error) => {
+				onError: error => {
 					if (error.type !== SteeringErrorType.CALLBACK) {
 						errors.push(error)
 					}

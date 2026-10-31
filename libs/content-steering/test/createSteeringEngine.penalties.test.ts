@@ -1,7 +1,17 @@
-import { createSteeringEngine, DEFAULT_PATHWAY_PENALTY, type SteeringEngine, type SteeringEngineConfig } from '@svta/cml-content-steering'
+import {
+	createSteeringEngine,
+	DEFAULT_PATHWAY_PENALTY,
+	type SteeringEngine,
+	type SteeringEngineConfig,
+} from '@svta/cml-content-steering'
 import { deepEqual, equal } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
-import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
+import {
+	createStubRequester,
+	flush,
+	manifestResponse,
+	type StubResponse,
+} from './createStubRequester.ts'
 
 const PRIORITY = ['CDN-A', 'CDN-B', 'CDN-C']
 
@@ -14,7 +24,7 @@ async function started(overrides: Partial<SteeringEngineConfig>, ...responses: S
 		pathways: ['CDN-A', 'CDN-B', 'CDN-C'],
 		pathway: 'CDN-A',
 		requester,
-		onPathwayChange: (pathway) => changes.push(pathway),
+		onPathwayChange: pathway => changes.push(pathway),
 		...overrides,
 	})
 
@@ -38,7 +48,10 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('selects the next pathway when the selected pathway is penalized', async () => {
-		const { engine, changes } = await started({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }))
+		const { engine, changes } = await started(
+			{},
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
 
 		engine.penalize()
 		engine.stop()
@@ -48,7 +61,10 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('does not change the selection for a pathway that is not selected', async () => {
-		const { engine, changes } = await started({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }))
+		const { engine, changes } = await started(
+			{},
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
 
 		engine.penalize('CDN-C')
 		engine.stop()
@@ -59,7 +75,10 @@ describe('createSteeringEngine penalties', () => {
 
 	it('selects again when an HLS penalty of DEFAULT_PATHWAY_PENALTY ends', async () => {
 		//#region example
-		const { engine, changes } = await started({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }))
+		const { engine, changes } = await started(
+			{},
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
 
 		engine.penalize()
 		await advance(DEFAULT_PATHWAY_PENALTY - 1)
@@ -74,7 +93,11 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('uses the TTL of the last valid Steering Manifest as the DASH penalty', async () => {
-		const { engine } = await started({ protocol: 'dash' }, manifestResponse({ VERSION: 1, TTL: 30, 'PATHWAY-PRIORITY': PRIORITY }), manifestResponse({ VERSION: 1, TTL: 30, 'PATHWAY-PRIORITY': PRIORITY }))
+		const { engine } = await started(
+			{ protocol: 'dash' },
+			manifestResponse({ VERSION: 1, TTL: 30, 'PATHWAY-PRIORITY': PRIORITY }),
+			manifestResponse({ VERSION: 1, TTL: 30, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
 
 		engine.penalize()
 		await advance(29999)
@@ -87,7 +110,10 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('uses a DASH penalty of at least 1 second for a TTL below 1 second', async () => {
-		const { engine } = await started({ protocol: 'dash' }, manifestResponse({ VERSION: 1, TTL: 0.001, 'PATHWAY-PRIORITY': PRIORITY }))
+		const { engine } = await started(
+			{ protocol: 'dash' },
+			manifestResponse({ VERSION: 1, TTL: 0.001, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
 
 		engine.penalize()
 		await advance(999)
@@ -100,7 +126,10 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('uses the penalty of the configuration for both protocols', async () => {
-		const { engine } = await started({ penalty: 1000 }, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }))
+		const { engine } = await started(
+			{ penalty: 1000 },
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
 
 		engine.penalize()
 		await advance(1000)
@@ -121,7 +150,10 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('restarts a penalty when the pathway is penalized again', async () => {
-		const { engine } = await started({ penalty: 1000 }, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] }))
+		const { engine } = await started(
+			{ penalty: 1000 },
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A', 'CDN-B'] }),
+		)
 
 		engine.penalize('CDN-A')
 		await advance(500)
@@ -136,7 +168,10 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('keeps the selection when no pathway qualifies', async () => {
-		const { engine, changes } = await started({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A'] }))
+		const { engine, changes } = await started(
+			{},
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-A'] }),
+		)
 
 		engine.penalize()
 		engine.stop()
@@ -146,7 +181,9 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('selects the next pathway when onPathwayChange penalizes the selected one', async () => {
-		const { requester } = createStubRequester(manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A', 'CDN-C'] }))
+		const { requester } = createStubRequester(
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A', 'CDN-C'] }),
+		)
 		const changes: string[] = []
 		const nested: boolean[] = []
 		let inside = false
@@ -156,7 +193,7 @@ describe('createSteeringEngine penalties', () => {
 			pathways: PRIORITY,
 			pathway: 'CDN-A',
 			requester,
-			onPathwayChange: (pathway) => {
+			onPathwayChange: pathway => {
 				changes.push(pathway)
 				nested.push(inside)
 
@@ -177,7 +214,9 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('keeps the selection when onPathwayChange penalizes every pathway', async () => {
-		const { requester } = createStubRequester(manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }))
+		const { requester } = createStubRequester(
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }),
+		)
 		const changes: string[] = []
 		const engine: SteeringEngine = createSteeringEngine({
 			protocol: 'hls',
@@ -185,7 +224,7 @@ describe('createSteeringEngine penalties', () => {
 			pathways: ['CDN-A', 'CDN-B'],
 			pathway: 'CDN-A',
 			requester,
-			onPathwayChange: (pathway) => {
+			onPathwayChange: pathway => {
 				changes.push(pathway)
 				engine.penalize(pathway)
 			},
@@ -199,7 +238,10 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('ignores pathway IDs that the Content Description does not define', async () => {
-		const { engine } = await started({}, manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-X', 'CDN-C'] }))
+		const { engine } = await started(
+			{},
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-X', 'CDN-C'] }),
+		)
 
 		engine.stop()
 
@@ -207,7 +249,9 @@ describe('createSteeringEngine penalties', () => {
 	})
 
 	it('fails over with the fallback priority list before the first Steering Manifest', async () => {
-		const { requester } = createStubRequester(manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }))
+		const { requester } = createStubRequester(
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
 		const engine = createSteeringEngine({
 			protocol: 'hls',
 			uri: 'https://steering.example.com/manifest.json',

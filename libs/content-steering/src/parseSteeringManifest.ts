@@ -8,16 +8,16 @@ import { uniqueStrings } from './uniqueStrings.ts'
  */
 export type ParsedSteeringManifest =
 	| {
-		readonly manifest: SteeringManifest;
-		readonly priority: readonly string[];
-		readonly clones: readonly unknown[];
-		readonly reloadUri: string | undefined;
-	}
+			readonly manifest: SteeringManifest
+			readonly priority: readonly string[]
+			readonly clones: readonly unknown[]
+			readonly reloadUri: string | undefined
+	  }
 	| {
-		readonly error: string;
-		readonly version: boolean;
-		readonly cause?: unknown;
-	};
+			readonly error: string
+			readonly version: boolean
+			readonly cause?: unknown
+	  }
 
 /**
  * Parses and checks the body of a Steering Manifest response.
@@ -54,7 +54,10 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 	const manifest = value as SteeringManifest
 
 	if (manifest.VERSION !== 1) {
-		return { error: `The Steering Manifest has VERSION ${JSON.stringify(manifest.VERSION)}, not 1.`, version: true }
+		return {
+			error: `The Steering Manifest has VERSION ${JSON.stringify(manifest.VERSION)}, not 1.`,
+			version: true,
+		}
 	}
 
 	if (typeof manifest.TTL !== 'number' || !Number.isFinite(manifest.TTL) || manifest.TTL <= 0) {
@@ -83,7 +86,11 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 
 		return { manifest, priority, clones, reloadUri: new URL(reload, uri).href }
 	} catch (cause) {
-		return { error: `The RELOAD-URI ${JSON.stringify(reload)} does not resolve.`, version: false, cause }
+		return {
+			error: `The RELOAD-URI ${JSON.stringify(reload)} does not resolve.`,
+			version: false,
+			cause,
+		}
 	}
 }
 

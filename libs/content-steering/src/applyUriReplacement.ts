@@ -12,18 +12,18 @@ export type UriReplacementOptions = {
 	/**
 	 * The absolute URI that a relative `uri` resolves against.
 	 */
-	baseUri?: string;
+	baseUri?: string
 
 	/**
 	 * HLS only. The STABLE-VARIANT-ID of the variant stream of `uri`.
 	 */
-	stableVariantId?: string;
+	stableVariantId?: string
 
 	/**
 	 * HLS only. The STABLE-RENDITION-ID of the rendition of `uri`.
 	 */
-	stableRenditionId?: string;
-};
+	stableRenditionId?: string
+}
 
 /**
  * Builds a URI of a pathway clone from a URI of its base pathway.
@@ -45,9 +45,14 @@ export type UriReplacementOptions = {
  *
  * @beta
  */
-export function applyUriReplacement(uri: string, replacement: UriReplacement, options?: UriReplacementOptions): string {
-	const override = findUri(replacement['PER-VARIANT-URIS'], options?.stableVariantId)
-		?? findUri(replacement['PER-RENDITION-URIS'], options?.stableRenditionId)
+export function applyUriReplacement(
+	uri: string,
+	replacement: UriReplacement,
+	options?: UriReplacementOptions,
+): string {
+	const override =
+		findUri(replacement['PER-VARIANT-URIS'], options?.stableVariantId) ??
+		findUri(replacement['PER-RENDITION-URIS'], options?.stableRenditionId)
 
 	if (override !== undefined) {
 		return override
@@ -65,7 +70,9 @@ export function applyUriReplacement(uri: string, replacement: UriReplacement, op
 		const hostname = toHostname(HOST)
 
 		if (hostname === undefined) {
-			throw new TypeError(`applyUriReplacement: HOST must be a hostname without a port. Received '${HOST}'.`)
+			throw new TypeError(
+				`applyUriReplacement: HOST must be a hostname without a port. Received '${HOST}'.`,
+			)
 		}
 
 		url.hostname = hostname
@@ -101,6 +108,8 @@ function toUrl(uri: string, baseUri: string | undefined): URL {
 	try {
 		return new URL(uri, baseUri)
 	} catch {
-		throw new TypeError(`applyUriReplacement: uri must be absolute, or baseUri must be an absolute URI. Received uri '${uri}' and baseUri '${baseUri}'.`)
+		throw new TypeError(
+			`applyUriReplacement: uri must be absolute, or baseUri must be an absolute URI. Received uri '${uri}' and baseUri '${baseUri}'.`,
+		)
 	}
 }

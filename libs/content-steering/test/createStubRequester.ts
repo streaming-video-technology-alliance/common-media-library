@@ -4,10 +4,10 @@ import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 export type StubResponse = Omit<HttpResponse, 'request'> | Error
 
 export type StubRequester = {
-	readonly requester: SteeringRequester;
-	readonly requests: HttpRequest[];
-	respond(...responses: StubResponse[]): void;
-};
+	readonly requester: SteeringRequester
+	readonly requests: HttpRequest[]
+	respond(...responses: StubResponse[]): void
+}
 
 /**
  * Creates a requester that records each request and answers it with the
@@ -20,7 +20,7 @@ export function createStubRequester(...responses: StubResponse[]): StubRequester
 
 	return {
 		requests,
-		requester: async (request) => {
+		requester: async request => {
 			requests.push(request)
 
 			const next = queue.shift() ?? { status: 500 }
@@ -40,7 +40,10 @@ export function createStubRequester(...responses: StubResponse[]): StubRequester
 /**
  * Creates a status 200 response with a Steering Manifest body.
  */
-export function manifestResponse(manifest: Partial<SteeringManifest> & Record<string, unknown>, url?: string): StubResponse {
+export function manifestResponse(
+	manifest: Partial<SteeringManifest> & Record<string, unknown>,
+	url?: string,
+): StubResponse {
 	return { status: 200, url, data: JSON.stringify(manifest) }
 }
 

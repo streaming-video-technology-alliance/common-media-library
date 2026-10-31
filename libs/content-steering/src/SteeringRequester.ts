@@ -13,4 +13,4 @@ import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
  *
  * @beta
  */
-export type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>;
+export type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>

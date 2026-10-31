@@ -1,4 +1,8 @@
-import { STEERING_PROTOCOL_DASH, STEERING_PROTOCOL_HLS, SteeringProtocol } from '@svta/cml-content-steering'
+import {
+	STEERING_PROTOCOL_DASH,
+	STEERING_PROTOCOL_HLS,
+	SteeringProtocol,
+} from '@svta/cml-content-steering'
 import { equal } from 'node:assert'
 import { describe, it } from 'node:test'
 

@@ -10,7 +10,11 @@ import { selectPathway } from './selectPathway.ts'
 import type { SteeringEngine } from './SteeringEngine.ts'
 import type { SteeringEngineConfig } from './SteeringEngineConfig.ts'
 import type { SteeringError } from './SteeringError.ts'
-import { STEERING_ERROR_TYPE_CALLBACK, STEERING_ERROR_TYPE_LOAD, STEERING_ERROR_TYPE_PARSE } from './SteeringErrorType.ts'
+import {
+	STEERING_ERROR_TYPE_CALLBACK,
+	STEERING_ERROR_TYPE_LOAD,
+	STEERING_ERROR_TYPE_PARSE,
+} from './SteeringErrorType.ts'
 import type { SteeringManifest } from './SteeringManifest.ts'
 import { STEERING_PROTOCOL_DASH, STEERING_PROTOCOL_HLS } from './SteeringProtocol.ts'
 import { uniqueStrings } from './uniqueStrings.ts'
@@ -21,11 +25,14 @@ const SURROGATE = /[\uD800-\uDFFF]/g
 
 type SteeringRequestError = Exclude<SteeringError, { type: typeof STEERING_ERROR_TYPE_CALLBACK }>
 
-type CallbackName = Extract<SteeringError, { type: typeof STEERING_ERROR_TYPE_CALLBACK }>['callback']
+type CallbackName = Extract<
+	SteeringError,
+	{ type: typeof STEERING_ERROR_TYPE_CALLBACK }
+>['callback']
 
 type Failure = {
-	readonly name: CallbackName;
-	readonly cause: unknown;
+	readonly name: CallbackName
+	readonly cause: unknown
 }
 
 /**
@@ -151,11 +158,18 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return
 		}
 
-		penalties.set(pathway, Date.now() + (penalty ?? (isDash ? ttl * 1000 : DEFAULT_PATHWAY_PENALTY)))
+		penalties.set(
+			pathway,
+			Date.now() + (penalty ?? (isDash ? ttl * 1000 : DEFAULT_PATHWAY_PENALTY)),
+		)
 		run(true, select)
 	}
 
-	function update(changes: { readonly uri?: string; readonly pathways?: readonly string[]; readonly priority?: readonly string[] }): void {
+	function update(changes: {
+		readonly uri?: string
+		readonly pathways?: readonly string[]
+		readonly priority?: readonly string[]
+	}): void {
 		const { uri: nextUri, pathways: nextPathways, priority: nextPriority } = changes
 
 		if (nextUri !== undefined) {
@@ -166,8 +180,13 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			checkPathways('SteeringEngine.update', nextPathways)
 		}
 
-		if (nextPriority !== undefined && (!Array.isArray(nextPriority) || nextPriority.some(id => typeof id !== 'string'))) {
-			throw new TypeError(`SteeringEngine.update: priority must be an array of strings. Received ${JSON.stringify(nextPriority)}.`)
+		if (
+			nextPriority !== undefined &&
+			(!Array.isArray(nextPriority) || nextPriority.some(id => typeof id !== 'string'))
+		) {
+			throw new TypeError(
+				`SteeringEngine.update: priority must be an array of strings. Received ${JSON.stringify(nextPriority)}.`,
+			)
 		}
 
 		run(true, () => {
@@ -229,7 +248,12 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 		for (const failure of list) {
 			if (failure !== thrown) {
-				report({ type: STEERING_ERROR_TYPE_CALLBACK, callback: failure.name, cause: failure.cause, message: `The ${failure.name} callback threw.` })
+				report({
+					type: STEERING_ERROR_TYPE_CALLBACK,
+					callback: failure.name,
+					cause: failure.cause,
+					message: `The ${failure.name} callback threw.`,
+				})
 			}
 		}
 
@@ -238,7 +262,11 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		}
 	}
 
-	function invoke<A extends unknown[], R>(name: CallbackName, callback: ((...args: A) => R) | undefined, ...args: A): R | undefined {
+	function invoke<A extends unknown[], R>(
+		name: CallbackName,
+		callback: ((...args: A) => R) | undefined,
+		...args: A
+	): R | undefined {
 		if (!callback) {
 			return undefined
 		}
@@ -267,7 +295,12 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			},
 			(cause: unknown) => {
 				if (token === session) {
-					retry({ type: STEERING_ERROR_TYPE_LOAD, url, cause, message: `The Steering Manifest request failed.` })
+					retry({
+						type: STEERING_ERROR_TYPE_LOAD,
+						url,
+						cause,
+						message: `The Steering Manifest request failed.`,
+					})
 				}
 			},
 		)
@@ -283,7 +316,11 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 	function receive(url: string, response: HttpResponse, requestGeneration: number): void {
 		if (typeof response !== 'object' || response === null) {
-			retry({ type: STEERING_ERROR_TYPE_LOAD, url, message: `The requester did not return a response object.` })
+			retry({
+				type: STEERING_ERROR_TYPE_LOAD,
+				url,
+				message: `The requester did not return a response object.`,
+			})
 			return
 		}
 
@@ -295,30 +332,60 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			const result = parseSteeringManifest(response.data, responseUrl)
 
 			if ('manifest' in result) {
-				apply(result.manifest, result.priority, result.clones, stale ? undefined : result.reloadUri, responseUrl)
+				apply(
+					result.manifest,
+					result.priority,
+					result.clones,
+					stale ? undefined : result.reloadUri,
+					responseUrl,
+				)
 			} else if (isDash && result.version) {
 				if (stale) {
 					retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error }, 0)
 				} else {
 					end()
-					report({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: `${result.error} No request follows.` })
+					report({
+						type: STEERING_ERROR_TYPE_PARSE,
+						url,
+						status,
+						message: `${result.error} No request follows.`,
+					})
 
 					if (!manualPriority) {
 						fallback()
 					}
 				}
 			} else {
-				retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, cause: result.cause, message: result.error })
+				retry({
+					type: STEERING_ERROR_TYPE_PARSE,
+					url,
+					status,
+					cause: result.cause,
+					message: result.error,
+				})
 			}
 			return
 		}
 
 		if (status === 410) {
 			if (stale) {
-				retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410.` }, 0)
+				retry(
+					{
+						type: STEERING_ERROR_TYPE_LOAD,
+						url,
+						status,
+						message: `The steering server returned status 410.`,
+					},
+					0,
+				)
 			} else {
 				end()
-				report({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410. No request follows.` })
+				report({
+					type: STEERING_ERROR_TYPE_LOAD,
+					url,
+					status,
+					message: `The steering server returned status 410. No request follows.`,
+				})
 
 				if (!loaded && !manualPriority) {
 					fallback()
@@ -327,21 +394,43 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return
 		}
 
-		const retryAfter = status === 429 ? parseRetryAfter(getHeader(response.headers, 'retry-after'), Date.now()) : undefined
+		const retryAfter =
+			status === 429
+				? parseRetryAfter(getHeader(response.headers, 'retry-after'), Date.now())
+				: undefined
 
 		if (retryAfter !== undefined) {
 			if (isDash) {
 				ttl = Math.max(retryAfter / 1000, MIN_TTL)
 			}
 
-			retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 429.` }, retryAfter)
+			retry(
+				{
+					type: STEERING_ERROR_TYPE_LOAD,
+					url,
+					status,
+					message: `The steering server returned status 429.`,
+				},
+				retryAfter,
+			)
 			return
 		}
 
-		retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The Steering Manifest request failed with status ${status}.` })
+		retry({
+			type: STEERING_ERROR_TYPE_LOAD,
+			url,
+			status,
+			message: `The Steering Manifest request failed with status ${status}.`,
+		})
 	}
 
-	function apply(manifest: SteeringManifest, list: readonly string[], clones: readonly unknown[], reloadUri: string | undefined, responseUrl: string): void {
+	function apply(
+		manifest: SteeringManifest,
+		list: readonly string[],
+		clones: readonly unknown[],
+		reloadUri: string | undefined,
+		responseUrl: string,
+	): void {
 		loaded = true
 		ttl = Math.max(manifest.TTL, MIN_TTL)
 		uri = reloadUri ?? uri
@@ -356,7 +445,10 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		select()
 	}
 
-	function setClones(clones: readonly unknown[], accept: (clone: PathwayClone) => boolean): PathwayClone[] {
+	function setClones(
+		clones: readonly unknown[],
+		accept: (clone: PathwayClone) => boolean,
+	): PathwayClone[] {
 		const valid = resolveClones(clones, pathways, accept)
 
 		manifestClones = clones
@@ -380,7 +472,9 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	}
 
 	function fallbackList(): readonly string[] {
-		return selected === undefined ? pathways : [selected, ...pathways.filter(pathway => pathway !== selected)]
+		return selected === undefined
+			? pathways
+			: [selected, ...pathways.filter(pathway => pathway !== selected)]
 	}
 
 	function fallback(): void {
@@ -464,7 +558,10 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		requestTimer = undefined
 	}
 
-	function retry(error: Omit<SteeringRequestError, 'retryDelay'>, delay: number = ttl * 1000): void {
+	function retry(
+		error: Omit<SteeringRequestError, 'retryDelay'>,
+		delay: number = ttl * 1000,
+	): void {
 		scheduleRequest(delay)
 		report({ ...error, retryDelay: delay })
 	}
@@ -517,7 +614,9 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	function throughputOf(pathway: string): string {
 		const value = invoke('getThroughput', getThroughput, pathway)
 
-		return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? String(Math.round(value)) : ''
+		return typeof value === 'number' && Number.isFinite(value) && value >= 0
+			? String(Math.round(value))
+			: ''
 	}
 
 	return {
@@ -543,24 +642,42 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	}
 }
 
-function checkConfig({ protocol, uri, pathways, pathway, penalty, requester }: SteeringEngineConfig): void {
+function checkConfig({
+	protocol,
+	uri,
+	pathways,
+	pathway,
+	penalty,
+	requester,
+}: SteeringEngineConfig): void {
 	if (protocol !== STEERING_PROTOCOL_HLS && protocol !== STEERING_PROTOCOL_DASH) {
-		throw new TypeError(`createSteeringEngine: protocol must be 'hls' or 'dash'. Received ${JSON.stringify(protocol)}.`)
+		throw new TypeError(
+			`createSteeringEngine: protocol must be 'hls' or 'dash'. Received ${JSON.stringify(protocol)}.`,
+		)
 	}
 
 	checkUri('createSteeringEngine', uri)
 	checkPathways('createSteeringEngine', pathways)
 
 	if (pathway !== undefined && !pathways.includes(pathway)) {
-		throw new TypeError(`createSteeringEngine: pathway must be one of pathways. Received ${JSON.stringify(pathway)}.`)
+		throw new TypeError(
+			`createSteeringEngine: pathway must be one of pathways. Received ${JSON.stringify(pathway)}.`,
+		)
 	}
 
-	if (penalty !== undefined && (typeof penalty !== 'number' || !Number.isFinite(penalty) || penalty < 0)) {
-		throw new TypeError(`createSteeringEngine: penalty must be a finite number of milliseconds, 0 or more. Received ${JSON.stringify(penalty)}.`)
+	if (
+		penalty !== undefined &&
+		(typeof penalty !== 'number' || !Number.isFinite(penalty) || penalty < 0)
+	) {
+		throw new TypeError(
+			`createSteeringEngine: penalty must be a finite number of milliseconds, 0 or more. Received ${JSON.stringify(penalty)}.`,
+		)
 	}
 
 	if (typeof requester !== 'function') {
-		throw new TypeError(`createSteeringEngine: requester must be a function. Received ${JSON.stringify(requester)}.`)
+		throw new TypeError(
+			`createSteeringEngine: requester must be a function. Received ${JSON.stringify(requester)}.`,
+		)
 	}
 }
 
@@ -571,8 +688,14 @@ function checkUri(caller: string, uri: unknown): void {
 }
 
 function checkPathways(caller: string, pathways: unknown): void {
-	if (!Array.isArray(pathways) || pathways.length === 0 || pathways.some(id => typeof id !== 'string')) {
-		throw new TypeError(`${caller}: pathways must be a non-empty array of strings. Received ${JSON.stringify(pathways)}.`)
+	if (
+		!Array.isArray(pathways) ||
+		pathways.length === 0 ||
+		pathways.some(id => typeof id !== 'string')
+	) {
+		throw new TypeError(
+			`${caller}: pathways must be a non-empty array of strings. Received ${JSON.stringify(pathways)}.`,
+		)
 	}
 }
 

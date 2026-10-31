@@ -14,24 +14,24 @@ export type SteeringEngineConfig = {
 	/**
 	 * The delivery protocol.
 	 */
-	protocol: SteeringProtocol;
+	protocol: SteeringProtocol
 
 	/**
 	 * The absolute URI of the first Steering Manifest request.
 	 */
-	uri: string;
+	uri: string
 
 	/**
 	 * The pathway IDs that the Content Description defines.
 	 */
-	pathways: readonly string[];
+	pathways: readonly string[]
 
 	/**
 	 * The pathway that the player applies now. The priority list before the
 	 * first valid Steering Manifest starts with this pathway, followed by the
 	 * other `pathways`.
 	 */
-	pathway?: string;
+	pathway?: string
 
 	/**
 	 * The penalty duration in milliseconds. The default is
@@ -44,32 +44,32 @@ export type SteeringEngineConfig = {
 	 * 429 response can arrive at any time, even before the first valid
 	 * Steering Manifest. The engine never uses a current TTL below 1 second.
 	 */
-	penalty?: number;
+	penalty?: number
 
 	/**
 	 * When `true`, the first request has no steering query parameters.
 	 * For DASH, set it from `@queryBeforeStart`.
 	 */
-	queryBeforeStart?: boolean;
+	queryBeforeStart?: boolean
 
 	/**
 	 * The function that sends the Steering Manifest requests.
 	 * `fetchRequester` is a requester that uses `fetch`.
 	 * `SteeringRequester` describes the response and the promise.
 	 */
-	requester: SteeringRequester;
+	requester: SteeringRequester
 
 	/**
 	 * Returns the throughput estimate of the player for a pathway, in bits per second.
 	 */
-	getThroughput?: (pathway: string) => number | undefined;
+	getThroughput?: (pathway: string) => number | undefined
 
 	/**
 	 * DASH only. Returns every pathway that the player used since the
 	 * previous request, for `_DASH_pathway`. Without this function, the
 	 * engine lists the pathways that it selected since the previous request.
 	 */
-	getReportedPathways?: () => readonly string[];
+	getReportedPathways?: () => readonly string[]
 
 	/**
 	 * Returns `false` for a valid pathway clone that the player cannot build.
@@ -78,12 +78,12 @@ export type SteeringEngineConfig = {
 	 * this function for each valid clone of a Steering Manifest, before `onManifest`.
 	 * `update({ pathways })` does not call this function again.
 	 */
-	acceptClone?: (clone: PathwayClone) => boolean;
+	acceptClone?: (clone: PathwayClone) => boolean
 
 	/**
 	 * Called when the selected pathway changes.
 	 */
-	onPathwayChange?: (pathway: string) => void;
+	onPathwayChange?: (pathway: string) => void
 
 	/**
 	 * Called with each valid Steering Manifest and its pathway clones, before
@@ -92,11 +92,15 @@ export type SteeringEngineConfig = {
 	 * checked values instead. The context has the URI of the response in
 	 * `url`, and the URI of the next request in `reloadUri`.
 	 */
-	onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[], context: { readonly url: string; readonly reloadUri: string }) => void;
+	onManifest?: (
+		manifest: SteeringManifest,
+		clones: readonly PathwayClone[],
+		context: { readonly url: string; readonly reloadUri: string },
+	) => void
 
 	/**
 	 * Called when a request fails or a Steering Manifest is not valid. Also
 	 * called when a callback throws and no caller can receive the exception.
 	 */
-	onError?: (error: SteeringError) => void;
-};
+	onError?: (error: SteeringError) => void
+}

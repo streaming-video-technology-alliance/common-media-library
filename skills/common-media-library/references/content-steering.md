@@ -1,7 +1,7 @@
 <!-- libs/content-steering/README.md -->
 # @svta/cml-content-steering
 
-Content steering functionality.
+Content steering for HLS and DASH players. The package implements Pathway-based Content Steering. It has the Steering Manifest types, validators, a steering engine, and a function for pathway clones.
 
 ## When to use
 
@@ -20,45 +20,72 @@ npm i @svta/cml-content-steering
 
 ## Usage
 
+### Steering engine
+
+The engine requests the Steering Manifest, schedules the next request, and selects the pathway that the player applies.
+
 ```typescript
-import {
-	isValidPathwayClone,
-	isValidSteeringManifest,
-} from "@svta/cml-content-steering";
+import { createSteeringEngine } from '@svta/cml-content-steering'
+
+const manifest = { VERSION: 1, TTL: 300, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+
+const engine = createSteeringEngine({
+	protocol: 'hls',
+	uri: 'https://steering.example.com/manifest.json',
+	pathways: ['CDN-A', 'CDN-B'],
+	pathway: 'CDN-A',
+	requester: async (request) => ({ request, status: 200, data: JSON.stringify(manifest) }),
+	getThroughput: () => 6000000,
+	onPathwayChange: (pathway) => console.log(`apply ${pathway}`),
+})
+
+await engine.start() // apply CDN-B
+
+engine.penalize() // apply CDN-A
+engine.stop()
+```
+
+The example uses a requester that returns a fixed Steering Manifest. `fetchRequester` is a requester that uses `fetch`.
+
+### Pathway clones
+
+`applyUriReplacement` builds a URI of a pathway clone from a URI of its base pathway.
+
+```typescript
+import { applyUriReplacement } from '@svta/cml-content-steering'
+
+const replacement = { HOST: 'backup2.example.com', PARAMS: { token: 'dkfs1239414' } }
+
+const uri = applyUriReplacement('https://example.com/some/path/to/file', replacement)
+
+console.log(uri) // https://backup2.example.com/some/path/to/file?token=dkfs1239414
+```
+
+### Validation
+
+```typescript
+import { isValidPathwayClone, isValidSteeringManifest } from '@svta/cml-content-steering'
+
+const pathwayClone = {
+	'BASE-ID': 'pathway1',
+	ID: 'clone1',
+	'URI-REPLACEMENT': {
+		HOST: 'example.com',
+		PARAMS: {
+			param1: 'value1',
+		},
+	},
+}
 
 const manifest = {
 	VERSION: 1,
 	TTL: 100,
-	"PATHWAY-PRIORITY": ["pathway1", "pathway2"],
-	"PATHWAY-CLONES": [
-		{
-			"BASE-ID": "pathway1",
-			ID: "clone1",
-			"URI-REPLACEMENT": {
-				HOST: "example.com",
-				PARAMS: {
-					param1: "value1",
-					param2: "value2",
-				},
-			},
-		},
-	],
-};
+	'PATHWAY-PRIORITY': ['pathway1', 'clone1'],
+	'PATHWAY-CLONES': [pathwayClone],
+}
 
-const pathwayClone = {
-	"BASE-ID": "pathway1",
-	ID: "clone1",
-	"URI-REPLACEMENT": {
-		HOST: "example.com",
-		PARAMS: {
-			param1: "value1",
-			param2: "value2",
-		},
-	},
-};
-
-const isValidManifest = isValidSteeringManifest(manifest);
-const isValidClone = isValidPathwayClone(pathwayClone);
+console.log(isValidSteeringManifest(manifest)) // true
+console.log(isValidPathwayClone(pathwayClone)) // true
 ```
 
 <!-- libs/content-steering/config/cml-content-steering.api.md -->
@@ -68,11 +95,24 @@ const isValidClone = isValidPathwayClone(pathwayClone);
 
 ```ts
 
+import { HttpRequest } from '@svta/cml-utils';
+import { HttpResponse } from '@svta/cml-utils';
+import { ValueOf } from '@svta/cml-utils';
+
+// @beta
+export function applyUriReplacement(uri: string, replacement: UriReplacement, options?: UriReplacementOptions): string;
+
+// @beta
+export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngine;
+
 // @beta
 export const DEFAULT_PATHWAY_PENALTY = 3e5;
 
 // @beta
 export const DEFAULT_TTL = 300;
+
+// @beta
+export function fetchRequester(request: HttpRequest): Promise<HttpResponse>;
 
 // @beta
 export function isValidPathwayClone(clone: PathwayClone): boolean;
@@ -88,6 +128,80 @@ export type PathwayClone = {
 };
 
 // @beta
+export const STEERING_ERROR_TYPE_CALLBACK: "callback";
+
+// @beta
+export const STEERING_ERROR_TYPE_LOAD: "load";
+
+// @beta
+export const STEERING_ERROR_TYPE_PARSE: "parse";
+
+// @beta
+export const STEERING_PROTOCOL_DASH: "dash";
+
+// @beta
+export const STEERING_PROTOCOL_HLS: "hls";
+
+// @beta
+export type SteeringEngine = {
+    readonly pathway: string | undefined;
+    readonly priority: readonly string[];
+    start(): Promise<void>;
+    stop(): void;
+    penalize(pathway?: string): void;
+    update(changes: {
+        readonly uri?: string;
+        readonly pathways?: readonly string[];
+        readonly priority?: readonly string[];
+    }): void;
+};
+
+// @beta
+export type SteeringEngineConfig = {
+    protocol: SteeringProtocol;
+    uri: string;
+    pathways: readonly string[];
+    pathway?: string;
+    penalty?: number;
+    queryBeforeStart?: boolean;
+    requester: SteeringRequester;
+    getThroughput?: (pathway: string) => number | undefined;
+    getReportedPathways?: () => readonly string[];
+    acceptClone?: (clone: PathwayClone) => boolean;
+    onPathwayChange?: (pathway: string) => void;
+    onManifest?: (manifest: SteeringManifest, clones: readonly PathwayClone[], context: {
+        readonly url: string;
+        readonly reloadUri: string;
+    }) => void;
+    onError?: (error: SteeringError) => void;
+};
+
+// @beta
+export type SteeringError = {
+    readonly type: typeof STEERING_ERROR_TYPE_LOAD | typeof STEERING_ERROR_TYPE_PARSE;
+    readonly url: string;
+    readonly status?: number;
+    readonly cause?: unknown;
+    readonly message: string;
+    readonly retryDelay?: number;
+} | {
+    readonly type: typeof STEERING_ERROR_TYPE_CALLBACK;
+    readonly callback: "acceptClone" | "getReportedPathways" | "getThroughput" | "onManifest" | "onPathwayChange";
+    readonly cause: unknown;
+    readonly message: string;
+};
+
+// @beta
+export const SteeringErrorType: {
+    readonly LOAD: typeof STEERING_ERROR_TYPE_LOAD;
+    readonly PARSE: typeof STEERING_ERROR_TYPE_PARSE;
+    readonly CALLBACK: typeof STEERING_ERROR_TYPE_CALLBACK;
+};
+
+// @beta (undocumented)
+export type SteeringErrorType = ValueOf<typeof SteeringErrorType>;
+
+// @beta
 export type SteeringManifest = {
     VERSION: number;
     TTL: number;
@@ -97,9 +211,30 @@ export type SteeringManifest = {
 };
 
 // @beta
+export const SteeringProtocol: {
+    readonly HLS: typeof STEERING_PROTOCOL_HLS;
+    readonly DASH: typeof STEERING_PROTOCOL_DASH;
+};
+
+// @beta (undocumented)
+export type SteeringProtocol = ValueOf<typeof SteeringProtocol>;
+
+// @beta
+export type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>;
+
+// @beta
 export type UriReplacement = {
     HOST?: string;
     PARAMS?: Record<string, string>;
+    "PER-VARIANT-URIS"?: Record<string, string>;
+    "PER-RENDITION-URIS"?: Record<string, string>;
+};
+
+// @beta
+export type UriReplacementOptions = {
+    baseUri?: string;
+    stableVariantId?: string;
+    stableRenditionId?: string;
 };
 
 // (No @packageDocumentation comment for this package)

@@ -38,4 +38,4 @@ export const SteeringProtocol = {
 /**
  * @beta
  */
-export type SteeringProtocol = ValueOf<typeof SteeringProtocol>;
+export type SteeringProtocol = ValueOf<typeof SteeringProtocol>

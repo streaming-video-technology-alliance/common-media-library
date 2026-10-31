@@ -51,4 +51,4 @@ export const SteeringErrorType = {
 /**
  * @beta
  */
-export type SteeringErrorType = ValueOf<typeof SteeringErrorType>;
+export type SteeringErrorType = ValueOf<typeof SteeringErrorType>

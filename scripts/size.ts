@@ -77,14 +77,21 @@ function parseBudget(file: string, data: unknown): Budget {
 }
 
 async function exists(file: string): Promise<boolean> {
-	return access(file).then(() => true, () => false)
+	return access(file).then(
+		() => true,
+		() => false,
+	)
 }
 
 async function findBudgetPackages(): Promise<string[]> {
 	const folders = await readdir(path.join(root, 'libs'))
-	const found = await Promise.all(folders.map(async (folder) => {
-		return await exists(path.join(root, 'libs', folder, 'config', 'size-budget.json')) ? folder : undefined
-	}))
+	const found = await Promise.all(
+		folders.map(async folder => {
+			return (await exists(path.join(root, 'libs', folder, 'config', 'size-budget.json')))
+				? folder
+				: undefined
+		}),
+	)
 	return found.filter((folder): folder is string => folder !== undefined).sort()
 }
 
@@ -95,13 +102,23 @@ async function loadPeers(pkg: string): Promise<string[]> {
 	return isRecord(peerDependencies) ? Object.keys(peerDependencies) : []
 }
 
-async function measure(pkg: string, name: string, entry: Entry, peers: string[], tmp: string, id: string): Promise<Omit<Row, 'budget' | 'over'>> {
+async function measure(
+	pkg: string,
+	name: string,
+	entry: Entry,
+	peers: string[],
+	tmp: string,
+	id: string,
+): Promise<Omit<Row, 'budget' | 'over'>> {
 	const dist = path.join(root, 'libs', pkg, 'dist', 'index.js')
 	const names = entry.imports.join(', ')
 	const input = path.join(tmp, `${id}.entry.js`)
 	const output = path.join(tmp, `${id}.out.js`)
 
-	await writeFile(input, `import { ${names} } from ${JSON.stringify(dist)}\nglobalThis.__cmlSize = [${names}]\n`)
+	await writeFile(
+		input,
+		`import { ${names} } from ${JSON.stringify(dist)}\nglobalThis.__cmlSize = [${names}]\n`,
+	)
 
 	const args = [input, '--format', 'esm', '--minify', '--file', output]
 	if (peers.length > 0) {
@@ -110,8 +127,7 @@ async function measure(pkg: string, name: string, entry: Entry, peers: string[],
 
 	try {
 		await execFileAsync(rolldown, args)
-	}
-	catch (error) {
+	} catch (error) {
 		const { stdout, stderr } = error as { stdout?: string; stderr?: string }
 		const detail = `${stdout ?? ''}${stderr ?? ''}`.trim()
 		throw new Error(`Bundling the entry "${name}" of ${pkg} failed.\n${detail || String(error)}`)
@@ -145,12 +161,15 @@ function printTable(pkg: string, tolerance: number, rows: Row[]): void {
 		formatSigned(row.budget - row.brotli),
 		row.over ? 'OVER' : '',
 	])
-	const widths = header.map((title, i) => Math.max(title.length, ...body.map(cells => cells[i].length)))
+	const widths = header.map((title, i) =>
+		Math.max(title.length, ...body.map(cells => cells[i].length)),
+	)
 	const last = header.length - 1
-	const format = (cells: string[]): string => cells
-		.map((cell, i) => i === 0 || i === last ? cell.padEnd(widths[i]) : cell.padStart(widths[i]))
-		.join('  ')
-		.trimEnd()
+	const format = (cells: string[]): string =>
+		cells
+			.map((cell, i) => (i === 0 || i === last ? cell.padEnd(widths[i]) : cell.padStart(widths[i])))
+			.join('  ')
+			.trimEnd()
 
 	console.log(`${pkg} (sizes in bytes, tolerance ${Number((tolerance * 100).toFixed(2))}%)`)
 	console.log(format(header))
@@ -165,7 +184,7 @@ async function sizePackage(pkg: string, tmp: string, update: boolean): Promise<R
 	const file = `libs/${pkg}/config/size-budget.json`
 	const absolute = path.join(root, file)
 
-	if (!await exists(absolute)) {
+	if (!(await exists(absolute))) {
 		throw new Error(`${file} does not exist. Create the budget file for ${pkg}.`)
 	}
 
@@ -173,21 +192,26 @@ async function sizePackage(pkg: string, tmp: string, update: boolean): Promise<R
 	let data: unknown
 	try {
 		data = JSON.parse(text)
-	}
-	catch (error) {
-		throw new Error(`${file}: is not valid JSON. ${error instanceof Error ? error.message : String(error)}`)
+	} catch (error) {
+		throw new Error(
+			`${file}: is not valid JSON. ${error instanceof Error ? error.message : String(error)}`,
+		)
 	}
 
 	const budget = parseBudget(file, data)
 
-	if (!await exists(path.join(root, 'libs', pkg, 'dist', 'index.js'))) {
-		throw new Error(`libs/${pkg}/dist/index.js does not exist. Build the package with: npm run build -w libs/${pkg}`)
+	if (!(await exists(path.join(root, 'libs', pkg, 'dist', 'index.js')))) {
+		throw new Error(
+			`libs/${pkg}/dist/index.js does not exist. Build the package with: npm run build -w libs/${pkg}`,
+		)
 	}
 
 	const peers = await loadPeers(pkg)
-	const sizes = await Promise.all(Object.entries(budget.entries).map(([name, entry], i) => {
-		return measure(pkg, name, entry, peers, tmp, `${pkg}-${i}`)
-	}))
+	const sizes = await Promise.all(
+		Object.entries(budget.entries).map(([name, entry], i) => {
+			return measure(pkg, name, entry, peers, tmp, `${pkg}-${i}`)
+		}),
+	)
 
 	const rows = sizes.map((size): Row => {
 		const entry = budget.entries[size.name]
@@ -243,18 +267,18 @@ async function main(): Promise<void> {
 		}
 
 		if (values.check && over > 0) {
-			throw new Error(`Size check failed: ${over} ${over === 1 ? 'entry is' : 'entries are'} over budget plus the tolerance.`)
+			throw new Error(
+				`Size check failed: ${over} ${over === 1 ? 'entry is' : 'entries are'} over budget plus the tolerance.`,
+			)
 		}
-	}
-	finally {
+	} finally {
 		await rm(tmp, { recursive: true, force: true })
 	}
 }
 
 try {
 	await main()
-}
-catch (error) {
+} catch (error) {
 	console.error(error instanceof Error ? error.message : error)
 	process.exitCode = 1
 }
