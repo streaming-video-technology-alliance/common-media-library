@@ -13,14 +13,32 @@ Four analyses read each player at the commits of the [design record](architectur
 | Shaka Player | The engine fits the location model, where Shaka asks for URIs when it needs them. | The steering manager shrinks. The total code grows, because of a port. | The Closure build cannot use the npm module. Shaka has no read access to the priority list or the penalties. | `priority` resolves the API gap. The Closure port remains. |
 | VHS | The engine fits the exclusion model. | About 720 lines become 230. | None in the API. The build needs Babel for `@svta/*` and must inline CML. | `acceptClone` and `update()` remove two workarounds. The build changes remain. |
 
-In all four players, the gain is spec compliance and shared maintenance, not smaller code. The engine is larger than the controllers it replaces:
+In all four players, the gain is spec compliance and shared maintenance, not smaller code. The engine is larger than the controllers it replaces, because the controllers skip rules that the engine implements. The spikes measured the growth of each player as three parts, in brotli bytes of the main bundle. The method is four builds per player. The builds are the pinned commit, the same commit with the old steering module stubbed, the spike, and the spike with the engine stubbed.
 
-| Measurement | Minified | Compressed |
+| Player, bundle | Old steering code removed | Adapter and wiring added | Engine | Net growth |
+|---|---|---|---|---|
+| hls.js, `hls.light.min.js` | 1,850 | 1,555 | 3,410 | 3,115 |
+| dash.js, `dash.all.min.js` | 1,162 | 1,831 | 2,808 | 3,477 |
+| VHS, `videojs-http-streaming.min.js` | 1,168 | 733 | 3,053 | 2,618 |
+| Shaka Player, compiled bundle and the engine file | 743 | 1,221 | 3,927 | 4,405 |
+
+The removed code offsets 20% to 55% of the engine, and the adapter takes most of that offset back. The VHS "old" number counts the controller module only, so its old and new wiring in the playlist controller both land in the adapter column. The Shaka engine is a separate file, so its compiled bundle alone grows 478 bytes. These numbers predate the three size trims of the engine, which remove about 160 bytes brotli.
+
+What the engine bytes buy, measured by removing one part at a time from the engine (3,686 bytes brotli before the trims, 3,523 after):
+
+| Part of the engine | Brotli bytes | Rule or fix |
 |---|---|---|
-| Engine and `applyUriReplacement`, rolldown (plan Task 3) | 7.6 KB | 3.2 KB gzip |
-| Engine in the hls.js build | 7.8 KB | 2.9 KB brotli |
-| hls.js light build, growth | | 2.4 KB brotli |
-| Current Shaka steering manager, rolldown | 4.1 KB | 1.3 KB gzip |
+| Pathway clones | 545 | Base spec section 5. Clone checks, BASE-ID chains, `acceptClone`. |
+| Error messages | 405 | Actionable messages for adopters. The trims shortened them. |
+| Configuration checks | 281 | `TypeError` for values from the content, such as an empty pathway list. |
+| `update()` | 216 | MPD updates and the hls.js setter, without a new engine. |
+| 429 and Retry-After | 166 | Base spec section 7, with HTTP dates. hls.js stopped steering after a 429. |
+| Callback error routing | 165 | The rule of the CMCD session API RFC. |
+| Pathway ID encoding | 105 | IDs with reserved characters stay intact in the query. |
+| DASH rules in an HLS build | 97 | Rollup drops them in hls.js. webpack keeps them in dash.js. |
+| Default `fetch` requester | 94 | Now a separate export, so a player with its own requester pays nothing. |
+
+The old code also misses fixes that the engine has. In hls.js, a 429 stopped steering, and a clone of an embedded audio group threw. In VHS, a failure before the first manifest caused a retry loop, and a DASH refresh stopped steering. In dash.js, the Annex I parameters never reached a steering request.
 
 ## Gaps in the API
 
