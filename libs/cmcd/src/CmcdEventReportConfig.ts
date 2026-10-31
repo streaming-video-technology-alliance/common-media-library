@@ -31,7 +31,7 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 *
 	 * @defaultValue `undefined`
 	 */
-	events?: CmcdEventType[]
+	events?: readonly CmcdEventType[]
 
 	/**
 	 * When the time interval event is sent, the interval in seconds at

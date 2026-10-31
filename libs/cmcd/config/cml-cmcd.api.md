@@ -219,7 +219,7 @@ export type CmcdEvent = CmcdRequest & {
 export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
     version?: typeof CMCD_V2;
     url: string;
-    events?: CmcdEventType[];
+    events?: readonly CmcdEventType[];
     interval?: number;
     batchSize?: number;
     transform?: CmcdEventReportTransform<C>;
