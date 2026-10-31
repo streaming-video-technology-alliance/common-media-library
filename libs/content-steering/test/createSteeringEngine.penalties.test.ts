@@ -1,4 +1,4 @@
-import { createSteeringEngine, DEFAULT_PATHWAY_PENALTY, type SteeringEngineConfig } from '@svta/cml-content-steering'
+import { createSteeringEngine, DEFAULT_PATHWAY_PENALTY, type SteeringEngine, type SteeringEngineConfig } from '@svta/cml-content-steering'
 import { deepEqual, equal } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
 import { createStubRequester, flush, manifestResponse, type StubResponse } from './createStubRequester.ts'
@@ -143,6 +143,59 @@ describe('createSteeringEngine penalties', () => {
 
 		equal(engine.pathway, 'CDN-A')
 		deepEqual(changes, [])
+	})
+
+	it('selects the next pathway when onPathwayChange penalizes the selected one', async () => {
+		const { requester } = createStubRequester(manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A', 'CDN-C'] }))
+		const changes: string[] = []
+		const nested: boolean[] = []
+		let inside = false
+		const engine: SteeringEngine = createSteeringEngine({
+			protocol: 'hls',
+			uri: 'https://steering.example.com/manifest.json',
+			pathways: PRIORITY,
+			pathway: 'CDN-A',
+			requester,
+			onPathwayChange: (pathway) => {
+				changes.push(pathway)
+				nested.push(inside)
+
+				if (pathway === 'CDN-B') {
+					inside = true
+					engine.penalize(pathway)
+					inside = false
+				}
+			},
+		})
+
+		await engine.start()
+		engine.stop()
+
+		deepEqual(changes, ['CDN-B', 'CDN-A'])
+		deepEqual(nested, [false, true])
+		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('keeps the selection when onPathwayChange penalizes every pathway', async () => {
+		const { requester } = createStubRequester(manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }))
+		const changes: string[] = []
+		const engine: SteeringEngine = createSteeringEngine({
+			protocol: 'hls',
+			uri: 'https://steering.example.com/manifest.json',
+			pathways: ['CDN-A', 'CDN-B'],
+			pathway: 'CDN-A',
+			requester,
+			onPathwayChange: (pathway) => {
+				changes.push(pathway)
+				engine.penalize(pathway)
+			},
+		})
+
+		await engine.start()
+		engine.stop()
+
+		deepEqual(changes, ['CDN-B', 'CDN-A'])
+		equal(engine.pathway, 'CDN-A')
 	})
 
 	it('ignores pathway IDs that the Content Description does not define', async () => {
