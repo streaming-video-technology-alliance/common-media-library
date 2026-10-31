@@ -14,7 +14,7 @@ status: draft
 
 ## Summary
 
-Add `createCmcdSession()`, a reporting API next to `CmcdReporter`. A session is one `sid`. It keeps only the state that CTA-5004-B scopes to a session or to a destination. This state is a sequence number for each destination, the event queues, and the timers. It also includes the `msd`, `bs`, `bsd`, and `ec` values that wait for the next report of each destination. The player passes its data on every call and decides itself when its state changes. A `filter` predicate on an event target selects the reports that the target receives. The release that adds the session deprecates `CmcdReporter`, and version 3.0.0 removes it.
+Add `createCmcdSession()`, a reporting API next to `CmcdReporter`. A session is one `sid`. It keeps only the state that CTA-5004-B scopes to a session or to a destination. This state is a sequence number for each destination, the event queues, and the timers. It also includes the `msd`, `bs`, `bsd`, and `ec` values that wait for the next report of each destination. The player passes its data on every call and decides itself when its state changes. A `filter` predicate on an event target selects the reports that the target receives. An event target has a collector `url` or a `send` function, for a transport that is not HTTP. The release that adds the session deprecates `CmcdReporter`, and version 3.0.0 removes it.
 
 ```ts
 import type { CmcdSnapshot } from '@svta/cml-cmcd'
@@ -52,6 +52,8 @@ The state that `CmcdReporter` keeps causes failures in these integrations:
 
 dash.js also needs to route `rr` reports by request type. Its setting `eventTargets[].includeInRequests` limits the `rr` reports of each target, and two targets can share one collector URL. `CmcdReporter` offers `transform` for this case. A transform can rewrite a report. The reporter must therefore copy nested values, restore required keys, and isolate errors for each target. dash.js only needs to choose targets.
 
+The CMCD over MSF draft sends event reports over MoQ tracks. The player publishes each report as a record, and the transport has no HTTP response. A requester receives an encoded body, so a MoQ player would decode every line again and would invent status codes. Zac Shenker proposed a function for each target in an RFC on a fork. This RFC adopts that function as `send`.
+
 RFC 455 proposed a larger session API. The design record compares the options: [analysis](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md), [option 1](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/option-1.md), and [option 2](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/option-2.md). This RFC is option 2 with later changes. The largest change deprecates `CmcdReporter` instead of a later decision on its future. [Rationale and alternatives](#rationale-and-alternatives) lists the other changes.
 
 ## Guide-level explanation
@@ -60,7 +62,7 @@ RFC 455 proposed a larger session API. The design record compares the options: [
 
 Create a session when playback starts. The session generates a `sid` when the configuration has none. The second argument sends the event reports, so a player passes its own loader there.
 
-Request mode is one destination. Each target URL is one destination, so targets that share a URL share a destination. Each destination has its own sequence number, which starts at 0. When the player needs a new `sid`, it creates a new session. It calls `flush()` and `stop()` on the old session first. A player that keeps the old session can still record late responses under the old `sid`.
+Request mode is one destination. Each event target is one destination, also when two targets have one URL. Each destination has its own sequence number, which starts at 0. When the player needs a new `sid`, it creates a new session. It calls `flush()` and `stop()` on the old session first. A player that keeps the old session can still record late responses under the old `sid`.
 
 ### Pass the state on every call
 
@@ -179,7 +181,32 @@ session.recordResponseReceived({ request: { url: 'https://cdn.example.com/movie.
 session.flush()
 ```
 
-The first target receives only the segment response, and the second target receives only the manifest response. Both targets use one collector URL, so they share one sequence of `sn` values.
+The first target receives only the segment response, and the second target receives only the manifest response. Both targets post to one collector URL. Each target is its own destination, so each target keeps its own sequence of `sn` values.
+
+### Send reports without HTTP
+
+An event target has a collector `url` or a `send` function. The session calls the function with each batch, oldest report first. Use a function for a transport that is not HTTP, such as a MoQ track or a WebSocket.
+
+```ts
+import type { CmcdEventSender } from '@svta/cml-cmcd'
+import { CmcdEventType, createCmcdSession } from '@svta/cml-cmcd'
+
+declare function publishRecords(records: { timestamp: number; data: object }[]): Promise<void>
+
+const send: CmcdEventSender = async (reports) => {
+	await publishRecords(reports.map((report) => ({ timestamp: report.ts, data: report })))
+}
+
+const session = createCmcdSession({
+	eventTargets: [{ send, events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR] }],
+})
+
+session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+```
+
+Each report is the data of one event. The session has applied `enabledKeys`, the `filter`, and the waiting values, and has written `e`, `sid`, `sn`, `ts`, and `v`. A token value is an `SfToken`, and an inner list is an array. A function that needs the encoded line calls `encodeCmcd()` on the report.
+
+The promise takes the place of the HTTP response. A promise that resolves means that the batch is delivered. A result of `{ gone: true }` stops the target, as a 410 response does. A promise that rejects sends the batch again after a wait, as a 5xx response does. The function must not change a report, and the `DeepReadonly` type rejects a change.
 
 ### Several players, one session
 
@@ -239,7 +266,7 @@ Without `enabledKeys`, the session reports every key. In the same case, `CmcdRep
 |---|---|
 | `createCmcdSession` | function |
 | `CmcdSession`, `CmcdSessionConfig`, `CmcdSessionRequestReportConfig`, `CmcdSessionEventReportConfig`, `CmcdSnapshot` | types |
-| `CmcdReportFilter` | type |
+| `CmcdReportFilter`, `CmcdEventSender`, `CmcdEventSendResult` | types |
 | `CMCD_EVENT_HOSTNAME`, and `HOSTNAME` in `CmcdEventType` | constant |
 
 CTA-5004-B defines the `h` event for a change of the content host, and the package has no constant for it. The player records the event with the new host in the `h` key.
@@ -279,10 +306,20 @@ type CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, 'transform'>
 	transform?: never                           // CmcdReporter only. A session has no transform
 }
 
-type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, 'transform'> & {
+type CmcdEventSendResult = {
+	readonly gone?: boolean                     // true: the destination stops, as after a 410 response
+}
+
+// The reports of one batch, oldest first. The session has written e, sid, sn, ts, and v.
+type CmcdEventSender = (reports: readonly DeepReadonly<Cmcd & Required<Pick<Cmcd, 'e' | 'sid' | 'sn' | 'ts' | 'v'>>>[]) => Promise<CmcdEventSendResult | void>
+
+type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, 'transform' | 'url'> & {
 	transform?: never                           // CmcdReporter only. filter selects the reports of the target
 	filter?: CmcdReportFilter
-}
+} & (
+	| { url: string; send?: never }             // an HTTP collector. The requester sends each batch as a POST
+	| { url?: never; send: CmcdEventSender }    // any other transport. The function sends each batch
+)
 
 type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	sid?: string                                // default: a new UUID
@@ -310,6 +347,9 @@ type CmcdSession = {
 }
 
 function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status: number }>): CmcdSession
+
+// The parameter widens, so a send function can encode a report without a copy
+function encodeCmcd(cmcd: DeepReadonly<Cmcd>, options?: CmcdEncodeOptions): string
 ```
 
 The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordResponseReceived`, `enabledKeys`, `eventTargets`, `customHeaderMap`, and the `requester` argument. The session types derive from the types of `CmcdReporter`, so a configuration object without `transform` type-checks against both APIs. The default requester is `fetch`.
@@ -328,9 +368,9 @@ The session encodes each report with the rules of `encodeCmcd`. The encoder roun
 
 `recordEvent()` selects its targets first. A target is selected when three conditions hold. It lists the event type, no 410 response stopped it, and its `filter` returns `true`. A target without a `filter` meets the third condition. The filter receives the report data with `e` and `ts` set, and the request when the caller passes one. A filter must not change the data. The `DeepReadonly` types of `CmcdReportFilter` reject a change at any depth.
 
-The session builds a report only for the selected targets. If a filter throws, no target receives the report, and the error goes to the caller. A destination advances its sequence number only for a report that one of its targets receives. The values of the call with a destination scope wait for the next report of each other destination.
+The session builds a report only for the selected targets. If a filter throws, no target receives the report, and the error goes to the caller. A target advances its sequence number only for a report that the target receives. The values of the call with a destination scope wait for the next report of each other destination.
 
-Targets with the same URL form one destination. They share one sequence number, the `msd` gate, and the waiting values. Each target keeps its own events, `enabledKeys`, `filter`, `batchSize`, `interval`, and queue.
+Each target is one destination, with its own sequence number, `msd` gate, and waiting values. Two targets with one URL, or with one `send` function, are two destinations. Each target also keeps its own events, `enabledKeys`, `filter`, `batchSize`, `interval`, and queue.
 
 `recordResponseReceived()` derives `url` without any `CMCD` parameter, and `rc` from `status`. It derives three keys from `resourceTiming`:
 
@@ -365,23 +405,27 @@ The next report drops a waiting `bs`, `bsd`, or `ec` value that the version or `
 
 ### Delivery
 
-A target sends its queue when the queue reaches `batchSize`, and on `flush()`. An `e` report in the queue also makes the target send. One batch is one POST with the content type `application/cmcd`. The lines are joined with a line feed, with no line feed at the end. A target has at most one POST in flight. Lines that arrive meanwhile wait in its queue. After the response, the target checks the send conditions again.
+A target sends its queue when the queue reaches `batchSize`, and on `flush()`. An `e` report in the queue also makes the target send. For a `url` target, one batch is one POST with the content type `application/cmcd`. The lines are joined with a line feed, with no line feed at the end. For a `send` target, one batch is one call of the function with the reports, oldest first. A target has at most one batch in flight. Reports that arrive meanwhile wait in its queue. After the response, or after the promise settles, the target checks the send conditions again.
 
 | Response | Action |
 |---|---|
 | 2xx | Done. The wait resets. |
-| 410 | Every target with that URL stops for the life of the session. The session clears their queues and waiting values. It also drops a batch still in flight to that URL. |
+| 410 | The target stops for the life of the session. The session clears its queue and waiting values and drops a batch still in flight. Another target with the same URL stops when its own POST receives 410. |
 | 429, 5xx, status 0, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send |
 | Any other status | The batch is dropped. The wait resets. |
 
-The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new lines join the queue and go out with the retry, also an `e` report. CTA-5004-B recommends this back-off for 429 and 5xx responses. Status 0 means that no response arrived, as from an XMLHttpRequest requester after a network failure. `flush()` sends at once, also during a wait. If a POST is in flight, `flush()` sends after its response. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
+The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. The session then ignores the result of a call that is still in flight for that target. A promise that rejects, or a function that throws, counts as a rejected request. No result drops a batch. A function that cannot deliver a batch resolves.
+
+For a `send` target, the session copies the nested values of each report at queue time. The copy follows the rule for waiting values. A later change to the data of the caller does not change a queued report. The function must not change a report. The `DeepReadonly` type of `CmcdEventSender` rejects a change at any depth, as the type of `CmcdReportFilter` does.
+
+The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new reports join the queue and go out with the retry, also an `e` report. CTA-5004-B recommends this back-off for 429 and 5xx responses. Status 0 means that no response arrived, as from an XMLHttpRequest requester after a network failure. `flush()` sends at once, also during a wait. If a batch is in flight, `flush()` sends after that batch completes. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
 
 ### Errors
 
 Each call builds and encodes all of its reports before it changes any state. A call that throws therefore changes no sequence number, no waiting value, and no queue.
 
 - A filter that throws stops the report for every target, and the error goes to the caller.
-- A value that the structured-field encoder cannot serialize throws from the call that produced it. The session checks the `bs`, `bsd`, and `ec` values of a call before they wait. A waiting value therefore cannot fail a later report.
+- A value that the structured-field encoder cannot serialize throws from the call that produced it. The session checks the `bs`, `bsd`, and `ec` values of a call before they wait. A waiting value therefore cannot fail a later report. A `send` target gets the same check. The session encodes the report, discards the line, and queues a copy of the report.
 - An error in a timer tick goes to the timer callback, as in `CmcdReporter` today. The error can come from `snapshot()` or from encoding.
 - A failed send does not throw. The delivery table describes what happens instead.
 
@@ -391,7 +435,9 @@ Each call builds and encodes all of its reports before it changes any state. A c
 |---|---|
 | `sid` | A string of 1 to 64 characters |
 | `cid` | A string of at most 128 characters |
+| `url` or `send` of a target | Exactly one of the two |
 | `url` of a target | A non-empty string |
+| `send` of a target | A function |
 | `interval` of a target | A finite number, 0 or more |
 | `batchSize` of a target | A positive integer |
 
@@ -429,7 +475,7 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 | `createCmcdSession`, prototype | 12.0 µs | 20.5 KB |
 | `CmcdReporter`, current | 20.2 µs | 32.6 KB |
 
-The prototype writes the same request output as `CmcdReporter`, byte for byte, for the same data. The [design record](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md) has the method.
+The prototype writes the same request output as `CmcdReporter`, byte for byte, for the same data. The measurements predate `send`. The implementation PR measures the addition. The [design record](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md) has the method.
 
 ## Drawbacks
 
@@ -440,6 +486,7 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - During a long outage of a collector, the queues of its targets grow without a limit. `CmcdReporter` has the same behavior.
 - A target cannot receive data that differs from the data of the other targets. The `bg=?0` opt-in of `CmcdReporter` has no equivalent.
 - The session derives no playback keys. Players keep computing `msd`, `bs`, `su`, and `dl`, as they do today.
+- A `send` target encodes each report to check the values and copies the nested values at queue time. A `url` target encodes once and copies nothing. Every adopter receives the `send` code, also an adopter with `url` targets only.
 
 ## Rationale and alternatives
 
@@ -459,11 +506,18 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **Timers in the player.** shaka-player 5.2.0 shows the lifecycle risk of timers in the library. Targets have their own intervals, though, so the session needs to know them. `start()` and `stop()` keep the lifecycle explicit.
 - **A store, as in `update()`, without the automatic events.** One store gives one way to pass data, but the session would keep player state again. The `t` reports would carry old `bl` and `mtp` values unless the player updates the store before each tick. Each key would need a rule for whether it persists, and two players in one session would overwrite one store. `CmcdReporter` also merges its store with the data of each call, so its players already use two sources.
 - **`snapshot()` for every report, under the data of the call.** It removes the `...state()` spread from each call. One snapshot describes one player, though. In a shared session, the reports of the ad player would carry the state of the primary player.
+- **One destination for targets with one URL.** CTA-5004-B defines `sn` per mode and target, and the player requirements call a target a destination URL. The text does not address two configured targets with one URL. `CmcdReporter` keeps one counter for each target, and the session keeps that behavior. A collector behind two targets receives two `sn` sequences and `msd` twice, which that configuration chose. One rule for every target also removes the destination lookup by URL or by function.
+- **A custom requester for other transports.** The requester receives the encoded body. A MoQ player would decode every line again and would invent HTTP status codes to drive the back-off.
+- **The report objects on the batch request.** The POST request could include the reports in `customData`, and a requester could route a `moqt:` URL. The URL becomes a routing key. The session encodes a body that no one reads, and one requester serves every target.
+- **One `send` function for the session.** One function would replace HTTP for every target. A player with one HTTP collector and one MoQ track needs the choice for each target.
+- **Encoded lines for `send`.** Transports that are not HTTP mostly need structured data. A function that needs lines calls `encodeCmcd()`.
+- **A time limit for a batch.** The CMCD over MSF draft asks for a `batchInterval` option. The option is separable from `send`. The draft calls the option a minimum interval and also a trigger, and that wording is open. A later RFC can add the option without a change to `send`.
+- **Other names for `send`.** `sink` is a term from stream libraries, and a sink does not answer. This function answers with a promise that drives the retry. `transport` names the fetch and XHR adapters of `CmcdReportRecorder`. `destination` and `target` name concepts of this RFC. `publish` names one transport.
 - **Types that sort keys into state keys and object keys.** CTA-5004-B has no such classes. Table 1 allows most keys in both modes, and `br` changes meaning between the modes. Section 2 leaves the choice of keys to the application. The types leave out only the keys that the session writes and the keys of one occurrence. `CmcdSnapshot` uses `never` members, because `Omit` alone accepts a value typed `Cmcd`. The data arguments use `Omit`, so the `Cmcd` values of existing players still compile. Required keys for each event type, such as `sta` for `ps`, need conditional parameter lists. They also reject a state object whose `sta` is optional.
 
 ## Prior art
 
-`CmcdReporter` 2.3.2 and 2.4.0 are the versions that the players adopted. The integrations in hls.js, dash.js, and shaka-player show which parts of the reporter the players use. The review of the transforms RFC (PR 390) defined the dash.js routing need.
+`CmcdReporter` 2.3.2 and 2.4.0 are the versions that the players adopted. The integrations in hls.js, dash.js, and shaka-player show which parts of the reporter the players use. The review of the transforms RFC (PR 390) defined the dash.js routing need. Zac Shenker wrote an event sink RFC on a fork. The RFC proposed a function for each target, the `gone` result, and a `batchInterval` option. This RFC adopts the function and the result under the name `send`.
 
 ## Unresolved questions
 
@@ -475,6 +529,8 @@ None. The review of the RFC PR can add questions.
 - Helpers that derive `msd`, `bs`, and `bsd` from play-state transitions, if players ask for them.
 - A rewrite step for each target, if an adopter needs one.
 - A filter for request mode.
+- A `batchInterval` option, the maximum time that a report waits in a batch. The CMCD over MSF draft asks for the option.
+- Helpers for CMCD over MoQ, such as a record serializer, when that draft is stable.
 
 ## Final Decision
 
@@ -490,3 +546,5 @@ To be completed after review.
 | dash.js PR 4816 | https://github.com/Dash-Industry-Forum/dash.js/pull/4816 |
 | shaka-player PR 10060 | https://github.com/shaka-project/shaka-player/pull/10060 |
 | shaka-player issue 10414 | https://github.com/shaka-project/shaka-player/issues/10414 |
+| Event sink RFC, Zac Shenker | https://github.com/zshenker/common-media-library/blob/rfc/cmcd-event-sink/rfc/cmcd-event-sink.md |
+| CMCD over MSF Event Timeline draft | https://wilaw.github.io/CMCD-over-MSF-event-timeline/draft-wilaw-moq-cmcd-event-timeline.html |
