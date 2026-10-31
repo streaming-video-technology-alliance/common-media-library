@@ -4,13 +4,13 @@
 
 **Goal:** Add `createCmcdSession()` to `@svta/cml-cmcd`, as [the session RFC](../../rfc/cmcd-session.md) defines it.
 
-**Architecture:** One factory function returns a session object. The session keeps one destination for request mode and one destination for each event target URL. Each call builds and encodes all of its reports first, and then it commits the sequence numbers and the waiting values. Each event target has a queue, at most one POST in flight, and a back-off timer. The encoder and `replaceCmcdParam()` of version 2.8.1 write every report. The configuration types are `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig`. Both derive from the `CmcdReporter` types without `transform`.
+**Architecture:** One factory function returns a session object. The session keeps one destination for request mode and one destination for each event target. Each call builds and encodes all of its reports first, and then it commits the sequence numbers and the waiting values. Each event target has a queue, at most one batch in flight, and a back-off timer. A target posts its batches to a `url` or passes them to a `send` function. The encoder and `replaceCmcdParam()` of version 2.8.1 write every report. The configuration types are `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig`. Both derive from the `CmcdReporter` types without `transform`.
 
-**Tech Stack:** TypeScript, `node:test` with mock timers, tsdown, API Extractor, TypeDoc, and rolldown for the bundle measurement.
+**Tech Stack:** TypeScript, Vitest through `vp test`, with its fake timers, tsdown through `vp pack`, API Extractor, TypeDoc, and `vp pack --minify` for the bundle measurement.
 
-This plan is Task 3.1 of [the roadmap](steps.md). It is a draft, last checked on 2026-10-08, while the RFC is in review in PR 486. If the review changes the RFC, update the affected tasks before Task 3.2 starts.
+This plan is Task 3.1 of [the roadmap](steps.md). It is a draft, last checked on 2026-10-30, while the RFC is in review in PR 486. If the review changes the RFC, update the affected tasks before Task 3.2 starts.
 
-Edited on 2026-10-30 for the session configuration types and the status 0 rule, without a replay. `main` has moved since the last replay. The tests run on Vitest with `vp test`. The lint and the format check run with `vp lint` and `vp fmt`. The typecheck runs with tsgolint. cmcd 2.8.4 derives `ttfb` with `getTimeToFirstByte` from `@svta/cml-utils`, so Task 5 reuses that function. Replay the plan on current `main` before Task 3.2. Port the test files and the check commands to these tools.
+Edited and replayed on 2026-10-30 for the session configuration types, the status 0 rule, the `send` function, and one destination for each target. The tests run on Vitest with `vp test`. The lint, the format check, and the typecheck run with `vp lint`, `vp fmt`, and tsgolint. The listings carry the output of `vp fmt`. cmcd 2.8.4 derives `ttfb` with `getTimeToFirstByte` from `@svta/cml-utils`, so Task 5 reuses that function.
 
 ## Global Constraints
 
@@ -27,19 +27,20 @@ Edited on 2026-10-30 for the session configuration types and the status 0 rule, 
 
 ## How This Plan Was Checked
 
-The code of each task ran before this plan was written, on a copy of `main` at 0e45a1db5 (release 2.8.1):
+The code of each task ran on 2026-10-30 on a copy of `main` at b291c609a (release cmaf-ham 0.25.0):
 
 - The tests of each task fail before its code and pass after it.
-- After each task, every `libs/cmcd` test passes. `tsc` and ESLint report nothing with the root configuration.
-- The root `npm test` passes on the final code. API Extractor reports the same 10 warnings as `main`. The docs build reports the same 18 warnings as `main`.
-- Each code block of the new documents runs and passes a strict typecheck.
+- After each task, every `libs/cmcd` test passes. The typecheck and the format check report nothing.
+- The root `npm test` passes on the final code, and the site build passes.
+- Each code block of the new documents runs.
+- Without `copyReport()`, the test of the report copy fails. `prepareCmcdData()` shares the parameter objects of the items with the caller.
 
 | Measurement, final code | Session | `CmcdReporter` |
 |---|---:|---:|
-| Minified with gzip, with its dependencies | 6923 B | 8696 B |
-| One version 2 request report, Node 24 | 8.11 µs | 14.60 µs |
+| Minified with gzip, with its dependencies, `vp pack` | 7140 B | 8791 B |
+| One version 2 request report, Node 24 | 7.58 µs | 13.38 µs |
 
-Both APIs in one bundle measure 10556 B. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
+Both APIs in one bundle measure 10793 B. The replay of 2026-10-08 measured 6923 B, 8696 B, and 10556 B with the rolldown CLI, before `send`. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
 
 The configuration types follow the decisions of Casey of 2026-10-02 and 2026-10-30. `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig` derive from `CmcdRequestReportConfig` and `CmcdEventReportConfig` without `transform`. A `transform` member typed `never` rejects a `CmcdReporter` configuration at compile time. Only `CmcdSessionEventReportConfig` has `filter`. `enabledKeys` accepts a read-only array.
 
@@ -51,11 +52,14 @@ The RFC does not settle these points. The plan applies the choice in the second 
 
 | Point | Choice | Task |
 |---|---|---|
-| Two targets with one URL select the same call | The reports take sequence numbers in the order of the targets. Only the first report takes the waiting values and `msd`. | 3, 4 |
 | A request with CMCD headers, in header mode | The session removes the four CMCD headers of the request, and then it adds the new ones. In query mode, the first `CMCD` parameter takes the new value in place, and the session removes the other `CMCD` parameters, as `CmcdReporter` does. | 2 |
 | A waiting `bsd` or `ec` list with parameters on the list | The copy keeps the items and their parameters. It does not keep the parameters of the list itself, because two lists cannot merge them. | 4 |
 | A requester that resolves with status 0 | The session returns the batch to the queue, like a rejected request (Casey, 2026-10-30). | 6 |
-| A call to `flush()` during a POST that fails | The target sends again at once after the response. The RFC says that `flush()` sends after the response of a POST in flight. | 6 |
+| A call to `flush()` during a batch that fails | The target sends again at once after the response. The RFC says that `flush()` sends after the batch in flight completes. | 6 |
+| The return type of `CmcdEventSender` | `Promise<CmcdEventSendResult \| void>`, as the RFC writes it, with a lint directive for `no-invalid-void-type`. A union of two promise types rejects a `Promise.resolve()` call with mixed results. | 6 |
+| The copy of a `send` report | `copyReport()` copies arrays, `SfItem` values with their parameters, and `SfToken` values. `prepareCmcdData()` already allocates new arrays and items, but the items share their parameter objects with the caller. | 6 |
+| `ttfb` of an `rr` report | `getTimeToFirstByte()` from `@svta/cml-utils`, as `CmcdReporter` 2.8.4 uses it. The function also rejects a `responseStart` after `startTime` plus `duration`. The RFC names only the lower bound. | 5 |
+| The `cmcd` of a request in `recordResponseReceived()` | The session reads `customData.cmcd` through a cast, because `HttpRequest` types `customData` as `any`. | 5 |
 | Documents | The session guide and the migration guide are new files in `libs/cmcd/docs/`. The user guide describes `CmcdReporter`, which Phase 4 deprecates. | 10 |
 | Spec examples | A conformance task reproduces 15 examples of CTA-5004-B section 8, with the data file of PR 460. | 9 |
 
@@ -82,7 +86,7 @@ The scenarios of the four test files of PR 460:
 | honors interval, batchSize, headers, and flush() | Port | 3, 7 |
 | drains on dispose() and stops the timers | Port as `flush()` and `stop()` | 7 |
 | disables t with interval 0 | Port | 7 |
-| silences a target for the rest of the sid after a 410 | Port. A 410 stops every target with the URL. | 6 |
+| silences a target for the rest of the sid after a 410 | Port. A 410 stops the target. | 6 |
 | backs off after a 429 and aggregates the lines queued during the wait | Port | 6 |
 | retries a 5xx and a rejection, and drops the batch on another 4xx | Port | 6 |
 | forgets the drain request when another 4xx drops the batch | Drop. A `flush()` during a POST sends after every response. | |
@@ -131,12 +135,12 @@ The other inputs of Task 3.1 map to these tasks:
 |---|---|
 | Prototype scenario: a `b` event with `bg: false` is the exit, without `bg` | 3 |
 | Prototype scenarios: `msd` once for each destination, values that cannot be encoded, waiting `bs` and `ec`, `bsd` lists, the request-time data of a response | 4, 5 |
-| Prototype scenarios: a 410 for each URL, the back-off, `flush()` during a wait | 6 |
+| Prototype scenarios: a 410 for each target, the back-off, `flush()` during a wait | 6 |
 | Prototype scenarios: `start()` and `start(false)`, `configure()` keeps the sequence number | 2, 7 |
 | Prototype scenario: the configuration checks | 8 |
 | `CmcdReporter` spec rules: the `msd` checks | 4 |
 | `CmcdReporter` spec rules: the `bg` exit, batching | 3 |
-| `CmcdReporter` spec rules: 410 for each URL | 6 |
+| `CmcdReporter` spec rules: 410 for each target | 6 |
 | `CmcdReporter` spec rules: response timing | 5 |
 
 ## RFC Coverage
@@ -150,6 +154,7 @@ The other inputs of Task 3.1 map to these tasks:
 | Keys with a destination scope | 4 |
 | Settings and timers | 2, 7 |
 | Delivery | 3, 6 |
+| Send reports without HTTP | 6, 10 |
 | Errors | 2, 3, 4, 7, 8 |
 | Migration table | 10 |
 | Bundle and performance | 11 |
@@ -163,15 +168,17 @@ The other inputs of Task 3.1 map to these tasks:
 | `libs/cmcd/src/CmcdSessionRequestReportConfig.ts` | Public type of the request mode settings, `CmcdRequestReportConfig` without `transform` | 2 |
 | `libs/cmcd/src/CmcdSessionConfig.ts` | Public type of the configuration, based on `CmcdSessionRequestReportConfig` | 2, 3, 4, 7 |
 | `libs/cmcd/src/CmcdSession.ts` | Public type of the session | 2 to 7 |
-| `libs/cmcd/src/createCmcdSession.ts` | Public function. The destinations, the reports, the queues, and the timers. | 2 to 8 |
+| `libs/cmcd/src/createCmcdSession.ts` | Public function. The destinations, the reports, the queues, the delivery, and the timers. | 2 to 8 |
 | `libs/cmcd/src/CmcdSnapshot.ts` | Public type of the player state that `snapshot` returns | 7 |
 | `libs/cmcd/src/CmcdReportFilter.ts` | Public type of the filter of an event target | 3 |
-| `libs/cmcd/src/CmcdSessionEventReportConfig.ts` | Public type of an event target, `CmcdEventReportConfig` without `transform` and with `filter` | 3 |
+| `libs/cmcd/src/CmcdSessionEventReportConfig.ts` | Public type of an event target, `CmcdEventReportConfig` without `transform` and with `filter`. Task 6 adds the `url` or `send` union. | 3, 6 |
+| `libs/cmcd/src/CmcdEventSender.ts`, `libs/cmcd/src/CmcdEventSendResult.ts` | Public types of the `send` function of an event target and its result | 6 |
+| `libs/cmcd/src/encodeCmcd.ts` | Existing function. The parameter accepts a deeply read-only object. | 6 |
 | `libs/cmcd/src/CmcdEventType.ts` | Gains `CMCD_EVENT_HOSTNAME` and `HOSTNAME` | 3 |
 | `libs/cmcd/src/readScopedValues.ts` | Internal. Reads and checks the `msd`, `bs`, `bsd`, and `ec` values of a call. | 4 |
 | `libs/cmcd/src/toResponseKeys.ts` | Internal. Derives the keys of an `rr` report. | 5 |
 | `libs/cmcd/src/checkSessionConfig.ts` | Internal. The configuration checks. | 8 |
-| `libs/cmcd/src/index.ts` | Exports the public files | 2, 3, 7 |
+| `libs/cmcd/src/index.ts` | Exports the public files | 2, 3, 6, 7 |
 | `libs/cmcd/test/createCmcdSession.test.ts` and seven files `createCmcdSession.<area>.test.ts` | One test file for each task from 2 to 9 | 2 to 9 |
 | `libs/cmcd/test/toResponseKeys.test.ts` | Test of an internal helper | 5 |
 | `libs/cmcd/test/data/CTA_5004_B_EXAMPLES.ts` | The examples of CTA-5004-B section 8 | 9 |
@@ -211,7 +218,7 @@ The fix PR of the branch `fix/cmcd-query-strict-encoding` adds this helper and i
 
 ```bash
 git log --oneline -1 -- libs/cmcd/src/replaceCmcdParam.ts
-node --no-warnings --test libs/cmcd/test/replaceCmcdParam.test.ts
+npx vp test --run libs/cmcd/test/replaceCmcdParam.test.ts
 ```
 
 Expected: the log shows the commit of the fix PR, and the tests pass. If the file is not on `main`, stop and report: the fix PR must merge before Task 2.
@@ -232,9 +239,15 @@ Expected: the log shows the commit of the fix PR, and the tests pass. If the fil
 Create `libs/cmcd/test/createCmcdSession.test.ts`:
 
 ```ts
-import { CmcdHeaderField, CmcdObjectType, CmcdTransmissionMode, createCmcdSession } from '@svta/cml-cmcd'
+import type { Cmcd } from '@svta/cml-cmcd'
+import {
+	CmcdHeaderField,
+	CmcdObjectType,
+	CmcdTransmissionMode,
+	createCmcdSession,
+} from '@svta/cml-cmcd'
 import { deepEqual, equal, notEqual, ok, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 const SEGMENT = 'https://cdn.test/v/1.m4s'
 
@@ -248,7 +261,10 @@ describe('createCmcdSession', () => {
 			{ ot: CmcdObjectType.VIDEO, d: 4000, br: [3000] },
 		)
 
-		equal(decodeURIComponent(report.url), 'https://cdn.example.com/movie/seg-1.m4s?CMCD=br=(3000),cid="movie-42",d=4000,ot=v,sid="session-1",sn=0,v=2')
+		equal(
+			decodeURIComponent(report.url),
+			'https://cdn.example.com/movie/seg-1.m4s?CMCD=br=(3000),cid="movie-42",d=4000,ot=v,sid="session-1",sn=0,v=2',
+		)
 		// #endregion example
 	})
 
@@ -276,7 +292,11 @@ describe('createCmcdSession', () => {
 			const session = createCmcdSession()
 
 			ok(/^[0-9a-f-]{36}$/.test(session.sid))
-			ok(decodeURIComponent(session.createRequestReport({ url: SEGMENT }).url).includes(`sid="${session.sid}"`))
+			ok(
+				decodeURIComponent(session.createRequestReport({ url: SEGMENT }).url).includes(
+					`sid="${session.sid}"`,
+				),
+			)
 		})
 
 		it('replaces the first CMCD parameter in place and keeps the fragment', () => {
@@ -290,14 +310,21 @@ describe('createCmcdSession', () => {
 		it('writes nor as a path relative to the request URL', () => {
 			const session = createCmcdSession({ sid: 's1' })
 
-			const report = session.createRequestReport({ url: SEGMENT }, { nor: ['https://cdn.test/v/2.m4s'] })
+			const report = session.createRequestReport(
+				{ url: SEGMENT },
+				{ nor: ['https://cdn.test/v/2.m4s'] },
+			)
 
 			equal(decodeURIComponent(report.url), `${SEGMENT}?CMCD=nor=("2.m4s"),sid="s1",sn=0,v=2`)
 		})
 
 		it('returns a copy of the request, with the report data in customData.cmcd', () => {
 			const session = createCmcdSession({ sid: 's1' })
-			const request = { url: SEGMENT, headers: { Range: 'bytes=0-99' }, customData: { requestType: 'segment' } }
+			const request = {
+				url: SEGMENT,
+				headers: { Range: 'bytes=0-99' },
+				customData: { requestType: 'segment' },
+			}
 
 			const report = session.createRequestReport(request, { ot: CmcdObjectType.VIDEO })
 
@@ -305,20 +332,27 @@ describe('createCmcdSession', () => {
 			deepEqual(request.customData, { requestType: 'segment' })
 			notEqual(report.headers, request.headers)
 			deepEqual(report.headers, { Range: 'bytes=0-99' })
-			equal(report.customData.requestType, 'segment')
-			equal(report.customData.cmcd.sid, 's1')
-			equal(report.customData.cmcd.sn, 0)
+			const customData = report.customData as { requestType: string; cmcd: Cmcd }
+			equal(customData.requestType, 'segment')
+			equal(customData.cmcd.sid, 's1')
+			equal(customData.cmcd.sn, 0)
 		})
 
 		it('sends CMCD headers in header mode and replaces the existing ones', () => {
-			const session = createCmcdSession({ sid: 's1', transmissionMode: CmcdTransmissionMode.HEADERS })
-			const request = { url: SEGMENT, headers: { 'cmcd-status': 'bs', [CmcdHeaderField.REQUEST]: 'bl=(100)', Accept: '*/*' } }
+			const session = createCmcdSession({
+				sid: 's1',
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+			})
+			const request = {
+				url: SEGMENT,
+				headers: { 'cmcd-status': 'bs', [CmcdHeaderField.REQUEST]: 'bl=(100)', Accept: '*/*' },
+			}
 
 			const report = session.createRequestReport(request, { ot: CmcdObjectType.VIDEO, bl: [5000] })
 
 			equal(report.url, SEGMENT)
 			deepEqual(report.headers, {
-				'Accept': '*/*',
+				Accept: '*/*',
 				'CMCD-Object': 'ot=v',
 				'CMCD-Request': 'bl=(5000),sn=0',
 				'CMCD-Session': 'sid="s1",v=2',
@@ -340,7 +374,10 @@ describe('createCmcdSession', () => {
 		it('encodes version 1 without sn and without the version 2 keys', () => {
 			const session = createCmcdSession({ sid: 's1', version: 1 })
 
-			const report = session.createRequestReport({ url: SEGMENT }, { ot: CmcdObjectType.VIDEO, bl: [5000], msd: 300, sta: 'p' })
+			const report = session.createRequestReport(
+				{ url: SEGMENT },
+				{ ot: CmcdObjectType.VIDEO, bl: [5000], msd: 300, sta: 'p' },
+			)
 
 			equal(decodeURIComponent(report.url), `${SEGMENT}?CMCD=bl=5000,ot=v,sid="s1"`)
 		})
@@ -358,7 +395,10 @@ describe('createCmcdSession', () => {
 
 			throws(() => session.createRequestReport({ url: SEGMENT }, { 'com.example-key': 'a\nb' }))
 
-			equal(decodeURIComponent(session.createRequestReport({ url: SEGMENT }).url), `${SEGMENT}?CMCD=sid="s1",sn=0,v=2`)
+			equal(
+				decodeURIComponent(session.createRequestReport({ url: SEGMENT }).url),
+				`${SEGMENT}?CMCD=sid="s1",sn=0,v=2`,
+			)
 		})
 	})
 
@@ -369,7 +409,11 @@ describe('createCmcdSession', () => {
 			const first = session.createRequestReport({ url: SEGMENT })
 			session.configure({ version: 1, enabledKeys: ['sid'] })
 			const second = session.createRequestReport({ url: SEGMENT })
-			session.configure({ version: 2, enabledKeys: undefined, transmissionMode: CmcdTransmissionMode.HEADERS })
+			session.configure({
+				version: 2,
+				enabledKeys: undefined,
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+			})
 			const third = session.createRequestReport({ url: SEGMENT })
 
 			equal(decodeURIComponent(first.url), `${SEGMENT}?CMCD=sid="s1",sn=0,v=2`)
@@ -385,10 +429,10 @@ describe('createCmcdSession', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.test.ts
 ```
 
-Expected: FAIL with `SyntaxError: The requested module '@svta/cml-cmcd' does not provide an export named 'createCmcdSession'`.
+Expected: FAIL. The 13 tests fail with `TypeError: createCmcdSession is not a function`.
 
 - [ ] **Step 3: Write the types**
 
@@ -409,7 +453,7 @@ export type CmcdReportConfig = {
 	 *
 	 * @defaultValue `CMCD_V2`
 	 */
-	version?: CmcdVersion;
+	version?: CmcdVersion
 
 	/**
 	 * The list of CMCD keys to include in the report. Without the list,
@@ -420,7 +464,7 @@ export type CmcdReportConfig = {
 	 *
 	 * @defaultValue `undefined`
 	 */
-	enabledKeys?: readonly CmcdKey[];
+	enabledKeys?: readonly CmcdKey[]
 }
 ```
 
@@ -441,8 +485,8 @@ export type CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, 'tran
 	 * `transform` does not compile. The data of each call shapes the reports
 	 * of a session.
 	 */
-	transform?: never;
-};
+	transform?: never
+}
 ```
 
 Create `libs/cmcd/src/CmcdSessionConfig.ts`:
@@ -463,12 +507,12 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	 *
 	 * @defaultValue A new UUID
 	 */
-	sid?: string;
+	sid?: string
 
 	/**
 	 * The content ID of each report whose data has no `cid`. It has at most 128 characters.
 	 */
-	cid?: string;
+	cid?: string
 }
 ```
 
@@ -493,7 +537,7 @@ export type CmcdSession = {
 	/**
 	 * The session ID of every report.
 	 */
-	readonly sid: string;
+	readonly sid: string
 
 	/**
 	 * Returns a copy of the request with a CMCD request report.
@@ -510,7 +554,10 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(
+		request: R,
+		data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>,
+	): R & CmcdRequestReport<R['customData']>
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -518,7 +565,7 @@ export type CmcdSession = {
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionRequestReportConfig): void;
+	configure(settings: CmcdSessionRequestReportConfig): void
 }
 ```
 
@@ -555,7 +602,7 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 
 	const set = new Set<string>(keys)
 
-	return (key) => set.has(key)
+	return key => set.has(key)
 }
 
 /**
@@ -586,14 +633,21 @@ export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 	return {
 		sid,
 
-		createRequestReport<R extends HttpRequest>(request: R, data: Cmcd = {}): R & CmcdRequestReport<R['customData']> {
-			const cmcd = prepareCmcdData({ ...data, cid: data.cid ?? config.cid, sid, sn }, {
-				version: settings.version ?? CMCD_V2,
-				reportingMode: CMCD_REQUEST_MODE,
-				filter: requestKeys,
-				baseUrl: request.url,
-			})
-			const source = request.headers ?? {}
+		createRequestReport<R extends HttpRequest>(
+			request: R,
+			data: Cmcd = {},
+		): R & CmcdRequestReport<R['customData']> {
+			const cmcd = prepareCmcdData(
+				{ ...data, cid: data.cid ?? config.cid, sid, sn },
+				{
+					version: settings.version ?? CMCD_V2,
+					reportingMode: CMCD_REQUEST_MODE,
+					filter: requestKeys,
+					baseUrl: request.url,
+				},
+			)
+			const { headers: source = {}, ...rest } = request
+			const customData = request.customData as object | undefined
 			const replace = settings.transmissionMode === CMCD_HEADERS
 			const headers: Record<string, string> = {}
 			let url = request.url
@@ -606,14 +660,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}): CmcdSession {
 
 			if (replace) {
 				Object.assign(headers, toPreparedCmcdHeaders(cmcd, settings.customHeaderMap))
-			}
-			else {
+			} else {
 				url = replaceCmcdParam(url, encodePreparedCmcd(cmcd))
 			}
 
 			sn++
 
-			return { ...request, url, headers, customData: { ...request.customData, cmcd } } as R & CmcdRequestReport<R['customData']>
+			return { ...rest, url, headers, customData: { ...customData, cmcd } } as R &
+				CmcdRequestReport<R['customData']>
 		},
 
 		configure(next) {
@@ -642,13 +696,13 @@ export * from './createCmcdSession.ts'
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 13 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing. The API report gains `CmcdSession`, `CmcdSessionConfig`, `CmcdSessionRequestReportConfig`, and `createCmcdSession`, and `enabledKeys` of `CmcdReportConfig` becomes `readonly CmcdKey[]`.
+Expected: the 13 tests of the file pass, and every package test passes. The typecheck and the format check report nothing. The API report gains `CmcdSession`, `CmcdSessionConfig`, `CmcdSessionRequestReportConfig`, and `createCmcdSession`, and `enabledKeys` of `CmcdReportConfig` becomes `readonly CmcdKey[]`.
 
 - [ ] **Step 6: Commit**
 
@@ -674,11 +728,16 @@ Create `libs/cmcd/test/createCmcdSession.events.test.ts`:
 
 ```ts
 import type { CmcdReportFilter, CmcdSessionConfig } from '@svta/cml-cmcd'
-import { CMCD_EVENT_HOSTNAME, CmcdEventType, CmcdPlayerState, createCmcdSession } from '@svta/cml-cmcd'
+import {
+	CMCD_EVENT_HOSTNAME,
+	CmcdEventType,
+	CmcdPlayerState,
+	createCmcdSession,
+} from '@svta/cml-cmcd'
 import { SfItem } from '@svta/cml-structured-field-values'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok, throws } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 
 const SEGMENT = 'https://cdn.test/v/1.m4s'
 const A = 'https://a.test/cmcd'
@@ -686,50 +745,66 @@ const B = 'https://b.test/cmcd'
 const ts = 1000
 
 function settle(): Promise<void> {
-	return new Promise((resolve) => setImmediate(resolve))
+	return new Promise(resolve => setImmediate(resolve))
 }
 
 function setup(config: CmcdSessionConfig) {
 	const posts: HttpRequest[] = []
-	const session = createCmcdSession({ sid: 's1', ...config }, async (request) => {
+	const session = createCmcdSession({ sid: 's1', ...config }, request => {
 		posts.push(request)
-		return { status: 200 }
+		return Promise.resolve({ status: 200 })
 	})
-	const lines = (url?: string): string[] => posts.filter((post) => !url || post.url === url).flatMap((post) => String(post.body).split('\n'))
+	const lines = (url?: string): string[] =>
+		posts
+			.filter(post => !url || post.url === url)
+			.flatMap(post => (post.body as string).split('\n'))
 
 	return { session, posts, lines }
 }
 
 describe('createCmcdSession events', () => {
-	beforeEach(() => mock.timers.enable({ apis: ['Date'], now: ts }))
-	afterEach(() => mock.timers.reset())
+	beforeEach(() => vi.useFakeTimers({ now: ts, toFake: ['Date'] }))
+	afterEach(() => vi.useRealTimers())
 
 	it('provides a valid example', () => {
 		// #region example
 		const bodies: string[] = []
-		const session = createCmcdSession({
-			sid: 'session-1',
-			cid: 'movie-42',
-			eventTargets: [{
-				url: 'https://collector.example.com/cmcd',
-				events: [CmcdEventType.PLAY_STATE],
-				filter: (report) => report.sta !== CmcdPlayerState.SEEKING,
-			}],
-		}, async (request) => {
-			bodies.push(String(request.body))
-			return { status: 200 }
-		})
+		const session = createCmcdSession(
+			{
+				sid: 'session-1',
+				cid: 'movie-42',
+				eventTargets: [
+					{
+						url: 'https://collector.example.com/cmcd',
+						events: [CmcdEventType.PLAY_STATE],
+						filter: report => report.sta !== CmcdPlayerState.SEEKING,
+					},
+				],
+			},
+			request => {
+				bodies.push(request.body as string)
+				return Promise.resolve({ status: 200 })
+			},
+		)
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: CmcdPlayerState.SEEKING })
-		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: CmcdPlayerState.PLAYING, ts: 1767225600000 })
+		session.recordEvent(CmcdEventType.PLAY_STATE, {
+			sta: CmcdPlayerState.PLAYING,
+			ts: 1767225600000,
+		})
 
 		equal(bodies[0], 'cid="movie-42",e=ps,sid="session-1",sn=0,sta=p,ts=1767225600000,v=2')
 		// #endregion example
 	})
 
 	describe('recordEvent', () => {
-		it('sends a report to each target that lists the event, with a sequence number for each URL', async () => {
-			const { session, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }, { url: B, events: [CmcdEventType.PLAY_STATE] }] })
+		it('sends a report to each target that lists the event, with a sequence number for each target', async () => {
+			const { session, lines } = setup({
+				eventTargets: [
+					{ url: A, events: [CmcdEventType.PLAY_STATE] },
+					{ url: B, events: [CmcdEventType.PLAY_STATE] },
+				],
+			})
 
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
@@ -737,15 +812,18 @@ describe('createCmcdSession events', () => {
 			await settle()
 
 			for (const url of [A, B]) {
-				deepEqual(lines(url), [`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`, `e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`])
+				deepEqual(lines(url), [
+					`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
+					`e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`,
+				])
 			}
 		})
 
-		it('gives the targets that share a URL one sequence', async () => {
+		it('gives each target its own sequence, also when two targets share a URL', async () => {
 			const { session, lines } = setup({
 				eventTargets: [
 					{ url: A, events: [CmcdEventType.PLAY_STATE] },
-					{ url: A, events: [CmcdEventType.PLAY_STATE], filter: (report) => report.sta === 'p' },
+					{ url: A, events: [CmcdEventType.PLAY_STATE], filter: report => report.sta === 'p' },
 				],
 			})
 
@@ -756,21 +834,23 @@ describe('createCmcdSession events', () => {
 			deepEqual(lines(), [
 				`e=ps,sid="s1",sn=0,sta=a,ts=${ts},v=2`,
 				`e=ps,sid="s1",sn=1,sta=p,ts=${ts},v=2`,
-				`e=ps,sid="s1",sn=2,sta=p,ts=${ts},v=2`,
+				`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
 			])
 		})
 
 		it('calls the filter with e, ts, and the request, before it uses a sequence number', () => {
 			const calls: Parameters<CmcdReportFilter>[] = []
 			const { session, lines } = setup({
-				eventTargets: [{
-					url: A,
-					events: [CmcdEventType.PLAY_STATE],
-					filter: (report, request) => {
-						calls.push([report, request])
-						return report.sta !== 'a'
+				eventTargets: [
+					{
+						url: A,
+						events: [CmcdEventType.PLAY_STATE],
+						filter: (report, request) => {
+							calls.push([report, request])
+							return report.sta !== 'a'
+						},
 					},
-				}],
+				],
 			})
 
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' }, { url: SEGMENT })
@@ -802,13 +882,18 @@ describe('createCmcdSession events', () => {
 			fail = false
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
 
-			deepEqual(lines(), [`e=ps,sid="s1",sn=0,sta=a,ts=${ts},v=2`, `e=ps,sid="s1",sn=0,sta=a,ts=${ts},v=2`])
+			deepEqual(lines(), [
+				`e=ps,sid="s1",sn=0,sta=a,ts=${ts},v=2`,
+				`e=ps,sid="s1",sn=0,sta=a,ts=${ts},v=2`,
+			])
 		})
 
 		it('types the arguments of a filter as deeply read-only', () => {
 			const filter: CmcdReportFilter = (report, request) => {
+				const list = report.bl ?? []
+
 				// @ts-expect-error A filter cannot change a nested value of the report.
-				report.bl?.push(1)
+				list[0] = 1
 				// @ts-expect-error A filter cannot change the request.
 				request.url = 'x'
 				return true
@@ -818,10 +903,16 @@ describe('createCmcdSession events', () => {
 		})
 
 		it('ignores sid, sn, and e in the data, and uses the configured cid when the data has none', async () => {
-			const { session, lines } = setup({ cid: 'c1', eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+			const { session, lines } = setup({
+				cid: 'c1',
+				eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+			})
 
-			// @ts-expect-error - The data type leaves out sid, sn, and e. A JavaScript caller can still pass them.
-			session.recordEvent(CmcdEventType.PLAY_STATE, { sid: 'x', sn: 7, e: 'rr', cid: undefined, sta: 'p' })
+			session.recordEvent(
+				CmcdEventType.PLAY_STATE,
+				// @ts-expect-error - The data type leaves out sid, sn, and e. A JavaScript caller can still pass them.
+				{ sid: 'x', sn: 7, e: 'rr', cid: undefined, sta: 'p' },
+			)
 			session.recordEvent(CmcdEventType.PLAY_STATE, { cid: 'ad-7', sta: 'a' })
 			await settle()
 
@@ -832,11 +923,15 @@ describe('createCmcdSession events', () => {
 		})
 
 		it('writes the exit from backgrounded mode without bg', async () => {
-			const { session, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.BACKGROUNDED_MODE] }] })
+			const { session, lines } = setup({
+				eventTargets: [{ url: A, events: [CmcdEventType.BACKGROUNDED_MODE] }],
+			})
 
 			session.recordEvent(CmcdEventType.BACKGROUNDED_MODE, { bg: true })
 			session.recordEvent(CmcdEventType.BACKGROUNDED_MODE, { bg: false })
-			session.recordEvent(CmcdEventType.BACKGROUNDED_MODE, { bg: new SfItem(false, { x: 1 }) as unknown as boolean })
+			session.recordEvent(CmcdEventType.BACKGROUNDED_MODE, {
+				bg: new SfItem(false, { x: 1 }) as unknown as boolean,
+			})
 			await settle()
 
 			deepEqual(lines(), [
@@ -847,7 +942,9 @@ describe('createCmcdSession events', () => {
 		})
 
 		it('keeps only the enabled keys and the keys that the event requires', () => {
-			const { session, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE], enabledKeys: ['sid', 'sn'] }] })
+			const { session, lines } = setup({
+				eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE], enabledKeys: ['sid', 'sn'] }],
+			})
 
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', bl: [100] })
 
@@ -855,7 +952,9 @@ describe('createCmcdSession events', () => {
 		})
 
 		it('records the h event with the new host', () => {
-			const { session, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.HOSTNAME] }] })
+			const { session, lines } = setup({
+				eventTargets: [{ url: A, events: [CmcdEventType.HOSTNAME] }],
+			})
 
 			session.recordEvent(CMCD_EVENT_HOSTNAME, { h: 'cdn2.example.com' })
 
@@ -864,9 +963,13 @@ describe('createCmcdSession events', () => {
 		})
 
 		it('throws for a value that cannot be encoded, and keeps the sequence number', () => {
-			const { session, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+			const { session, lines } = setup({
+				eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+			})
 
-			throws(() => session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', 'com.example-name': 'a\nb' }))
+			throws(() =>
+				session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', 'com.example-name': 'a\nb' }),
+			)
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 
 			deepEqual(lines(), [`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`])
@@ -875,7 +978,9 @@ describe('createCmcdSession events', () => {
 
 	describe('batches', () => {
 		it('posts a batch of batchSize lines, and flush() posts the rest after the response', async () => {
-			const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE], batchSize: 2 }] })
+			const { session, posts } = setup({
+				eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE], batchSize: 2 }],
+			})
 
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
@@ -885,18 +990,32 @@ describe('createCmcdSession events', () => {
 			await settle()
 
 			deepEqual(posts, [
-				{ url: A, method: 'POST', headers: { 'Content-Type': 'application/cmcd' }, body: `e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2\ne=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2` },
-				{ url: A, method: 'POST', headers: { 'Content-Type': 'application/cmcd' }, body: `e=ps,sid="s1",sn=2,sta=p,ts=${ts},v=2` },
+				{
+					url: A,
+					method: 'POST',
+					headers: { 'Content-Type': 'application/cmcd' },
+					body: `e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2\ne=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`,
+				},
+				{
+					url: A,
+					method: 'POST',
+					headers: { 'Content-Type': 'application/cmcd' },
+					body: `e=ps,sid="s1",sn=2,sta=p,ts=${ts},v=2`,
+				},
 			])
 		})
 
 		it('keeps one POST in flight for each target, and sends the waiting lines after the response', async () => {
 			const posts: HttpRequest[] = []
 			const replies: ((status: number) => void)[] = []
-			const session = createCmcdSession({ sid: 's1', eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] }, (request) => new Promise((resolve) => {
-				posts.push(request)
-				replies.push((status) => resolve({ status }))
-			}))
+			const session = createCmcdSession(
+				{ sid: 's1', eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] },
+				request =>
+					new Promise(resolve => {
+						posts.push(request)
+						replies.push(status => resolve({ status }))
+					}),
+			)
 
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
@@ -906,17 +1025,32 @@ describe('createCmcdSession events', () => {
 			await settle()
 
 			equal(posts.length, 2)
-			equal(posts[1].body, `e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2\ne=ps,sid="s1",sn=2,sta=p,ts=${ts},v=2`)
+			equal(
+				posts[1].body,
+				`e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2\ne=ps,sid="s1",sn=2,sta=p,ts=${ts},v=2`,
+			)
 		})
 
-		it('posts with fetch and without keepalive by default', (context) => {
-			const fetch = context.mock.method(globalThis, 'fetch', async () => new Response(null, { status: 200 }))
-			const session = createCmcdSession({ sid: 's1', eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+		it('posts with fetch and without keepalive by default', () => {
+			const fetch = vi
+				.spyOn(globalThis, 'fetch')
+				.mockResolvedValue(new Response(null, { status: 200 }))
+			const session = createCmcdSession({
+				sid: 's1',
+				eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+			})
 
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 
-			equal(fetch.mock.callCount(), 1)
-			deepEqual(fetch.mock.calls[0].arguments, [A, { method: 'POST', headers: { 'Content-Type': 'application/cmcd' }, body: `e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2` }])
+			equal(fetch.mock.calls.length, 1)
+			deepEqual(fetch.mock.calls[0], [
+				A,
+				{
+					method: 'POST',
+					headers: { 'Content-Type': 'application/cmcd' },
+					body: `e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
+				},
+			])
 		})
 	})
 })
@@ -926,10 +1060,10 @@ describe('createCmcdSession events', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.events.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.events.test.ts
 ```
 
-Expected: FAIL with `SyntaxError: The requested module '@svta/cml-cmcd' does not provide an export named 'CMCD_EVENT_HOSTNAME'`.
+Expected: FAIL. The tests fail with `TypeError: session.recordEvent is not a function`, and the `h` event test fails with `CMCD_EVENT_HOSTNAME is not defined`.
 
 - [ ] **Step 3: Add the `h` event**
 
@@ -980,7 +1114,10 @@ import type { Cmcd } from './Cmcd.ts'
  * @example
  * {@includeCode ../test/createCmcdSession.events.test.ts#example}
  */
-export type CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean
+export type CmcdReportFilter = (
+	report: DeepReadonly<Cmcd>,
+	request?: DeepReadonly<HttpRequest>,
+) => boolean
 ```
 
 Create `libs/cmcd/src/CmcdSessionEventReportConfig.ts`:
@@ -1002,15 +1139,15 @@ export type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, 'transfor
 	 *
 	 * @defaultValue `undefined`
 	 */
-	filter?: CmcdReportFilter;
+	filter?: CmcdReportFilter
 
 	/**
 	 * Only `CmcdReporter` reads `transform`. A session target with a
 	 * `transform` does not compile. Use `filter` to select the reports of
 	 * the target.
 	 */
-	transform?: never;
-};
+	transform?: never
+}
 ```
 
 Replace the content of `libs/cmcd/src/CmcdSessionConfig.ts` with:
@@ -1032,18 +1169,18 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	 *
 	 * @defaultValue A new UUID
 	 */
-	sid?: string;
+	sid?: string
 
 	/**
 	 * The content ID of each report whose data has no `cid`. It has at most 128 characters.
 	 */
-	cid?: string;
+	cid?: string
 
 	/**
 	 * The event targets. They cannot change after the session is created.
-	 * The targets with the same `url` form one destination, and they share one sequence number.
+	 * Each target is one destination with its own sequence number.
 	 */
-	eventTargets?: readonly CmcdSessionEventReportConfig[];
+	eventTargets?: readonly CmcdSessionEventReportConfig[]
 }
 ```
 
@@ -1070,7 +1207,7 @@ export type CmcdSession = {
 	/**
 	 * The session ID of every report.
 	 */
-	readonly sid: string;
+	readonly sid: string
 
 	/**
 	 * Returns a copy of the request with a CMCD request report.
@@ -1087,7 +1224,10 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(
+		request: R,
+		data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>,
+	): R & CmcdRequestReport<R['customData']>
 
 	/**
 	 * Records an event report for each selected event target.
@@ -1103,7 +1243,11 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
+	recordEvent(
+		type: CmcdEventType,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+		request?: Readonly<HttpRequest>,
+	): void
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -1111,13 +1255,13 @@ export type CmcdSession = {
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionRequestReportConfig): void;
+	configure(settings: CmcdSessionRequestReportConfig): void
 
 	/**
 	 * Sends the queue of each event target at once.
 	 * If a POST is in flight, the target sends after its response.
 	 */
-	flush(): void;
+	flush(): void
 }
 ```
 
@@ -1165,21 +1309,21 @@ import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
 type KeyFilter = CmcdEncodeOptions['filter']
 
 type Destination = {
-	sn: number;
+	sn: number
 }
 
 type Draft = Pick<Destination, 'sn'>
 
 type Target = {
-	url: string;
-	destination: Destination;
-	events: readonly CmcdEventType[];
-	keys: KeyFilter;
-	batchSize: number;
-	filter?: CmcdReportFilter;
-	queue: string[];
-	inFlight: boolean;
-	flushPending: boolean;
+	url: string
+	destination: Destination
+	events: readonly CmcdEventType[]
+	keys: KeyFilter
+	batchSize: number
+	filter?: CmcdReportFilter
+	queue: string[]
+	inFlight: boolean
+	flushPending: boolean
 }
 
 const CMCD_HEADER = /^cmcd-(object|request|session|status)$/i
@@ -1191,14 +1335,14 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 
 	const set = new Set<string>(keys)
 
-	return (key) => set.has(key)
+	return key => set.has(key)
 }
 
 function createDestination(): Destination {
 	return { sn: 0 }
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
+function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 
 	return fetch(url, init)
@@ -1207,7 +1351,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 /**
  * Creates a CMCD session. One session reports one `sid`.
  *
- * Request mode is one destination. Each event target URL is one destination.
+ * Request mode is one destination. Each event target is one destination.
  * Each destination has its own sequence number.
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
@@ -1220,7 +1364,10 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
  * @example
  * {@includeCode ../test/createCmcdSession.test.ts#example}
  */
-export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
+export function createCmcdSession(
+	config: CmcdSessionConfig = {},
+	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const settings: CmcdSessionRequestReportConfig = {
 		version: config.version,
@@ -1229,17 +1376,11 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		customHeaderMap: config.customHeaderMap,
 	}
 	const requestDestination = createDestination()
-	const urls = new Map<string, Destination>()
 	const targets: Target[] = []
 	let requestKeys = toKeyFilter(settings.enabledKeys)
 
 	for (const target of config.eventTargets ?? []) {
-		let destination = urls.get(target.url)
-
-		if (!destination) {
-			destination = createDestination()
-			urls.set(target.url, destination)
-		}
+		const destination = createDestination()
 
 		targets.push({
 			url: target.url,
@@ -1265,8 +1406,18 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		return draft
 	}
 
-	function build(draft: Draft, base: Cmcd, reportingMode: CmcdReportingMode, version: CmcdVersion, keys: KeyFilter, baseUrl?: string): Cmcd {
-		return prepareCmcdData({ ...base, cid: base.cid ?? config.cid, sid, sn: draft.sn++ }, { version, reportingMode, filter: keys, baseUrl })
+	function build(
+		draft: Draft,
+		base: Cmcd,
+		reportingMode: CmcdReportingMode,
+		version: CmcdVersion,
+		keys: KeyFilter,
+		baseUrl?: string,
+	): Cmcd {
+		return prepareCmcdData(
+			{ ...base, cid: base.cid ?? config.cid, sid, sn: draft.sn++ },
+			{ version, reportingMode, filter: keys, baseUrl },
+		)
 	}
 
 	function commit(drafts: Map<Destination, Draft>): void {
@@ -1292,7 +1443,12 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		target.inFlight = true
 
 		const lines = target.queue.splice(0)
-		const request: HttpRequest = { url: target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }
+		const request: HttpRequest = {
+			url: target.url,
+			method: 'POST',
+			headers: { 'Content-Type': CMCD_MIME_TYPE },
+			body: lines.join('\n'),
+		}
 
 		const settle = (): void => {
 			target.inFlight = false
@@ -1300,13 +1456,12 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
-			}
-			else if (isReady(target)) {
+			} else if (isReady(target)) {
 				send(target)
 			}
 		}
 
-		new Promise<{ status: number; }>((resolve) => resolve(requester(request))).then(settle, settle)
+		new Promise<{ status: number }>(resolve => resolve(requester(request))).then(settle, settle)
 	}
 
 	function emit(type: CmcdEventType, data: Cmcd, request?: DeepReadonly<HttpRequest>): void {
@@ -1317,9 +1472,15 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			delete report.bg
 		}
 
-		const selected = targets.filter((target) => target.events.includes(type) && (!target.filter || target.filter(report, request)))
+		const selected = targets.filter(
+			target => target.events.includes(type) && (!target.filter || target.filter(report, request)),
+		)
 		const drafts = new Map<Destination, Draft>()
-		const lines = selected.map((target) => encodePreparedCmcd(build(draftOf(drafts, target.destination), report, CMCD_EVENT_MODE, CMCD_V2, target.keys)))
+		const lines = selected.map(target =>
+			encodePreparedCmcd(
+				build(draftOf(drafts, target.destination), report, CMCD_EVENT_MODE, CMCD_V2, target.keys),
+			),
+		)
 
 		commit(drafts)
 
@@ -1335,10 +1496,21 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	return {
 		sid,
 
-		createRequestReport<R extends HttpRequest>(request: R, data: Cmcd = {}): R & CmcdRequestReport<R['customData']> {
+		createRequestReport<R extends HttpRequest>(
+			request: R,
+			data: Cmcd = {},
+		): R & CmcdRequestReport<R['customData']> {
 			const drafts = new Map<Destination, Draft>()
-			const cmcd = build(draftOf(drafts, requestDestination), data, CMCD_REQUEST_MODE, settings.version ?? CMCD_V2, requestKeys, request.url)
-			const source = request.headers ?? {}
+			const cmcd = build(
+				draftOf(drafts, requestDestination),
+				data,
+				CMCD_REQUEST_MODE,
+				settings.version ?? CMCD_V2,
+				requestKeys,
+				request.url,
+			)
+			const { headers: source = {}, ...rest } = request
+			const customData = request.customData as object | undefined
 			const replace = settings.transmissionMode === CMCD_HEADERS
 			const headers: Record<string, string> = {}
 			let url = request.url
@@ -1351,14 +1523,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (replace) {
 				Object.assign(headers, toPreparedCmcdHeaders(cmcd, settings.customHeaderMap))
-			}
-			else {
+			} else {
 				url = replaceCmcdParam(url, encodePreparedCmcd(cmcd))
 			}
 
 			commit(drafts)
 
-			return { ...request, url, headers, customData: { ...request.customData, cmcd } } as R & CmcdRequestReport<R['customData']>
+			return { ...rest, url, headers, customData: { ...customData, cmcd } } as R &
+				CmcdRequestReport<R['customData']>
 		},
 
 		recordEvent(type, data = {}, request) {
@@ -1383,13 +1555,13 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.events.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.events.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 14 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing.
+Expected: the 14 tests of the file pass, and every package test passes. The typecheck and the format check report nothing.
 
 - [ ] **Step 7: Commit**
 
@@ -1415,10 +1587,16 @@ Create `libs/cmcd/test/createCmcdSession.errors.test.ts`:
 
 ```ts
 import type { Cmcd, CmcdSessionConfig } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdObjectType, CmcdPlayerState, createCmcdSession, toCmcdValue } from '@svta/cml-cmcd'
+import {
+	CmcdEventType,
+	CmcdObjectType,
+	CmcdPlayerState,
+	createCmcdSession,
+	toCmcdValue,
+} from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok, throws } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 
 const SEGMENT = 'https://cdn.test/v/1.m4s'
 const A = 'https://a.test/cmcd'
@@ -1426,54 +1604,72 @@ const B = 'https://b.test/cmcd'
 const ts = 1000
 
 function settle(): Promise<void> {
-	return new Promise((resolve) => setImmediate(resolve))
+	return new Promise(resolve => setImmediate(resolve))
 }
 
 function setup(config: CmcdSessionConfig) {
 	const posts: HttpRequest[] = []
-	const session = createCmcdSession({ sid: 's1', ...config }, async (request) => {
+	const session = createCmcdSession({ sid: 's1', ...config }, request => {
 		posts.push(request)
-		return { status: 200 }
+		return Promise.resolve({ status: 200 })
 	})
-	const lines = (url?: string): string[] => posts.filter((post) => !url || post.url === url).flatMap((post) => String(post.body).split('\n'))
-	const request = (data: Cmcd): string => decodeURIComponent(session.createRequestReport({ url: SEGMENT }, data).url)
+	const lines = (url?: string): string[] =>
+		posts
+			.filter(post => !url || post.url === url)
+			.flatMap(post => (post.body as string).split('\n'))
+	const request = (data: Cmcd): string =>
+		decodeURIComponent(session.createRequestReport({ url: SEGMENT }, data).url)
 
 	return { session, lines, request }
 }
 
 describe('createCmcdSession errors and keys with a destination scope', () => {
-	beforeEach(() => mock.timers.enable({ apis: ['Date'], now: ts }))
-	afterEach(() => mock.timers.reset())
+	beforeEach(() => vi.useFakeTimers({ now: ts, toFake: ['Date'] }))
+	afterEach(() => vi.useRealTimers())
 
 	it('provides a valid example', () => {
 		// #region example
-		const posts: { url: string; body: string; }[] = []
-		const session = createCmcdSession({
-			sid: 'session-1',
-			eventTargets: [
-				{ url: 'https://collector.example.com/errors', events: [CmcdEventType.ERROR] },
-				{ url: 'https://collector.example.com/cmcd', events: [CmcdEventType.PLAY_STATE] },
-			],
-		}, async (request) => {
-			posts.push({ url: request.url, body: String(request.body) })
-			return { status: 200 }
-		})
+		const posts: { url: string; body: string }[] = []
+		const session = createCmcdSession(
+			{
+				sid: 'session-1',
+				eventTargets: [
+					{ url: 'https://collector.example.com/errors', events: [CmcdEventType.ERROR] },
+					{ url: 'https://collector.example.com/cmcd', events: [CmcdEventType.PLAY_STATE] },
+				],
+			},
+			request => {
+				posts.push({ url: request.url, body: request.body as string })
+				return Promise.resolve({ status: 200 })
+			},
+		)
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: CmcdPlayerState.PLAYING, msd: 850 })
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: CmcdPlayerState.REBUFFERING, bs: true })
 		session.recordError('MEDIA_ERR_NETWORK')
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: CmcdPlayerState.PLAYING, bsd: [1200] })
 
-		const report = session.createRequestReport({ url: 'https://cdn.example.com/movie/seg-4.m4s' }, { ot: CmcdObjectType.VIDEO, d: 4000 })
+		const report = session.createRequestReport(
+			{ url: 'https://cdn.example.com/movie/seg-4.m4s' },
+			{ ot: CmcdObjectType.VIDEO, d: 4000 },
+		)
 
-		const error = posts.find((post) => post.url === 'https://collector.example.com/errors')
+		const error = posts.find(post => post.url === 'https://collector.example.com/errors')
 		ok(error?.body.startsWith('bs,e=e,ec=("MEDIA_ERR_NETWORK"),msd=850,'))
-		equal(decodeURIComponent(report.url), 'https://cdn.example.com/movie/seg-4.m4s?CMCD=bs,bsd=(1200),d=4000,ec=("MEDIA_ERR_NETWORK"),msd=850,ot=v,sid="session-1",sn=0,v=2')
+		equal(
+			decodeURIComponent(report.url),
+			'https://cdn.example.com/movie/seg-4.m4s?CMCD=bs,bsd=(1200),d=4000,ec=("MEDIA_ERR_NETWORK"),msd=850,ot=v,sid="session-1",sn=0,v=2',
+		)
 		// #endregion example
 	})
 
 	it('sends msd from any call once to each destination, and ignores an invalid msd', async () => {
-		const { session, lines, request } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }, { url: B, events: [CmcdEventType.PLAY_STATE] }] })
+		const { session, lines, request } = setup({
+			eventTargets: [
+				{ url: A, events: [CmcdEventType.PLAY_STATE] },
+				{ url: B, events: [CmcdEventType.PLAY_STATE] },
+			],
+		})
 
 		for (const msd of [-5, Number.NaN, Infinity, 1e15]) {
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 's', msd })
@@ -1484,16 +1680,24 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 		const second = request({ ot: CmcdObjectType.VIDEO })
 		await settle()
 
-		deepEqual(lines().filter((line) => line.includes('msd')), [
-			`e=ps,msd=851,sid="s1",sn=4,sta=p,ts=${ts},v=2`,
-			`e=ps,msd=851,sid="s1",sn=4,sta=p,ts=${ts},v=2`,
-		])
+		deepEqual(
+			lines().filter(line => line.includes('msd')),
+			[
+				`e=ps,msd=851,sid="s1",sn=4,sta=p,ts=${ts},v=2`,
+				`e=ps,msd=851,sid="s1",sn=4,sta=p,ts=${ts},v=2`,
+			],
+		)
 		ok(first.includes('msd=851'))
 		ok(!second.includes('msd'))
 	})
 
 	it('rounds msd, and accepts values from 0 to the integer limit', () => {
-		const cases: [number, string][] = [[0, 'msd=0'], [12.5, 'msd=13'], [999_999_999_999_999, 'msd=999999999999999'], [999_999_999_999_998.6, 'msd=999999999999999']]
+		const cases: [number, string][] = [
+			[0, 'msd=0'],
+			[12.5, 'msd=13'],
+			[999_999_999_999_999, 'msd=999999999999999'],
+			[999_999_999_999_998.6, 'msd=999999999999999'],
+		]
 
 		for (const [msd, expected] of cases) {
 			const { request } = setup({})
@@ -1513,7 +1717,9 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 	})
 
 	it('sends a waiting bs with the next report of the same object type', async () => {
-		const { session, lines, request } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+		const { session, lines, request } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+		})
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'r', ot: CmcdObjectType.VIDEO, bs: true })
 		const audio = request({ ot: CmcdObjectType.AUDIO })
@@ -1535,7 +1741,9 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 	})
 
 	it('sends the bsd values of several calls to a destination as one list', async () => {
-		const { session, lines, request } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+		const { session, lines, request } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+		})
 
 		const first = request({ bsd: [1200] })
 		const second = request({ bsd: [800] })
@@ -1545,13 +1753,18 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 
 		equal(first, `${SEGMENT}?CMCD=bsd=(1200),sid="s1",sn=0,v=2`)
 		equal(second, `${SEGMENT}?CMCD=bsd=(800),sid="s1",sn=1,v=2`)
-		deepEqual(lines(), [`bsd=(1200 800),e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`, `e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`])
+		deepEqual(lines(), [
+			`bsd=(1200 800),e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
+			`e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`,
+		])
 	})
 
 	it('copies each waiting value, including the value inside an SfItem', () => {
-		const { session, lines, request } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+		const { session, lines, request } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+		})
 		const params = { v: true }
-		const item = toCmcdValue<number, { v: boolean; }>(1200, params)
+		const item = toCmcdValue<number, { v: boolean }>(1200, params)
 		const bsd = [item, 800]
 
 		request({ bsd })
@@ -1594,9 +1807,18 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 	})
 
 	it('changes no state when a call throws', () => {
-		const { session, lines, request } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+		const { session, lines, request } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+		})
 
-		throws(() => session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', bs: true, msd: 500, 'com.example-name': 'a\nb' }))
+		throws(() =>
+			session.recordEvent(CmcdEventType.PLAY_STATE, {
+				sta: 'p',
+				bs: true,
+				msd: 500,
+				'com.example-name': 'a\nb',
+			}),
+		)
 		throws(() => request({ bsd: [1e18] }))
 		throws(() => session.recordError('a\nb'))
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
@@ -1606,7 +1828,10 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 	})
 
 	it('drops a waiting value that the version or enabledKeys does not allow', () => {
-		const { session, request } = setup({ version: 1, eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] })
+		const { session, request } = setup({
+			version: 1,
+			eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+		})
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', bsd: [300] })
 		const first = request({})
@@ -1623,7 +1848,7 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.errors.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.errors.test.ts
 ```
 
 Expected: FAIL. 7 of 10 tests fail, with `TypeError: session.recordError is not a function` and with assertion errors for `msd`, `bs`, and `bsd`.
@@ -1651,22 +1876,22 @@ export type CmcdScopedValues = {
 	/**
 	 * A valid `msd`, rounded to an integer.
 	 */
-	msd?: number;
+	msd?: number
 
 	/**
 	 * The object type of a `bs: true` call. An empty string matches every object type.
 	 */
-	bs?: string;
+	bs?: string
 
 	/**
 	 * A copy of the `bsd` items.
 	 */
-	bsd?: unknown[];
+	bsd?: unknown[]
 
 	/**
 	 * A copy of the `ec` items.
 	 */
-	ec?: unknown[];
+	ec?: unknown[]
 }
 
 const MAX_INTEGER = 999_999_999_999_999
@@ -1676,9 +1901,14 @@ function copyItems(value: unknown, key: 'bsd' | 'ec'): unknown[] | undefined {
 		return undefined
 	}
 
-	const list = normalizeValue(toBareValue(value), CMCD_KEY_SPECS[key], { version: CMCD_V2, reportingMode: CMCD_EVENT_MODE }) as unknown[] | undefined
+	const list = normalizeValue(toBareValue(value), CMCD_KEY_SPECS[key], {
+		version: CMCD_V2,
+		reportingMode: CMCD_EVENT_MODE,
+	}) as unknown[] | undefined
 
-	return list?.map((item) => item instanceof SfItem ? new SfItem(item.value, item.params && { ...item.params }) : item)
+	return list?.map(item =>
+		item instanceof SfItem ? new SfItem(item.value, item.params && { ...item.params }) : item,
+	)
 }
 
 /**
@@ -1747,19 +1977,18 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	 *
 	 * @defaultValue A new UUID
 	 */
-	sid?: string;
+	sid?: string
 
 	/**
 	 * The content ID of each report whose data has no `cid`. It has at most 128 characters.
 	 */
-	cid?: string;
+	cid?: string
 
 	/**
 	 * The event targets. They cannot change after the session is created.
-	 * The targets with the same `url` form one destination.
-	 * They share one sequence number, the `msd` rule, and the waiting values.
+	 * Each target is one destination. It has its own sequence number, `msd` rule, and waiting values.
 	 */
-	eventTargets?: readonly CmcdSessionEventReportConfig[];
+	eventTargets?: readonly CmcdSessionEventReportConfig[]
 }
 ```
 
@@ -1788,7 +2017,7 @@ export type CmcdSession = {
 	/**
 	 * The session ID of every report.
 	 */
-	readonly sid: string;
+	readonly sid: string
 
 	/**
 	 * Returns a copy of the request with a CMCD request report.
@@ -1805,7 +2034,10 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(
+		request: R,
+		data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>,
+	): R & CmcdRequestReport<R['customData']>
 
 	/**
 	 * Records an event report for each selected event target.
@@ -1821,7 +2053,11 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
+	recordEvent(
+		type: CmcdEventType,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+		request?: Readonly<HttpRequest>,
+	): void
 
 	/**
 	 * Records an error.
@@ -1837,7 +2073,10 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
+	recordError(
+		codes: string | readonly string[],
+		data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+	): void
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -1845,13 +2084,13 @@ export type CmcdSession = {
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionRequestReportConfig): void;
+	configure(settings: CmcdSessionRequestReportConfig): void
 
 	/**
 	 * Sends the queue of each event target at once.
 	 * If a POST is in flight, the target sends after its response.
 	 */
-	flush(): void;
+	flush(): void
 }
 ```
 
@@ -1890,29 +2129,29 @@ import { toTokenString } from './toTokenString.ts'
 type KeyFilter = CmcdEncodeOptions['filter']
 
 type Waiting = {
-	bs: string[];
-	bsd: unknown[];
-	ec: unknown[];
+	bs: string[]
+	bsd: unknown[]
+	ec: unknown[]
 }
 
 type Destination = {
-	sn: number;
-	msdSent: boolean;
-	waiting: Waiting;
+	sn: number
+	msdSent: boolean
+	waiting: Waiting
 }
 
 type Draft = Pick<Destination, 'sn' | 'msdSent' | 'waiting'>
 
 type Target = {
-	url: string;
-	destination: Destination;
-	events: readonly CmcdEventType[];
-	keys: KeyFilter;
-	batchSize: number;
-	filter?: CmcdReportFilter;
-	queue: string[];
-	inFlight: boolean;
-	flushPending: boolean;
+	url: string
+	destination: Destination
+	events: readonly CmcdEventType[]
+	keys: KeyFilter
+	batchSize: number
+	filter?: CmcdReportFilter
+	queue: string[]
+	inFlight: boolean
+	flushPending: boolean
 }
 
 const CMCD_HEADER = /^cmcd-(object|request|session|status)$/i
@@ -1924,14 +2163,14 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 
 	const set = new Set<string>(keys)
 
-	return (key) => set.has(key)
+	return key => set.has(key)
 }
 
 function createDestination(): Destination {
 	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] } }
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
+function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 
 	return fetch(url, init)
@@ -1940,7 +2179,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 /**
  * Creates a CMCD session. One session reports one `sid`.
  *
- * Request mode is one destination. Each event target URL is one destination.
+ * Request mode is one destination. Each event target is one destination.
  * Each destination has its own sequence number.
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
@@ -1953,7 +2192,10 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
  * @example
  * {@includeCode ../test/createCmcdSession.test.ts#example}
  */
-export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
+export function createCmcdSession(
+	config: CmcdSessionConfig = {},
+	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const settings: CmcdSessionRequestReportConfig = {
 		version: config.version,
@@ -1963,19 +2205,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	}
 	const requestDestination = createDestination()
 	const destinations: Destination[] = [requestDestination]
-	const urls = new Map<string, Destination>()
 	const targets: Target[] = []
 	let requestKeys = toKeyFilter(settings.enabledKeys)
 	let msd: number | undefined
 
 	for (const target of config.eventTargets ?? []) {
-		let destination = urls.get(target.url)
+		const destination = createDestination()
 
-		if (!destination) {
-			destination = createDestination()
-			urls.set(target.url, destination)
-			destinations.push(destination)
-		}
+		destinations.push(destination)
 
 		targets.push({
 			url: target.url,
@@ -1994,20 +2231,36 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		let draft = drafts.get(destination)
 
 		if (!draft) {
-			draft = { sn: destination.sn, msdSent: destination.msdSent, waiting: { ...destination.waiting } }
+			draft = {
+				sn: destination.sn,
+				msdSent: destination.msdSent,
+				waiting: { ...destination.waiting },
+			}
 			drafts.set(destination, draft)
 		}
 
 		return draft
 	}
 
-	function build(draft: Draft, base: Cmcd, scoped: CmcdScopedValues, reportingMode: CmcdReportingMode, version: CmcdVersion, keys: KeyFilter, baseUrl?: string): Cmcd {
+	function build(
+		draft: Draft,
+		base: Cmcd,
+		scoped: CmcdScopedValues,
+		reportingMode: CmcdReportingMode,
+		version: CmcdVersion,
+		keys: KeyFilter,
+		baseUrl?: string,
+	): Cmcd {
 		const { waiting } = draft
-		const values: Record<string, unknown> = { ...base, cid: base.cid ?? config.cid, msd: draft.msdSent ? undefined : msd ?? scoped.msd }
+		const values: Record<string, unknown> = {
+			...base,
+			cid: base.cid ?? config.cid,
+			msd: draft.msdSent ? undefined : (msd ?? scoped.msd),
+		}
 
 		if (waiting.bs.length) {
 			const ot = toTokenString(base.ot)
-			const kept = ot === undefined ? [] : waiting.bs.filter((type) => type !== '' && type !== ot)
+			const kept = ot === undefined ? [] : waiting.bs.filter(type => type !== '' && type !== ot)
 
 			if (kept.length < waiting.bs.length) {
 				values['bs'] = true
@@ -2044,8 +2297,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (draft) {
 				Object.assign(destination, draft)
-			}
-			else {
+			} else {
 				const { waiting } = destination
 
 				if (scoped.bs !== undefined) {
@@ -2080,7 +2332,12 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		target.inFlight = true
 
 		const lines = target.queue.splice(0)
-		const request: HttpRequest = { url: target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }
+		const request: HttpRequest = {
+			url: target.url,
+			method: 'POST',
+			headers: { 'Content-Type': CMCD_MIME_TYPE },
+			body: lines.join('\n'),
+		}
 
 		const settle = (): void => {
 			target.inFlight = false
@@ -2088,16 +2345,20 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
-			}
-			else if (isReady(target)) {
+			} else if (isReady(target)) {
 				send(target)
 			}
 		}
 
-		new Promise<{ status: number; }>((resolve) => resolve(requester(request))).then(settle, settle)
+		new Promise<{ status: number }>(resolve => resolve(requester(request))).then(settle, settle)
 	}
 
-	function emit(type: CmcdEventType, data: Cmcd, request?: DeepReadonly<HttpRequest>, ec?: readonly string[]): void {
+	function emit(
+		type: CmcdEventType,
+		data: Cmcd,
+		request?: DeepReadonly<HttpRequest>,
+		ec?: readonly string[],
+	): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
 
 		// CTA-5004-B: a b event without bg is the exit from backgrounded mode.
@@ -2106,9 +2367,22 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 
 		const scoped = readScopedValues(report, ec)
-		const selected = targets.filter((target) => target.events.includes(type) && (!target.filter || target.filter(report, request)))
+		const selected = targets.filter(
+			target => target.events.includes(type) && (!target.filter || target.filter(report, request)),
+		)
 		const drafts = new Map<Destination, Draft>()
-		const lines = selected.map((target) => encodePreparedCmcd(build(draftOf(drafts, target.destination), report, scoped, CMCD_EVENT_MODE, CMCD_V2, target.keys)))
+		const lines = selected.map(target =>
+			encodePreparedCmcd(
+				build(
+					draftOf(drafts, target.destination),
+					report,
+					scoped,
+					CMCD_EVENT_MODE,
+					CMCD_V2,
+					target.keys,
+				),
+			),
+		)
 
 		commit(drafts, scoped)
 
@@ -2124,11 +2398,23 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	return {
 		sid,
 
-		createRequestReport<R extends HttpRequest>(request: R, data: Cmcd = {}): R & CmcdRequestReport<R['customData']> {
+		createRequestReport<R extends HttpRequest>(
+			request: R,
+			data: Cmcd = {},
+		): R & CmcdRequestReport<R['customData']> {
 			const scoped = readScopedValues(data)
 			const drafts = new Map<Destination, Draft>()
-			const cmcd = build(draftOf(drafts, requestDestination), data, scoped, CMCD_REQUEST_MODE, settings.version ?? CMCD_V2, requestKeys, request.url)
-			const source = request.headers ?? {}
+			const cmcd = build(
+				draftOf(drafts, requestDestination),
+				data,
+				scoped,
+				CMCD_REQUEST_MODE,
+				settings.version ?? CMCD_V2,
+				requestKeys,
+				request.url,
+			)
+			const { headers: source = {}, ...rest } = request
+			const customData = request.customData as object | undefined
 			const replace = settings.transmissionMode === CMCD_HEADERS
 			const headers: Record<string, string> = {}
 			let url = request.url
@@ -2141,14 +2427,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (replace) {
 				Object.assign(headers, toPreparedCmcdHeaders(cmcd, settings.customHeaderMap))
-			}
-			else {
+			} else {
 				url = replaceCmcdParam(url, encodePreparedCmcd(cmcd))
 			}
 
 			commit(drafts, scoped)
 
-			return { ...request, url, headers, customData: { ...request.customData, cmcd } } as R & CmcdRequestReport<R['customData']>
+			return { ...rest, url, headers, customData: { ...customData, cmcd } } as R &
+				CmcdRequestReport<R['customData']>
 		},
 
 		recordEvent(type, data = {}, request) {
@@ -2179,13 +2465,13 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.errors.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.errors.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 10 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing.
+Expected: the 10 tests of the file pass, and every package test passes. The typecheck and the format check report nothing.
 
 - [ ] **Step 7: Commit**
 
@@ -2211,32 +2497,61 @@ Create `libs/cmcd/test/toResponseKeys.test.ts`:
 
 ```ts
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { toResponseKeys } from '../src/toResponseKeys.ts'
 
 const request = { url: 'https://cdn.test/1.m4s?CMCD=sn%3D0&a=1' }
 
 describe('toResponseKeys', () => {
 	it('derives url, rc, ts, ttfb, and ttlb', () => {
-		const keys = toResponseKeys({ request, status: 200, resourceTiming: { startTime: 100.4, responseStart: 180.6, duration: 299.5, encodedBodySize: 1000 } }, 1000)
+		const keys = toResponseKeys(
+			{
+				request,
+				status: 200,
+				resourceTiming: {
+					startTime: 100.4,
+					responseStart: 180.6,
+					duration: 299.5,
+					encodedBodySize: 1000,
+				},
+			},
+			1000,
+		)
 
 		deepEqual(keys, { url: 'https://cdn.test/1.m4s?a=1', rc: 200, ts: 1100, ttfb: 80, ttlb: 300 })
 	})
 
 	it('derives only url and rc without resourceTiming', () => {
-		deepEqual(toResponseKeys({ request, status: 404 }, 1000), { url: 'https://cdn.test/1.m4s?a=1', rc: 404 })
+		deepEqual(toResponseKeys({ request, status: 404 }, 1000), {
+			url: 'https://cdn.test/1.m4s?a=1',
+			rc: 404,
+		})
 	})
 
 	it('omits ttfb when responseStart is 0, missing, or earlier than startTime', () => {
 		for (const responseStart of [0, undefined, 50]) {
-			const keys = toResponseKeys({ request, status: 200, resourceTiming: { startTime: 100, responseStart, duration: 300, encodedBodySize: 0 } }, 1000)
+			const keys = toResponseKeys(
+				{
+					request,
+					status: 200,
+					resourceTiming: { startTime: 100, responseStart, duration: 300, encodedBodySize: 0 },
+				},
+				1000,
+			)
 
 			deepEqual(keys, { url: 'https://cdn.test/1.m4s?a=1', rc: 200, ts: 1100, ttlb: 300 })
 		}
 	})
 
 	it('omits ttlb when duration is 0', () => {
-		const keys = toResponseKeys({ request, status: 200, resourceTiming: { startTime: 100, responseStart: 100, duration: 0, encodedBodySize: 0 } }, 1000)
+		const keys = toResponseKeys(
+			{
+				request,
+				status: 200,
+				resourceTiming: { startTime: 100, responseStart: 100, duration: 0, encodedBodySize: 0 },
+			},
+			1000,
+		)
 
 		deepEqual(keys, { url: 'https://cdn.test/1.m4s?a=1', rc: 200, ts: 1100, ttfb: 0 })
 	})
@@ -2249,30 +2564,33 @@ Create `libs/cmcd/test/createCmcdSession.responses.test.ts`:
 import { CmcdEventType, CmcdObjectType, createCmcdSession } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 
 const SEGMENT = 'https://cdn.test/v/1.m4s'
 const A = 'https://a.test/cmcd'
 const ts = 1000
 
 function settle(): Promise<void> {
-	return new Promise((resolve) => setImmediate(resolve))
+	return new Promise(resolve => setImmediate(resolve))
 }
 
 function setup() {
 	const posts: HttpRequest[] = []
-	const session = createCmcdSession({ sid: 's1', eventTargets: [{ url: A, events: [CmcdEventType.RESPONSE_RECEIVED] }] }, async (request) => {
-		posts.push(request)
-		return { status: 200 }
-	})
-	const lines = (): string[] => posts.flatMap((post) => String(post.body).split('\n'))
+	const session = createCmcdSession(
+		{ sid: 's1', eventTargets: [{ url: A, events: [CmcdEventType.RESPONSE_RECEIVED] }] },
+		request => {
+			posts.push(request)
+			return Promise.resolve({ status: 200 })
+		},
+	)
+	const lines = (): string[] => posts.flatMap(post => (post.body as string).split('\n'))
 
 	return { session, lines }
 }
 
 describe('createCmcdSession responses', () => {
-	beforeEach(() => mock.timers.enable({ apis: ['Date'], now: ts }))
-	afterEach(() => mock.timers.reset())
+	beforeEach(() => vi.useFakeTimers({ now: ts, toFake: ['Date'] }))
+	afterEach(() => vi.useRealTimers())
 
 	it('provides a valid example', () => {
 		// #region example
@@ -2282,23 +2600,45 @@ describe('createCmcdSession responses', () => {
 			{ url: 'https://collector.example.com/cmcd', includeInRequests: ['mpd'] },
 		]
 
-		const session = createCmcdSession({
-			eventTargets: settings.map((target) => ({
-				url: target.url,
-				events: [CmcdEventType.RESPONSE_RECEIVED],
-				filter: (report, request) => report.e !== CmcdEventType.RESPONSE_RECEIVED || target.includeInRequests.includes(request?.customData?.requestType),
-			})),
-		}, async (request) => {
-			bodies.push(String(request.body))
-			return { status: 200 }
+		const session = createCmcdSession(
+			{
+				eventTargets: settings.map(target => ({
+					url: target.url,
+					events: [CmcdEventType.RESPONSE_RECEIVED],
+					filter: (report, request) => {
+						const { requestType } = (request?.customData ?? {}) as { requestType?: string }
+
+						return (
+							report.e !== CmcdEventType.RESPONSE_RECEIVED ||
+							target.includeInRequests.includes(requestType ?? '')
+						)
+					},
+				})),
+			},
+			request => {
+				bodies.push(request.body as string)
+				return Promise.resolve({ status: 200 })
+			},
+		)
+
+		session.recordResponseReceived({
+			request: {
+				url: 'https://cdn.example.com/movie/seg-1.m4s',
+				customData: { requestType: 'segment' },
+			},
+			status: 200,
+		})
+		session.recordResponseReceived({
+			request: { url: 'https://cdn.example.com/movie.mpd', customData: { requestType: 'mpd' } },
+			status: 200,
 		})
 
-		session.recordResponseReceived({ request: { url: 'https://cdn.example.com/movie/seg-1.m4s', customData: { requestType: 'segment' } }, status: 200 })
-		session.recordResponseReceived({ request: { url: 'https://cdn.example.com/movie.mpd', customData: { requestType: 'mpd' } }, status: 200 })
-
 		equal(bodies.length, 2)
-		ok(bodies[0].includes('sn=0') && bodies[0].includes('url="https://cdn.example.com/movie/seg-1.m4s"'))
-		ok(bodies[1].includes('sn=1') && bodies[1].includes('url="https://cdn.example.com/movie.mpd"'))
+		ok(
+			bodies[0].includes('sn=0') &&
+				bodies[0].includes('url="https://cdn.example.com/movie/seg-1.m4s"'),
+		)
+		ok(bodies[1].includes('sn=0') && bodies[1].includes('url="https://cdn.example.com/movie.mpd"'))
 		// #endregion example
 	})
 
@@ -2311,13 +2651,18 @@ describe('createCmcdSession responses', () => {
 			resourceTiming: { startTime: 100, responseStart: 180, duration: 300, encodedBodySize: 1000 },
 		})
 
-		deepEqual(lines(), [`e=rr,rc=200,sid="s1",sn=0,ts=${Math.round(performance.timeOrigin + 100)},ttfb=80,ttlb=300,url="${SEGMENT}?a=1",v=2`])
+		deepEqual(lines(), [
+			`e=rr,rc=200,sid="s1",sn=0,ts=${Math.round(performance.timeOrigin + 100)},ttfb=80,ttlb=300,url="${SEGMENT}?a=1",v=2`,
+		])
 	})
 
 	it('adds the request-time data without the keys that have a destination scope, and data overrides the derived keys', async () => {
 		const { session, lines } = setup()
 
-		const report = session.createRequestReport({ url: SEGMENT }, { ot: CmcdObjectType.VIDEO, br: [3000], msd: 700, bs: true, bsd: [300] })
+		const report = session.createRequestReport(
+			{ url: SEGMENT },
+			{ ot: CmcdObjectType.VIDEO, br: [3000], msd: 700, bs: true, bsd: [300] },
+		)
 		session.recordResponseReceived({ request: report, status: 200 }, { rc: 206, ttfbb: 60 })
 		session.recordResponseReceived({ request: { url: 'https://cdn.test/v/2.m4s' }, status: 404 })
 		await settle()
@@ -2334,7 +2679,7 @@ describe('createCmcdSession responses', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/toResponseKeys.test.ts libs/cmcd/test/createCmcdSession.responses.test.ts
+npx vp test --run libs/cmcd/test/toResponseKeys.test.ts libs/cmcd/test/createCmcdSession.responses.test.ts
 ```
 
 Expected: FAIL with `ERR_MODULE_NOT_FOUND` for `src/toResponseKeys.ts`, and with `TypeError: session.recordResponseReceived is not a function`.
@@ -2345,6 +2690,7 @@ Create `libs/cmcd/src/toResponseKeys.ts`:
 
 ```ts
 import type { HttpResponse } from '@svta/cml-utils'
+import { getTimeToFirstByte } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import { replaceCmcdParam } from './replaceCmcdParam.ts'
 
@@ -2354,7 +2700,7 @@ import { replaceCmcdParam } from './replaceCmcdParam.ts'
  * - `url` is the request URL without the `CMCD` parameter.
  * - `rc` is the status.
  * - `ts` is the time origin plus `startTime`.
- * - `ttfb` is `responseStart` minus `startTime`. It needs a `responseStart` above 0 and not earlier than `startTime`.
+ * - `ttfb` is `responseStart` minus `startTime`, from `getTimeToFirstByte()`. It needs a `responseStart` between `startTime` and `startTime` plus `duration`.
  * - `ttlb` is `duration`. It needs a `duration` above 0.
  *
  * Resource Timing reports 0 for `responseStart` of a cross-origin response without the `Timing-Allow-Origin` header.
@@ -2370,12 +2716,13 @@ export function toResponseKeys(response: HttpResponse, timeOrigin: number): Cmcd
 	const timing = response.resourceTiming
 
 	if (timing) {
-		const { startTime, responseStart = 0, duration } = timing
+		const { startTime, duration } = timing
+		const ttfb = getTimeToFirstByte(timing)
 
 		keys.ts = Math.round(timeOrigin + startTime)
 
-		if (responseStart > 0 && responseStart >= startTime) {
-			keys.ttfb = Math.round(responseStart - startTime)
+		if (Number.isFinite(ttfb)) {
+			keys.ttfb = Math.round(ttfb)
 		}
 
 		if (duration > 0) {
@@ -2414,7 +2761,7 @@ export type CmcdSession = {
 	/**
 	 * The session ID of every report.
 	 */
-	readonly sid: string;
+	readonly sid: string
 
 	/**
 	 * Returns a copy of the request with a CMCD request report.
@@ -2431,7 +2778,10 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(
+		request: R,
+		data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>,
+	): R & CmcdRequestReport<R['customData']>
 
 	/**
 	 * Records an event report for each selected event target.
@@ -2447,7 +2797,11 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
+	recordEvent(
+		type: CmcdEventType,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+		request?: Readonly<HttpRequest>,
+	): void
 
 	/**
 	 * Records an `rr` report for a response.
@@ -2465,7 +2819,10 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.responses.test.ts#example}
 	 */
-	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
+	recordResponseReceived(
+		response: HttpResponse,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+	): void
 
 	/**
 	 * Records an error.
@@ -2481,7 +2838,10 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
+	recordError(
+		codes: string | readonly string[],
+		data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+	): void
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -2489,13 +2849,13 @@ export type CmcdSession = {
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionRequestReportConfig): void;
+	configure(settings: CmcdSessionRequestReportConfig): void
 
 	/**
 	 * Sends the queue of each event target at once.
 	 * If a POST is in flight, the target sends after its response.
 	 */
-	flush(): void;
+	flush(): void
 }
 ```
 
@@ -2509,7 +2869,11 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import {
+	CMCD_EVENT_BACKGROUNDED_MODE,
+	CMCD_EVENT_ERROR,
+	CMCD_EVENT_RESPONSE_RECEIVED,
+} from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
@@ -2533,29 +2897,29 @@ import { toTokenString } from './toTokenString.ts'
 type KeyFilter = CmcdEncodeOptions['filter']
 
 type Waiting = {
-	bs: string[];
-	bsd: unknown[];
-	ec: unknown[];
+	bs: string[]
+	bsd: unknown[]
+	ec: unknown[]
 }
 
 type Destination = {
-	sn: number;
-	msdSent: boolean;
-	waiting: Waiting;
+	sn: number
+	msdSent: boolean
+	waiting: Waiting
 }
 
 type Draft = Pick<Destination, 'sn' | 'msdSent' | 'waiting'>
 
 type Target = {
-	url: string;
-	destination: Destination;
-	events: readonly CmcdEventType[];
-	keys: KeyFilter;
-	batchSize: number;
-	filter?: CmcdReportFilter;
-	queue: string[];
-	inFlight: boolean;
-	flushPending: boolean;
+	url: string
+	destination: Destination
+	events: readonly CmcdEventType[]
+	keys: KeyFilter
+	batchSize: number
+	filter?: CmcdReportFilter
+	queue: string[]
+	inFlight: boolean
+	flushPending: boolean
 }
 
 const CMCD_HEADER = /^cmcd-(object|request|session|status)$/i
@@ -2567,7 +2931,7 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 
 	const set = new Set<string>(keys)
 
-	return (key) => set.has(key)
+	return key => set.has(key)
 }
 
 function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
@@ -2578,7 +2942,7 @@ function createDestination(): Destination {
 	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] } }
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
+function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 
 	return fetch(url, init)
@@ -2587,7 +2951,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
 /**
  * Creates a CMCD session. One session reports one `sid`.
  *
- * Request mode is one destination. Each event target URL is one destination.
+ * Request mode is one destination. Each event target is one destination.
  * Each destination has its own sequence number.
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
@@ -2600,7 +2964,10 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
  * @example
  * {@includeCode ../test/createCmcdSession.test.ts#example}
  */
-export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
+export function createCmcdSession(
+	config: CmcdSessionConfig = {},
+	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
 	const settings: CmcdSessionRequestReportConfig = {
@@ -2611,19 +2978,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	}
 	const requestDestination = createDestination()
 	const destinations: Destination[] = [requestDestination]
-	const urls = new Map<string, Destination>()
 	const targets: Target[] = []
 	let requestKeys = toKeyFilter(settings.enabledKeys)
 	let msd: number | undefined
 
 	for (const target of config.eventTargets ?? []) {
-		let destination = urls.get(target.url)
+		const destination = createDestination()
 
-		if (!destination) {
-			destination = createDestination()
-			urls.set(target.url, destination)
-			destinations.push(destination)
-		}
+		destinations.push(destination)
 
 		targets.push({
 			url: target.url,
@@ -2642,20 +3004,36 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		let draft = drafts.get(destination)
 
 		if (!draft) {
-			draft = { sn: destination.sn, msdSent: destination.msdSent, waiting: { ...destination.waiting } }
+			draft = {
+				sn: destination.sn,
+				msdSent: destination.msdSent,
+				waiting: { ...destination.waiting },
+			}
 			drafts.set(destination, draft)
 		}
 
 		return draft
 	}
 
-	function build(draft: Draft, base: Cmcd, scoped: CmcdScopedValues, reportingMode: CmcdReportingMode, version: CmcdVersion, keys: KeyFilter, baseUrl?: string): Cmcd {
+	function build(
+		draft: Draft,
+		base: Cmcd,
+		scoped: CmcdScopedValues,
+		reportingMode: CmcdReportingMode,
+		version: CmcdVersion,
+		keys: KeyFilter,
+		baseUrl?: string,
+	): Cmcd {
 		const { waiting } = draft
-		const values: Record<string, unknown> = { ...base, cid: base.cid ?? config.cid, msd: draft.msdSent ? undefined : msd ?? scoped.msd }
+		const values: Record<string, unknown> = {
+			...base,
+			cid: base.cid ?? config.cid,
+			msd: draft.msdSent ? undefined : (msd ?? scoped.msd),
+		}
 
 		if (waiting.bs.length) {
 			const ot = toTokenString(base.ot)
-			const kept = ot === undefined ? [] : waiting.bs.filter((type) => type !== '' && type !== ot)
+			const kept = ot === undefined ? [] : waiting.bs.filter(type => type !== '' && type !== ot)
 
 			if (kept.length < waiting.bs.length) {
 				values['bs'] = true
@@ -2692,8 +3070,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (draft) {
 				Object.assign(destination, draft)
-			}
-			else {
+			} else {
 				const { waiting } = destination
 
 				if (scoped.bs !== undefined) {
@@ -2728,7 +3105,12 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		target.inFlight = true
 
 		const lines = target.queue.splice(0)
-		const request: HttpRequest = { url: target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }
+		const request: HttpRequest = {
+			url: target.url,
+			method: 'POST',
+			headers: { 'Content-Type': CMCD_MIME_TYPE },
+			body: lines.join('\n'),
+		}
 
 		const settle = (): void => {
 			target.inFlight = false
@@ -2736,16 +3118,20 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
-			}
-			else if (isReady(target)) {
+			} else if (isReady(target)) {
 				send(target)
 			}
 		}
 
-		new Promise<{ status: number; }>((resolve) => resolve(requester(request))).then(settle, settle)
+		new Promise<{ status: number }>(resolve => resolve(requester(request))).then(settle, settle)
 	}
 
-	function emit(type: CmcdEventType, data: Cmcd, request?: DeepReadonly<HttpRequest>, ec?: readonly string[]): void {
+	function emit(
+		type: CmcdEventType,
+		data: Cmcd,
+		request?: DeepReadonly<HttpRequest>,
+		ec?: readonly string[],
+	): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
 
 		// CTA-5004-B: a b event without bg is the exit from backgrounded mode.
@@ -2754,9 +3140,22 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 
 		const scoped = readScopedValues(report, ec)
-		const selected = targets.filter((target) => target.events.includes(type) && (!target.filter || target.filter(report, request)))
+		const selected = targets.filter(
+			target => target.events.includes(type) && (!target.filter || target.filter(report, request)),
+		)
 		const drafts = new Map<Destination, Draft>()
-		const lines = selected.map((target) => encodePreparedCmcd(build(draftOf(drafts, target.destination), report, scoped, CMCD_EVENT_MODE, CMCD_V2, target.keys)))
+		const lines = selected.map(target =>
+			encodePreparedCmcd(
+				build(
+					draftOf(drafts, target.destination),
+					report,
+					scoped,
+					CMCD_EVENT_MODE,
+					CMCD_V2,
+					target.keys,
+				),
+			),
+		)
 
 		commit(drafts, scoped)
 
@@ -2772,11 +3171,23 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	return {
 		sid,
 
-		createRequestReport<R extends HttpRequest>(request: R, data: Cmcd = {}): R & CmcdRequestReport<R['customData']> {
+		createRequestReport<R extends HttpRequest>(
+			request: R,
+			data: Cmcd = {},
+		): R & CmcdRequestReport<R['customData']> {
 			const scoped = readScopedValues(data)
 			const drafts = new Map<Destination, Draft>()
-			const cmcd = build(draftOf(drafts, requestDestination), data, scoped, CMCD_REQUEST_MODE, settings.version ?? CMCD_V2, requestKeys, request.url)
-			const source = request.headers ?? {}
+			const cmcd = build(
+				draftOf(drafts, requestDestination),
+				data,
+				scoped,
+				CMCD_REQUEST_MODE,
+				settings.version ?? CMCD_V2,
+				requestKeys,
+				request.url,
+			)
+			const { headers: source = {}, ...rest } = request
+			const customData = request.customData as object | undefined
 			const replace = settings.transmissionMode === CMCD_HEADERS
 			const headers: Record<string, string> = {}
 			let url = request.url
@@ -2789,14 +3200,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (replace) {
 				Object.assign(headers, toPreparedCmcdHeaders(cmcd, settings.customHeaderMap))
-			}
-			else {
+			} else {
 				url = replaceCmcdParam(url, encodePreparedCmcd(cmcd))
 			}
 
 			commit(drafts, scoped)
 
-			return { ...request, url, headers, customData: { ...request.customData, cmcd } } as R & CmcdRequestReport<R['customData']>
+			return { ...rest, url, headers, customData: { ...customData, cmcd } } as R &
+				CmcdRequestReport<R['customData']>
 		},
 
 		recordEvent(type, data = {}, request) {
@@ -2804,9 +3215,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		},
 
 		recordResponseReceived(response, data = {}) {
-			const requestData = withoutScopedKeys(response.request.customData?.cmcd ?? {})
+			const { cmcd } = (response.request.customData ?? {}) as { cmcd?: Cmcd }
+			const requestData = withoutScopedKeys(cmcd ?? {})
 
-			emit(CMCD_EVENT_RESPONSE_RECEIVED, { ...requestData, ...toResponseKeys(response, timeOrigin), ...data }, response.request)
+			emit(
+				CMCD_EVENT_RESPONSE_RECEIVED,
+				{ ...requestData, ...toResponseKeys(response, timeOrigin), ...data },
+				response.request,
+			)
 		},
 
 		recordError(codes, data = {}) {
@@ -2833,13 +3249,13 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/toResponseKeys.test.ts libs/cmcd/test/createCmcdSession.responses.test.ts
+npx vp test --run libs/cmcd/test/toResponseKeys.test.ts libs/cmcd/test/createCmcdSession.responses.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 7 tests of the two files pass, and every package test passes. The typecheck and ESLint report nothing.
+Expected: the 7 tests of the two files pass, and every package test passes. The typecheck and the format check report nothing.
 
 - [ ] **Step 6: Commit**
 
@@ -2851,37 +3267,55 @@ git commit -s -m "feat(cmcd): record responses in the CMCD session" -m "Co-Autho
 ### Task 6: Delivery
 
 **Files:**
-- Modify: `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`
+- Create: `libs/cmcd/src/CmcdEventSender.ts`, `libs/cmcd/src/CmcdEventSendResult.ts`
+- Modify: `libs/cmcd/src/CmcdSessionEventReportConfig.ts`, `libs/cmcd/src/encodeCmcd.ts`, `libs/cmcd/src/CmcdSession.ts`, `libs/cmcd/src/createCmcdSession.ts`, `libs/cmcd/src/index.ts`, and the regenerated `libs/cmcd/config/cml-cmcd.api.md`
 - Test: `libs/cmcd/test/createCmcdSession.delivery.test.ts`
 
 **Interfaces:**
 - Consumes: `send()` and `emit()` from Task 5.
-- Produces: the delivery rules of the RFC. A 2xx response resets the wait. A 410 stops every target with the URL. A 429, a 5xx, status 0, a rejection, or a requester that throws returns the batch to the queue. The target then waits 1 to 60 seconds. Any other status drops the batch. An `e` report makes its target send. Internal: `stopDestination()`, and the target fields `urgent`, `delay`, and `retry`.
+- Produces: the delivery rules of the RFC. A 2xx response resets the wait. A 410 stops the target. A 429, a 5xx, status 0, a rejection, or a requester that throws returns the batch to the queue. The target then waits 1 to 60 seconds. Any other status drops the batch. An `e` report makes its target send. An event target has a `url` or a `send` function. The session calls `send` with the reports of a batch, oldest first. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. A promise that rejects counts as a rejected request. Public: `CmcdEventSender`, `CmcdEventSendResult`, the `url | send` union of `CmcdSessionEventReportConfig`, and `encodeCmcd(cmcd: DeepReadonly<Cmcd>)`. Internal: `toDeliver()`, `copyReport()`, `stopTarget()`, and the target fields `copies`, `deliver`, `urgent`, `delay`, and `retry`.
+
+The type of `CmcdEventSender` returns `Promise<CmcdEventSendResult | undefined> | Promise<void>`. The RFC writes `Promise<CmcdEventSendResult | void>`. The lint rule `no-invalid-void-type` rejects `void` in a union, and the union of two promise types accepts the same functions.
+
+A `send` function encodes a report with `encodeCmcd(report, { reportingMode: CmcdReportingMode.EVENT })`. Without the option, `encodeCmcd()` encodes in request mode and drops `e` and `ts`.
 
 - [ ] **Step 1: Write the failing test**
 
 Create `libs/cmcd/test/createCmcdSession.delivery.test.ts`:
 
 ```ts
-import type { CmcdSessionConfig } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdPlayerState, createCmcdSession } from '@svta/cml-cmcd'
+import type {
+	CmcdEventSender,
+	CmcdSessionConfig,
+	CmcdSessionEventReportConfig,
+} from '@svta/cml-cmcd'
+import {
+	CmcdEventType,
+	CmcdPlayerState,
+	CmcdReportingMode,
+	createCmcdSession,
+	encodeCmcd,
+	toCmcdValue,
+} from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
-import { deepEqual, equal } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { deepEqual, equal, ok, throws } from 'node:assert'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 
 const A = 'https://a.test/cmcd'
 const B = 'https://b.test/cmcd'
 const ts = 1000
 
 type Reply = number | 'reject' | 'throw'
+type SendReply = 'resolve' | 'gone' | 'reject' | 'throw'
+type Report = Parameters<CmcdEventSender>[0][number]
 
 function settle(): Promise<void> {
-	return new Promise((resolve) => setImmediate(resolve))
+	return new Promise(resolve => setImmediate(resolve))
 }
 
 function setup(config: CmcdSessionConfig, reply: Reply | (() => Reply) = 200) {
 	const posts: HttpRequest[] = []
-	const session = createCmcdSession({ sid: 's1', ...config }, (request) => {
+	const session = createCmcdSession({ sid: 's1', ...config }, request => {
 		posts.push(request)
 		const result = typeof reply === 'function' ? reply() : reply
 
@@ -2889,9 +3323,11 @@ function setup(config: CmcdSessionConfig, reply: Reply | (() => Reply) = 200) {
 			throw new Error('requester failed')
 		}
 
-		return result === 'reject' ? Promise.reject(new Error('network')) : Promise.resolve({ status: result })
+		return result === 'reject'
+			? Promise.reject(new Error('network'))
+			: Promise.resolve({ status: result })
 	})
-	const lines = (index: number): string[] => String(posts[index].body).split('\n')
+	const lines = (index: number): string[] => (posts[index].body as string).split('\n')
 
 	return { session, posts, lines }
 }
@@ -2899,32 +3335,67 @@ function setup(config: CmcdSessionConfig, reply: Reply | (() => Reply) = 200) {
 function setupManual(config: CmcdSessionConfig) {
 	const posts: HttpRequest[] = []
 	const replies: ((status: number) => void)[] = []
-	const session = createCmcdSession({ sid: 's1', ...config }, (request) => new Promise((resolve) => {
-		posts.push(request)
-		replies.push((status) => resolve({ status }))
-	}))
-	const lines = (index: number): string[] => String(posts[index].body).split('\n')
+	const session = createCmcdSession(
+		{ sid: 's1', ...config },
+		request =>
+			new Promise(resolve => {
+				posts.push(request)
+				replies.push(status => resolve({ status }))
+			}),
+	)
+	const lines = (index: number): string[] => (posts[index].body as string).split('\n')
 
 	return { session, posts, replies, lines }
 }
 
+function setupSend(
+	config: { events: CmcdEventType[]; batchSize?: number },
+	reply: SendReply | (() => SendReply) = 'resolve',
+) {
+	const batches: Report[][] = []
+	const send: CmcdEventSender = reports => {
+		batches.push([...reports])
+		const result = typeof reply === 'function' ? reply() : reply
+
+		if (result === 'throw') {
+			throw new Error('send failed')
+		}
+
+		if (result === 'reject') {
+			return Promise.reject(new Error('transport'))
+		}
+
+		return Promise.resolve(result === 'gone' ? { gone: true } : undefined)
+	}
+	const session = createCmcdSession({ sid: 's1', eventTargets: [{ send, ...config }] })
+	const lines = (index: number): string[] =>
+		batches[index].map(report => encodeCmcd(report, { reportingMode: CmcdReportingMode.EVENT }))
+
+	return { session, batches, lines }
+}
+
 describe('createCmcdSession delivery', () => {
-	beforeEach(() => mock.timers.enable({ apis: ['setTimeout', 'Date'], now: ts }))
-	afterEach(() => mock.timers.reset())
+	beforeEach(() => vi.useFakeTimers({ now: ts, toFake: ['setTimeout', 'clearTimeout', 'Date'] }))
+	afterEach(() => vi.useRealTimers())
 
 	it('provides a valid example', () => {
 		// #region example
 		const bodies: string[] = []
-		const session = createCmcdSession({
-			eventTargets: [{
-				url: 'https://collector.example.com/cmcd',
-				events: [CmcdEventType.PLAY_STATE],
-				batchSize: 10,
-			}],
-		}, async (request) => {
-			bodies.push(String(request.body))
-			return { status: 200 }
-		})
+		const session = createCmcdSession(
+			{
+				eventTargets: [
+					{
+						url: 'https://collector.example.com/cmcd',
+						events: [CmcdEventType.PLAY_STATE],
+						batchSize: 10,
+					},
+				],
+			},
+			request => {
+				bodies.push(request.body as string)
+				return Promise.resolve({ status: 200 })
+			},
+		)
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: CmcdPlayerState.PLAYING })
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: CmcdPlayerState.PAUSED })
@@ -2936,23 +3407,33 @@ describe('createCmcdSession delivery', () => {
 	})
 
 	it('sends at once when an e report joins the queue', () => {
-		const { session, posts, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR], batchSize: 10 }] })
+		const { session, posts, lines } = setup({
+			eventTargets: [
+				{ url: A, events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR], batchSize: 10 },
+			],
+		})
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 		equal(posts.length, 0)
 		session.recordError('NET')
 
 		equal(posts.length, 1)
-		deepEqual(lines(0), [`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`, `e=e,ec=("NET"),sid="s1",sn=1,ts=${ts},v=2`])
+		deepEqual(lines(0), [
+			`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
+			`e=e,ec=("NET"),sid="s1",sn=1,ts=${ts},v=2`,
+		])
 	})
 
 	it('drops a batch on a status other than 0, 2xx, 410, 429, or 5xx', async () => {
-		const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] }, 404)
+		const { session, posts } = setup(
+			{ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] },
+			404,
+		)
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 		await settle()
 		session.flush()
-		mock.timers.tick(60_000)
+		vi.advanceTimersByTime(60_000)
 
 		equal(posts.length, 1)
 	})
@@ -2960,13 +3441,16 @@ describe('createCmcdSession delivery', () => {
 	for (const reply of [0, 429, 500, 503, 'reject', 'throw'] as const) {
 		it(`returns the batch to the queue after ${reply}, and waits 1 second, doubling to 60 seconds`, async () => {
 			let current: Reply = reply
-			const { session, posts, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR] }] }, () => current)
+			const { session, posts, lines } = setup(
+				{ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR] }] },
+				() => current,
+			)
 
 			const wait = async (ms: number, expected: number): Promise<void> => {
-				mock.timers.tick(ms - 1)
+				vi.advanceTimersByTime(ms - 1)
 				await settle()
 				equal(posts.length, expected - 1)
-				mock.timers.tick(1)
+				vi.advanceTimersByTime(1)
 				await settle()
 				equal(posts.length, expected)
 			}
@@ -2993,7 +3477,10 @@ describe('createCmcdSession delivery', () => {
 	}
 
 	it('keeps every line while the collector fails', async () => {
-		const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] }, 429)
+		const { session, posts } = setup(
+			{ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] },
+			429,
+		)
 
 		for (let i = 0; i < 700; i++) {
 			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: i % 2 ? 'p' : 'a' })
@@ -3002,11 +3489,14 @@ describe('createCmcdSession delivery', () => {
 		session.flush()
 
 		equal(posts.length, 2)
-		equal(String(posts[1].body).split('\n').length, 700)
+		equal((posts[1].body as string).split('\n').length, 700)
 	})
 
 	it('sends at once on flush() during a wait', async () => {
-		const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] }, 503)
+		const { session, posts } = setup(
+			{ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] },
+			503,
+		)
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 		await settle()
@@ -3016,7 +3506,9 @@ describe('createCmcdSession delivery', () => {
 	})
 
 	it('sends after the response on flush() during a POST, also after a failure', async () => {
-		const { session, posts, replies, lines } = setupManual({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE], batchSize: 10 }] })
+		const { session, posts, replies, lines } = setupManual({
+			eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE], batchSize: 10 }],
+		})
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 		session.flush()
@@ -3027,10 +3519,13 @@ describe('createCmcdSession delivery', () => {
 		await settle()
 
 		equal(posts.length, 2)
-		deepEqual(lines(1), [`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`, `e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`])
+		deepEqual(lines(1), [
+			`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
+			`e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`,
+		])
 	})
 
-	it('stops every target with a URL after a 410, and drops a batch in flight to that URL', async () => {
+	it('stops only the target that received a 410, and drops its batch in flight', async () => {
 		const { session, posts, replies } = setupManual({
 			eventTargets: [
 				{ url: A, events: [CmcdEventType.PLAY_STATE] },
@@ -3048,11 +3543,162 @@ describe('createCmcdSession delivery', () => {
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a', bs: true })
 		session.recordError('NET')
 		session.flush()
-		mock.timers.tick(60_000)
+		vi.advanceTimersByTime(60_000)
 		await settle()
 
-		deepEqual(posts.map((post) => post.url), [A, A, B, B])
+		deepEqual(
+			posts.map(post => post.url),
+			[A, A, B, B, A],
+		)
 		equal(posts[3].body, `bs,e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`)
+		deepEqual((posts[4].body as string).split('\n'), [
+			`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
+			`bs,e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`,
+			`e=e,ec=("NET"),sid="s1",sn=2,ts=${ts},v=2`,
+		])
+	})
+
+	describe('send targets', () => {
+		it('provides a valid example', () => {
+			// #region example-send
+			const records: { timestamp: number; line: string }[] = []
+			const send: CmcdEventSender = reports => {
+				records.push(
+					...reports.map(report => ({
+						timestamp: report.ts,
+						line: encodeCmcd(report, { reportingMode: CmcdReportingMode.EVENT }),
+					})),
+				)
+				return Promise.resolve()
+			}
+			const session = createCmcdSession({
+				sid: 'session-1',
+				eventTargets: [{ send, events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR] }],
+			})
+
+			session.recordEvent(CmcdEventType.PLAY_STATE, {
+				sta: CmcdPlayerState.PLAYING,
+				ts: 1767225600000,
+			})
+
+			deepEqual(records, [
+				{ timestamp: 1767225600000, line: 'e=ps,sid="session-1",sn=0,sta=p,ts=1767225600000,v=2' },
+			])
+			// #endregion example-send
+		})
+
+		it('calls send with the reports of a batch, oldest first, with e, sid, sn, ts, and v', () => {
+			const { session, batches, lines } = setupSend({
+				events: [CmcdEventType.PLAY_STATE],
+				batchSize: 2,
+			})
+
+			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', bl: [1000] })
+			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+
+			equal(batches.length, 1)
+			deepEqual(lines(0), [
+				`bl=(1000),e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
+				`e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2`,
+			])
+			deepEqual(
+				batches[0].map(report => [report.sid, report.sn, report.ts, report.v]),
+				[
+					['s1', 0, ts, 2],
+					['s1', 1, ts, 2],
+				],
+			)
+		})
+
+		for (const reply of ['reject', 'throw'] as const) {
+			it(`sends the batch again after a wait when send ${reply === 'reject' ? 'rejects' : 'throws'}`, async () => {
+				let current: SendReply = reply
+				const { session, batches } = setupSend(
+					{ events: [CmcdEventType.PLAY_STATE] },
+					() => current,
+				)
+
+				session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+				await settle()
+				session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+				equal(batches.length, 1)
+				vi.advanceTimersByTime(999)
+				await settle()
+				equal(batches.length, 1)
+				vi.advanceTimersByTime(1)
+				await settle()
+				equal(batches.length, 2)
+				equal(batches[1].length, 2)
+				current = 'resolve'
+				vi.advanceTimersByTime(2000)
+				await settle()
+				equal(batches.length, 3)
+				session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+
+				equal(batches.length, 4)
+			})
+		}
+
+		it('stops the target after a result with gone', async () => {
+			const { session, batches } = setupSend(
+				{ events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR] },
+				'gone',
+			)
+
+			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+			await settle()
+			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'a' })
+			session.recordError('NET')
+			session.flush()
+			vi.advanceTimersByTime(60_000)
+			await settle()
+
+			equal(batches.length, 1)
+		})
+
+		it('copies the nested values of a report when the report joins the queue', () => {
+			const { session, lines } = setupSend({ events: [CmcdEventType.PLAY_STATE], batchSize: 2 })
+			const params = { v: true }
+			const item = toCmcdValue<number, { v: boolean }>(1000, params)
+			const bl = [item]
+
+			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', bl })
+			item.value = 5
+			params.v = false
+			bl.push(toCmcdValue(2))
+			session.flush()
+
+			deepEqual(lines(0), [`bl=(1000;v),e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`])
+		})
+
+		it('throws for a value that cannot be encoded, and keeps the sequence number', () => {
+			const { session, lines } = setupSend({ events: [CmcdEventType.PLAY_STATE] })
+
+			throws(() =>
+				session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p', 'com.example-name': 'a\nb' }),
+			)
+			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+
+			deepEqual(lines(0), [`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`])
+		})
+
+		it('types a target with url or send, and the reports as deeply read-only', () => {
+			const send: CmcdEventSender = reports => {
+				// @ts-expect-error A send function cannot change a report.
+				reports[0].sta = 'p'
+				return Promise.resolve()
+			}
+			const targets: CmcdSessionEventReportConfig[] = [
+				{ url: A, events: [] },
+				{ send, events: [] },
+				// @ts-expect-error A target has url or send, not both.
+				{ url: A, send, events: [] },
+				// @ts-expect-error A target needs url or send.
+				{ events: [] },
+			]
+
+			ok(targets.length)
+		})
 	})
 })
 ```
@@ -3061,12 +3707,119 @@ describe('createCmcdSession delivery', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.delivery.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.delivery.test.ts
 ```
 
-Expected: FAIL. 10 of 12 tests fail with assertion errors, for example `0 == 1` and `2 == 1`.
+Expected: FAIL. 18 of 21 tests fail with assertion errors, for example `0 == 1`, and with `TypeError: Cannot read properties of undefined (reading 'map')` for the `send` targets.
 
-- [ ] **Step 3: Update the type and the implementation**
+- [ ] **Step 3: Write the types**
+
+Create `libs/cmcd/src/CmcdEventSendResult.ts`:
+
+```ts
+/**
+ * The result of a {@link CmcdEventSender} call.
+ *
+ * @public
+ */
+export type CmcdEventSendResult = {
+	/**
+	 * If `true`, the target stops for the life of the session, as after a 410 response.
+	 */
+	readonly gone?: boolean
+}
+```
+
+Create `libs/cmcd/src/CmcdEventSender.ts`:
+
+```ts
+import type { DeepReadonly } from '@svta/cml-utils'
+import type { Cmcd } from './Cmcd.ts'
+import type { CmcdEventSendResult } from './CmcdEventSendResult.ts'
+
+/* oxlint-disable typescript/no-invalid-void-type */
+
+/**
+ * Sends the event reports of one batch for an event target of a CMCD session.
+ *
+ * The session calls the function with the reports of a batch, oldest report first.
+ * Each report is the data of one event. The session has written `e`, `sid`, `sn`, `ts`, and `v`.
+ * A token value is an `SfToken`, and an inner list is an array.
+ * `encodeCmcd(report, { reportingMode: CmcdReportingMode.EVENT })` encodes a report.
+ *
+ * The promise takes the place of the HTTP response.
+ * A promise that resolves means that the batch is delivered.
+ * A result with `gone: true` stops the target, as a 410 response does.
+ * A promise that rejects, or a function that throws, sends the batch again after a wait, as a 5xx response does.
+ * The function must not change a report. The `DeepReadonly` type rejects a change at any depth.
+ *
+ * @param reports - The reports of the batch, oldest first.
+ * @returns A promise of the result, or a promise of nothing.
+ *
+ * @public
+ *
+ * @example
+ * {@includeCode ../test/createCmcdSession.delivery.test.ts#example-send}
+ */
+export type CmcdEventSender = (
+	reports: readonly DeepReadonly<Cmcd & Required<Pick<Cmcd, 'e' | 'sid' | 'sn' | 'ts' | 'v'>>>[],
+) => Promise<CmcdEventSendResult | void>
+```
+
+Replace the content of `libs/cmcd/src/CmcdSessionEventReportConfig.ts` with:
+
+```ts
+import type { CmcdEventReportConfig } from './CmcdEventReportConfig.ts'
+import type { CmcdEventSender } from './CmcdEventSender.ts'
+import type { CmcdReportFilter } from './CmcdReportFilter.ts'
+
+/**
+ * An event target of a CMCD session. The type is {@link CmcdEventReportConfig}
+ * without `transform`, with `filter`. The target has a collector `url` or a
+ * `send` function.
+ *
+ * @public
+ */
+export type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, 'transform' | 'url'> & {
+	/**
+	 * Selects the reports that the target receives. Without a filter, the
+	 * target receives every report of its events.
+	 *
+	 * @defaultValue `undefined`
+	 */
+	filter?: CmcdReportFilter
+
+	/**
+	 * Only `CmcdReporter` reads `transform`. A session target with a
+	 * `transform` does not compile. Use `filter` to select the reports of
+	 * the target.
+	 */
+	transform?: never
+} & (
+		| {
+				/**
+				 * The URL of the collector. The requester sends each batch as a POST.
+				 */
+				url: string
+
+				/**
+				 * A target with `url` has no `send`.
+				 */
+				send?: never
+		  }
+		| {
+				/**
+				 * A target with `send` has no `url`.
+				 */
+				url?: never
+
+				/**
+				 * Sends each batch. Use a function for a transport that is not HTTP.
+				 */
+				send: CmcdEventSender
+		  }
+	)
+```
 
 Replace the content of `libs/cmcd/src/CmcdSession.ts` with:
 
@@ -3093,7 +3846,7 @@ export type CmcdSession = {
 	/**
 	 * The session ID of every report.
 	 */
-	readonly sid: string;
+	readonly sid: string
 
 	/**
 	 * Returns a copy of the request with a CMCD request report.
@@ -3110,7 +3863,10 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(
+		request: R,
+		data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>,
+	): R & CmcdRequestReport<R['customData']>
 
 	/**
 	 * Records an event report for each selected event target.
@@ -3126,7 +3882,11 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
+	recordEvent(
+		type: CmcdEventType,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+		request?: Readonly<HttpRequest>,
+	): void
 
 	/**
 	 * Records an `rr` report for a response.
@@ -3144,7 +3904,10 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.responses.test.ts#example}
 	 */
-	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
+	recordResponseReceived(
+		response: HttpResponse,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+	): void
 
 	/**
 	 * Records an error.
@@ -3160,7 +3923,10 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
+	recordError(
+		codes: string | readonly string[],
+		data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+	): void
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -3168,30 +3934,58 @@ export type CmcdSession = {
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionRequestReportConfig): void;
+	configure(settings: CmcdSessionRequestReportConfig): void
 
 	/**
 	 * Sends the queue of each event target at once, also during a wait.
-	 * If a POST is in flight, the target sends after its response.
+	 * If a batch is in flight, the target sends after that batch completes.
 	 *
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.delivery.test.ts#example}
 	 */
-	flush(): void;
+	flush(): void
 }
 ```
+
+In `libs/cmcd/src/encodeCmcd.ts`, before the line `import type { Cmcd } from './Cmcd.ts'`, add:
+
+```ts
+import type { DeepReadonly } from '@svta/cml-utils'
+```
+
+In the same file, replace the line `export function encodeCmcd(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {` with:
+
+```ts
+export function encodeCmcd(cmcd: DeepReadonly<Cmcd>, options: CmcdEncodeOptions = {}): string {
+```
+
+In `libs/cmcd/src/index.ts`, after the line `export type * from './CmcdEventReportTransform.ts'`, add:
+
+```ts
+export type * from './CmcdEventSender.ts'
+export type * from './CmcdEventSendResult.ts'
+```
+
+- [ ] **Step 4: Write the implementation**
 
 Replace the content of `libs/cmcd/src/createCmcdSession.ts` with:
 
 ```ts
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import type { CmcdEventSender } from './CmcdEventSender.ts'
+import type { CmcdEventSendResult } from './CmcdEventSendResult.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED } from './CmcdEventType.ts'
+import {
+	CMCD_EVENT_BACKGROUNDED_MODE,
+	CMCD_EVENT_ERROR,
+	CMCD_EVENT_RESPONSE_RECEIVED,
+} from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
@@ -3200,6 +3994,7 @@ import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdSessionRequestReportConfig } from './CmcdSessionRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
+import type { CmcdSessionEventReportConfig } from './CmcdSessionEventReportConfig.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -3214,35 +4009,39 @@ import { toTokenString } from './toTokenString.ts'
 
 type KeyFilter = CmcdEncodeOptions['filter']
 
+type Requester = (request: HttpRequest) => Promise<{ status: number }>
+
+type Batch = (string | Cmcd)[]
+
 type Waiting = {
-	bs: string[];
-	bsd: unknown[];
-	ec: unknown[];
+	bs: string[]
+	bsd: unknown[]
+	ec: unknown[]
 }
 
 type Destination = {
-	sn: number;
-	msdSent: boolean;
-	waiting: Waiting;
-	gone: boolean;
-	targets: Target[];
+	sn: number
+	msdSent: boolean
+	waiting: Waiting
+	gone: boolean
 }
 
 type Draft = Pick<Destination, 'sn' | 'msdSent' | 'waiting'>
 
 type Target = {
-	url: string;
-	destination: Destination;
-	events: readonly CmcdEventType[];
-	keys: KeyFilter;
-	batchSize: number;
-	filter?: CmcdReportFilter;
-	queue: string[];
-	urgent: boolean;
-	inFlight: boolean;
-	flushPending: boolean;
-	delay: number;
-	retry?: ReturnType<typeof setTimeout>;
+	destination: Destination
+	events: readonly CmcdEventType[]
+	keys: KeyFilter
+	batchSize: number
+	filter?: CmcdReportFilter
+	copies: boolean
+	deliver: (batch: Batch) => Promise<number>
+	queue: Batch
+	urgent: boolean
+	inFlight: boolean
+	flushPending: boolean
+	delay: number
+	retry?: ReturnType<typeof setTimeout>
 }
 
 const MIN_DELAY = 1000
@@ -3256,32 +4055,78 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 
 	const set = new Set<string>(keys)
 
-	return (key) => set.has(key)
+	return key => set.has(key)
 }
 
 function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
 	return data
 }
 
-function createDestination(): Destination {
-	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false, targets: [] }
+function copyValue(value: unknown): unknown {
+	if (Array.isArray(value)) {
+		return value.map(copyValue)
+	}
+
+	if (value instanceof SfItem) {
+		return new SfItem(copyValue(value.value), value.params && { ...value.params })
+	}
+
+	if (value instanceof SfToken) {
+		return new SfToken(value.description)
+	}
+
+	return value
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
+function copyReport(report: Cmcd): Cmcd {
+	const copy: Record<string, unknown> = {}
+
+	for (const [key, value] of Object.entries(report)) {
+		copy[key] = copyValue(value)
+	}
+
+	return copy as Cmcd
+}
+
+function createDestination(): Destination {
+	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false }
+}
+
+function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 
 	return fetch(url, init)
 }
 
+function toDeliver(
+	{ url, send }: CmcdSessionEventReportConfig,
+	requester: Requester,
+): Target['deliver'] {
+	if (url !== undefined) {
+		return batch =>
+			requester({
+				url,
+				method: 'POST',
+				headers: { 'Content-Type': CMCD_MIME_TYPE },
+				body: (batch as string[]).join('\n'),
+			}).then(response => response?.status ?? 0)
+	}
+
+	return batch =>
+		Promise.resolve(send?.(batch as Parameters<CmcdEventSender>[0])).then(result =>
+			(result as CmcdEventSendResult | undefined)?.gone ? 410 : 200,
+		)
+}
+
 /**
  * Creates a CMCD session. One session reports one `sid`.
  *
- * Request mode is one destination. Each event target URL is one destination.
+ * Request mode is one destination. Each event target is one destination.
  * Each destination has its own sequence number.
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
  * @param config - The configuration of the session.
- * @param requester - Sends each batch of event reports. The default requester uses `fetch`.
+ * @param requester - Sends each batch of event reports to a target with a `url`. The default requester uses `fetch`.
  * @returns The session.
  *
  * @public
@@ -3289,7 +4134,10 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
  * @example
  * {@includeCode ../test/createCmcdSession.test.ts#example}
  */
-export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
+export function createCmcdSession(
+	config: CmcdSessionConfig = {},
+	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
 	const settings: CmcdSessionRequestReportConfig = {
@@ -3300,56 +4148,64 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	}
 	const requestDestination = createDestination()
 	const destinations: Destination[] = [requestDestination]
-	const urls = new Map<string, Destination>()
 	const targets: Target[] = []
 	let requestKeys = toKeyFilter(settings.enabledKeys)
 	let msd: number | undefined
 
 	for (const target of config.eventTargets ?? []) {
-		let destination = urls.get(target.url)
+		const destination = createDestination()
 
-		if (!destination) {
-			destination = createDestination()
-			urls.set(target.url, destination)
-			destinations.push(destination)
-		}
-
-		const state: Target = {
-			url: target.url,
+		destinations.push(destination)
+		targets.push({
 			destination,
 			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			filter: target.filter,
+			copies: target.send !== undefined,
+			deliver: toDeliver(target, requester),
 			queue: [],
 			urgent: false,
 			inFlight: false,
 			flushPending: false,
 			delay: 0,
-		}
-
-		destination.targets.push(state)
-		targets.push(state)
+		})
 	}
 
 	function draftOf(drafts: Map<Destination, Draft>, destination: Destination): Draft {
 		let draft = drafts.get(destination)
 
 		if (!draft) {
-			draft = { sn: destination.sn, msdSent: destination.msdSent, waiting: { ...destination.waiting } }
+			draft = {
+				sn: destination.sn,
+				msdSent: destination.msdSent,
+				waiting: { ...destination.waiting },
+			}
 			drafts.set(destination, draft)
 		}
 
 		return draft
 	}
 
-	function build(draft: Draft, base: Cmcd, scoped: CmcdScopedValues, reportingMode: CmcdReportingMode, version: CmcdVersion, keys: KeyFilter, baseUrl?: string): Cmcd {
+	function build(
+		draft: Draft,
+		base: Cmcd,
+		scoped: CmcdScopedValues,
+		reportingMode: CmcdReportingMode,
+		version: CmcdVersion,
+		keys: KeyFilter,
+		baseUrl?: string,
+	): Cmcd {
 		const { waiting } = draft
-		const values: Record<string, unknown> = { ...base, cid: base.cid ?? config.cid, msd: draft.msdSent ? undefined : msd ?? scoped.msd }
+		const values: Record<string, unknown> = {
+			...base,
+			cid: base.cid ?? config.cid,
+			msd: draft.msdSent ? undefined : (msd ?? scoped.msd),
+		}
 
 		if (waiting.bs.length) {
 			const ot = toTokenString(base.ot)
-			const kept = ot === undefined ? [] : waiting.bs.filter((type) => type !== '' && type !== ot)
+			const kept = ot === undefined ? [] : waiting.bs.filter(type => type !== '' && type !== ot)
 
 			if (kept.length < waiting.bs.length) {
 				values['bs'] = true
@@ -3386,8 +4242,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (draft) {
 				Object.assign(destination, draft)
-			}
-			else if (!destination.gone) {
+			} else if (!destination.gone) {
 				const { waiting } = destination
 
 				if (scoped.bs !== undefined) {
@@ -3405,17 +4260,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 	}
 
-	function stopDestination(destination: Destination): void {
-		destination.gone = true
-		destination.waiting = { bs: [], bsd: [], ec: [] }
-
-		for (const target of destination.targets) {
-			clearTimeout(target.retry)
-			target.retry = undefined
-			target.queue.length = 0
-			target.urgent = false
-			target.flushPending = false
-		}
+	function stopTarget(target: Target): void {
+		target.destination.gone = true
+		target.destination.waiting = { bs: [], bsd: [], ec: [] }
+		clearTimeout(target.retry)
+		target.retry = undefined
+		target.queue.length = 0
+		target.urgent = false
+		target.flushPending = false
 	}
 
 	function isReady(target: Target): boolean {
@@ -3436,9 +4288,8 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		target.retry = undefined
 		target.inFlight = true
 
-		const lines = target.queue.splice(0)
+		const batch = target.queue.splice(0)
 		const urgent = target.urgent
-		const request: HttpRequest = { url: target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }
 
 		target.urgent = false
 
@@ -3446,7 +4297,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			target.inFlight = false
 
 			if (status === 410) {
-				stopDestination(target.destination)
+				stopTarget(target)
 				return
 			}
 
@@ -3455,34 +4306,38 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			}
 
 			// CTA-5004-B: back off after a 429 or 5xx response.
-			const failed = status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
+			const failed =
+				status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
 
 			if (failed) {
-				target.queue.unshift(...lines)
+				target.queue.unshift(...batch)
 				target.urgent ||= urgent
 				target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
 				target.retry = setTimeout(() => {
 					target.retry = undefined
 					send(target)
 				}, target.delay)
-			}
-			else {
+			} else {
 				target.delay = 0
 			}
 
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
-			}
-			else if (!failed && isReady(target)) {
+			} else if (!failed && isReady(target)) {
 				send(target)
 			}
 		}
 
-		new Promise<{ status: number; }>((resolve) => resolve(requester(request))).then((response) => settle(response?.status ?? 0), () => settle())
+		new Promise<number>(resolve => resolve(target.deliver(batch))).then(settle, () => settle())
 	}
 
-	function emit(type: CmcdEventType, data: Cmcd, request?: DeepReadonly<HttpRequest>, ec?: readonly string[]): void {
+	function emit(
+		type: CmcdEventType,
+		data: Cmcd,
+		request?: DeepReadonly<HttpRequest>,
+		ec?: readonly string[],
+	): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
 
 		// CTA-5004-B: a b event without bg is the exit from backgrounded mode.
@@ -3491,14 +4346,31 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 
 		const scoped = readScopedValues(report, ec)
-		const selected = targets.filter((target) => target.events.includes(type) && !target.destination.gone && (!target.filter || target.filter(report, request)))
+		const selected = targets.filter(
+			target =>
+				target.events.includes(type) &&
+				!target.destination.gone &&
+				(!target.filter || target.filter(report, request)),
+		)
 		const drafts = new Map<Destination, Draft>()
-		const lines = selected.map((target) => encodePreparedCmcd(build(draftOf(drafts, target.destination), report, scoped, CMCD_EVENT_MODE, CMCD_V2, target.keys)))
+		const queued = selected.map(target => {
+			const prepared = build(
+				draftOf(drafts, target.destination),
+				report,
+				scoped,
+				CMCD_EVENT_MODE,
+				CMCD_V2,
+				target.keys,
+			)
+			const line = encodePreparedCmcd(prepared)
+
+			return target.copies ? copyReport(prepared) : line
+		})
 
 		commit(drafts, scoped)
 
 		selected.forEach((target, i) => {
-			target.queue.push(lines[i])
+			target.queue.push(queued[i])
 			target.urgent ||= type === CMCD_EVENT_ERROR
 
 			if (isReady(target)) {
@@ -3510,11 +4382,23 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	return {
 		sid,
 
-		createRequestReport<R extends HttpRequest>(request: R, data: Cmcd = {}): R & CmcdRequestReport<R['customData']> {
+		createRequestReport<R extends HttpRequest>(
+			request: R,
+			data: Cmcd = {},
+		): R & CmcdRequestReport<R['customData']> {
 			const scoped = readScopedValues(data)
 			const drafts = new Map<Destination, Draft>()
-			const cmcd = build(draftOf(drafts, requestDestination), data, scoped, CMCD_REQUEST_MODE, settings.version ?? CMCD_V2, requestKeys, request.url)
-			const source = request.headers ?? {}
+			const cmcd = build(
+				draftOf(drafts, requestDestination),
+				data,
+				scoped,
+				CMCD_REQUEST_MODE,
+				settings.version ?? CMCD_V2,
+				requestKeys,
+				request.url,
+			)
+			const { headers: source = {}, ...rest } = request
+			const customData = request.customData as object | undefined
 			const replace = settings.transmissionMode === CMCD_HEADERS
 			const headers: Record<string, string> = {}
 			let url = request.url
@@ -3527,14 +4411,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (replace) {
 				Object.assign(headers, toPreparedCmcdHeaders(cmcd, settings.customHeaderMap))
-			}
-			else {
+			} else {
 				url = replaceCmcdParam(url, encodePreparedCmcd(cmcd))
 			}
 
 			commit(drafts, scoped)
 
-			return { ...request, url, headers, customData: { ...request.customData, cmcd } } as R & CmcdRequestReport<R['customData']>
+			return { ...rest, url, headers, customData: { ...customData, cmcd } } as R &
+				CmcdRequestReport<R['customData']>
 		},
 
 		recordEvent(type, data = {}, request) {
@@ -3542,9 +4426,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		},
 
 		recordResponseReceived(response, data = {}) {
-			const requestData = withoutScopedKeys(response.request.customData?.cmcd ?? {})
+			const { cmcd } = (response.request.customData ?? {}) as { cmcd?: Cmcd }
+			const requestData = withoutScopedKeys(cmcd ?? {})
 
-			emit(CMCD_EVENT_RESPONSE_RECEIVED, { ...requestData, ...toResponseKeys(response, timeOrigin), ...data }, response.request)
+			emit(
+				CMCD_EVENT_RESPONSE_RECEIVED,
+				{ ...requestData, ...toResponseKeys(response, timeOrigin), ...data },
+				response.request,
+			)
 		},
 
 		recordError(codes, data = {}) {
@@ -3567,23 +4456,23 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 }
 ```
 
-- [ ] **Step 4: Build, run the checks, and confirm that they pass**
+- [ ] **Step 5: Build, run the checks, and confirm that they pass**
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.delivery.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.delivery.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 12 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing. The API report does not change, because the task changes only TSDoc in the public types.
+Expected: the 21 tests of the file pass, and every package test passes. The typecheck and the format check report nothing. The API report gains `CmcdEventSender` and `CmcdEventSendResult`, the `url | send` union of `CmcdSessionEventReportConfig`, and the `DeepReadonly<Cmcd>` parameter of `encodeCmcd`.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/test/createCmcdSession.delivery.test.ts
-git commit -s -m "feat(cmcd): back off and stop on the responses of a collector" -m "Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
+git add libs/cmcd/src/CmcdEventSender.ts libs/cmcd/src/CmcdEventSendResult.ts libs/cmcd/src/CmcdSessionEventReportConfig.ts libs/cmcd/src/encodeCmcd.ts libs/cmcd/src/CmcdSession.ts libs/cmcd/src/createCmcdSession.ts libs/cmcd/src/index.ts libs/cmcd/config/cml-cmcd.api.md libs/cmcd/test/createCmcdSession.delivery.test.ts
+git commit -s -m "feat(cmcd): deliver the event reports of the CMCD session to a URL or a send function" -m "Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
 
 ### Task 7: Timers
@@ -3606,23 +4495,23 @@ import type { CmcdSessionConfig, CmcdSnapshot } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdPlayerState, CmcdStreamType, createCmcdSession } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok, throws } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 
 const A = 'https://a.test/cmcd'
 const B = 'https://b.test/cmcd'
 const ts = 1000
 
 function settle(): Promise<void> {
-	return new Promise((resolve) => setImmediate(resolve))
+	return new Promise(resolve => setImmediate(resolve))
 }
 
 function setup(config: CmcdSessionConfig, status = 200) {
 	const posts: HttpRequest[] = []
-	const session = createCmcdSession({ sid: 's1', ...config }, async (request) => {
+	const session = createCmcdSession({ sid: 's1', ...config }, request => {
 		posts.push(request)
-		return { status }
+		return Promise.resolve({ status })
 	})
-	const lines = (index: number): string[] => String(posts[index].body).split('\n')
+	const lines = (index: number): string[] => (posts[index].body as string).split('\n')
 
 	return { session, posts, lines }
 }
@@ -3630,8 +4519,13 @@ function setup(config: CmcdSessionConfig, status = 200) {
 describe('createCmcdSession timers', () => {
 	const state: CmcdSnapshot = { sta: 'p' }
 
-	beforeEach(() => mock.timers.enable({ apis: ['setTimeout', 'setInterval', 'Date'], now: ts }))
-	afterEach(() => mock.timers.reset())
+	beforeEach(() =>
+		vi.useFakeTimers({
+			now: ts,
+			toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'],
+		}),
+	)
+	afterEach(() => vi.useRealTimers())
 
 	it('provides a valid example', () => {
 		// #region example
@@ -3640,19 +4534,24 @@ describe('createCmcdSession timers', () => {
 
 		const data = (): CmcdSnapshot => ({ st: CmcdStreamType.VOD, sta: playerState, bl: [21300] })
 
-		const session = createCmcdSession({
-			cid: 'movie-42',
-			eventTargets: [{
-				url: 'https://collector.example.com/cmcd',
-				events: [CmcdEventType.PLAY_STATE, CmcdEventType.TIME_INTERVAL],
-				interval: 30,
-				batchSize: 2,
-			}],
-			snapshot: data,
-		}, async (request) => {
-			bodies.push(String(request.body))
-			return { status: 200 }
-		})
+		const session = createCmcdSession(
+			{
+				cid: 'movie-42',
+				eventTargets: [
+					{
+						url: 'https://collector.example.com/cmcd',
+						events: [CmcdEventType.PLAY_STATE, CmcdEventType.TIME_INTERVAL],
+						interval: 30,
+						batchSize: 2,
+					},
+				],
+				snapshot: data,
+			},
+			request => {
+				bodies.push(request.body as string)
+				return Promise.resolve({ status: 200 })
+			},
+		)
 
 		function setPlayerState(next: CmcdPlayerState): void {
 			if (next === playerState) {
@@ -3675,42 +4574,54 @@ describe('createCmcdSession timers', () => {
 	})
 
 	it('sends the first t report on start() and one each interval, until stop()', async () => {
-		const { session, posts, lines } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 }], snapshot: () => state })
+		const { session, posts, lines } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 }],
+			snapshot: () => state,
+		})
 
 		session.start()
 		equal(posts.length, 1)
 		await settle()
-		mock.timers.tick(9999)
+		vi.advanceTimersByTime(9999)
 		equal(posts.length, 1)
-		mock.timers.tick(1)
+		vi.advanceTimersByTime(1)
 		equal(posts.length, 2)
 		session.stop()
-		mock.timers.tick(60_000)
+		vi.advanceTimersByTime(60_000)
 
 		equal(posts.length, 2)
 		deepEqual(lines(1), [`e=t,sid="s1",sn=1,sta=p,ts=${ts + 10_000},v=2`])
 	})
 
 	it('waits one interval on start(false), and uses CMCD_DEFAULT_TIME_INTERVAL without an interval', () => {
-		const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL] }], snapshot: () => state })
+		const { session, posts } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL] }],
+			snapshot: () => state,
+		})
 
 		session.start(false)
-		mock.timers.tick(29_999)
+		vi.advanceTimersByTime(29_999)
 		equal(posts.length, 0)
-		mock.timers.tick(1)
+		vi.advanceTimersByTime(1)
 
 		equal(posts.length, 1)
 	})
 
 	it('arms no timer without snapshot, for an interval of 0, or for a target without t', () => {
 		const first = setup({ eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL] }] })
-		const second = setup({ eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 0 }], snapshot: () => state })
-		const third = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }], snapshot: () => state })
+		const second = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 0 }],
+			snapshot: () => state,
+		})
+		const third = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
+			snapshot: () => state,
+		})
 
 		for (const { session } of [first, second, third]) {
 			session.start()
 		}
-		mock.timers.tick(60_000)
+		vi.advanceTimersByTime(60_000)
 
 		equal(first.posts.length + second.posts.length + third.posts.length, 0)
 	})
@@ -3720,27 +4631,38 @@ describe('createCmcdSession timers', () => {
 		const { session, posts } = setup({
 			eventTargets: [
 				{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 },
-				{ url: B, events: [CmcdEventType.TIME_INTERVAL], interval: 15, filter: (report) => report.sta === 'a' },
+				{
+					url: B,
+					events: [CmcdEventType.TIME_INTERVAL],
+					interval: 15,
+					filter: report => report.sta === 'a',
+				},
 			],
 			snapshot: () => data,
 		})
 
 		session.start(false)
-		mock.timers.tick(10_000)
+		vi.advanceTimersByTime(10_000)
 		await settle()
 		data.sta = 'a'
-		mock.timers.tick(5000)
-		mock.timers.tick(5000)
+		vi.advanceTimersByTime(5000)
+		vi.advanceTimersByTime(5000)
 
-		deepEqual(posts.map((post) => post.url), [A, B, A])
+		deepEqual(
+			posts.map(post => post.url),
+			[A, B, A],
+		)
 	})
 
 	it('arms one timer for each target when start() runs twice', () => {
-		const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 }], snapshot: () => state })
+		const { session, posts } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 }],
+			snapshot: () => state,
+		})
 
 		session.start(false)
 		session.start(false)
-		mock.timers.tick(10_000)
+		vi.advanceTimersByTime(10_000)
 
 		equal(posts.length, 1)
 	})
@@ -3755,7 +4677,7 @@ describe('createCmcdSession timers', () => {
 
 		session.start(false)
 
-		throws(() => mock.timers.tick(10_000), /snapshot failed/)
+		throws(() => vi.advanceTimersByTime(10_000), /snapshot failed/)
 		session.stop()
 	})
 
@@ -3776,17 +4698,20 @@ describe('createCmcdSession timers', () => {
 	})
 
 	it('clears the wait on stop(), and a failure after stop() starts no timer', async () => {
-		const { session, posts } = setup({ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] }, 503)
+		const { session, posts } = setup(
+			{ eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }] },
+			503,
+		)
 
 		session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 		await settle()
 		session.stop()
-		mock.timers.tick(300_000)
+		vi.advanceTimersByTime(300_000)
 		await settle()
 		equal(posts.length, 1)
 		session.flush()
 		await settle()
-		mock.timers.tick(300_000)
+		vi.advanceTimersByTime(300_000)
 		await settle()
 
 		equal(posts.length, 2)
@@ -3798,7 +4723,7 @@ describe('createCmcdSession timers', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.timers.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.timers.test.ts
 ```
 
 Expected: FAIL. The 9 tests fail with `TypeError`, because `start()` and `stop()` do not exist yet.
@@ -3820,51 +4745,54 @@ import type { CmcdEvent } from './CmcdEvent.ts'
  *
  * @public
  */
-export type CmcdSnapshot = Omit<CmcdEvent, 'bs' | 'bsd' | 'cen' | 'e' | 'ec' | 'sid' | 'sn' | 'ts' | 'v'> & {
+export type CmcdSnapshot = Omit<
+	CmcdEvent,
+	'bs' | 'bsd' | 'cen' | 'e' | 'ec' | 'sid' | 'sn' | 'ts' | 'v'
+> & {
 	/**
 	 * `bs` reports a stall. Pass it once, in the data of a call at the stall.
 	 */
-	bs?: never;
+	bs?: never
 
 	/**
 	 * `bsd` reports the duration of a stall. Pass it once, in the data of a call after the stall.
 	 */
-	bsd?: never;
+	bsd?: never
 
 	/**
 	 * CTA-5004-B allows `cen` only on `ce` events.
 	 */
-	cen?: never;
+	cen?: never
 
 	/**
 	 * The session writes `e`.
 	 */
-	e?: never;
+	e?: never
 
 	/**
 	 * Pass error codes to `recordError()`.
 	 */
-	ec?: never;
+	ec?: never
 
 	/**
 	 * The session writes `sid`.
 	 */
-	sid?: never;
+	sid?: never
 
 	/**
 	 * The session writes `sn`.
 	 */
-	sn?: never;
+	sn?: never
 
 	/**
 	 * The session writes the time of each `t` report.
 	 */
-	ts?: never;
+	ts?: never
 
 	/**
 	 * The session writes `v`.
 	 */
-	v?: never;
+	v?: never
 }
 ```
 
@@ -3888,25 +4816,24 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	 *
 	 * @defaultValue A new UUID
 	 */
-	sid?: string;
+	sid?: string
 
 	/**
 	 * The content ID of each report whose data has no `cid`. It has at most 128 characters.
 	 */
-	cid?: string;
+	cid?: string
 
 	/**
 	 * The event targets. They cannot change after the session is created.
-	 * The targets with the same `url` form one destination.
-	 * They share one sequence number, the `msd` rule, and the waiting values.
+	 * Each target is one destination. It has its own sequence number, `msd` rule, and waiting values.
 	 */
-	eventTargets?: readonly CmcdSessionEventReportConfig[];
+	eventTargets?: readonly CmcdSessionEventReportConfig[]
 
 	/**
 	 * Returns the data of each `t` report. The other reports use only the data of their call.
 	 * Without `snapshot`, `start()` arms no timer.
 	 */
-	snapshot?: () => CmcdSnapshot;
+	snapshot?: () => CmcdSnapshot
 }
 ```
 
@@ -3935,7 +4862,7 @@ export type CmcdSession = {
 	/**
 	 * The session ID of every report.
 	 */
-	readonly sid: string;
+	readonly sid: string
 
 	/**
 	 * Returns a copy of the request with a CMCD request report.
@@ -3952,7 +4879,10 @@ export type CmcdSession = {
 	 *
 	 * @throws If a value cannot be encoded. The call then changes no state.
 	 */
-	createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>): R & CmcdRequestReport<R['customData']>;
+	createRequestReport<R extends HttpRequest>(
+		request: R,
+		data?: Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>,
+	): R & CmcdRequestReport<R['customData']>
 
 	/**
 	 * Records an event report for each selected event target.
@@ -3968,7 +4898,11 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.events.test.ts#example}
 	 */
-	recordEvent(type: CmcdEventType, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>, request?: Readonly<HttpRequest>): void;
+	recordEvent(
+		type: CmcdEventType,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+		request?: Readonly<HttpRequest>,
+	): void
 
 	/**
 	 * Records an `rr` report for a response.
@@ -3986,7 +4920,10 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.responses.test.ts#example}
 	 */
-	recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
+	recordResponseReceived(
+		response: HttpResponse,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+	): void
 
 	/**
 	 * Records an error.
@@ -4002,7 +4939,10 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}
 	 */
-	recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>): void;
+	recordError(
+		codes: string | readonly string[],
+		data?: Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
+	): void
 
 	/**
 	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
@@ -4010,7 +4950,7 @@ export type CmcdSession = {
 	 *
 	 * @param settings - The new settings.
 	 */
-	configure(settings: CmcdSessionRequestReportConfig): void;
+	configure(settings: CmcdSessionRequestReportConfig): void
 
 	/**
 	 * Arms one timer for each event target that lists `t` and has an interval above 0.
@@ -4023,22 +4963,22 @@ export type CmcdSession = {
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.timers.test.ts#example}
 	 */
-	start(immediate?: boolean): void;
+	start(immediate?: boolean): void
 
 	/**
 	 * Clears the interval timers and the wait timers of the event targets.
 	 * After `stop()`, a failed send starts no timer.
 	 */
-	stop(): void;
+	stop(): void
 
 	/**
 	 * Sends the queue of each event target at once, also during a wait.
-	 * If a POST is in flight, the target sends after its response.
+	 * If a batch is in flight, the target sends after that batch completes.
 	 *
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.delivery.test.ts#example}
 	 */
-	flush(): void;
+	flush(): void
 }
 ```
 
@@ -4053,6 +4993,7 @@ export type * from './CmcdSnapshot.ts'
 Replace the content of `libs/cmcd/src/createCmcdSession.ts` with:
 
 ```ts
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -4060,8 +5001,15 @@ import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import type { CmcdEventSender } from './CmcdEventSender.ts'
+import type { CmcdEventSendResult } from './CmcdEventSendResult.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL } from './CmcdEventType.ts'
+import {
+	CMCD_EVENT_BACKGROUNDED_MODE,
+	CMCD_EVENT_ERROR,
+	CMCD_EVENT_RESPONSE_RECEIVED,
+	CMCD_EVENT_TIME_INTERVAL,
+} from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
@@ -4070,6 +5018,7 @@ import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdSessionRequestReportConfig } from './CmcdSessionRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
+import type { CmcdSessionEventReportConfig } from './CmcdSessionEventReportConfig.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -4084,37 +5033,41 @@ import { toTokenString } from './toTokenString.ts'
 
 type KeyFilter = CmcdEncodeOptions['filter']
 
+type Requester = (request: HttpRequest) => Promise<{ status: number }>
+
+type Batch = (string | Cmcd)[]
+
 type Waiting = {
-	bs: string[];
-	bsd: unknown[];
-	ec: unknown[];
+	bs: string[]
+	bsd: unknown[]
+	ec: unknown[]
 }
 
 type Destination = {
-	sn: number;
-	msdSent: boolean;
-	waiting: Waiting;
-	gone: boolean;
-	targets: Target[];
+	sn: number
+	msdSent: boolean
+	waiting: Waiting
+	gone: boolean
 }
 
 type Draft = Pick<Destination, 'sn' | 'msdSent' | 'waiting'>
 
 type Target = {
-	url: string;
-	destination: Destination;
-	events: readonly CmcdEventType[];
-	keys: KeyFilter;
-	batchSize: number;
-	interval: number;
-	filter?: CmcdReportFilter;
-	queue: string[];
-	urgent: boolean;
-	inFlight: boolean;
-	flushPending: boolean;
-	delay: number;
-	retry?: ReturnType<typeof setTimeout>;
-	timer?: ReturnType<typeof setInterval>;
+	destination: Destination
+	events: readonly CmcdEventType[]
+	keys: KeyFilter
+	batchSize: number
+	interval: number
+	filter?: CmcdReportFilter
+	copies: boolean
+	deliver: (batch: Batch) => Promise<number>
+	queue: Batch
+	urgent: boolean
+	inFlight: boolean
+	flushPending: boolean
+	delay: number
+	retry?: ReturnType<typeof setTimeout>
+	timer?: ReturnType<typeof setInterval>
 }
 
 const MIN_DELAY = 1000
@@ -4128,7 +5081,7 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 
 	const set = new Set<string>(keys)
 
-	return (key) => set.has(key)
+	return key => set.has(key)
 }
 
 function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
@@ -4139,25 +5092,71 @@ function withoutStallKeys({ bs, bsd, ...data }: Cmcd): Cmcd {
 	return data
 }
 
-function createDestination(): Destination {
-	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false, targets: [] }
+function copyValue(value: unknown): unknown {
+	if (Array.isArray(value)) {
+		return value.map(copyValue)
+	}
+
+	if (value instanceof SfItem) {
+		return new SfItem(copyValue(value.value), value.params && { ...value.params })
+	}
+
+	if (value instanceof SfToken) {
+		return new SfToken(value.description)
+	}
+
+	return value
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
+function copyReport(report: Cmcd): Cmcd {
+	const copy: Record<string, unknown> = {}
+
+	for (const [key, value] of Object.entries(report)) {
+		copy[key] = copyValue(value)
+	}
+
+	return copy as Cmcd
+}
+
+function createDestination(): Destination {
+	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false }
+}
+
+function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 
 	return fetch(url, init)
 }
 
+function toDeliver(
+	{ url, send }: CmcdSessionEventReportConfig,
+	requester: Requester,
+): Target['deliver'] {
+	if (url !== undefined) {
+		return batch =>
+			requester({
+				url,
+				method: 'POST',
+				headers: { 'Content-Type': CMCD_MIME_TYPE },
+				body: (batch as string[]).join('\n'),
+			}).then(response => response?.status ?? 0)
+	}
+
+	return batch =>
+		Promise.resolve(send?.(batch as Parameters<CmcdEventSender>[0])).then(result =>
+			(result as CmcdEventSendResult | undefined)?.gone ? 410 : 200,
+		)
+}
+
 /**
  * Creates a CMCD session. One session reports one `sid`.
  *
- * Request mode is one destination. Each event target URL is one destination.
+ * Request mode is one destination. Each event target is one destination.
  * Each destination has its own sequence number.
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
  * @param config - The configuration of the session.
- * @param requester - Sends each batch of event reports. The default requester uses `fetch`.
+ * @param requester - Sends each batch of event reports to a target with a `url`. The default requester uses `fetch`.
  * @returns The session.
  *
  * @public
@@ -4165,7 +5164,10 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
  * @example
  * {@includeCode ../test/createCmcdSession.test.ts#example}
  */
-export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
+export function createCmcdSession(
+	config: CmcdSessionConfig = {},
+	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+): CmcdSession {
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
 	const settings: CmcdSessionRequestReportConfig = {
@@ -4176,58 +5178,66 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	}
 	const requestDestination = createDestination()
 	const destinations: Destination[] = [requestDestination]
-	const urls = new Map<string, Destination>()
 	const targets: Target[] = []
 	let requestKeys = toKeyFilter(settings.enabledKeys)
 	let msd: number | undefined
 	let stopped = false
 
 	for (const target of config.eventTargets ?? []) {
-		let destination = urls.get(target.url)
+		const destination = createDestination()
 
-		if (!destination) {
-			destination = createDestination()
-			urls.set(target.url, destination)
-			destinations.push(destination)
-		}
-
-		const state: Target = {
-			url: target.url,
+		destinations.push(destination)
+		targets.push({
 			destination,
 			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
 			filter: target.filter,
+			copies: target.send !== undefined,
+			deliver: toDeliver(target, requester),
 			queue: [],
 			urgent: false,
 			inFlight: false,
 			flushPending: false,
 			delay: 0,
-		}
-
-		destination.targets.push(state)
-		targets.push(state)
+		})
 	}
 
 	function draftOf(drafts: Map<Destination, Draft>, destination: Destination): Draft {
 		let draft = drafts.get(destination)
 
 		if (!draft) {
-			draft = { sn: destination.sn, msdSent: destination.msdSent, waiting: { ...destination.waiting } }
+			draft = {
+				sn: destination.sn,
+				msdSent: destination.msdSent,
+				waiting: { ...destination.waiting },
+			}
 			drafts.set(destination, draft)
 		}
 
 		return draft
 	}
 
-	function build(draft: Draft, base: Cmcd, scoped: CmcdScopedValues, reportingMode: CmcdReportingMode, version: CmcdVersion, keys: KeyFilter, baseUrl?: string): Cmcd {
+	function build(
+		draft: Draft,
+		base: Cmcd,
+		scoped: CmcdScopedValues,
+		reportingMode: CmcdReportingMode,
+		version: CmcdVersion,
+		keys: KeyFilter,
+		baseUrl?: string,
+	): Cmcd {
 		const { waiting } = draft
-		const values: Record<string, unknown> = { ...base, cid: base.cid ?? config.cid, msd: draft.msdSent ? undefined : msd ?? scoped.msd }
+		const values: Record<string, unknown> = {
+			...base,
+			cid: base.cid ?? config.cid,
+			msd: draft.msdSent ? undefined : (msd ?? scoped.msd),
+		}
 
 		if (waiting.bs.length) {
 			const ot = toTokenString(base.ot)
-			const kept = ot === undefined ? [] : waiting.bs.filter((type) => type !== '' && type !== ot)
+			const kept = ot === undefined ? [] : waiting.bs.filter(type => type !== '' && type !== ot)
 
 			if (kept.length < waiting.bs.length) {
 				values['bs'] = true
@@ -4264,8 +5274,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (draft) {
 				Object.assign(destination, draft)
-			}
-			else if (!destination.gone) {
+			} else if (!destination.gone) {
 				const { waiting } = destination
 
 				if (scoped.bs !== undefined) {
@@ -4283,19 +5292,16 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 	}
 
-	function stopDestination(destination: Destination): void {
-		destination.gone = true
-		destination.waiting = { bs: [], bsd: [], ec: [] }
-
-		for (const target of destination.targets) {
-			clearInterval(target.timer)
-			clearTimeout(target.retry)
-			target.timer = undefined
-			target.retry = undefined
-			target.queue.length = 0
-			target.urgent = false
-			target.flushPending = false
-		}
+	function stopTarget(target: Target): void {
+		target.destination.gone = true
+		target.destination.waiting = { bs: [], bsd: [], ec: [] }
+		clearInterval(target.timer)
+		clearTimeout(target.retry)
+		target.timer = undefined
+		target.retry = undefined
+		target.queue.length = 0
+		target.urgent = false
+		target.flushPending = false
 	}
 
 	function isReady(target: Target): boolean {
@@ -4316,9 +5322,8 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		target.retry = undefined
 		target.inFlight = true
 
-		const lines = target.queue.splice(0)
+		const batch = target.queue.splice(0)
 		const urgent = target.urgent
-		const request: HttpRequest = { url: target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }
 
 		target.urgent = false
 
@@ -4326,7 +5331,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			target.inFlight = false
 
 			if (status === 410) {
-				stopDestination(target.destination)
+				stopTarget(target)
 				return
 			}
 
@@ -4335,10 +5340,11 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			}
 
 			// CTA-5004-B: back off after a 429 or 5xx response.
-			const failed = status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
+			const failed =
+				status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
 
 			if (failed) {
-				target.queue.unshift(...lines)
+				target.queue.unshift(...batch)
 				target.urgent ||= urgent
 				target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
 
@@ -4348,24 +5354,28 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 						send(target)
 					}, target.delay)
 				}
-			}
-			else {
+			} else {
 				target.delay = 0
 			}
 
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
-			}
-			else if (!failed && isReady(target)) {
+			} else if (!failed && isReady(target)) {
 				send(target)
 			}
 		}
 
-		new Promise<{ status: number; }>((resolve) => resolve(requester(request))).then((response) => settle(response?.status ?? 0), () => settle())
+		new Promise<number>(resolve => resolve(target.deliver(batch))).then(settle, () => settle())
 	}
 
-	function emit(type: CmcdEventType, data: Cmcd, request?: DeepReadonly<HttpRequest>, candidates: readonly Target[] = targets, ec?: readonly string[]): void {
+	function emit(
+		type: CmcdEventType,
+		data: Cmcd,
+		request?: DeepReadonly<HttpRequest>,
+		candidates: readonly Target[] = targets,
+		ec?: readonly string[],
+	): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
 
 		// CTA-5004-B: a b event without bg is the exit from backgrounded mode.
@@ -4374,14 +5384,31 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 
 		const scoped = readScopedValues(report, ec)
-		const selected = candidates.filter((target) => target.events.includes(type) && !target.destination.gone && (!target.filter || target.filter(report, request)))
+		const selected = candidates.filter(
+			target =>
+				target.events.includes(type) &&
+				!target.destination.gone &&
+				(!target.filter || target.filter(report, request)),
+		)
 		const drafts = new Map<Destination, Draft>()
-		const lines = selected.map((target) => encodePreparedCmcd(build(draftOf(drafts, target.destination), report, scoped, CMCD_EVENT_MODE, CMCD_V2, target.keys)))
+		const queued = selected.map(target => {
+			const prepared = build(
+				draftOf(drafts, target.destination),
+				report,
+				scoped,
+				CMCD_EVENT_MODE,
+				CMCD_V2,
+				target.keys,
+			)
+			const line = encodePreparedCmcd(prepared)
+
+			return target.copies ? copyReport(prepared) : line
+		})
 
 		commit(drafts, scoped)
 
 		selected.forEach((target, i) => {
-			target.queue.push(lines[i])
+			target.queue.push(queued[i])
 			target.urgent ||= type === CMCD_EVENT_ERROR
 
 			if (isReady(target)) {
@@ -4393,11 +5420,23 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	return {
 		sid,
 
-		createRequestReport<R extends HttpRequest>(request: R, data: Cmcd = {}): R & CmcdRequestReport<R['customData']> {
+		createRequestReport<R extends HttpRequest>(
+			request: R,
+			data: Cmcd = {},
+		): R & CmcdRequestReport<R['customData']> {
 			const scoped = readScopedValues(data)
 			const drafts = new Map<Destination, Draft>()
-			const cmcd = build(draftOf(drafts, requestDestination), data, scoped, CMCD_REQUEST_MODE, settings.version ?? CMCD_V2, requestKeys, request.url)
-			const source = request.headers ?? {}
+			const cmcd = build(
+				draftOf(drafts, requestDestination),
+				data,
+				scoped,
+				CMCD_REQUEST_MODE,
+				settings.version ?? CMCD_V2,
+				requestKeys,
+				request.url,
+			)
+			const { headers: source = {}, ...rest } = request
+			const customData = request.customData as object | undefined
 			const replace = settings.transmissionMode === CMCD_HEADERS
 			const headers: Record<string, string> = {}
 			let url = request.url
@@ -4410,14 +5449,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (replace) {
 				Object.assign(headers, toPreparedCmcdHeaders(cmcd, settings.customHeaderMap))
-			}
-			else {
+			} else {
 				url = replaceCmcdParam(url, encodePreparedCmcd(cmcd))
 			}
 
 			commit(drafts, scoped)
 
-			return { ...request, url, headers, customData: { ...request.customData, cmcd } } as R & CmcdRequestReport<R['customData']>
+			return { ...rest, url, headers, customData: { ...customData, cmcd } } as R &
+				CmcdRequestReport<R['customData']>
 		},
 
 		recordEvent(type, data = {}, request) {
@@ -4425,9 +5464,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		},
 
 		recordResponseReceived(response, data = {}) {
-			const requestData = withoutScopedKeys(response.request.customData?.cmcd ?? {})
+			const { cmcd } = (response.request.customData ?? {}) as { cmcd?: Cmcd }
+			const requestData = withoutScopedKeys(cmcd ?? {})
 
-			emit(CMCD_EVENT_RESPONSE_RECEIVED, { ...requestData, ...toResponseKeys(response, timeOrigin), ...data }, response.request)
+			emit(
+				CMCD_EVENT_RESPONSE_RECEIVED,
+				{ ...requestData, ...toResponseKeys(response, timeOrigin), ...data },
+				response.request,
+			)
 		},
 
 		recordError(codes, data = {}) {
@@ -4451,8 +5495,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				clearInterval(target.timer)
 				target.timer = undefined
 
-				if (snapshot && target.interval > 0 && !target.destination.gone && target.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
-					const tick = (): void => emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
+				if (
+					snapshot &&
+					target.interval > 0 &&
+					!target.destination.gone &&
+					target.events.includes(CMCD_EVENT_TIME_INTERVAL)
+				) {
+					const tick = (): void =>
+						emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
 
 					target.timer = setInterval(tick, target.interval * 1000)
 
@@ -4462,7 +5512,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				}
 			}
 
-			ticks.forEach((tick) => tick())
+			ticks.forEach(tick => tick())
 		},
 
 		stop() {
@@ -4489,13 +5539,13 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.timers.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.timers.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 9 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing. The typecheck also confirms the `@ts-expect-error` line of the test: `CmcdSnapshot` rejects `bs` and `bsd`. The API report gains `CmcdSnapshot`.
+Expected: the 9 tests of the file pass, and every package test passes. The typecheck and the format check report nothing. The typecheck also confirms the `@ts-expect-error` line of the test: `CmcdSnapshot` rejects `bs` and `bsd`. The API report gains `CmcdSnapshot`.
 
 - [ ] **Step 6: Commit**
 
@@ -4513,7 +5563,7 @@ git commit -s -m "feat(cmcd): add the t report timers of the CMCD session" -m "C
 
 **Interfaces:**
 - Consumes: `createCmcdSession()` from Task 7.
-- Produces: internal `checkSessionConfig(config: CmcdSessionConfig): void`, which throws `Error` with the message `createCmcdSession: <parameter> must be <valid values>, received <value>`.
+- Produces: internal `checkSessionConfig(config: CmcdSessionConfig): void`, which throws `Error` with the message `createCmcdSession: <parameter> must be <valid values>, received <value>`. A target has a `url` or a `send` function, not both. The `url` is a non-empty string, and `send` is a function.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -4523,32 +5573,74 @@ Create `libs/cmcd/test/createCmcdSession.config.test.ts`:
 import type { CmcdSessionConfig } from '@svta/cml-cmcd'
 import { CmcdTransmissionMode, createCmcdSession } from '@svta/cml-cmcd'
 import { doesNotThrow, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 const target = { url: 'https://collector.test/cmcd', events: [] }
+const send = () => Promise.resolve()
 
 describe('createCmcdSession configuration checks', () => {
 	it('provides a valid example', () => {
 		// #region example
 		throws(
-			() => createCmcdSession({ eventTargets: [{ url: 'https://collector.example.com/cmcd', events: [], batchSize: 0 }] }),
-			{ message: 'createCmcdSession: eventTargets[0].batchSize must be a positive integer, received 0' },
+			() =>
+				createCmcdSession({
+					eventTargets: [{ url: 'https://collector.example.com/cmcd', events: [], batchSize: 0 }],
+				}),
+			{
+				message:
+					'createCmcdSession: eventTargets[0].batchSize must be a positive integer, received 0',
+			},
 		)
 		// #endregion example
 	})
 
-	it('throws for an invalid sid, cid, url, interval, or batchSize', () => {
+	it('throws for an invalid sid, cid, url, send, interval, or batchSize', () => {
 		const cases: [CmcdSessionConfig, string][] = [
 			[{ sid: '' }, 'createCmcdSession: sid must be a string of 1 to 64 characters, received ""'],
-			[{ sid: 'x'.repeat(65) }, `createCmcdSession: sid must be a string of 1 to 64 characters, received "${'x'.repeat(65)}"`],
-			[{ sid: 5 as unknown as string }, 'createCmcdSession: sid must be a string of 1 to 64 characters, received 5'],
-			[{ cid: 'x'.repeat(129) }, `createCmcdSession: cid must be a string of at most 128 characters, received "${'x'.repeat(129)}"`],
-			[{ eventTargets: [{ ...target, url: '' }] }, 'createCmcdSession: eventTargets[0].url must be a non-empty string, received ""'],
-			[{ eventTargets: [{ events: [] } as unknown as typeof target] }, 'createCmcdSession: eventTargets[0].url must be a non-empty string, received undefined'],
-			[{ eventTargets: [{ ...target, interval: -1 }] }, 'createCmcdSession: eventTargets[0].interval must be a finite number, 0 or more, received -1'],
-			[{ eventTargets: [{ ...target, interval: Infinity }] }, 'createCmcdSession: eventTargets[0].interval must be a finite number, 0 or more, received Infinity'],
-			[{ eventTargets: [target, { ...target, batchSize: 0 }] }, 'createCmcdSession: eventTargets[1].batchSize must be a positive integer, received 0'],
-			[{ eventTargets: [{ ...target, batchSize: 1.5 }] }, 'createCmcdSession: eventTargets[0].batchSize must be a positive integer, received 1.5'],
+			[
+				{ sid: 'x'.repeat(65) },
+				`createCmcdSession: sid must be a string of 1 to 64 characters, received "${'x'.repeat(65)}"`,
+			],
+			[
+				{ sid: 5 as unknown as string },
+				'createCmcdSession: sid must be a string of 1 to 64 characters, received 5',
+			],
+			[
+				{ cid: 'x'.repeat(129) },
+				`createCmcdSession: cid must be a string of at most 128 characters, received "${'x'.repeat(129)}"`,
+			],
+			[
+				{ eventTargets: [{ ...target, url: '' }] },
+				'createCmcdSession: eventTargets[0].url must be a non-empty string, received ""',
+			],
+			[
+				{ eventTargets: [{ events: [] } as unknown as typeof target] },
+				'createCmcdSession: eventTargets[0].url must be a non-empty string, received undefined',
+			],
+			[
+				{ eventTargets: [{ send: 5, events: [] } as unknown as typeof target] },
+				'createCmcdSession: eventTargets[0].send must be a function, received 5',
+			],
+			[
+				{ eventTargets: [{ ...target, send } as unknown as typeof target] },
+				'createCmcdSession: eventTargets[0].url must be undefined when send is set, received "https://collector.test/cmcd"',
+			],
+			[
+				{ eventTargets: [{ ...target, interval: -1 }] },
+				'createCmcdSession: eventTargets[0].interval must be a finite number, 0 or more, received -1',
+			],
+			[
+				{ eventTargets: [{ ...target, interval: Infinity }] },
+				'createCmcdSession: eventTargets[0].interval must be a finite number, 0 or more, received Infinity',
+			],
+			[
+				{ eventTargets: [target, { ...target, batchSize: 0 }] },
+				'createCmcdSession: eventTargets[1].batchSize must be a positive integer, received 0',
+			],
+			[
+				{ eventTargets: [{ ...target, batchSize: 1.5 }] },
+				'createCmcdSession: eventTargets[0].batchSize must be a positive integer, received 1.5',
+			],
 		]
 
 		for (const [config, message] of cases) {
@@ -4559,9 +5651,15 @@ describe('createCmcdSession configuration checks', () => {
 	it('accepts the limits of each rule', () => {
 		const configs: CmcdSessionConfig[] = [
 			{},
-			{ sid: 'x'.repeat(64), cid: 'x'.repeat(128), version: 1, transmissionMode: CmcdTransmissionMode.HEADERS },
+			{
+				sid: 'x'.repeat(64),
+				cid: 'x'.repeat(128),
+				version: 1,
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+			},
 			{ cid: '' },
 			{ eventTargets: [{ ...target, interval: 0, batchSize: 1 }] },
+			{ eventTargets: [{ send, events: [] }] },
 		]
 
 		for (const config of configs) {
@@ -4575,10 +5673,10 @@ describe('createCmcdSession configuration checks', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.config.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.config.test.ts
 ```
 
-Expected: FAIL. 2 of 3 tests fail with `AssertionError [ERR_ASSERTION]: Missing expected exception.`
+Expected: FAIL. 2 of 3 tests fail with `AssertionError: Missing expected exception.`
 
 - [ ] **Step 3: Write the checks**
 
@@ -4598,7 +5696,8 @@ function configError(parameter: string, expected: string, received: unknown): Er
  *
  * @param config - The configuration to check.
  *
- * @throws If `sid`, `cid`, or the `url`, `interval`, or `batchSize` of a target is invalid.
+ * @throws If `sid`, `cid`, or the `url`, `send`, `interval`, or `batchSize` of a target is invalid.
+ * A target has a `url` or a `send` function, not both.
  *
  * @internal
  */
@@ -4613,8 +5712,16 @@ export function checkSessionConfig(config: CmcdSessionConfig): void {
 		throw configError('cid', 'a string of at most 128 characters', cid)
 	}
 
-	eventTargets?.forEach(({ url, interval, batchSize }, i) => {
-		if (typeof url !== 'string' || url === '') {
+	eventTargets?.forEach(({ url, send, interval, batchSize }, i) => {
+		if (send !== undefined) {
+			if (typeof send !== 'function') {
+				throw configError(`eventTargets[${i}].send`, 'a function', send)
+			}
+
+			if (url !== undefined) {
+				throw configError(`eventTargets[${i}].url`, 'undefined when send is set', url)
+			}
+		} else if (typeof url !== 'string' || url === '') {
 			throw configError(`eventTargets[${i}].url`, 'a non-empty string', url)
 		}
 
@@ -4632,6 +5739,7 @@ export function checkSessionConfig(config: CmcdSessionConfig): void {
 Replace the content of `libs/cmcd/src/createCmcdSession.ts` with:
 
 ```ts
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -4639,8 +5747,15 @@ import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import type { CmcdEventSender } from './CmcdEventSender.ts'
+import type { CmcdEventSendResult } from './CmcdEventSendResult.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_ERROR, CMCD_EVENT_RESPONSE_RECEIVED, CMCD_EVENT_TIME_INTERVAL } from './CmcdEventType.ts'
+import {
+	CMCD_EVENT_BACKGROUNDED_MODE,
+	CMCD_EVENT_ERROR,
+	CMCD_EVENT_RESPONSE_RECEIVED,
+	CMCD_EVENT_TIME_INTERVAL,
+} from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
@@ -4649,6 +5764,7 @@ import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdSessionRequestReportConfig } from './CmcdSessionRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
+import type { CmcdSessionEventReportConfig } from './CmcdSessionEventReportConfig.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { checkSessionConfig } from './checkSessionConfig.ts'
@@ -4664,37 +5780,41 @@ import { toTokenString } from './toTokenString.ts'
 
 type KeyFilter = CmcdEncodeOptions['filter']
 
+type Requester = (request: HttpRequest) => Promise<{ status: number }>
+
+type Batch = (string | Cmcd)[]
+
 type Waiting = {
-	bs: string[];
-	bsd: unknown[];
-	ec: unknown[];
+	bs: string[]
+	bsd: unknown[]
+	ec: unknown[]
 }
 
 type Destination = {
-	sn: number;
-	msdSent: boolean;
-	waiting: Waiting;
-	gone: boolean;
-	targets: Target[];
+	sn: number
+	msdSent: boolean
+	waiting: Waiting
+	gone: boolean
 }
 
 type Draft = Pick<Destination, 'sn' | 'msdSent' | 'waiting'>
 
 type Target = {
-	url: string;
-	destination: Destination;
-	events: readonly CmcdEventType[];
-	keys: KeyFilter;
-	batchSize: number;
-	interval: number;
-	filter?: CmcdReportFilter;
-	queue: string[];
-	urgent: boolean;
-	inFlight: boolean;
-	flushPending: boolean;
-	delay: number;
-	retry?: ReturnType<typeof setTimeout>;
-	timer?: ReturnType<typeof setInterval>;
+	destination: Destination
+	events: readonly CmcdEventType[]
+	keys: KeyFilter
+	batchSize: number
+	interval: number
+	filter?: CmcdReportFilter
+	copies: boolean
+	deliver: (batch: Batch) => Promise<number>
+	queue: Batch
+	urgent: boolean
+	inFlight: boolean
+	flushPending: boolean
+	delay: number
+	retry?: ReturnType<typeof setTimeout>
+	timer?: ReturnType<typeof setInterval>
 }
 
 const MIN_DELAY = 1000
@@ -4708,7 +5828,7 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 
 	const set = new Set<string>(keys)
 
-	return (key) => set.has(key)
+	return key => set.has(key)
 }
 
 function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
@@ -4719,35 +5839,84 @@ function withoutStallKeys({ bs, bsd, ...data }: Cmcd): Cmcd {
 	return data
 }
 
-function createDestination(): Destination {
-	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false, targets: [] }
+function copyValue(value: unknown): unknown {
+	if (Array.isArray(value)) {
+		return value.map(copyValue)
+	}
+
+	if (value instanceof SfItem) {
+		return new SfItem(copyValue(value.value), value.params && { ...value.params })
+	}
+
+	if (value instanceof SfToken) {
+		return new SfToken(value.description)
+	}
+
+	return value
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number; }> {
+function copyReport(report: Cmcd): Cmcd {
+	const copy: Record<string, unknown> = {}
+
+	for (const [key, value] of Object.entries(report)) {
+		copy[key] = copyValue(value)
+	}
+
+	return copy as Cmcd
+}
+
+function createDestination(): Destination {
+	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false }
+}
+
+function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 
 	return fetch(url, init)
 }
 
+function toDeliver(
+	{ url, send }: CmcdSessionEventReportConfig,
+	requester: Requester,
+): Target['deliver'] {
+	if (url !== undefined) {
+		return batch =>
+			requester({
+				url,
+				method: 'POST',
+				headers: { 'Content-Type': CMCD_MIME_TYPE },
+				body: (batch as string[]).join('\n'),
+			}).then(response => response?.status ?? 0)
+	}
+
+	return batch =>
+		Promise.resolve(send?.(batch as Parameters<CmcdEventSender>[0])).then(result =>
+			(result as CmcdEventSendResult | undefined)?.gone ? 410 : 200,
+		)
+}
+
 /**
  * Creates a CMCD session. One session reports one `sid`.
  *
- * Request mode is one destination. Each event target URL is one destination.
+ * Request mode is one destination. Each event target is one destination.
  * Each destination has its own sequence number.
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
  * @param config - The configuration of the session.
- * @param requester - Sends each batch of event reports. The default requester uses `fetch`.
+ * @param requester - Sends each batch of event reports to a target with a `url`. The default requester uses `fetch`.
  * @returns The session.
  *
- * @throws If `sid`, `cid`, or the `url`, `interval`, or `batchSize` of a target is invalid.
+ * @throws If `sid`, `cid`, or the `url`, `send`, `interval`, or `batchSize` of a target is invalid.
  *
  * @public
  *
  * @example
  * {@includeCode ../test/createCmcdSession.test.ts#example}
  */
-export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (request: HttpRequest) => Promise<{ status: number; }> = defaultRequester): CmcdSession {
+export function createCmcdSession(
+	config: CmcdSessionConfig = {},
+	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+): CmcdSession {
 	checkSessionConfig(config)
 
 	const sid = config.sid ?? uuid()
@@ -4760,58 +5929,66 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	}
 	const requestDestination = createDestination()
 	const destinations: Destination[] = [requestDestination]
-	const urls = new Map<string, Destination>()
 	const targets: Target[] = []
 	let requestKeys = toKeyFilter(settings.enabledKeys)
 	let msd: number | undefined
 	let stopped = false
 
 	for (const target of config.eventTargets ?? []) {
-		let destination = urls.get(target.url)
+		const destination = createDestination()
 
-		if (!destination) {
-			destination = createDestination()
-			urls.set(target.url, destination)
-			destinations.push(destination)
-		}
-
-		const state: Target = {
-			url: target.url,
+		destinations.push(destination)
+		targets.push({
 			destination,
 			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
 			filter: target.filter,
+			copies: target.send !== undefined,
+			deliver: toDeliver(target, requester),
 			queue: [],
 			urgent: false,
 			inFlight: false,
 			flushPending: false,
 			delay: 0,
-		}
-
-		destination.targets.push(state)
-		targets.push(state)
+		})
 	}
 
 	function draftOf(drafts: Map<Destination, Draft>, destination: Destination): Draft {
 		let draft = drafts.get(destination)
 
 		if (!draft) {
-			draft = { sn: destination.sn, msdSent: destination.msdSent, waiting: { ...destination.waiting } }
+			draft = {
+				sn: destination.sn,
+				msdSent: destination.msdSent,
+				waiting: { ...destination.waiting },
+			}
 			drafts.set(destination, draft)
 		}
 
 		return draft
 	}
 
-	function build(draft: Draft, base: Cmcd, scoped: CmcdScopedValues, reportingMode: CmcdReportingMode, version: CmcdVersion, keys: KeyFilter, baseUrl?: string): Cmcd {
+	function build(
+		draft: Draft,
+		base: Cmcd,
+		scoped: CmcdScopedValues,
+		reportingMode: CmcdReportingMode,
+		version: CmcdVersion,
+		keys: KeyFilter,
+		baseUrl?: string,
+	): Cmcd {
 		const { waiting } = draft
-		const values: Record<string, unknown> = { ...base, cid: base.cid ?? config.cid, msd: draft.msdSent ? undefined : msd ?? scoped.msd }
+		const values: Record<string, unknown> = {
+			...base,
+			cid: base.cid ?? config.cid,
+			msd: draft.msdSent ? undefined : (msd ?? scoped.msd),
+		}
 
 		if (waiting.bs.length) {
 			const ot = toTokenString(base.ot)
-			const kept = ot === undefined ? [] : waiting.bs.filter((type) => type !== '' && type !== ot)
+			const kept = ot === undefined ? [] : waiting.bs.filter(type => type !== '' && type !== ot)
 
 			if (kept.length < waiting.bs.length) {
 				values['bs'] = true
@@ -4848,8 +6025,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (draft) {
 				Object.assign(destination, draft)
-			}
-			else if (!destination.gone) {
+			} else if (!destination.gone) {
 				const { waiting } = destination
 
 				if (scoped.bs !== undefined) {
@@ -4867,19 +6043,16 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 	}
 
-	function stopDestination(destination: Destination): void {
-		destination.gone = true
-		destination.waiting = { bs: [], bsd: [], ec: [] }
-
-		for (const target of destination.targets) {
-			clearInterval(target.timer)
-			clearTimeout(target.retry)
-			target.timer = undefined
-			target.retry = undefined
-			target.queue.length = 0
-			target.urgent = false
-			target.flushPending = false
-		}
+	function stopTarget(target: Target): void {
+		target.destination.gone = true
+		target.destination.waiting = { bs: [], bsd: [], ec: [] }
+		clearInterval(target.timer)
+		clearTimeout(target.retry)
+		target.timer = undefined
+		target.retry = undefined
+		target.queue.length = 0
+		target.urgent = false
+		target.flushPending = false
 	}
 
 	function isReady(target: Target): boolean {
@@ -4900,9 +6073,8 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		target.retry = undefined
 		target.inFlight = true
 
-		const lines = target.queue.splice(0)
+		const batch = target.queue.splice(0)
 		const urgent = target.urgent
-		const request: HttpRequest = { url: target.url, method: 'POST', headers: { 'Content-Type': CMCD_MIME_TYPE }, body: lines.join('\n') }
 
 		target.urgent = false
 
@@ -4910,7 +6082,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			target.inFlight = false
 
 			if (status === 410) {
-				stopDestination(target.destination)
+				stopTarget(target)
 				return
 			}
 
@@ -4919,10 +6091,11 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 			}
 
 			// CTA-5004-B: back off after a 429 or 5xx response.
-			const failed = status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
+			const failed =
+				status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
 
 			if (failed) {
-				target.queue.unshift(...lines)
+				target.queue.unshift(...batch)
 				target.urgent ||= urgent
 				target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
 
@@ -4932,24 +6105,28 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 						send(target)
 					}, target.delay)
 				}
-			}
-			else {
+			} else {
 				target.delay = 0
 			}
 
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
-			}
-			else if (!failed && isReady(target)) {
+			} else if (!failed && isReady(target)) {
 				send(target)
 			}
 		}
 
-		new Promise<{ status: number; }>((resolve) => resolve(requester(request))).then((response) => settle(response?.status ?? 0), () => settle())
+		new Promise<number>(resolve => resolve(target.deliver(batch))).then(settle, () => settle())
 	}
 
-	function emit(type: CmcdEventType, data: Cmcd, request?: DeepReadonly<HttpRequest>, candidates: readonly Target[] = targets, ec?: readonly string[]): void {
+	function emit(
+		type: CmcdEventType,
+		data: Cmcd,
+		request?: DeepReadonly<HttpRequest>,
+		candidates: readonly Target[] = targets,
+		ec?: readonly string[],
+	): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
 
 		// CTA-5004-B: a b event without bg is the exit from backgrounded mode.
@@ -4958,14 +6135,31 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		}
 
 		const scoped = readScopedValues(report, ec)
-		const selected = candidates.filter((target) => target.events.includes(type) && !target.destination.gone && (!target.filter || target.filter(report, request)))
+		const selected = candidates.filter(
+			target =>
+				target.events.includes(type) &&
+				!target.destination.gone &&
+				(!target.filter || target.filter(report, request)),
+		)
 		const drafts = new Map<Destination, Draft>()
-		const lines = selected.map((target) => encodePreparedCmcd(build(draftOf(drafts, target.destination), report, scoped, CMCD_EVENT_MODE, CMCD_V2, target.keys)))
+		const queued = selected.map(target => {
+			const prepared = build(
+				draftOf(drafts, target.destination),
+				report,
+				scoped,
+				CMCD_EVENT_MODE,
+				CMCD_V2,
+				target.keys,
+			)
+			const line = encodePreparedCmcd(prepared)
+
+			return target.copies ? copyReport(prepared) : line
+		})
 
 		commit(drafts, scoped)
 
 		selected.forEach((target, i) => {
-			target.queue.push(lines[i])
+			target.queue.push(queued[i])
 			target.urgent ||= type === CMCD_EVENT_ERROR
 
 			if (isReady(target)) {
@@ -4977,11 +6171,23 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 	return {
 		sid,
 
-		createRequestReport<R extends HttpRequest>(request: R, data: Cmcd = {}): R & CmcdRequestReport<R['customData']> {
+		createRequestReport<R extends HttpRequest>(
+			request: R,
+			data: Cmcd = {},
+		): R & CmcdRequestReport<R['customData']> {
 			const scoped = readScopedValues(data)
 			const drafts = new Map<Destination, Draft>()
-			const cmcd = build(draftOf(drafts, requestDestination), data, scoped, CMCD_REQUEST_MODE, settings.version ?? CMCD_V2, requestKeys, request.url)
-			const source = request.headers ?? {}
+			const cmcd = build(
+				draftOf(drafts, requestDestination),
+				data,
+				scoped,
+				CMCD_REQUEST_MODE,
+				settings.version ?? CMCD_V2,
+				requestKeys,
+				request.url,
+			)
+			const { headers: source = {}, ...rest } = request
+			const customData = request.customData as object | undefined
 			const replace = settings.transmissionMode === CMCD_HEADERS
 			const headers: Record<string, string> = {}
 			let url = request.url
@@ -4994,14 +6200,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 			if (replace) {
 				Object.assign(headers, toPreparedCmcdHeaders(cmcd, settings.customHeaderMap))
-			}
-			else {
+			} else {
 				url = replaceCmcdParam(url, encodePreparedCmcd(cmcd))
 			}
 
 			commit(drafts, scoped)
 
-			return { ...request, url, headers, customData: { ...request.customData, cmcd } } as R & CmcdRequestReport<R['customData']>
+			return { ...rest, url, headers, customData: { ...customData, cmcd } } as R &
+				CmcdRequestReport<R['customData']>
 		},
 
 		recordEvent(type, data = {}, request) {
@@ -5009,9 +6215,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 		},
 
 		recordResponseReceived(response, data = {}) {
-			const requestData = withoutScopedKeys(response.request.customData?.cmcd ?? {})
+			const { cmcd } = (response.request.customData ?? {}) as { cmcd?: Cmcd }
+			const requestData = withoutScopedKeys(cmcd ?? {})
 
-			emit(CMCD_EVENT_RESPONSE_RECEIVED, { ...requestData, ...toResponseKeys(response, timeOrigin), ...data }, response.request)
+			emit(
+				CMCD_EVENT_RESPONSE_RECEIVED,
+				{ ...requestData, ...toResponseKeys(response, timeOrigin), ...data },
+				response.request,
+			)
 		},
 
 		recordError(codes, data = {}) {
@@ -5035,8 +6246,14 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				clearInterval(target.timer)
 				target.timer = undefined
 
-				if (snapshot && target.interval > 0 && !target.destination.gone && target.events.includes(CMCD_EVENT_TIME_INTERVAL)) {
-					const tick = (): void => emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
+				if (
+					snapshot &&
+					target.interval > 0 &&
+					!target.destination.gone &&
+					target.events.includes(CMCD_EVENT_TIME_INTERVAL)
+				) {
+					const tick = (): void =>
+						emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
 
 					target.timer = setInterval(tick, target.interval * 1000)
 
@@ -5046,7 +6263,7 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 				}
 			}
 
-			ticks.forEach((tick) => tick())
+			ticks.forEach(tick => tick())
 		},
 
 		stop() {
@@ -5073,13 +6290,13 @@ export function createCmcdSession(config: CmcdSessionConfig = {}, requester: (re
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.config.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.config.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 3 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing.
+Expected: the 3 tests of the file pass, and every package test passes. The typecheck and the format check report nothing.
 
 - [ ] **Step 5: Commit**
 
@@ -5108,14 +6325,16 @@ Create `libs/cmcd/test/data/CTA_5004_B_EXAMPLES.ts`:
 
 ```ts
 /** Query-arg lines of CTA-5004-B section 8.1, request mode. */
-export const EX_8_1_1 = 'CMCD=bl%3D%282000%29%2Cbr%3D%283000%3Bv%29%2Ccid%3D%22content-id-123%22%2Cd%3D4000%2Cdl%3D1000%2Cmtp%3D%2815000%29%2Cnor%3D%28%22next-seg.mp4%22%29%2Cot%3Dv%2Crtp%3D12000%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csta%3Dp%2Ctb%3D%286000%3Bv%29%2Cv%3D2'
+export const EX_8_1_1 =
+	'CMCD=bl%3D%282000%29%2Cbr%3D%283000%3Bv%29%2Ccid%3D%22content-id-123%22%2Cd%3D4000%2Cdl%3D1000%2Cmtp%3D%2815000%29%2Cnor%3D%28%22next-seg.mp4%22%29%2Cot%3Dv%2Crtp%3D12000%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csta%3Dp%2Ctb%3D%286000%3Bv%29%2Cv%3D2'
 export const EX_8_1_1_HEADERS = {
 	'CMCD-Request': 'bl=(2000),dl=1000,mtp=(15000),nor=("next-seg.mp4"),sta=p',
 	'CMCD-Object': 'br=(3000;v),d=4000,ot=v,tb=(6000;v)',
 	'CMCD-Status': 'rtp=12000',
 	'CMCD-Session': 'cid="content-id-123",sf=d,sid="session-id-123",st=v,v=2',
 }
-export const EX_8_1_2 = 'CMCD=bl%3D%282000%29%2Cbr%3D%28320%29%2Ccid%3D%22content-id-123%22%2Cd%3D2000%2Cmtp%3D%2815000%29%2Cot%3Da%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Cv%3D2'
+export const EX_8_1_2 =
+	'CMCD=bl%3D%282000%29%2Cbr%3D%28320%29%2Ccid%3D%22content-id-123%22%2Cd%3D2000%2Cmtp%3D%2815000%29%2Cot%3Da%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Cv%3D2'
 export const EX_8_1_3 = 'CMCD=cid%3D%22content-id-123%22%2Csid%3D%22session-id-123%22%2Cv%3D2'
 export const EX_8_1_4: readonly string[] = [
 	'CMCD=cid%3D%22content-id-123%22%2Cot%3Dm%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Cst%3Dv%2Csu%2Cv%3D2',
@@ -5138,7 +6357,8 @@ export const EX_8_1_7 = {
 	adShown: 'CMCD=cid%3D%22ad-555%22%2Cot%3Dv%2Csid%3D%22session-common-1%22%2Cv%3D2',
 }
 /** 8.1.8 with `sn=129` replaced by the first sequence number of a fresh session. */
-export const EX_8_1_8 = 'CMCD=bg%2Cbl%3D%282100%3Bv%201800%3Ba%29%2Cbr%3D%283000%3Bv%20164%3Ba%29%2Cbs%2Cbsa%3D%283%3Bv%29%2Cbsd%3D%281200%3Bv%20100%3Ba%29%2Cbsda%3D%284150%3Bv%20300%3Ba%29%2Ccid%3D%22content-id-123%22%2Ccs%3D%22g48djn236sk2%22%2Cd%3D4000%2Cdfa%3D32%2Cdl%3D1000%2Cec%3D%28%222001%22%29%2Clb%3D%28500%3Bv%2032%3Ba%29%2Cltc%3D13500%2Cmsd%3D1700%2Cmtp%3D%2815000%3Bv%206000%3Ba%29%2Cnor%3D%28%22next-seg.mp4%22%29%2Cnr%2Cot%3Dv%2Cpb%3D%282000%3Bv%20164%3Ba%29%2Cpr%3D1.1%2Cpt%3D632782%2Crtp%3D12000%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Csn%3D0%2Cst%3Dl%2Csta%3Dp%2Csu%2Ctb%3D%286000%3Bv%20350%3Ba%29%2Ctbl%3D%282000%3Bv%202000%3Ba%29%2Ctpb%3D%285000%3Bv%20164%3Ba%29%2Cv%3D2'
+export const EX_8_1_8 =
+	'CMCD=bg%2Cbl%3D%282100%3Bv%201800%3Ba%29%2Cbr%3D%283000%3Bv%20164%3Ba%29%2Cbs%2Cbsa%3D%283%3Bv%29%2Cbsd%3D%281200%3Bv%20100%3Ba%29%2Cbsda%3D%284150%3Bv%20300%3Ba%29%2Ccid%3D%22content-id-123%22%2Ccs%3D%22g48djn236sk2%22%2Cd%3D4000%2Cdfa%3D32%2Cdl%3D1000%2Cec%3D%28%222001%22%29%2Clb%3D%28500%3Bv%2032%3Ba%29%2Cltc%3D13500%2Cmsd%3D1700%2Cmtp%3D%2815000%3Bv%206000%3Ba%29%2Cnor%3D%28%22next-seg.mp4%22%29%2Cnr%2Cot%3Dv%2Cpb%3D%282000%3Bv%20164%3Ba%29%2Cpr%3D1.1%2Cpt%3D632782%2Crtp%3D12000%2Csf%3Dd%2Csid%3D%22session-id-123%22%2Csn%3D0%2Cst%3Dl%2Csta%3Dp%2Csu%2Ctb%3D%286000%3Bv%20350%3Ba%29%2Ctbl%3D%282000%3Bv%202000%3Ba%29%2Ctpb%3D%285000%3Bv%20164%3Ba%29%2Cv%3D2'
 
 /** POST bodies of section 8.2, event mode. Document whitespace removed. */
 export const EX_8_2_1 = 'e=t,ts=1764752400000,v=2'
@@ -5149,9 +6369,12 @@ export const EX_8_2_2: readonly string[] = [
 	'bl=(6000),br=(4200;v 256;a),cid="content-id-123",e=t,h="example.com",lb=(523;v 64;a),mtp=(81000;v 55000;a),pb=(4200;v 256;a),pt=89188,sf=d,sid="session-id-123",sn=4,st=v,sta=p,tb=(4200;v 256;a),tpb=(4200;v 256;a),ts=1764752490000,v=2',
 	'bl=(0),br=(4200;v 256;a),cid="content-id-123",e=t,h="example.com",lb=(523;v 64;a),mtp=(82000;v 55000;a),pb=(4200;v 256;a),pr=0,pt=111000,sf=d,sid="session-id-123",sn=5,st=v,sta=e,tb=(4200;v 256;a),tpb=(4200;v 256;a),ts=1764752520000,v=2',
 ]
-export const EX_8_2_3 = 'cid="bbb",cmsdd="ZXRwPTEyNTAwO3J0dD0zNTttYj02MDAwO3JkPTIwMA==",cmsds="c2lkPSI5YTNiLTIxY2QiO2JyPTQ1MDA7ZD00MDAwO290PXY7c3Q9dg==",e=rr,nor=("video/segment-6.m4v"),ot=v,rc=200,sid="session1",ts=1763657019723,ttfb=180,ttlb=200,url="video/segment-5.m4v",v=2'
-export const EX_8_2_4 = 'cid="content-id-123",e=e,ec=("CODEC_NOT_SUPPORTED"),sid="session-id-123",ts=1764269150213,v=2'
-export const EX_8_2_6 = 'bl=(0),cid="content-id-123",e=ps,pt=30000,sid="session-id-123",sta=k,ts=1764269150529,v=2'
+export const EX_8_2_3 =
+	'cid="bbb",cmsdd="ZXRwPTEyNTAwO3J0dD0zNTttYj02MDAwO3JkPTIwMA==",cmsds="c2lkPSI5YTNiLTIxY2QiO2JyPTQ1MDA7ZD00MDAwO290PXY7c3Q9dg==",e=rr,nor=("video/segment-6.m4v"),ot=v,rc=200,sid="session1",ts=1763657019723,ttfb=180,ttlb=200,url="video/segment-5.m4v",v=2'
+export const EX_8_2_4 =
+	'cid="content-id-123",e=e,ec=("CODEC_NOT_SUPPORTED"),sid="session-id-123",ts=1764269150213,v=2'
+export const EX_8_2_6 =
+	'bl=(0),cid="content-id-123",e=ps,pt=30000,sid="session-id-123",sta=k,ts=1764269150529,v=2'
 export const EX_8_2_7 = 'cid="ad-content-555",e=sk,sid="session-id-123",ts=1764269150076,v=2'
 export const EX_8_2_8: readonly string[] = [
 	'cid="movie-123",e=abs,nr,sid="session-id-123",ts=1764269150186,v=2',
@@ -5167,11 +6390,37 @@ Create `libs/cmcd/test/createCmcdSession.examples.test.ts`:
 
 ```ts
 import type { Cmcd, CmcdKey, CmcdSessionConfig, CmcdSnapshot } from '@svta/cml-cmcd'
-import { CmcdEventType, CmcdObjectType, CmcdPlayerState, CmcdStreamingFormat, CmcdStreamType, CmcdTransmissionMode, createCmcdSession, toCmcdValue } from '@svta/cml-cmcd'
+import {
+	CmcdEventType,
+	CmcdObjectType,
+	CmcdPlayerState,
+	CmcdStreamingFormat,
+	CmcdStreamType,
+	CmcdTransmissionMode,
+	createCmcdSession,
+	toCmcdValue,
+} from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal } from 'node:assert'
-import { afterEach, describe, it, mock } from 'node:test'
-import { EX_8_1_1, EX_8_1_1_HEADERS, EX_8_1_2, EX_8_1_3, EX_8_1_4, EX_8_1_5, EX_8_1_6, EX_8_1_7, EX_8_1_8, EX_8_2_1, EX_8_2_2, EX_8_2_3, EX_8_2_4, EX_8_2_6, EX_8_2_7, EX_8_2_8 } from './data/CTA_5004_B_EXAMPLES.ts'
+import { afterEach, describe, it, vi } from 'vite-plus/test'
+import {
+	EX_8_1_1,
+	EX_8_1_1_HEADERS,
+	EX_8_1_2,
+	EX_8_1_3,
+	EX_8_1_4,
+	EX_8_1_5,
+	EX_8_1_6,
+	EX_8_1_7,
+	EX_8_1_8,
+	EX_8_2_1,
+	EX_8_2_2,
+	EX_8_2_3,
+	EX_8_2_4,
+	EX_8_2_6,
+	EX_8_2_7,
+	EX_8_2_8,
+} from './data/CTA_5004_B_EXAMPLES.ts'
 
 const CDN = 'https://cdn.example.com'
 const SEGMENT = `${CDN}/seg-1.m4s`
@@ -5184,39 +6433,105 @@ function query(url: string): string {
 }
 
 function settle(): Promise<void> {
-	return new Promise((resolve) => setImmediate(resolve))
+	return new Promise(resolve => setImmediate(resolve))
 }
 
 function eventSetup(config: CmcdSessionConfig) {
 	const bodies: string[] = []
-	const session = createCmcdSession({ sid: SID, ...config }, async (request: HttpRequest) => {
-		bodies.push(String(request.body))
-		return { status: 200 }
+	const session = createCmcdSession({ sid: SID, ...config }, (request: HttpRequest) => {
+		bodies.push(request.body as string)
+		return Promise.resolve({ status: 200 })
 	})
 
 	return { session, bodies }
 }
 
-const v = (value: number) => toCmcdValue<number, { v: boolean; }>(value, { v: true })
-const a = (value: number) => toCmcdValue<number, { a: boolean; }>(value, { a: true })
-const NO_SN: CmcdKey[] = ['bl', 'br', 'bs', 'cid', 'cmsdd', 'cmsds', 'd', 'dl', 'e', 'ec', 'h', 'msd', 'mtp', 'nor', 'nr', 'ot', 'pt', 'rc', 'rtp', 'sf', 'sid', 'st', 'sta', 'su', 'tb', 'ts', 'ttfb', 'ttlb', 'url', 'v']
+const v = (value: number) => toCmcdValue<number, { v: boolean }>(value, { v: true })
+const a = (value: number) => toCmcdValue<number, { a: boolean }>(value, { a: true })
+const NO_SN: CmcdKey[] = [
+	'bl',
+	'br',
+	'bs',
+	'cid',
+	'cmsdd',
+	'cmsds',
+	'd',
+	'dl',
+	'e',
+	'ec',
+	'h',
+	'msd',
+	'mtp',
+	'nor',
+	'nr',
+	'ot',
+	'pt',
+	'rc',
+	'rtp',
+	'sf',
+	'sid',
+	'st',
+	'sta',
+	'su',
+	'tb',
+	'ts',
+	'ttfb',
+	'ttlb',
+	'url',
+	'v',
+]
 
 describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
-	afterEach(() => mock.timers.reset())
+	afterEach(() => vi.useRealTimers())
 
 	it('provides a valid example', () => {
 		// #region example
 		const session = createCmcdSession({ sid: 'session-id-123', enabledKeys: ['cid', 'sid'] })
 
-		const report = session.createRequestReport({ url: 'https://cdn.example.com/seg-1.m4s' }, { cid: 'content-id-123' })
+		const report = session.createRequestReport(
+			{ url: 'https://cdn.example.com/seg-1.m4s' },
+			{ cid: 'content-id-123' },
+		)
 
-		equal(decodeURIComponent(report.url), 'https://cdn.example.com/seg-1.m4s?CMCD=cid="content-id-123",sid="session-id-123",v=2')
+		equal(
+			decodeURIComponent(report.url),
+			'https://cdn.example.com/seg-1.m4s?CMCD=cid="content-id-123",sid="session-id-123",v=2',
+		)
 		// #endregion example
 	})
 
 	describe('8.1 request mode', () => {
-		const data81: Cmcd = { cid: CID, sf: CmcdStreamingFormat.DASH, st: CmcdStreamType.VOD, sta: CmcdPlayerState.PLAYING, bl: [2000], mtp: [15000], rtp: 12000, br: [v(3000)], d: 4000, dl: 1000, nor: [`${CDN}/next-seg.mp4`], ot: CmcdObjectType.VIDEO, tb: [v(6000)] }
-		const keys81: CmcdKey[] = ['bl', 'br', 'cid', 'd', 'dl', 'mtp', 'nor', 'ot', 'rtp', 'sf', 'sid', 'st', 'sta', 'tb']
+		const data81: Cmcd = {
+			cid: CID,
+			sf: CmcdStreamingFormat.DASH,
+			st: CmcdStreamType.VOD,
+			sta: CmcdPlayerState.PLAYING,
+			bl: [2000],
+			mtp: [15000],
+			rtp: 12000,
+			br: [v(3000)],
+			d: 4000,
+			dl: 1000,
+			nor: [`${CDN}/next-seg.mp4`],
+			ot: CmcdObjectType.VIDEO,
+			tb: [v(6000)],
+		}
+		const keys81: CmcdKey[] = [
+			'bl',
+			'br',
+			'cid',
+			'd',
+			'dl',
+			'mtp',
+			'nor',
+			'ot',
+			'rtp',
+			'sf',
+			'sid',
+			'st',
+			'sta',
+			'tb',
+		]
 
 		it('8.1.1 in query mode', () => {
 			const session = createCmcdSession({ sid: SID, enabledKeys: keys81 })
@@ -5225,29 +6540,105 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 		})
 
 		it('8.1.1 in header mode', () => {
-			const session = createCmcdSession({ sid: SID, enabledKeys: keys81, transmissionMode: CmcdTransmissionMode.HEADERS })
+			const session = createCmcdSession({
+				sid: SID,
+				enabledKeys: keys81,
+				transmissionMode: CmcdTransmissionMode.HEADERS,
+			})
 
-			deepEqual(session.createRequestReport({ url: SEGMENT, headers: { Accept: '*/*' } }, data81).headers, { Accept: '*/*', ...EX_8_1_1_HEADERS })
+			deepEqual(
+				session.createRequestReport({ url: SEGMENT, headers: { Accept: '*/*' } }, data81).headers,
+				{ Accept: '*/*', ...EX_8_1_1_HEADERS },
+			)
 		})
 
 		it('8.1.2 and 8.1.3', () => {
-			const audio = createCmcdSession({ sid: SID, enabledKeys: ['bl', 'br', 'cid', 'd', 'mtp', 'ot', 'sid', 'st'] })
+			const audio = createCmcdSession({
+				sid: SID,
+				enabledKeys: ['bl', 'br', 'cid', 'd', 'mtp', 'ot', 'sid', 'st'],
+			})
 			const minimal = createCmcdSession({ sid: SID, enabledKeys: ['cid', 'sid'] })
 
-			equal(query(audio.createRequestReport({ url: SEGMENT }, { cid: CID, st: CmcdStreamType.VOD, bl: [2000], mtp: [15000], br: [320], d: 2000, ot: CmcdObjectType.AUDIO }).url), EX_8_1_2)
+			equal(
+				query(
+					audio.createRequestReport(
+						{ url: SEGMENT },
+						{
+							cid: CID,
+							st: CmcdStreamType.VOD,
+							bl: [2000],
+							mtp: [15000],
+							br: [320],
+							d: 2000,
+							ot: CmcdObjectType.AUDIO,
+						},
+					).url,
+				),
+				EX_8_1_2,
+			)
 			equal(query(minimal.createRequestReport({ url: SEGMENT }, { cid: CID }).url), EX_8_1_3)
 		})
 
 		it('8.1.4, a startup sequence with su and msd', () => {
-			const session = createCmcdSession({ sid: SID, enabledKeys: ['bl', 'br', 'cid', 'd', 'msd', 'mtp', 'nor', 'ot', 'sf', 'sid', 'st', 'sta', 'su'] })
+			const session = createCmcdSession({
+				sid: SID,
+				enabledKeys: [
+					'bl',
+					'br',
+					'cid',
+					'd',
+					'msd',
+					'mtp',
+					'nor',
+					'ot',
+					'sf',
+					'sid',
+					'st',
+					'sta',
+					'su',
+				],
+			})
 			const base: Cmcd = { cid: CID, st: CmcdStreamType.VOD }
-			const media: Cmcd = { ...base, bl: [0], br: [v(3000)], mtp: [15000], sta: CmcdPlayerState.STARTING, su: true }
+			const media: Cmcd = {
+				...base,
+				bl: [0],
+				br: [v(3000)],
+				mtp: [15000],
+				sta: CmcdPlayerState.STARTING,
+				su: true,
+			}
 
 			const urls = [
-				session.createRequestReport({ url: `${CDN}/manifest.mpd` }, { ...base, ot: CmcdObjectType.MANIFEST, sf: CmcdStreamingFormat.DASH, su: true }).url,
-				session.createRequestReport({ url: `${CDN}/init.m4v` }, { ...media, ot: CmcdObjectType.INIT, nor: [`${CDN}/seg-1.m4v`, `${CDN}/seg-2.m4v`] }).url,
-				session.createRequestReport({ url: `${CDN}/seg-1.m4v` }, { ...media, ot: CmcdObjectType.VIDEO, d: 4000, nor: [`${CDN}/seg-2.m4v`, `${CDN}/seg-3.m4v`] }).url,
-				session.createRequestReport({ url: `${CDN}/seg-2.m4v` }, { ...media, bl: [4000], sta: CmcdPlayerState.PLAYING, su: false, msd: 200, ot: CmcdObjectType.VIDEO, d: 4000, nor: [`${CDN}/seg-3.m4v`, `${CDN}/seg-4.m4v`] }).url,
+				session.createRequestReport(
+					{ url: `${CDN}/manifest.mpd` },
+					{ ...base, ot: CmcdObjectType.MANIFEST, sf: CmcdStreamingFormat.DASH, su: true },
+				).url,
+				session.createRequestReport(
+					{ url: `${CDN}/init.m4v` },
+					{ ...media, ot: CmcdObjectType.INIT, nor: [`${CDN}/seg-1.m4v`, `${CDN}/seg-2.m4v`] },
+				).url,
+				session.createRequestReport(
+					{ url: `${CDN}/seg-1.m4v` },
+					{
+						...media,
+						ot: CmcdObjectType.VIDEO,
+						d: 4000,
+						nor: [`${CDN}/seg-2.m4v`, `${CDN}/seg-3.m4v`],
+					},
+				).url,
+				session.createRequestReport(
+					{ url: `${CDN}/seg-2.m4v` },
+					{
+						...media,
+						bl: [4000],
+						sta: CmcdPlayerState.PLAYING,
+						su: false,
+						msd: 200,
+						ot: CmcdObjectType.VIDEO,
+						d: 4000,
+						nor: [`${CDN}/seg-3.m4v`, `${CDN}/seg-4.m4v`],
+					},
+				).url,
 			]
 
 			deepEqual(urls.map(query), EX_8_1_4)
@@ -5257,18 +6648,38 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 			const session = createCmcdSession({ sid: SID, enabledKeys: ['cid', 'ec', 'sid', 'sta'] })
 
 			session.recordError('CODEC_NOT_SUPPORTED')
-			const first = session.createRequestReport({ url: SEGMENT }, { cid: CID, sta: CmcdPlayerState.PLAYING })
-			const second = session.createRequestReport({ url: SEGMENT }, { cid: CID, sta: CmcdPlayerState.PLAYING })
+			const first = session.createRequestReport(
+				{ url: SEGMENT },
+				{ cid: CID, sta: CmcdPlayerState.PLAYING },
+			)
+			const second = session.createRequestReport(
+				{ url: SEGMENT },
+				{ cid: CID, sta: CmcdPlayerState.PLAYING },
+			)
 			session.recordError(['DRM_NOT_SUPPORTED', 'PLAYBACK_FAILED'])
 			const third = session.createRequestReport({ url: SEGMENT }, { cid: CID, sta: 'f' })
 
-			deepEqual([first, third].map((report) => query(report.url)), EX_8_1_5)
-			equal(query(second.url), 'CMCD=cid%3D%22content-id-123%22%2Csid%3D%22session-id-123%22%2Csta%3Dp%2Cv%3D2')
+			deepEqual(
+				[first, third].map(report => query(report.url)),
+				EX_8_1_5,
+			)
+			equal(
+				query(second.url),
+				'CMCD=cid%3D%22content-id-123%22%2Csid%3D%22session-id-123%22%2Csta%3Dp%2Cv%3D2',
+			)
 		})
 
 		it('8.1.6, buffer starvation', () => {
-			const session = createCmcdSession({ sid: SID, enabledKeys: ['bl', 'bs', 'cid', 'ot', 'sid', 'sta'] })
-			const stall: Cmcd = { cid: CID, sta: CmcdPlayerState.REBUFFERING, ot: CmcdObjectType.VIDEO, bs: true }
+			const session = createCmcdSession({
+				sid: SID,
+				enabledKeys: ['bl', 'bs', 'cid', 'ot', 'sid', 'sta'],
+			})
+			const stall: Cmcd = {
+				cid: CID,
+				sta: CmcdPlayerState.REBUFFERING,
+				ot: CmcdObjectType.VIDEO,
+				bs: true,
+			}
 
 			const urls = [
 				session.createRequestReport({ url: SEGMENT }, { ...stall, bl: [0] }).url,
@@ -5279,27 +6690,65 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 		})
 
 		it('8.1.7, two players in one session', () => {
-			const session = createCmcdSession({ sid: 'session-common-1', enabledKeys: ['cid', 'nr', 'ot', 'sid'] })
-			const report = (data: Cmcd): string => query(session.createRequestReport({ url: SEGMENT }, { ...data, ot: CmcdObjectType.VIDEO }).url)
+			const session = createCmcdSession({
+				sid: 'session-common-1',
+				enabledKeys: ['cid', 'nr', 'ot', 'sid'],
+			})
+			const report = (data: Cmcd): string =>
+				query(
+					session.createRequestReport({ url: SEGMENT }, { ...data, ot: CmcdObjectType.VIDEO }).url,
+				)
 
-			deepEqual({
-				primary: report({ cid: 'movie-123' }),
-				ad: report({ cid: 'ad-555', nr: true }),
-				primaryHidden: report({ cid: 'movie-123', nr: true }),
-				adShown: report({ cid: 'ad-555' }),
-			}, EX_8_1_7)
+			deepEqual(
+				{
+					primary: report({ cid: 'movie-123' }),
+					ad: report({ cid: 'ad-555', nr: true }),
+					primaryHidden: report({ cid: 'movie-123', nr: true }),
+					adShown: report({ cid: 'ad-555' }),
+				},
+				EX_8_1_7,
+			)
 		})
 
 		it('8.1.8, every request mode key', () => {
 			const session = createCmcdSession({ sid: SID })
 
 			session.recordError('2001')
-			const report = session.createRequestReport({ url: SEGMENT }, {
-				bg: true, bl: [v(2100), a(1800)], br: [v(3000), a(164)], bs: true, bsa: [v(3)], bsd: [v(1200), a(100)], bsda: [v(4150), a(300)],
-				cid: CID, cs: 'g48djn236sk2', d: 4000, dfa: 32, dl: 1000, lb: [v(500), a(32)], ltc: 13500, msd: 1700, mtp: [v(15000), a(6000)],
-				nor: [`${CDN}/next-seg.mp4`], nr: true, ot: CmcdObjectType.VIDEO, pb: [v(2000), a(164)], pr: 1.1, pt: 632782, rtp: 12000,
-				sf: CmcdStreamingFormat.DASH, st: CmcdStreamType.LIVE, sta: CmcdPlayerState.PLAYING, su: true, tb: [v(6000), a(350)], tbl: [v(2000), a(2000)], tpb: [v(5000), a(164)],
-			})
+			const report = session.createRequestReport(
+				{ url: SEGMENT },
+				{
+					bg: true,
+					bl: [v(2100), a(1800)],
+					br: [v(3000), a(164)],
+					bs: true,
+					bsa: [v(3)],
+					bsd: [v(1200), a(100)],
+					bsda: [v(4150), a(300)],
+					cid: CID,
+					cs: 'g48djn236sk2',
+					d: 4000,
+					dfa: 32,
+					dl: 1000,
+					lb: [v(500), a(32)],
+					ltc: 13500,
+					msd: 1700,
+					mtp: [v(15000), a(6000)],
+					nor: [`${CDN}/next-seg.mp4`],
+					nr: true,
+					ot: CmcdObjectType.VIDEO,
+					pb: [v(2000), a(164)],
+					pr: 1.1,
+					pt: 632782,
+					rtp: 12000,
+					sf: CmcdStreamingFormat.DASH,
+					st: CmcdStreamType.LIVE,
+					sta: CmcdPlayerState.PLAYING,
+					su: true,
+					tb: [v(6000), a(350)],
+					tbl: [v(2000), a(2000)],
+					tpb: [v(5000), a(164)],
+				},
+			)
 
 			equal(query(report.url), EX_8_1_8)
 		})
@@ -5307,38 +6756,82 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 
 	describe('8.2 event mode', () => {
 		it('8.2.1, a minimal t report', () => {
-			mock.timers.enable({ apis: ['setInterval', 'Date'], now: 1764752400000 - 30_000 })
-			const { session, bodies } = eventSetup({ eventTargets: [{ url: COLLECTOR, events: [CmcdEventType.TIME_INTERVAL], enabledKeys: [] }], snapshot: () => ({}) })
+			vi.useFakeTimers({
+				now: 1764752400000 - 30_000,
+				toFake: ['setInterval', 'clearInterval', 'Date'],
+			})
+			const { session, bodies } = eventSetup({
+				eventTargets: [{ url: COLLECTOR, events: [CmcdEventType.TIME_INTERVAL], enabledKeys: [] }],
+				snapshot: () => ({}),
+			})
 
 			session.start(false)
-			mock.timers.tick(30_000)
+			vi.advanceTimersByTime(30_000)
 			session.stop()
 
 			deepEqual(bodies, [EX_8_2_1])
 		})
 
 		it('8.2.2, t reports with msd, a stall, and an error between two reports', async () => {
-			mock.timers.enable({ apis: ['setInterval', 'Date'], now: 1764752400000 - 30_000 })
-			const media: CmcdSnapshot = { cid: CID, h: 'example.com', sf: CmcdStreamingFormat.DASH, st: CmcdStreamType.VOD, br: [v(4200), a(256)], lb: [v(523), a(64)], pb: [v(4200), a(256)], tb: [v(4200), a(256)], tpb: [v(4200), a(256)] }
+			vi.useFakeTimers({
+				now: 1764752400000 - 30_000,
+				toFake: ['setInterval', 'clearInterval', 'Date'],
+			})
+			const media: CmcdSnapshot = {
+				cid: CID,
+				h: 'example.com',
+				sf: CmcdStreamingFormat.DASH,
+				st: CmcdStreamType.VOD,
+				br: [v(4200), a(256)],
+				lb: [v(523), a(64)],
+				pb: [v(4200), a(256)],
+				tb: [v(4200), a(256)],
+				tpb: [v(4200), a(256)],
+			}
 			const snapshots: CmcdSnapshot[] = [
 				{ cid: CID },
 				{ cid: CID, h: 'example.com', bl: [0], pt: 0, sta: CmcdPlayerState.STARTING, su: true },
-				{ ...media, bl: [6000], msd: 812, mtp: [v(87000), a(49000)], pt: 29188, sta: CmcdPlayerState.PLAYING },
-				{ ...media, bl: [3200], mtp: [v(89000), a(52000)], pt: 59188, sta: CmcdPlayerState.PLAYING },
-				{ ...media, bl: [6000], mtp: [v(81000), a(55000)], pt: 89188, sta: CmcdPlayerState.PLAYING },
+				{
+					...media,
+					bl: [6000],
+					msd: 812,
+					mtp: [v(87000), a(49000)],
+					pt: 29188,
+					sta: CmcdPlayerState.PLAYING,
+				},
+				{
+					...media,
+					bl: [3200],
+					mtp: [v(89000), a(52000)],
+					pt: 59188,
+					sta: CmcdPlayerState.PLAYING,
+				},
+				{
+					...media,
+					bl: [6000],
+					mtp: [v(81000), a(55000)],
+					pt: 89188,
+					sta: CmcdPlayerState.PLAYING,
+				},
 				{ ...media, bl: [0], mtp: [v(82000), a(55000)], pr: 0, pt: 111000, sta: 'e' },
 			]
 			let tick = 0
-			const { session, bodies } = eventSetup({ eventTargets: [{ url: COLLECTOR, events: [CmcdEventType.TIME_INTERVAL] }], snapshot: () => snapshots[tick++] })
+			const { session, bodies } = eventSetup({
+				eventTargets: [{ url: COLLECTOR, events: [CmcdEventType.TIME_INTERVAL] }],
+				snapshot: () => snapshots[tick++],
+			})
 
 			session.start()
 			for (let i = 1; i < snapshots.length; i++) {
 				await settle()
 				if (i === 3) {
 					session.recordError('MEDIA_ERR_NETWORK')
-					session.createRequestReport({ url: SEGMENT }, { ot: CmcdObjectType.VIDEO, bs: true, bsd: [v(720)] })
+					session.createRequestReport(
+						{ url: SEGMENT },
+						{ ot: CmcdObjectType.VIDEO, bs: true, bsd: [v(720)] },
+					)
 				}
-				mock.timers.tick(30_000)
+				vi.advanceTimersByTime(30_000)
 			}
 			session.stop()
 
@@ -5346,24 +6839,63 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 		})
 
 		it('8.2.3, an rr report with CMSD keys', () => {
-			const { session, bodies } = eventSetup({ sid: 'session1', enabledKeys: NO_SN, eventTargets: [{ url: COLLECTOR, events: [CmcdEventType.RESPONSE_RECEIVED], enabledKeys: [...NO_SN, 'cmsdd', 'cmsds'] }] })
-
-			const request = session.createRequestReport({ url: 'video/segment-5.m4v' }, { cid: 'bbb', ot: CmcdObjectType.VIDEO, nor: ['video/segment-6.m4v'] })
-			session.recordResponseReceived({ request, status: 200, resourceTiming: { startTime: 1000, responseStart: 1180, duration: 200, encodedBodySize: 0 } }, {
-				ts: 1763657019723,
-				cmsdd: 'ZXRwPTEyNTAwO3J0dD0zNTttYj02MDAwO3JkPTIwMA==',
-				cmsds: 'c2lkPSI5YTNiLTIxY2QiO2JyPTQ1MDA7ZD00MDAwO290PXY7c3Q9dg==',
+			const { session, bodies } = eventSetup({
+				sid: 'session1',
+				enabledKeys: NO_SN,
+				eventTargets: [
+					{
+						url: COLLECTOR,
+						events: [CmcdEventType.RESPONSE_RECEIVED],
+						enabledKeys: [...NO_SN, 'cmsdd', 'cmsds'],
+					},
+				],
 			})
+
+			const request = session.createRequestReport(
+				{ url: 'video/segment-5.m4v' },
+				{ cid: 'bbb', ot: CmcdObjectType.VIDEO, nor: ['video/segment-6.m4v'] },
+			)
+			session.recordResponseReceived(
+				{
+					request,
+					status: 200,
+					resourceTiming: {
+						startTime: 1000,
+						responseStart: 1180,
+						duration: 200,
+						encodedBodySize: 0,
+					},
+				},
+				{
+					ts: 1763657019723,
+					cmsdd: 'ZXRwPTEyNTAwO3J0dD0zNTttYj02MDAwO3JkPTIwMA==',
+					cmsds: 'c2lkPSI5YTNiLTIxY2QiO2JyPTQ1MDA7ZD00MDAwO290PXY7c3Q9dg==',
+				},
+			)
 
 			deepEqual(bodies, [EX_8_2_3])
 		})
 
 		it('8.2.4, 8.2.6, and 8.2.7, error, play state, and skip reports', async () => {
-			const { session, bodies } = eventSetup({ eventTargets: [{ url: COLLECTOR, events: [CmcdEventType.ERROR, CmcdEventType.PLAY_STATE, CmcdEventType.SKIP], enabledKeys: NO_SN }] })
+			const { session, bodies } = eventSetup({
+				eventTargets: [
+					{
+						url: COLLECTOR,
+						events: [CmcdEventType.ERROR, CmcdEventType.PLAY_STATE, CmcdEventType.SKIP],
+						enabledKeys: NO_SN,
+					},
+				],
+			})
 
 			session.recordError('CODEC_NOT_SUPPORTED', { cid: CID, ts: 1764269150213 })
 			await settle()
-			session.recordEvent(CmcdEventType.PLAY_STATE, { cid: CID, bl: [0], pt: 30000, sta: CmcdPlayerState.SEEKING, ts: 1764269150529 })
+			session.recordEvent(CmcdEventType.PLAY_STATE, {
+				cid: CID,
+				bl: [0],
+				pt: 30000,
+				sta: CmcdPlayerState.SEEKING,
+				ts: 1764269150529,
+			})
 			await settle()
 			session.recordEvent(CmcdEventType.SKIP, { cid: 'ad-content-555', ts: 1764269150076 })
 
@@ -5372,14 +6904,25 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 
 		it('8.2.8, an ad break', async () => {
 			const { session, bodies } = eventSetup({
-				eventTargets: [{
-					url: COLLECTOR,
-					events: [CmcdEventType.AD_BREAK_START, CmcdEventType.AD_START, CmcdEventType.AD_END, CmcdEventType.AD_BREAK_END],
-					enabledKeys: NO_SN,
-				}],
+				eventTargets: [
+					{
+						url: COLLECTOR,
+						events: [
+							CmcdEventType.AD_BREAK_START,
+							CmcdEventType.AD_START,
+							CmcdEventType.AD_END,
+							CmcdEventType.AD_BREAK_END,
+						],
+						enabledKeys: NO_SN,
+					},
+				],
 			})
 
-			session.recordEvent(CmcdEventType.AD_BREAK_START, { cid: 'movie-123', nr: true, ts: 1764269150186 })
+			session.recordEvent(CmcdEventType.AD_BREAK_START, {
+				cid: 'movie-123',
+				nr: true,
+				ts: 1764269150186,
+			})
 			await settle()
 			session.recordEvent(CmcdEventType.AD_START, { cid: 'ad-001', ts: 1764269150934 })
 			await settle()
@@ -5397,13 +6940,13 @@ describe('createCmcdSession reproduces the examples of CTA-5004-B', () => {
 
 ```bash
 npm run build -w libs/cmcd
-node --no-warnings --test libs/cmcd/test/createCmcdSession.examples.test.ts
+npx vp test --run libs/cmcd/test/createCmcdSession.examples.test.ts
 npm test -w libs/cmcd
 npm run typecheck
-npx eslint libs/cmcd
+npx vp fmt --check libs/cmcd
 ```
 
-Expected: the 14 tests of the file pass, and every package test passes. The typecheck and ESLint report nothing.
+Expected: the 14 tests of the file pass, and every package test passes. The typecheck and the format check report nothing.
 
 - [ ] **Step 4: Commit**
 
@@ -5460,9 +7003,9 @@ console.log(session.sid)
 
 The session generates a `sid` when the configuration has none. The second argument sends the event reports, so pass the HTTP client of the player there. Without it, the session sends with `fetch`, without the `keepalive` option.
 
-The configuration types are `CmcdSessionRequestReportConfig` for request mode and `CmcdSessionEventReportConfig` for each event target. Both derive from the `CmcdReporter` types without `transform`. A configuration with a `transform` does not compile. Use `filter` on an event target to select the reports of the target.
+The configuration types are `CmcdSessionRequestReportConfig` for request mode and `CmcdSessionEventReportConfig` for each event target. Both derive from the `CmcdReporter` types without `transform`. A configuration with a `transform` does not compile. Use `filter` on an event target to select the reports of the target. An event target has a collector `url` or a `send` function. The section [Send Reports Without HTTP](#send-reports-without-http) describes `send`.
 
-Request mode is one destination. Each event target URL is one destination, so the targets with the same URL share one destination. Each destination has its own sequence number (`sn`), which starts at 0.
+Request mode is one destination. Each event target is one destination, also when two targets have one URL. Each destination has its own sequence number (`sn`), which starts at 0.
 
 To change the `sid`, create a new session. Call `flush()` and `stop()` on the old session first. If the player keeps the old session, it can record late responses under the old `sid`.
 
@@ -5654,7 +7197,37 @@ session.recordResponseReceived({ request: { url: 'https://cdn.example.com/movie.
 session.flush()
 ```
 
-The first target receives only the segment response, and the second target receives only the manifest response. Both targets use one collector URL, so they share one sequence of `sn` values.
+The first target receives only the segment response, and the second target receives only the manifest response. Both targets post to one collector URL. Each target is its own destination, so each target keeps its own sequence of `sn` values.
+
+## Send Reports Without HTTP
+
+An event target has a collector `url` or a `send` function. The session calls the function with each batch, oldest report first. Use a function for a transport that is not HTTP, such as a MoQ track or a WebSocket.
+
+```typescript
+import type { CmcdEventSender } from '@svta/cml-cmcd'
+import { CmcdEventType, CmcdReportingMode, createCmcdSession, encodeCmcd } from '@svta/cml-cmcd'
+
+async function publishRecords(records: { timestamp: number; line: string }[]): Promise<void> {
+	console.log(records)
+}
+
+const send: CmcdEventSender = async (reports) => {
+	await publishRecords(reports.map((report) => ({
+		timestamp: report.ts,
+		line: encodeCmcd(report, { reportingMode: CmcdReportingMode.EVENT }),
+	})))
+}
+
+const session = createCmcdSession({
+	eventTargets: [{ send, events: [CmcdEventType.PLAY_STATE, CmcdEventType.ERROR] }],
+})
+
+session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
+```
+
+Each report is the data of one event. The session has applied `enabledKeys`, the `filter`, and the waiting values, and has written `e`, `sid`, `sn`, `ts`, and `v`. A token value is an `SfToken`, and an inner list is an array. A function that needs the encoded line calls `encodeCmcd()` on the report with the event reporting mode. Without the mode, `encodeCmcd()` encodes in request mode and drops `e` and `ts`.
+
+The promise takes the place of the HTTP response. A promise that resolves means that the batch is delivered. A result of `{ gone: true }` stops the target, as a 410 response does. A promise that rejects sends the batch again after a wait, as a 5xx response does. The function must not change a report, and the `DeepReadonly` type rejects a change.
 
 ## Several Players, One Session
 
@@ -5680,18 +7253,22 @@ session.recordEvent(CmcdEventType.PLAY_STATE, { cid: 'ad-7', sta: 'p' })
 
 ## Delivery
 
-A target sends its queue when the queue reaches `batchSize`, and on `flush()`. An `e` report in the queue also makes the target send. One batch is one POST with the content type `application/cmcd`. The lines are joined with a line feed, with no line feed at the end.
+A target sends its queue when the queue reaches `batchSize`, and on `flush()`. An `e` report in the queue also makes the target send. For a `url` target, one batch is one POST with the content type `application/cmcd`. The lines are joined with a line feed, with no line feed at the end. For a `send` target, one batch is one call of the function with the reports, oldest first.
 
-A target has at most one POST in flight. Lines that arrive meanwhile wait in its queue. After the response, the target checks the send conditions again.
+A target has at most one batch in flight. Reports that arrive meanwhile wait in its queue. After the response, or after the promise settles, the target checks the send conditions again.
 
 | Response | Action |
 |---|---|
 | 2xx | Done. The wait resets. |
-| 410 | Every target with that URL stops for the life of the session. The session clears their queues and waiting values. It also drops a batch in flight to that URL. |
+| 410 | The target stops for the life of the session. The session clears its queue and waiting values and drops a batch in flight. Another target with the same URL stops when its own POST receives 410. |
 | 429, 5xx, status 0, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send. |
 | Any other status | The session drops the batch. The wait resets. |
 
-The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new lines join the queue and go out with the retry. `flush()` sends at once, also during a wait. If a POST is in flight, `flush()` sends after its response. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
+The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. A promise that rejects, or a function that throws, counts as a rejected request. No result drops a batch. A function that cannot deliver a batch resolves.
+
+For a `send` target, the session copies the nested values of each report at queue time. A later change to the data of the caller does not change a queued report. The function must not change a report. The `DeepReadonly` type of `CmcdEventSender` rejects a change at any depth, as the type of `CmcdReportFilter` does.
+
+The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new reports join the queue and go out with the retry. `flush()` sends at once, also during a wait. If a batch is in flight, `flush()` sends after that batch completes. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
 
 During a long outage of a collector, the queues of its targets grow without a limit.
 
@@ -5700,7 +7277,7 @@ During a long outage of a collector, the queues of its targets grow without a li
 Each call builds and encodes all of its reports before it changes any state. A call that throws changes no sequence number, no waiting value, and no queue.
 
 - If a filter throws, no target receives the report, and the error goes to the caller.
-- A value that the structured field encoder cannot serialize throws from the call that has it.
+- A value that the structured field encoder cannot serialize throws from the call that has it. A `send` target gets the same check. The session encodes the report, discards the line, and queues a copy of the report.
 - An error in a timer tick, from `snapshot()` or from encoding, goes to the timer callback.
 - A failed send does not throw. The [delivery](#delivery) table describes what happens instead.
 
@@ -5710,7 +7287,9 @@ Each call builds and encodes all of its reports before it changes any state. A c
 |---|---|
 | `sid` | A string of 1 to 64 characters |
 | `cid` | A string of at most 128 characters |
+| `url` or `send` of a target | Exactly one of the two |
 | `url` of a target | A non-empty string |
+| `send` of a target | A function |
 | `interval` of a target | A finite number, 0 or more |
 | `batchSize` of a target | A positive integer |
 
@@ -5789,7 +7368,8 @@ console.log(report.url)
 | `CmcdReporter` | Session API |
 |---|---|
 | `new CmcdReporter(config, requester)` | `createCmcdSession(config, requester)` |
-| `sid`, `cid`, `version`, `transmissionMode`, `enabledKeys`, `customHeaderMap`, `eventTargets` | The same names and types: `CmcdRequestReportConfig` and `CmcdEventReportConfig` |
+| `sid`, `cid`, `version`, `transmissionMode`, `enabledKeys`, `customHeaderMap`, `eventTargets` | The same names. The types are `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig`, without `transform` |
+| A custom `requester` for a transport that is not HTTP | `send` on the event target. The requester stays for the `url` targets. |
 | `update(data)` for values that persist | The player keeps the values in a `CmcdSnapshot` object and passes them with each call |
 | The events that `update()` fires for `sta`, `pr`, `cid`, `bg`, and `br` | The player compares the new value with the old value, then calls `recordEvent()` |
 | `update({ sid })` | A new session. The player calls `flush()` and `stop()` on the old session. |
@@ -5816,6 +7396,7 @@ console.log(report.url)
 - The session types reject `transform`, and `CmcdSessionConfig` has no `sessionRetention`. Version 3.0.0 removes `transform` from the configuration types.
 - Every target receives the same data. A `transform` that changes the report of one target has no equivalent, and neither has the `bg=?0` opt-in.
 - After a failed send, a target waits from 1 to 60 seconds before the retry. `CmcdReporter` sends a failed batch again with the next send.
+- An event target has a `url` or a `send` function. `CmcdReporter` sends every target through the requester.
 - During a migration, report each `sid` through one API only. Each API keeps its own sequence numbers.
 ````
 
@@ -5862,13 +7443,16 @@ In `libs/cmcd/CHANGELOG.md`, under `## [Unreleased]`, add:
 ````markdown
 ### Added
 
-- `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call. The session keeps one sequence number for each destination, the event queues, and the timers. Its configuration uses the types of `CmcdReporter`: `CmcdRequestReportConfig` and `CmcdEventReportConfig`. The new `filter` of `CmcdEventReportConfig` selects the reports of an event target. The session guide and the migration guide describe the API
+- `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call, and the session keeps the sequence numbers, the queues, and the timers. The session guide and the migration guide describe the API
+- `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig`, the configuration types of a session. Both derive from the `CmcdReporter` types without `transform`. The `filter` of an event target selects the reports of the target
+- `CmcdEventSender` and `CmcdEventSendResult`. An event target has a collector `url` or a `send` function, for a transport that is not HTTP
 - `CmcdSnapshot`, the type of the player state. `snapshot` returns it for the `t` reports, and the player can pass it with each call. It rejects the keys that the session writes, `bs`, `bsd`, `ec`, and `cen`
 - `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` for the `h` event of CTA-5004-B
 
 ### Changed
 
 - `enabledKeys` of `CmcdReportConfig` accepts a read-only array
+- `encodeCmcd()` accepts a deeply read-only object
 ````
 
 - [ ] **Step 5: Run every code block of the documents**
@@ -5898,20 +7482,20 @@ for f in <scratchpad>/doc-check/*.ts; do node --input-type=module-typescript < "
 node --input-type=module-typescript < <scratchpad>/doc-check/session-guide-3.ts
 ```
 
-Expected: the script finds 2 blocks in the README, 7 in the session guide, and 2 in the migration guide. No block prints `FAIL`. The last command prints the two lines that the comments of the third session guide block show:
+Expected: the script finds 2 blocks in the README, 8 in the session guide, and 2 in the migration guide. No block prints `FAIL`. The last command prints the two lines that the comments of the third session guide block show:
 
 ```text
 https://cdn.example.com/movie/seg-2.m4s?CMCD=br=(3000),d=4000,nor=("seg-3.m4s"),ot=v,sid="session-1",sn=0,v=2
 sn=1
 ```
 
-- [ ] **Step 6: Build the docs**
+- [ ] **Step 6: Build the site**
 
 ```bash
-npm run build -w docs
+npm run build -w site
 ```
 
-Expected: 0 errors. The warnings are the same 18 as on `main`: 17 for package `docs/*.md` globs that match no file, and one for the example tag in `validateCmcdEventReport.ts`.
+Expected: the build passes. The build fails on a dead link in a README or a guide.
 
 - [ ] **Step 7: Commit**
 
@@ -5930,7 +7514,7 @@ git commit -s -m "docs(cmcd): add the session guide and the migration guide" -m 
 npm test
 ```
 
-Expected: lint, the build of every package, the typecheck, and every package test pass.
+Expected: lint, the format check, the build of every package, the typecheck, and every package test pass. The root build regenerates `skills/common-media-library/references/cmcd.md` from the README and the guides of the package. Step 6 commits the file.
 
 - [ ] **Step 2: Review the API report**
 
@@ -5941,8 +7525,11 @@ git diff origin/main -- libs/cmcd/config/cml-cmcd.api.md
 Expected: the diff has these changes, and nothing else:
 
 - `CMCD_EVENT_HOSTNAME: "h"`, and `HOSTNAME` in `CmcdEventType`
-- `enabledKeys?: readonly CmcdKey[]` in `CmcdReportConfig`, and `filter?: CmcdReportFilter` in `CmcdEventReportConfig`
+- `enabledKeys?: readonly CmcdKey[]` in `CmcdReportConfig`
 - `CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean`
+- `CmcdEventSender` and `CmcdEventSendResult`, as the section "Types" of the RFC lists them, with the return type `Promise<CmcdEventSendResult | void>`
+- `CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, "transform"> & { transform?: never }`, and `CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, "transform" | "url"> & { filter?, transform?: never } & ({ url: string; send?: never } | { url?: never; send: CmcdEventSender })`
+- `encodeCmcd(cmcd: DeepReadonly<Cmcd>, options?: CmcdEncodeOptions): string`
 - `CmcdSession` with `sid`, `createRequestReport`, `recordEvent`, `recordResponseReceived`, `recordError`, `configure`, `start`, `stop`, and `flush`
 - The data arguments of `CmcdSession`: `Omit<CmcdRequest, 'sid' | 'sn' | 'v' | 'ec'>` for `createRequestReport`, `Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>` for `recordEvent` and `recordResponseReceived`, and `Omit<CmcdEvent, 'sid' | 'sn' | 'e' | 'v' | 'ec'>` for `recordError`
 - `CmcdSessionConfig = CmcdSessionRequestReportConfig & { sid?, cid?, eventTargets?: readonly CmcdSessionEventReportConfig[], snapshot?: () => CmcdSnapshot }`, and `configure(settings: CmcdSessionRequestReportConfig)` in `CmcdSession`
@@ -5953,7 +7540,7 @@ The diff must have no `ae-forgotten-export` warning. Compare each declaration wi
 
 - [ ] **Step 3: Measure the bundle**
 
-Write the three entry files and bundle them from the worktree root:
+Write the three entry files and bundle them from the worktree root. `vp pack` bundles the workspace dependencies, because the root `package.json` lists no dependency.
 
 ```bash
 S=<scratchpad>/bundle
@@ -5962,22 +7549,22 @@ D=$(pwd)/libs/cmcd/dist/index.js
 printf "import { createCmcdSession } from '%s'\nglobalThis.x = createCmcdSession\n" "$D" > $S/session.mjs
 printf "import { CmcdReporter } from '%s'\nglobalThis.x = CmcdReporter\n" "$D" > $S/reporter.mjs
 printf "import { CmcdReporter, createCmcdSession } from '%s'\nglobalThis.x = [CmcdReporter, createCmcdSession]\n" "$D" > $S/both.mjs
-for name in session reporter both; do npx rolldown $S/$name.mjs --format esm --minify --file $S/$name.min.js > /dev/null && printf "%s %s B\n" $name $(gzip -9 -c $S/$name.min.js | wc -c); done
+for name in session reporter both; do npx vp pack $S/$name.mjs --no-config --minify -f esm --platform browser -d $S/out-$name -l error --no-report && printf "%s %s B\n" $name $(gzip -9 -c $S/out-$name/$name.js | wc -c); done
 ```
 
-Expected: about 6.9 KB for the session, 8.7 KB for `CmcdReporter`, and 10.6 KB for both. If the session measures more than 7.5 KB, stop and report.
+Expected: about 7.1 KB for the session, 8.8 KB for `CmcdReporter`, and 10.8 KB for both. If the session measures more than 7.5 KB, stop and report.
 
 - [ ] **Step 4: Run the bare-import probes**
 
 ```bash
 printf "import './libs/cmcd/dist/index.js'\n" > temp-bare-probe.mjs
 npx rollup temp-bare-probe.mjs --format es --file <scratchpad>/probe/rollup.js --silent
-npx tsdown temp-bare-probe.mjs --format esm --out-dir <scratchpad>/probe/tsdown --no-dts -l warn --external @svta/cml-utils --external @svta/cml-structured-field-values
+npx vp pack temp-bare-probe.mjs --no-config -f esm -d <scratchpad>/probe/tsdown -l error --no-report --deps.never-bundle @svta/cml-utils --deps.never-bundle @svta/cml-structured-field-values
 rm temp-bare-probe.mjs
-cat <scratchpad>/probe/rollup.js <scratchpad>/probe/tsdown/temp-bare-probe.js
+cat <scratchpad>/probe/rollup.js <scratchpad>/probe/tsdown/temp-bare-probe.mjs
 ```
 
-Expected: each output has only the two import lines of `@svta/cml-structured-field-values` and `@svta/cml-utils`, and the tsdown output also has an empty `export {  };`.
+Expected: the Rollup output has only the two import lines of `@svta/cml-structured-field-values` and `@svta/cml-utils`. The tsdown output is an empty `export {};`.
 
 - [ ] **Step 5: Compare the speed with `CmcdReporter`**
 
@@ -6028,13 +7615,15 @@ bench('reporter', () => reporter.createRequestReport(request, data))
 node <scratchpad>/bench.mjs "$(pwd)"
 ```
 
-Expected: `same output: true`. The session takes about half the time of `CmcdReporter`. If the session is slower than `CmcdReporter`, stop and report.
+Expected: `same output: true`. The session takes about 7.6 µs and `CmcdReporter` about 13.4 µs. If the session is slower than `CmcdReporter`, stop and report.
 
 - [ ] **Step 6: Record the results and push**
 
-Add the numbers of Steps 3 and 5 to the log of the roadmap. Check the state of the branch, and push:
+Add the numbers of Steps 3 and 5 to the log of the roadmap. Commit the regenerated skill file, check the state of the branch, and push:
 
 ```bash
+git add skills/common-media-library/references/cmcd.md
+git commit -s -m "docs(skills): regenerate the cmcd reference for the CMCD session" -m "Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 git status --short
 git push -u origin feat/cmcd-session
 ```

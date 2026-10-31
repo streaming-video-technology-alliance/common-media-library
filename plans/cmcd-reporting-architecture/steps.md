@@ -145,7 +145,7 @@ Entry: none. This phase does not depend on the RFC.
 
 Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
 
-- [x] **3.1 Write the detailed plan (agent).** Draft of 2026-10-01: [session-steps.md](session-steps.md), with 11 tasks. Edited on 2026-10-30 for the session configuration types and the status 0 rule. Replay the plan on current `main` before Task 3.2. The tests moved to Vitest, the checks to `vp lint` and tsgolint, and `ttfb` to `getTimeToFirstByte`. If the review of PR 486 changes the RFC, update the plan before Task 3.2. Use superpowers:writing-plans, and save the result as `plans/cmcd-reporting-architecture/session-steps.md`. The inputs are:
+- [x] **3.1 Write the detailed plan (agent).** Draft of 2026-10-01: [session-steps.md](session-steps.md), with 11 tasks. Edited and replayed on current `main` on 2026-10-30 for the session configuration types, the status 0 rule, the `send` function, and one destination for each target. The tests run on Vitest, the checks on `vp lint` and tsgolint, and `ttfb` comes from `getTimeToFirstByte`. If the review of PR 486 changes the RFC, update the plan before Task 3.2. Use superpowers:writing-plans, and save the result as `plans/cmcd-reporting-architecture/session-steps.md`. The inputs are:
     - the accepted RFC and the prototype listing
     - the salvage list from Task 1.2
     - the eight scenarios of the prototype test
@@ -153,10 +153,10 @@ Detailed plan at phase start. Entry: Tasks 0.6 and 2.4 are done.
   - The plan covers these deliverables, each with its own test cycle:
     - the types and the exports, including `CMCD_EVENT_HOSTNAME`, and `DeepReadonly` in `CmcdReportFilter`
     - `createRequestReport()`, which removes every existing `CMCD` parameter, also when the URL has several, a fragment, or a relative path
-    - `recordEvent()` and `filter`, and one destination for the targets that share a URL: one `sn`, one `msd` gate, and one set of waiting values
+    - `recordEvent()` and `filter`, and one destination for each target: its own `sn`, `msd` gate, and waiting values
     - `recordResponseReceived()` with the timing rules of Task 0.1
     - `recordError()` and the keys with a destination scope (`msd`, `bs`, `bsd`), with their value checks. The tests cover the copies of waiting values and the `ot` scope of a waiting `bs`.
-    - delivery: batches, response statuses, and the back-off. A requester that throws counts as a rejected request. A 410 clears the queue and the waiting values of each target with that URL. It also drops a batch in flight. Each target has one POST in flight. An `e` report sends at once, except during a wait.
+    - delivery: batches, response statuses, and the back-off. A requester that throws counts as a rejected request. A 410 clears the queue and the waiting values of the target. It also drops a batch in flight. Each target has one batch in flight. An `e` report sends at once, except during a wait. A target posts to a `url` or calls a `send` function.
     - the timers, `start()`, and `stop()`
     - `configure()`, and the configuration checks of `createCmcdSession()`
     - the README quick start, the user guide section, and the migration guide
@@ -437,6 +437,7 @@ Casey opens the PR with `/create-pr refactor/cmcd-encode`.
 | 2026-10-02 | Casey chose the configuration types of `CmcdReporter` for the session: `CmcdRequestReportConfig` and `CmcdEventReportConfig`, reworked in 3.0.0. `CmcdSessionSettings` and `CmcdSessionEventTarget` are gone. The RFC and the plan changed with it. The plan was replayed on `main` at 0e45a1db5 (release 2.8.1), with the edits of b08f99cb1. Each task fails before its code and passes after it, and the root `npm test` passes. Final code: 6910 B against 8696 B for `CmcdReporter`, and 7.98 µs against 14.52 µs. |
 | 2026-10-08 | Casey approved the data rules of the session. `snapshot()` supplies only the `t` reports, and a tick drops `bs` and `bsd`. The new type `CmcdSnapshot` rejects nine keys with `never` members, and the data arguments use `Omit`. The RFC gained three alternatives and a note on `t` reports in a shared session. The plan was replayed on 0e45a1db5: each task fails before its code and passes after it, and the root `npm test` passes. Final code: 6923 B against 8696 B, and 8.11 µs against 14.60 µs. |
 | 2026-10-30 | Casey dropped `transform` from the session types. `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig` derive from the `CmcdReporter` types, and a `transform` member typed `never` rejects a reporter configuration. Only the session target type has `filter`. Casey chose the retry for status 0. The RFC changed on `rfc/cmcd-session` (42b727506), and the plan files moved to `feat/cmcd-session`. The RFC links the design record at 0de942fa3. Next: Task 0.6, then a replay of the plan on current `main`. |
+| 2026-10-30 | Casey added a `send` function for each event target and made every event target its own destination (RFC 4b7144a2a). The plan gained `CmcdEventSender`, `CmcdEventSendResult`, the `url | send` union, the report copy for `send` targets, and the `url`, `send` configuration checks. The plan was replayed on `main` at b291c609a with Vitest, `vp lint`, `vp fmt`, and tsgolint. Each task fails before its code and passes after it. The root `npm test` and the site build pass. Final code with `vp pack --minify`: 7140 B against 8791 B for `CmcdReporter`, both 10793 B, and 7.58 µs against 13.38 µs. Three notes for the RFC review: `ttfb` comes from `getTimeToFirstByte()`, which also rejects a `responseStart` after the end of the response. A `send` function encodes a report with the event reporting mode option of `encodeCmcd()`. The return type `Promise<CmcdEventSendResult | void>` needs a lint directive. |
 
 ## Links
 
