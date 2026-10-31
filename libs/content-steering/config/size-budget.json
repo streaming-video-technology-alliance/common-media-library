@@ -10,13 +10,13 @@
 			"imports": [
 				"createSteeringEngine"
 			],
-			"brotli": 3310
+			"brotli": 3312
 		},
 		"applyUriReplacement": {
 			"imports": [
 				"applyUriReplacement"
 			],
-			"brotli": 734
+			"brotli": 742
 		},
 		"createSteeringEngine+applyUriReplacement": {
 			"imports": [

@@ -1,15 +1,12 @@
-import { execFile } from 'node:child_process'
 import { access, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { parseArgs, promisify } from 'node:util'
+import { parseArgs, stripVTControlCharacters } from 'node:util'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
-
-const execFileAsync = promisify(execFile)
+import { build } from 'vite-plus'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const rolldown = path.join(root, 'node_modules', '.bin', 'rolldown')
 
 type Entry = {
 	imports: string[]
@@ -113,27 +110,37 @@ async function measure(
 	const dist = path.join(root, 'libs', pkg, 'dist', 'index.js')
 	const names = entry.imports.join(', ')
 	const input = path.join(tmp, `${id}.entry.js`)
-	const output = path.join(tmp, `${id}.out.js`)
 
 	await writeFile(
 		input,
 		`import { ${names} } from ${JSON.stringify(dist)}\nglobalThis.__cmlSize = [${names}]\n`,
 	)
 
-	const args = [input, '--format', 'esm', '--minify', '--file', output]
-	if (peers.length > 0) {
-		args.push('--external', peers.join(','))
-	}
-
+	let code: Buffer
 	try {
-		await execFileAsync(rolldown, args)
+		const result = await build({
+			configFile: false,
+			logLevel: 'silent',
+			build: {
+				lib: { entry: input, formats: ['es'], fileName: 'bundle' },
+				minify: true,
+				write: false,
+				target: 'esnext',
+				rolldownOptions: { external: peers, output: { minify: { codegen: true } } },
+			},
+		})
+		const first = Array.isArray(result) ? result[0] : result
+		if (first === undefined || !('output' in first) || first.output.length === 0) {
+			throw new Error('The build returned no output chunk.')
+		}
+		code = Buffer.from(first.output[0].code)
 	} catch (error) {
-		const { stdout, stderr } = error as { stdout?: string; stderr?: string }
-		const detail = `${stdout ?? ''}${stderr ?? ''}`.trim()
-		throw new Error(`Bundling the entry "${name}" of ${pkg} failed.\n${detail || String(error)}`)
+		const detail = error instanceof Error ? error.message : String(error)
+		throw new Error(
+			`Bundling the entry "${name}" of ${pkg} failed.\n${stripVTControlCharacters(detail)}`,
+		)
 	}
 
-	const code = await readFile(output)
 	return {
 		name,
 		minified: code.length,
