@@ -1,4 +1,4 @@
-import type { HttpRequest } from '@svta/cml-utils'
+import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEvent } from './CmcdEvent.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
@@ -60,6 +60,27 @@ export type CmcdSession = {
 		type: CmcdEventType,
 		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
 		request?: Readonly<HttpRequest>,
+	): void
+
+	/**
+	 * Records an `rr` report for a response.
+	 *
+	 * The session derives `url` without the `CMCD` parameter, and `rc` from `status`.
+	 * It derives `ts`, `ttfb`, and `ttlb` from `resourceTiming`.
+	 * It adds the request-time data from `customData.cmcd`, without `msd`, `bs`, `bsd`, and `ec`.
+	 * The `data` argument overrides the derived keys.
+	 *
+	 * @param response - The response. Its `request` is the request report.
+	 * @param data - The keys that override the derived keys.
+	 *
+	 * @throws If a filter throws, or if a value cannot be encoded. The call then changes no state.
+	 *
+	 * @example
+	 * {@includeCode ../test/createCmcdSession.responses.test.ts#example}
+	 */
+	recordResponseReceived(
+		response: HttpResponse,
+		data?: Omit<Cmcd, 'sid' | 'sn' | 'e' | 'v' | 'ec'>,
 	): void
 
 	/**

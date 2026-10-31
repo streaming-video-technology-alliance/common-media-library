@@ -529,6 +529,7 @@ export type CmcdSession = {
     readonly sid: string;
     createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, "sid" | "sn" | "v" | "ec">): R & CmcdRequestReport<R["customData"]>;
     recordEvent(type: CmcdEventType, data?: Omit<Cmcd, "sid" | "sn" | "e" | "v" | "ec">, request?: Readonly<HttpRequest>): void;
+    recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, "sid" | "sn" | "e" | "v" | "ec">): void;
     recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, "sid" | "sn" | "e" | "v" | "ec">): void;
     configure(settings: CmcdSessionRequestReportConfig): void;
     flush(): void;

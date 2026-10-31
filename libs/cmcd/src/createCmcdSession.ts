@@ -5,7 +5,11 @@ import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
-import { CMCD_EVENT_BACKGROUNDED_MODE, CMCD_EVENT_ERROR } from './CmcdEventType.ts'
+import {
+	CMCD_EVENT_BACKGROUNDED_MODE,
+	CMCD_EVENT_ERROR,
+	CMCD_EVENT_RESPONSE_RECEIVED,
+} from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportFilter } from './CmcdReportFilter.ts'
 import type { CmcdReportingMode } from './CmcdReportingMode.ts'
@@ -23,6 +27,7 @@ import { readScopedValues } from './readScopedValues.ts'
 import { replaceCmcdParam } from './replaceCmcdParam.ts'
 import { toBareValue } from './toBareValue.ts'
 import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
+import { toResponseKeys } from './toResponseKeys.ts'
 import { toTokenString } from './toTokenString.ts'
 
 type KeyFilter = CmcdEncodeOptions['filter']
@@ -65,6 +70,10 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 	return key => set.has(key)
 }
 
+function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
+	return data
+}
+
 function createDestination(): Destination {
 	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] } }
 }
@@ -96,6 +105,7 @@ export function createCmcdSession(
 	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
 ): CmcdSession {
 	const sid = config.sid ?? uuid()
+	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
 	const settings: CmcdSessionRequestReportConfig = {
 		version: config.version,
 		transmissionMode: config.transmissionMode,
@@ -338,6 +348,17 @@ export function createCmcdSession(
 
 		recordEvent(type, data = {}, request) {
 			emit(type, data, request)
+		},
+
+		recordResponseReceived(response, data = {}) {
+			const { cmcd } = (response.request.customData ?? {}) as { cmcd?: Cmcd }
+			const requestData = withoutScopedKeys(cmcd ?? {})
+
+			emit(
+				CMCD_EVENT_RESPONSE_RECEIVED,
+				{ ...requestData, ...toResponseKeys(response, timeOrigin), ...data },
+				response.request,
+			)
 		},
 
 		recordError(codes, data = {}) {
