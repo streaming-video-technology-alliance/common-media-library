@@ -125,12 +125,16 @@ Reference: references/cmsd.md
 
 Content steering functionality
 
+- Run the content steering client of a player, which requests the Steering Manifest, keeps the request schedule, and selects the pathway: `createSteeringEngine`
+- Send the Steering Manifest requests with `fetch` when the player has no requester of its own: `fetchRequester`
+- Build a URI of a pathway clone from a URI of its base pathway: `applyUriReplacement`
 - Validate a content steering manifest before the player applies it: `isValidSteeringManifest`
 - Validate a pathway clone and its URI replacement: `isValidPathwayClone`
-- Type the steering manifest, the pathway clones, and the URI replacements: `SteeringManifest`, `PathwayClone`, `UriReplacement`
+- Type the steering manifest, the pathway clones, the URI replacements, the engine configuration, and the engine errors: `SteeringManifest`, `PathwayClone`, `UriReplacement`, `SteeringEngineConfig`, `SteeringError`
+- Name the protocol and the error types with constants: `SteeringProtocol`, `SteeringErrorType`
 - Apply the default TTL and pathway penalty of the specification: `DEFAULT_TTL`, `DEFAULT_PATHWAY_PENALTY`
 
-Do not write your own steering manifest validation or types. Open an issue for a field that is missing.
+Do not write your own steering client, manifest validation, or types. The engine implements the client rules of the HLS and DASH specifications. Open an issue for a rule or a field that is missing.
 
 Reference: references/content-steering.md
 
