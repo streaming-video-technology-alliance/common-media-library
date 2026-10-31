@@ -2,7 +2,7 @@ import type { Cmcd } from '@svta/cml-cmcd'
 import { decodeCmcd, encodeCmcd } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { CMCD_OUTPUT_REQUEST } from './data/CMCD_OUTPUT_REQUEST.ts'
 import { CMCD_STRING_REQUEST } from './data/CMCD_STRING_REQUEST.ts'
 
@@ -66,14 +66,16 @@ describe('decodeCmcd', () => {
 		// Token preservation plus params preservation make the codec
 		// symmetric: with tokens reduced to strings (the default), a
 		// custom-key token would re-encode quoted.
-		const s = 'br=(3000;ot=v 6000),com.example-tok=abc,com.example-x=1;p=2,ot=v,su,tab=(3000);p=2,v=2'
+		const s =
+			'br=(3000;ot=v 6000),com.example-tok=abc,com.example-x=1;p=2,ot=v,su,tab=(3000);p=2,v=2'
 
 		equal(encodeCmcd(decodeCmcd(s, { useSymbol: false }) as Cmcd), s)
 		equal(encodeCmcd(decodeCmcd(s, { useSymbol: true }) as Cmcd), s)
 	})
 
 	it('handles null data object', () => {
-		deepEqual(decodeCmcd(null as any), {})
+		// @ts-expect-error - This is a test
+		deepEqual(decodeCmcd(null), {})
 	})
 
 	it('handles empty string', () => {

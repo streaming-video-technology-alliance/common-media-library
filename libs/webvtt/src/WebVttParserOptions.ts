@@ -14,7 +14,7 @@ export type WebVttParserOptions = {
 	 *
 	 * @defaultValue `true`
 	 */
-	useDomTypes?: boolean;
+	useDomTypes?: boolean
 
 	/**
 	 * A factory for creating WebVttCue objects.
@@ -26,7 +26,7 @@ export type WebVttParserOptions = {
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/VTTCue | VTTCue}
 	 */
-	createCue?: WebVttCueFactory;
+	createCue?: WebVttCueFactory
 
 	/**
 	 * A factory for creating WebVttRegion objects.
@@ -38,5 +38,5 @@ export type WebVttParserOptions = {
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/VTTRegion | VTTRegion}
 	 */
-	createRegion?: WebVttRegionFactory;
-};
+	createRegion?: WebVttRegionFactory
+}

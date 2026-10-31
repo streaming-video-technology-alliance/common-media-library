@@ -36,10 +36,11 @@ export function serializeParams(params?: Record<string, any>): string {
 	let output = ''
 
 	for (const key of Object.keys(params)) {
-		const value = params[key]
+		const value: unknown = params[key]
 		output += `;${serializeKey(key)}`
 
-		if (value !== true) { // omit true
+		if (value !== true) {
+			// omit true
 			output += `=${serializeBareItem(value)}`
 		}
 	}

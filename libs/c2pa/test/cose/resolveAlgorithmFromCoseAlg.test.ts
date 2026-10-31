@@ -1,6 +1,6 @@
 import { resolveAlgorithmFromCoseAlg } from '../../src/cose/resolveAlgorithmFromCoseAlg.ts'
 import { deepStrictEqual, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('resolveAlgorithmFromCoseAlg', () => {
 	// #region example
@@ -22,27 +22,45 @@ describe('resolveAlgorithmFromCoseAlg', () => {
 	})
 
 	it('maps PS256 (-37) to RSA-PSS SHA-256', () => {
-		deepStrictEqual(resolveAlgorithmFromCoseAlg(-37), { name: 'RSA-PSS', hash: { name: 'SHA-256' } })
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-37), {
+			name: 'RSA-PSS',
+			hash: { name: 'SHA-256' },
+		})
 	})
 
 	it('maps PS384 (-38) to RSA-PSS SHA-384', () => {
-		deepStrictEqual(resolveAlgorithmFromCoseAlg(-38), { name: 'RSA-PSS', hash: { name: 'SHA-384' } })
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-38), {
+			name: 'RSA-PSS',
+			hash: { name: 'SHA-384' },
+		})
 	})
 
 	it('maps PS512 (-39) to RSA-PSS SHA-512', () => {
-		deepStrictEqual(resolveAlgorithmFromCoseAlg(-39), { name: 'RSA-PSS', hash: { name: 'SHA-512' } })
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-39), {
+			name: 'RSA-PSS',
+			hash: { name: 'SHA-512' },
+		})
 	})
 
 	it('maps PS256 (-37) to RSA-PSS SHA-256', () => {
-		deepStrictEqual(resolveAlgorithmFromCoseAlg(-37), { name: 'RSA-PSS', hash: { name: 'SHA-256' } })
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-37), {
+			name: 'RSA-PSS',
+			hash: { name: 'SHA-256' },
+		})
 	})
 
 	it('maps PS384 (-38) to RSA-PSS SHA-384', () => {
-		deepStrictEqual(resolveAlgorithmFromCoseAlg(-38), { name: 'RSA-PSS', hash: { name: 'SHA-384' } })
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-38), {
+			name: 'RSA-PSS',
+			hash: { name: 'SHA-384' },
+		})
 	})
 
 	it('maps PS512 (-39) to RSA-PSS SHA-512', () => {
-		deepStrictEqual(resolveAlgorithmFromCoseAlg(-39), { name: 'RSA-PSS', hash: { name: 'SHA-512' } })
+		deepStrictEqual(resolveAlgorithmFromCoseAlg(-39), {
+			name: 'RSA-PSS',
+			hash: { name: 'SHA-512' },
+		})
 	})
 
 	it('throws for unsupported algorithm', () => {

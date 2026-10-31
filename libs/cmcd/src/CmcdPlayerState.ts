@@ -65,4 +65,4 @@ export const CmcdPlayerState = {
 /**
  * @public
  */
-export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>;
+export type CmcdPlayerState = ValueOf<typeof CmcdPlayerState>

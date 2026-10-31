@@ -27,9 +27,9 @@ export type ParseJob = { inputs: string[] } | { prefixesOf: string }
 export type ParseOutcome<T> = { result: T } | { error: string }
 
 type ParseMessage = {
-	index: number;
-	result?: unknown;
-	error?: string;
+	index: number
+	result?: unknown
+	error?: string
 }
 
 /**
@@ -37,18 +37,32 @@ type ParseMessage = {
  * never returns fails the test instead of hanging the test runner. A prefix sweep reports only
  * whether each parse returned; the parsed trees stay in the worker.
  */
-export function runParseWorker(job: { inputs: string[] }, options?: XmlParseOptions): Promise<ParseOutcome<XmlNode>[]>
-export function runParseWorker(job: { prefixesOf: string }, options?: XmlParseOptions): Promise<ParseOutcome<true>[]>
-export function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promise<ParseOutcome<unknown>[]> {
+export function runParseWorker(
+	job: { inputs: string[] },
+	options?: XmlParseOptions,
+): Promise<ParseOutcome<XmlNode>[]>
+export function runParseWorker(
+	job: { prefixesOf: string },
+	options?: XmlParseOptions,
+): Promise<ParseOutcome<true>[]>
+export function runParseWorker(
+	job: ParseJob,
+	options?: XmlParseOptions,
+): Promise<ParseOutcome<unknown>[]> {
 	const count = 'inputs' in job ? job.inputs.length : job.prefixesOf.length + 1
-	const inputAt = (index: number): string => 'inputs' in job ? job.inputs[index] : job.prefixesOf.slice(0, index)
+	const inputAt = (index: number): string =>
+		'inputs' in job ? job.inputs[index] : job.prefixesOf.slice(0, index)
 
 	if (count === 0) {
 		return Promise.resolve([])
 	}
 
 	return new Promise((done, fail) => {
-		const worker = new Worker(WORKER_SOURCE, { eval: true, execArgv: [], workerData: { url: PARSE_XML_URL, options, ...job } })
+		const worker = new Worker(WORKER_SOURCE, {
+			eval: true,
+			execArgv: [],
+			workerData: { url: PARSE_XML_URL, options, ...job },
+		})
 		const outcomes: ParseOutcome<unknown>[] = []
 		let current = 0
 		let timer: ReturnType<typeof setTimeout>
@@ -62,7 +76,13 @@ export function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promis
 		const watch = () => {
 			clearTimeout(timer)
 			timer = setTimeout(() => {
-				settle(() => fail(new Error(`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputAt(current))}`)))
+				settle(() =>
+					fail(
+						new Error(
+							`parseXml did not return within ${PARSE_TIMEOUT_MS}ms for ${JSON.stringify(inputAt(current))}`,
+						),
+					),
+				)
 			}, PARSE_TIMEOUT_MS)
 		}
 
@@ -70,19 +90,17 @@ export function runParseWorker(job: ParseJob, options?: XmlParseOptions): Promis
 			current = message.index
 			if (message.error !== undefined) {
 				outcomes.push({ error: message.error })
-			}
-			else if (message.result !== undefined) {
+			} else if (message.result !== undefined) {
 				outcomes.push({ result: message.result })
 			}
 
 			if (outcomes.length === count) {
 				settle(() => done(outcomes))
-			}
-			else {
+			} else {
 				watch()
 			}
 		})
-		worker.on('error', (error) => settle(() => fail(error)))
+		worker.on('error', (error: Error) => settle(() => fail(error)))
 		watch()
 	})
 }

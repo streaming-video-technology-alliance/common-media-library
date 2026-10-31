@@ -13,4 +13,4 @@ import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
  */
 export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<'mp4a'> {
 	return readAudioSampleEntryBox('mp4a', view)
-};
+}

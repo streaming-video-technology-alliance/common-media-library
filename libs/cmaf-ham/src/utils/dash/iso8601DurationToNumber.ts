@@ -1,26 +1,18 @@
-// The (?:^|[^.,\d]) prefix pins each match to the start of a number run,
-// keeping the scan linear on non-matching input (CodeQL js/polynomial-redos).
-const HOURS_REGEX = /(?:^|[^.,\d])([.,\d]+)H/
-const MINUTES_REGEX = /(?:^|[^.,\d])([.,\d]+)M/
-const SECONDS_REGEX = /(?:^|[^.,\d])([.,\d]+)S/
+import { decodeIso8601Duration } from '@svta/cml-iso-8601'
 
 /**
+ * Converts the ISO 8601 duration of an MPD attribute to seconds.
+ *
+ * The function trims the whitespace that the XML scanner keeps around an
+ * attribute value, and decodes the rest with `decodeIso8601Duration`. A value
+ * that is not an ISO 8601 duration gives 0.
+ *
+ * @param isoDuration - The ISO 8601 duration, such as `PT1H2M3S` or ` P1DT2H `.
+ * @returns The duration in seconds.
+ *
  * @internal
  */
 export function iso8601DurationToNumber(isoDuration: string): number {
-	const hours = HOURS_REGEX.exec(isoDuration)
-	const minutes = MINUTES_REGEX.exec(isoDuration)
-	const seconds = SECONDS_REGEX.exec(isoDuration)
-
-	let duration = 0
-	if (hours) {
-		duration += +hours[1] * 60 * 60
-	}
-	if (minutes) {
-		duration += +minutes[1] * 60
-	}
-	if (seconds) {
-		duration += +seconds[1]
-	}
-	return duration
+	const duration = decodeIso8601Duration(isoDuration.trim())
+	return Number.isNaN(duration) ? 0 : duration
 }

@@ -36,4 +36,4 @@ export const CmcdReportingMode = {
 /**
  * @public
  */
-export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>;
+export type CmcdReportingMode = ValueOf<typeof CmcdReportingMode>

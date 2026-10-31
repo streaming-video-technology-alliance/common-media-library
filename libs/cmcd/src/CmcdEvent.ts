@@ -12,7 +12,6 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  * @public
  */
 export type CmcdEvent = CmcdRequest & {
-
 	/**
 	 * Custom Event Name
 	 *
@@ -25,7 +24,7 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#custom-event-name | CTA-5004-B Custom Event Name}
 	 */
-	cen?: string;
+	cen?: string
 
 	/**
 	 * Event
@@ -57,7 +56,7 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event | CTA-5004-B Event}
 	 */
-	e?: CmcdEventType;
+	e?: CmcdEventType
 
 	/**
 	 * Hostname
@@ -68,7 +67,7 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#hostname | CTA-5004-B Hostname}
 	 */
-	h?: string;
+	h?: string
 
 	/**
 	 * Timestamp
@@ -83,5 +82,5 @@ export type CmcdEvent = CmcdRequest & {
 	 *
 	 * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#timestamp | CTA-5004-B Timestamp}
 	 */
-	ts?: number;
-};
+	ts?: number
+}

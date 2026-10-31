@@ -35,8 +35,5 @@ export function parseDate(src: string): ParsedValue<Date> {
 		throw parseError(src, DATE)
 	}
 
-	return parsedValue(
-		new Date(date.value * 1000),
-		date.src,
-	)
+	return parsedValue(new Date(date.value * 1000), date.src)
 }

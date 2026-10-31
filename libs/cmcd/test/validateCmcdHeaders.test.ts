@@ -1,6 +1,6 @@
 import { validateCmcdHeaders } from '@svta/cml-cmcd'
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('validateCmcdHeaders', () => {
 	it('provides a valid example', () => {
@@ -55,7 +55,10 @@ describe('validateCmcdHeaders', () => {
 			'CMCD-Request': 'bl=21600',
 		})
 		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'xyz'), true)
+		equal(
+			result.issues.some(i => i.key === 'xyz'),
+			true,
+		)
 	})
 
 	it('detects invalid value types across shards', () => {
@@ -64,7 +67,10 @@ describe('validateCmcdHeaders', () => {
 			'CMCD-Request': 'bl=21600',
 		})
 		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'br'), true)
+		equal(
+			result.issues.some(i => i.key === 'br'),
+			true,
+		)
 	})
 
 	it('automatically validates in request mode', () => {
@@ -81,7 +87,10 @@ describe('validateCmcdHeaders', () => {
 			'CMCD-Status': 'e=ps',
 		})
 		equal(result.valid, false)
-		equal(result.issues.some(i => i.key === 'e'), true)
+		equal(
+			result.issues.some(i => i.key === 'e'),
+			true,
+		)
 	})
 
 	it('handles lowercase header names', () => {

@@ -4,7 +4,7 @@
  * @public
  */
 export type IdentifiedMediaDataBox = {
-	type: 'imda';
-	imdaIdentifier: number;
-	data: Uint8Array;
-};
+	type: 'imda'
+	imdaIdentifier: number
+	data: Uint8Array
+}

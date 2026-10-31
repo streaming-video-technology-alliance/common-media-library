@@ -15,4 +15,4 @@ export function readIden(view: IsoBoxReadView): WebVttCueIdBox {
 		type: 'iden',
 		cueId: view.readUtf8(-1),
 	}
-};
+}

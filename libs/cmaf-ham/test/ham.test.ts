@@ -1,14 +1,8 @@
 import { deepStrictEqual } from 'node:assert'
-import { beforeEach, describe, it } from 'node:test'
+import { beforeEach, describe, it } from 'vite-plus/test'
 
-import type {
-	Presentation,
-	SelectionSet,
-} from '@svta/cml-cmaf-ham'
-import {
-	getTracksFromSelectionSet,
-	validateTracks,
-} from '@svta/cml-cmaf-ham'
+import type { Presentation, SelectionSet } from '@svta/cml-cmaf-ham'
+import { getTracksFromSelectionSet, validateTracks } from '@svta/cml-cmaf-ham'
 
 import jsonHam0 from './data/ham-samples/fromDash/ham0.json' with { type: 'json' }
 
@@ -36,8 +30,7 @@ describe('ham validation', () => {
 	})
 
 	it('returns false when at least one track has different duration', () => {
-		const originalDuration =
-			selectionSet.switchingSets[0].tracks[1].duration
+		const originalDuration = selectionSet.switchingSets[0].tracks[1].duration
 		selectionSet.switchingSets[0].tracks[1].duration = 1
 
 		const valid = validateTracks(getTracksFromSelectionSet(selectionSet))
@@ -50,8 +43,7 @@ describe('ham validation', () => {
 
 	it.skip('returns false when at least one track has no segments', () => {
 		// FIXME: For some reason the changes in the object are affecting other tests
-		const originalSegments =
-			selectionSet.switchingSets[0].tracks[1].segments
+		const originalSegments = selectionSet.switchingSets[0].tracks[1].segments
 		selectionSet.switchingSets[0].tracks[1].segments = []
 
 		const valid = validateTracks(getTracksFromSelectionSet(selectionSet))

@@ -5,4 +5,4 @@ import type { SfToken } from './SfToken.ts'
  *
  * @public
  */
-export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken;
+export type SfBareItem = string | Uint8Array | boolean | number | symbol | Date | SfToken

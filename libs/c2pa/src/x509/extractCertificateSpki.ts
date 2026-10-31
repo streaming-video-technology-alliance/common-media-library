@@ -66,8 +66,7 @@ export function extractCertificateSpki(certDER: Uint8Array): Uint8Array | null {
 
 		// 7. SubjectPublicKeyInfo (SEQUENCE) — return full DER encoding
 		return readElementRaw(tbs.value, offset)
-	}
-	catch {
+	} catch {
 		return null
 	}
 }

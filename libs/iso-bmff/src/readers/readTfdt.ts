@@ -17,6 +17,6 @@ export function readTfdt(view: IsoBoxReadView): TrackFragmentBaseMediaDecodeTime
 		type: 'tfdt',
 		version,
 		flags,
-		baseMediaDecodeTime: view.readUint((version == 1) ? 8 : 4),
+		baseMediaDecodeTime: view.readUint(version == 1 ? 8 : 4),
 	}
-};
+}

@@ -1,6 +1,6 @@
 import { SvtaAdvertisingErrorCode, SvtaErrorCategory } from '@svta/cml-error-codes'
 import assert, { ok, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { assertCatalogInvariants } from './data/assertCatalogInvariants.ts'
 
 describe('SvtaAdvertisingErrorCode', () => {
@@ -13,7 +13,12 @@ describe('SvtaAdvertisingErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaAdvertisingErrorCode, SvtaErrorCategory.ADVERTISING, 34, 'SVTA_ADVERTISING')
+		assertCatalogInvariants(
+			SvtaAdvertisingErrorCode,
+			SvtaErrorCategory.ADVERTISING,
+			34,
+			'SVTA_ADVERTISING',
+		)
 	})
 
 	it('matches the spec table', () => {

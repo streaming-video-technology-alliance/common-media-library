@@ -46,7 +46,7 @@ export function readLeb128(raw: DataView, pos: number, endPos: number): Leb128 |
 		}
 
 		const byte = raw.getUint8(pos + i)
-		value += (byte & 0x7F) * 2 ** (i * 7)
+		value += (byte & 0x7f) * 2 ** (i * 7)
 
 		if (!(byte & 0x80)) {
 			return { value, size: i + 1 }
@@ -71,7 +71,11 @@ export function readLeb128(raw: DataView, pos: number, endPos: number): Leb128 |
  * @param endPos - The exclusive end of the enclosing sample
  * @returns The payload bounds and whether this is a metadata OBU, or null if malformed
  */
-export function readObu(raw: DataView, pos: number, endPos: number): { isMetadata: boolean; payloadStart: number; payloadEnd: number } | null {
+export function readObu(
+	raw: DataView,
+	pos: number,
+	endPos: number,
+): { isMetadata: boolean; payloadStart: number; payloadEnd: number } | null {
 	const header = raw.getUint8(pos)
 
 	// obu_forbidden_bit must be zero; a set bit means this is not an OBU stream.
@@ -104,7 +108,7 @@ export function readObu(raw: DataView, pos: number, endPos: number): { isMetadat
 	}
 
 	return {
-		isMetadata: ((header >> 3) & 0x0F) === OBU_METADATA,
+		isMetadata: ((header >> 3) & 0x0f) === OBU_METADATA,
 		payloadStart,
 		payloadEnd,
 	}
@@ -123,7 +127,12 @@ export function readObu(raw: DataView, pos: number, endPos: number): { isMetadat
  * @param endPos - The exclusive end of the OBU payload
  * @param fieldData - Field 1 and field 2 byte arrays, appended to in place
  */
-export function parseCta608DataFromMetadataObu(raw: DataView, pos: number, endPos: number, fieldData: number[][]): void {
+export function parseCta608DataFromMetadataObu(
+	raw: DataView,
+	pos: number,
+	endPos: number,
+	fieldData: number[][],
+): void {
 	const metadataType = readLeb128(raw, pos, endPos)
 	if (!metadataType || metadataType.value !== METADATA_TYPE_ITUT_T35) {
 		return

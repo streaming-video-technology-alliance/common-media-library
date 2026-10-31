@@ -16,5 +16,4 @@ export function readMfro(view: IsoBoxReadView): MovieFragmentRandomAccessOffsetB
 		...view.readFullBox(),
 		mfraSize: view.readUint(4),
 	}
-};
-
+}

@@ -6,4 +6,4 @@
  *
  * @public
  */
-export type CmCustomKey = `${string}-${string}`;
+export type CmCustomKey = `${string}-${string}`

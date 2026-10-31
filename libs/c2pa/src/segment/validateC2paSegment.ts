@@ -3,6 +3,7 @@ import { decodeCoseSign1 } from '../cose/decodeCoseSign1.ts'
 import { extractVsiEmsgBox } from '../emsg/extractVsiEmsgBox.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { decodeVsiMap } from '../vsi/decodeVsiMap.ts'
+import { SequenceValidationReason } from '../vsi/SequenceState.ts'
 import type { SequenceState } from '../vsi/SequenceState.ts'
 import { createSequenceState } from '../vsi/createSequenceState.ts'
 import { validateSequenceNumber } from '../vsi/validateSequenceNumber.ts'
@@ -12,7 +13,10 @@ import { resolveImportAlgorithm } from '../cose/resolveImportAlgorithm.ts'
 import { bytesToHex, isKeyExpired } from '../utils.ts'
 import type { SegmentValidationResult } from './SegmentValidation.ts'
 
-function findSessionKey(sessionKeys: readonly ValidatedSessionKey[], kidHex: string | null): ValidatedSessionKey | null {
+function findSessionKey(
+	sessionKeys: readonly ValidatedSessionKey[],
+	kidHex: string | null,
+): ValidatedSessionKey | null {
 	if (!kidHex || sessionKeys.length === 0) return null
 	return sessionKeys.find(k => k.kid === kidHex) ?? null
 }
@@ -26,10 +30,18 @@ function findSessionKey(sessionKeys: readonly ValidatedSessionKey[], kidHex: str
  *
  * Returns `null` if the segment does not contain a C2PA EMSG box.
  *
+ * A segment whose signature, content hash, or key validity does not verify
+ * returns the received `sequenceState` unchanged.
+ *
+ * A duplicate, out-of-order, or below-minimum `sequenceNumber` fails with
+ * `livevideo.segment.invalid`. A gap in the sequence numbers does not fail the
+ * segment. `result.sequenceResult` reports the gap with its missing range.
+ *
  * @param segmentBytes - Raw segment bytes
  * @param sessionKeys - Available session keys from the init segment
  * @param sequenceState - Current sequence state for this stream
- * @returns Validation result and updated sequence state, or `null` if no C2PA EMSG box
+ * @returns Validation result and the sequence state for the next call, or `null` if no C2PA EMSG box
+ * @throws Error If the VSI EMSG box does not hold a `COSE_Sign1` structure with a valid VSI map as its payload
  *
  * @example
  * {@includeCode ../../test/segment/validateC2paSegment.test.ts#example}
@@ -40,7 +52,10 @@ export async function validateC2paSegment(
 	segmentBytes: Uint8Array,
 	sessionKeys: readonly ValidatedSessionKey[],
 	sequenceState: SequenceState = createSequenceState(),
-): Promise<{ readonly result: SegmentValidationResult; readonly nextSequenceState: SequenceState } | null> {
+): Promise<{
+	readonly result: SegmentValidationResult
+	readonly nextSequenceState: SequenceState
+} | null> {
 	const emsgBox = extractVsiEmsgBox(segmentBytes)
 	if (!emsgBox) return null
 
@@ -75,7 +90,7 @@ export async function validateC2paSegment(
 				isValid: false,
 				errorCodes: [LiveVideoStatusCode.SEGMENT_INVALID],
 			},
-			nextSequenceState,
+			nextSequenceState: sequenceState,
 		}
 	}
 
@@ -100,16 +115,22 @@ export async function validateC2paSegment(
 	// §19.7.3 requires comparing against the segment's presentation time, but the
 	// VSI map does not carry it. We compare against `now` as an approximation,
 	// which is accurate for live streams validated in real time.
+	const keyNotYetActive = new Date() < new Date(sessionKey.createdAt)
 	const keyExpired = isKeyExpired(sessionKey.createdAt, sessionKey.validityPeriod)
 
+	const authentic = signatureValid && hashValid && !keyNotYetActive && !keyExpired
+
 	const codes = new Set<LiveVideoStatusCode>()
-	if (!signatureValid || !hashValid || !sequenceAboveMin) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
-	if (!sequenceResult.isValid) codes.add(LiveVideoStatusCode.ASSERTION_INVALID)
-	if (keyExpired) codes.add(LiveVideoStatusCode.SESSIONKEY_INVALID)
+	if (!authentic || !sequenceAboveMin) codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
+	// C2PA 2.4 §19.7.3 defines only the minSequenceNumber check. The order check is a library rule with the 2.5 draft code.
+	// A gap is not a failure. sequenceResult still reports it, so the caller can detect missing segments.
+	if (!sequenceResult.isValid && sequenceResult.reason !== SequenceValidationReason.GAP_DETECTED) {
+		codes.add(LiveVideoStatusCode.SEGMENT_INVALID)
+	}
 	const errorCodes = [...codes]
 
 	return {
 		result: { ...baseFields, isValid: errorCodes.length === 0, errorCodes },
-		nextSequenceState,
+		nextSequenceState: authentic ? nextSequenceState : sequenceState,
 	}
 }

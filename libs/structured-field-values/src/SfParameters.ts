@@ -3,4 +3,4 @@
  *
  * @public
  */
-export type SfParameters = Record<string, any>;
+export type SfParameters = Record<string, any>

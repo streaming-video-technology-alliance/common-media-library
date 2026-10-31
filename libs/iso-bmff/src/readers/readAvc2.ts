@@ -14,4 +14,3 @@ import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
 export function readAvc2(view: IsoBoxReadView): VisualSampleEntryBox<'avc2'> {
 	return readVisualSampleEntryBox('avc2', view)
 }
-

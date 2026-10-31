@@ -73,9 +73,8 @@ function manifestToAllFormats(
 ) {
 	// Read the Manifests
 	const manifest = fs.readFileSync(mainManifestPath, FILE_ENCODING)
-	const ancillaryManifests = AncillaryManifestsPath?.map(
-		(ancillaryManifest) =>
-			fs.readFileSync(ancillaryManifest, FILE_ENCODING),
+	const ancillaryManifests = AncillaryManifestsPath?.map(ancillaryManifest =>
+		fs.readFileSync(ancillaryManifest, FILE_ENCODING),
 	)
 
 	// Convert the Manifest to HAM
@@ -90,10 +89,7 @@ function manifestToAllFormats(
 
 	// Run validations and save them to a file
 	const validations = ham.map(validatePresentation)
-	fs.writeFileSync(
-		path.join(outputPath, 'validations.json'),
-		JSON.stringify(validations),
-	)
+	fs.writeFileSync(path.join(outputPath, 'validations.json'), JSON.stringify(validations))
 
 	// Save HAM object
 	fs.writeFileSync(path.join(outputPath, 'ham.json'), JSON.stringify(ham))
@@ -114,14 +110,14 @@ function manifestToAllFormats(
 	})
 }
 
-listDirectories(INPUT_PATH_DASH).forEach((contentDir) => {
+listDirectories(INPUT_PATH_DASH).forEach(contentDir => {
 	const mpds = listMPDFiles(path.join(INPUT_PATH_DASH, contentDir))
-	mpds.forEach((mpd) => {
+	mpds.forEach(mpd => {
 		manifestToAllFormats(mpd, path.join(OUTPUT_PATH_DASH, contentDir))
 	})
 })
 
-listDirectories(INPUT_PATH_HLS).forEach((contentDir) => {
+listDirectories(INPUT_PATH_HLS).forEach(contentDir => {
 	const hlsManifests = listM3U8Files(path.join(INPUT_PATH_HLS, contentDir))
 	if (!hlsManifests.error) {
 		manifestToAllFormats(

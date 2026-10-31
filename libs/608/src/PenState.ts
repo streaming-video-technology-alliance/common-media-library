@@ -44,7 +44,7 @@ import type { PenStyles } from './PenStyles.ts'
  * @public
  */
 export class PenState {
-	public foreground: string = 'white'
+	public foreground: string | null = 'white'
 	public underline: boolean = false
 	public italics: boolean = false
 	public background: string = 'black'
@@ -59,17 +59,20 @@ export class PenState {
 	}
 
 	setStyles(styles: Partial<PenStyles>): void {
-		const attribs = [
-			'foreground',
-			'underline',
-			'italics',
-			'background',
-			'flash',
-		]
-		for (const style of attribs) {
-			if (Object.prototype.hasOwnProperty.call(styles, style)) {
-				(this as any)[style] = (styles as any)[style]
-			}
+		if (styles.foreground !== undefined) {
+			this.foreground = styles.foreground
+		}
+		if (styles.underline !== undefined) {
+			this.underline = styles.underline
+		}
+		if (styles.italics !== undefined) {
+			this.italics = styles.italics
+		}
+		if (styles.background !== undefined) {
+			this.background = styles.background
+		}
+		if (styles.flash !== undefined) {
+			this.flash = styles.flash
 		}
 	}
 

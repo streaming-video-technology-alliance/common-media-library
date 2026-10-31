@@ -10,6 +10,9 @@ import type { IsoBoxMap } from './IsoBoxMap.ts'
  *
  * @public
  */
-export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: any): box is IsoBoxMap[T] {
-	return 'type' in box && box.type === type
+export function isIsoBoxType<T extends keyof IsoBoxMap>(
+	type: T,
+	box: unknown,
+): box is IsoBoxMap[T] {
+	return typeof box === 'object' && box !== null && 'type' in box && box.type === type
 }

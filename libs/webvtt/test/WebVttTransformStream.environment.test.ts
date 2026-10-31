@@ -1,5 +1,5 @@
 import { equal, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 // This file must not import @svta/cml-webvtt statically: the module has to be
 // evaluated for the first time after TransformStream has been removed to
@@ -16,7 +16,10 @@ describe('WebVttTransformStream in a runtime without TransformStream', () => {
 			const { parseWebVtt, WebVttTransformStream } = await import('@svta/cml-webvtt')
 
 			equal(typeof WebVttTransformStream, 'function')
-			throws(() => new WebVttTransformStream(), /TransformStream is not available in this environment/)
+			throws(
+				() => new WebVttTransformStream(),
+				/TransformStream is not available in this environment/,
+			)
 
 			// Non-stream exports remain fully usable
 			const { cues } = await parseWebVtt('WEBVTT\n\n00:00:00.000 --> 00:00:01.000\ntest')

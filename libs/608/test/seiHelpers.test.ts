@@ -1,6 +1,6 @@
 import { extractNalUnitType, isSeiNalUnitType } from '../src/utils/seiHelpers.ts'
 import { equal, deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('isSeiNalUnitType Tests', () => {
 	// #region example
@@ -58,7 +58,7 @@ describe('extractNalUnitType Tests', () => {
 		// Type 39 shifted left 1 bit: (39 << 1) = 0x4E
 		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
-		view.setUint8(0, 0x4E)
+		view.setUint8(0, 0x4e)
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 39, headerSize: 2 })
@@ -82,7 +82,7 @@ describe('extractNalUnitType Tests', () => {
 		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
 		view.setUint8(0, 0x00)
-		view.setUint8(1, 0xB8)
+		view.setUint8(1, 0xb8)
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 23, headerSize: 2 })
@@ -94,7 +94,7 @@ describe('extractNalUnitType Tests', () => {
 		const buffer = new ArrayBuffer(2)
 		const view = new DataView(buffer)
 		view.setUint8(0, 0x00)
-		view.setUint8(1, 0xC0)
+		view.setUint8(1, 0xc0)
 
 		const result = extractNalUnitType(view, 0)
 		deepEqual(result, { nalType: 24, headerSize: 2 })

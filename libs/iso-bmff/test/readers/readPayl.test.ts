@@ -1,4 +1,14 @@
-import { assert, describe, findBox, isContainer, it, readIsoBoxes, readMdat, readPayl } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	findBox,
+	isContainer,
+	it,
+	readIsoBoxes,
+	readMdat,
+	readPayl,
+	type WebVttCuePayloadBox,
+} from '../util/box.ts'
 
 describe('readPayl', function () {
 	it('should correctly parse the box from sample data', function () {
@@ -8,7 +18,7 @@ describe('readPayl', function () {
 		const container = boxes[0]
 		assert(isContainer(container))
 
-		const box = container.boxes[0]
+		const box = container.boxes[0] as WebVttCuePayloadBox
 
 		assert.ok(box)
 		assert.strictEqual(box.type, 'payl')

@@ -1,9 +1,8 @@
 import { findCencContentProtection, MP4_PROTECTION_SCHEME } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('findCencContentProtection', () => {
-
 	it('should return null if no matching ContentProtection is found', () => {
 		//#region example
 		const cpArray = [

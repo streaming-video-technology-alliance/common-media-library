@@ -94,8 +94,8 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 	}
 
 	const re_integer = /^(\d+)?/g
-	const result_integer = re_integer.exec(src) as any
-	if (result_integer[0].length === 0) {
+	const result_integer = re_integer.exec(src)
+	if (!result_integer || result_integer[0].length === 0) {
 		throw integerOrDecimalError(orig)
 	}
 	num += result_integer[1]
@@ -108,10 +108,10 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 		}
 
 		const re_decimal = /^(\.\d+)?/g
-		const result_decimal = re_decimal.exec(src) as any
+		const result_decimal = re_decimal.exec(src)
 		src = src.substring(re_decimal.lastIndex)
 		// 9.2.  If the number of characters after "." in input_number is greater than three, fail parsing.
-		if (result_decimal[0].length === 0 || result_decimal[1].length > 4) {
+		if (!result_decimal || result_decimal[0].length === 0 || result_decimal[1].length > 4) {
 			throw integerOrDecimalError(orig)
 		}
 
@@ -122,8 +122,7 @@ export function parseIntegerOrDecimal(src: string): ParsedValue<number> {
 		}
 
 		value = parseFloat(num) * sign
-	}
-	else {
+	} else {
 		// integer
 		// 7.5.  If type is "integer" and input_number contains more than 15 characters, fail parsing.
 		if (num.length > 15) {

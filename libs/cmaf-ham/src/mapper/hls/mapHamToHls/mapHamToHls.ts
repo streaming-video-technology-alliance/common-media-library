@@ -14,11 +14,9 @@ export function mapHamToHls(presentations: Presentation[]): ManifestFile {
 		presentation.selectionSets.map((selectionSet: SelectionSet) => {
 			selectionSet.switchingSets.map((switchingSet: SwitchingSet) => {
 				switchingSet.tracks.map((track: Track) => {
-					const { mainRef, playlist } =
-						generateManifestPlaylistPiece(track)
+					const { mainRef, playlist } = generateManifestPlaylistPiece(track)
 					mainManifest += mainRef
-					const manifestFileName =
-						track.url ?? `${track.id}.m3u8`
+					const manifestFileName = track.url ?? `${track.id}.m3u8`
 					playlists.push({
 						manifest: playlist,
 						type: 'hls',

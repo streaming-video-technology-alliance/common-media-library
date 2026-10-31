@@ -1,23 +1,39 @@
-import { deepEqual, equal } from 'node:assert'
+import { deepEqual, equal, ok } from 'node:assert'
 import { readFile } from 'node:fs/promises'
-import { describe, it, defaultWriterConfig, readFtyp, readIsoBoxes, writeFtyp, writeIsoBoxes, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
+import {
+	describe,
+	it,
+	defaultWriterConfig,
+	readFtyp,
+	readIsoBoxes,
+	writeFtyp,
+	writeIsoBoxes,
+	writeMdat,
+	writeMfhd,
+	writeStyp,
+	writeSubs,
+	writeTfdt,
+	writeTfhd,
+	writeTrun,
+	type IsoBoxStreamable,
+} from './util/box.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 
 describe('writeIsoBoxes', function () {
 	it('should write to a parsed file', async function () {
 		// #region example
-		const isoFile = await readFile('test/fixtures/captions.mp4')
+		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 
 		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
 			readers: {
 				ftyp: readFtyp,
-			}
+			},
 		})
 
 		const bytes = writeIsoBoxes(boxes, {
 			writers: {
 				ftyp: writeFtyp,
-			}
+			},
 		})
 
 		deepEqual(isoFile, reduceUint8Arrays(bytes))
@@ -30,16 +46,18 @@ describe('writeIsoBoxes', function () {
 				type: 'styp',
 				majorBrand: 'cmfs',
 				minorVersion: 0,
-				compatibleBrands: ['iso9', 'dash']
-			}, {
+				compatibleBrands: ['iso9', 'dash'],
+			},
+			{
 				type: 'moof',
 				boxes: [
 					{
 						type: 'mfhd',
 						version: 0,
 						flags: 0,
-						sequenceNumber: 1
-					}, {
+						sequenceNumber: 1,
+					},
+					{
 						type: 'traf',
 						boxes: [
 							{
@@ -47,12 +65,14 @@ describe('writeIsoBoxes', function () {
 								trackId: 1,
 								version: 0,
 								flags: 131072,
-							}, {
+							},
+							{
 								type: 'tfdt',
 								version: 1,
 								flags: 0,
 								baseMediaDecodeTime: 0,
-							}, {
+							},
+							{
 								type: 'subs',
 								version: 1,
 								flags: 0,
@@ -61,25 +81,30 @@ describe('writeIsoBoxes', function () {
 									{
 										sampleDelta: 1,
 										subsampleCount: 3,
-										subsamples: [{
-											subsampleSize: 5,
-											subsamplePriority: 0,
-											discardable: 0,
-											codecSpecificParameters: 0,
-										}, {
-											subsampleSize: 6,
-											subsamplePriority: 0,
-											discardable: 0,
-											codecSpecificParameters: 0,
-										}, {
-											subsampleSize: 5,
-											subsamplePriority: 0,
-											discardable: 0,
-											codecSpecificParameters: 0,
-										}],
+										subsamples: [
+											{
+												subsampleSize: 5,
+												subsamplePriority: 0,
+												discardable: 0,
+												codecSpecificParameters: 0,
+											},
+											{
+												subsampleSize: 6,
+												subsamplePriority: 0,
+												discardable: 0,
+												codecSpecificParameters: 0,
+											},
+											{
+												subsampleSize: 5,
+												subsamplePriority: 0,
+												discardable: 0,
+												codecSpecificParameters: 0,
+											},
+										],
 									},
 								],
-							}, {
+							},
+							{
 								type: 'trun',
 								version: 0,
 								flags: 1793,
@@ -91,20 +116,18 @@ describe('writeIsoBoxes', function () {
 										sampleSize: 16,
 										sampleFlags: 16777216,
 									},
-								]
+								],
 							},
 						],
 					},
 				],
-			}, {
+			},
+			{
 				type: 'mdat',
 				data: new Uint8Array([
-					102, 105, 114, 115, 116,
-					115, 101, 99, 111, 110,
-					100, 116, 104, 105, 114,
-					100
+					102, 105, 114, 115, 116, 115, 101, 99, 111, 110, 100, 116, 104, 105, 114, 100,
 				]),
-			}
+			},
 		]
 
 		const bytes = writeIsoBoxes(boxes, {
@@ -116,15 +139,34 @@ describe('writeIsoBoxes', function () {
 				trun: writeTrun,
 				subs: writeSubs,
 				mdat: writeMdat,
-			}
+			},
 		})
 
-		const isoFile = await readFile('test/fixtures/subsample.m4s')
+		const isoFile = await readFile(new URL('./fixtures/subsample.m4s', import.meta.url))
 		deepEqual(isoFile, reduceUint8Arrays(bytes))
 	})
 
-	it('should exit if boxes are empty', async function () {
+	it('should exit if boxes are empty', function () {
 		const bytes = writeIsoBoxes([], defaultWriterConfig())
 		equal(bytes.length, 0)
+	})
+
+	it('should copy a box given as a view over a SharedArrayBuffer', function () {
+		const bytes = [0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65]
+		const shared = new Uint8Array(new SharedArrayBuffer(bytes.length))
+		shared.set(bytes)
+
+		const [result] = writeIsoBoxes([shared], defaultWriterConfig())
+
+		ok(result.buffer instanceof ArrayBuffer)
+		deepEqual([...result], bytes)
+	})
+
+	it('should not copy a box given as a view over an ArrayBuffer', function () {
+		const plain = new Uint8Array([0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65])
+
+		const [result] = writeIsoBoxes([plain], defaultWriterConfig())
+
+		equal(result.buffer, plain.buffer)
 	})
 })

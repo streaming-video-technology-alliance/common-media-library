@@ -38,7 +38,10 @@ import { validateCmcdHeaders } from './validateCmcdHeaders.ts'
  *
  * @public
  */
-export function validateCmcdRequest(request: Request | HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdDataValidationResult {
+export function validateCmcdRequest(
+	request: Request | HttpRequest,
+	options?: Omit<CmcdValidationOptions, 'reportingMode'>,
+): CmcdDataValidationResult {
 	const headers = extractHeaderRecord(request.headers)
 	const param = getCmcdQueryParam(request.url)
 
@@ -51,10 +54,13 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 
 		const conflict: CmcdValidationResult = {
 			valid: false,
-			issues: [{
-				message: 'CMCD data found in both request headers and the "CMCD" query parameter. A request must use only one transmission mode.',
-				severity: CMCD_VALIDATION_SEVERITY_ERROR,
-			}],
+			issues: [
+				{
+					message:
+						'CMCD data found in both request headers and the "CMCD" query parameter. A request must use only one transmission mode.',
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
+				},
+			],
 		}
 
 		return { ...mergeValidationResults(conflict, result), data: result.data }
@@ -63,13 +69,15 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 	if (!param) {
 		return {
 			valid: false,
-			issues: [{
-				message: hasCmcdInFragment(request.url)
-					? 'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.'
-					: 'No CMCD data found in request headers or query parameters.',
-				severity: CMCD_VALIDATION_SEVERITY_ERROR,
-			}],
-			data: {} as CmcdData,
+			issues: [
+				{
+					message: hasCmcdInFragment(request.url)
+						? 'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.'
+						: 'No CMCD data found in request headers or query parameters.',
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
+				},
+			],
+			data: {},
 		}
 	}
 
@@ -79,11 +87,13 @@ export function validateCmcdRequest(request: Request | HttpRequest, options?: Om
 	} catch {
 		return {
 			valid: false,
-			issues: [{
-				message: 'Failed to decode CMCD query parameter: invalid structured field syntax.',
-				severity: CMCD_VALIDATION_SEVERITY_ERROR,
-			}],
-			data: {} as CmcdData,
+			issues: [
+				{
+					message: 'Failed to decode CMCD query parameter: invalid structured field syntax.',
+					severity: CMCD_VALIDATION_SEVERITY_ERROR,
+				},
+			],
+			data: {},
 		}
 	}
 
@@ -111,7 +121,9 @@ function hasCmcdInFragment(url: string): boolean {
 	return hash >= 0 && CMCD_IN_FRAGMENT.test(url.slice(hash + 1))
 }
 
-function extractHeaderRecord(headers: Headers | Record<string, string> | undefined): Partial<Record<CmcdHeaderField, string>> | undefined {
+function extractHeaderRecord(
+	headers: Headers | Record<string, string> | undefined,
+): Partial<Record<CmcdHeaderField, string>> | undefined {
 	if (!headers) {
 		return undefined
 	}

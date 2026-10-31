@@ -6,8 +6,9 @@ Open source players such as [hls.js](https://github.com/video-dev/hls.js/), [das
 
 ## Project structure
 
-This project is a monorepo with three workspaces: `libs`, `docs`, and `dev`. The `libs` workspace contains the individual libraries, which are published to npm. The `docs` workspace contains the documentation for all the libraries. The documentation is published as one site on GitHub Pages. The `dev` workspace is a private development server. The available libraries are:
+This project is a monorepo with three workspaces: `libs`, `site`, and `dev`. The `libs` workspace contains the individual libraries, which are published to npm. The `site` workspace contains the website: the landing page, the package guides, and the API reference. The site is published on GitHub Pages. The `dev` workspace is a private development server. The available libraries are:
 
+- `@svta/cml-abr`
 - `@svta/cml-cmcd`
 - `@svta/cml-cmsd`
 - `@svta/cml-content-steering`
@@ -34,6 +35,8 @@ Install one of the libraries with npm:
 npm i @svta/cml-cmcd
 ```
 
+The type declarations need TypeScript 5.7 or later.
+
 ## Usage
 
 ```typescript
@@ -42,19 +45,29 @@ import { appendCmcdQuery, CmcdObjectType } from "@svta/cml-cmcd";
 const cmcd = {
 	sid: "4f2867f2-b0fd-4db7-a3e0-cea7dff44cfb",
 	cid: "cc002fc3-d9e1-418d-9a5f-3d0eac601882",
-	d: 324.69,
-	ot: CmcdObjectType.MANIFEST,
+	d: 4004.37,
+	ot: CmcdObjectType.VIDEO,
 	["com.example-hello"]: "world",
 };
 
-const cmcdUrl = appendCmcdQuery("https://example.com/playlist.m3u8", cmcd);
+const cmcdUrl = appendCmcdQuery("https://example.com/video/segment-1.m4s", cmcd);
 console.log(cmcdUrl);
-// https://example.com/playlist.m3u8?CMCD=cid%3D%22cc002fc3-d9e1-418d-9a5f-3d0eac601882%22%2Ccom.example-hello%3D%22world%22%2Cd%3D325%2Cot%3Dm%2Csid%3D%224f2867f2-b0fd-4db7-a3e0-cea7dff44cfb%22
+// https://example.com/video/segment-1.m4s?CMCD=cid%3D%22cc002fc3-d9e1-418d-9a5f-3d0eac601882%22%2Ccom.example-hello%3D%22world%22%2Cd%3D4004%2Cot%3Dv%2Csid%3D%224f2867f2-b0fd-4db7-a3e0-cea7dff44cfb%22%2Cv%3D2
 ```
 
 ## Documentation
 
-Read the [API documentation](https://streaming-video-technology-alliance.github.io/common-media-library/).
+Read the [API documentation](https://cml.svta.org/).
+
+## Coding agents
+
+The repository ships a skill that tells a coding agent which package covers a media playback task. Install the skill in a player project:
+
+```bash
+npx skills add streaming-video-technology-alliance/common-media-library
+```
+
+Agents that read documentation from the web can begin with [llms.txt](https://cml.svta.org/llms.txt).
 
 ## Community
 

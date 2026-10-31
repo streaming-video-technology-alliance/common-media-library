@@ -68,8 +68,8 @@ export class IsoBoxWriteView {
 				break
 
 			case 3: {
-				const s1 = (value & 0xFFFF00) >> 8
-				const s2 = (value & 0x0000FF)
+				const s1 = (value & 0xffff00) >> 8
+				const s2 = value & 0x0000ff
 				dataView.setUint16(cursor, s1)
 				dataView.setUint8(cursor + 2, s2)
 				break
@@ -83,7 +83,7 @@ export class IsoBoxWriteView {
 				// Warning: JavaScript cannot handle 64-bit integers natively.
 				// This will give unexpected results for integers >= 2^53
 				const s1 = Math.floor(value / Math.pow(2, 32))
-				const s2 = value - (s1 * Math.pow(2, 32))
+				const s2 = value - s1 * Math.pow(2, 32)
 				dataView.setUint32(cursor, s1)
 				dataView.setUint32(cursor + 4, s2)
 				break
@@ -119,7 +119,7 @@ export class IsoBoxWriteView {
 				// Warning: JavaScript cannot handle 64-bit integers natively.
 				// This will give unexpected results for integers >= 2^53
 				const s1 = Math.floor(value / Math.pow(2, 32))
-				const s2 = value - (s1 * Math.pow(2, 32))
+				const s2 = value - s1 * Math.pow(2, 32)
 				dataView.setUint32(cursor, s1)
 				dataView.setUint32(cursor + 4, s2)
 				break
@@ -190,8 +190,14 @@ export class IsoBoxWriteView {
 	 * @param size - The size, in bytes, of each data value.
 	 * @param length - The number of values to write. (optional)
 	 */
-	writeArray = <T extends keyof IsoFieldTypeMap>(data: number[], type: T, size: number, length: number): void => {
-		const write = type === UINT ? this.writeUint : type === TEMPLATE ? this.writeTemplate : this.writeInt
+	writeArray = <T extends keyof IsoFieldTypeMap>(
+		data: number[],
+		type: T,
+		size: number,
+		length: number,
+	): void => {
+		const write =
+			type === UINT ? this.writeUint : type === TEMPLATE ? this.writeTemplate : this.writeInt
 
 		for (let i = 0; i < length; i++) {
 			write(data[i] ?? 0, size)

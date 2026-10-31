@@ -1,9 +1,24 @@
 import { readFile } from 'fs/promises'
-import { assert, createAudioSampleEntryReader, createVisualSampleEntryReader, describe, filterIsoBoxes, findIsoBox, IsoBoxWriteView, it, readIsoBoxes, readStsd, writeIsoBoxes, writeStsd, writeVisualSampleEntryBox, type IsoBoxReadView } from './util/box.ts'
+import {
+	assert,
+	createAudioSampleEntryReader,
+	createVisualSampleEntryReader,
+	describe,
+	filterIsoBoxes,
+	findIsoBox,
+	IsoBoxWriteView,
+	it,
+	readIsoBoxes,
+	readStsd,
+	writeIsoBoxes,
+	writeStsd,
+	writeVisualSampleEntryBox,
+	type IsoBoxReadView,
+} from './util/box.ts'
 
 describe('API', function () {
 	it('should handle advanced use cases', async () => {
-		const isoFile = await readFile('test/fixtures/hvc1_init.mp4')
+		const isoFile = await readFile(new URL('./fixtures/hvc1_init.mp4', import.meta.url))
 		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
 			readers: {
 				stsd: readStsd,
@@ -31,13 +46,13 @@ describe('API', function () {
 			writers: {
 				hvc1: writeVisualSampleEntryBox,
 				dvh1: writeVisualSampleEntryBox,
-				test: (box: any) => {
+				test: (box: { type: string; value: number }) => {
 					const view = new IsoBoxWriteView(box.type, 4)
 					view.writeUint(box.value, 4)
 					return view
 				},
 				stsd: writeStsd,
-			}
+			},
 		})
 
 		const size = stream.reduce((acc, chunk) => acc + chunk.byteLength, 0)

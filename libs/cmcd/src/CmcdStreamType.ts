@@ -29,4 +29,4 @@ export const CmcdStreamType = {
 /**
  * @public
  */
-export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;
+export type CmcdStreamType = ValueOf<typeof CmcdStreamType>

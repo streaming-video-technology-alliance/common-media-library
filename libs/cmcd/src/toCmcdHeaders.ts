@@ -19,7 +19,10 @@ import { toPreparedCmcdHeaders } from './toPreparedCmcdHeaders.ts'
  * @example
  * {@includeCode ../test/toCmcdHeaders.test.ts#example}
  */
-export function toCmcdHeaders(cmcd: Cmcd, options: CmcdEncodeOptions = {}): Record<CmcdHeaderField, string> {
+export function toCmcdHeaders(
+	cmcd: Cmcd,
+	options: CmcdEncodeOptions = {},
+): Record<CmcdHeaderField, string> {
 	if (!cmcd) {
 		return {} as Record<CmcdHeaderField, string>
 	}

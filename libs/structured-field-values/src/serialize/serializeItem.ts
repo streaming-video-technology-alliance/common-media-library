@@ -23,8 +23,7 @@ import { serializeParams } from './serializeParams.ts'
 export function serializeItem(value: SfItem | SfBareItem): string {
 	if (value instanceof SfItem) {
 		return `${serializeBareItem(value.value)}${serializeParams(value.params)}`
-	}
-	else {
+	} else {
 		return serializeBareItem(value)
 	}
 }

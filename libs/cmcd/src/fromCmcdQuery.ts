@@ -19,9 +19,28 @@ import { decodeCmcd } from './decodeCmcd.ts'
  * @example
  * {@includeCode ../test/fromCmcdQuery.test.ts#example}
  */
-export function fromCmcdQuery(query: string | URLSearchParams, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
-export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData
-export function fromCmcdQuery(query: string | URLSearchParams, options?: CmcdDecodeOptions): CmcdData | Cmcd {
+export function fromCmcdQuery(
+	query: string | URLSearchParams,
+	options: CmcdDecodeOptions & { convertToLatest: true },
+): Cmcd
+/**
+ * Decode CMCD data from a query string.
+ *
+ * @param query - The query string to decode.
+ * @param options - Options for decoding.
+ *
+ * @returns The decoded CMCD data.
+ *
+ * @public
+ */
+export function fromCmcdQuery(
+	query: string | URLSearchParams,
+	options?: CmcdDecodeOptions,
+): CmcdData
+export function fromCmcdQuery(
+	query: string | URLSearchParams,
+	options?: CmcdDecodeOptions,
+): CmcdData | Cmcd {
 	if (typeof query === 'string') {
 		query = new URLSearchParams(query)
 	}

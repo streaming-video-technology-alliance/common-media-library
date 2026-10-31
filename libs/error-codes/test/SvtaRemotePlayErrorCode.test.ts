@@ -1,6 +1,6 @@
 import { SvtaErrorCategory, SvtaRemotePlayErrorCode } from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { assertCatalogInvariants } from './data/assertCatalogInvariants.ts'
 
 describe('SvtaRemotePlayErrorCode', () => {
@@ -13,7 +13,12 @@ describe('SvtaRemotePlayErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaRemotePlayErrorCode, SvtaErrorCategory.REMOTE_PLAY, 10, 'SVTA_REMOTE_PLAY')
+		assertCatalogInvariants(
+			SvtaRemotePlayErrorCode,
+			SvtaErrorCategory.REMOTE_PLAY,
+			10,
+			'SVTA_REMOTE_PLAY',
+		)
 	})
 
 	it('matches the spec table', () => {

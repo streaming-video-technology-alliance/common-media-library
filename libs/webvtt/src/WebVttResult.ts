@@ -9,4 +9,9 @@ import type { WebVttTimestampMapResult } from './WebVttTimestampMapResult.ts'
  *
  * @public
  */
-export type WebVttResult = WebVttCueResult | WebVttRegionResult | WebVttTimestampMapResult | WebVttStyleResult | WebVttErrorResult;
+export type WebVttResult =
+	| WebVttCueResult
+	| WebVttRegionResult
+	| WebVttTimestampMapResult
+	| WebVttStyleResult
+	| WebVttErrorResult

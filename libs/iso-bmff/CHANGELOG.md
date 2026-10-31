@@ -10,7 +10,19 @@ and this project adheres to
 
 ### Changed
 
+- `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
+- `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
+- Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+
+## [1.0.7] - 2026-10-18
+
+### Changed
+
+- Type parameter names in `dist/index.d.ts` now match the source, for example `T` instead of `T$1`.
 - README and the Reading Boxes, Writing Boxes, and Utilities guides: the prose is rewritten for readers who do not read English as a first language. The code examples are unchanged.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
 
 ## [1.0.6] - 2026-09-15
 
@@ -187,7 +199,8 @@ Official stable release. No changes since 1.0.0-beta.2.
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.6...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.7...HEAD
+[1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.6...iso-bmff-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.5...iso-bmff-v1.0.6
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.4...iso-bmff-v1.0.5
 [1.0.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.3...iso-bmff-v1.0.4

@@ -98,7 +98,8 @@ export const SvtaErrorCategory = {
 	/**
 	 * Security related error, including authentication or entitlement issues
 	 */
-	CONTENT_PROTECTION: SVTA_ERROR_CATEGORY_CONTENT_PROTECTION as typeof SVTA_ERROR_CATEGORY_CONTENT_PROTECTION,
+	CONTENT_PROTECTION:
+		SVTA_ERROR_CATEGORY_CONTENT_PROTECTION as typeof SVTA_ERROR_CATEGORY_CONTENT_PROTECTION,
 
 	/**
 	 * Defective captions or audio description

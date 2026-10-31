@@ -6,18 +6,18 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type TrackHeaderBox = FullBox & {
-	type: 'tkhd';
-	creationTime: number;
-	modificationTime: number;
-	trackId: number;
-	reserved1: number;
-	duration: number;
-	reserved2: number[];
-	layer: number;
-	alternateGroup: number;
-	volume: number;
-	reserved3: number;
-	matrix: number[];
-	width: number;
-	height: number;
-};
+	type: 'tkhd'
+	creationTime: number
+	modificationTime: number
+	trackId: number
+	reserved1: number
+	duration: number
+	reserved2: number[]
+	layer: number
+	alternateGroup: number
+	volume: number
+	reserved3: number
+	matrix: number[]
+	width: number
+	height: number
+}

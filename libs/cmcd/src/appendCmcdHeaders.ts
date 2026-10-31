@@ -18,6 +18,10 @@ import { toCmcdHeaders } from './toCmcdHeaders.ts'
  *
  * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#header-field-definition | CTA-5004-B Header Field Definition}
  */
-export function appendCmcdHeaders(headers: Record<string, string>, cmcd: Cmcd, options?: CmcdEncodeOptions): Record<string, string> {
+export function appendCmcdHeaders(
+	headers: Record<string, string>,
+	cmcd: Cmcd,
+	options?: CmcdEncodeOptions,
+): Record<string, string> {
 	return Object.assign(headers, toCmcdHeaders(cmcd, options))
 }

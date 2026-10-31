@@ -7,12 +7,12 @@ import type { TrackFragmentRandomAccessEntry } from './TrackFragmentRandomAccess
  * @public
  */
 export type TrackFragmentRandomAccessBox = FullBox & {
-	type: 'tfra';
-	trackId: number;
-	reserved: number;
-	numberOfEntry: number;
-	lengthSizeOfTrafNum: number;
-	lengthSizeOfTrunNum: number;
-	lengthSizeOfSampleNum: number;
-	entries: TrackFragmentRandomAccessEntry[];
-};
+	type: 'tfra'
+	trackId: number
+	reserved: number
+	numberOfEntry: number
+	lengthSizeOfTrafNum: number
+	lengthSizeOfTrunNum: number
+	lengthSizeOfSampleNum: number
+	entries: TrackFragmentRandomAccessEntry[]
+}

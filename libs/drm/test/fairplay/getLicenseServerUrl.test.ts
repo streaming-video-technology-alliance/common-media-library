@@ -1,11 +1,13 @@
 import { getLicenseServerUrl } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('getLicenseServerUrl', () => {
 	it('extracts URL from initData when skd:// is present', () => {
 		//#region example
-		const initData = new Uint16Array([...new TextEncoder().encode('skd://common-media-library.com')])
+		const initData = new Uint16Array([
+			...new TextEncoder().encode('skd://common-media-library.com'),
+		])
 		strictEqual(getLicenseServerUrl(initData), 'https://common-media-library.com')
 		//#endregion example
 	})

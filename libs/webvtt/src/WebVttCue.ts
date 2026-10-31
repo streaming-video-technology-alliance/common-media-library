@@ -6,18 +6,18 @@ import type { WebVttRegion } from './WebVttRegion.ts'
  * @public
  */
 export type WebVttCue = {
-	id: string;
-	startTime: number;
-	endTime: number;
-	pauseOnExit: boolean;
-	text: string;
-	align: AlignSetting;
-	region: WebVttRegion | null;
-	vertical: DirectionSetting;
-	snapToLines: boolean;
-	line: LineAndPositionSetting;
-	lineAlign: LineAlignSetting;
-	position: LineAndPositionSetting;
-	positionAlign: PositionAlignSetting;
-	size: number;
-};
+	id: string
+	startTime: number
+	endTime: number
+	pauseOnExit: boolean
+	text: string
+	align: AlignSetting
+	region: WebVttRegion | null
+	vertical: DirectionSetting
+	snapToLines: boolean
+	line: LineAndPositionSetting
+	lineAlign: LineAlignSetting
+	position: LineAndPositionSetting
+	positionAlign: PositionAlignSetting
+	size: number
+}

@@ -3,4 +3,4 @@
  *
  * @alpha
  */
-export type ManifestFormat = 'hls' | 'dash';
+export type ManifestFormat = 'hls' | 'dash'

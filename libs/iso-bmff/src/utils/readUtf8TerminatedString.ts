@@ -30,4 +30,4 @@ export function readUtf8TerminatedString(dataView: DataView, offset: number): st
 	}
 
 	return data
-};
+}

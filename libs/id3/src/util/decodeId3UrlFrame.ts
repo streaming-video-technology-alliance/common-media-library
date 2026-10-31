@@ -23,10 +23,7 @@ export function decodeId3UrlFrame(frame: RawId3Frame): DecodedId3Frame<string> |
 		}
 
 		let index = 1
-		const description: string = utf8ArrayToStr(
-			frame.data.subarray(index),
-			true,
-		)
+		const description: string = utf8ArrayToStr(frame.data.subarray(index), true)
 
 		index += description.length + 1
 		const value: string = utf8ArrayToStr(frame.data.subarray(index))

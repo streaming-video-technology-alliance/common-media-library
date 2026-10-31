@@ -14,7 +14,11 @@ import { stringToUint16 } from '@svta/cml-utils'
  * {@includeCode ../../test/fairplay/concatInitDataIdAndCertificate.test.ts#example}
  */
 
-export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array {
+export function concatInitDataIdAndCertificate(
+	initData: Uint16Array,
+	id: Uint16Array | string,
+	cert: Uint8Array,
+): Uint8Array<ArrayBuffer> {
 	if (typeof id === 'string') {
 		id = stringToUint16(id)
 	}

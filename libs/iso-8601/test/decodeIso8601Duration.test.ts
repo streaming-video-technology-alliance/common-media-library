@@ -1,11 +1,11 @@
 import { decodeIso8601Duration } from '@svta/cml-iso-8601'
 import assert, { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 const HUGE_NUMBER_STRING = new Array(500).join('7')
 
 describe('decodeIso8601Duration', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const result = decodeIso8601Duration('PT1H1M1S')
 
@@ -65,12 +65,18 @@ describe('decodeIso8601Duration', () => {
 		equal(decodeIso8601Duration('P1DT1H2M3.3S'), 90123.3)
 
 		// Months, hours, minutes, and seconds.
-		equal(decodeIso8601Duration('P1M1DT1H2M3S') < (60 * 60 * 24 * 31) + 90123 + 1, true)
-		equal(decodeIso8601Duration('P1M1DT1H2M3S') > (60 * 60 * 24 * 28) + 90123 - 1, true)
+		equal(decodeIso8601Duration('P1M1DT1H2M3S') < 60 * 60 * 24 * 31 + 90123 + 1, true)
+		equal(decodeIso8601Duration('P1M1DT1H2M3S') > 60 * 60 * 24 * 28 + 90123 - 1, true)
 
 		// Years, Months, hours, minutes, and seconds.
-		equal(decodeIso8601Duration('P1Y1M1DT1H2M3S') < (60 * 60 * 24 * 366) + (60 * 60 * 24 * 31) + 90123 + 1, true)
-		equal(decodeIso8601Duration('P1Y1M1DT1H2M3S') > (60 * 60 * 24 * 365) + (60 * 60 * 24 * 28) + 90123 - 1, true)
+		equal(
+			decodeIso8601Duration('P1Y1M1DT1H2M3S') < 60 * 60 * 24 * 366 + 60 * 60 * 24 * 31 + 90123 + 1,
+			true,
+		)
+		equal(
+			decodeIso8601Duration('P1Y1M1DT1H2M3S') > 60 * 60 * 24 * 365 + 60 * 60 * 24 * 28 + 90123 - 1,
+			true,
+		)
 
 		equal(decodeIso8601Duration('PT'), 0)
 		equal(decodeIso8601Duration('P'), 0)
@@ -84,6 +90,15 @@ describe('decodeIso8601Duration', () => {
 		equal(decodeIso8601Duration('123'), NaN)
 		equal(decodeIso8601Duration('abc'), NaN)
 		equal(decodeIso8601Duration(''), NaN)
+
+		// A time designator needs the T.
+		equal(decodeIso8601Duration('P1H'), NaN)
+		equal(decodeIso8601Duration('P1S'), NaN)
+
+		// Every designator needs a number.
+		equal(decodeIso8601Duration('PTH1M'), NaN)
+		equal(decodeIso8601Duration('PT1.S'), NaN)
+		equal(decodeIso8601Duration('PYT1S'), NaN)
 
 		equal(decodeIso8601Duration('P' + HUGE_NUMBER_STRING + 'Y'), NaN)
 		equal(decodeIso8601Duration('P' + HUGE_NUMBER_STRING + 'M'), NaN)

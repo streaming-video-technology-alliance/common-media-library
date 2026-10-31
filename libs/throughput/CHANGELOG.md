@@ -8,10 +8,47 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-26
+
+### Added
+
+- `EwmaEstimatorOptions.minTransferDuration`: the shortest transfer, in milliseconds, that counts as a sample. A body that arrives within a few milliseconds of its headers came from a cache. shaka-player uses 5. Default 0 ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+
+### Changed
+
+- Every estimator measures a sample over its transfer, from `responseStart` to the end of the response, when the sample has `responseStart`. `EwmaEstimator` also weights the sample by that transfer. Before, the rate and the weight included the wait for the first byte, so a 112 kB live segment on a connection with an 800 ms wait measured about 1 Mbps and carried 0.85 s of weight ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- Every estimator ignores a sample whose body arrived with its first byte, a transfer of 0 ms.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+
+## [1.1.0] - 2026-10-18
+
+### Changed
+
+- `EwmaEstimator` no longer adds `defaultEstimate` to both averages as a sample with a weight of 1 second. The first valid estimate is the measured rate. Before, the estimate stayed near `defaultEstimate` for about 1 second of download time.
+- README: a section on the samples the estimators ignore, with the browser rules for the body size of a cross-origin response.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
+
+### Fixed
+
+- Every estimator now ignores a sample with an `encodedBodySize` of 0 or less, `NaN`, or `Infinity`. Before, a zero-byte sample counted as 0 bits per second and moved the estimate toward 0.
+- `ArithmeticMeanEstimator`, `HarmonicMeanEstimator`, and `ZlemaEstimator` now ignore a sample with a `duration` of 0 or less, `NaN`, or `Infinity`. Before, a zero duration made the estimate `Infinity` or `NaN`. `EwmaEstimator` already ignored that sample.
+
+## [1.0.10] - 2026-10-12
+
 ### Changed
 
 - README: the usage example imports from `@svta/cml-throughput` instead of an unexported subpath, and prints its result instead of calling an undefined `assert`.
+- The TSDoc of `EwmaEstimatorOptions` describes each option, the default value, and the shaka-player value.
 
+### Fixed
+
+- The `getEstimate` TSDoc states the unit as bits per second. Before, the comment said bytes per second.
+- `EwmaEstimator` now returns a positive estimate. Before, the estimator used the half-life as the smoothing factor and could return a negative estimate. All estimates change after this fix.
+- `EwmaEstimator` now returns `defaultEstimate` until the first sample.
+- `Ewma.sample` now weights the new value by `1 - alpha ^ weight` and the previous estimate by `alpha ^ weight`. Before, the new value received the weight `alpha ^ weight`. The constructor still takes the smoothing factor `alpha`, and the estimate of a direct `Ewma` instance changes.
+- `Ewma.getEstimate` now returns 0 for an empty `Ewma`. Before, the method returned `NaN`. With an `alpha` of 0, the method now returns the last value.
+- `Ewma.sample` now ignores a sample that would make the estimate `NaN`. The estimate and the total duration do not change for that sample.
+- `EwmaEstimator.sample` now ignores a sample with a duration of 0 or less. Before, a zero duration made every later estimate infinite or `NaN`, and a negative duration gave a negative estimate.
 
 ## [1.0.9] - 2026-09-15
 
@@ -75,7 +112,10 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.9...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.2.0...HEAD
+[1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.1.0...throughput-v1.2.0
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.10...throughput-v1.1.0
+[1.0.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.9...throughput-v1.0.10
 [1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.8...throughput-v1.0.9
 [1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.7...throughput-v1.0.8
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/throughput-v1.0.6...throughput-v1.0.7

@@ -11,6 +11,9 @@ import { serializeDict } from './serialize/serializeDict.ts'
  *
  * @public
  */
-export function encodeSfDict(value: Record<string, any> | Map<string, any>, options?: SfEncodeOptions): string {
+export function encodeSfDict(
+	value: Record<string, any> | Map<string, any>,
+	options?: SfEncodeOptions,
+): string {
 	return serializeDict(value, options)
 }

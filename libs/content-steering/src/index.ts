@@ -25,4 +25,3 @@ export type * from './SteeringManifest.ts'
 export * from './SteeringProtocol.ts'
 export type * from './SteeringRequester.ts'
 export type * from './UriReplacement.ts'
-

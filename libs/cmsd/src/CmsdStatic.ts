@@ -12,12 +12,11 @@ import type { CmsdValue } from './CmsdValue.ts'
  * @public
  */
 export type CmsdStatic = {
-
 	/**
 	 * Custom key names may be used, but they MUST carry a hyphenated prefix to ensure that there will not be a namespace collision
 	 * with future revisions to this specification. Clients SHOULD use a reverse-DNS syntax when defining their own prefix.
 	 */
-	[index: CmsdCustomKey]: CmsdValue;
+	[index: CmsdCustomKey]: CmsdValue
 
 	/**
 	 * Availability time
@@ -28,7 +27,7 @@ export type CmsdStatic = {
 	 *
 	 * Integer Milliseconds
 	 */
-	at?: number;
+	at?: number
 
 	/**
 	 * Encoded bitrate
@@ -39,7 +38,7 @@ export type CmsdStatic = {
 	 *
 	 * Integer kbps
 	 */
-	br?: number;
+	br?: number
 
 	/**
 	 * Object duration
@@ -50,7 +49,7 @@ export type CmsdStatic = {
 	 *
 	 * Integer milliseconds
 	 */
-	d?: number;
+	d?: number
 
 	/**
 	 * Held time
@@ -60,7 +59,7 @@ export type CmsdStatic = {
 	 *
 	 * Integer Milliseconds
 	 */
-	ht?: number;
+	ht?: number
 
 	/**
 	 * Intermediary identifier
@@ -70,7 +69,7 @@ export type CmsdStatic = {
 	 *
 	 * String
 	 */
-	n?: string;
+	n?: string
 
 	/**
 	 * Next object request
@@ -81,7 +80,7 @@ export type CmsdStatic = {
 	 *
 	 * String
 	 */
-	nor?: string;
+	nor?: string
 
 	/**
 	 * Next range request
@@ -97,7 +96,7 @@ export type CmsdStatic = {
 	 *
 	 * String
 	 */
-	nrr?: string;
+	nrr?: string
 
 	/**
 	 * Object type
@@ -117,7 +116,7 @@ export type CmsdStatic = {
 	 *
 	 * Token
 	 */
-	ot?: CmsdObjectType;
+	ot?: CmsdObjectType
 
 	/**
 	 * Streaming format
@@ -133,7 +132,7 @@ export type CmsdStatic = {
 	 *
 	 * Token
 	 */
-	sf?: CmsdStreamingFormat;
+	sf?: CmsdStreamingFormat
 
 	/**
 	 * Stream type
@@ -142,7 +141,7 @@ export type CmsdStatic = {
 	 *
 	 * Token
 	 */
-	st?: CmsdStreamType;
+	st?: CmsdStreamType
 
 	/**
 	 * Startup
@@ -152,7 +151,7 @@ export type CmsdStatic = {
 	 *
 	 * Boolean
 	 */
-	su?: boolean;
+	su?: boolean
 
 	/**
 	 * CMSD version
@@ -162,5 +161,5 @@ export type CmsdStatic = {
 	 *
 	 * Integer
 	 */
-	v?: number;
-};
+	v?: number
+}

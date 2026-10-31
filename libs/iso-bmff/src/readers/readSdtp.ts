@@ -17,4 +17,4 @@ export function readSdtp(view: IsoBoxReadView): SampleDependencyTypeBox {
 		...view.readFullBox(),
 		sampleDependencyTable: view.readArray(UINT, 1, view.bytesRemaining),
 	}
-};
+}

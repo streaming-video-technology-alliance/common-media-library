@@ -13,8 +13,6 @@ export const specialCea608CharsCodes: Record<number, number> = {
 	126: 241, // lowercase n tilde
 	127: 9608, // Full block
 
-
-
 	// THIS BLOCK INCLUDES THE 16 EXTENDED (TWO-BYTE) LINE 21 CHARACTERS
 	// THAT COME FROM HI BYTE=0x11 AND LOW BETWEEN 0x30 AND 0x3F
 	// THIS MEANS THAT \x50 MUST BE ADDED TO THE VALUES
@@ -34,7 +32,6 @@ export const specialCea608CharsCodes: Record<number, number> = {
 	141: 238, // lowercase i, circumflex accent
 	142: 244, // lowercase o, circumflex accent
 	143: 251, // lowercase u, circumflex accent
-
 
 	// THIS BLOCK INCLUDES THE 32 EXTENDED (TWO-BYTE) LINE 21 CHARACTERS
 	// THAT COME FROM HI BYTE=0x12 AND LOW BETWEEN 0x20 AND 0x3F
@@ -70,7 +67,6 @@ export const specialCea608CharsCodes: Record<number, number> = {
 	173: 219, // uppercase U, circumflex
 	174: 171, // left-pointing double angle quotation mark
 	175: 187, // right-pointing double angle quotation mark
-
 
 	// THIS BLOCK INCLUDES THE 32 EXTENDED (TWO-BYTE) LINE 21 CHARACTERS
 	// THAT COME FROM HI BYTE=0x13 AND LOW BETWEEN 0x20 AND 0x3F

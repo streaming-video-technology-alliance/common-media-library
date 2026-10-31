@@ -6,6 +6,6 @@
  *
  * @public
  */
-export function decodeBase64(str: string): Uint8Array {
-	return new Uint8Array([...atob(str)].map((a) => a.charCodeAt(0)))
+export function decodeBase64(str: string): Uint8Array<ArrayBuffer> {
+	return new Uint8Array([...atob(str)].map(a => a.charCodeAt(0)))
 }

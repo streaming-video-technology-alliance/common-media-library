@@ -21,6 +21,7 @@ and this project adheres to
 
 - `UriReplacement` has the optional HLS keys `PER-VARIANT-URIS` and `PER-RENDITION-URIS` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - The package has a peer dependency on `@svta/cml-utils`. The package imports only types from it ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ## [0.23.1] - 2025-12-22
 

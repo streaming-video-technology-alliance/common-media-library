@@ -4,14 +4,16 @@
  * @alpha
  */
 export type PlayList = {
-	uri: string;
+	uri: string
 	attributes: {
-		FRAME_RATE: number;
-		CODECS: string;
-		BANDWIDTH: number;
+		FRAME_RATE: number
+		'FRAME-RATE'?: number
+		LANGUAGE?: string
+		CODECS: string
+		BANDWIDTH: number
 		RESOLUTION: {
-			width: number;
-			height: number;
-		};
-	};
-};
+			width: number
+			height: number
+		}
+	}
+}

@@ -1,6 +1,18 @@
-import { getSvtaErrorCategory, SvtaAccessibilityErrorCode, SvtaAdvertisingErrorCode, SvtaContentProtectionErrorCode, SvtaCustomErrorCode, SvtaErrorCategory, SvtaMediaContentErrorCode, SvtaNetworkErrorCode, SvtaPlaybackErrorCode, SvtaRemotePlayErrorCode, SvtaUnknownErrorCode } from '@svta/cml-error-codes'
+import {
+	getSvtaErrorCategory,
+	SvtaAccessibilityErrorCode,
+	SvtaAdvertisingErrorCode,
+	SvtaContentProtectionErrorCode,
+	SvtaCustomErrorCode,
+	SvtaErrorCategory,
+	SvtaMediaContentErrorCode,
+	SvtaNetworkErrorCode,
+	SvtaPlaybackErrorCode,
+	SvtaRemotePlayErrorCode,
+	SvtaUnknownErrorCode,
+} from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('getSvtaErrorCategory', () => {
 	it('provides a valid example', () => {

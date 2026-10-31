@@ -21,10 +21,7 @@ export function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 	segmentList.map((segment: SegmentList) => {
 		if (segment.SegmentURL) {
 			return segment.SegmentURL.forEach((segmentURL: SegmentURL) => {
-				const duration = calculateDuration(
-					segment.$.duration,
-					segment.$.timescale,
-				)
+				const duration = calculateDuration(segment.$.duration, segment.$.timescale)
 				const startTime = cumulativeTime
 				cumulativeTime += duration
 
@@ -34,7 +31,7 @@ export function mapSegmentList(segmentList: SegmentList[]): Segment[] {
 					url: segmentURL.$.media ?? '',
 					// byteRange not included - SegmentList typically doesn't include byteRange info
 					startTime,
-				} as Segment)
+				})
 			})
 		}
 	})

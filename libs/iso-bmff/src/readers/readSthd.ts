@@ -15,4 +15,4 @@ export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox {
 		type: 'sthd',
 		...view.readFullBox(),
 	}
-};
+}

@@ -67,14 +67,11 @@ export function parseString(src: string): ParsedValue<string> {
 			}
 
 			output += src[i]
-		}
-		else if (src[i] === `"`) {
+		} else if (src[i] === `"`) {
 			return parsedValue(output, src.substring(++i))
-		}
-		else if (STRING_REGEX.test(src[i])) {
+		} else if (STRING_REGEX.test(src[i])) {
 			throw parseError(src, STRING)
-		}
-		else {
+		} else {
 			output += src[i]
 		}
 

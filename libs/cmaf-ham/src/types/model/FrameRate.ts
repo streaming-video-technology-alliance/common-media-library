@@ -6,9 +6,9 @@
  * frameRateDenominator - Denominator.
  *
  * @alpha
-*/
+ */
 
 export type FrameRate = {
-	frameRateNumerator: number;
-	frameRateDenominator?: number;
-};
+	frameRateNumerator: number
+	frameRateDenominator?: number
+}

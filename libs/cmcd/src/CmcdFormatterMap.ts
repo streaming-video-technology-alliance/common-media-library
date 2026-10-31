@@ -6,4 +6,4 @@ import type { CmcdKey } from './CmcdKey.ts'
  *
  * @public
  */
-export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>;
+export type CmcdFormatterMap = Record<CmcdKey, CmcdFormatter>

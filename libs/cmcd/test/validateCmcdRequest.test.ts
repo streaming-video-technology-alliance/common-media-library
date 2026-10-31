@@ -1,6 +1,6 @@
 import { validateCmcdRequest } from '@svta/cml-cmcd'
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('validateCmcdRequest', () => {
 	it('provides a valid example', () => {
@@ -39,7 +39,10 @@ describe('validateCmcdRequest', () => {
 			})
 			const result = validateCmcdRequest(request)
 			equal(result.valid, false)
-			equal(result.issues.some(i => i.key === 'bl'), true)
+			equal(
+				result.issues.some(i => i.key === 'bl'),
+				true,
+			)
 		})
 
 		it('falls back to query parameter when no CMCD headers present', () => {
@@ -52,7 +55,10 @@ describe('validateCmcdRequest', () => {
 			const request = new Request('https://cdn.example.com/seg.mp4?CMCD=br%3D3000%2Ce%3Dps')
 			const result = validateCmcdRequest(request)
 			equal(result.valid, false)
-			equal(result.issues.some(i => i.key === 'e'), true)
+			equal(
+				result.issues.some(i => i.key === 'e'),
+				true,
+			)
 		})
 
 		it('forwards the version option with Request input', () => {
@@ -88,7 +94,10 @@ describe('validateCmcdRequest', () => {
 				},
 			})
 			equal(result.valid, false)
-			equal(result.issues.some(i => i.key === 'bl'), true)
+			equal(
+				result.issues.some(i => i.key === 'bl'),
+				true,
+			)
 		})
 
 		it('falls back to query parameter when no CMCD headers present', () => {
@@ -111,17 +120,23 @@ describe('validateCmcdRequest', () => {
 				url: 'https://cdn.example.com/seg.mp4?CMCD=br%3D3000%2Ce%3Dps',
 			})
 			equal(result.valid, false)
-			equal(result.issues.some(i => i.key === 'e'), true)
+			equal(
+				result.issues.some(i => i.key === 'e'),
+				true,
+			)
 		})
 
 		it('forwards the version option with HttpRequest input', () => {
-			const result = validateCmcdRequest({
-				url: 'https://cdn.example.com/seg.mp4',
-				headers: {
-					'CMCD-Session': 'v=2,sid="abc"',
-					'CMCD-Status': 'bs',
+			const result = validateCmcdRequest(
+				{
+					url: 'https://cdn.example.com/seg.mp4',
+					headers: {
+						'CMCD-Session': 'v=2,sid="abc"',
+						'CMCD-Status': 'bs',
+					},
 				},
-			}, { version: 2 })
+				{ version: 2 },
+			)
 			equal(result.valid, true)
 		})
 
@@ -138,7 +153,8 @@ describe('validateCmcdRequest', () => {
 	})
 
 	describe('both transmission modes', () => {
-		const message = 'CMCD data found in both request headers and the "CMCD" query parameter. A request must use only one transmission mode.'
+		const message =
+			'CMCD data found in both request headers and the "CMCD" query parameter. A request must use only one transmission mode.'
 
 		it('reports error for a Request with CMCD headers and a CMCD query parameter', () => {
 			const request = new Request('https://cdn.example.com/seg.mp4?CMCD=br%3D5000', {
@@ -148,7 +164,10 @@ describe('validateCmcdRequest', () => {
 			})
 			const result = validateCmcdRequest(request)
 			equal(result.valid, false)
-			equal(result.issues.some(i => i.severity === 'error' && i.message === message), true)
+			equal(
+				result.issues.some(i => i.severity === 'error' && i.message === message),
+				true,
+			)
 		})
 
 		it('reports error for an HttpRequest with CMCD headers and a CMCD query parameter', () => {
@@ -159,7 +178,10 @@ describe('validateCmcdRequest', () => {
 				},
 			})
 			equal(result.valid, false)
-			equal(result.issues.some(i => i.severity === 'error' && i.message === message), true)
+			equal(
+				result.issues.some(i => i.severity === 'error' && i.message === message),
+				true,
+			)
 		})
 
 		it('still validates the headers and returns their data', () => {
@@ -169,7 +191,10 @@ describe('validateCmcdRequest', () => {
 					'CMCD-Object': 'bl=21600',
 				},
 			})
-			equal(result.issues.some(i => i.key === 'bl'), true)
+			equal(
+				result.issues.some(i => i.key === 'bl'),
+				true,
+			)
 			equal(result.data['bl'], 21600)
 			equal('br' in result.data, false)
 		})
@@ -233,7 +258,10 @@ describe('validateCmcdRequest', () => {
 			const result = validateCmcdRequest({ url })
 			equal(result.valid, false)
 			equal(result.issues.length, 1)
-			equal(result.issues[0].message, 'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.')
+			equal(
+				result.issues[0].message,
+				'No CMCD data found in request headers or query parameters. The URL fragment contains a "CMCD" parameter. A server never receives the fragment.',
+			)
 			deepStrictEqual(result.data, {})
 		})
 

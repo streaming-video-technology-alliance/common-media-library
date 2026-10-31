@@ -16,4 +16,4 @@ export function readElng(view: IsoBoxReadView): ExtendedLanguageBox {
 		...view.readFullBox(),
 		extendedLanguage: view.readUtf8(-1),
 	}
-};
+}

@@ -1,9 +1,32 @@
 import { deepStrictEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
-import type { AdaptationSet, Period, Representation, SegmentTemplate } from '@svta/cml-cmaf-ham'
+import type {
+	AdaptationSet,
+	DashManifest,
+	Period,
+	Representation,
+	SegmentTemplate,
+} from '@svta/cml-cmaf-ham'
 
-import { calculateDuration, getChannels, getCodec, getContentType, getFrameRate, getGroup, getLanguage, getNumberOfSegments, getPresentationId, getSampleRate, getSar, getTrackDuration, getUrlFromTemplate } from '@svta/cml-cmaf-ham'
+import { getInitializationUrl } from '../src/mapper/dash/mapDashToHam/utils/getInitializationUrl.ts'
+
+import {
+	calculateDuration,
+	getChannels,
+	getCodec,
+	getContentType,
+	getFrameRate,
+	getGroup,
+	getLanguage,
+	getNumberOfSegments,
+	getPeriodDuration,
+	getPresentationId,
+	getSampleRate,
+	getSar,
+	getTrackDuration,
+	getUrlFromTemplate,
+} from '@svta/cml-cmaf-ham'
 
 describe('calculateDuration', () => {
 	it('returns 1 when duration is 1 and timescale is 1', () => {
@@ -29,8 +52,7 @@ describe('getChannels', () => {
 				AudioChannelConfiguration: [
 					{
 						$: {
-							schemeIdUri:
-								'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
+							schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
 							value: '2',
 						},
 					},
@@ -41,8 +63,7 @@ describe('getChannels', () => {
 				AudioChannelConfiguration: [
 					{
 						$: {
-							schemeIdUri:
-								'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
+							schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
 							value: '3',
 						},
 					},
@@ -60,8 +81,7 @@ describe('getChannels', () => {
 				AudioChannelConfiguration: [
 					{
 						$: {
-							schemeIdUri:
-								'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
+							schemeIdUri: 'urn:mpeg:dash:23003:3:audio_channel_configuration:2011',
 							value: '3',
 						},
 					},
@@ -110,10 +130,7 @@ describe('getCodec', () => {
 	})
 
 	it('returns empty string if Representation and AdaptationSet have no codecs', () => {
-		const res = getCodec(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getCodec({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		equal(res, '')
 	})
 })
@@ -243,10 +260,7 @@ describe('getFrameRate', () => {
 	})
 
 	it('returns default frame rate if there is no frameRate', () => {
-		const res = getFrameRate(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getFrameRate({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		deepStrictEqual(res, {
 			frameRateNumerator: 30,
 			frameRateDenominator: 0,
@@ -292,6 +306,138 @@ describe('getNumberOfSegments', () => {
 	})
 })
 
+describe('getPeriodDuration', () => {
+	it('returns the duration of the Period', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { duration: 'PT10S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 10)
+	})
+
+	it('returns the time to the start of the next Period if the Period has no duration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT0S' } }, { $: { start: 'PT12S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 12)
+	})
+
+	it('returns the time to the mediaPresentationDuration if the last Period has no duration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT0S' } }, { $: { start: 'PT12S' } }],
+				},
+			} as DashManifest,
+			1,
+		)
+		equal(res, 18)
+	})
+
+	it('derives the start of a Period without a start from the previous Period', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { duration: 'PT10S' } }, { $: {} }],
+				},
+			} as DashManifest,
+			1,
+		)
+		equal(res, 20)
+	})
+
+	it('derives the start of a middle Period without a start from the previous Period', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { duration: 'PT10S' } }, { $: {} }, { $: { start: 'PT25S' } }],
+				},
+			} as DashManifest,
+			1,
+		)
+		equal(res, 15)
+	})
+
+	it('returns 0 if the start of the next Period is unknown', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT0S' } }, { $: {} }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
+	})
+
+	it('returns 0 for a Period without attributes if the MPD has no mediaPresentationDuration', () => {
+		const res = getPeriodDuration({ MPD: { Period: [{ $: {} }] } } as DashManifest, 0)
+		equal(res, 0)
+	})
+
+	it('returns 0 for the last Period of a dynamic MPD without a mediaPresentationDuration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { type: 'dynamic' },
+					Period: [{ $: { start: 'PT0S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
+	})
+
+	it('returns 0 for the first Period of a dynamic MPD if the Period has no start', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { type: 'dynamic', mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: {} }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
+	})
+
+	it('returns 0 if the Period starts after the mediaPresentationDuration', () => {
+		const res = getPeriodDuration(
+			{
+				MPD: {
+					$: { mediaPresentationDuration: 'PT30S' },
+					Period: [{ $: { start: 'PT40S' } }],
+				},
+			} as DashManifest,
+			0,
+		)
+		equal(res, 0)
+	})
+
+	it('accepts a Period without a duration attribute', () => {
+		const period: Period = { $: { start: 'PT0S' }, AdaptationSet: [] }
+		const dash: DashManifest = {
+			MPD: { $: { mediaPresentationDuration: 'PT30S' }, Period: [period] },
+		}
+		equal(getPeriodDuration(dash, 0), 30)
+	})
+})
+
 describe('getPresentationId', () => {
 	it('returns period id if it exists', () => {
 		const res = getPresentationId({ $: { id: 'periodId' } } as Period, 5)
@@ -322,10 +468,7 @@ describe('getSampleRate', () => {
 	})
 
 	it('returns 0 if there is no audioSamplingRate', () => {
-		const res = getSampleRate(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getSampleRate({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		equal(res, 0)
 	})
 })
@@ -340,18 +483,12 @@ describe('getSar', () => {
 	})
 
 	it('returns sar from adaptationSet if it exists and representation does not have sar', () => {
-		const res = getSar(
-			{ $: { sar: '1:1' } } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getSar({ $: { sar: '1:1' } } as AdaptationSet, { $: {} } as Representation)
 		equal(res, '1:1')
 	})
 
 	it('returns empty string if there is no sar', () => {
-		const res = getSar(
-			{ $: {} } as AdaptationSet,
-			{ $: {} } as Representation,
-		)
+		const res = getSar({ $: {} } as AdaptationSet, { $: {} } as Representation)
 		equal(res, '')
 	})
 })
@@ -393,7 +530,7 @@ describe('getUrlFromTemplate', () => {
 			{ $: { id: 'repId' } } as Representation,
 			{
 				$: {
-					media: 'representation: $RepresentationID$ and number: $Number_one$',
+					media: 'representation: $RepresentationID$ and number: $Number$',
 				},
 			} as SegmentTemplate,
 			3,
@@ -405,10 +542,79 @@ describe('getUrlFromTemplate', () => {
 		const res = getUrlFromTemplate(
 			{ $: { id: 'repId' } } as Representation,
 			{
-				$: { media: 'number: $Number_one$' },
+				$: { media: 'number: $Number$' },
 			} as SegmentTemplate,
 			3,
 		)
 		equal(res, 'number: 3')
+	})
+
+	it('pads Number to the width of the format tag', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$RepresentationID$/$Number%03d$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/003.m4s')
+	})
+
+	it('replaces Bandwidth', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId', bandwidth: '1500000' } },
+			{ $: { media: '$RepresentationID$/$Bandwidth$/$Number$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/1500000/3.m4s')
+	})
+
+	it('replaces Time with the segment start time', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$RepresentationID$/$Time$.m4s' } } as SegmentTemplate,
+			3,
+			180000,
+		)
+		equal(res, 'repId/180000.m4s')
+	})
+
+	it('leaves Time in the url when the segment has no time', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$RepresentationID$/$Time$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/$Time$.m4s')
+	})
+
+	it('replaces $$ with a single $', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{ $: { media: '$$$RepresentationID$-$Number$$$.m4s' } } as SegmentTemplate,
+			3,
+		)
+		equal(res, '$repId-3$.m4s')
+	})
+
+	it('leaves a token outside the template grammar unchanged', () => {
+		const res = getUrlFromTemplate(
+			{ $: { id: 'repId' } } as Representation,
+			{
+				$: { media: '$RepresentationID$/$Number%d$/$SubNumber$/$Garbage$.m4s' },
+			} as SegmentTemplate,
+			3,
+		)
+		equal(res, 'repId/$Number%d$/$SubNumber$/$Garbage$.m4s')
+	})
+})
+
+describe('getInitializationUrl', () => {
+	it('replaces RepresentationID and Bandwidth in the SegmentTemplate initialization', () => {
+		const res = getInitializationUrl(
+			{
+				SegmentTemplate: [{ $: { initialization: '$RepresentationID$/$Bandwidth$/init.mp4' } }],
+			} as AdaptationSet,
+			{ $: { id: 'repId', bandwidth: '1500000' } },
+		)
+		equal(res, 'repId/1500000/init.mp4')
 	})
 })

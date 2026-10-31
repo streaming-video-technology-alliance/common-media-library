@@ -38,7 +38,11 @@ export class IsoBoxReadView {
 	 * @param config - The configuration for the IsoView.
 	 */
 	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
-		this.dataView = isArrayBufferLike(raw) ? new DataView(raw) : (raw instanceof DataView) ? raw : new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+		this.dataView = isArrayBufferLike(raw)
+			? new DataView(raw)
+			: raw instanceof DataView
+				? raw
+				: new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
 	}
@@ -107,7 +111,7 @@ export class IsoBoxReadView {
 		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this
 
-		let result: any
+		let result: unknown
 		let cursor = size
 
 		switch (type) {
@@ -125,25 +129,27 @@ export class IsoBoxReadView {
 
 			case STRING:
 				if (size === -1) {
-					result = readTerminatedString(dataView, offset)
-					cursor = result.length + 1
-				}
-				else {
+					const text = readTerminatedString(dataView, offset)
+					result = text
+					cursor = text.length + 1
+				} else {
 					result = readString(dataView, offset, size)
 				}
 				break
 
-			case DATA:
-				result = readData(dataView, offset, size)
-				cursor = result.length
+			case DATA: {
+				const data = readData(dataView, offset, size)
+				result = data
+				cursor = data.length
 				break
+			}
 
 			case UTF8:
 				if (size === -1) {
-					result = readUtf8TerminatedString(dataView, offset)
-					cursor = result.length + 1
-				}
-				else {
+					const text = readUtf8TerminatedString(dataView, offset)
+					result = text
+					cursor = text.length + 1
+				} else {
 					result = readUtf8String(dataView, offset)
 				}
 				break
@@ -154,7 +160,7 @@ export class IsoBoxReadView {
 
 		this.offset += cursor
 
-		return result
+		return result as IsoFieldTypeMap[T]
 	}
 
 	/**
@@ -237,14 +243,18 @@ export class IsoBoxReadView {
 	 * @param length - The number of values to read.
 	 * @returns The array of values.
 	 */
-	readArray = <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number): IsoFieldTypeMap[T][] => {
+	readArray = <T extends keyof IsoFieldTypeMap>(
+		type: T,
+		size: number,
+		length: number,
+	): IsoFieldTypeMap[T][] => {
 		const value = []
 
 		for (let i = 0; i < length; i++) {
 			value.push(this.read(type, size))
 		}
 
-		return value as IsoFieldTypeMap[T][]
+		return value
 	}
 
 	/**
@@ -277,7 +287,7 @@ export class IsoBoxReadView {
 			cursor += 8
 		}
 
-		const actualSize = box.size === 0 ? this.bytesRemaining : box.largesize ?? box.size
+		const actualSize = box.size === 0 ? this.bytesRemaining : (box.largesize ?? box.size)
 		if (this.cursor + actualSize > dataView.byteLength) {
 			this.truncated = true
 			throw new Error('Truncated box')
@@ -361,8 +371,7 @@ export class IsoBoxReadView {
 				}
 
 				yield box
-			}
-			catch (error) {
+			} catch (error) {
 				if (error instanceof Error && error.message === 'Truncated box') {
 					break
 				}

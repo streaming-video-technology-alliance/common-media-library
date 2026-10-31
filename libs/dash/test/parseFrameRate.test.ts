@@ -1,9 +1,9 @@
 import { parseFrameRate } from '@svta/cml-dash'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('parseFramerate', () => {
-	it('provides a valid example', async () => {
+	it('provides a valid example', () => {
 		//#region example
 		const result = parseFrameRate('24000/1001')
 
@@ -11,13 +11,13 @@ describe('parseFramerate', () => {
 		//#endregion example
 	})
 
-	it('handles integer framerates', async () => {
+	it('handles integer framerates', () => {
 		const result = parseFrameRate('30')
 
 		equal(result, 30)
 	})
 
-	it('returns NaN for invalid framerates', async () => {
+	it('returns NaN for invalid framerates', () => {
 		equal(parseFrameRate('test'), NaN)
 		equal(parseFrameRate('30/0'), NaN)
 	})

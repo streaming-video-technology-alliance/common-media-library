@@ -24,18 +24,20 @@ export function readSidx(view: IsoBoxReadView): SegmentIndexBox {
 	const reserved = readUint(2)
 	const referenceCount = readUint(2)
 	const references = view.readEntries<SegmentIndexReference>(referenceCount, () => {
-		const entry = {} as any
+		const reference = readUint(4)
+		const subsegmentDuration = readUint(4)
+		const sap = readUint(4)
 
-		entry.reference = readUint(4)
-		entry.subsegmentDuration = readUint(4)
-		entry.sap = readUint(4)
-		entry.referenceType = (entry.reference >> 31) & 0x00000001
-		entry.referencedSize = entry.reference & 0x7FFFFFFF
-		entry.startsWithSap = (entry.sap >> 31) & 0x00000001
-		entry.sapType = (entry.sap >> 28) & 0x00000007
-		entry.sapDeltaTime = (entry.sap & 0x0FFFFFFF)
-
-		return entry
+		return {
+			reference,
+			subsegmentDuration,
+			sap,
+			referenceType: (reference >> 31) & 0x00000001,
+			referencedSize: reference & 0x7fffffff,
+			startsWithSap: (sap >> 31) & 0x00000001,
+			sapType: (sap >> 28) & 0x00000007,
+			sapDeltaTime: sap & 0x0fffffff,
+		}
 	})
 
 	return {
@@ -49,4 +51,4 @@ export function readSidx(view: IsoBoxReadView): SegmentIndexBox {
 		reserved,
 		references,
 	}
-};
+}

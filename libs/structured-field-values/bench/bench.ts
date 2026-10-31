@@ -25,18 +25,20 @@ import { performance, PerformanceObserver } from 'node:perf_hooks'
 import { pathToFileURL } from 'node:url'
 import base32 from 'hi-base32'
 import { type EncoderApi, type Input, makeInputs } from './inputs.ts'
+import type { RawBareItem, RawDict, RawItem, RawList, RawParams } from '../test/util/format.ts'
+import type { SfTestCase } from '../test/util/read.ts'
 
 type Variant = {
-	name: string;
-	load: () => Promise<EncoderApi>;
+	name: string
+	load: () => Promise<EncoderApi>
 }
 
 type WorkerResult = {
-	median: number;
-	p95: number;
-	bytesPerCall: number;
-	collections: number;
-	length: number;
+	median: number
+	p95: number
+	bytesPerCall: number
+	collections: number
+	length: number
 }
 
 const BATCH = 1000
@@ -61,7 +63,7 @@ const variants: Variant[] = [
 if (baseline !== undefined) {
 	variants.unshift({
 		name: 'baseline',
-		load: async () => await import(pathToFileURL(resolve(baseline)).href) as EncoderApi,
+		load: async () => (await import(pathToFileURL(resolve(baseline)).href)) as EncoderApi,
 	})
 }
 
@@ -111,7 +113,7 @@ async function measure(variantIndex: number, inputIndex: number): Promise<void> 
 	for (let i = 0; i < TIMED_BATCHES; i++) {
 		const start = performance.now()
 		batch()
-		times.push((performance.now() - start) * 1e6 / BATCH)
+		times.push(((performance.now() - start) * 1e6) / BATCH)
 	}
 
 	gc()
@@ -151,35 +153,54 @@ async function drive(): Promise<void> {
 	const self = resolve(import.meta.filename)
 	const inputs = selectInputs(await variants[variants.length - 1].load())
 
-	console.log(`Node ${process.version}, ${process.arch}, one process per variant and input, ${WARM_UP_BATCHES} warm-up batches of ${BATCH} calls, ${TIMED_BATCHES} timed batches\n`)
+	console.log(
+		`Node ${process.version}, ${process.arch}, one process per variant and input, ${WARM_UP_BATCHES} warm-up batches of ${BATCH} calls, ${TIMED_BATCHES} timed batches\n`,
+	)
 
-	const results: WorkerResult[][] = inputs.map((_, inputIndex) => variants.map((_, variantIndex) => {
-		const nodeArgs = ['--expose-gc', '--min-semi-space-size=64', '--max-semi-space-size=128', '--no-warnings', self, `--run=${variantIndex},${inputIndex}`, ...args]
-		const proc = spawnSync(process.execPath, nodeArgs, { encoding: 'utf8' })
-		if (proc.status !== 0) {
-			throw new Error(proc.stderr)
-		}
-		const lines = proc.stdout.trim().split('\n')
-		return JSON.parse(lines[lines.length - 1])
-	}))
+	const results: WorkerResult[][] = inputs.map((_, inputIndex) =>
+		variants.map((_, variantIndex) => {
+			const nodeArgs = [
+				'--expose-gc',
+				'--min-semi-space-size=64',
+				'--max-semi-space-size=128',
+				'--no-warnings',
+				self,
+				`--run=${variantIndex},${inputIndex}`,
+				...args,
+			]
+			const proc = spawnSync(process.execPath, nodeArgs, { encoding: 'utf8' })
+			if (proc.status !== 0) {
+				throw new Error(proc.stderr)
+			}
+			const lines = proc.stdout.trim().split('\n')
+			return JSON.parse(lines[lines.length - 1]) as WorkerResult
+		}),
+	)
 
-	const bytes = (result: WorkerResult): string => result.bytesPerCall.toFixed(0) + (result.collections > 0 ? ` (${result.collections} gc)` : '')
+	const bytes = (result: WorkerResult): string =>
+		result.bytesPerCall.toFixed(0) + (result.collections > 0 ? ` (${result.collections} gc)` : '')
 
 	if (variants.length === 1) {
 		console.log('| Input | Output chars | Median ns | p95 ns | Heap bytes per call |')
 		console.log('| --- | ---: | ---: | ---: | ---: |')
 		inputs.forEach((input, inputIndex) => {
 			const [result] = results[inputIndex]
-			console.log(`| ${input.name} | ${result.length} | ${result.median.toFixed(0)} | ${result.p95.toFixed(0)} | ${bytes(result)} |`)
+			console.log(
+				`| ${input.name} | ${result.length} | ${result.median.toFixed(0)} | ${result.p95.toFixed(0)} | ${bytes(result)} |`,
+			)
 		})
 		return
 	}
 
-	console.log('| Input | Baseline ns, median (p95) | This build ns, median (p95) | Median delta | Baseline bytes per call | This build bytes per call |')
+	console.log(
+		'| Input | Baseline ns, median (p95) | This build ns, median (p95) | Median delta | Baseline bytes per call | This build bytes per call |',
+	)
 	console.log('| --- | ---: | ---: | ---: | ---: | ---: |')
 	inputs.forEach((input, inputIndex) => {
 		const [base, current] = results[inputIndex]
-		console.log(`| ${input.name} | ${base.median.toFixed(0)} (${base.p95.toFixed(0)}) | ${current.median.toFixed(0)} (${current.p95.toFixed(0)}) | ${formatDelta(current.median, base.median)} | ${bytes(base)} | ${bytes(current)} |`)
+		console.log(
+			`| ${input.name} | ${base.median.toFixed(0)} (${base.p95.toFixed(0)}) | ${current.median.toFixed(0)} (${current.p95.toFixed(0)}) | ${formatDelta(current.median, base.median)} | ${bytes(base)} | ${bytes(current)} |`,
+		)
 	})
 }
 
@@ -189,44 +210,60 @@ async function drive(): Promise<void> {
 function makeCorpusCases(api: EncoderApi): Input[] {
 	const { SfItem } = api
 
-	const format = (value: any): any => {
-		if (Array.isArray(value)) {
-			return value.map(format)
+	const format = (value: RawBareItem): unknown => {
+		if (typeof value !== 'object') {
+			return value
 		}
-		switch (value?.__type) {
+		switch (value.__type) {
 			case 'binary':
 				return Uint8Array.from(value.value === '' ? [] : base32.decode.asBytes(value.value))
 			case 'token':
 				return Symbol.for(value.value)
 			case 'date':
 				return new Date(value.value * 1000)
-			default:
-				return value
 		}
 	}
-	const formatParams = (params: any[]): Record<string, any> | undefined => (params.length === 0 ? undefined : Object.fromEntries(params.map(format)))
-	const formatItem = ([value, params]: any[]): any => new SfItem(Array.isArray(value) ? value.map(formatItem) : format(value), formatParams(params))
+	const formatParams = (params: RawParams): Record<string, unknown> | undefined =>
+		params.length === 0
+			? undefined
+			: Object.fromEntries(params.map(([key, value]) => [key, format(value)]))
+	const formatItem = ([value, params]: RawItem): InstanceType<typeof SfItem> =>
+		new SfItem(Array.isArray(value) ? value.map(formatItem) : format(value), formatParams(params))
 
 	const files = [
-		...readdirSync(CORPUS).filter(file => file.endsWith('.json')).map(file => resolve(CORPUS, file)),
-		...readdirSync(resolve(CORPUS, 'serialisation-tests')).map(file => resolve(CORPUS, 'serialisation-tests', file)),
+		...readdirSync(CORPUS)
+			.filter(file => file.endsWith('.json'))
+			.map(file => resolve(CORPUS, file)),
+		...readdirSync(resolve(CORPUS, 'serialisation-tests')).map(file =>
+			resolve(CORPUS, 'serialisation-tests', file),
+		),
 	]
 	const cases: Input[] = []
 
 	for (const file of files) {
-		for (const suite of JSON.parse(readFileSync(file, 'utf8'))) {
-			if (suite.expected === undefined || JSON.stringify(suite.expected).includes('displaystring')) {
+		for (const suite of JSON.parse(readFileSync(file, 'utf8')) as SfTestCase[]) {
+			if (
+				suite.expected === undefined ||
+				JSON.stringify(suite.expected).includes('displaystring')
+			) {
 				continue
 			}
 			const name = `${basename(file)}: ${suite.name}`
 			if (suite.header_type === 'item') {
-				cases.push({ name, call: () => api.encodeSfItem(formatItem(suite.expected)) })
-			}
-			else if (suite.header_type === 'list') {
-				cases.push({ name, call: () => api.encodeSfList(suite.expected.map(formatItem)) })
-			}
-			else if (suite.header_type === 'dictionary') {
-				cases.push({ name, call: () => api.encodeSfDict(Object.fromEntries(suite.expected.map(([key, entry]: any[]) => [key, formatItem(entry)]))) })
+				const expected = suite.expected as RawItem
+				cases.push({ name, call: () => api.encodeSfItem(formatItem(expected)) })
+			} else if (suite.header_type === 'list') {
+				const expected = suite.expected as RawList
+				cases.push({ name, call: () => api.encodeSfList(expected.map(formatItem)) })
+			} else if (suite.header_type === 'dictionary') {
+				const expected = suite.expected as RawDict
+				cases.push({
+					name,
+					call: () =>
+						api.encodeSfDict(
+							Object.fromEntries(expected.map(([key, entry]) => [key, formatItem(entry)])),
+						),
+				})
 			}
 		}
 	}
@@ -237,8 +274,7 @@ function makeCorpusCases(api: EncoderApi): Input[] {
 function outcome(input: Input): string {
 	try {
 		return input.call()
-	}
-	catch (error) {
+	} catch (error) {
 		return THROWS + (error as Error).message
 	}
 }
@@ -263,28 +299,30 @@ async function verify(): Promise<void> {
 		const actual = outcome(currentCases[index])
 		if (expected === actual) {
 			identical++
-		}
-		else if (expected.startsWith(THROWS) && actual.startsWith(THROWS)) {
+		} else if (expected.startsWith(THROWS) && actual.startsWith(THROWS)) {
 			messageOnly++
-			differences.push(`error message  ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`)
-		}
-		else {
-			differences.push(`OUTPUT         ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`)
+			differences.push(
+				`error message  ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`,
+			)
+		} else {
+			differences.push(
+				`OUTPUT         ${baseCase.name}\n    baseline:   ${expected}\n    this build: ${actual}`,
+			)
 		}
 	})
 
-	console.log(`${baseCases.length} cases: ${identical} identical, ${messageOnly} differ only in the error message, ${baseCases.length - identical - messageOnly} differ in output`)
+	console.log(
+		`${baseCases.length} cases: ${identical} identical, ${messageOnly} differ only in the error message, ${baseCases.length - identical - messageOnly} differ in output`,
+	)
 	differences.forEach(line => console.log(`  ${line}`))
 }
 
 if (run !== undefined) {
 	const [variantIndex, inputIndex] = run.split(',').map(Number)
 	await measure(variantIndex, inputIndex)
-}
-else if (args.includes('--verify')) {
+} else if (args.includes('--verify')) {
 	await verify()
-}
-else {
+} else {
 	await drive()
 }
 

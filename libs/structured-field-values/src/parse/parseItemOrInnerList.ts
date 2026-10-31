@@ -21,7 +21,10 @@ import { parseItem } from './parseItem.ts'
 /**
  * @internal
  */
-export function parseItemOrInnerList(src: string, options?: SfDecodeOptions): ParsedValue<SfItem | SfInnerList> {
+export function parseItemOrInnerList(
+	src: string,
+	options?: SfDecodeOptions,
+): ParsedValue<SfItem | SfInnerList> {
 	if (src[0] === '(') {
 		return parseInnerList(src, options)
 	}

@@ -8,14 +8,21 @@ Supported C2PA segment validation methods:
 - **§19.4 Verifiable Segment Info (VSI/EMSG)**: the init segment contains the manifest and the session keys. Each media segment contains a small signed EMSG box
 - **§15.12.2 / §18.6 VOD Merkle**: for VOD assets in fragmented MP4, the init manifest stores one Merkle tree row per track. Each media segment contains its own leaf hash and proof
 
+## When to use
+
+- Validate the C2PA manifest in an init segment: `validateC2paInitSegment`
+- Validate a live segment with the VSI and EMSG method and the session keys of the init segment: `validateC2paSegment`
+- Validate a per-segment C2PA manifest box: `validateC2paManifestBoxSegment`
+- Validate the Merkle leaf and proof in a VOD segment: `validateC2paMerkleSegment`
+- Map a validation result to a status code: `C2paStatusCode`, `LiveVideoStatusCode`
+
+Do not write your own COSE, CBOR, or manifest box parsing for C2PA. Open an issue for a validation method that is missing.
 
 ## Installation
 
 ```bash
 npm i @svta/cml-c2pa
 ```
-
-> **Note:** `@svta/cml-iso-bmff`, `@svta/cml-utils`, and `cbor-x` are peer dependencies. Most package managers install them automatically, but you may need to add them explicitly.
 
 > **Note:** This library uses the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API) (`crypto.subtle`) to verify COSE signatures and compute BMFF hashes. In Node.js 20+, `crypto.subtle` is available globally. In browsers, it requires a [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) (HTTPS or `localhost`).
 
@@ -55,6 +62,10 @@ import { validateC2paInitSegment, validateC2paSegment } from '@svta/cml-c2pa'
 async function validateVsiSegment(initUrl: string, segmentUrl: string): Promise<void> {
   const initResponse = await fetch(initUrl)
   const init = await validateC2paInitSegment(new Uint8Array(await initResponse.arrayBuffer()))
+  if (!init.isValid) {
+    console.error(init.errorCodes)
+    return
+  }
 
   const segmentResponse = await fetch(segmentUrl)
   const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())

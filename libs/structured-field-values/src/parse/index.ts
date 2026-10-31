@@ -19,4 +19,3 @@ export * from './parseList.ts'
 export * from './parseParameters.ts'
 export * from './parseString.ts'
 export * from './parseToken.ts'
-

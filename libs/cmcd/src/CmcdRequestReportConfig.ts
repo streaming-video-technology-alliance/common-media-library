@@ -18,7 +18,7 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
 	 *
 	 * @defaultValue `CmcdTransmissionMode.QUERY`
 	 */
-	transmissionMode?: CmcdTransmissionMode;
+	transmissionMode?: CmcdTransmissionMode
 
 	/**
 	 * A map of CMCD header fields to the custom keys to emit in them.
@@ -31,7 +31,7 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
 	 *
 	 * @defaultValue `undefined`
 	 */
-	customHeaderMap?: Partial<CmcdHeaderMap>;
+	customHeaderMap?: Partial<CmcdHeaderMap>
 
 	/**
 	 * Transform applied to each request-mode report before encoding.
@@ -47,5 +47,5 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
 	 * @example
 	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
 	 */
-	transform?: CmcdRequestReportTransform<C>;
+	transform?: CmcdRequestReportTransform<C>
 }

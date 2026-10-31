@@ -8,10 +8,37 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-26
+
 ### Changed
 
-- README: a usage example replaces the empty code block. The examples in `src/README.md` import from `@svta/cml-cmaf-ham` and compile. The sample README gives the correct folder and run command.
+- `Track.url` is optional. An HLS audio rendition without a `URI` attribute maps to a track without a URL, and the HLS writer already falls back to `<id>.m3u8` for that case. TypeScript consumers that read `track.url` as a `string` need to handle `undefined`.
+- `addMetadataToHls` stores `version` and `mediaSequence` as strings when the parsed HLS manifest has them. Before, an inverted check stored the value only when it was missing. Nothing in the package reads these entries.
+- The HLS mapper types describe the fields the mapper reads. `PlayList.attributes` adds `LANGUAGE` and `FRAME-RATE`, the `MediaGroups` items add an optional `uri`, and `HlsManifest` adds `version` and `mediaSequence`. `audioGroupsToSwitchingSets` and `subtitleGroupsToSwitchingSets` take the typed media groups instead of `any`. `Mapper.getManifestMetadata` and `HlsMapper.getManifestMetadata` return `JSON | undefined`, the type that `DashMapper` and `MapperContext` already declare.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The overview in `src/README.md` links the documentation at https://cml.svta.org/.
+- `getUrlFromTemplate` and `getInitializationUrl` resolve the segment URL templates with `processUriTemplate` from `@svta/cml-dash`, a new peer dependency. The templates now resolve `$Bandwidth$`, `$Time$`, `$$`, and a `%0<width>d` tag of any width, so `$Number%05d$` gives `00001` instead of `1`. A token outside the template grammar, such as `$Number%d$`, stays in the URL unchanged instead of becoming the plain number.
+- `@svta/cml-iso-8601` is a new peer dependency. `iso8601DurationToNumber` trims the value and decodes it with `decodeIso8601Duration` from that package. A year counts as 365 days and a month as 30 days.
+- The DASH and HLS mapper helpers write nothing to the console. `getCodec`, `getSar`, `getContentType`, `getChannels`, `getFrameRate`, `getSampleRate`, `getLanguage`, `mapSegments`, `getDuration`, and `parseHlsManifest` return their documented default for a missing value, without a log. Before, each of these helpers also wrote an error or info line to the console.
+- `Period.$.duration` is optional, as in the DASH specification. `getPeriodDuration` derives the duration of a Period without the attribute. TypeScript consumers that read `period.$.duration` as a `string` need to handle `undefined`.
 
+### Removed
+
+- `numberToIso8601Duration`. Use `encodeIso8601Duration` from `@svta/cml-iso-8601`, which gives the same string.
+
+### Fixed
+
+- `iso8601DurationToNumber` adds the days of a duration and reads the minutes after the `T` designator. Before, `P1DT1H` gave 3600 and `P0Y0M0DT0H1M30.000S` gave 30.
+- `dashToHam` now derives the duration of a Period without a `duration` attribute. The Period ends at the start of the next Period or at the `mediaPresentationDuration` of the MPD. Before, such a Period had duration 0 and a `SegmentTemplate` track had no segments.
+
+## [0.24.8] - 2026-10-18
+
+### Changed
+
+- `@svta/cml-drm` is now a declared peer dependency.
+- README: a usage example replaces the empty code block. The examples in `src/README.md` import from `@svta/cml-cmaf-ham` and compile. The sample README gives the correct folder and run command.
+- The `parseByteRangeString` and `byteRangeToHlsString` docs now format `length@offset` as code.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
 
 ### Fixed
 
@@ -85,7 +112,9 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.7...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.25.0...HEAD
+[0.25.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.8...cmaf-ham-v0.25.0
+[0.24.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.7...cmaf-ham-v0.24.8
 [0.24.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.6...cmaf-ham-v0.24.7
 [0.24.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.5...cmaf-ham-v0.24.6
 [0.24.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmaf-ham-v0.24.4...cmaf-ham-v0.24.5

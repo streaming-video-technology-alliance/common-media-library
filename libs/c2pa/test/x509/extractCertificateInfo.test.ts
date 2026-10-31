@@ -2,7 +2,7 @@ import { extractCertificateInfo } from '../../src/x509/extractCertificateInfo.ts
 import { extractManifestCertificate } from '../../src/extractManifestCertificate.ts'
 import { ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 function loadFixture(name: string): Uint8Array {
 	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
@@ -38,7 +38,13 @@ describe('extractCertificateInfo', () => {
 
 		const info = extractCertificateInfo(certDER)
 		ok(info !== null, 'should parse the certificate')
-		ok(typeof info.issuer === 'string' && info.issuer.length > 0, 'issuer should be a non-empty string')
-		ok(typeof info.notBefore === 'string' && info.notBefore.length > 0, 'notBefore should be a non-empty string')
+		ok(
+			typeof info.issuer === 'string' && info.issuer.length > 0,
+			'issuer should be a non-empty string',
+		)
+		ok(
+			typeof info.notBefore === 'string' && info.notBefore.length > 0,
+			'notBefore should be a non-empty string',
+		)
 	})
 })

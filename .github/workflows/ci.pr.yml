@@ -27,15 +27,18 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: "npm"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "@svta"
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@svta'
 
       - name: Install
         run: npm ci
 
       - name: Test
         run: npm test
+
+      - name: Generated skill files are current
+        run: git add -N skills && git diff --exit-code -- skills || { echo "skills/ is stale. Run npm run build and commit the skills/ directory."; exit 1; }
 
       - name: Size
         run: npm run size -- --check

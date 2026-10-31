@@ -10,37 +10,42 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 2. **Tree-shakeability**: Adopters' final bundle size is what matters. Adopters must not receive code they do not import.
 3. **Developer experience**: Correct usage should be obvious. Incorrect usage should fail at compile time.
 4. **Documentation quality**: Adopters evaluate libraries by their docs before reading source code.
-5. **Minimal barriers to entry**: Zero config, no peer dependencies, copy-pasteable examples.
+5. **Minimal barriers to entry**: Zero config and copy-pasteable examples. Strive for no peer dependencies outside of CML.
 6. **Spec compliance**: Implementations must be accurate to the relevant specification. Do not invent extensions.
 
 ## Repo Setup
 
-- Development requires Node >= 24. `npm install` fails on older versions. Repo scripts are TypeScript files that `node` runs directly.
+- Development requires Node >= 24.11. `npm install` fails on older versions. Repo scripts are TypeScript files that `node` runs directly.
 - Fresh clones and git worktrees must run `git submodule update --init`. The structured-field-values tests need the `structured-field-tests` submodule.
 
 ## Build Commands
 
 - `npm run build -w libs/<package>`: Build a package. The root `npm run build` builds every package in dependency order.
-- `npm run typecheck`: Run the typechecker
-- `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies.
-- `npm test`: Full validation at the root. It runs lint, build all, typecheck, then every package's tests. The PR checks run this command.
+- `npm run typecheck`: Run the type check. The script runs `vp lint --type-aware --type-check`, so the TypeScript 7 compiler inside tsgolint checks the code. Build first: the test files import the `dist/` output of the packages.
+- tsgolint checks each file with the nearest `tsconfig.json`. The package `tsconfig.json` files cover `src`, the root `tsconfig.json` covers the tests and the scripts. A file outside every `tsconfig.json` gets default compiler options, so the lint ignores `dev/`, `**/samples/`, and the `*.context.d.ts` files of the guides.
+- The `typescript` devDependency is 6.0, the last release with the JavaScript compiler API. typedoc and the README example check use that API, and the TypeScript 7 package does not export it. Keep the explicit `types` list in the root `tsconfig.json`: TypeScript 6 no longer includes every `@types` package by default.
+- `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies. The script passes `--config ../../vite.config.ts --dir .`, because `vp test` inside a package directory does not find the root configuration on its own.
+- Test files share long-lived Vitest workers, so module state carries over between files. A test that removes a global or needs a fresh module cache goes in a file named `*.environment.test.ts`. Those files run in a separate project with one worker per file.
+- `npm test`: Full validation at the root. It runs lint, the format check, build all, typecheck, then every package's tests. The PR checks run this command.
 - `npm run size`: Print the compressed size of each import set that a package budgets in `libs/<package>/config/size-budget.json`. `npm run size -- --check` fails when a size is over its budget plus the tolerance. Raise the budget in the pull request that grows the bundle.
-- `npm run format`: Run the linter with auto-fix
+- `npm run format`: Run the linter with auto-fix, then format the code
+- `npm run site`: Start the website dev server. `npm run build -w site` builds the website into `site/dist`. The build fails on dead links in any README or guide.
+- Lint, format, package builds, tests, and the type check run through Vite+: `vp lint`, `vp fmt`, `vp pack`, `vp test` (Vitest), and `vp lint --type-check` (tsgolint). The configuration is `vite.config.ts` at the root.
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
-- `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the packages that depend on them.
+- `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the dependent packages. A dependent needs the bump when the peer range in the published package rejects the new version. Packages declare workspace peers as `*`. The Publish workflow rewrites `*` to a caret range of the current peer version. A cascade therefore happens when the new peer version falls outside that caret range, such as a major bump. The command also warns about packages that have unreleased changelog entries and no version change.
 
 ## Publishing a New Package
 
 The Publish workflow uses npm trusted publishing. A trusted publisher is configured per package on npmjs.com. The workflow cannot publish a package that is not on npm yet. The first release of a new package needs these manual steps:
 
-1. Merge the release-prep PR. That PR sets the first version, adds the package to `scripts/projects.ts`, and sets the RFC status to `implemented`.
+1. Merge the release-prep PR. That PR sets the first version and adds the package to `scripts/projects.ts`. It also sets the RFC status to `implemented` and adds the `## When to use` section to the README.
 2. From a clean checkout of `main`, run `npm ci` and `npm run build`.
 3. Publish the package once manually: `npm publish --no-provenance --access public -w libs/<package>`. The package sets `publishConfig.provenance`, and npm can only generate provenance in CI.
 4. On npmjs.com, open the package settings and add a trusted publisher. Select GitHub Actions with organization `streaming-video-technology-alliance`, repository `common-media-library`, and workflow `publish.yml`.
 5. Run the Publish workflow. It publishes the other packages of the release and skips the new package, because npm already has that version.
 6. Create the GitHub release for the new package manually: `gh release create <package>-v<version> --target main --title "@svta/cml-<package> v<version>"`. Use the changelog section of the version as the notes.
 
-If the Publish workflow runs before steps 3 and 4, the run fails. This happened for c2pa 1.0.0 on 2026-04-15 and for error-codes 0.1.0 on 2026-09-08.
+If the Publish workflow runs before steps 3 and 4, the run fails.
 
 ## Developer Experience
 
@@ -50,25 +55,35 @@ APIs are the product. Design them so that the easy way is the correct way:
 - Actionable error messages: include parameter name, expected value(s), and received value.
 - Minimal API surface: do not add a public export unless it serves a clear use case.
 - Follow the naming and structural patterns of the other packages: `encode`/`decode`, options objects, and the const enum pattern.
+- The type declarations need TypeScript 5.7 or later, and the root README states that minimum. A function that allocates its result returns `Uint8Array<ArrayBuffer>`, so adopters can pass the result to Web APIs without a cast. A function that returns a view over its input returns `Uint8Array`. Never narrow an input type: parameters accept `Uint8Array` and `ArrayBufferLike`. Newer TypeScript syntax in a public signature raises the minimum, so document it when you add one.
 
 ## Workflow
 
 - Typecheck the entire project after code changes
+- The root `npm test` typechecks every example block of the READMEs and guides. Run the command after a README or guide change.
 - Prefer builds and tests at the workspace level
 - Create tests for new public API members
 - For every change, add a note under the `## [Unreleased]` heading in the affected package's `CHANGELOG.md`.
 - Bump versions only in dedicated release-prep PRs, with `npm run ver` and then `npm run prepare-release` (see Build Commands).
 - Avoid breaking changes. If one is unavoidable, provide migration guidance in the changelog and the docs.
+- If a third-party dependency has a bug, open an issue in that project and avoid the bug locally with a wrapper or a patch. Do not copy or reimplement the dependency's code.
 - Save plans and design-session artifacts in `plans/<feature-name>/`, where the folder name is the feature or issue. Save each part of the plan, such as steps or architecture, in its own file: `plans/<feature-name>/steps.md`. Do not use `docs/` for planning documents.
+- Plan files are working artifacts. They may exist on a feature branch while the work is in progress, and never on `main`. Delete them before the PR merges. Record unfinished work and follow-up items as GitHub issues. Record decisions that adopters need in the package docs.
 - Proposals that need community agreement are RFCs, not plans: public API changes, new packages, and significant architecture changes. Save an RFC as `rfc/<feature-name>.md` and follow the process in `rfc/README.md`.
 
 ## Documentation
 
 - Every package needs a `README.md` with description, install instructions, and a quick-start example.
+- Every published package README needs a `## When to use` section: one to eight task bullets with their entry-point exports, then a closing paragraph. `scripts/agentDocs.ts` reads the section. The root build regenerates `skills/common-media-library` from it. Commit the result.
 - Use `{@includeCode ../test/<file>.test.ts#example}` in TSDoc to reference test examples.
 - Mark example regions in tests with `// #region example` and `// #endregion example`.
-- All code examples must be complete and runnable: no pseudocode and no missing imports.
+- Every fenced TypeScript block in a README or guide must typecheck. Import every library name the block uses. No pseudocode.
+- A block may use a value that the reader's code provides, such as a player or a request. Declare that value in `<guide>.context.d.ts` next to the guide. The check prepends the declarations to every block of the guide that does not declare the name. Write types as `import('@svta/cml-cmcd').CmcdReporter`, with no import statements.
+- A block that shows a compile error marks the line with `// @ts-expect-error`.
+- TSDoc examples that `{@includeCode}` a test region compile with the test file. The rule does not apply to those examples.
 - The package build regenerates the public API report `libs/<package>/config/cml-<package>.api.md`. Review its diff to confirm that every API change is intentional.
+- The website copies every published package's `README.md`, `docs/*.md`, and `CHANGELOG.md` at build time. Link to a guide from a README as `docs/<file>.md`. Link between guides as sibling files, for example `other-guide.md#anchor`.
+- Every published package needs an entry in `site/scripts/groups.ts`. The site build fails without one.
 
 ## Writing Style
 
@@ -83,7 +98,7 @@ CML collaborators and adopters live in many countries. Many of them do not read 
 - Give every pronoun a visible noun in the same or previous sentence: "this check", not "this".
 - At most three nouns in a row. Break longer strings with prepositions.
 - Keep the author's hedges. "May have failed" does not become "failed". Never add a fact the source did not state.
-- Write for the reader's decision. An RFC reader needs what the API is, one example, the contract, the costs, the alternatives, and the open questions. Methodology, history, and engine internals go to the design record in `plans/`, with a link.
+- Write for the reader's decision. An RFC reader needs what the API is, one example, the contract, the costs, the alternatives, and the open questions. Plan files contain methodology, history, and engine internals while work is in progress. The PR description contains that information when the work merges.
 - State each finding once, in one place, and reference it from elsewhere. Numbers go in tables or lists, at most one per sentence of prose.
 - After a clarity pass, do a second pass that removes duplication. Splitting sentences adds words, so the document must get shorter, not longer.
 

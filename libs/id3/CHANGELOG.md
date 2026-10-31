@@ -10,8 +10,15 @@ and this project adheres to
 
 ### Changed
 
-- README: the usage example is complete. The tag bytes are a function parameter.
+- `toUint8` accepts `AllowSharedBufferSource`, the type that `TextDecoder.decode` uses. The view check uses `ArrayBuffer.isView`, so a view created in another realm keeps its `byteOffset`.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
+## [1.0.10] - 2026-10-18
+
+### Changed
+
+- README: the usage example is complete. The tag bytes are a function parameter.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
 
 ## [1.0.9] - 2026-09-15
 
@@ -80,7 +87,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.9...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.10...HEAD
+[1.0.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.9...id3-v1.0.10
 [1.0.9]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.8...id3-v1.0.9
 [1.0.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.7...id3-v1.0.8
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/id3-v1.0.6...id3-v1.0.7

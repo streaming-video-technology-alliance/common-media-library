@@ -24,4 +24,4 @@ export function readDref(view: IsoBoxReadView): DataReferenceBox {
 		entryCount,
 		entries,
 	}
-};
+}

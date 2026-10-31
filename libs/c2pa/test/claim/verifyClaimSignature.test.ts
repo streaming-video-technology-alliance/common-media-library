@@ -3,7 +3,7 @@ import { extractManifestCertificate } from '../../src/extractManifestCertificate
 import { readC2paManifest } from '../../src/readC2paManifest.ts'
 import { strictEqual, ok } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 function loadFixture(name: string): Uint8Array {
 	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
@@ -13,7 +13,7 @@ describe('verifyClaimSignature', () => {
 	// #region example
 	it('returns false when signature bytes are tampered', async () => {
 		const result = await verifyClaimSignature(
-			new Uint8Array([0x84, 0x40, 0xa0, 0x40, 0x40]),
+			new Uint8Array([0xd2, 0x84, 0x40, 0xa0, 0x40, 0x40]),
 			new Uint8Array([0x01]),
 			new Uint8Array([0x30, 0x00]),
 		)

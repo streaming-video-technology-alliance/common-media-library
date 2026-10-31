@@ -25,7 +25,10 @@ const CMCD_KEY_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CMCD_KEYS)
  *
  * @public
  */
-export function validateCmcdKeys(data: Record<string, unknown>, options?: CmcdValidationOptions): CmcdValidationResult {
+export function validateCmcdKeys(
+	data: Record<string, unknown>,
+	options?: CmcdValidationOptions,
+): CmcdValidationResult {
 	const version = resolveVersion(data, options)
 	const validKeySet = version === CMCD_V1 ? CMCD_V1_KEY_SET : CMCD_KEY_SET
 	const issues: CmcdValidationResult['issues'] = []

@@ -1,3 +1,7 @@
+// RFC 3986 section 3.1 scheme and ":".
+// The WHATWG URL parser first removes leading C0 control or space and every ASCII tab or newline.
+const SCHEME_REGEX = /^[\0-\x20]*[a-z][a-z0-9+.\t\n\r-]*:/i
+
 /**
  * Constructs a relative path from a URL.
  *
@@ -13,11 +17,14 @@
  * {@includeCode ../test/urlToRelativePath.test.ts#example}
  */
 export function urlToRelativePath(url: string, base: string): string {
+	if (!SCHEME_REGEX.test(url)) {
+		return url
+	}
+
 	let to: URL
 	try {
 		to = new URL(url)
-	}
-	catch {
+	} catch {
 		return url
 	}
 
@@ -33,7 +40,11 @@ export function urlToRelativePath(url: string, base: string): string {
 	// count common parents, stopping before the destination file
 	let common = 0
 
-	while (common < toPath.length - 1 && common < fromPath.length && toPath[common] === fromPath[common]) {
+	while (
+		common < toPath.length - 1 &&
+		common < fromPath.length &&
+		toPath[common] === fromPath[common]
+	) {
 		common++
 	}
 
@@ -42,7 +53,10 @@ export function urlToRelativePath(url: string, base: string): string {
 	let relativePath = '../'.repeat(ups) + toPath.slice(common).join('/')
 
 	// RFC 3986 section 4.2: a relative-path reference cannot be empty, start with "/", or have ":" in its first segment
-	if (ups === 0 && (relativePath === '' || relativePath.startsWith('/') || toPath[common].includes(':'))) {
+	if (
+		ups === 0 &&
+		(relativePath === '' || relativePath.startsWith('/') || toPath[common].includes(':'))
+	) {
 		relativePath = './' + relativePath
 	}
 

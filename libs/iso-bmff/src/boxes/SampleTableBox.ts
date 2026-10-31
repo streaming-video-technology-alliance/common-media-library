@@ -16,7 +16,19 @@ import type { SyncSampleBox } from './SyncSampleBox.ts'
  *
  * @public
  */
-export type SampleTableBoxChild = SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox;
+export type SampleTableBoxChild =
+	| SampleDescriptionBox
+	| DecodingTimeToSampleBox
+	| CompositionTimeToSampleBox
+	| SampleToChunkBox
+	| SampleSizeBox
+	| ChunkOffsetBox
+	| SyncSampleBox
+	| ShadowSyncSampleBox
+	| DegradationPriorityBox
+	| SampleDependencyTypeBox
+	| SampleToGroupBox
+	| SampleGroupDescriptionBox
 
 /**
  * Sample Table Box - 'stbl' - Container
@@ -24,6 +36,6 @@ export type SampleTableBoxChild = SampleDescriptionBox | DecodingTimeToSampleBox
  * @public
  */
 export type SampleTableBox = {
-	type: 'stbl';
-	boxes: SampleTableBoxChild[];
-};
+	type: 'stbl'
+	boxes: SampleTableBoxChild[]
+}

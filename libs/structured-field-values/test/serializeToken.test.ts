@@ -1,6 +1,6 @@
 import { serializeToken } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vite-plus/test'
 
 test('serializeToken', () => {
 	assert.deepStrictEqual(serializeToken(Symbol.for('token')), `token`)
@@ -24,18 +24,42 @@ test('serializeToken', () => {
 	assert.deepStrictEqual(serializeToken(Symbol.for(`to/ken`)), `to/ken`)
 
 	assert.throws(() => serializeToken(Symbol.for(`to"ken`)), /failed to serialize "to"ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to(ken`)), /failed to serialize "to\(ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to)ken`)), /failed to serialize "to\)ken" as Token/)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to(ken`)),
+		/failed to serialize "to\(ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to)ken`)),
+		/failed to serialize "to\)ken" as Token/,
+	)
 	assert.throws(() => serializeToken(Symbol.for(`to,ken`)), /failed to serialize "to,ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to;ken`)), /failed to serialize "to;ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to<ken`)), /failed to serialize "to<ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to=ken`)), /failed to serialize "to=ken" as Token/)
 	assert.throws(() => serializeToken(Symbol.for(`to>ken`)), /failed to serialize "to>ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to?ken`)), /failed to serialize "to\?ken" as Token/)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to?ken`)),
+		/failed to serialize "to\?ken" as Token/,
+	)
 	assert.throws(() => serializeToken(Symbol.for(`to@ken`)), /failed to serialize "to@ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to[ken`)), /failed to serialize "to\[ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to\\ken`)), /failed to serialize "to\\ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to]ken`)), /failed to serialize "to\]ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to{ken`)), /failed to serialize "to\{ken" as Token/)
-	assert.throws(() => serializeToken(Symbol.for(`to}ken`)), /failed to serialize "to\}ken" as Token/)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to[ken`)),
+		/failed to serialize "to\[ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to\\ken`)),
+		/failed to serialize "to\\ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to]ken`)),
+		/failed to serialize "to\]ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to{ken`)),
+		/failed to serialize "to\{ken" as Token/,
+	)
+	assert.throws(
+		() => serializeToken(Symbol.for(`to}ken`)),
+		/failed to serialize "to\}ken" as Token/,
+	)
 })

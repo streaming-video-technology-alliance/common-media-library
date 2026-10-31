@@ -4,6 +4,6 @@
  * @public
  */
 export type CompositionTimeToSampleEntry = {
-	sampleCount: number;
-	sampleOffset: number;
-};
+	sampleCount: number
+	sampleOffset: number
+}

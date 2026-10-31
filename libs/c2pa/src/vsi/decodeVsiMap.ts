@@ -1,8 +1,7 @@
-import { decode } from 'cbor-x/decode'
-import type { BmffHashExclusion } from '../bmff/BmffHashExclusion.ts'
-import { normalizeAlgorithmName } from '../utils.ts'
+import { decodeCbor } from '../cbor/readCborItem.ts'
+import { parseExclusions } from '../bmff/parseExclusions.ts'
+import { asUnsignedInteger, normalizeAlgorithmName } from '../utils.ts'
 import type { VsiMap } from './VsiMap.ts'
-
 
 /**
  * Decodes a C2PA Verifiable Segment Info (VSI) CBOR map from raw bytes.
@@ -19,14 +18,23 @@ import type { VsiMap } from './VsiMap.ts'
  * @internal
  */
 export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
-	const raw = decode(vsiCborBytes) as Record<string, unknown>
+	const raw = decodeCbor(vsiCborBytes) as Record<string, unknown>
 
 	if (typeof raw !== 'object' || raw === null) {
 		throw new Error('VSI map must be a CBOR map')
 	}
 
-	const sequenceNumber = raw['sequenceNumber']
-	if (typeof sequenceNumber !== 'number') throw new Error('VSI map missing or invalid sequenceNumber')
+	const rawSequenceNumber = raw['sequenceNumber']
+	const sequenceNumber = asUnsignedInteger(rawSequenceNumber)
+	if (sequenceNumber === null) {
+		const received =
+			typeof rawSequenceNumber === 'number' || typeof rawSequenceNumber === 'bigint'
+				? String(rawSequenceNumber)
+				: typeof rawSequenceNumber
+		throw new Error(
+			`VSI map sequenceNumber must be an unsigned integer up to ${Number.MAX_SAFE_INTEGER}, got ${received}`,
+		)
+	}
 
 	const bmffHashRaw = raw['bmffHash'] as Record<string, unknown> | undefined
 	if (!bmffHashRaw || typeof bmffHashRaw !== 'object') throw new Error('VSI map missing bmffHash')
@@ -34,8 +42,11 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 	const hash = bmffHashRaw['hash']
 	if (!(hash instanceof Uint8Array)) throw new Error('VSI map bmffHash.hash must be a Uint8Array')
 
-	const exclusions = bmffHashRaw['exclusions']
-	if (exclusions !== undefined && !Array.isArray(exclusions)) throw new Error('VSI map bmffHash.exclusions must be an array')
+	const exclusions = parseExclusions(bmffHashRaw['exclusions'])
+	if (!exclusions)
+		throw new Error(
+			'VSI map bmffHash.exclusions must be an array of maps with an xpath in the grammar of C2PA section 18.6.2 and fields of the exclusions-map CDDL types',
+		)
 
 	const manifestId = raw['manifestId']
 	if (typeof manifestId !== 'string') throw new Error('VSI map missing or invalid manifestId')
@@ -47,7 +58,7 @@ export function decodeVsiMap(vsiCborBytes: Uint8Array): VsiMap {
 		bmffHash: {
 			hash,
 			alg,
-			exclusions: (exclusions as BmffHashExclusion[] | undefined) ?? [],
+			exclusions,
 		},
 		manifestId,
 	}

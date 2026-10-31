@@ -1,5 +1,5 @@
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 import type { AudioTrack, Track } from '@svta/cml-cmaf-ham'
 
@@ -10,7 +10,7 @@ describe('getTimescale', () => {
 		const res = getTimescale({
 			type: 'audio',
 			sampleRate: 48000,
-		} as AudioTrack as Track)
+		} as AudioTrack)
 		equal(res, 48000)
 	})
 

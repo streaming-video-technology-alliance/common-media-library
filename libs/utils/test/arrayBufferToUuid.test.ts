@@ -1,6 +1,6 @@
 import { arrayBufferToUuid } from '@svta/cml-utils'
 import { equal } from 'assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('arrayBufferToUuid', () => {
 	function hexStringToArrayBuffer(hex: string): ArrayBuffer {
@@ -16,11 +16,7 @@ describe('arrayBufferToUuid', () => {
 	it('should convert 16-byte ArrayBuffer to UUID format', () => {
 		//#region example
 		const data = new Uint8Array([
-			160, 86, 74, 247,
-			96, 194,
-			217, 75,
-			150, 16,
-			199, 174, 112, 213, 217, 112,
+			160, 86, 74, 247, 96, 194, 217, 75, 150, 16, 199, 174, 112, 213, 217, 112,
 		])
 		const result = arrayBufferToUuid(data.buffer)
 

@@ -1,5 +1,6 @@
 import { CMCD_INNER_LIST_KEYS } from './CMCD_INNER_LIST_KEYS.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
+import { toBareValue } from './toBareValue.ts'
 
 /**
  * Up-convert version 1 CMCD data to version 2.
@@ -7,30 +8,30 @@ import { CMCD_V2 } from './CMCD_V2.ts'
  * - Wraps scalar values in arrays for inner-list keys.
  * - Wraps `nor` string in an array.
  *
- * The function returns version 2 data (has `v: 2`) unchanged.
+ * The function returns version 2 data (has `v: 2`) unchanged. An inner list
+ * with parameters, which `decodeCmcd` returns as an `SfItem` that wraps the
+ * list, also stays unchanged.
  *
  * @internal
  */
 export function upConvertToV2(obj: Record<string, any>): Record<string, any> {
-	if (obj['v'] === CMCD_V2) {
+	if (toBareValue(obj['v']) === CMCD_V2) {
 		return obj
 	}
 
-	const result: Record<string, any> = {}
+	const result: Record<string, unknown> = {}
 
-	for (const [key, value] of Object.entries(obj)) {
+	for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
 		if (value == null) {
 			result[key] = value
 			continue
 		}
 
-		if (CMCD_INNER_LIST_KEYS.has(key) && !Array.isArray(value)) {
+		if (CMCD_INNER_LIST_KEYS.has(key) && !Array.isArray(toBareValue(value))) {
 			result[key] = [value]
-		}
-		else if (key === 'nor' && typeof value === 'string') {
+		} else if (key === 'nor' && typeof value === 'string') {
 			result[key] = [value]
-		}
-		else {
+		} else {
 			result[key] = value
 		}
 	}

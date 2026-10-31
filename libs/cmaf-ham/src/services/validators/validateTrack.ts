@@ -44,34 +44,22 @@ export function validateTrack(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = switchingSetId
-		? ` in the switching set with id = ${switchingSetId}`
-		: '.'
+	const moreInformation = switchingSetId ? ` in the switching set with id = ${switchingSetId}` : '.'
 
 	if (!track.id) {
 		validation.status = false
-		validation.errorMessages.push(
-			`Track id is undefined${moreInformation}`,
-		)
+		validation.errorMessages.push(`Track id is undefined${moreInformation}`)
 	}
 
 	switch (track.type) {
 		case 'video':
-			_validateVideoTrack(
-				track as VideoTrack,
-				switchingSetId,
-				validation,
-			)
+			_validateVideoTrack(track as VideoTrack, switchingSetId, validation)
 			break
 		case 'audio':
-			_validateAudioTrack(
-				track as AudioTrack,
-				switchingSetId,
-				validation,
-			)
+			_validateAudioTrack(track as AudioTrack, switchingSetId, validation)
 			break
 		case 'text':
-			_validateTextTrack(track as TextTrack, switchingSetId, validation)
+			_validateTextTrack(track, switchingSetId, validation)
 			break
 	}
 
@@ -103,9 +91,7 @@ function _validateVideoTrack(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = switchingSetId
-		? ` in the switching set with id = ${switchingSetId}`
-		: '.'
+	const moreInformation = switchingSetId ? ` in the switching set with id = ${switchingSetId}` : '.'
 
 	if (!videoTrack.codecs || videoTrack.codecs.length === 0) {
 		validation.status = false
@@ -140,9 +126,7 @@ function _validateAudioTrack(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = switchingSetId
-		? ` in the switching set with id = ${switchingSetId}`
-		: '.'
+	const moreInformation = switchingSetId ? ` in the switching set with id = ${switchingSetId}` : '.'
 
 	if (!audioTrack.codecs || audioTrack.codecs.length === 0) {
 		validation.status = false
@@ -177,9 +161,7 @@ function _validateTextTrack(
 		status: true,
 		errorMessages: [],
 	}
-	const moreInformation = switchingSetId
-		? ` in the switching set with id = ${switchingSetId}`
-		: '.'
+	const moreInformation = switchingSetId ? ` in the switching set with id = ${switchingSetId}` : '.'
 
 	if (!textTrack.language) {
 		validation.status = false

@@ -1,11 +1,24 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
-import { decodeMultiple } from 'cbor-x/decode'
+import { readCborItem } from '../cbor/readCborItem.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
-import { JUMBF_UUID, asInteger, bytesToHex, hashesEqual, matchesUuid, normalizeAlgorithmName, readUuidBoxPurpose, toUint8Array } from '../utils.ts'
+import {
+	JUMBF_UUID,
+	asInteger,
+	bytesToHex,
+	hashesEqual,
+	matchesUuid,
+	normalizeAlgorithmName,
+	readUuidBoxPurpose,
+	toUint8Array,
+} from '../utils.ts'
 import type { UuidParsedBox } from '../utils.ts'
-import type { MerkleMap, MerkleSegmentState, MerkleSegmentValidation } from './MerkleSegmentValidation.ts'
+import type {
+	MerkleMap,
+	MerkleSegmentState,
+	MerkleSegmentValidation,
+} from './MerkleSegmentValidation.ts'
 
 type MerkleValidationCode = LiveVideoStatusCode | C2paStatusCode
 
@@ -31,7 +44,7 @@ function extractMerkleAuxBoxes(segmentBytes: Uint8Array): Uint8Array[] {
 		const usertype = uuidBox.usertype ?? []
 		if (!matchesUuid(usertype, JUMBF_UUID)) continue
 
-		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining) as Uint8Array
+		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
 		const payload = readAuxPayload(rawPayload)
 		if (payload !== 'other') payloads.push(payload)
 	}
@@ -49,38 +62,27 @@ type BmffMerkleMapSegment = {
 	readonly hashes: readonly (Uint8Array | null)[] | null
 }
 
-function readMapField(map: unknown, name: string): unknown {
-	if (map instanceof Map) return map.get(name)
-	return (map as Record<string, unknown>)[name]
-}
-
 // §A.5.4.1.4: multiple merkle boxes for one tree are padded to a fixed size,
 // so trailing bytes after the CBOR item are expected and not part of the data.
 function decodeFirstCbor(payload: Uint8Array): unknown {
-	let first: unknown
-	let found = false
 	try {
-		decodeMultiple(payload, value => {
-			first = value
-			found = true
-			return false
-		})
+		return readCborItem(payload).value
 	} catch {
 		return undefined
 	}
-	return found ? first : undefined
 }
 
 function parseBmffMerkleMap(payload: Uint8Array): BmffMerkleMapSegment | null {
 	const decoded = decodeFirstCbor(payload)
 	if (decoded === null || decoded === undefined || typeof decoded !== 'object') return null
+	const map = decoded as Record<string, unknown>
 
-	const uniqueId = asInteger(readMapField(decoded, 'uniqueId'))
-	const localId = asInteger(readMapField(decoded, 'localId'))
-	const location = asInteger(readMapField(decoded, 'location'))
+	const uniqueId = asInteger(map['uniqueId'])
+	const localId = asInteger(map['localId'])
+	const location = asInteger(map['location'])
 	if (uniqueId === null || localId === null || location === null) return null
 
-	const rawHashes = readMapField(decoded, 'hashes')
+	const rawHashes = map['hashes']
 	if (rawHashes == null) return { uniqueId, localId, location, hashes: null }
 	if (!Array.isArray(rawHashes)) return null
 
@@ -150,9 +152,10 @@ async function verifyMerkleProof(
 		if (siblingIndex >= 0 && siblingIndex < layer) {
 			const sibling = path[proofIndex++]
 			if (!sibling) return C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED
-			currentHash = currentIndex % 2 === 0
-				? await hashPair(currentHash, sibling, alg)
-				: await hashPair(sibling, currentHash, alg)
+			currentHash =
+				currentIndex % 2 === 0
+					? await hashPair(currentHash, sibling, alg)
+					: await hashPair(sibling, currentHash, alg)
 		}
 		currentIndex = Math.floor(currentIndex / 2)
 	}
@@ -186,10 +189,11 @@ async function computeLeafHash(
 	merkleMap: MerkleMap,
 	cache: LeafHashCache,
 ): Promise<Uint8Array> {
-	const cached = cache.find(entry =>
-		entry.alg === merkleMap.alg &&
-		entry.offsetPrefixSize === merkleMap.offsetPrefixSize &&
-		entry.exclusions === merkleMap.exclusions,
+	const cached = cache.find(
+		entry =>
+			entry.alg === merkleMap.alg &&
+			entry.offsetPrefixSize === merkleMap.offsetPrefixSize &&
+			entry.exclusions === merkleMap.exclusions,
 	)
 	if (cached) return cached.hash
 
@@ -266,7 +270,12 @@ export async function validateC2paMerkleSegment(
 
 		const leafHash = await computeLeafHash(segmentBytes, merkleMap, leafHashCache)
 		if (bmffHashHex === null) bmffHashHex = bytesToHex(leafHash)
-		const proofResult = await verifyMerkleProof(leafHash, segmentMap.location, segmentMap.hashes, merkleMap)
+		const proofResult = await verifyMerkleProof(
+			leafHash,
+			segmentMap.location,
+			segmentMap.hashes,
+			merkleMap,
+		)
 		if (proofResult === 'ok') {
 			// Advance on any proof-verified location, even a discontinuous one: it's
 			// genuinely signed content, so it resyncs continuity checking after a gap

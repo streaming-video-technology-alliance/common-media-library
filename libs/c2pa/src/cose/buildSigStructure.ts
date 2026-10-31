@@ -55,13 +55,17 @@ export function buildSigStructure(
 	protectedBytes: Uint8Array,
 	payload: Uint8Array,
 	externalAad: Uint8Array = new Uint8Array(0),
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
 	const totalLength =
-		1 // array header
-		+ 1 + COSE_SIG1_CONTEXT_BYTES.length // context string (length < 24, fits inline)
-		+ byteStringHeaderSize(protectedBytes.length) + protectedBytes.length
-		+ byteStringHeaderSize(externalAad.length) + externalAad.length
-		+ byteStringHeaderSize(payload.length) + payload.length
+		1 + // array header
+		1 +
+		COSE_SIG1_CONTEXT_BYTES.length + // context string (length < 24, fits inline)
+		byteStringHeaderSize(protectedBytes.length) +
+		protectedBytes.length +
+		byteStringHeaderSize(externalAad.length) +
+		externalAad.length +
+		byteStringHeaderSize(payload.length) +
+		payload.length
 
 	const result = new Uint8Array(totalLength)
 	let offset = 0
@@ -82,5 +86,19 @@ export function buildSigStructure(
 	offset = writeByteStringHeader(result, offset, payload.length)
 	result.set(payload, offset)
 
+	return result
+}
+
+/**
+ * Encodes bytes as a CBOR byte string (RFC 8949 §3.1, major type 2), without a tag.
+ *
+ * @param bytes - Bytes to encode
+ * @returns The byte string header, followed by `bytes`
+ *
+ * @internal
+ */
+export function encodeCborByteString(bytes: Uint8Array): Uint8Array {
+	const result = new Uint8Array(byteStringHeaderSize(bytes.length) + bytes.length)
+	result.set(bytes, writeByteStringHeader(result, 0, bytes.length))
 	return result
 }

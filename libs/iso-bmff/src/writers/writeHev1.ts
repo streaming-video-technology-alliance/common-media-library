@@ -13,6 +13,9 @@ import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
  *
  * @public
  */
-export function writeHev1(box: VisualSampleEntryBox<'hev1'>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeHev1(
+	box: VisualSampleEntryBox<'hev1'>,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	return writeVisualSampleEntryBox(box, config)
 }

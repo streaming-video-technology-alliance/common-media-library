@@ -1,9 +1,4 @@
-import type {
-	AudioTrack,
-	Presentation,
-	Segment,
-	VideoTrack,
-} from '@svta/cml-cmaf-ham'
+import type { AudioTrack, Presentation, Segment, VideoTrack } from '@svta/cml-cmaf-ham'
 
 export const videoSegments: Segment[] = [
 	{
@@ -127,8 +122,7 @@ export const videoTrack: VideoTrack = {
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleh264-videoinit.cmfv',
 	},
 	baseUrls: [],
-} as VideoTrack
-
+}
 
 // @ts-expect-error - Invalid video track
 export const invalidVideoTrack: VideoTrack = {
@@ -181,7 +175,7 @@ export const audioTrack: AudioTrack = {
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
 	},
 	baseUrls: [],
-} as AudioTrack
+}
 
 export const invalidAudioTrack: AudioTrack = {
 	url: 'audio/mp4',
@@ -199,7 +193,7 @@ export const invalidAudioTrack: AudioTrack = {
 		url: 'https://d11a69xzkl9ifh.cloudfront.net/output-mediaconvert/big buck bunny sampleaac-audioinit.cmfa',
 	},
 	baseUrls: [],
-} as AudioTrack
+}
 
 export const presentation: Presentation = {
 	id: '1',

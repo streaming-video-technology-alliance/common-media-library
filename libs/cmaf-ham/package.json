@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-cmaf-ham",
-	"version": "0.24.7",
+	"version": "0.25.0",
 	"description": "CMAF Hypothetical Application Model (HAM) functionality",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -41,7 +41,7 @@
 	],
 	"scripts": {
 		"build": "node ../../scripts/build.ts",
-		"test": "node ../../scripts/test.ts",
+		"test": "vp test --run --passWithNoTests --config ../../vite.config.ts --dir .",
 		"dev": "node samples/cmaf-ham-conversion/src/index.ts"
 	},
 	"engines": {
@@ -55,6 +55,9 @@
 		}
 	},
 	"peerDependencies": {
+		"@svta/cml-dash": "*",
+		"@svta/cml-drm": "*",
+		"@svta/cml-iso-8601": "*",
 		"@svta/cml-utils": "*"
 	},
 	"devDependencies": {

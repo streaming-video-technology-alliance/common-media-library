@@ -2,7 +2,7 @@ import { extractCertificateSpki } from '../../src/x509/extractCertificateSpki.ts
 import { extractManifestCertificate } from '../../src/extractManifestCertificate.ts'
 import { ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 function loadFixture(name: string): Uint8Array {
 	return new Uint8Array(readFileSync(new URL(`../fixtures/${name}`, import.meta.url)))
@@ -52,7 +52,13 @@ describe('extractCertificateSpki', () => {
 			{ name: 'Ed25519' },
 		] as (AlgorithmIdentifier | EcKeyImportParams)[]) {
 			try {
-				const key = await crypto.subtle.importKey('spki', spki, algorithm, true, ['verify'])
+				const key = await crypto.subtle.importKey(
+					'spki',
+					spki as Uint8Array<ArrayBuffer>,
+					algorithm,
+					true,
+					['verify'],
+				)
 				ok(key, 'key should be importable')
 				imported = true
 				break

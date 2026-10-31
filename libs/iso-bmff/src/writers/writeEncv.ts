@@ -13,6 +13,9 @@ import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
  *
  * @public
  */
-export function writeEncv(box: VisualSampleEntryBox<'encv'>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeEncv(
+	box: VisualSampleEntryBox<'encv'>,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	return writeVisualSampleEntryBox(box, config)
 }

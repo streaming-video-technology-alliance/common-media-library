@@ -1,8 +1,7 @@
 import type { BmffHashExclusion } from './BmffHashExclusion.ts'
-import { shouldExcludeBox } from './shouldExcludeBox.ts'
+import { type ByteRange, compileExclusions, findExcludedRanges } from './findExcludedRanges.ts'
+import { type BmffBox, readRootBoxes } from './readRootBoxes.ts'
 
-const MINIMUM_BOX_SIZE = 8 // size(4) + type(4)
-const BOX_TYPE_OFFSET = 4
 const DEFAULT_HASH_ALG = 'SHA-256'
 
 /**
@@ -17,57 +16,67 @@ export type BmffHashOptions = {
 	readonly offsetPrefixSize?: number
 }
 
-function readBoxType(bytes: Uint8Array, offset: number): string {
-	return String.fromCharCode(bytes[offset], bytes[offset + 1], bytes[offset + 2], bytes[offset + 3])
+function excludedLength(ranges: readonly ByteRange[]): number {
+	let length = 0
+	for (const range of ranges) length += range.end - range.start
+	return length
 }
 
-function writeUint64BigEndian(bytes: Uint8Array, value: number): void {
-	new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).setBigUint64(0, BigInt(value), false)
+// Writes the box bytes outside `ranges` to `target` at `offset` and returns the number of bytes written.
+function writeKeptBytes(
+	target: Uint8Array,
+	offset: number,
+	bytes: Uint8Array,
+	ranges: readonly ByteRange[],
+): number {
+	if (ranges.length === 0) {
+		target.set(bytes, offset)
+		return bytes.length
+	}
+	let written = 0
+	let start = 0
+	for (const range of ranges) {
+		target.set(bytes.subarray(start, range.start), offset + written)
+		written += range.start - start
+		start = range.end
+	}
+	target.set(bytes.subarray(start), offset + written)
+	return written + bytes.length - start
 }
 
 function buildHashInput(
 	bytes: Uint8Array,
 	exclusions: readonly BmffHashExclusion[],
 	offsetPrefixSize: number,
-): Uint8Array {
+): Uint8Array<ArrayBuffer> {
 	if (offsetPrefixSize !== 0 && offsetPrefixSize !== 8) {
 		throw new Error(`offsetPrefixSize must be 0 or 8, got ${offsetPrefixSize}`)
 	}
+	const compiled = compileExclusions(exclusions)
 
-	const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-
-	// First pass: calculate total size
+	// First pass: select the boxes, find their excluded ranges, and calculate the total size
+	const included: BmffBox[] = []
+	const excluded: (readonly ByteRange[])[] = []
 	let totalLength = 0
-	let offset = 0
-	while (offset + MINIMUM_BOX_SIZE <= bytes.length) {
-		const boxSize = view.getUint32(offset, false)
-		if (boxSize < MINIMUM_BOX_SIZE || offset + boxSize > bytes.length) break
-		const boxType = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
-		const boxData = bytes.subarray(offset, offset + boxSize)
-		if (!shouldExcludeBox(boxType, boxData, exclusions)) {
-			totalLength += offsetPrefixSize + boxSize
-		}
-		offset += boxSize
+	for (const box of readRootBoxes(bytes)) {
+		const ranges = findExcludedRanges(box, compiled)
+		if (ranges === null) continue
+		included.push(box)
+		excluded.push(ranges)
+		totalLength += offsetPrefixSize + box.bytes.length - excludedLength(ranges)
 	}
 
 	// Second pass: write directly into pre-sized buffer
 	const hashInput = new Uint8Array(totalLength)
+	const view = new DataView(hashInput.buffer)
 	let writeOffset = 0
-	offset = 0
-	while (offset + MINIMUM_BOX_SIZE <= bytes.length) {
-		const boxSize = view.getUint32(offset, false)
-		if (boxSize < MINIMUM_BOX_SIZE || offset + boxSize > bytes.length) break
-		const boxType = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
-		const boxData = bytes.subarray(offset, offset + boxSize)
-		if (!shouldExcludeBox(boxType, boxData, exclusions)) {
-			if (offsetPrefixSize > 0) {
-				writeUint64BigEndian(hashInput.subarray(writeOffset, writeOffset + offsetPrefixSize), offset)
-				writeOffset += offsetPrefixSize
-			}
-			hashInput.set(boxData, writeOffset)
-			writeOffset += boxSize
+	for (let i = 0; i < included.length; i++) {
+		const box = included[i]
+		if (offsetPrefixSize > 0) {
+			view.setBigUint64(writeOffset, BigInt(box.offset), false)
+			writeOffset += offsetPrefixSize
 		}
-		offset += boxSize
+		writeOffset += writeKeptBytes(hashInput, writeOffset, box.bytes, excluded[i])
 	}
 
 	return hashInput
@@ -76,9 +85,11 @@ function buildHashInput(
 /**
  * Computes the C2PA BMFF content hash (`c2pa.hash.bmff.v3`) for a DASH segment.
  *
- * Iterates through top-level BMFF boxes, excludes those matching the exclusion list,
- * concatenates the remaining box bytes (optionally prefixed with each box's file offset),
- * and returns the WebCrypto digest.
+ * Iterates through the root BMFF boxes and drops each box that an exclusion excludes in its
+ * entirety. Inside the other root boxes, the function drops the byte ranges of nested
+ * exclusions and `subset` exclusions (C2PA section 18.6.2). It concatenates the remaining
+ * bytes of each root box, optionally prefixed with the file offset of the box, and returns
+ * the WebCrypto digest.
  *
  * @param segmentBytes - Raw segment bytes to hash
  * @param options - Hash options (exclusions, algorithm, offset prefix size)
@@ -89,7 +100,10 @@ function buildHashInput(
  *
  * @internal
  */
-export async function computeBmffHash(segmentBytes: Uint8Array, options?: BmffHashOptions): Promise<Uint8Array> {
+export async function computeBmffHash(
+	segmentBytes: Uint8Array,
+	options?: BmffHashOptions,
+): Promise<Uint8Array> {
 	const exclusions = options?.exclusions ?? []
 	const alg = options?.alg ?? DEFAULT_HASH_ALG
 	const offsetPrefixSize = options?.offsetPrefixSize ?? 0

@@ -23,7 +23,8 @@ A stream is in VOD Merkle mode only when `merkleMaps` is not empty. Otherwise it
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
-const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+const initResponse = await fetch(initUrl)
+const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
 
 if (init.isValid && init.merkleMaps.length > 0) {
@@ -35,6 +36,8 @@ if (init.isValid && init.merkleMaps.length > 0) {
 
 Check `isValid` before you use `merkleMaps`. The init manifest must carry a claim signature that verifies. An init segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`, and its `merkleMaps` must not be trusted. The signature is verified with the certificate inside the manifest. The library does not check that certificate against a trust list. See [Signer Trust](results-and-error-codes.md#signer-trust).
 
+If the `exclusions` of the `c2pa.hash.bmff.v3` assertion exclude the whole `moov` box, the init segment fails with `LiveVideoStatusCode.INIT_INVALID`. The library applies this rule of C2PA section 19.2.3 to VOD Merkle init segments too. A nested exclusion such as `/moov/udta` keeps the init segment valid. A `subset` exclusion of the `moov` box also keeps the init segment valid, unless the ranges cover the whole box.
+
 ## Validating Media Segments
 
 ```typescript
@@ -44,7 +47,8 @@ import type { MerkleSegmentState } from '@svta/cml-c2pa'
 let state: MerkleSegmentState | undefined
 
 for (const segmentUrl of segmentUrls) {
-  const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+  const response = await fetch(segmentUrl)
+  const bytes = new Uint8Array(await response.arrayBuffer())
 
   const { result, nextState } = await validateC2paMerkleSegment(bytes, init.merkleMaps, state)
   state = nextState
@@ -69,7 +73,8 @@ import { validateC2paInitSegment, validateC2paMerkleSegment, LiveVideoStatusCode
 import type { MerkleSegmentState } from '@svta/cml-c2pa'
 
 async function validateStream(initUrl: string, segmentUrls: string[]) {
-  const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+  const initResponse = await fetch(initUrl)
+  const initBytes = new Uint8Array(await initResponse.arrayBuffer())
   const init = await validateC2paInitSegment(initBytes)
 
   if (!init.isValid) {
@@ -85,7 +90,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
   let state: MerkleSegmentState | undefined
 
   for (const segmentUrl of segmentUrls) {
-    const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
 
     const { result, nextState } = await validateC2paMerkleSegment(bytes, init.merkleMaps, state)
     state = nextState

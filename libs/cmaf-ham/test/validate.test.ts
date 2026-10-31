@@ -1,10 +1,6 @@
-import {
-	validatePresentation,
-	validateSegments,
-	validateTrack,
-} from '@svta/cml-cmaf-ham'
+import { validatePresentation, validateSegments, validateTrack } from '@svta/cml-cmaf-ham'
 import { deepEqual, equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import {
 	audioTrack,
 	invalidAudioTrack,
@@ -57,19 +53,14 @@ describe('validateTrack', () => {
 		const validate = validateTrack(invalidVideoTrack)
 
 		equal(validate.status, false)
-		deepEqual(validate.errorMessages, [
-			'Track id is undefined.',
-			'Segment url is undefined.',
-		])
+		deepEqual(validate.errorMessages, ['Track id is undefined.', 'Segment url is undefined.'])
 	})
 
 	it('it returns false when audio track is invalid', () => {
 		const validate = validateTrack(invalidAudioTrack)
 
 		equal(validate.status, false)
-		deepEqual(validate.errorMessages, [
-			'AudioTrack with id: 1 does not have codecs.',
-		])
+		deepEqual(validate.errorMessages, ['AudioTrack with id: 1 does not have codecs.'])
 	})
 })
 

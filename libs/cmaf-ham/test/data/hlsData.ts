@@ -1,13 +1,13 @@
 import type { AudioTrack, SegmentHls } from '@svta/cml-cmaf-ham'
 
 export type AudioTrackInfo = {
-	byteRange?: { start: number; end: number };
-	codec?: string;
-	duration?: number;
-	id?: string;
-	language?: string;
-	urlInitialization?: string;
-};
+	byteRange?: { start: number; end: number }
+	codec?: string
+	duration?: number
+	id?: string
+	language?: string
+	urlInitialization?: string
+}
 
 function getAudioTrack({
 	byteRange,
@@ -47,7 +47,7 @@ function getAudioTrack({
 			...(byteRange && { byteRange }),
 		},
 		baseUrls: [],
-	} as AudioTrack
+	}
 }
 
 function getSegments(): SegmentHls[] {

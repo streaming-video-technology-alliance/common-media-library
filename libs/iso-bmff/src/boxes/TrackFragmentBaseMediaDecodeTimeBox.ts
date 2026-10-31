@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
-	type: 'tfdt';
-	baseMediaDecodeTime: number;
-};
+	type: 'tfdt'
+	baseMediaDecodeTime: number
+}

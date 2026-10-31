@@ -43,8 +43,7 @@ export async function verifyClaimSignature(
 		)
 
 		return verifyCoseSign1(coseSign1, claimCborBytes, publicKey)
-	}
-	catch {
+	} catch {
 		return false
 	}
 }

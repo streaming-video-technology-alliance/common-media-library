@@ -10,12 +10,12 @@ export type CmcdReportRecorderWaitOptions = {
 	 *
 	 * @defaultValue `1`
 	 */
-	count?: number;
+	count?: number
 
 	/**
 	 * Maximum time to wait (in milliseconds) before rejecting. The
 	 * default is the recorder's `waitTimeout` attach option (15000 ms if
 	 * unset).
 	 */
-	timeout?: number;
+	timeout?: number
 }

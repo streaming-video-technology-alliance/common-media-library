@@ -1,6 +1,11 @@
-import { getSvtaErrorIndex, SvtaNetworkErrorCode, SvtaPlaybackErrorCode, SvtaUnknownErrorCode } from '@svta/cml-error-codes'
+import {
+	getSvtaErrorIndex,
+	SvtaNetworkErrorCode,
+	SvtaPlaybackErrorCode,
+	SvtaUnknownErrorCode,
+} from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('getSvtaErrorIndex', () => {
 	it('provides a valid example', () => {

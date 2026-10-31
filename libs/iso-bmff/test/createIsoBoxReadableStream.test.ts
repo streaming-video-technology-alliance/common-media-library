@@ -4,23 +4,39 @@ import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { Writable } from 'node:stream'
-import { createIsoBoxReadableStream, defaultWriterConfig, describe, it, readFtyp, readIsoBoxes, writeFtyp, writeMdat, writeMfhd, writeStyp, writeSubs, writeTfdt, writeTfhd, writeTrun, type IsoBoxStreamable } from './util/box.ts'
+import {
+	createIsoBoxReadableStream,
+	defaultWriterConfig,
+	describe,
+	it,
+	readFtyp,
+	readIsoBoxes,
+	writeFtyp,
+	writeMdat,
+	writeMfhd,
+	writeStyp,
+	writeSubs,
+	writeTfdt,
+	writeTfhd,
+	writeTrun,
+	type IsoBoxStreamable,
+} from './util/box.ts'
 
 describe('createIsoBoxReadableStream', function () {
 	it('should write from a parsed file', async function () {
 		// #region example
-		const isoFile = await readFile('test/fixtures/captions.mp4')
+		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 
 		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
 			readers: {
 				ftyp: readFtyp,
-			}
+			},
 		})
 
 		const stream = createIsoBoxReadableStream(boxes, {
 			writers: {
 				ftyp: writeFtyp,
-			}
+			},
 		})
 
 		const copy = join(tmpdir(), 'captions-copy.mp4')
@@ -36,16 +52,18 @@ describe('createIsoBoxReadableStream', function () {
 				type: 'styp',
 				majorBrand: 'cmfs',
 				minorVersion: 0,
-				compatibleBrands: ['iso9', 'dash']
-			}, {
+				compatibleBrands: ['iso9', 'dash'],
+			},
+			{
 				type: 'moof',
 				boxes: [
 					{
 						type: 'mfhd',
 						version: 0,
 						flags: 0,
-						sequenceNumber: 1
-					}, {
+						sequenceNumber: 1,
+					},
+					{
 						type: 'traf',
 						boxes: [
 							{
@@ -53,12 +71,14 @@ describe('createIsoBoxReadableStream', function () {
 								trackId: 1,
 								version: 0,
 								flags: 131072,
-							}, {
+							},
+							{
 								type: 'tfdt',
 								version: 1,
 								flags: 0,
 								baseMediaDecodeTime: 0,
-							}, {
+							},
+							{
 								type: 'subs',
 								version: 1,
 								flags: 0,
@@ -67,25 +87,30 @@ describe('createIsoBoxReadableStream', function () {
 									{
 										sampleDelta: 1,
 										subsampleCount: 3,
-										subsamples: [{
-											subsampleSize: 5,
-											subsamplePriority: 0,
-											discardable: 0,
-											codecSpecificParameters: 0,
-										}, {
-											subsampleSize: 6,
-											subsamplePriority: 0,
-											discardable: 0,
-											codecSpecificParameters: 0,
-										}, {
-											subsampleSize: 5,
-											subsamplePriority: 0,
-											discardable: 0,
-											codecSpecificParameters: 0,
-										}],
+										subsamples: [
+											{
+												subsampleSize: 5,
+												subsamplePriority: 0,
+												discardable: 0,
+												codecSpecificParameters: 0,
+											},
+											{
+												subsampleSize: 6,
+												subsamplePriority: 0,
+												discardable: 0,
+												codecSpecificParameters: 0,
+											},
+											{
+												subsampleSize: 5,
+												subsamplePriority: 0,
+												discardable: 0,
+												codecSpecificParameters: 0,
+											},
+										],
 									},
 								],
-							}, {
+							},
+							{
 								type: 'trun',
 								version: 0,
 								flags: 1793,
@@ -97,20 +122,18 @@ describe('createIsoBoxReadableStream', function () {
 										sampleSize: 16,
 										sampleFlags: 16777216,
 									},
-								]
+								],
 							},
 						],
 					},
 				],
-			}, {
+			},
+			{
 				type: 'mdat',
 				data: new Uint8Array([
-					102, 105, 114, 115, 116,
-					115, 101, 99, 111, 110,
-					100, 116, 104, 105, 114,
-					100
+					102, 105, 114, 115, 116, 115, 101, 99, 111, 110, 100, 116, 104, 105, 114, 100,
 				]),
-			}
+			},
 		]
 
 		const stream = createIsoBoxReadableStream(boxes, {
@@ -122,10 +145,10 @@ describe('createIsoBoxReadableStream', function () {
 				trun: writeTrun,
 				subs: writeSubs,
 				mdat: writeMdat,
-			}
+			},
 		})
 
-		const isoFile = await readFile('test/fixtures/subsample.m4s')
+		const isoFile = await readFile(new URL('./fixtures/subsample.m4s', import.meta.url))
 		const copy = join(tmpdir(), 'subsample.mp4')
 		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
 

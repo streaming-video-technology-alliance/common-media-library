@@ -8,7 +8,7 @@ import { getTimescale } from './utils/getTimescale.ts'
 export function trackToSegmentList(track: Track): SegmentList[] {
 	const segmentList: SegmentList[] = []
 	const segmentURLs: SegmentURL[] = []
-	track.segments.forEach((segment) => {
+	track.segments.forEach(segment => {
 		segmentURLs.push({
 			$: {
 				media: segment.url,
@@ -20,15 +20,12 @@ export function trackToSegmentList(track: Track): SegmentList[] {
 		const timescale = getTimescale(track)
 		segmentList.push({
 			$: {
-				duration: (
-					(track.duration * timescale) /
-					segmentURLs.length
-				).toString(),
+				duration: ((track.duration * timescale) / segmentURLs.length).toString(),
 				timescale: timescale.toString(),
 			},
 			Initialization: [{ $: { sourceURL: track.initialization.url } }],
 			SegmentURL: segmentURLs,
-		} as SegmentList)
+		})
 	}
 	return segmentList
 }

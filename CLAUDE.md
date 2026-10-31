@@ -6,15 +6,13 @@ Common Media Library is optimized for adoption by web video players. The top pri
 
 ## Skills
 
-The following skills are available as slash commands:
+The following skill is available as a slash command:
 
 - `/create-pr [base branch]` - Validate tests and docs, then create a GitHub PR with conventional commit formatting
-- `/code-review [files or branch]` - Review code changes for performance, tree-shaking, bundle size, API ergonomics, and TypeScript best practices
-- `/pr-feedback [PR number]` - Fetch unresolved PR review comments, validate them, plan fixes, implement, push, and resolve threads
 
 ## Agents
 
-- **code-reviewer** - Specialized agent for code review, used by the `/code-review` skill
+- **code-reviewer** - Specialized agent for code review
 
 ## Rules
 

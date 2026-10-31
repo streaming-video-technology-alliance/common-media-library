@@ -25,4 +25,4 @@ export function readStts(view: IsoBoxReadView): DecodingTimeToSampleBox {
 		entryCount,
 		entries,
 	}
-};
+}

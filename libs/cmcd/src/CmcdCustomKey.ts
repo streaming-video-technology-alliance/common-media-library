@@ -14,4 +14,4 @@
  *
  * @public
  */
-export type CmcdCustomKey = Lowercase<`${string}-${string}`>;
+export type CmcdCustomKey = Lowercase<`${string}-${string}`>

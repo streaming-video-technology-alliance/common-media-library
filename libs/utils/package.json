@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-utils",
-	"version": "1.6.1",
+	"version": "1.7.0",
 	"description": "Common utility functions for media processing",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -36,7 +36,7 @@
 	],
 	"scripts": {
 		"build": "node ../../scripts/build.ts",
-		"test": "node ../../scripts/test.ts"
+		"test": "vp test --run --passWithNoTests --config ../../vite.config.ts --dir ."
 	},
 	"engines": {
 		"node": ">=20"

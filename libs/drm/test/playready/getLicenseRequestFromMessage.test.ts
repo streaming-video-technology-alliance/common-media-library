@@ -1,7 +1,7 @@
 import { getLicenseRequestFromMessage } from '@svta/cml-drm'
 import { decodeBase64, UTF_16 } from '@svta/cml-utils'
 import { deepStrictEqual, strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { PLAYREADY_KEY_MESSAGE } from './data/PLAYREADY_KEY_MESSAGE.ts'
 import { stringToUtf16Buffer } from './utils/stringToUtf16Buffer.ts'
 
@@ -16,7 +16,7 @@ describe('getLicenseRequestFromMessage', () => {
 		const message = stringToUtf16Buffer(PLAYREADY_KEY_MESSAGE)
 		//#region example
 		const result = getLicenseRequestFromMessage(message)
-		deepStrictEqual(result, decodeBase64('1beR1c0').buffer as ArrayBuffer)
+		deepStrictEqual(result, decodeBase64('1beR1c0').buffer)
 		//#endregion example
 	})
 })

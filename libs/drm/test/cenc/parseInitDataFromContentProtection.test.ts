@@ -1,9 +1,9 @@
-import { parseInitDataFromContentProtection } from '@svta/cml-drm'
+import { parseInitDataFromContentProtection, type ContentProtection } from '@svta/cml-drm'
 import { strictEqual } from 'node:assert'
-import { beforeEach, describe, it } from 'node:test'
+import { beforeEach, describe, it } from 'vite-plus/test'
 
 describe('parseInitDataFromContentProtection', () => {
-	let cpData: any
+	let cpData: ContentProtection & { pssh: string; KID: null }
 
 	const base64Decode = (base64: string): ArrayBuffer => {
 		const buffer = Buffer.from(base64, 'base64')

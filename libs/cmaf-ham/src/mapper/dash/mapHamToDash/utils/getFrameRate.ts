@@ -1,11 +1,7 @@
 import type { Track } from '../../../../types/model/Track.ts'
 import type { VideoTrack } from '../../../../types/model/VideoTrack.ts'
 
-import {
-	FRAME_RATE_NUMERATOR_30,
-	ZERO,
-} from '../../../../utils/constants.ts'
-
+import { FRAME_RATE_NUMERATOR_30, ZERO } from '../../../../utils/constants.ts'
 
 /**
  * @internal

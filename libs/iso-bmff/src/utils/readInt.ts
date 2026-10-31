@@ -20,9 +20,9 @@ export function readInt(dataView: DataView, offset: number, size: number): numbe
 			// This will give unexpected results for integers >= 2^53
 			const s1 = dataView.getInt32(cursor)
 			const s2 = dataView.getInt32(cursor + 4)
-			result = (s1 * Math.pow(2, 32)) + s2
+			result = s1 * Math.pow(2, 32) + s2
 			break
 	}
 
 	return result
-};
+}

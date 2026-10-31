@@ -31,11 +31,11 @@ setHlsParser((text: string) => {
 	const parser = new Parser()
 	parser.push(text)
 	parser.end()
-	const parsedHlsManifest = parser.manifest as any
+	const parsedHlsManifest = parser.manifest as unknown as HlsManifest
 	if (!parsedHlsManifest) {
 		throw new Error()
 	}
-	return parsedHlsManifest as HlsManifest
+	return parsedHlsManifest
 })
 
 setDashSerializer((manifest: DashManifest) => {
@@ -105,7 +105,10 @@ console.log('Regenerating HAM to DASH snapshots...')
 // Note: ham3 is already an array of Presentations, don't wrap it again
 const dashFromHam3 = hamToDash(ham3)
 
-writeFileSync('./test/data/dash-samples/fromHam/dashFromHam3.json', JSON.stringify(dashFromHam3.manifest, null, 2))
+writeFileSync(
+	'./test/data/dash-samples/fromHam/dashFromHam3.json',
+	JSON.stringify(dashFromHam3.manifest, null, 2),
+)
 
 console.log('✅ HAM to DASH snapshots regenerated')
 

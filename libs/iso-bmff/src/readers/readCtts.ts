@@ -28,4 +28,4 @@ export function readCtts(view: IsoBoxReadView): CompositionTimeToSampleBox {
 		entryCount,
 		entries,
 	}
-};
+}

@@ -30,9 +30,20 @@ export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView {
 	const widthSize = 4
 	const heightSize = 4
 
-	const totalSize = headerSize + fullBoxSize + timesSize + trackIdSize + reserved1Size +
-		reserved2Size + layerSize + alternateGroupSize + volumeSize + reserved3Size +
-		matrixSize + widthSize + heightSize
+	const totalSize =
+		headerSize +
+		fullBoxSize +
+		timesSize +
+		trackIdSize +
+		reserved1Size +
+		reserved2Size +
+		layerSize +
+		alternateGroupSize +
+		volumeSize +
+		reserved3Size +
+		matrixSize +
+		widthSize +
+		heightSize
 
 	const writer = new IsoBoxWriteView('tkhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)

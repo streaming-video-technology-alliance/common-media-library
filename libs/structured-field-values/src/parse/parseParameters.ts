@@ -1,3 +1,4 @@
+import type { SfBareItem } from '../SfBareItem.ts'
 import type { SfDecodeOptions } from '../SfDecodeOptions.ts'
 import type { SfParameters } from '../SfParameters.ts'
 import type { ParsedValue } from './ParsedValue.ts'
@@ -46,7 +47,10 @@ import { parseKey } from './parseKey.ts'
 /**
  * @internal
  */
-export function parseParameters(src: string, options?: SfDecodeOptions): ParsedValue<SfParameters | undefined> {
+export function parseParameters(
+	src: string,
+	options?: SfDecodeOptions,
+): ParsedValue<SfParameters | undefined> {
 	let parameters: SfParameters | undefined = undefined
 	while (src.length > 0) {
 		if (src[0] !== ';') {
@@ -56,13 +60,13 @@ export function parseParameters(src: string, options?: SfDecodeOptions): ParsedV
 		src = src.substring(1).trim()
 		const parsedKey = parseKey(src)
 		const key = parsedKey.value
-		let value = true
+		let value: SfBareItem = true
 		src = parsedKey.src
 
 		if (src[0] === '=') {
 			src = src.substring(1)
 			const parsedBareItem = parseBareItem(src, options)
-			value = parsedBareItem.value as any
+			value = parsedBareItem.value
 			src = parsedBareItem.src
 		}
 

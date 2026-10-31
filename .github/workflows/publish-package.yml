@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "The package short name to publish (i.e utils for @svta/cml-utils)"
+        description: 'The package short name to publish (i.e utils for @svta/cml-utils)'
         required: true
 
 jobs:
@@ -23,9 +23,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: "npm"
-          registry-url: "https://registry.npmjs.org"
-          scope: "@svta"
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@svta'
 
       - name: Install
         run: npm ci
@@ -40,11 +40,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docs
-        run: npm run build -w docs
+      - name: Build Site
+        run: npm run build -w site
 
-      - name: Deploy Docs
+      - name: Deploy Site
         uses: peaceiris/actions-gh-pages@v4
         with:
-          publish_dir: ./docs/dist/
+          publish_dir: ./site/dist/
+          force_orphan: true
           personal_token: ${{ secrets.GH_ACTIONS }}

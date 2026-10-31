@@ -8,7 +8,7 @@ function release(pkg: string, version: string, changes: string) {
 ${changes}
 
 ## Documentation
-- API Docs: https://streaming-video-technology-alliance.github.io/common-media-library/
+- API Docs: https://cml.svta.org/
 
 ## NPM Package
 \`\`\`sh
@@ -27,7 +27,7 @@ async function getChanges(pkg: string, version: string) {
 
 async function getVersion(pkg: string) {
 	const txt = await readFile(`libs/${pkg}/package.json`, 'utf8')
-	return JSON.parse(txt).version
+	return (JSON.parse(txt) as { version: string }).version
 }
 
 const createReleaseNotes = async (pkg: string) => {
@@ -37,4 +37,4 @@ const createReleaseNotes = async (pkg: string) => {
 	await writeFile('./RELEASE.md', releaseNotes)
 }
 
-createReleaseNotes(process.argv[2])
+await createReleaseNotes(process.argv[2])

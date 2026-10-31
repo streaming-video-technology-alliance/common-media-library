@@ -14,7 +14,7 @@ import { serializeParams } from './serialize/serializeParams.ts'
  *
  * @public
  */
-export function encodeSfItem(value: SfItem): string;
+export function encodeSfItem(value: SfItem): string
 
 /**
  * Encode a structured field value to a string with optional parameters.
@@ -26,7 +26,7 @@ export function encodeSfItem(value: SfItem): string;
  *
  * @public
  */
-export function encodeSfItem(value: SfBareItem, params?: SfParameters): string;
+export function encodeSfItem(value: SfBareItem, params?: SfParameters): string
 
 export function encodeSfItem(value: SfItem | SfBareItem, params?: SfParameters): string {
 	if (value instanceof SfItem) {

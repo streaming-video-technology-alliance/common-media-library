@@ -6,9 +6,9 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type ProducerReferenceTimeBox = FullBox & {
-	type: 'prft';
-	referenceTrackId: number;
-	ntpTimestampSec: number;
-	ntpTimestampFrac: number;
-	mediaTime: number;
-};
+	type: 'prft'
+	referenceTrackId: number
+	ntpTimestampSec: number
+	ntpTimestampFrac: number
+	mediaTime: number
+}

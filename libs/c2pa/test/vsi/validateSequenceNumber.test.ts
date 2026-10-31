@@ -2,7 +2,7 @@ import { createSequenceState } from '../../src/vsi/createSequenceState.ts'
 import { SequenceValidationReason } from '../../src/vsi/SequenceState.ts'
 import { validateSequenceNumber } from '../../src/vsi/validateSequenceNumber.ts'
 import { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('validateSequenceNumber', () => {
 	// #region example
@@ -42,9 +42,11 @@ describe('validateSequenceNumber', () => {
 		let state = createSequenceState()
 		state = validateSequenceNumber(state, 5, 0).nextState
 
-		const { result } = validateSequenceNumber(state, 3, 0)
+		const { result, nextState } = validateSequenceNumber(state, 3, 0)
 		strictEqual(result.isValid, false)
 		strictEqual(result.reason, SequenceValidationReason.OUT_OF_ORDER)
+		// An out-of-order number does not move the floor backward.
+		strictEqual(nextState.lastSequenceNumber, 5)
 	})
 
 	it('detects gap and reports missing range', () => {

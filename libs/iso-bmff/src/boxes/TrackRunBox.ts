@@ -10,9 +10,9 @@ import type { TrackRunSample } from './TrackRunSample.ts'
  * @public
  */
 export type TrackRunBox = FullBox & {
-	type: 'trun';
-	sampleCount: number;
-	dataOffset?: number;
-	firstSampleFlags?: number;
-	samples: TrackRunSample[];
-};
+	type: 'trun'
+	sampleCount: number
+	dataOffset?: number
+	firstSampleFlags?: number
+	samples: TrackRunSample[]
+}

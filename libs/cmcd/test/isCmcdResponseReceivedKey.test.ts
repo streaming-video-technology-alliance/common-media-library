@@ -1,6 +1,6 @@
 import { CMCD_REQUEST_KEYS, CMCD_RESPONSE_KEYS, isCmcdResponseReceivedKey } from '@svta/cml-cmcd'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('isCmcdResponseReceivedKey', () => {
 	it('provides a valid example', () => {

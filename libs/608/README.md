@@ -2,6 +2,15 @@
 
 CTA-608/CEA-608 closed captioning functionality.
 
+## When to use
+
+- Extract CTA-608 caption bytes from an AVC or HEVC sample: `extractCta608DataFromSample`, `findCta608Nalus`
+- Extract CTA-608 caption bytes from an AV1 sample: `extractCta608DataFromAv1Sample`
+- Decode caption byte pairs into timed caption screens and cues: `Cta608Parser`, `CaptionScreen`
+- Parse a Scenarist Closed Caption file: `SccParser`
+
+Do not write your own SEI or OBU scanner, 608 command decoder, or caption screen model. Open an issue for a command or layout that is missing.
+
 ## Installation
 
 ```bash

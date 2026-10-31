@@ -1,15 +1,27 @@
-import { createAudioSampleEntryReader, createVisualSampleEntryReader, findIsoBox, fourCcToUint32, readIsoBoxes, readStsd, writeAudioSampleEntryBox, writeFrma, writeIsoBoxes, writeSchm, writeStsd, writeTenc, writeVisualSampleEntryBox, type AudioSampleEntryBox, type VisualSampleEntryBox } from '@svta/cml-iso-bmff'
+import {
+	createAudioSampleEntryReader,
+	createVisualSampleEntryReader,
+	findIsoBox,
+	fourCcToUint32,
+	readIsoBoxes,
+	readStsd,
+	writeAudioSampleEntryBox,
+	writeFrma,
+	writeIsoBoxes,
+	writeSchm,
+	writeStsd,
+	writeTenc,
+	writeVisualSampleEntryBox,
+	type AudioSampleEntryBox,
+	type IsoBoxReaderMap,
+	type IsoBoxType,
+	type IsoBoxWriterMap,
+	type VisualSampleEntryBox,
+} from '@svta/cml-iso-bmff'
 
-const audioTypes = [
-	'mp4a',
-	'ac-3',
-	'ec-3',
-	'ac-4',
-	'fLaC',
-	'Opus',
-]
+const audioTypes: IsoBoxType[] = ['mp4a', 'ac-3', 'ec-3', 'ac-4', 'fLaC', 'Opus']
 
-const videoTypes = [
+const videoTypes: IsoBoxType[] = [
 	'dvh1',
 	'dvhe',
 	'hev1',
@@ -26,8 +38,9 @@ const readers = /* @__PURE__ */ (() => {
 	const map = {
 		stsd: readStsd,
 	}
-	audioTypes.forEach(type => (map as any)[type] = createAudioSampleEntryReader(type))
-	videoTypes.forEach(type => (map as any)[type] = createVisualSampleEntryReader(type))
+	const dynamic: IsoBoxReaderMap = map
+	audioTypes.forEach(type => (dynamic[type] = createAudioSampleEntryReader(type)))
+	videoTypes.forEach(type => (dynamic[type] = createVisualSampleEntryReader(type)))
 	return map
 })()
 
@@ -40,8 +53,9 @@ const writers = /* @__PURE__ */ (() => {
 		encv: writeVisualSampleEntryBox,
 		enca: writeAudioSampleEntryBox,
 	}
-	audioTypes.forEach(type => (map as any)[type] = writeAudioSampleEntryBox)
-	videoTypes.forEach(type => (map as any)[type] = writeVisualSampleEntryBox)
+	const dynamic: IsoBoxWriterMap = map
+	audioTypes.forEach(type => (dynamic[type] = writeAudioSampleEntryBox))
+	videoTypes.forEach(type => (dynamic[type] = writeVisualSampleEntryBox))
 	return map
 })()
 
@@ -56,28 +70,28 @@ export type EnsureEncryptedInitOptions = {
 	 *
 	 * @defaultValue `true`
 	 */
-	prepend: boolean;
+	prepend: boolean
 
 	/**
 	 * Whether to include the original init segment in the result.
 	 *
 	 * @defaultValue `true`
 	 */
-	includeOriginal: boolean;
+	includeOriginal: boolean
 
 	/**
 	 * The scheme type to use for the encryption. Defaults to `cenc`.
 	 *
 	 * @defaultValue `1667591779`
 	 */
-	schemeType: number;
+	schemeType: number
 
 	/**
 	 * The default KID to use for the encryption.
 	 *
 	 * @defaultValue `[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]`
 	 */
-	defaultKid: number[];
+	defaultKid: number[]
 }
 
 /**
@@ -94,8 +108,16 @@ export type EnsureEncryptedInitOptions = {
  * @example
  * {@includeCode ../test/ensureEncryptedInit.test.ts#example}
  */
-export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEncryptedInitOptions>): Uint8Array {
-	const { prepend = true, includeOriginal = true, schemeType = 1667591779, defaultKid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] } = options ?? {}
+export function ensureEncryptedInit(
+	init: Uint8Array,
+	options?: Partial<EnsureEncryptedInitOptions>,
+): Uint8Array {
+	const {
+		prepend = true,
+		includeOriginal = true,
+		schemeType = 1667591779,
+		defaultKid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+	} = options ?? {}
 	const boxes = readIsoBoxes(init, { readers })
 	const stsd = findIsoBox(boxes, box => box.type === 'stsd')
 
@@ -109,42 +131,51 @@ export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEn
 		return init
 	}
 
-	const entries = stsd.entries.filter(({ type }) => videoTypes.includes(type) || audioTypes.includes(type))
+	const entries = stsd.entries.filter(
+		({ type }) => videoTypes.includes(type) || audioTypes.includes(type),
+	)
 
 	// Add sinf to each sample entry box
 	for (const entry of entries) {
 		const type = videoTypes.includes(entry.type) ? 'encv' : 'enca'
-		const box = { ...entry, boxes: entry.boxes.slice(), type } as AudioSampleEntryBox | VisualSampleEntryBox
+		const box = { ...entry, boxes: entry.boxes.slice(), type } as
+			| AudioSampleEntryBox
+			| VisualSampleEntryBox
 
 		if (prepend) {
 			stsd.entries.unshift(box)
-		}
-		else {
+		} else {
 			stsd.entries.push(box)
 		}
 
 		box.boxes.push({
 			type: 'sinf',
-			boxes: [{
-				type: 'frma',
-				dataFormat: fourCcToUint32(entry.type),
-			}, {
-				type: 'schm',
-				version: 0,
-				flags: 0,
-				schemeType,
-				schemeVersion: 65536,
-			}, {
-				type: 'schi',
-				boxes: [{
-					type: 'tenc',
+			boxes: [
+				{
+					type: 'frma',
+					dataFormat: fourCcToUint32(entry.type),
+				},
+				{
+					type: 'schm',
 					version: 0,
 					flags: 0,
-					defaultIsEncrypted: 1,
-					defaultIvSize: 8,
-					defaultKid,
-				}],
-			}],
+					schemeType,
+					schemeVersion: 65536,
+				},
+				{
+					type: 'schi',
+					boxes: [
+						{
+							type: 'tenc',
+							version: 0,
+							flags: 0,
+							defaultIsEncrypted: 1,
+							defaultIvSize: 8,
+							defaultKid,
+						},
+					],
+				},
+			],
 		})
 	}
 

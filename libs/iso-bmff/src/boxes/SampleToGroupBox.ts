@@ -7,9 +7,9 @@ import type { SampleToGroupEntry } from './SampleToGroupEntry.ts'
  * @public
  */
 export type SampleToGroupBox = FullBox & {
-	type: 'sbgp';
-	groupingType: number;
-	groupingTypeParameter?: number;
-	entryCount: number;
-	entries: SampleToGroupEntry[];
-};
+	type: 'sbgp'
+	groupingType: number
+	groupingTypeParameter?: number
+	entryCount: number
+	entries: SampleToGroupEntry[]
+}

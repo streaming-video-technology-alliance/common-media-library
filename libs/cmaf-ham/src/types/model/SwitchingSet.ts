@@ -8,10 +8,11 @@ import type { Track } from './Track.ts'
  *
  * @alpha
  */
-export type SwitchingSet = Ham & Base & {
-	tracks: Track[];
-	protection?: Protection;
+export type SwitchingSet = Ham &
+	Base & {
+		tracks: Track[]
+		protection?: Protection
 
-	// TODO: Is this a DASH specific term? - Yes: Revisit for shareable concepts/categorization, e.g. CHARACTERISTICS + values on #EXT-X-MEDIA
-	role?: string;
-};
+		// TODO: Is this a DASH specific term? - Yes: Revisit for shareable concepts/categorization, e.g. CHARACTERISTICS + values on #EXT-X-MEDIA
+		role?: string
+	}

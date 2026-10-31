@@ -16,4 +16,4 @@ export function readSkip(view: IsoBoxReadView): FreeSpaceBox<'skip'> {
 		...readFree(view),
 		type: 'skip',
 	}
-};
+}

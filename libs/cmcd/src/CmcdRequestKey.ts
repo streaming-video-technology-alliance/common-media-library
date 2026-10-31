@@ -5,4 +5,4 @@ import type { CmcdRequest } from './CmcdRequest.ts'
  *
  * @public
  */
-export type CmcdRequestKey = keyof CmcdRequest | 'nrr';
+export type CmcdRequestKey = keyof CmcdRequest | 'nrr'

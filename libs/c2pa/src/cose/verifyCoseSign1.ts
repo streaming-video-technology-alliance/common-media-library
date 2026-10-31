@@ -1,29 +1,28 @@
 import type { CoseSign1 } from './CoseSign1.ts'
 import { buildSigStructure } from './buildSigStructure.ts'
 import {
-	CURVE_P256, 
-	CURVE_P384, 
+	CURVE_P384,
 	CURVE_P521,
-	ECDSA_ALGORITHM, 
-	ED25519_ALGORITHM, 
+	ECDSA_ALGORITHM,
+	ED25519_ALGORITHM,
 	RSA_PSS_ALGORITHM,
-	HASH_SHA256, 
-	HASH_SHA384, 
+	HASH_SHA256,
+	HASH_SHA384,
 	HASH_SHA512,
 } from './constants.ts'
 
 const DER_SEQUENCE_TAG = 0x30
 const DER_INTEGER_TAG = 0x02
 
-const CURVE_COMPONENT_BYTES: Record<string, number> = { [CURVE_P256]: 32, [CURVE_P384]: 48, [CURVE_P521]: 66 }
+const CURVE_COMPONENT_BYTES: Record<string, number> = { 'P-256': 32, 'P-384': 48, 'P-521': 66 }
 
 type EcKeyAlgorithm = KeyAlgorithm & { readonly namedCurve: string }
 type RsaHashedKeyAlgorithm = KeyAlgorithm & { readonly hash: { readonly name: string } }
 
 const RSA_PSS_SALT_LENGTH: Record<string, number> = {
-	[HASH_SHA256]: 32,
-	[HASH_SHA384]: 48,
-	[HASH_SHA512]: 64,
+	'SHA-256': 32,
+	'SHA-384': 48,
+	'SHA-512': 64,
 }
 
 function getComponentSize(publicKey: CryptoKey): number {
@@ -34,7 +33,11 @@ function getComponentSize(publicKey: CryptoKey): number {
 }
 
 function isDerEncoded(signature: Uint8Array, expectedRawLength: number): boolean {
-	return signature.length !== expectedRawLength && signature.length > 2 && signature[0] === DER_SEQUENCE_TAG
+	return (
+		signature.length !== expectedRawLength &&
+		signature.length > 2 &&
+		signature[0] === DER_SEQUENCE_TAG
+	)
 }
 
 function parseDerLength(der: Uint8Array, offset: number): { length: number; nextOffset: number } {
@@ -44,7 +47,8 @@ function parseDerLength(der: Uint8Array, offset: number): { length: number; next
 		return { length: firstByte, nextOffset: offset + 1 }
 	}
 	const numBytes = firstByte & 0x7f
-	if (numBytes === 0 || offset + numBytes >= der.length) throw new Error('DER signature: invalid long-form length')
+	if (numBytes === 0 || offset + numBytes >= der.length)
+		throw new Error('DER signature: invalid long-form length')
 	let length = 0
 	for (let i = 1; i <= numBytes; i++) {
 		length = (length << 8) | der[offset + i]
@@ -85,7 +89,8 @@ function resolveVerifyAlgorithm(publicKey: CryptoKey) {
 	if (name === ED25519_ALGORITHM) return { name: ED25519_ALGORITHM }
 	if (name === ECDSA_ALGORITHM) {
 		const curve = (publicKey.algorithm as EcKeyAlgorithm).namedCurve
-		const hash = curve === CURVE_P384 ? HASH_SHA384 : curve === CURVE_P521 ? HASH_SHA512 : HASH_SHA256
+		const hash =
+			curve === CURVE_P384 ? HASH_SHA384 : curve === CURVE_P521 ? HASH_SHA512 : HASH_SHA256
 		return { name: ECDSA_ALGORITHM, hash: { name: hash } }
 	}
 	if (name === RSA_PSS_ALGORITHM) {
@@ -132,5 +137,10 @@ export async function verifyCoseSign1(
 	const sigStructure = buildSigStructure(coseSign1.protectedBytes, payload)
 	const algorithm = resolveVerifyAlgorithm(publicKey)
 	const signature = normalizeSignature(coseSign1.signature, publicKey)
-	return crypto.subtle.verify(algorithm, publicKey, signature, sigStructure)
+	return crypto.subtle.verify(
+		algorithm,
+		publicKey,
+		signature as Uint8Array<ArrayBuffer>,
+		sigStructure,
+	)
 }

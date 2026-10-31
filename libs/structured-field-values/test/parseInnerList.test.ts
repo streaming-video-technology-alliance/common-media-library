@@ -1,6 +1,6 @@
 import { parseInnerList, parseList, SfItem } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vite-plus/test'
 
 test('parseInnerList', () => {
 	assert.deepStrictEqual(parseInnerList(`( 1 2 3 )`), {
@@ -26,9 +26,9 @@ test('parseInnerList', () => {
 				new Uint8Array([1, 2, 3]),
 				new Date(1659578233 * 1000),
 			]),
-		], src: ``,
-	},
-	)
+		],
+		src: ``,
+	})
 	assert.throws(() => parseInnerList(`[1 2 3)`), /failed to parse "\[1 2 3\)" as Inner List/)
 	assert.throws(() => parseInnerList(`(1 2 3]`), /failed to parse "\]" as Inner List/)
 	assert.throws(() => parseInnerList(`(`), /failed to parse "" as Inner List/)

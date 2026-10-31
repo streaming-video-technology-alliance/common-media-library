@@ -1,6 +1,6 @@
 import { appendCmcdHeaders } from '@svta/cml-cmcd'
 import { deepEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('appendCmcdHeaders', () => {
 	const headers = {
@@ -30,7 +30,8 @@ describe('appendCmcdHeaders', () => {
 	})
 
 	it('handles null data object', () => {
-		deepEqual(appendCmcdHeaders(headers, null as any), headers)
+		// @ts-expect-error - This is a test
+		deepEqual(appendCmcdHeaders(headers, null), headers)
 	})
 
 	it('appends headers', () => {

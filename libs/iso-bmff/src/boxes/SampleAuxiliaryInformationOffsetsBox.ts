@@ -6,9 +6,9 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
-	type: 'saio';
-	auxInfoType?: number;
-	auxInfoTypeParameter?: number;
-	entryCount: number;
-	offset: number[];
-};
+	type: 'saio'
+	auxInfoType?: number
+	auxInfoTypeParameter?: number
+	entryCount: number
+	offset: number[]
+}

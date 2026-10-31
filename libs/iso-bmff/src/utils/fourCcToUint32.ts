@@ -12,9 +12,10 @@
  */
 export function fourCcToUint32(str: string): number {
 	return (
-		(str.charCodeAt(0) << 24) |
-		(str.charCodeAt(1) << 16) |
-		(str.charCodeAt(2) << 8) |
-		str.charCodeAt(3)
-	) >>> 0
+		((str.charCodeAt(0) << 24) |
+			(str.charCodeAt(1) << 16) |
+			(str.charCodeAt(2) << 8) |
+			str.charCodeAt(3)) >>>
+		0
+	)
 }

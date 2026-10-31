@@ -17,4 +17,4 @@ export function readKind(view: IsoBoxReadView): TrackKindBox {
 		schemeUri: view.readUtf8(-1),
 		value: view.readUtf8(-1),
 	}
-};
+}

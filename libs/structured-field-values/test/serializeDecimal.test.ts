@@ -1,6 +1,6 @@
 import { serializeDecimal } from '@svta/cml-structured-field-values'
 import assert from 'node:assert'
-import test from 'node:test'
+import { test } from 'vite-plus/test'
 
 test('serializeDecimal', () => {
 	assert.deepStrictEqual(serializeDecimal(0), '0.0')
@@ -13,8 +13,14 @@ test('serializeDecimal', () => {
 	assert.deepStrictEqual(serializeDecimal(-1.0035), '-1.004')
 	assert.deepStrictEqual(serializeDecimal(999_999_999_999.999), '999999999999.999')
 	assert.deepStrictEqual(serializeDecimal(-999_999_999_999.999), '-999999999999.999')
-	assert.throws(() => serializeDecimal(1_000_000_000_000.0), /failed to serialize "1000000000000" as Decimal/)
-	assert.throws(() => serializeDecimal(-1_000_000_000_000.0), /failed to serialize "-1000000000000" as Decimal/)
+	assert.throws(
+		() => serializeDecimal(1_000_000_000_000.0),
+		/failed to serialize "1000000000000" as Decimal/,
+	)
+	assert.throws(
+		() => serializeDecimal(-1_000_000_000_000.0),
+		/failed to serialize "-1000000000000" as Decimal/,
+	)
 	assert.throws(() => serializeDecimal(1e21), /failed to serialize "1e\+21" as Decimal/)
 	assert.throws(() => serializeDecimal(-1e21), /failed to serialize "-1e\+21" as Decimal/)
 })

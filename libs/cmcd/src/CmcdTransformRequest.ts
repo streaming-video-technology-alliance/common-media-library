@@ -28,7 +28,7 @@ import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
  * 	request?.customData?.requestType === 'segment' ? data : null
  * ```
  *
- * This type wraps `C` in {@link DeepReadonly}, so a nested `C` keeps both the
+ * This type wraps `C` in {@link @svta/cml-utils!DeepReadonly | DeepReadonly}, so a nested `C` keeps both the
  * read-only guarantee and typed reads.
  *
  * Two limits apply. A mutable body such as `FormData` or `URLSearchParams`
@@ -41,15 +41,17 @@ import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
  *
  * @public
  */
-export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, 'customData' | 'headers'>> & {
+export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<
+	Omit<HttpRequest, 'customData' | 'headers'>
+> & {
 	/**
 	 * The headers associated with the request.
 	 */
-	readonly headers?: Readonly<Record<string, string>>;
+	readonly headers?: Readonly<Record<string, string>>
 
 	/**
 	 * Any custom data the caller attached to the request, including the
 	 * player's own fields.
 	 */
-	readonly customData?: DeepReadonly<C>;
-};
+	readonly customData?: DeepReadonly<C>
+}

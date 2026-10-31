@@ -39,7 +39,7 @@ The library also offers presentation queries and track validation.
 
 ## Documentation
 
-For the API reference and more examples, read the [API documentation](https://streaming-video-technology-alliance.github.io/common-media-library/).
+For the API reference and more examples, read the [API documentation](https://cml.svta.org/).
 
 ## Contribution
 

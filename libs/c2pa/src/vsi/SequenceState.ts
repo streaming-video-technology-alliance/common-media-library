@@ -64,10 +64,10 @@ export type SequenceValidationResult =
 				| typeof SequenceValidationReason.SEQUENCE_NUMBER_BELOW_MINIMUM
 				| typeof SequenceValidationReason.DUPLICATE
 				| typeof SequenceValidationReason.OUT_OF_ORDER
-		}
+	  }
 	| {
 			readonly isValid: false
 			readonly reason: typeof SequenceValidationReason.GAP_DETECTED
 			readonly missingFrom: number
 			readonly missingTo: number
-		}
+	  }

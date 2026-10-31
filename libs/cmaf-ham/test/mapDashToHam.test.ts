@@ -1,5 +1,5 @@
 import { deepStrictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 import { mapSegmentBase, mapSegmentList, mapSegments, mapSegmentTemplate } from '@svta/cml-cmaf-ham'
 
@@ -33,12 +33,19 @@ describe('map segments', () => {
 
 	describe('mapSegmentTemplate', () => {
 		it('maps Representation and SegmentTemplate to Segments[]', () => {
-			const res = mapSegmentTemplate(
-				representationTemplate,
-				duration,
-				segmentTemplate,
-			)
+			const res = mapSegmentTemplate(representationTemplate, duration, segmentTemplate)
 			deepStrictEqual(res, expectedSegmentTemplate)
+		})
+
+		it('replaces Time with the start time of each segment in timescale units', () => {
+			const timeTemplate = {
+				$: { ...segmentTemplate.$, media: '$RepresentationID$/$Time$.m4s' },
+			}
+			const res = mapSegmentTemplate(representationTemplate, duration, timeTemplate)
+			deepStrictEqual(
+				res.map(segment => segment.url),
+				['1/0.m4s', '1/96.m4s', '1/192.m4s'],
+			)
 		})
 	})
 
@@ -48,11 +55,7 @@ describe('map segments', () => {
 				$: { segmentAlignment: '' },
 				Representation: [representationBase],
 			}
-			const res = mapSegments(
-				adaptationSet,
-				representationBase,
-				duration,
-			)
+			const res = mapSegments(adaptationSet, representationBase, duration)
 			deepStrictEqual(res, expectedSegmentBase)
 		})
 
@@ -61,11 +64,7 @@ describe('map segments', () => {
 				$: { segmentAlignment: '' },
 				Representation: [representationList],
 			}
-			const res = mapSegments(
-				adaptationSet,
-				representationList,
-				duration,
-			)
+			const res = mapSegments(adaptationSet, representationList, duration)
 			deepStrictEqual(res, expectedSegmentList)
 		})
 
@@ -75,11 +74,7 @@ describe('map segments', () => {
 				Representation: [representationTemplate],
 				SegmentTemplate: [segmentTemplate],
 			}
-			const res = mapSegments(
-				adaptationSet,
-				representationTemplate,
-				duration,
-			)
+			const res = mapSegments(adaptationSet, representationTemplate, duration)
 			deepStrictEqual(res, expectedSegmentTemplate)
 		})
 	})

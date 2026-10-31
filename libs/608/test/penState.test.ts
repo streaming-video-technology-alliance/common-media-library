@@ -1,6 +1,6 @@
 import { PenState } from '@svta/cml-608'
 import { deepEqual, equal, notDeepEqual } from 'node:assert'
-import { beforeEach, describe, it } from 'node:test'
+import { beforeEach, describe, it } from 'vite-plus/test'
 
 describe('PenState Tests', () => {
 	let penState: PenState
@@ -27,35 +27,35 @@ describe('PenState Tests', () => {
 	it('setStyles foreground to blac', () => {
 		equal(penState.foreground, 'white')
 
-		penState.setStyles({ 'foreground': 'black' })
+		penState.setStyles({ foreground: 'black' })
 		equal(penState.foreground, 'black')
 	})
 
 	it('setStyles underline to true', () => {
 		equal(penState.underline, false)
 
-		penState.setStyles({ 'underline': true })
+		penState.setStyles({ underline: true })
 		equal(penState.underline, true)
 	})
 
 	it('setStyles italics to true', () => {
 		equal(penState.italics, false)
 
-		penState.setStyles({ 'italics': true })
+		penState.setStyles({ italics: true })
 		equal(penState.italics, true)
 	})
 
 	it('setStyles background to white', () => {
 		equal(penState.background, 'black')
 
-		penState.setStyles({ 'background': 'white' })
+		penState.setStyles({ background: 'white' })
 		equal(penState.background, 'white')
 	})
 
 	it('setStyles flash to true', () => {
 		equal(penState.flash, false)
 
-		penState.setStyles({ 'flash': true })
+		penState.setStyles({ flash: true })
 		equal(penState.flash, true)
 	})
 
@@ -83,11 +83,9 @@ describe('PenState Tests', () => {
 		auxPenState.background = 'white'
 		auxPenState.flash = true
 
-
 		equal(penState.equals(auxPenState), false)
 
 		penState.copy(auxPenState)
 		equal(penState.equals(auxPenState), true)
 	})
-
 })

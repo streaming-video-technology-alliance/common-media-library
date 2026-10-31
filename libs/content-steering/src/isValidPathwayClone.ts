@@ -16,7 +16,12 @@ export function isValidPathwayClone(clone: PathwayClone): boolean {
 
 	const { ID, 'BASE-ID': BASE_ID, 'URI-REPLACEMENT': URI_REPLACEMENT } = clone
 
-	if (typeof ID !== 'string' || typeof BASE_ID !== 'string' || URI_REPLACEMENT == null || typeof URI_REPLACEMENT !== 'object') {
+	if (
+		typeof ID !== 'string' ||
+		typeof BASE_ID !== 'string' ||
+		URI_REPLACEMENT == null ||
+		typeof URI_REPLACEMENT !== 'object'
+	) {
 		return false
 	}
 

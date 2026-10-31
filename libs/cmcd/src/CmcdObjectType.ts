@@ -59,4 +59,4 @@ export const CmcdObjectType = {
 /**
  * @public
  */
-export type CmcdObjectType = ValueOf<typeof CmcdObjectType>;
+export type CmcdObjectType = ValueOf<typeof CmcdObjectType>

@@ -1,9 +1,4 @@
-import { toUint8 } from '@svta/cml-id3'
-
-export function generateId3(
-	frames: Uint8Array,
-	extendedHeader: boolean = false,
-): Uint8Array {
+export function generateId3(frames: Uint8Array, extendedHeader: boolean = false): Uint8Array {
 	let result = concat(
 		stringToInts('ID3'),
 		new Uint8Array([
@@ -81,7 +76,7 @@ export function generateId3Frame(type: string, value: Uint8Array): Uint8Array {
 	return result
 }
 
-function concat(...varArgs: BufferSource[]) {
+function concat(...varArgs: Uint8Array[]) {
 	let totalLength = 0
 	for (const value of varArgs) {
 		totalLength += value.byteLength
@@ -91,12 +86,7 @@ function concat(...varArgs: BufferSource[]) {
 	let offset = 0
 
 	for (const value of varArgs) {
-		if (value instanceof Uint8Array) {
-			result.set(value, offset)
-		}
-		else {
-			result.set(toUint8(value), offset)
-		}
+		result.set(value, offset)
 		offset += value.byteLength
 	}
 

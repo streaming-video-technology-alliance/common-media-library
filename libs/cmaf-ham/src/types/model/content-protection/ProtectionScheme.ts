@@ -30,4 +30,4 @@ export const ProtectionScheme = {
  *
  * @alpha
  */
-export type ProtectionScheme = ValueOf<typeof ProtectionScheme>;
+export type ProtectionScheme = ValueOf<typeof ProtectionScheme>

@@ -1,6 +1,6 @@
 import { SvtaContentProtectionErrorCode, SvtaErrorCategory } from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { assertCatalogInvariants } from './data/assertCatalogInvariants.ts'
 
 describe('SvtaContentProtectionErrorCode', () => {
@@ -13,7 +13,12 @@ describe('SvtaContentProtectionErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaContentProtectionErrorCode, SvtaErrorCategory.CONTENT_PROTECTION, 22, 'SVTA_CONTENT_PROTECTION')
+		assertCatalogInvariants(
+			SvtaContentProtectionErrorCode,
+			SvtaErrorCategory.CONTENT_PROTECTION,
+			22,
+			'SVTA_CONTENT_PROTECTION',
+		)
 	})
 
 	it('matches the spec table', () => {

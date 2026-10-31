@@ -1,6 +1,6 @@
 {
 	"name": "@svta/cml-webvtt",
-	"version": "1.0.9",
+	"version": "1.0.10",
 	"description": "WebVTT parsing and rendering functionality",
 	"license": "Apache-2.0",
 	"type": "module",
@@ -40,7 +40,7 @@
 	],
 	"scripts": {
 		"build": "node ../../scripts/build.ts",
-		"test": "node ../../scripts/test.ts"
+		"test": "vp test --run --passWithNoTests --config ../../vite.config.ts --dir ."
 	},
 	"engines": {
 		"node": ">=20"

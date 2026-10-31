@@ -4,6 +4,6 @@
  * @public
  */
 export type OriginalFormatBox = {
-	type: 'frma';
-	dataFormat: number;
-};
+	type: 'frma'
+	dataFormat: number
+}

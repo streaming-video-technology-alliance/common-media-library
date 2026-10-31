@@ -12,6 +12,8 @@ import { CONTAINERS } from './CONTAINERS.ts'
  *
  * @public
  */
-export function isContainer<T extends IsoBox | Box<IsoBox['type']>>(box: T): box is T & IsoBoxContainer {
+export function isContainer<T extends IsoBox | Box<IsoBox['type']>>(
+	box: T,
+): box is T & IsoBoxContainer {
 	return 'boxes' in box || CONTAINERS.includes(box.type)
 }

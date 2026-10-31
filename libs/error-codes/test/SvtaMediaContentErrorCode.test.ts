@@ -1,6 +1,6 @@
 import { SvtaErrorCategory, SvtaMediaContentErrorCode } from '@svta/cml-error-codes'
 import assert, { strictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { assertCatalogInvariants } from './data/assertCatalogInvariants.ts'
 
 describe('SvtaMediaContentErrorCode', () => {
@@ -13,7 +13,12 @@ describe('SvtaMediaContentErrorCode', () => {
 	})
 
 	it('satisfies the catalog invariants', () => {
-		assertCatalogInvariants(SvtaMediaContentErrorCode, SvtaErrorCategory.MEDIA_CONTENT, 10, 'SVTA_MEDIA_CONTENT')
+		assertCatalogInvariants(
+			SvtaMediaContentErrorCode,
+			SvtaErrorCategory.MEDIA_CONTENT,
+			10,
+			'SVTA_MEDIA_CONTENT',
+		)
 	})
 
 	it('matches the spec table', () => {

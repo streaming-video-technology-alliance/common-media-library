@@ -7,6 +7,8 @@ import type { Ham } from './Ham.ts'
  *
  * @alpha
  */
-export type Segment = Ham & AddressableObject & Duration & {
-	startTime: number;
-};
+export type Segment = Ham &
+	AddressableObject &
+	Duration & {
+		startTime: number
+	}

@@ -7,10 +7,10 @@ import type { CmcdValue } from './CmcdValue.ts'
 import { upConvertToV2 } from './upConvertToV2.ts'
 
 // Define the input type for reduceValue
-type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[];
+type ReduceValueInput = SfBareItem | SfItem | ReduceValueInput[]
 
 // Define the output type for reduceValue - matches what CMCD values can be, including arrays
-type ReduceValueOutput = CmcdValue | ReduceValueOutput[];
+type ReduceValueOutput = CmcdValue | ReduceValueOutput[]
 
 function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): ReduceValueOutput {
 	if (Array.isArray(value)) {
@@ -22,7 +22,7 @@ function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): R
 	// a registry symbol, or an SfToken when `useSymbol` is `false`. Both
 	// re-encode as bare tokens, so preserved output round-trips.
 	if (typeof value === 'symbol') {
-		return useSymbol === undefined ? symbolToStr(value) : (value as unknown as ReduceValueOutput)
+		return useSymbol === undefined ? symbolToStr(value) : value
 	}
 
 	if (value instanceof SfItem) {
@@ -35,7 +35,7 @@ function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): R
 	}
 
 	return value as ReduceValueOutput
-};
+}
 
 /**
  * Decode a CMCD string to an object.
@@ -52,11 +52,28 @@ function reduceValue(value: ReduceValueInput, useSymbol: boolean | undefined): R
  * @example
  * {@includeCode ../test/decodeCmcd.test.ts#example}
  */
-export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
-export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T
+export function decodeCmcd(
+	cmcd: string,
+	options: CmcdDecodeOptions & { convertToLatest: true },
+): Cmcd
+/**
+ * Decode a CMCD string to an object.
+ *
+ * @typeParam T - The type of the decoded object. Defaults to {@link CmcdData}.
+ * @param cmcd - The CMCD string to decode.
+ * @param options - Options for decoding.
+ *
+ * @returns The decoded CMCD object.
+ *
+ * @public
+ */
+export function decodeCmcd<T extends CmcdData = CmcdData>(
+	cmcd: string,
+	options?: CmcdDecodeOptions,
+): T
 export function decodeCmcd(cmcd: string, options?: CmcdDecodeOptions): CmcdData | Cmcd {
 	if (!cmcd) {
-		return {} as CmcdData
+		return {}
 	}
 
 	const sfDict = decodeSfDict(cmcd, options)

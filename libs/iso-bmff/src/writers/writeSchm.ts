@@ -17,7 +17,7 @@ export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView {
 	const fullBoxSize = 4
 	const schemeTypeSize = 4
 	const schemeVersionSize = 4
-	const schemeUriSize = (box.flags & 0x000001) && box.schemeUri ? box.schemeUri.length + 1 : 0
+	const schemeUriSize = box.flags & 0x000001 && box.schemeUri ? box.schemeUri.length + 1 : 0
 	const totalSize = headerSize + fullBoxSize + schemeTypeSize + schemeVersionSize + schemeUriSize
 
 	const writer = new IsoBoxWriteView('schm', totalSize)
@@ -26,7 +26,7 @@ export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView {
 	writer.writeUint(box.schemeType, 4)
 	writer.writeUint(box.schemeVersion, 4)
 
-	if ((box.flags & 0x000001) && box.schemeUri) {
+	if (box.flags & 0x000001 && box.schemeUri) {
 		writer.writeTerminatedString(box.schemeUri)
 	}
 

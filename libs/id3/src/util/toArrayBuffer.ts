@@ -12,7 +12,7 @@ export type TypedArray =
 	| Uint32Array
 	| Float32Array
 	| Float64Array
-	| Uint8ClampedArray;
+	| Uint8ClampedArray
 
 /**
  * @internal
@@ -20,11 +20,10 @@ export type TypedArray =
 export function toArrayBuffer(view: ArrayBufferLike | TypedArray): ArrayBufferLike {
 	if (isArrayBufferLike(view)) {
 		return view
-	}
-	else {
+	} else {
 		if (view.byteOffset == 0 && view.byteLength == view.buffer.byteLength) {
 			// This is a TypedArray over the whole buffer.
-			return view.buffer as ArrayBuffer
+			return view.buffer
 		}
 		// This is a 'view' on the buffer.  Create a new buffer that only contains
 		// the data.  Note that since this isn't an ArrayBuffer, the 'new' call

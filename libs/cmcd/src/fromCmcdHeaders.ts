@@ -21,9 +21,28 @@ import { upConvertToV2 } from './upConvertToV2.ts'
  * @example
  * {@includeCode ../test/fromCmcdHeaders.test.ts#example}
  */
-export function fromCmcdHeaders(headers: Record<string, string> | Headers, options: CmcdDecodeOptions & { convertToLatest: true }): Cmcd
-export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData
-export function fromCmcdHeaders(headers: Record<string, string> | Headers, options?: CmcdDecodeOptions): CmcdData | Cmcd {
+export function fromCmcdHeaders(
+	headers: Record<string, string> | Headers,
+	options: CmcdDecodeOptions & { convertToLatest: true },
+): Cmcd
+/**
+ * Decode CMCD data from request headers.
+ *
+ * @param headers - The request headers to decode.
+ * @param options - Options for decoding.
+ *
+ * @returns The decoded CMCD data.
+ *
+ * @public
+ */
+export function fromCmcdHeaders(
+	headers: Record<string, string> | Headers,
+	options?: CmcdDecodeOptions,
+): CmcdData
+export function fromCmcdHeaders(
+	headers: Record<string, string> | Headers,
+	options?: CmcdDecodeOptions,
+): CmcdData | Cmcd {
 	const h = ensureHeaders(headers)
 
 	const result: Record<string, unknown> = {}

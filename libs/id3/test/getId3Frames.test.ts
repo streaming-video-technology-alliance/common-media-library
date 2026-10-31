@@ -1,13 +1,10 @@
 import { getId3Frames, toArrayBuffer } from '@svta/cml-id3'
 import { deepEqual, deepStrictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { DATA, DATA_BYTES, DATA_UINT8 } from './data/DATA.ts'
 import { INFO, INFO_BYTES } from './data/INFO.ts'
 import { createId3 } from './data/createId3.ts'
-import {
-	generateId3,
-	generateId3Frame,
-} from './utils/id3Generator.ts'
+import { generateId3, generateId3Frame } from './utils/id3Generator.ts'
 
 describe('getId3Frames', () => {
 	it('no valid data produces empty output', () => {
@@ -16,8 +13,7 @@ describe('getId3Frames', () => {
 
 	it('parse an APIC frame with image data', () => {
 		const apicValue = new Uint8Array([
-			3, 105, 109, 97, 103, 101, 47, 106, 112, 101, 103, 0, 3, 83, 104, 97, 107,
-			97, 0, 1, 2, 3,
+			3, 105, 109, 97, 103, 101, 47, 106, 112, 101, 103, 0, 3, 83, 104, 97, 107, 97, 0, 1, 2, 3,
 		])
 		const apicFrame = generateId3Frame('APIC', apicValue)
 		const apicID3 = generateId3(apicFrame)
@@ -35,8 +31,7 @@ describe('getId3Frames', () => {
 
 	it('parse an APIC frame with image URL', () => {
 		const apicValue = new Uint8Array([
-			3, 45, 45, 62, 0, 3, 83, 104, 97, 107, 97, 0, 103, 111, 111, 103, 108,
-			101, 46, 99, 111, 109,
+			3, 45, 45, 62, 0, 3, 83, 104, 97, 107, 97, 0, 103, 111, 111, 103, 108, 101, 46, 99, 111, 109,
 		])
 		const apicFrame = generateId3Frame('APIC', apicValue)
 		const apicID3 = generateId3(apicFrame)
@@ -53,10 +48,7 @@ describe('getId3Frames', () => {
 	})
 
 	it('parses PRIV frames', () => {
-		const id3 = createId3(
-			'PRIV',
-			new Uint8Array([...INFO_BYTES, 0x00, ...DATA_BYTES]),
-		)
+		const id3 = createId3('PRIV', new Uint8Array([...INFO_BYTES, 0x00, ...DATA_BYTES]))
 		deepEqual(getId3Frames(id3), [
 			{
 				key: 'PRIV',
@@ -67,10 +59,7 @@ describe('getId3Frames', () => {
 	})
 
 	it('parses TXXX frames', () => {
-		const id3 = createId3(
-			'TXXX',
-			new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES]),
-		)
+		const id3 = createId3('TXXX', new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES]))
 		deepEqual(getId3Frames(id3), [
 			{
 				key: 'TXXX',
@@ -81,10 +70,7 @@ describe('getId3Frames', () => {
 	})
 
 	it('parses WXXX frames', () => {
-		const id3 = createId3(
-			'WXXX',
-			new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES]),
-		)
+		const id3 = createId3('WXXX', new Uint8Array([0x03, ...INFO_BYTES, 0x00, ...DATA_BYTES]))
 		deepEqual(getId3Frames(id3), [
 			{
 				key: 'WXXX',

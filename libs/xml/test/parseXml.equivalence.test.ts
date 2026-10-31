@@ -3,7 +3,7 @@ import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { before, describe, it } from 'node:test'
+import { beforeAll as before, describe, it } from 'vite-plus/test'
 import { generateMpd } from '../bench/generate.ts'
 import { runParseWorker, type ParseOutcome } from './parseXmlWorker.ts'
 
@@ -16,10 +16,11 @@ import { runParseWorker, type ParseOutcome } from './parseXmlWorker.ts'
  * Regenerate the fixture from the parser under test with `UPDATE_FIXTURES=1 npm test -w libs/xml`.
  */
 
-const FIXTURE_PATH = resolve('./test/fixtures/parseXml.equivalence.json')
+const FIXTURE_PATH = resolve(import.meta.dirname, 'fixtures', 'parseXml.equivalence.json')
 const INLINE_LIMIT = 2000
 
-const fixture = (name: string): string => readFileSync(resolve('./test/fixtures/', name), 'utf8')
+const fixture = (name: string): string =>
+	readFileSync(resolve(import.meta.dirname, 'fixtures', name), 'utf8')
 
 const CORPUS: Record<string, string> = {
 	// Manifests
@@ -33,7 +34,8 @@ const CORPUS: Record<string, string> = {
 	// Text and entities
 	'nbsp only text': '<a>&nbsp;</a>',
 	'raw nbsp': '<a>\u00a0</a><b>\u00a0x\u00a0</b>',
-	'entities in text': '<a>a &lt; b &amp;&amp; c &gt; d &quot;q&quot; &apos;s&apos; &#65;&#x42; &lrm;&rlm;</a>',
+	'entities in text':
+		'<a>a &lt; b &amp;&amp; c &gt; d &quot;q&quot; &apos;s&apos; &#65;&#x42; &lrm;&rlm;</a>',
 	'entities in attributes': '<a x="&lt;&amp;&gt;" y=\'&quot;&#x41;\'/>',
 	'numeric entities': '<a>&#x1F600;&#128512;&#65;</a>',
 	'mixed content': '<a>one<b>two</b>three<c/>four</a>',
@@ -46,13 +48,14 @@ const CORPUS: Record<string, string> = {
 	'whitespace before root': '\n\n<a/>',
 	'trailing whitespace': '<a/>\n\n  ',
 	'trailing text': '<a/>tail',
-	'CRLF': '<a>\r\n<b>x</b>\r\n</a>\r\n',
+	CRLF: '<a>\r\n<b>x</b>\r\n</a>\r\n',
 	'whitespace then text': '<a>   x</a>',
 	'long whitespace run': '<a>' + ' '.repeat(5000) + '<b/>' + '\n'.repeat(5000) + '</a>',
 	'unicode text': '<a>héllo wörld 日本語 😀</a>',
 
 	// Attributes
-	'attribute spacing and quotes': '<a b = "c"\n\td\t=\n\'e\' f="g"h="i" /><j k="x/>y" l=\'p>q\'>t</j>',
+	'attribute spacing and quotes':
+		'<a b = "c"\n\td\t=\n\'e\' f="g"h="i" /><j k="x/>y" l=\'p>q\'>t</j>',
 	'double and single quoted values': '<a b="c" d=\'e\'>text</a>',
 	'whitespace around equals': '<a b = "c"\n\td\t=\n"e"/>',
 	'markup inside quoted values': '<a b="x/>y" c=\'p>q\'>t</a>',
@@ -85,7 +88,7 @@ const CORPUS: Record<string, string> = {
 	'slash space quirk': '<a/ >x</a>',
 	'empty tag name': '<>x</>',
 	'hash named element': '<#a><b/></#a>',
-	'namespaces': '<tt:root xmlns:tt="urn:x"><tt:a xml:lang="en" tt:b="1"/><c:d/></tt:root>',
+	namespaces: '<tt:root xmlns:tt="urn:x"><tt:a xml:lang="en" tt:b="1"/><c:d/></tt:root>',
 	'leading colon': '<:a/>',
 	'trailing colon': '<a:/>',
 	'multiple colons': '<a:b:c/>',
@@ -112,13 +115,14 @@ const CORPUS: Record<string, string> = {
 	'nested elements sharing a prefix': '<a><ab>text</ab></a>',
 
 	// Comments, CDATA, doctype, declarations
-	'comments': '<a><!-- c1 --><b/><!-- c2 -- still --><!---->x<!--->y</a>',
+	comments: '<a><!-- c1 --><b/><!-- c2 -- still --><!---->x<!--->y</a>',
 	'comment at document level': '<!-- c --><a/><!-- d -->',
-	'cdata': '<a><![CDATA[<x>&amp;]]><![CDATA[]]></a>',
+	cdata: '<a><![CDATA[<x>&amp;]]><![CDATA[]]></a>',
 	'cdata at document level': '<![CDATA[x]]><a/>',
-	'doctype with subset': '<!DOCTYPE note [<!ELEMENT note (to,from)><!ENTITY x "y">]><note><to>a</to></note>',
+	'doctype with subset':
+		'<!DOCTYPE note [<!ELEMENT note (to,from)><!ENTITY x "y">]><note><to>a</to></note>',
 	'doctype simple': '<!DOCTYPE html><root/>',
-	'declaration': '<?xml version="1.0" encoding="UTF-8"?><a/>',
+	declaration: '<?xml version="1.0" encoding="UTF-8"?><a/>',
 	'declaration only': '<?xml version="1.0"?>',
 	'declaration then markup': '<?xml version="1.0" encoding="UTF-8"?><a b="1"><c/>text</a>',
 	'processing instruction inside': '<a><?pi x?><b/></a>',
@@ -157,8 +161,8 @@ const OPTION_SETS: Record<string, XmlParseOptions> = {
 type Expectation = { throws: string } | { sha256: string; length: number } | { tree: unknown }
 
 type CaseFixture = {
-	input: { length: number; sha256: string };
-	results: Record<string, Expectation>;
+	input: { length: number; sha256: string }
+	results: Record<string, Expectation>
 }
 
 const sha256 = (text: string): string => createHash('sha256').update(text).digest('hex')
@@ -168,26 +172,32 @@ const sha256 = (text: string): string => createHash('sha256').update(text).diges
  * and `parentElement` with the parent's path, so that `JSON.stringify` of the result is a complete
  * and cycle-free description of the tree.
  */
-function serializeNode(node: XmlNode, path: number[], paths: Map<XmlNode, number[]>): Record<string, unknown> {
+function serializeNode(
+	node: XmlNode,
+	path: number[],
+	paths: Map<XmlNode, number[]>,
+): Record<string, unknown> {
 	paths.set(node, path)
 	const out: Record<string, unknown> = {}
 
 	for (const key of Object.keys(node)) {
 		if (key === 'childNodes') {
-			out[key] = node.childNodes.map((child, index) => serializeNode(child, [...path, index], paths))
-		}
-		else if (key === 'parentElement') {
+			out[key] = node.childNodes.map((child, index) =>
+				serializeNode(child, [...path, index], paths),
+			)
+		} else if (key === 'parentElement') {
 			const parent = node.parentElement
 			if (parent === null) {
 				out[key] = null
-			}
-			else {
+			} else {
 				const parentPath = parent === undefined ? undefined : paths.get(parent)
-				ok(parentPath !== undefined, `parentElement of node at [${path.join(',')}] is not an ancestor node`)
+				ok(
+					parentPath !== undefined,
+					`parentElement of node at [${path.join(',')}] is not an ancestor node`,
+				)
 				out[key] = parentPath
 			}
-		}
-		else {
+		} else {
 			out[key] = node[key as keyof XmlNode]
 		}
 	}
@@ -222,7 +232,10 @@ function check(outcome: ParseOutcome<XmlNode>, expected: Expectation, label: str
 		return
 	}
 
-	ok('json' in actual, `${label}: expected a tree but parseXml threw: ${'throws' in actual ? actual.throws : ''}`)
+	ok(
+		'json' in actual,
+		`${label}: expected a tree but parseXml threw: ${'throws' in actual ? actual.throws : ''}`,
+	)
 
 	if ('sha256' in expected) {
 		strictEqual(actual.json.length, expected.length, `${label}: serialized tree length differs`)
@@ -250,7 +263,9 @@ function formatFixtures(fixtures: Record<string, CaseFixture>): string {
 		lines.push('\t\t"results": {')
 		const results = Object.entries(entry.results)
 		results.forEach(([label, expectation], index) => {
-			lines.push(`\t\t\t${JSON.stringify(label)}: ${JSON.stringify(expectation)}${index < results.length - 1 ? ',' : ''}`)
+			lines.push(
+				`\t\t\t${JSON.stringify(label)}: ${JSON.stringify(expectation)}${index < results.length - 1 ? ',' : ''}`,
+			)
 		})
 		lines.push('\t\t}')
 		lines.push(`\t}${caseIndex < cases.length - 1 ? ',' : ''}`)
@@ -268,7 +283,11 @@ describe('parseXml equivalence', () => {
 	let fixtures: Record<string, CaseFixture> = {}
 
 	before(async () => {
-		outcomes.push(...await Promise.all(optionLabels.map(label => runParseWorker({ inputs }, OPTION_SETS[label]))))
+		outcomes.push(
+			...(await Promise.all(
+				optionLabels.map(label => runParseWorker({ inputs }, OPTION_SETS[label])),
+			)),
+		)
 
 		if (process.env['UPDATE_FIXTURES']) {
 			fixtures = {}
@@ -277,12 +296,14 @@ describe('parseXml equivalence', () => {
 				optionLabels.forEach((label, option) => {
 					results[label] = toExpectation(outcomes[option][index])
 				})
-				fixtures[name] = { input: { length: inputs[index].length, sha256: sha256(inputs[index]) }, results }
+				fixtures[name] = {
+					input: { length: inputs[index].length, sha256: sha256(inputs[index]) },
+					results,
+				}
 			})
 			writeFileSync(FIXTURE_PATH, formatFixtures(fixtures))
-		}
-		else {
-			fixtures = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8'))
+		} else {
+			fixtures = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8')) as Record<string, CaseFixture>
 		}
 	})
 
@@ -294,7 +315,11 @@ describe('parseXml equivalence', () => {
 		it(name, () => {
 			const expected = fixtures[name]
 			ok(expected !== undefined, 'no fixture; run with UPDATE_FIXTURES=1 to capture it')
-			strictEqual(sha256(inputs[index]), expected.input.sha256, 'the corpus input changed; recapture the fixture')
+			strictEqual(
+				sha256(inputs[index]),
+				expected.input.sha256,
+				'the corpus input changed; recapture the fixture',
+			)
 
 			optionLabels.forEach((label, option) => {
 				check(outcomes[option][index], expected.results[label], `${name} with ${label}`)

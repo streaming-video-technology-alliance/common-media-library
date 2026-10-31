@@ -10,25 +10,25 @@ export type SteeringManifest = {
 	/**
 	 * The version of the content steering manifest.
 	 */
-	VERSION: number;
+	VERSION: number
 
 	/**
 	 * The time to live of the content steering manifest in seconds.
 	 */
-	TTL: number;
+	TTL: number
 
 	/**
 	 * The URI to reload the content steering manifest.
 	 */
-	'RELOAD-URI'?: string;
+	'RELOAD-URI'?: string
 
 	/**
 	 * The priority of the pathways.
 	 */
-	'PATHWAY-PRIORITY': string[];
+	'PATHWAY-PRIORITY': string[]
 
 	/**
 	 * The clones of the pathways.
 	 */
-	'PATHWAY-CLONES'?: PathwayClone[];
-};
+	'PATHWAY-CLONES'?: PathwayClone[]
+}

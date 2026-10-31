@@ -25,7 +25,7 @@ export const CLEAR_KEY_SYSTEM = "org.w3.clearkey";
 export const CLEAR_KEY_UUID = "e2719d58-a985-b3c9-781a-b030af78d30e";
 
 // @public
-export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array;
+export function concatInitDataIdAndCertificate(initData: Uint16Array, id: Uint16Array | string, cert: Uint8Array): Uint8Array<ArrayBuffer>;
 
 // @public
 export const CONTENT_TYPE = "Content-Type";
@@ -42,7 +42,7 @@ export type ContentProtection = {
 export function createMediaKeySystemConfiguration(supportedAudio: MediaKeySystemMediaCapability[] | null, supportedVideo: MediaKeySystemMediaCapability[] | null): MediaKeySystemConfiguration;
 
 // @public
-export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array;
+export function decodeFairPlayLicense(response: string | ArrayBuffer): Uint8Array<ArrayBuffer>;
 
 // @public
 export const EncryptionScheme: {
@@ -218,7 +218,7 @@ export function parseInitDataFromContentProtection(cpData: ContentProtection, BA
 // @public
 export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>;
 
-// @public (undocumented)
+// @public
 export function parsePsshList(data: Uint8Array): Record<string, Uint8Array>;
 
 // @public

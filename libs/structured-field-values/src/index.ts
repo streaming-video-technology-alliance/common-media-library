@@ -22,4 +22,3 @@ export * from './utils/symbolToStr.ts'
 
 export * from './parse/index.ts'
 export * from './serialize/index.ts'
-

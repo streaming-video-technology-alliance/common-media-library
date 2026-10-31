@@ -1,11 +1,14 @@
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
-import { toCmcdQuery } from './toCmcdQuery.ts'
-
-const REGEX = /CMCD=[^&#]+/
+import { encodeCmcd } from './encodeCmcd.ts'
+import { replaceCmcdParam } from './replaceCmcdParam.ts'
 
 /**
  * Append CMCD query args to a URL.
+ *
+ * If the URL has a `CMCD` parameter, the new value replaces it in place. The
+ * other parameters and the fragment stay as they are. If the data has no keys
+ * to send, the function returns the URL unchanged.
  *
  * @param url - The URL to append to.
  * @param cmcd - The CMCD object to append.
@@ -21,15 +24,7 @@ const REGEX = /CMCD=[^&#]+/
  * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#query-argument-definition | CTA-5004-B Query Argument Definition}
  */
 export function appendCmcdQuery(url: string, cmcd: Cmcd, options?: CmcdEncodeOptions): string {
-	const query = toCmcdQuery(cmcd, options)
-	if (!query) {
-		return url
-	}
+	const value = cmcd ? encodeCmcd(cmcd, options) : ''
 
-	if (REGEX.test(url)) {
-		return url.replace(REGEX, query)
-	}
-
-	const separator = url.includes('?') ? '&' : '?'
-	return `${url}${separator}${query}`
+	return value ? replaceCmcdParam(url, value) : url
 }

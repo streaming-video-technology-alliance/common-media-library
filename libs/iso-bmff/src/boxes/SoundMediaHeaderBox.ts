@@ -6,7 +6,7 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type SoundMediaHeaderBox = FullBox & {
-	type: 'smhd';
-	balance: number;
-	reserved: number;
-};
+	type: 'smhd'
+	balance: number
+	reserved: number
+}

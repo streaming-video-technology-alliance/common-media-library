@@ -8,6 +8,78 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.8.4] - 2026-10-26
+
+### Changed
+
+- `recordResponseReceived` derives `ttfb` with `getTimeToFirstByte` from `@svta/cml-utils`. The report omits `ttfb` when `responseStart` is before `startTime` or after the end of the response, or when `duration` is missing. Before, the report held `responseStart - startTime` for any `responseStart` ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587)).
+- The `validateCmcdEventReport` doc now renders the example code block. The docs build no longer warns about the `@example` tag.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- Every code example in the guides now typechecks. The `recordResponseReceived` examples now include `encodedBodySize` ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+
+## [2.8.3] - 2026-10-18
+
+### Changed
+
+- Both overloads of `decodeCmcd`, `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl` now have a doc comment.
+- The `CmcdTransformRequest` doc now links to `DeepReadonly` in `@svta/cml-utils`.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
+
+## [2.8.2] - 2026-10-08
+
+### Fixed
+
+- `dist/index.js` now parses as ES2021. A bundler no longer needs to transpile the package for an ES2021 target
+- A webpack bundle with a bare import of the package no longer contains code from the package
+
+## [2.8.1] - 2026-10-01
+
+### Fixed
+
+- The `CMCD` query parameter uses the encoding of the CTA-5004-B query examples. Only letters, digits, `-`, `.`, `_`, and `~` stay unencoded. A space becomes `%20`, and `(` and `)` become `%28` and `%29`. This is a wire output change. It covers `toCmcdUrl`, `toCmcdQuery`, `appendCmcdQuery`, and `CmcdReporter`. Before, `CmcdReporter` wrote a space as `+`, and the other functions sent `(` and `)` unencoded. A decoder that uses `URLSearchParams` reads the old and the new output as the same value. If a test compares exact URLs, update its expected strings. An unpaired surrogate in a string becomes U+FFFD. Before, it made `toCmcdUrl`, `toCmcdQuery`, and `appendCmcdQuery` throw `URIError`
+- `CmcdReporter` adds the `CMCD` query parameter and makes no other change to the request URL. Before, it parsed and serialized the whole URL. The serialization changed other query parameters, such as `~` to `%7E` and `flag` to `flag=`. It also lowercased the host, removed a default port, and resolved `./` and `../` in the path. A CDN that checks a token against the raw query could reject such a request. The `url` key of an `rr` event is the request URL without the `CMCD` parameter, also with no other change. `createRequestReport` and `recordResponseReceived` accept a relative URL. Before, they threw `Invalid URL`
+- `appendCmcdQuery` adds the parameter before the fragment. Before, it added the parameter after the fragment, so the request carried no CMCD data. It reads only the `CMCD` parameter of the query. Before, it replaced the value of a parameter such as `XCMCD`, or text that starts with `CMCD=` in the path. It removes every `CMCD` parameter after the first. If the data has no keys to send, it returns the URL unchanged. Before, it wrote a `CMCD` parameter with no value
+- `fromCmcdUrl` decodes a `+` as a space, as `fromCmcdQuery` does. CTA-5004-B refers to the `application/x-www-form-urlencoded` format for the `CMCD` query argument. In this format, a `+` is a space. `CmcdReporter` 2.8.0 and earlier write a space as `+`. Before, `fromCmcdUrl` threw `failed to parse ... as Dict` for an inner list with two or more items, such as `nor=("a.m4s" "b.m4s")`. It decoded the string `"a b"` as `a+b`. A `%2B` still decodes as a `+`
+
+## [2.8.0] - 2026-10-01
+
+### Changed
+
+- The encoder reads its key rules from one internal table. It no longer reads `CMCD_FORMATTER_MAP`. To change a value, use `CmcdEncodeOptions.formatters`. A formatter runs at most once in a call, and only for a key that the encoder can send. The `ot` and `e` formatters also run when a rule needs their value. The encoder no longer calls a `v` formatter. `CmcdReporter` applies the same rules and has no option to change them. `CMCD_FORMATTER_MAP` has an entry for each integer key and for `pr`. `prepareCmcdData` returns a symbol token as an `SfToken`. It returns a `nor` value that is one `SfItem` as a list. Both shapes give the same wire output as before
+
+### Fixed
+
+- The encoder applies the value rules of CTA-5004 and CTA-5004-B. This is a wire output change. It covers `prepareCmcdData`, `encodeCmcd`, `toCmcdHeaders`, `toCmcdQuery`, and `CmcdReporter`:
+  - It rounds every integer key, also inside an inner list with parameters. `tbl` rounds to 100 ms, like `bl`. A fractional `ts` and a `bl`, `br`, `mtp`, or `tb` list with parameters no longer make encoding throw
+  - It drops a value of the wrong type and a number that is not finite. In a list, it drops only that element. It also drops a string over the maximum length of its key. In version 2, a custom string has at most 64 characters. A number that is not finite in the data of `CmcdReporter` made each later request report throw
+  - It drops a plain object, a `Date`, or a byte sequence in a custom key. A plain object made encoding throw. It also drops an empty `nor` entry
+  - It omits a default value with parameters, such as `pr=1;x`, as it omits the bare value
+  - It reads the version from the value inside `v`, and it sends `v` without parameters
+  - It ignores a `baseUrl` that is not a valid URL or that has an opaque origin. Before, it threw `Invalid URL`
+  - In version 1, an inner list becomes one value. The encoder selects the item by its object type flag, such as `br=(5000;v 320;a)`. An item without parameters matches any `ot`. If no item matches, the encoder omits the key
+  - In version 1, `nor` sends its first item. The `r` parameter of that item becomes `nrr`
+  - In version 1, `cid` has at most 64 characters, and a custom string has no length limit. `st=ll` becomes `st=l`, and `sf=e` becomes `sf=o`
+  - In version 1, event mode sends only version 1 keys and custom keys
+  - In version 2, one value on a list key is sent as a list. `br: 3000` becomes `br=(3000)`
+  - In version 2, `baseUrl` applies to a `nor` inner list with parameters. It also applies to a `nor` value that is one `SfItem`
+  - An `h` event carries `h`, also when the key filter removes it. In event mode, a report without `e` drops the response keys, such as `ttfb` and `url`
+  - The event rules and the object type rules read `e` and `ot` after their formatters. An event report keeps a `ts` with parameters
+- The validators apply the rules of CTA-5004 and CTA-5004-B more closely. The changes cover `validateCmcd`, `validateCmcdRequest`, `validateCmcdHeaders`, `validateCmcdEvents`, `validateCmcdEventReport`, `validateCmcdStructure`, and `validateCmcdValues`:
+  - They accept a `b` event without `bg`, and `pr`, `c`, and `bc` events without their state keys. A `ps` event still requires `sta`. Its message now begins with "Play state change event"
+  - A rounding rule stated with MUST gives an error, and a rule stated with SHOULD gives a warning. A payload that passed with a warning can now fail
+  - They check the rounding of each element of a version 2 inner list. They also check that `br` and `tb` are integers
+  - They accept a value with parameters, and they check the value inside its `SfItem`
+- `decodeCmcd` with `convertToLatest` keeps an inner list with parameters, such as `br=(3000 6000);p=2`. Before, it put the list inside a second list, and the encoder dropped the key. A payload with parameters on `v`, such as `v=2;x`, no longer converts as version 1 data. The fix also applies to `fromCmcdHeaders`, `fromCmcdQuery`, and `fromCmcdUrl`
+- `CmcdReporter`:
+  - `recordResponseReceived()` again reports a response without a provenance record, under the current session, as in version 2.4.0. Since version 2.6.0, hls.js and dash.js lost every `rr` event
+  - The exit from backgrounded mode is a `b` event without `bg`. The reporter sent `bg=?0`. A receiver that checks for the key read `bg=?0` as an entry. This is a wire output change. If a receiver reads the exit from `bg=?0`, change it to accept a `b` event without `bg`. A target transform can add `bg: false` to send `bg=?0`. `encodeCmcd` still writes `bg: false` on a `b` event as `?0`
+  - A first `bg: false` in a session fires no `b` event. A transform that sets `bg: false` on an entry report no longer turns it into an exit
+  - `update()` accepts a `br` inner list with parameters. It threw `v.slice is not a function`. A `BITRATE_CHANGE` event fires only when a bitrate or an object type flag changes
+
+### Documentation
+
+- The user guide describes the value that `decodeCmcd` returns for a member with parameters. It also lists the values that the encoder drops and the version 1 limits. The TSDoc of `CmcdReporter.recordEvent` and `CmcdReportConfig.enabledKeys` no longer says that CTA-5004-B requires a key on every state-change event
+
 ## [2.7.0] - 2026-09-15
 
 ### Changed
@@ -276,7 +348,12 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.4...HEAD
+[2.8.4]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.3...cmcd-v2.8.4
+[2.8.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.2...cmcd-v2.8.3
+[2.8.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.1...cmcd-v2.8.2
+[2.8.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.8.0...cmcd-v2.8.1
+[2.8.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.7.0...cmcd-v2.8.0
 [2.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.1...cmcd-v2.7.0
 [2.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.6.0...cmcd-v2.6.1
 [2.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmcd-v2.5.0...cmcd-v2.6.0

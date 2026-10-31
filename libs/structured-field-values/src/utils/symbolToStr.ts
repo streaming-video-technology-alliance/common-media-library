@@ -10,5 +10,9 @@ import type { SfToken } from '../SfToken.ts'
  * @public
  */
 export function symbolToStr(symbol: symbol | SfToken): string {
-	return symbol.description || symbol.toString().slice(7, -1)
+	if (typeof symbol === 'symbol') {
+		return symbol.description || symbol.toString().slice(7, -1)
+	}
+
+	return symbol.description
 }

@@ -8,6 +8,25 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-26
+
+### Added
+
+- `getTransferDuration` returns the milliseconds from `responseStart` to the end of a `ResourceTiming` sample, or `duration` when the sample has no `responseStart` ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- `getTimeToFirstByte` returns the milliseconds from `startTime` to `responseStart` of a `ResourceTiming` sample, or `NaN` when the sample has no `responseStart` inside the response. The result and `getTransferDuration` add up to `duration` ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+
+### Changed
+
+- `getBandwidthBps` divides the body size by the transfer duration from `getTransferDuration`. For a sample with `responseStart`, the wait for the first byte no longer lowers the rate. A 112 kB body that waited 800 ms and transferred in 50 ms now measures 17.9 Mbps instead of 1.05 Mbps ([#587](https://github.com/streaming-video-technology-alliance/common-media-library/issues/587))
+- `decodeBase64` and `encodeText` now return `Uint8Array<ArrayBuffer>`. The result passes to Web APIs such as `crypto.subtle.digest` without a cast under TypeScript 6 and later. The type declarations now need TypeScript 5.7 or later.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+
+## [1.6.2] - 2026-10-18
+
+### Changed
+
+- `urlToRelativePath` no longer throws and catches a `TypeError` for a relative `url`. A call with a relative `url` now runs about 100 times faster in Node.js. CMCD encoding calls `urlToRelativePath` for `nor` values when the `baseUrl` option is set. The output does not change.
+
 ## [1.6.1] - 2026-09-15
 
 ### Changed
@@ -96,7 +115,9 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...HEAD
+[1.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.2...utils-v1.7.0
+[1.6.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...utils-v1.6.2
 [1.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.6.1
 [1.6.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.1...utils-v1.6.0
 [1.5.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.5.0...utils-v1.5.1

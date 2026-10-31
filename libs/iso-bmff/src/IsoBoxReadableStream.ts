@@ -11,14 +11,13 @@ import { writeIsoBox } from './writeIsoBox.ts'
 // statement when IsoBoxReadableStream is unused.
 const ReadableStreamBase: typeof ReadableStream = /* @__PURE__ */ (() =>
 	typeof ReadableStream === 'undefined'
-		// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-		? class {
-			constructor() {
-				throw new Error('ReadableStream is not available in this environment')
-			}
-		} as unknown as typeof ReadableStream
-		: ReadableStream
-)()
+		? // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+			(class {
+				constructor() {
+					throw new Error('ReadableStream is not available in this environment')
+				}
+			} as unknown as typeof ReadableStream)
+		: ReadableStream)()
 
 /**
  * A readable stream of ISO BMFF boxes as Uint8Arrays.
@@ -40,12 +39,12 @@ export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
 			const desiredSize = controller.desiredSize ?? 0
 
 			for (let i = 0; i < desiredSize; i++) {
-				const { value, done } = iterator.next()
+				const next = iterator.next()
 
-				if (done) {
+				if (next.done) {
 					controller.close()
 				} else {
-					controller.enqueue(writeIsoBox(value, cfg))
+					controller.enqueue(writeIsoBox(next.value, cfg))
 				}
 			}
 		}

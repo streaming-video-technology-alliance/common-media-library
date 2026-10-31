@@ -14,7 +14,9 @@ export function normalizeAlgorithmName(rawAlg?: string): string {
 	return (rawAlg ?? 'SHA-256').replace(SHA_ALGORITHM_PATTERN, 'SHA-$1')
 }
 
-const HEX_TABLE: readonly string[] = /* @__PURE__ */ Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, '0'))
+const HEX_TABLE: readonly string[] = /* @__PURE__ */ Array.from({ length: 256 }, (_, i) =>
+	i.toString(16).padStart(2, '0'),
+)
 
 /**
  * Converts a Uint8Array to a lowercase hex string.
@@ -38,7 +40,11 @@ export function bytesToHex(bytes: Uint8Array): string {
  *
  * @internal
  */
-export function isKeyExpired(createdAt: string, validityPeriodSeconds: number, now: Date = new Date()): boolean {
+export function isKeyExpired(
+	createdAt: string,
+	validityPeriodSeconds: number,
+	now: Date = new Date(),
+): boolean {
 	const createdAtMs = new Date(createdAt).getTime()
 	if (Number.isNaN(createdAtMs)) return true
 	const validityEnd = new Date(createdAtMs + validityPeriodSeconds * MILLISECONDS_PER_SECOND)
@@ -59,15 +65,13 @@ export function hashesEqual(a: Uint8Array, b: Uint8Array): boolean {
 
 // C2PA manifest store UUID per C2PA specification
 const C2PA_MANIFEST_UUID: readonly number[] = [
-	0xd8, 0xfe, 0xc3, 0xd6, 0x1a, 0x96, 0x4f, 0x32,
-	0xa0, 0xf6, 0xf3, 0xec, 0xf9, 0x6c, 0x10, 0xea,
+	0xd8, 0xfe, 0xc3, 0xd6, 0x1a, 0x96, 0x4f, 0x32, 0xa0, 0xf6, 0xf3, 0xec, 0xf9, 0x6c, 0x10, 0xea,
 ]
 
 // JUMBF UUID per ISO 19566-5 (used by c2pa-rs and other JUMBF-compliant tools)
 /** @internal */
 export const JUMBF_UUID: readonly number[] = [
-	0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0e, 0x48, 0x3c,
-	0x92, 0x97, 0x58, 0x28, 0x87, 0x7e, 0xc4, 0x81,
+	0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0e, 0x48, 0x3c, 0x92, 0x97, 0x58, 0x28, 0x87, 0x7e, 0xc4, 0x81,
 ]
 
 // Compares a uuid box usertype against an expected 16-byte extended type.
@@ -76,17 +80,27 @@ export function matchesUuid(usertype: readonly number[], expected: readonly numb
 	return usertype.length === expected.length && expected.every((b, i) => b === usertype[i])
 }
 
-// Converts CBOR-decoded bytes (Uint8Array or number[]) to Uint8Array, or null.
+// A CBOR byte string as a Uint8Array, or null for a value of another type.
 /** @internal */
 export function toUint8Array(value: unknown): Uint8Array | null {
-	if (value instanceof Uint8Array) return value
-	if (Array.isArray(value)) return new Uint8Array(value as number[])
-	return null
+	return value instanceof Uint8Array ? value : null
 }
 
 /** @internal */
 export function asInteger(value: unknown): number | null {
 	return typeof value === 'number' && Number.isInteger(value) ? value : null
+}
+
+// A CBOR uint up to Number.MAX_SAFE_INTEGER as a number, or null. The reader decodes a larger uint to a BigInt.
+/** @internal */
+export function asUnsignedInteger(value: unknown): number | null {
+	return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? value : null
+}
+
+// A CBOR text string, or null for a value of another type.
+/** @internal */
+export function asString(value: unknown): string | null {
+	return typeof value === 'string' ? value : null
 }
 
 function isC2paUuid(usertype: readonly number[]): boolean {
@@ -125,11 +139,13 @@ export function findC2paUuidBox(boxes: ParsedIsoBox[]): UuidParsedBox | undefine
 
 const FULLBOX_HEADER_SIZE = 4
 const AUX_UUID_OFFSET_SIZE = 8
-const TEXT_DECODER = new TextDecoder()
+const TEXT_DECODER = /* @__PURE__ */ new TextDecoder()
 
 // Reads a version/flags + null-terminated purpose prefix, or null if malformed.
 /** @internal */
-export function readUuidBoxPurpose(payload: Uint8Array): { purpose: string; rest: Uint8Array } | null {
+export function readUuidBoxPurpose(
+	payload: Uint8Array,
+): { purpose: string; rest: Uint8Array } | null {
 	if (payload.length < FULLBOX_HEADER_SIZE) return null
 
 	let offset = FULLBOX_HEADER_SIZE

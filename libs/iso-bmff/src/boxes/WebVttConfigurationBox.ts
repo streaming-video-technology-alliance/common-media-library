@@ -4,6 +4,6 @@
  * @public
  */
 export type WebVttConfigurationBox = {
-	type: 'vttC';
-	config: string;
-};
+	type: 'vttC'
+	config: string
+}

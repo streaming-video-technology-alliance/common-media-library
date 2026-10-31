@@ -29,6 +29,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { Cta608Parser } from './Cta608Parser.ts'
+
 /**
  * SCC Parser
  *
@@ -37,10 +39,10 @@
 export class SccParser {
 	hasHeader: boolean = false
 	nrLinesParsed: number = 0
-	processor: any
-	field: number | any
+	processor: Pick<Cta608Parser, 'addData'>
+	field: number
 
-	constructor(processor: any, field: number | any = 1) {
+	constructor(processor: Pick<Cta608Parser, 'addData'>, field: number = 1) {
 		this.processor = processor
 		this.field = field
 	}
@@ -56,7 +58,7 @@ export class SccParser {
 
 		for (let l = 1; l < lines.length; l += 2) {
 			if (lines[l] !== '') {
-				break  // Every second line should be empty
+				break // Every second line should be empty
 			}
 			this.nrLinesParsed++
 			const lineData = this.parseDataLine(lines[l + 1])
@@ -94,16 +96,22 @@ export class SccParser {
 			const lastParts = parts[2].split(';')
 			parts[2] = lastParts[0]
 			const frames = parseInt(lastParts[1], 10)
-			return (30 * (60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) + frames) * 1001 / 30000
+			return (
+				((30 *
+					(60 * (60 * parseInt(parts[0], 10) + parseInt(parts[1], 10)) + parseInt(parts[2], 10)) +
+					frames) *
+					1001) /
+				30000
+			)
 		}
-		return 0  // in case if format is incorrect
+		return 0 // in case if format is incorrect
 	}
 
 	getHeaderStatus(): boolean {
 		return this.hasHeader
 	}
 
-	getField(): number | any {
+	getField(): number {
 		return this.field
 	}
 

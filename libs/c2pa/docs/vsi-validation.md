@@ -21,11 +21,12 @@ A `SequenceState` object passes from each media segment call to the next and tra
 ```typescript
 import { validateC2paInitSegment } from '@svta/cml-c2pa'
 
-const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+const initResponse = await fetch(initUrl)
+const initBytes = new Uint8Array(await initResponse.arrayBuffer())
 const init = await validateC2paInitSegment(initBytes)
 
 if (!init.isValid) {
-  console.error('Init segment validation failed:', init.errorCodes)
+  throw new Error(`Init segment validation failed: ${init.errorCodes.join(', ')}`)
 }
 ```
 
@@ -35,10 +36,12 @@ The returned `InitSegmentValidation` object contains:
 |-------|------|-------------|
 | `manifest` | `C2paManifest \| null` | Parsed manifest (label, assertions, signature info) |
 | `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate |
-| `manifestId` | `string \| null` | Manifest identifier |
+| `manifestId` | `string \| null` | Manifest identifier (`urn:c2pa:` URN), from the JUMBF label of the manifest. `null` if the claim `signature` URI does not name the label, as with a URI relative to the manifest. Compare it with the `manifestId` of each segment. |
 | `sessionKeys` | `readonly ValidatedSessionKey[]` | Session keys with valid signer binding |
 | `isValid` | `boolean` | All checks passed |
 | `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |
+
+C2PA section 19.2.3 requires a `c2pa.hash.bmff.v3` assertion in the init manifest. The content hash of that assertion must include the `moov` box. If the init segment does not conform, the result has `LiveVideoStatusCode.INIT_INVALID` and no `sessionKeys`.
 
 ### Accessing Session Keys
 
@@ -53,6 +56,8 @@ for (const key of init.sessionKeys) {
   console.log('Created at:', key.createdAt)
 }
 ```
+
+If a session key is invalid, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`. See [Invalid Session Keys](results-and-error-codes.md#invalid-session-keys).
 
 Each `ValidatedSessionKey` contains:
 
@@ -74,7 +79,8 @@ import type { SequenceState } from '@svta/cml-c2pa'
 let sequenceState: SequenceState | undefined
 
 for (const segmentUrl of segmentUrls) {
-  const segmentBytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+  const segmentResponse = await fetch(segmentUrl)
+  const segmentBytes = new Uint8Array(await segmentResponse.arrayBuffer())
   const validated = await validateC2paSegment(segmentBytes, init.sessionKeys, sequenceState)
 
   if (!validated) {
@@ -96,7 +102,7 @@ for (const segmentUrl of segmentUrls) {
 `validateC2paSegment` returns `null` when the segment does not contain a C2PA EMSG box. Otherwise it returns an object with:
 
 - `result`: a `SegmentValidationResult` with the validation outcome
-- `nextSequenceState`: the updated sequence state to pass into the next call
+- `nextSequenceState`: the sequence state to pass into the next call
 
 The `SegmentValidationResult` contains:
 
@@ -107,11 +113,11 @@ The `SegmentValidationResult` contains:
 | `bmffHashHex` | `string \| null` | Hex-encoded BMFF content hash |
 | `kidHex` | `string \| null` | Hex-encoded key ID used for verification |
 | `sequenceResult` | `SequenceValidationResult` | Sequence number validation outcome |
-| `isValid` | `boolean` | All crypto and sequence checks passed |
+| `isValid` | `boolean` | All checks passed. A gap does not fail the segment. |
 | `errorCodes` | `readonly LiveVideoStatusCode[]` | Failure codes (empty when valid) |
 
 > [!NOTE]
-> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments.
+> Always keep `nextSequenceState` and pass it to the next `validateC2paSegment` call. It enables the detection of duplicates, gaps, and out-of-order segments. A duplicate, out-of-order, or below-minimum sequence number fails the segment with `LiveVideoStatusCode.SEGMENT_INVALID`. C2PA 2.4 section 19.7.3 defines only the below-minimum check. The duplicate and out-of-order check is a library rule with the code of the C2PA 2.5 draft. A gap does not fail the segment. `sequenceResult` reports the gap and its missing range. A segment whose signature or content hash does not verify leaves `nextSequenceState` equal to the `sequenceState` that the function received. The same applies to a segment whose session key is missing, not yet active, or expired. After a seek or an encoder restart, pass `undefined` to start a new state.
 
 ## Complete Example
 
@@ -125,7 +131,8 @@ import type { SequenceState } from '@svta/cml-c2pa'
 
 async function validateStream(initUrl: string, segmentUrls: string[]) {
   // Phase 1: Validate the init segment
-  const initBytes = new Uint8Array(await fetch(initUrl).then(r => r.arrayBuffer()))
+  const initResponse = await fetch(initUrl)
+  const initBytes = new Uint8Array(await initResponse.arrayBuffer())
   const init = await validateC2paInitSegment(initBytes)
 
   if (!init.isValid) {
@@ -142,7 +149,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
   let sequenceState: SequenceState | undefined
 
   for (const segmentUrl of segmentUrls) {
-    const bytes = new Uint8Array(await fetch(segmentUrl).then(r => r.arrayBuffer()))
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
     const validated = await validateC2paSegment(bytes, init.sessionKeys, sequenceState)
 
     if (!validated) {
@@ -159,8 +167,8 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
       console.error(`Segment ${result.sequenceNumber}: failed`, result.errorCodes)
     }
 
-    // Check sequence continuity
-    if (result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
+    // A gap does not fail the segment. Report the missing segments before a valid segment.
+    if (result.isValid && result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
       console.warn(
         `Missing segments ${result.sequenceResult.missingFrom}` +
         ` through ${result.sequenceResult.missingTo}`,
@@ -172,20 +180,45 @@ async function validateStream(initUrl: string, segmentUrls: string[]) {
 
 ## Session Key Lifecycle
 
-Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result.
+Session keys are extracted from the `c2pa.session-keys` assertion in the init segment manifest. Each key passes signer binding verification before it is included in the validation result. The signer binding verification accepts two forms of the signed payload: the end-entity certificate itself, or the certificate as a CBOR byte string. The text of C2PA section 18.25.2 allows both forms.
 
-The validation function handles key matching and expiration:
+The signer binding is a `COSE_Sign1` structure with CBOR tag 18 and a payload field. The payload field can be nil, an empty byte string, or an exact copy of the signed payload. If the payload field has other content, the signer binding verification fails.
+
+The validation function handles key matching and the validity period:
 
 1. **Key matching**: `validateC2paSegment` matches the `kid` (key ID) from the COSE_Sign1 header against the available session keys.
-2. **Expiration**: A key expires when `createdAt + validityPeriod` is in the past. If the matched key has expired, the result includes `LiveVideoStatusCode.SESSIONKEY_INVALID`.
+2. **Validity period**: A key is active from `createdAt` until `createdAt + validityPeriod` (C2PA section 18.25.2). If the matched key is not yet active or has expired, the result includes `LiveVideoStatusCode.SEGMENT_INVALID` (C2PA section 19.7.3).
 3. **No match**: If no session key matches the `kid`, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
 
+`SEGMENT_INVALID` is also the code for signature and hash failures. If you need to know whether the validity period caused the failure, check the matched key:
+
+```typescript
+import type { SegmentValidationResult, ValidatedSessionKey } from '@svta/cml-c2pa'
+
+function isOutsideValidityPeriod(
+  result: SegmentValidationResult,
+  sessionKeys: readonly ValidatedSessionKey[],
+): boolean {
+  const key = sessionKeys.find(k => k.kid === result.kidHex)
+  if (!key) return false
+
+  const now = Date.now()
+  const activeFrom = Date.parse(key.createdAt)
+  const activeUntil = activeFrom + key.validityPeriod * 1000
+  return now < activeFrom || now > activeUntil
+}
+```
+
 > [!NOTE]
+> An init segment can contain a session key that becomes active later. `sessionKeys` includes that key. You do not need to validate the same init segment again when the key becomes active.
+>
 > When a session key expires during the stream, the signer is expected to produce a new init segment with new session keys. Validate the new init segment and use its `sessionKeys` for the following media segments.
 
 ## Sequence Number Validation
 
-Each media segment has an increasing sequence number in its VSI map. The `sequenceResult` field is a discriminated union on `reason`, with `SequenceValidationReason` constants:
+Each media segment has an increasing sequence number in its VSI map. The sequence number must be an unsigned integer (C2PA section 19.4.2). The library supports values up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). For any other value, `validateC2paSegment` throws an error.
+
+The `sequenceResult` field is a discriminated union on `reason`, with `SequenceValidationReason` constants:
 
 ```typescript
 import { SequenceValidationReason } from '@svta/cml-c2pa'
@@ -195,7 +228,7 @@ import { SequenceValidationReason } from '@svta/cml-c2pa'
 |----------|-------|-------|-------------|
 | `VALID` | `valid` | `true` | Sequence number is the next expected value |
 | `DUPLICATE` | `duplicate` | `false` | Sequence number was already seen |
-| `GAP_DETECTED` | `gap_detected` | `false` | One or more sequence numbers were skipped |
+| `GAP_DETECTED` | `gap_detected` | `false` | One or more sequence numbers were skipped. The segment is not invalid for this reason. |
 | `OUT_OF_ORDER` | `out_of_order` | `false` | Sequence number is less than the last seen |
 | `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | Below the session key's `minSequenceNumber` |
 

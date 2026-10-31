@@ -1,7 +1,7 @@
 import { extractManifestCertificate } from '../../src/extractManifestCertificate.ts'
 import { ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('extractManifestCertificate', () => {
 	// #region example

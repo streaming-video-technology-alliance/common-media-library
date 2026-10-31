@@ -4,9 +4,9 @@
  * @alpha
  */
 export type AddressableObject = {
-	url: string;
+	url: string
 	byteRange?: {
-		start: number;
-		end: number;
+		start: number
+		end: number
 	}
 }

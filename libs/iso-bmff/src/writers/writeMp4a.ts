@@ -14,6 +14,9 @@ import { writeAudioSampleEntryBox } from './writeAudioSampleEntryBox.ts'
  *
  * @public
  */
-export function writeMp4a(box: AudioSampleEntryBox<'mp4a'>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeMp4a(
+	box: AudioSampleEntryBox<'mp4a'>,
+	config: IsoBoxWriteViewConfig,
+): IsoBoxWriteView {
 	return writeAudioSampleEntryBox(box, config)
 }

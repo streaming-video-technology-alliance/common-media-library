@@ -10,9 +10,17 @@ and this project adheres to
 
 ### Changed
 
+- `PenState.foreground` is `string | null`, the type of `PenStyles.foreground`. A PAC without a color already set it to `null`. TypeScript consumers that read `foreground` as a `string` need to handle `null`. `setStyles` assigns the five styles directly, with no allocation per call. A style key that is present with the value `undefined` keeps the previous value instead of storing `undefined`.
+- `SccParser` types its `processor` as `Pick<Cta608Parser, 'addData'>` and its `field` as `number`. Both were `any`.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+
+## [1.1.1] - 2026-10-18
+
+### Changed
+
+- `@svta/cml-utils` is now a declared peer dependency with the range `^1.6.2`.
 - README: the prose is rewritten for readers who do not read English as a first language. The extractor table and the code examples are unchanged.
 - README: the extraction example is complete. The sample inputs are function parameters.
-
 
 ## [1.1.0] - 2026-08-13
 
@@ -56,7 +64,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.1...HEAD
+[1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.1.0...608-v1.1.1
 [1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.3...608-v1.1.0
 [1.0.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.2...608-v1.0.3
 [1.0.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/608-v1.0.1...608-v1.0.2

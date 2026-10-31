@@ -6,6 +6,6 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type IpmpInfoBox = FullBox & {
-	type: 'imif';
-	ipmpDescr: any[];
-};
+	type: 'imif'
+	ipmpDescr: any[]
+}

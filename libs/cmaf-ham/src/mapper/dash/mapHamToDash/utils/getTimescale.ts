@@ -24,9 +24,7 @@ import {
 export function getTimescale(track: Track): number {
 	if (track?.type === 'audio') {
 		const audioTrack = track as AudioTrack
-		return audioTrack.sampleRate !== 0
-			? audioTrack.sampleRate
-			: TIMESCALE_48000
+		return audioTrack.sampleRate !== 0 ? audioTrack.sampleRate : TIMESCALE_48000
 	}
 	if (track?.type === 'video') {
 		return VIDEO_SAMPLE_RATE

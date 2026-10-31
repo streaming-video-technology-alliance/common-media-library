@@ -7,9 +7,9 @@ import type { Initialization } from './Initialization.ts'
  */
 export type SegmentBase = {
 	$: {
-		indexRange: string;
-		indexRangeExact: string;
-		timescale: string;
-	};
-	Initialization: Initialization[];
-};
+		indexRange: string
+		indexRangeExact: string
+		timescale: string
+	}
+	Initialization: Initialization[]
+}

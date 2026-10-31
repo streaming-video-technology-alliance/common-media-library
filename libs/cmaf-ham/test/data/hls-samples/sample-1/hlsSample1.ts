@@ -1,9 +1,6 @@
 import { readFileSync } from 'fs'
 
-const hlsMain1: string = readFileSync(
-	new URL('./main.m3u8', import.meta.url),
-	'utf8',
-)
+const hlsMain1: string = readFileSync(new URL('./main.m3u8', import.meta.url), 'utf8')
 
 const aac_100k = readFileSync(
 	new URL('./playlist_a-eng-0128k-aac-2c.mp4.m3u8', import.meta.url),

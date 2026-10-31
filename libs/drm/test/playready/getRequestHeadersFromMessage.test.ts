@@ -1,7 +1,6 @@
-
 import { getRequestHeadersFromMessage } from '@svta/cml-drm'
 import { deepStrictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import { PLAYREADY_HEADERS } from './data/PLAYREADY_HEADERS.ts'
 import { PLAYREADY_KEY_MESSAGE } from './data/PLAYREADY_KEY_MESSAGE.ts'
 import { stringToUtf16Buffer } from './utils/stringToUtf16Buffer.ts'

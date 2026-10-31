@@ -10,8 +10,15 @@ and this project adheres to
 
 ### Changed
 
-- README: the usage example is complete. It imports every identifier it uses and shows the encoded output.
+- `CmsdValue` no longer lists `CmsdObjectType`, `CmsdStreamingFormat`, and `CmsdStreamType`. `string` already covers the three, so the type is unchanged.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
+## [1.1.2] - 2026-10-18
+
+### Changed
+
+- README: the usage example is complete. It imports every identifier it uses and shows the encoded output.
+- Peer dependency ranges are now caret ranges, for example `^1.6.2` instead of `1.6.2`. A later patch or minor release of a peer no longer requires a new release of this package.
 
 ## [1.1.1] - 2026-09-15
 
@@ -91,7 +98,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.1.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.1.2...HEAD
+[1.1.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.1.1...cmsd-v1.1.2
 [1.1.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.1.0...cmsd-v1.1.1
 [1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.0.7...cmsd-v1.1.0
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/cmsd-v1.0.6...cmsd-v1.0.7

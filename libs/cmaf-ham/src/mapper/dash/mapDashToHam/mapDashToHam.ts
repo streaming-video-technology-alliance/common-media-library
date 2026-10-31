@@ -6,14 +6,12 @@ import type { Representation } from '../../../types/mapper/dash/Representation.t
 import type { Presentation } from '../../../types/model/Presentation.ts'
 import type { Segment } from '../../../types/model/Segment.ts'
 import type { SelectionSet } from '../../../types/model/SelectionSet.ts'
-import type { SwitchingSet } from '../../../types/model/SwitchingSet.ts'
 import type { Track } from '../../../types/model/Track.ts'
-
-import { iso8601DurationToNumber } from '../../../utils/dash/iso8601DurationToNumber.ts'
 
 import { getContentType } from './utils/getContentType.ts'
 import { getGroup } from './utils/getGroup.ts'
 import { getInitializationUrl } from './utils/getInitializationUrl.ts'
+import { getPeriodDuration } from './utils/getPeriodDuration.ts'
 import { getPresentationId } from './utils/getPresentationId.ts'
 
 import { mapSegments } from './mapSegments.ts'
@@ -28,29 +26,23 @@ import { mapTracks } from './mapTracks.ts'
  * @returns List of presentations in ham
  */
 export function mapDashToHam(dash: DashManifest): Presentation[] {
-	return dash.MPD.Period.map((period: Period) => {
-		const duration: number = iso8601DurationToNumber(period.$.duration)
+	return dash.MPD.Period.map((period: Period, index: number) => {
+		const duration: number = getPeriodDuration(dash, index)
 		const presentationId: string = getPresentationId(period, duration)
 
 		const selectionSetGroups: Record<string, SelectionSet> = {}
 
 		period.AdaptationSet.map((adaptationSet: AdaptationSet) => {
-			const tracks: Track[] = adaptationSet.Representation.map(
-				(representation: Representation) => {
-					const segments: Segment[] = mapSegments(
-						adaptationSet,
-						representation,
-						duration,
-					)
+			const tracks: Track[] = adaptationSet.Representation.map((representation: Representation) => {
+				const segments: Segment[] = mapSegments(adaptationSet, representation, duration)
 
-					return mapTracks(
-						adaptationSet,
-						representation,
-						segments,
-						getInitializationUrl(adaptationSet, representation),
-					)
-				},
-			)
+				return mapTracks(
+					adaptationSet,
+					representation,
+					segments,
+					getInitializationUrl(adaptationSet, representation),
+				)
+			})
 
 			const group: string = getGroup(adaptationSet)
 			const contentType = getContentType(adaptationSet, adaptationSet.Representation[0])
@@ -63,13 +55,10 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 			}
 
 			selectionSetGroups[group].switchingSets.push({
-				id:
-					adaptationSet.$.id ??
-					adaptationSet.ContentComponent?.at(0)?.$.id ??
-					group,
+				id: adaptationSet.$.id ?? adaptationSet.ContentComponent?.at(0)?.$.id ?? group,
 				tracks,
 				baseUrls: [],
-			} as SwitchingSet)
+			})
 		})
 
 		const selectionSets: SelectionSet[] = Object.values(selectionSetGroups)
@@ -81,6 +70,6 @@ export function mapDashToHam(dash: DashManifest): Presentation[] {
 			startTime: 0,
 			endTime: duration,
 			baseUrls: [],
-		} as Presentation
+		}
 	})
 }

@@ -5,6 +5,6 @@
  */
 export type SegmentURL = {
 	$: {
-		media?: string;
-	};
-};
+		media?: string
+	}
+}

@@ -19,13 +19,17 @@ import { validateCmcdEvents } from './validateCmcdEvents.ts'
  * @param options - Validation options (excluding `reportingMode`).
  * @returns The validation result including decoded data per event line.
  *
- * @example {@includeCode ../test/validateCmcdEventReport.test.ts#example}
+ * @example
+ * {@includeCode ../test/validateCmcdEventReport.test.ts#example}
  *
  * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#event-mode | CTA-5004-B Event Mode}
  *
  * @public
  */
-export function validateCmcdEventReport(request: HttpRequest, options?: Omit<CmcdValidationOptions, 'reportingMode'>): CmcdEventsValidationResult {
+export function validateCmcdEventReport(
+	request: HttpRequest,
+	options?: Omit<CmcdValidationOptions, 'reportingMode'>,
+): CmcdEventsValidationResult {
 	const issues: CmcdEventsValidationResult['issues'] = []
 
 	if (request.method !== 'POST') {
@@ -35,7 +39,9 @@ export function validateCmcdEventReport(request: HttpRequest, options?: Omit<Cmc
 		})
 	}
 
-	const contentType = request.headers ? ensureHeaders(request.headers).get('Content-Type') : undefined
+	const contentType = request.headers
+		? ensureHeaders(request.headers).get('Content-Type')
+		: undefined
 
 	if (!contentType) {
 		issues.push({

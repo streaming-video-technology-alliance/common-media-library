@@ -22,4 +22,4 @@ export const CmStreamType = {
  *
  * @internal
  */
-export type CmStreamType = ValueOf<typeof CmStreamType>;
+export type CmStreamType = ValueOf<typeof CmStreamType>

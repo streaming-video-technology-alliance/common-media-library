@@ -7,7 +7,7 @@ import type { SampleToChunkEntry } from './SampleToChunkEntry.ts'
  * @public
  */
 export type SampleToChunkBox = FullBox & {
-	type: 'stsc';
-	entryCount: number;
-	entries: SampleToChunkEntry[];
-};
+	type: 'stsc'
+	entryCount: number
+	entries: SampleToChunkEntry[]
+}

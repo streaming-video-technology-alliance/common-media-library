@@ -4,6 +4,6 @@
  * @alpha
  */
 export type Validation = {
-	status: boolean;
-	errorMessages: string[];
-};
+	status: boolean
+	errorMessages: string[]
+}

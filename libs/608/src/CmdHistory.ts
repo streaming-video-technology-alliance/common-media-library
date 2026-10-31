@@ -4,6 +4,6 @@
  * @public
  */
 export type CmdHistory = {
-	a: number | null;
-	b: number | null;
-};
+	a: number | null
+	b: number | null
+}

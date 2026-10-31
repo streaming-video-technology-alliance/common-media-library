@@ -1,14 +1,16 @@
-import { WebVttResultType, WebVttTransformStream } from '@svta/cml-webvtt'
+import { WebVttResultType, WebVttTransformStream, type WebVttResult } from '@svta/cml-webvtt'
 import { equal } from 'node:assert'
 import { createReadStream } from 'node:fs'
 import { resolve } from 'node:path'
 import { Readable } from 'node:stream'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 import './utils/pollyfill.ts'
 
 // NOTE: This "polyfill" is here to make the example look like a browser fetch.
-function fetch(path: string): Promise<{ body: ReadableStream<any> }> {
-	const body = Readable.toWeb(createReadStream(resolve(path))) as ReadableStream<any>
+function fetch(path: string): Promise<{ body: ReadableStream<Uint8Array<ArrayBuffer>> }> {
+	const body = Readable.toWeb(
+		createReadStream(resolve(import.meta.dirname, '..', path)),
+	) as ReadableStream<Uint8Array<ArrayBuffer>>
 	return Promise.resolve({ body })
 }
 
@@ -20,7 +22,7 @@ describe('WebVttTransformStream examples', () => {
 			.pipeThrough(new TextDecoderStream())
 			.pipeThrough(new WebVttTransformStream())
 
-		const results: any[] = []
+		const results: WebVttResult[] = []
 
 		for await (const result of stream) {
 			results.push(result)

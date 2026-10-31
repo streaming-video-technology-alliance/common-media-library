@@ -15,4 +15,4 @@ export function readMdat(view: IsoBoxReadView): MediaDataBox {
 		type: 'mdat',
 		data: view.readData(-1),
 	}
-};
+}

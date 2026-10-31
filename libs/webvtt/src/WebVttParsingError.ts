@@ -4,7 +4,6 @@
  * @public
  */
 export class WebVttParsingError extends Error {
-
 	/**
 	 * Create a new WebVTT parsing error.
 	 *

@@ -11,7 +11,7 @@ import type { Mapper } from '../Mapper.ts'
 export class HlsMapper implements Mapper {
 	private manifest: ManifestFile | undefined
 
-	getManifestMetadata(): any | undefined {
+	getManifestMetadata(): JSON | undefined {
 		return getMetadata(this.manifest)
 	}
 

@@ -1,6 +1,6 @@
 import { hexToArrayBuffer } from '@svta/cml-utils'
 import { deepEqual } from 'assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('hexToArrayBuffer', () => {
 	it('should convert hex string to ArrayBuffer', () => {
@@ -9,11 +9,7 @@ describe('hexToArrayBuffer', () => {
 		const result = hexToArrayBuffer(hex)
 
 		const expected = new Uint8Array([
-			160, 86, 74, 247,
-			96, 194,
-			217, 75,
-			150, 16,
-			199, 174, 112, 213, 217, 112,
+			160, 86, 74, 247, 96, 194, 217, 75, 150, 16, 199, 174, 112, 213, 217, 112,
 		])
 
 		deepEqual(new Uint8Array(result), expected)
@@ -32,11 +28,7 @@ describe('hexToArrayBuffer', () => {
 		const result = hexToArrayBuffer(hex)
 
 		const expected = new Uint8Array([
-			160, 86, 74, 247,
-			96, 194,
-			217, 75,
-			150, 16,
-			199, 174, 112, 213, 217, 112,
+			160, 86, 74, 247, 96, 194, 217, 75, 150, 16, 199, 174, 112, 213, 217, 112,
 		])
 
 		deepEqual(new Uint8Array(result), expected)

@@ -20,7 +20,6 @@ export function getLicenseRequestFromMessage(
 	message: ArrayBuffer,
 	encoding: Encoding = UTF_16,
 ): ArrayBuffer {
-
 	// If encoding is configured for UTF-16 and the number of bytes is odd,
 	// assume an 'unwrapped' raw CDM message.
 	if (encoding === UTF_16 && message?.byteLength % 2 === 1) {
@@ -40,7 +39,7 @@ export function getLicenseRequestFromMessage(
 	const challengeValue = challengeNode?.childNodes[0]?.nodeValue
 
 	if (challengeValue) {
-		return decodeBase64(challengeValue).buffer as ArrayBuffer
+		return decodeBase64(challengeValue).buffer
 	}
 
 	return message

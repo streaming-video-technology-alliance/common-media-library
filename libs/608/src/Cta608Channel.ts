@@ -121,8 +121,7 @@ export class Cta608Channel {
 		this.logger.log(VerboseLevel.INFO, () => 'MODE=' + newMode)
 		if (this.mode === 'MODE_POP-ON') {
 			this.writeScreen = this.nonDisplayedMemory
-		}
-		else {
+		} else {
 			this.writeScreen = this.displayedMemory
 			this.writeScreen.reset()
 		}
@@ -138,12 +137,8 @@ export class Cta608Channel {
 			this.writeScreen.insertChar(char)
 		}
 
-		const screen =
-			this.writeScreen === this.displayedMemory ? 'DISP' : 'NON_DISP'
-		this.logger.log(
-			VerboseLevel.INFO,
-			() => screen + ': ' + this.writeScreen.getDisplayText(true),
-		)
+		const screen = this.writeScreen === this.displayedMemory ? 'DISP' : 'NON_DISP'
+		this.logger.log(VerboseLevel.INFO, () => screen + ': ' + this.writeScreen.getDisplayText(true))
 		if (this.mode === 'MODE_PAINT-ON' || this.mode === 'MODE_ROLL-UP') {
 			this.logger.log(
 				VerboseLevel.TEXT,
@@ -247,10 +242,7 @@ export class Cta608Channel {
 			this.displayedMemory = this.nonDisplayedMemory
 			this.nonDisplayedMemory = tmp
 			this.writeScreen = this.nonDisplayedMemory
-			this.logger.log(
-				VerboseLevel.TEXT,
-				() => 'DISP: ' + this.displayedMemory.getDisplayText(),
-			)
+			this.logger.log(VerboseLevel.TEXT, () => 'DISP: ' + this.displayedMemory.getDisplayText())
 		}
 		this.outputDataUpdate(true)
 	}
@@ -268,18 +260,9 @@ export class Cta608Channel {
 		styles.italics = secondByte >= 0x2e
 		if (!styles.italics) {
 			const colorIndex = Math.floor(secondByte / 2) - 0x10
-			const colors = [
-				'white',
-				'green',
-				'blue',
-				'cyan',
-				'red',
-				'yellow',
-				'magenta',
-			]
+			const colors = ['white', 'green', 'blue', 'cyan', 'red', 'yellow', 'magenta']
 			styles.foreground = colors[colorIndex]
-		}
-		else {
+		} else {
 			styles.foreground = 'white'
 		}
 		this.logger.log(VerboseLevel.INFO, 'MIDROW: ' + JSON.stringify(styles))
@@ -300,8 +283,7 @@ export class Cta608Channel {
 			if (this.cueStartTime === null && !this.displayedMemory.isEmpty()) {
 				// Start of a new cue
 				this.cueStartTime = time
-			}
-			else {
+			} else {
 				if (!this.displayedMemory.equals(this.lastOutputScreen)) {
 					this.outputFilter.newCue(
 						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion

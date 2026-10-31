@@ -6,23 +6,23 @@ import type { FullBox } from './FullBox.ts'
  * @public
  */
 export type MediaHeaderBox = FullBox & {
-	type: 'mdhd';
+	type: 'mdhd'
 
 	/** A 32-bit integer that specifies the creation time of the media in this track. */
-	creationTime: number;
+	creationTime: number
 
 	/** A 32-bit integer that specifies the most recent time the media in this track was modified. */
-	modificationTime: number;
+	modificationTime: number
 
 	/** A time value that indicates the time-scale for this media; this is the number of time units that pass in one second. */
-	timescale: number;
+	timescale: number
 
 	/** A time value that indicates the duration of this media. */
-	duration: number;
+	duration: number
 
 	/** A 16-bit integer that specifies the language code for this media. */
-	language: string;
+	language: string
 
 	/** A 16-bit value that is reserved for use in other specifications. */
-	preDefined: number;
-};
+	preDefined: number
+}

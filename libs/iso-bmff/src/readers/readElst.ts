@@ -31,4 +31,4 @@ export function readElst(view: IsoBoxReadView): EditListBox {
 		entryCount,
 		entries,
 	}
-};
+}

@@ -4,6 +4,6 @@
  * @public
  */
 export type CompTimeToSampleEntry = {
-	sampleCount: number;
-	sampleOffset: number;
-};
+	sampleCount: number
+	sampleOffset: number
+}

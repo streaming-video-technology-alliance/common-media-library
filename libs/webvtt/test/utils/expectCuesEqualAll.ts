@@ -5,10 +5,25 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { options } from './options.ts'
 
-export async function expectCuesEqualAll(vttFile: string, jsonFile: string, message?: string): Promise<void> {
+const PACKAGE_ROOT = path.resolve(import.meta.dirname, '..', '..')
+
+type ExpectedJson = {
+	cues: unknown[]
+	regions: unknown[]
+	styles: unknown[]
+	errors: unknown[]
+}
+
+export async function expectCuesEqualAll(
+	vttFile: string,
+	jsonFile: string,
+	message?: string,
+): Promise<void> {
 	const [vttText, json] = await Promise.all([
-		readFile(path.resolve(vttFile), 'utf-8'),
-		readFile(path.resolve(jsonFile), 'utf-8').then(text => JSON.parse(text)),
+		readFile(path.resolve(PACKAGE_ROOT, vttFile), 'utf-8'),
+		readFile(path.resolve(PACKAGE_ROOT, jsonFile), 'utf-8').then(
+			text => JSON.parse(text) as ExpectedJson,
+		),
 	])
 
 	const { cues, regions, styles, errors } = await parseWebVtt(vttText, options)

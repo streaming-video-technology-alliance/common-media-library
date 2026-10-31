@@ -1,6 +1,6 @@
 import { decodeFairPlayLicense } from '@svta/cml-drm'
 import { deepStrictEqual } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('decodeFairPlayLicense', () => {
 	it('decodes base64 string to Uint8Array', () => {
@@ -12,9 +12,8 @@ describe('decodeFairPlayLicense', () => {
 	})
 
 	it('returns Uint8Array if input is ArrayBuffer', () => {
-		const buffer = new TextEncoder().encode('test').buffer as ArrayBuffer
+		const buffer = new TextEncoder().encode('test').buffer
 		const result = decodeFairPlayLicense(buffer)
 		deepStrictEqual(new Uint8Array(buffer), result)
 	})
 })
-

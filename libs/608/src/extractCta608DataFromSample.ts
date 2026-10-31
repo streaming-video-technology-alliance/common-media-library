@@ -1,8 +1,4 @@
-import {
-	extractNalUnitType,
-	getSeiData,
-	parseCta608DataFromSei,
-} from './utils/seiHelpers.ts'
+import { extractNalUnitType, getSeiData, parseCta608DataFromSei } from './utils/seiHelpers.ts'
 
 /**
  * Extracts CEA-608 data from a given sample.
@@ -14,7 +10,11 @@ import {
  *
  * @public
  */
-export function extractCta608DataFromSample(raw: DataView, startPos: number, sampleSize: number): number[][] {
+export function extractCta608DataFromSample(
+	raw: DataView,
+	startPos: number,
+	sampleSize: number,
+): number[][] {
 	let nalSize: number = 0
 	const fieldData: number[][] = [[], []]
 
