@@ -1,4 +1,4 @@
-import { createSteeringEngine, type SteeringEngineConfig } from '@svta/cml-content-steering'
+import { createSteeringEngine, fetchRequester, type SteeringEngineConfig } from '@svta/cml-content-steering'
 import { deepEqual, equal, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, mock } from 'node:test'
 import { createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
@@ -11,6 +11,7 @@ function hlsConfig(overrides: Partial<SteeringEngineConfig> = {}): SteeringEngin
 		uri: 'https://steering.example.com/manifest.json',
 		pathways: ['CDN-A', 'CDN-B'],
 		pathway: 'CDN-A',
+		requester: createStubRequester().requester,
 		...overrides,
 	}
 }
@@ -58,6 +59,12 @@ describe('createSteeringEngine', () => {
 
 		it('throws for a negative penalty', () => {
 			throws(() => createSteeringEngine(hlsConfig({ penalty: -1 })), { name: 'TypeError', message: /penalty must be a finite number/ })
+		})
+
+		it('throws for a missing requester', () => {
+			throws(() => createSteeringEngine(hlsConfig({ requester: undefined })), { name: 'TypeError', message: 'createSteeringEngine: requester must be a function. Received undefined.' })
+			// @ts-expect-error - requester must be a function
+			throws(() => createSteeringEngine(hlsConfig({ requester: 'fetch' })), { name: 'TypeError', message: 'createSteeringEngine: requester must be a function. Received "fetch".' })
 		})
 
 		it('starts with the configured pathway', () => {
@@ -275,9 +282,9 @@ describe('createSteeringEngine', () => {
 			equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22')
 		})
 
-		it('uses fetch when no requester is configured', async (t) => {
+		it('uses fetch when the requester is fetchRequester', async (t) => {
 			const fetchMock = t.mock.method(globalThis, 'fetch', async () => new Response(JSON.stringify(MANIFEST), { status: 200 }))
-			const engine = createSteeringEngine(hlsConfig())
+			const engine = createSteeringEngine(hlsConfig({ requester: fetchRequester }))
 
 			await engine.start()
 			engine.stop()

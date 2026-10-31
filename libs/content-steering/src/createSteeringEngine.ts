@@ -57,7 +57,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		protocol,
 		penalty,
 		queryBeforeStart,
-		requester = fetchRequester,
+		requester,
 		getThroughput,
 		getReportedPathways,
 		acceptClone,
@@ -542,7 +542,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	}
 }
 
-function checkConfig({ protocol, uri, pathways, pathway, penalty }: SteeringEngineConfig): void {
+function checkConfig({ protocol, uri, pathways, pathway, penalty, requester }: SteeringEngineConfig): void {
 	if (protocol !== STEERING_PROTOCOL_HLS && protocol !== STEERING_PROTOCOL_DASH) {
 		throw new TypeError(`createSteeringEngine: protocol must be 'hls' or 'dash'. Received ${JSON.stringify(protocol)}.`)
 	}
@@ -556,6 +556,10 @@ function checkConfig({ protocol, uri, pathways, pathway, penalty }: SteeringEngi
 
 	if (penalty !== undefined && (typeof penalty !== 'number' || !Number.isFinite(penalty) || penalty < 0)) {
 		throw new TypeError(`createSteeringEngine: penalty must be a finite number of milliseconds, 0 or more. Received ${JSON.stringify(penalty)}.`)
+	}
+
+	if (typeof requester !== 'function') {
+		throw new TypeError(`createSteeringEngine: requester must be a function. Received ${JSON.stringify(requester)}.`)
 	}
 }
 
@@ -631,18 +635,4 @@ function throwLater(cause: unknown): void {
 	setTimeout(() => {
 		throw cause
 	}, 0)
-}
-
-function fetchRequester(request: HttpRequest): Promise<HttpResponse> {
-	const { url, method, headers, credentials, mode } = request
-
-	return fetch(url, { method, headers, credentials, mode }).then(response => response.text().then(data => {
-		const responseHeaders: Record<string, string> = {}
-
-		response.headers.forEach((value, key) => {
-			responseHeaders[key] = value
-		})
-
-		return { request, url: response.url, status: response.status, headers: responseHeaders, data }
-	}))
 }

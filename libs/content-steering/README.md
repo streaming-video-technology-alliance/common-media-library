@@ -35,7 +35,7 @@ engine.penalize() // apply CDN-A
 engine.stop()
 ```
 
-The example uses a requester that returns a fixed Steering Manifest. Without `requester`, the engine uses `fetch`.
+The example uses a requester that returns a fixed Steering Manifest. `fetchRequester` is a requester that uses `fetch`.
 
 ### Pathway clones
 

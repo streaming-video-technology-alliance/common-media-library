@@ -12,6 +12,7 @@ and this project adheres to
 
 - `applyUriReplacement`, which builds a URI of a pathway clone from a URI of its base pathway ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - `createSteeringEngine`, a content steering engine for HLS and DASH players. It implements the RFC in `rfc/content-steering-engine.md` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- `fetchRequester`, a requester that sends the Steering Manifest request with `fetch` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, and `STEERING_PROTOCOL_DASH` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, and `STEERING_ERROR_TYPE_CALLBACK` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 

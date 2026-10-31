@@ -53,11 +53,11 @@ export type SteeringEngineConfig = {
 	queryBeforeStart?: boolean;
 
 	/**
-	 * The function that sends the Steering Manifest requests. The default
-	 * uses `fetch`. `SteeringRequester` describes the contract of the
-	 * request and the response.
+	 * The function that sends the Steering Manifest requests.
+	 * `fetchRequester` is a requester that uses `fetch`.
+	 * `SteeringRequester` describes the response and the promise.
 	 */
-	requester?: SteeringRequester;
+	requester: SteeringRequester;
 
 	/**
 	 * Returns the throughput estimate of the player for a pathway, in bits per second.

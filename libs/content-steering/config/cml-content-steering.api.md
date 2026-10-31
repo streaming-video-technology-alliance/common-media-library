@@ -21,6 +21,9 @@ export const DEFAULT_PATHWAY_PENALTY = 3e5;
 export const DEFAULT_TTL = 300;
 
 // @beta
+export function fetchRequester(request: HttpRequest): Promise<HttpResponse>;
+
+// @beta
 export function isValidPathwayClone(clone: PathwayClone): boolean;
 
 // @beta
@@ -70,7 +73,7 @@ export type SteeringEngineConfig = {
     pathway?: string;
     penalty?: number;
     queryBeforeStart?: boolean;
-    requester?: SteeringRequester;
+    requester: SteeringRequester;
     getThroughput?: (pathway: string) => number | undefined;
     getReportedPathways?: () => readonly string[];
     acceptClone?: (clone: PathwayClone) => boolean;
