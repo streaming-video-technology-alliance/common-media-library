@@ -467,16 +467,16 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession`, prototype | 6174 B |
-| `CmcdReporter`, current | 8423 B |
-| Both in one bundle | 9846 B |
+| `createCmcdSession` | 7140 B |
+| `CmcdReporter` | 8791 B |
+| Both in one bundle | 10793 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
-| `createCmcdSession`, prototype | 12.0 µs | 20.5 KB |
-| `CmcdReporter`, current | 20.2 µs | 32.6 KB |
+| `createCmcdSession` | 8.1 µs | 10.9 KB |
+| `CmcdReporter` | 13.0 µs | 19.3 KB |
 
-The prototype writes the same request output as `CmcdReporter`, byte for byte, for the same data. The measurements predate `send`. The implementation PR measures the addition. The [design record](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md) has the method.
+The implementation writes the same request output as `CmcdReporter`, byte for byte, for the same data. The `send` code is 185 B of the session figure. The bundles come from `vp pack --minify` and gzip. The time is the median of 50 batches of 1000 calls, with one process for each row. The heap figure is the memory that 1000 calls allocate, with no collection during those calls, divided by the call count. The [design record](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md) describes the input shape.
 
 ## Drawbacks
 
