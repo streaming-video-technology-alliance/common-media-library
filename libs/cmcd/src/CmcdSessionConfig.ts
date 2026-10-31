@@ -23,7 +23,7 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 
 	/**
 	 * The event targets. They cannot change after the session is created.
-	 * Each target is one destination with its own sequence number.
+	 * Each target is one destination. It has its own sequence number, `msd` rule, and waiting values.
 	 */
 	eventTargets?: readonly CmcdSessionEventReportConfig[]
 }
