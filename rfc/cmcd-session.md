@@ -204,7 +204,7 @@ const session = createCmcdSession({
 session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 ```
 
-Each report is the data of one event. The session has applied `enabledKeys`, the `filter`, and the waiting values. The session has written `e`, `sid`, `sn`, `ts`, and `v`. A token value is an `SfToken`, and an inner list is an array. A function that needs the encoded line calls `encodeCmcd()` on the report.
+Each report is the data of one event. The session has applied `enabledKeys`, the `filter`, and the waiting values. The session has written `e`, `sid`, `sn`, `ts`, and `v`. A token value is an `SfToken`, and an inner list is an array. A function that needs the encoded line calls `encodeCmcd(report, { reportingMode: CmcdReportingMode.EVENT })`. Without that option, the encoder uses request mode and drops `e` and `ts`.
 
 The promise takes the place of the HTTP response. A promise that resolves means that the function delivered the batch. A result of `{ gone: true }` stops the target, as a 410 response does. A promise that rejects sends the batch again after a wait, as a 5xx response does. The function must not change a report, and the `DeepReadonly` type rejects a change.
 
@@ -349,6 +349,7 @@ type CmcdSession = {
 function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status: number }>): CmcdSession
 
 // The parameter widens, so a send function can encode a report without a copy
+// An event report needs { reportingMode: CmcdReportingMode.EVENT }
 function encodeCmcd(cmcd: DeepReadonly<Cmcd>, options?: CmcdEncodeOptions): string
 ```
 
@@ -375,7 +376,7 @@ Each target is one destination, with its own sequence number, `msd` gate, and wa
 `recordResponseReceived()` derives `url` without any `CMCD` parameter, and `rc` from `status`. The method derives three keys from `resourceTiming`:
 
 - `ts` is the time origin plus `startTime`.
-- `ttfb` is `responseStart` minus `startTime`. The session omits `ttfb` when `responseStart` is 0 or earlier than `startTime`. Resource Timing reports 0 for a cross-origin response without the `Timing-Allow-Origin` header.
+- `ttfb` is `responseStart` minus `startTime`. The session omits `ttfb` when `responseStart` is missing, earlier than `startTime`, or later than `startTime` plus `duration`. Resource Timing reports 0 for a cross-origin response without the `Timing-Allow-Origin` header. That value is earlier than `startTime`, so the response has no `ttfb`.
 - `ttlb` is `duration`, when `duration` is above 0.
 
 The method adds the request-time data from `customData.cmcd`, without the keys that have a destination scope. The request report already gave those keys to every destination. The `data` argument overrides the derived keys. The method then records an `rr` event and passes the request to the filters.
@@ -510,7 +511,8 @@ The prototype writes the same request output as `CmcdReporter`, byte for byte, f
 - **A custom requester for other transports.** The requester receives only the encoded body. The Motivation describes the decode and the invented status codes of a MoQ player.
 - **The report objects on the batch request.** The POST request could include the reports in `customData`, and a requester could route a `moqt:` URL. The URL becomes a routing key. The session encodes a body that no one reads, and one requester serves every target.
 - **One `send` function for the session.** One function would replace HTTP for every target. A player with one HTTP collector and one MoQ track needs the choice for each target.
-- **Encoded lines for `send`.** Transports that are not HTTP mostly need structured data. A function that needs lines calls `encodeCmcd()`.
+- **`Promise<CmcdEventSendResult> | Promise<void>` as the return type of `send`.** A union of two promise types rejects a `Promise.resolve()` call whose argument is `CmcdEventSendResult` or `undefined`. The RFC keeps `void` inside one promise type, and the source needs one lint exception for `no-invalid-void-type` on that line.
+- **Encoded lines for `send`.** Transports that are not HTTP mostly need structured data. A function that needs lines calls `encodeCmcd()` with the event reporting mode.
 - **A time limit for a batch.** The CMCD over MSF draft asks for a `batchInterval` option. The option is separable from `send`. The draft calls the option a minimum interval and also a trigger, and the draft does not resolve that difference. A later RFC can add the option without a change to `send`.
 - **Other names for `send`.** `sink` is a term from stream libraries, and a sink does not answer. This function answers with a promise, and the promise controls the retry. `transport` names the fetch and XHR adapters of `CmcdReportRecorder`. `destination` and `target` name concepts of this RFC. `publish` names one transport.
 - **Types that sort keys into state keys and object keys.** CTA-5004-B has no such classes. Table 1 allows most keys in both modes, and `br` changes meaning between the modes. Section 2 leaves the choice of keys to the application. The types leave out only the keys that the session writes and the keys of one occurrence. `CmcdSnapshot` uses `never` members, because `Omit` alone accepts a value typed `Cmcd`. The data arguments use `Omit`, so the `Cmcd` values of existing players still compile. Required keys for each event type, such as `sta` for `ps`, need conditional parameter lists. They also reject a state object whose `sta` is optional.
