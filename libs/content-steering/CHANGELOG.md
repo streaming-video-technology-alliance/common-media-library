@@ -15,6 +15,7 @@ and this project adheres to
 - `fetchRequester`, a requester that sends the Steering Manifest request with `fetch` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, and `STEERING_PROTOCOL_DASH` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, and `STEERING_ERROR_TYPE_CALLBACK` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- A bundle size budget in `config/size-budget.json`, checked by `npm run size -- --check` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 
 ### Changed
 
