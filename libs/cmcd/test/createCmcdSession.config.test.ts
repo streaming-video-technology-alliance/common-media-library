@@ -55,11 +55,19 @@ describe('createCmcdSession configuration checks', () => {
 			],
 			[
 				{ eventTargets: [{ ...target, interval: -1 }] },
-				'createCmcdSession: eventTargets[0].interval must be a finite number, 0 or more, received -1',
+				'createCmcdSession: eventTargets[0].interval must be a number from 0 to 2147483, received -1',
 			],
 			[
 				{ eventTargets: [{ ...target, interval: Infinity }] },
-				'createCmcdSession: eventTargets[0].interval must be a finite number, 0 or more, received Infinity',
+				'createCmcdSession: eventTargets[0].interval must be a number from 0 to 2147483, received Infinity',
+			],
+			[
+				{ eventTargets: [{ ...target, interval: 2_147_484 }] },
+				'createCmcdSession: eventTargets[0].interval must be a number from 0 to 2147483, received 2147484',
+			],
+			[
+				{ eventTargets: [{ ...target, interval: NaN }] },
+				'createCmcdSession: eventTargets[0].interval must be a number from 0 to 2147483, received NaN',
 			],
 			[
 				{ eventTargets: [target, { ...target, batchSize: 0 }] },
@@ -87,6 +95,7 @@ describe('createCmcdSession configuration checks', () => {
 			},
 			{ cid: '' },
 			{ eventTargets: [{ ...target, interval: 0, batchSize: 1 }] },
+			{ eventTargets: [{ ...target, interval: 2_147_483 }] },
 			{ eventTargets: [{ send, events: [] }] },
 		]
 

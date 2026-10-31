@@ -1,5 +1,7 @@
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
 
+const MAX_INTERVAL = 2_147_483
+
 function configError(parameter: string, expected: string, received: unknown): Error {
 	const value = typeof received === 'string' ? JSON.stringify(received) : String(received)
 
@@ -40,8 +42,12 @@ export function checkSessionConfig(config: CmcdSessionConfig): void {
 			throw configError(`eventTargets[${i}].url`, 'a non-empty string', url)
 		}
 
-		if (interval !== undefined && !(Number.isFinite(interval) && interval >= 0)) {
-			throw configError(`eventTargets[${i}].interval`, 'a finite number, 0 or more', interval)
+		if (interval !== undefined && !(interval >= 0 && interval <= MAX_INTERVAL)) {
+			throw configError(
+				`eventTargets[${i}].interval`,
+				`a number from 0 to ${MAX_INTERVAL}`,
+				interval,
+			)
 		}
 
 		if (batchSize !== undefined && !(Number.isInteger(batchSize) && batchSize > 0)) {
