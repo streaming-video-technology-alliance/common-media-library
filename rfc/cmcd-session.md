@@ -417,7 +417,7 @@ A target sends its queue when the queue reaches `batchSize`, and on `flush()`. A
 
 The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. The session then ignores the result of a call that has not settled for that target. A promise that rejects, or a function that throws, counts as a rejected request. No result of the function drops a batch. A function that cannot deliver a batch resolves.
 
-For a `send` target, the session copies the nested values of each report at queue time. The copy follows the rule for waiting values. The `DeepReadonly` type of `CmcdEventSender` rejects a change by the function, as the type of `CmcdReportFilter` does.
+A queued report shares no list, `SfItem`, or parameter object with the data of the caller. `prepareCmcdData()` returns a copy, and the session queues that copy. The `DeepReadonly` type of `CmcdEventSender` rejects a change by the function, as the type of `CmcdReportFilter` does.
 
 The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new reports join the queue, also an `e` report, and the retry sends them. CTA-5004-B recommends this back-off for 429 and 5xx responses. Status 0 means that no response arrived, as from an XMLHttpRequest requester after a network failure. `flush()` sends at once, also during a wait. If a batch awaits its response, `flush()` sends after that batch completes. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
 
@@ -467,16 +467,16 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession` | 7140 B |
-| `CmcdReporter` | 8791 B |
-| Both in one bundle | 10793 B |
+| `createCmcdSession` | 7114 B |
+| `CmcdReporter` | 8852 B |
+| Both in one bundle | 10773 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
 | `createCmcdSession` | 8.1 µs | 10.9 KB |
-| `CmcdReporter` | 13.0 µs | 19.3 KB |
+| `CmcdReporter` | 12.7 µs | 18.8 KB |
 
-The implementation writes the same request output as `CmcdReporter`, byte for byte, for the same data. The `send` code is 185 B of the session figure. The bundles come from `vp pack --minify` and gzip. The time is the median of 50 batches of 1000 calls, with one process for each row. The heap figure is the memory that 1000 calls allocate, with no collection during those calls, divided by the call count. The [design record](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md) describes the input shape.
+The implementation writes the same request output as `CmcdReporter`, byte for byte, for the same data. The `send` code is 89 B of the session figure. `vp pack --minify` and gzip produce the bundle figures. The time is the median of 50 batches of 1000 calls, with one process for each row. The heap figure is the memory that 1000 calls allocate, with no collection during those calls, divided by the call count. The [design record](https://github.com/streaming-video-technology-alliance/common-media-library/blob/0de942fa34554e5d2cfbccff98a2809184593c3e/plans/cmcd-reporting-architecture/analysis.md) describes the input data.
 
 ## Drawbacks
 
@@ -487,7 +487,7 @@ The implementation writes the same request output as `CmcdReporter`, byte for by
 - During a long outage of a collector, the queues of its targets grow without a limit. `CmcdReporter` has the same behavior.
 - A target cannot receive data that differs from the data of the other targets. The `bg=?0` option of `CmcdReporter` has no equivalent.
 - The session derives no playback keys. Players compute `msd`, `bs`, `su`, and `dl` themselves, as they do today.
-- A `send` target encodes each report to check the values and copies the nested values at queue time. A `url` target encodes once and copies nothing. Every player receives the `send` code, also a player with `url` targets only.
+- A `send` target encodes each report to check the values and discards the line. Every player receives the `send` code, also a player with `url` targets only.
 
 ## Rationale and alternatives
 
@@ -512,6 +512,7 @@ The implementation writes the same request output as `CmcdReporter`, byte for by
 - **The report objects on the batch request.** The POST request could include the reports in `customData`, and a requester could route a `moqt:` URL. The URL becomes a routing key. The session encodes a body that no one reads, and one requester serves every target.
 - **One `send` function for the session.** One function would replace HTTP for every target. A player with one HTTP collector and one MoQ track needs the choice for each target.
 - **`Promise<CmcdEventSendResult> | Promise<void>` as the return type of `send`.** A union of two promise types rejects a `Promise.resolve()` call whose argument is `CmcdEventSendResult` or `undefined`. The RFC keeps `void` inside one promise type, and the source needs one lint exception for `no-invalid-void-type` on that line.
+- **A copy inside `prepareCmcdData()`.** The result of `prepareCmcdData()` shares no list, `SfItem`, or parameter object with the input. The session queues the result for a `send` target without a second copy. `CmcdReporter` drops one copy on its request path. The copy adds 56 B to the bundle of a player that imports `encodeCmcd()` alone. The copy does not replace an `SfToken`, because the token is the replacement for a `Symbol`, and a `Symbol` is immutable.
 - **Encoded lines for `send`.** Transports that are not HTTP mostly need structured data. A function that needs lines calls `encodeCmcd()` with the event reporting mode.
 - **A time limit for a batch.** The CMCD over MSF draft asks for a `batchInterval` option. The option is separable from `send`. The draft calls the option a minimum interval and also a trigger, and the draft does not resolve that difference. A later RFC can add the option without a change to `send`.
 - **Other names for `send`.** `sink` is a term from stream libraries, and a sink does not answer. This function answers with a promise, and the promise controls the retry. `transport` names the fetch and XHR adapters of `CmcdReportRecorder`. `destination` and `target` name concepts of this RFC. `publish` names one transport.
