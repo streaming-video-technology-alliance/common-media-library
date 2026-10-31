@@ -28,6 +28,9 @@
  * that session. The reporter drops the response when the record names a
  * `sid` it does not retain.
  *
+ * @deprecated The provenance record serves `sessionRetention` of `CmcdReporter`. With {@link createCmcdSession}, the player keeps the old session object and records late responses there.
+ * The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member to the session API. Version 3.0.0 removes this type.
+ *
  * @public
  */
 export type CmcdRequestProvenance = {

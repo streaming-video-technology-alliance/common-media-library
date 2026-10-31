@@ -7,7 +7,7 @@ Common Media Client Data (CMCD) encoding and decoding.
 
 - Add a CMCD report to a segment request as a query string or as headers: `appendCmcdQuery`, `appendCmcdHeaders`, `toCmcdQuery`, `toCmcdHeaders`
 - Encode or decode CMCD key and value pairs: `encodeCmcd`, `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`
-- Report CMCD v2 events and time intervals to a collector: `createCmcdSession`, `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
+- Report CMCD v2 events and time intervals to a collector: `createCmcdSession`, `createFetchTransport`, `createXhrTransport`
 - Validate a CMCD payload against CTA-5004: `validateCmcd`, `validateCmcdEventReport`
 - Capture the CMCD that a player sends in a test: `CmcdReportRecorder`
 
@@ -2257,7 +2257,7 @@ export const CMCD_REQUEST_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "
 // @public
 export const CMCD_REQUEST_MODE: "request";
 
-// @public
+// @public @deprecated
 export const CMCD_REQUEST_PROVENANCE: unique symbol;
 
 // @public
@@ -2333,7 +2333,7 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
     transform?: CmcdEventReportTransform<C>;
 };
 
-// @public
+// @public @deprecated
 export type CmcdEventReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C> | undefined) => Cmcd | null;
 
 // @public
@@ -2482,7 +2482,7 @@ export type CmcdReportConfig = {
     enabledKeys?: readonly CmcdKey[];
 };
 
-// @public
+// @public @deprecated
 export class CmcdReporter<C = Record<string, unknown>> {
     constructor(config: Partial<CmcdReporterConfig<C>>, requester?: (request: HttpRequest) => Promise<{
         status: number;
@@ -2502,7 +2502,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
     update(data: Partial<Cmcd>): void;
 }
 
-// @public
+// @public @deprecated
 export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportConfig<C> & {
     sid?: string;
     cid?: string;
@@ -2510,7 +2510,7 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
     sessionRetention?: number;
 };
 
-// @public
+// @public @deprecated
 export type CmcdReporterCustomData<C> = Record<string, unknown> extends C ? any : C;
 
 // @public
@@ -2602,7 +2602,7 @@ export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined;
 // @public
 export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 
-// @public
+// @public @deprecated
 export type CmcdRequestProvenance = {
     readonly sid: string;
     readonly cid?: string;
@@ -2625,7 +2625,7 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
     transform?: CmcdRequestReportTransform<C>;
 };
 
-// @public
+// @public @deprecated
 export type CmcdRequestReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C>) => Cmcd | null;
 
 // @public
@@ -2712,7 +2712,7 @@ export const CmcdStreamType: {
 // @public (undocumented)
 export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;
 
-// @public
+// @public @deprecated
 export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, "customData" | "headers">> & {
     readonly headers?: Readonly<Record<string, string>>;
     readonly customData?: DeepReadonly<C>;

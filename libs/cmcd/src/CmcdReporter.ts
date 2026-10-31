@@ -395,6 +395,9 @@ type CmcdSession<C> = {
  *
  * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#reporting-modes-when-we-send-data | CTA-5004-B Reporting Modes}
  *
+ * @deprecated Use {@link createCmcdSession} instead. The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member of `CmcdReporter` to the session API.
+ * Version 3.0.0 removes `CmcdReporter`.
+ *
  * @public
  */
 export class CmcdReporter<C = Record<string, unknown>> {

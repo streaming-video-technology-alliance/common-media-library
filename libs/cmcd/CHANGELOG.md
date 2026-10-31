@@ -23,6 +23,12 @@ and this project adheres to
 - `encodeCmcd()` accepts a deeply read-only object
 - `prepareCmcdData()` returns a copy. The result shares no list, `SfItem`, or parameter object with the input. Before, the result shared the parameter objects and the lists of custom keys with the input
 
+### Deprecated
+
+- `CmcdReporter` and `CmcdReporterConfig`. Use `createCmcdSession()`. The migration guide maps each member to the session API, and version 3.0.0 removes both
+- `CmcdReporterCustomData`, `CmcdTransformRequest`, `CmcdRequestReportTransform`, `CmcdEventReportTransform`, and the `transform` members of `CmcdRequestReportConfig` and `CmcdEventReportConfig`. A `filter` on an event target drops reports, and the data of each call changes them. Version 3.0.0 removes them
+- `CMCD_REQUEST_PROVENANCE` and `CmcdRequestProvenance`. With a session, the player keeps the old session object and records late responses there. Version 3.0.0 removes both
+
 ## [2.8.4] - 2026-10-26
 
 ### Changed

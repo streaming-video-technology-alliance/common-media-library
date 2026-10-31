@@ -61,6 +61,9 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 *
 	 * @defaultValue `undefined`
 	 *
+	 * @deprecated The session types reject `transform`. A {@link CmcdReportFilter} on the event target drops reports, and the data of each call changes them.
+	 * The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member to the session API. Version 3.0.0 removes this member.
+	 *
 	 * @example
 	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
 	 */
