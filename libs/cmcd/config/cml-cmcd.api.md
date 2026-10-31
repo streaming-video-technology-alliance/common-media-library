@@ -359,7 +359,7 @@ export type CmcdRecordedRequestType = ValueOf<typeof CmcdRecordedRequestType>;
 // @public
 export type CmcdReportConfig = {
     version?: CmcdVersion;
-    enabledKeys?: CmcdKey[];
+    enabledKeys?: readonly CmcdKey[];
 };
 
 // @public
@@ -518,6 +518,24 @@ export type CmcdResponse = CmcdRequest & {
 };
 
 // @public
+export type CmcdSession = {
+    readonly sid: string;
+    createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, "sid" | "sn" | "v" | "ec">): R & CmcdRequestReport<R["customData"]>;
+    configure(settings: CmcdSessionRequestReportConfig): void;
+};
+
+// @public
+export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
+    sid?: string;
+    cid?: string;
+};
+
+// @public
+export type CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, "transform"> & {
+    transform?: never;
+};
+
+// @public
 export const CmcdStreamingFormat: {
     readonly DASH: "d";
     readonly HLS: "h";
@@ -612,6 +630,9 @@ export type CmcdValue = ValueOf<Cmcd>;
 
 // @public
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
+
+// @public
+export function createCmcdSession(config?: CmcdSessionConfig): CmcdSession;
 
 // @public
 export function createFetchTransport(): CmcdTransportAdapter;
