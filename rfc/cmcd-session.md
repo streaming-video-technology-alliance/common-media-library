@@ -206,7 +206,7 @@ session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
 
 Each report is the data of one event. The session has applied `enabledKeys`, the `filter`, and the waiting values. The session has written `e`, `sid`, `sn`, `ts`, and `v`. A token value is an `SfToken`, and an inner list is an array. A function that needs the encoded line calls `encodeCmcd(report, { reportingMode: CmcdReportingMode.EVENT })`. Without that option, the encoder uses request mode and drops `e` and `ts`.
 
-The promise takes the place of the HTTP response. A promise that resolves means that the function delivered the batch. A result of `{ gone: true }` stops the target, as a 410 response does. A promise that rejects sends the batch again after a wait, as a 5xx response does. The function must not change a report, and the `DeepReadonly` type rejects a change.
+The promise takes the place of the HTTP response. A promise that resolves removes the batch from the queue, as a 2xx response does. A result of `{ gone: true }` stops the target, as a 410 response does. A promise that rejects sends the batch again after a wait, as a 5xx response does. The function must not change a report, and the `DeepReadonly` type rejects a change.
 
 ### Several players, one session
 
@@ -415,7 +415,7 @@ A target sends its queue when the queue reaches `batchSize`, and on `flush()`. A
 | 429, 5xx, status 0, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send |
 | Any other status | The session drops the batch. The wait resets. |
 
-The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. The session then ignores the result of a call that has not settled for that target. A promise that rejects, or a function that throws, counts as a rejected request. No result of the function drops a batch. A function that cannot deliver a batch resolves.
+The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. The session then ignores the result of a call that has not settled for that target. A promise that rejects, or a function that throws, counts as a rejected request. A resolved promise removes the batch from the queue whether or not the function delivered it. If a later retry cannot deliver a batch, the function resolves.
 
 A queued report shares no list, `SfItem`, or parameter object with the data of the caller. `prepareCmcdData()` returns a copy, and the session queues that copy. The `DeepReadonly` type of `CmcdEventSender` rejects a change by the function, as the type of `CmcdReportFilter` does.
 
