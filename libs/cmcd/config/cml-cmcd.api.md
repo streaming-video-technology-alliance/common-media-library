@@ -54,6 +54,9 @@ export const CMCD_EVENT_CUSTOM_EVENT: "ce";
 export const CMCD_EVENT_ERROR: "e";
 
 // @public
+export const CMCD_EVENT_HOSTNAME: "h";
+
+// @public
 export const CMCD_EVENT_KEYS: readonly ["cen", "e", "h", "ts"];
 
 // @public
@@ -250,6 +253,7 @@ export const CmcdEventType: {
     readonly AD_BREAK_END: typeof CMCD_EVENT_AD_BREAK_END;
     readonly SKIP: typeof CMCD_EVENT_SKIP;
     readonly CUSTOM_EVENT: typeof CMCD_EVENT_CUSTOM_EVENT;
+    readonly HOSTNAME: typeof CMCD_EVENT_HOSTNAME;
 };
 
 // @public (undocumented)
@@ -394,6 +398,9 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
 export type CmcdReporterCustomData<C> = Record<string, unknown> extends C ? any : C;
 
 // @public
+export type CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean;
+
+// @public
 export const CmcdReportingMode: {
     readonly REQUEST: typeof CMCD_REQUEST_MODE;
     readonly EVENT: typeof CMCD_EVENT_MODE;
@@ -521,13 +528,22 @@ export type CmcdResponse = CmcdRequest & {
 export type CmcdSession = {
     readonly sid: string;
     createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, "sid" | "sn" | "v" | "ec">): R & CmcdRequestReport<R["customData"]>;
+    recordEvent(type: CmcdEventType, data?: Omit<Cmcd, "sid" | "sn" | "e" | "v" | "ec">, request?: Readonly<HttpRequest>): void;
     configure(settings: CmcdSessionRequestReportConfig): void;
+    flush(): void;
 };
 
 // @public
 export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
     sid?: string;
     cid?: string;
+    eventTargets?: readonly CmcdSessionEventReportConfig[];
+};
+
+// @public
+export type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, "transform"> & {
+    filter?: CmcdReportFilter;
+    transform?: never;
 };
 
 // @public
@@ -632,7 +648,9 @@ export type CmcdValue = ValueOf<Cmcd>;
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
 // @public
-export function createCmcdSession(config?: CmcdSessionConfig): CmcdSession;
+export function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{
+    status: number;
+}>): CmcdSession;
 
 // @public
 export function createFetchTransport(): CmcdTransportAdapter;
