@@ -45,7 +45,7 @@ export type CmcdSession = {
 	/**
 	 * Records an event report for each selected event target.
 	 *
-	 * A target is selected when it lists the event type and its `filter` returns `true`.
+	 * A target is selected when it lists the event type, no 410 response stopped it, and its `filter` returns `true`.
 	 *
 	 * @param type - The event type.
 	 * @param data - The CMCD data of the event.
@@ -86,7 +86,7 @@ export type CmcdSession = {
 	/**
 	 * Records an error.
 	 *
-	 * Each selected target that lists `e` receives an `e` report with `ec`.
+	 * Each selected target that lists `e` sends an `e` report with `ec` at once.
 	 * Every other destination sends the codes with its next report.
 	 *
 	 * @param codes - The error codes.
@@ -111,8 +111,11 @@ export type CmcdSession = {
 	configure(settings: CmcdSessionRequestReportConfig): void
 
 	/**
-	 * Sends the queue of each event target at once.
-	 * If a POST is in flight, the target sends after its response.
+	 * Sends the queue of each event target at once, also during a wait.
+	 * If a batch is in flight, the target sends after that batch completes.
+	 *
+	 * @example
+	 * {@includeCode ../test/createCmcdSession.delivery.test.ts#example}
 	 */
 	flush(): void
 }

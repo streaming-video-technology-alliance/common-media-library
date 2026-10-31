@@ -229,6 +229,14 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 export type CmcdEventReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C> | undefined) => Cmcd | null;
 
 // @public
+export type CmcdEventSender = (reports: readonly DeepReadonly<Cmcd & Required<Pick<Cmcd, "e" | "sid" | "sn" | "ts" | "v">>>[]) => Promise<CmcdEventSendResult | void>;
+
+// @public
+export type CmcdEventSendResult = {
+    readonly gone?: boolean;
+};
+
+// @public
 export type CmcdEventsValidationResult = CmcdValidationResult & {
     data: CmcdData[];
 };
@@ -543,10 +551,16 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 };
 
 // @public
-export type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, "transform"> & {
+export type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, "transform" | "url"> & {
     filter?: CmcdReportFilter;
     transform?: never;
-};
+} & ({
+    url: string;
+    send?: never;
+} | {
+    url?: never;
+    send: CmcdEventSender;
+});
 
 // @public
 export type CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, "transform"> & {
@@ -669,7 +683,7 @@ export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T;
 
 // @public
-export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+export function encodeCmcd(cmcd: DeepReadonly<Cmcd>, options?: CmcdEncodeOptions): string;
 
 // @public
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options: CmcdDecodeOptions & {

@@ -1,9 +1,12 @@
+import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
+import type { CmcdEventSender } from './CmcdEventSender.ts'
+import type { CmcdEventSendResult } from './CmcdEventSendResult.ts'
 import type { CmcdEventType } from './CmcdEventType.ts'
 import {
 	CMCD_EVENT_BACKGROUNDED_MODE,
@@ -18,6 +21,7 @@ import type { CmcdRequestReport } from './CmcdRequestReport.ts'
 import type { CmcdSessionRequestReportConfig } from './CmcdSessionRequestReportConfig.ts'
 import type { CmcdSession } from './CmcdSession.ts'
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
+import type { CmcdSessionEventReportConfig } from './CmcdSessionEventReportConfig.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -32,6 +36,10 @@ import { toTokenString } from './toTokenString.ts'
 
 type KeyFilter = CmcdEncodeOptions['filter']
 
+type Requester = (request: HttpRequest) => Promise<{ status: number }>
+
+type Batch = (string | Cmcd)[]
+
 type Waiting = {
 	bs: string[]
 	bsd: unknown[]
@@ -42,22 +50,29 @@ type Destination = {
 	sn: number
 	msdSent: boolean
 	waiting: Waiting
+	gone: boolean
 }
 
 type Draft = Pick<Destination, 'sn' | 'msdSent' | 'waiting'>
 
 type Target = {
-	url: string
 	destination: Destination
 	events: readonly CmcdEventType[]
 	keys: KeyFilter
 	batchSize: number
 	filter?: CmcdReportFilter
-	queue: string[]
+	copies: boolean
+	deliver: (batch: Batch) => Promise<number>
+	queue: Batch
+	urgent: boolean
 	inFlight: boolean
 	flushPending: boolean
+	delay: number
+	retry?: ReturnType<typeof setTimeout>
 }
 
+const MIN_DELAY = 1000
+const MAX_DELAY = 60_000
 const CMCD_HEADER = /^cmcd-(object|request|session|status)$/i
 
 function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
@@ -74,14 +89,60 @@ function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
 	return data
 }
 
+function copyValue(value: unknown): unknown {
+	if (Array.isArray(value)) {
+		return value.map(copyValue)
+	}
+
+	if (value instanceof SfItem) {
+		return new SfItem(copyValue(value.value), value.params && { ...value.params })
+	}
+
+	if (value instanceof SfToken) {
+		return new SfToken(value.description)
+	}
+
+	return value
+}
+
+function copyReport(report: Cmcd): Cmcd {
+	const copy: Record<string, unknown> = {}
+
+	for (const [key, value] of Object.entries(report)) {
+		copy[key] = copyValue(value)
+	}
+
+	return copy as Cmcd
+}
+
 function createDestination(): Destination {
-	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] } }
+	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false }
 }
 
 function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	const { url, ...init } = request
 
 	return fetch(url, init)
+}
+
+function toDeliver(
+	{ url, send }: CmcdSessionEventReportConfig,
+	requester: Requester,
+): Target['deliver'] {
+	if (url !== undefined) {
+		return batch =>
+			requester({
+				url,
+				method: 'POST',
+				headers: { 'Content-Type': CMCD_MIME_TYPE },
+				body: (batch as string[]).join('\n'),
+			}).then(response => response?.status ?? 0)
+	}
+
+	return batch =>
+		Promise.resolve(send?.(batch as Parameters<CmcdEventSender>[0])).then(result =>
+			(result as CmcdEventSendResult | undefined)?.gone ? 410 : 200,
+		)
 }
 
 /**
@@ -92,7 +153,7 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
  * @param config - The configuration of the session.
- * @param requester - Sends each batch of event reports. The default requester uses `fetch`.
+ * @param requester - Sends each batch of event reports to a target with a `url`. The default requester uses `fetch`.
  * @returns The session.
  *
  * @public
@@ -122,17 +183,19 @@ export function createCmcdSession(
 		const destination = createDestination()
 
 		destinations.push(destination)
-
 		targets.push({
-			url: target.url,
 			destination,
 			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
 			filter: target.filter,
+			copies: target.send !== undefined,
+			deliver: toDeliver(target, requester),
 			queue: [],
+			urgent: false,
 			inFlight: false,
 			flushPending: false,
+			delay: 0,
 		})
 	}
 
@@ -206,7 +269,7 @@ export function createCmcdSession(
 
 			if (draft) {
 				Object.assign(destination, draft)
-			} else {
+			} else if (!destination.gone) {
 				const { waiting } = destination
 
 				if (scoped.bs !== undefined) {
@@ -224,8 +287,18 @@ export function createCmcdSession(
 		}
 	}
 
+	function stopTarget(target: Target): void {
+		target.destination.gone = true
+		target.destination.waiting = { bs: [], bsd: [], ec: [] }
+		clearTimeout(target.retry)
+		target.retry = undefined
+		target.queue.length = 0
+		target.urgent = false
+		target.flushPending = false
+	}
+
 	function isReady(target: Target): boolean {
-		return target.queue.length >= target.batchSize
+		return target.queue.length >= target.batchSize || target.urgent
 	}
 
 	function send(target: Target, force?: boolean): void {
@@ -234,32 +307,56 @@ export function createCmcdSession(
 			return
 		}
 
-		if (!target.queue.length) {
+		if (target.destination.gone || !target.queue.length || (target.retry !== undefined && !force)) {
 			return
 		}
 
+		clearTimeout(target.retry)
+		target.retry = undefined
 		target.inFlight = true
 
-		const lines = target.queue.splice(0)
-		const request: HttpRequest = {
-			url: target.url,
-			method: 'POST',
-			headers: { 'Content-Type': CMCD_MIME_TYPE },
-			body: lines.join('\n'),
-		}
+		const batch = target.queue.splice(0)
+		const urgent = target.urgent
 
-		const settle = (): void => {
+		target.urgent = false
+
+		const settle = (status?: number): void => {
 			target.inFlight = false
+
+			if (status === 410) {
+				stopTarget(target)
+				return
+			}
+
+			if (target.destination.gone) {
+				return
+			}
+
+			// CTA-5004-B: back off after a 429 or 5xx response.
+			const failed =
+				status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
+
+			if (failed) {
+				target.queue.unshift(...batch)
+				target.urgent ||= urgent
+				target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
+				target.retry = setTimeout(() => {
+					target.retry = undefined
+					send(target)
+				}, target.delay)
+			} else {
+				target.delay = 0
+			}
 
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
-			} else if (isReady(target)) {
+			} else if (!failed && isReady(target)) {
 				send(target)
 			}
 		}
 
-		new Promise<{ status: number }>(resolve => resolve(requester(request))).then(settle, settle)
+		new Promise<number>(resolve => resolve(target.deliver(batch))).then(settle, () => settle())
 	}
 
 	function emit(
@@ -277,26 +374,31 @@ export function createCmcdSession(
 
 		const scoped = readScopedValues(report, ec)
 		const selected = targets.filter(
-			target => target.events.includes(type) && (!target.filter || target.filter(report, request)),
+			target =>
+				target.events.includes(type) &&
+				!target.destination.gone &&
+				(!target.filter || target.filter(report, request)),
 		)
 		const drafts = new Map<Destination, Draft>()
-		const lines = selected.map(target =>
-			encodePreparedCmcd(
-				build(
-					draftOf(drafts, target.destination),
-					report,
-					scoped,
-					CMCD_EVENT_MODE,
-					CMCD_V2,
-					target.keys,
-				),
-			),
-		)
+		const queued = selected.map(target => {
+			const prepared = build(
+				draftOf(drafts, target.destination),
+				report,
+				scoped,
+				CMCD_EVENT_MODE,
+				CMCD_V2,
+				target.keys,
+			)
+			const line = encodePreparedCmcd(prepared)
+
+			return target.copies ? copyReport(prepared) : line
+		})
 
 		commit(drafts, scoped)
 
 		selected.forEach((target, i) => {
-			target.queue.push(lines[i])
+			target.queue.push(queued[i])
+			target.urgent ||= type === CMCD_EVENT_ERROR
 
 			if (isReady(target)) {
 				send(target)
