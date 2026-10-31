@@ -246,6 +246,7 @@ The table maps each member of `CmcdReporter` to the session API. The example in 
 | The data store in `t` reports | `snapshot`, a function that returns `CmcdSnapshot` |
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
+| An error from the interval timer | `onError` in the configuration. Without `onError`, the error throws from the timer callback, as before. |
 | `isRequestReportingEnabled()` | No equivalent. The player calls `createRequestReport()` only for the requests that it reports. |
 | `applyRequestReport()`, deprecated | `createRequestReport()` |
 | `transform` on an event target, to drop reports | `filter` |
@@ -326,6 +327,7 @@ type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	cid?: string                                // used when a report has no cid
 	eventTargets?: readonly CmcdSessionEventReportConfig[]
 	snapshot?: () => CmcdSnapshot               // the data of each t report
+	onError?: (error: unknown) => void          // receives an error of a t report timer. Without it, the error throws from the timer callback
 }
 
 // The state of a player. The session writes e, sid, sn, ts, and v. The other keys describe one occurrence.
@@ -427,7 +429,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 
 - A filter that throws stops the report for every target, and the caller receives the error.
 - A value that the structured-field encoder cannot serialize throws from the call that produced it. The session checks the `bs`, `bsd`, and `ec` values of a call before they wait. A waiting value cannot fail a later report. A `send` target gets the same check. The session encodes the report and discards the line.
-- An error in a timer tick throws from the timer callback, as in `CmcdReporter` today. The source of the error is `snapshot()` or the encoder.
+- An error in a timer tick goes to `onError`. Without `onError`, the error throws from the timer callback, as in `CmcdReporter` today. The source of the error is `snapshot()`, a filter, or the encoder. The first `t` report of `start()` throws from `start()`, with or without `onError`. The methods of the session throw at their call site.
 - A failed send does not throw. The delivery table describes the result.
 
 `createCmcdSession()` checks the rules of the configuration that TypeScript types cannot express. It throws on an invalid value. Without these checks, an empty `url` would send the reports to the page URL. An `interval` of `Infinity` would run the tick without a pause.
