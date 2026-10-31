@@ -8,6 +8,19 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call, and the session keeps the sequence numbers, the queues, and the timers. The session guide and the migration guide describe the API
+- `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig`, the configuration types of a session. Both derive from the `CmcdReporter` types without `transform`. The `filter` of an event target selects the reports of the target
+- `CmcdEventSender` and `CmcdEventSendResult`. An event target has a collector `url` or a `send` function, for a transport that is not HTTP
+- `CmcdSnapshot`, the type of the player state. `snapshot` returns it for the `t` reports, and the player can pass it with each call. It rejects the keys that the session writes, `bs`, `bsd`, `ec`, and `cen`
+- `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` for the `h` event of CTA-5004-B
+
+### Changed
+
+- `enabledKeys` of `CmcdReportConfig` accepts a read-only array
+- `encodeCmcd()` accepts a deeply read-only object
+
 ## [2.8.4] - 2026-10-26
 
 ### Changed
