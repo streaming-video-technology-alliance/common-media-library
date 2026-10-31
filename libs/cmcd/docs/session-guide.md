@@ -294,7 +294,7 @@ A target has at most one batch in flight. Reports that arrive meanwhile wait in 
 
 The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. A promise that rejects, or a function that throws, counts as a rejected request. No result drops a batch. A function that cannot deliver a batch resolves.
 
-For a `send` target, the session copies the nested values of each report at queue time. A later change to the data of the caller does not change a queued report. The function must not change a report. The `DeepReadonly` type of `CmcdEventSender` rejects a change at any depth, as the type of `CmcdReportFilter` does.
+A queued report shares no list, `SfItem`, or parameter object with the data of the caller. A later change to the data of the caller does not change a queued report. The function must not change a report. The `DeepReadonly` type of `CmcdEventSender` rejects a change at any depth, as the type of `CmcdReportFilter` does.
 
 The wait starts at 1 second and doubles after each failure, up to 60 seconds. During the wait, new reports join the queue and go out with the retry. `flush()` sends at once, also during a wait. If a batch is in flight, `flush()` sends after that batch completes. `stop()` clears the wait timers together with the interval timers. After `stop()`, a failure starts no timer.
 
@@ -305,7 +305,7 @@ During a long outage of a collector, the queues of its targets grow without a li
 Each call builds and encodes all of its reports before it changes any state. A call that throws changes no sequence number, no waiting value, and no queue.
 
 - If a filter throws, no target receives the report, and the error goes to the caller.
-- A value that the structured field encoder cannot serialize throws from the call that has it. A `send` target gets the same check. The session encodes the report, discards the line, and queues a copy of the report.
+- A value that the structured field encoder cannot serialize throws from the call that has it. A `send` target gets the same check. The session encodes the report, discards the line, and queues the report.
 - An error in a timer tick, from `snapshot()` or from encoding, goes to the timer callback.
 - A failed send does not throw. The [delivery](#delivery) table describes what happens instead.
 

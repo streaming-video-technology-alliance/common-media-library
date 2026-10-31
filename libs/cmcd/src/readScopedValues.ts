@@ -1,4 +1,4 @@
-import { encodeSfDict, SfItem } from '@svta/cml-structured-field-values'
+import { encodeSfDict } from '@svta/cml-structured-field-values'
 import { CMCD_KEY_SPECS } from './CMCD_KEY_SPECS.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
@@ -46,9 +46,7 @@ function copyItems(value: unknown, key: 'bsd' | 'ec'): unknown[] | undefined {
 		reportingMode: CMCD_EVENT_MODE,
 	}) as unknown[] | undefined
 
-	return list?.map(item =>
-		item instanceof SfItem ? new SfItem(item.value, item.params && { ...item.params }) : item,
-	)
+	return list
 }
 
 /**

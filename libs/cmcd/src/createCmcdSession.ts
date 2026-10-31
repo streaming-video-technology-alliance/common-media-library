@@ -1,4 +1,3 @@
-import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
 import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
@@ -65,7 +64,7 @@ type Target = {
 	batchSize: number
 	interval: number
 	filter?: CmcdReportFilter
-	copies: boolean
+	reports: boolean
 	deliver: (batch: Batch) => Promise<number>
 	queue: Batch
 	urgent: boolean
@@ -96,32 +95,6 @@ function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
 
 function withoutStallKeys({ bs, bsd, ...data }: Cmcd): Cmcd {
 	return data
-}
-
-function copyValue(value: unknown): unknown {
-	if (Array.isArray(value)) {
-		return value.map(copyValue)
-	}
-
-	if (value instanceof SfItem) {
-		return new SfItem(copyValue(value.value), value.params && { ...value.params })
-	}
-
-	if (value instanceof SfToken) {
-		return new SfToken(value.description)
-	}
-
-	return value
-}
-
-function copyReport(report: Cmcd): Cmcd {
-	const copy: Record<string, unknown> = {}
-
-	for (const [key, value] of Object.entries(report)) {
-		copy[key] = copyValue(value)
-	}
-
-	return copy as Cmcd
 }
 
 function createDestination(): Destination {
@@ -204,7 +177,7 @@ export function createCmcdSession(
 			batchSize: target.batchSize ?? 1,
 			interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
 			filter: target.filter,
-			copies: target.send !== undefined,
+			reports: target.send !== undefined,
 			deliver: toDeliver(target, requester),
 			queue: [],
 			urgent: false,
@@ -412,7 +385,7 @@ export function createCmcdSession(
 			)
 			const line = encodePreparedCmcd(prepared)
 
-			return target.copies ? copyReport(prepared) : line
+			return target.reports ? prepared : line
 		})
 
 		commit(drafts, scoped)

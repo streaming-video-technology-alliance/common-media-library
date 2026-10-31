@@ -20,6 +20,7 @@ and this project adheres to
 
 - `enabledKeys` of `CmcdReportConfig` accepts a read-only array
 - `encodeCmcd()` accepts a deeply read-only object
+- `prepareCmcdData()` returns a copy. The result shares no list, `SfItem`, or parameter object with the input. Before, the result shared the parameter objects and the lists of custom keys with the input
 
 ## [2.8.4] - 2026-10-26
 
