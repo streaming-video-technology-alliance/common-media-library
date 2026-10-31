@@ -90,8 +90,9 @@ async function findBudgetPackages(): Promise<string[]> {
 
 async function loadPeers(pkg: string): Promise<string[]> {
 	const file = path.join(root, 'libs', pkg, 'package.json')
-	const { peerDependencies } = JSON.parse(await readFile(file, 'utf8'))
-	return Object.keys(peerDependencies ?? {})
+	const manifest: unknown = JSON.parse(await readFile(file, 'utf8'))
+	const peerDependencies = isRecord(manifest) ? manifest['peerDependencies'] : undefined
+	return isRecord(peerDependencies) ? Object.keys(peerDependencies) : []
 }
 
 async function measure(pkg: string, name: string, entry: Entry, peers: string[], tmp: string, id: string): Promise<Omit<Row, 'budget' | 'over'>> {
@@ -168,7 +169,15 @@ async function sizePackage(pkg: string, tmp: string, update: boolean): Promise<R
 		throw new Error(`${file} does not exist. Create the budget file for ${pkg}.`)
 	}
 
-	const data = JSON.parse(await readFile(absolute, 'utf8'))
+	const text = await readFile(absolute, 'utf8')
+	let data: unknown
+	try {
+		data = JSON.parse(text)
+	}
+	catch (error) {
+		throw new Error(`${file}: is not valid JSON. ${error instanceof Error ? error.message : String(error)}`)
+	}
+
 	const budget = parseBudget(file, data)
 
 	if (!await exists(path.join(root, 'libs', pkg, 'dist', 'index.js'))) {
