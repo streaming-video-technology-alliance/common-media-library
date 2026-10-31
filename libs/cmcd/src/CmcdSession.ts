@@ -111,6 +111,25 @@ export type CmcdSession = {
 	configure(settings: CmcdSessionRequestReportConfig): void
 
 	/**
+	 * Arms one timer for each event target that lists `t` and has an interval above 0.
+	 *
+	 * Each tick records a `t` report with the data from `snapshot()`.
+	 * Without `snapshot`, the method arms nothing.
+	 *
+	 * @param immediate - If `true`, the default, the first `t` report goes out at once. If `false`, it waits one interval.
+	 *
+	 * @example
+	 * {@includeCode ../test/createCmcdSession.timers.test.ts#example}
+	 */
+	start(immediate?: boolean): void
+
+	/**
+	 * Clears the interval timers and the wait timers of the event targets.
+	 * After `stop()`, a failed send starts no timer.
+	 */
+	stop(): void
+
+	/**
 	 * Sends the queue of each event target at once, also during a wait.
 	 * If a batch is in flight, the target sends after that batch completes.
 	 *

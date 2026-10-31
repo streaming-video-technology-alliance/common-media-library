@@ -1,5 +1,6 @@
 import type { CmcdSessionEventReportConfig } from './CmcdSessionEventReportConfig.ts'
 import type { CmcdSessionRequestReportConfig } from './CmcdSessionRequestReportConfig.ts'
+import type { CmcdSnapshot } from './CmcdSnapshot.ts'
 
 /**
  * The configuration of a CMCD session.
@@ -26,4 +27,10 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	 * Each target is one destination. It has its own sequence number, `msd` rule, and waiting values.
 	 */
 	eventTargets?: readonly CmcdSessionEventReportConfig[]
+
+	/**
+	 * Returns the data of each `t` report. The other reports use only the data of their call.
+	 * Without `snapshot`, `start()` arms no timer.
+	 */
+	snapshot?: () => CmcdSnapshot
 }

@@ -1,6 +1,7 @@
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
 import { uuid } from '@svta/cml-utils'
+import { CMCD_DEFAULT_TIME_INTERVAL } from './CMCD_DEFAULT_TIME_INTERVAL.ts'
 import { CMCD_MIME_TYPE } from './CMCD_MIME_TYPE.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
@@ -12,6 +13,7 @@ import {
 	CMCD_EVENT_BACKGROUNDED_MODE,
 	CMCD_EVENT_ERROR,
 	CMCD_EVENT_RESPONSE_RECEIVED,
+	CMCD_EVENT_TIME_INTERVAL,
 } from './CmcdEventType.ts'
 import type { CmcdKey } from './CmcdKey.ts'
 import type { CmcdReportFilter } from './CmcdReportFilter.ts'
@@ -60,6 +62,7 @@ type Target = {
 	events: readonly CmcdEventType[]
 	keys: KeyFilter
 	batchSize: number
+	interval: number
 	filter?: CmcdReportFilter
 	copies: boolean
 	deliver: (batch: Batch) => Promise<number>
@@ -69,6 +72,7 @@ type Target = {
 	flushPending: boolean
 	delay: number
 	retry?: ReturnType<typeof setTimeout>
+	timer?: ReturnType<typeof setInterval>
 }
 
 const MIN_DELAY = 1000
@@ -86,6 +90,10 @@ function toKeyFilter(keys: readonly CmcdKey[] | undefined): KeyFilter {
 }
 
 function withoutScopedKeys({ msd, bs, bsd, ec, ...data }: Cmcd): Cmcd {
+	return data
+}
+
+function withoutStallKeys({ bs, bsd, ...data }: Cmcd): Cmcd {
 	return data
 }
 
@@ -178,6 +186,7 @@ export function createCmcdSession(
 	const targets: Target[] = []
 	let requestKeys = toKeyFilter(settings.enabledKeys)
 	let msd: number | undefined
+	let stopped = false
 
 	for (const target of config.eventTargets ?? []) {
 		const destination = createDestination()
@@ -188,6 +197,7 @@ export function createCmcdSession(
 			events: [...(target.events ?? [])],
 			keys: toKeyFilter(target.enabledKeys),
 			batchSize: target.batchSize ?? 1,
+			interval: target.interval ?? CMCD_DEFAULT_TIME_INTERVAL,
 			filter: target.filter,
 			copies: target.send !== undefined,
 			deliver: toDeliver(target, requester),
@@ -290,7 +300,9 @@ export function createCmcdSession(
 	function stopTarget(target: Target): void {
 		target.destination.gone = true
 		target.destination.waiting = { bs: [], bsd: [], ec: [] }
+		clearInterval(target.timer)
 		clearTimeout(target.retry)
+		target.timer = undefined
 		target.retry = undefined
 		target.queue.length = 0
 		target.urgent = false
@@ -340,10 +352,13 @@ export function createCmcdSession(
 				target.queue.unshift(...batch)
 				target.urgent ||= urgent
 				target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
-				target.retry = setTimeout(() => {
-					target.retry = undefined
-					send(target)
-				}, target.delay)
+
+				if (!stopped) {
+					target.retry = setTimeout(() => {
+						target.retry = undefined
+						send(target)
+					}, target.delay)
+				}
 			} else {
 				target.delay = 0
 			}
@@ -363,6 +378,7 @@ export function createCmcdSession(
 		type: CmcdEventType,
 		data: Cmcd,
 		request?: DeepReadonly<HttpRequest>,
+		candidates: readonly Target[] = targets,
 		ec?: readonly string[],
 	): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
@@ -373,7 +389,7 @@ export function createCmcdSession(
 		}
 
 		const scoped = readScopedValues(report, ec)
-		const selected = targets.filter(
+		const selected = candidates.filter(
 			target =>
 				target.events.includes(type) &&
 				!target.destination.gone &&
@@ -466,12 +482,53 @@ export function createCmcdSession(
 		recordError(codes, data = {}) {
 			const ec = typeof codes === 'string' ? [codes] : [...codes]
 
-			emit(CMCD_EVENT_ERROR, { ...data, ec }, undefined, ec)
+			emit(CMCD_EVENT_ERROR, { ...data, ec }, undefined, targets, ec)
 		},
 
 		configure(next) {
 			Object.assign(settings, next)
 			requestKeys = toKeyFilter(settings.enabledKeys)
+		},
+
+		start(immediate = true) {
+			const { snapshot } = config
+			const ticks: (() => void)[] = []
+
+			stopped = false
+
+			for (const target of targets) {
+				clearInterval(target.timer)
+				target.timer = undefined
+
+				if (
+					snapshot &&
+					target.interval > 0 &&
+					!target.destination.gone &&
+					target.events.includes(CMCD_EVENT_TIME_INTERVAL)
+				) {
+					const tick = (): void =>
+						emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
+
+					target.timer = setInterval(tick, target.interval * 1000)
+
+					if (immediate) {
+						ticks.push(tick)
+					}
+				}
+			}
+
+			ticks.forEach(tick => tick())
+		},
+
+		stop() {
+			stopped = true
+
+			for (const target of targets) {
+				clearInterval(target.timer)
+				clearTimeout(target.retry)
+				target.timer = undefined
+				target.retry = undefined
+			}
 		},
 
 		flush() {

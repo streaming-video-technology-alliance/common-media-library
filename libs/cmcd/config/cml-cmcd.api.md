@@ -540,6 +540,8 @@ export type CmcdSession = {
     recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, "sid" | "sn" | "e" | "v" | "ec">): void;
     recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, "sid" | "sn" | "e" | "v" | "ec">): void;
     configure(settings: CmcdSessionRequestReportConfig): void;
+    start(immediate?: boolean): void;
+    stop(): void;
     flush(): void;
 };
 
@@ -548,6 +550,7 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
     sid?: string;
     cid?: string;
     eventTargets?: readonly CmcdSessionEventReportConfig[];
+    snapshot?: () => CmcdSnapshot;
 };
 
 // @public
@@ -565,6 +568,19 @@ export type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, "transfor
 // @public
 export type CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, "transform"> & {
     transform?: never;
+};
+
+// @public
+export type CmcdSnapshot = Omit<CmcdEvent, "bs" | "bsd" | "cen" | "e" | "ec" | "sid" | "sn" | "ts" | "v"> & {
+    bs?: never;
+    bsd?: never;
+    cen?: never;
+    e?: never;
+    ec?: never;
+    sid?: never;
+    sn?: never;
+    ts?: never;
+    v?: never;
 };
 
 // @public
