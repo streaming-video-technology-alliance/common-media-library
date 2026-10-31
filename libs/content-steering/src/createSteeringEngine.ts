@@ -266,7 +266,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			},
 			(cause: unknown) => {
 				if (token === session) {
-					retry({ type: STEERING_ERROR_TYPE_LOAD, url, cause, message: `The Steering Manifest request to ${url} failed.` })
+					retry({ type: STEERING_ERROR_TYPE_LOAD, url, cause, message: `The Steering Manifest request failed.` })
 				}
 			},
 		)
@@ -282,7 +282,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 	function receive(url: string, response: HttpResponse, requestGeneration: number): void {
 		if (typeof response !== 'object' || response === null) {
-			retry({ type: STEERING_ERROR_TYPE_LOAD, url, message: `The Steering Manifest request to ${url} did not return a response object.` })
+			retry({ type: STEERING_ERROR_TYPE_LOAD, url, message: `The requester did not return a response object.` })
 			return
 		}
 
@@ -314,10 +314,10 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 		if (status === 410) {
 			if (stale) {
-				retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410 for ${url}.` }, 0)
+				retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410.` }, 0)
 			} else {
 				end()
-				report({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410 for ${url}. No request follows.` })
+				report({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 410. No request follows.` })
 
 				if (!loaded && !manualPriority) {
 					fallback()
@@ -333,11 +333,11 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				ttl = Math.max(retryAfter / 1000, MIN_TTL)
 			}
 
-			retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 429 for ${url}.` }, retryAfter)
+			retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The steering server returned status 429.` }, retryAfter)
 			return
 		}
 
-		retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The Steering Manifest request to ${url} failed with status ${status}.` })
+		retry({ type: STEERING_ERROR_TYPE_LOAD, url, status, message: `The Steering Manifest request failed with status ${status}.` })
 	}
 
 	function apply(manifest: SteeringManifest, list: readonly string[], clones: readonly unknown[], reloadUri: string | undefined, responseUrl: string): void {

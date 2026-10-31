@@ -217,6 +217,16 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
 		})
 
+		it('names the finite rule in the message for a TTL that is not finite', async () => {
+			const data = '{"VERSION":1,"TTL":1e400,"PATHWAY-PRIORITY":["CDN-B","CDN-A"]}'
+			const { engine, errors } = setup('hls', { status: 200, data })
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].message, 'The Steering Manifest has no positive, finite TTL.')
+		})
+
 		it('keeps the previous state after an invalid Steering Manifest', async () => {
 			const { engine, errors } = setup('hls', manifestResponse(MANIFEST), manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': [] }))
 
@@ -237,6 +247,16 @@ describe('createSteeringEngine responses', () => {
 
 			equal(errors[0].type, 'parse')
 			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
+		})
+
+		it('writes a string VERSION with quotes in the message', async () => {
+			const data = JSON.stringify({ ...MANIFEST, VERSION: '1' })
+			const { engine, errors } = setup('hls', { status: 200, data })
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].message, 'The Steering Manifest has VERSION "1", not 1.')
 		})
 
 		it('reports a parse error and retries when the DASH response body is a Uint8Array', async () => {

@@ -43,29 +43,29 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 		try {
 			value = JSON.parse(data)
 		} catch (cause) {
-			return { error: `The Steering Manifest from ${uri} is not valid JSON.`, version: false, cause }
+			return { error: `The Steering Manifest is not valid JSON.`, version: false, cause }
 		}
 	}
 
 	if (!isPlainObject(value)) {
-		return { error: `The Steering Manifest from ${uri} is not a JSON object.`, version: false }
+		return { error: `The Steering Manifest is not a JSON object.`, version: false }
 	}
 
 	const manifest = value as SteeringManifest
 
 	if (manifest.VERSION !== 1) {
-		return { error: `The Steering Manifest from ${uri} has VERSION ${String(manifest.VERSION)}. Only VERSION 1 is supported.`, version: true }
+		return { error: `The Steering Manifest has VERSION ${JSON.stringify(manifest.VERSION)}, not 1.`, version: true }
 	}
 
 	if (typeof manifest.TTL !== 'number' || !Number.isFinite(manifest.TTL) || manifest.TTL <= 0) {
-		return { error: `The Steering Manifest from ${uri} has no positive TTL.`, version: false }
+		return { error: `The Steering Manifest has no positive, finite TTL.`, version: false }
 	}
 
 	const list: unknown = manifest['PATHWAY-PRIORITY']
 	const priority = Array.isArray(list) ? uniqueStrings(list) : []
 
 	if (priority.length === 0) {
-		return { error: `The Steering Manifest from ${uri} has no pathway in PATHWAY-PRIORITY.`, version: false }
+		return { error: `The Steering Manifest has no pathway in PATHWAY-PRIORITY.`, version: false }
 	}
 
 	const cloneList: unknown = manifest['PATHWAY-CLONES']
@@ -83,7 +83,7 @@ export function parseSteeringManifest(data: unknown, uri: string): ParsedSteerin
 
 		return { manifest, priority, clones, reloadUri: new URL(reload, uri).href }
 	} catch (cause) {
-		return { error: `The RELOAD-URI ${JSON.stringify(reload)} of the Steering Manifest from ${uri} does not resolve.`, version: false, cause }
+		return { error: `The RELOAD-URI ${JSON.stringify(reload)} does not resolve.`, version: false, cause }
 	}
 }
 
