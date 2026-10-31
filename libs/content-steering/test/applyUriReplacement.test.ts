@@ -33,8 +33,24 @@ describe('applyUriReplacement', () => {
 		equal(uri, 'https://b.example.com/video/seg/1.m4s')
 	})
 
-	it('returns the resolved URI for an empty replacement', () => {
-		equal(applyUriReplacement('1.m4s', {}, { baseUri: 'https://a.example.com/v/' }), 'https://a.example.com/v/1.m4s')
+	it('does not resolve a relative URI for an empty replacement', () => {
+		equal(applyUriReplacement('1.m4s', {}, { baseUri: 'https://a.example.com/v/' }), '1.m4s')
+	})
+
+	it('returns a URI that is not canonical unchanged when no replacement applies', () => {
+		const uri = 'https://CDN.example.com:443/video/../seg/1.m4s'
+
+		equal(applyUriReplacement(uri, {}), uri)
+	})
+
+	it('treats an empty PARAMS object as no PARAMS', () => {
+		const uri = 'https://CDN.example.com:443/video/../seg/1.m4s'
+
+		equal(applyUriReplacement(uri, { PARAMS: {} }), uri)
+	})
+
+	it('returns a relative URI unchanged when no replacement applies', () => {
+		equal(applyUriReplacement('seg/1.m4s', {}), 'seg/1.m4s')
 	})
 
 	it('replaces a query parameter of the same name at its position', () => {
@@ -131,6 +147,10 @@ describe('applyUriReplacement', () => {
 	describe('errors', () => {
 		it('throws when uri is relative and baseUri is absent', () => {
 			throws(() => applyUriReplacement('x/1.m4s', { HOST: 'b.example.com' }), { name: 'TypeError', message: /uri/ })
+		})
+
+		it('throws when uri is relative, baseUri is absent, and PARAMS has a key', () => {
+			throws(() => applyUriReplacement('seg/1.m4s', { PARAMS: { token: '1' } }), { name: 'TypeError', message: /uri must be absolute/ })
 		})
 
 		it('throws when HOST has a port', () => {

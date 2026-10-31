@@ -27,13 +27,15 @@ export type UriReplacementOptions = {
 
 /**
  * Builds a URI of a pathway clone from a URI of its base pathway.
+ * If the replacement has no `HOST` and no `PARAMS` entries, the function returns `uri` unchanged.
  *
  * @param uri - A URI of the base pathway.
  * @param replacement - The `URI-REPLACEMENT` object of the pathway clone.
  * @param options - The base URI and the HLS stable IDs.
- * @returns The absolute URI of the pathway clone.
+ * @returns The absolute URI of the pathway clone, or `uri` unchanged.
  *
- * @throws TypeError when `uri` is relative and `baseUri` is absent, or when `HOST` is not a hostname without a port.
+ * @throws TypeError when `HOST` is not a hostname without a port.
+ * @throws TypeError when `uri` is relative, `baseUri` is absent, and `HOST` or a `PARAMS` entry applies.
  *
  * @example
  * {@includeCode ../test/applyUriReplacement.test.ts#example}
@@ -51,8 +53,13 @@ export function applyUriReplacement(uri: string, replacement: UriReplacement, op
 		return override
 	}
 
-	const url = toUrl(uri, options?.baseUri)
 	const { HOST, PARAMS } = replacement
+
+	if (HOST === undefined && (!PARAMS || Object.keys(PARAMS).length === 0)) {
+		return uri
+	}
+
+	const url = toUrl(uri, options?.baseUri)
 
 	if (HOST !== undefined) {
 		const hostname = toHostname(HOST)
