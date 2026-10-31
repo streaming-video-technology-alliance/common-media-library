@@ -12,6 +12,17 @@
 
 **Status of the code in this plan:** every code block in Phase 1 is the code of a local prototype. The prototype implements RFC v3. It passed 124 package tests, `eslint`, `npm run typecheck` after a full build, and the tree-shaking probe of Task 3. A Babel loose ES5 build of it also passed a penalty test (`integration.md`, Findings outside the API).
 
+**Status after execution (2026-10-30):** Phases 1 and 2 are complete on this branch, and the code of the branch replaces the Phase 1 code blocks below. The reviews of Phase 1 changed the engine in these ways:
+
+- `update({ pathways })` only removes clones, and a refused clone cannot be a base.
+- A response to an older steering URI does not apply its RELOAD-URI and does not end steering.
+- The end of steering keeps a list from `update({ priority })`.
+- The engine waits at least 1 second between requests, and a Retry-After delay must be positive and finite.
+- A requester result must be an object, with a string or a plain object as `data`.
+- Pathway IDs are percent-encoded in the query.
+- A per-variant or per-rendition URI must be absolute.
+ Three size trims followed: short error messages, `requester` is required and `fetchRequester` is a public export, and a regex replaces unpaired surrogates. The package has 154 tests and a size budget in `config/size-budget.json`. The "Spike results" table of `integration.md` has the Phase 2 results. Phase 3 is in progress: RFC v4 waits for the maintainer.
+
 ## Global Constraints
 
 - The public API is the export list of RFC v3 and nothing more: `createSteeringEngine`, `applyUriReplacement`, `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH`, `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, `STEERING_ERROR_TYPE_CALLBACK`, and the types `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError`, and `UriReplacementOptions`.
