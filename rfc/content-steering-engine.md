@@ -14,16 +14,17 @@ status: draft
 
 ## Summary
 
-Add a content steering engine to `@svta/cml-content-steering`. The engine implements the client side of Pathway-based Content Steering for HLS and DASH players. It requests the Steering Manifest, schedules the next request, and selects the pathway that the player must apply. The player keeps its own model of the content. The player applies the selected pathway, creates the pathway clones, and reports the pathways that fail. A second new function, `applyUriReplacement`, builds the URIs of a clone.
+Add a content steering engine to `@svta/cml-content-steering`. The engine implements the client side of Pathway-based Content Steering for HLS and DASH players. It requests the Steering Manifest, schedules the next request, and selects the pathway that the player must apply. The player keeps its own model of the content. The player applies the selected pathway, creates the pathway clones, and reports the pathways that fail. A second new function, `applyUriReplacement`, builds the URIs of a clone. A third new function, `fetchRequester`, is a requester that uses `fetch`.
 
 ```ts
-import { createSteeringEngine } from '@svta/cml-content-steering'
+import { createSteeringEngine, fetchRequester } from '@svta/cml-content-steering'
 
 const engine = createSteeringEngine({
 	protocol: 'hls',
 	uri: 'https://steering.example.com/manifest?video=42',
 	pathways: ['CDN-A', 'CDN-B'],
 	pathway: 'CDN-A',
+	requester: fetchRequester,
 	getThroughput: () => 6000000,
 	onPathwayChange: (pathway) => console.log(`apply ${pathway}`),
 })
@@ -70,7 +71,7 @@ Create one engine for each Content Description that declares content steering. T
 `getThroughput` returns the throughput estimate of the player for a pathway, in bits per second.
 
 ```ts
-import { createSteeringEngine } from '@svta/cml-content-steering'
+import { createSteeringEngine, fetchRequester } from '@svta/cml-content-steering'
 
 // abr and player are objects of the media player
 const engine = createSteeringEngine({
@@ -79,6 +80,7 @@ const engine = createSteeringEngine({
 	pathways: ['alpha', 'beta'],
 	pathway: 'alpha',
 	queryBeforeStart: true,
+	requester: fetchRequester,
 	getThroughput: (pathway) => abr.getEstimate(pathway),
 	onManifest: (manifest, clones) => player.addClones(clones),
 	onPathwayChange: (pathway) => player.applyPathway(pathway),
@@ -102,7 +104,9 @@ The engine selects a pathway after each Steering Manifest, after each penalty, a
 
 ### Update the pathways
 
-A DASH MPD update can add service locations or change the steering URI. Call `update()` with the new values. The engine keeps its penalties, its clones, and its request schedule.
+A DASH MPD update can add service locations or change the steering URI. Call `update()` with the new values. The engine keeps its penalties and its request schedule. It also keeps the accepted clones whose base pathway is still known. A clone that becomes valid through `update()` waits for the next Steering Manifest. After the end of steering (see Responses), a new `uri` sends a request at once.
+
+For DASH, `pathways` are the `@serviceLocation` values of the MPD. If the list also holds the clone IDs, the engine ignores those clones, because a clone ID must not be a pathway ID.
 
 ```ts
 engine.update({ pathways: ['alpha', 'beta', 'gamma'] })
@@ -111,7 +115,7 @@ engine.update({ uri: 'https://steering2.example.com/dash?video=42' })
 
 ### Create clones
 
-A Steering Manifest can define pathway clones. A clone copies an existing pathway and changes the host or the query parameters of its URIs. The engine checks the clones and passes the valid clones to `onManifest`. The player adds each clone to its own model and builds the URIs with `applyUriReplacement`. The engine calls `onManifest` before `onPathwayChange`, so a clone exists before the engine selects it. If the player cannot build a clone, `acceptClone` returns `false` for it, and the engine ignores the clone.
+A Steering Manifest can define pathway clones. A clone copies an existing pathway and changes the host or the query parameters of its URIs. The engine does not create clones. It checks them and makes their IDs selectable. The engine passes the valid clones to `onManifest`. The player creates each clone in its own model and builds the URIs with `applyUriReplacement`. The engine calls `onManifest` before `onPathwayChange`, so a clone exists before the engine selects it. If the player cannot create a clone, `acceptClone` returns `false` for it, and the engine ignores the clone.
 
 The example uses the clone example of the base spec, section 8.2:
 
@@ -157,7 +161,7 @@ For DASH, put the `PARAMS` of a clone on the final request URI of each segment. 
 
 ### Report a failed pathway
 
-If all URIs of the selected pathway fail, call `penalize()`. The engine excludes that pathway for the penalty duration and selects the next pathway in the priority list. When the penalty ends, the engine selects again, so the player can return to the preferred pathway. `penalize()` also works before the first Steering Manifest, with the fallback priority list.
+If all URIs of the selected pathway fail, call `penalize()`. The engine excludes that pathway for the penalty duration and selects the next pathway in the priority list. When the penalty ends, the engine selects again, so the player can return to the preferred pathway. `penalize()` also works before the first Steering Manifest, with the fallback priority list. A player may also call `penalize()` inside `onPathwayChange`, to refuse a pathway that it cannot play. Penalties describes the call order.
 
 ```ts
 engine.penalize() // the selected pathway
@@ -184,7 +188,7 @@ function onError(error) {
 
 ### Stop and resume
 
-`stop()` cancels the timers and ignores any response that arrives later. The engine keeps its state. `start()` resumes, and the next request waits until its scheduled time. The base spec requires a player to wait TTL seconds between requests. When the player unloads the content, call `stop()` and release the engine.
+`stop()` cancels the timers and ignores any response that arrives later. The engine keeps its state. `start()` resumes, and the next request waits until its scheduled time. The base spec requires a player to wait TTL seconds between requests. If the player must not send requests while the media is ended or detached, call `stop()` in that state. Call `start()` when playback resumes. If a request is overdue, `start()` sends it at once. When the player unloads the content, call `stop()` and release the engine.
 
 ## Reference-level explanation
 
@@ -194,6 +198,7 @@ function onError(error) {
 |---|---|
 | `createSteeringEngine` | function |
 | `applyUriReplacement` | function |
+| `fetchRequester` | function |
 | `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH` | constants and type |
 | `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, `STEERING_ERROR_TYPE_CALLBACK` | constants and type |
 | `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError` | types |
@@ -211,7 +216,7 @@ type SteeringEngineConfig = {
 	pathway?: string                                        // the pathway that the player applies now
 	penalty?: number                                        // milliseconds. See Penalties
 	queryBeforeStart?: boolean                              // no steering parameters on the first request
-	requester?: SteeringRequester                           // default: fetch
+	requester: SteeringRequester
 	getThroughput?: (pathway: string) => number | undefined // bits per second
 	getReportedPathways?: () => readonly string[]           // DASH only. See Requests
 	acceptClone?: (clone: PathwayClone) => boolean          // false: the engine ignores the clone
@@ -228,6 +233,7 @@ type SteeringEngineConfig = {
 - `pathways` is empty, or it contains a value that is not a string.
 - `pathway` is not in `pathways`.
 - `penalty` is negative or not finite.
+- `requester` is not a function.
 
 The checks of `uri` and `pathways` depend on the Content Description. A player must catch the `TypeError` when the Content Description has, for example, no service locations.
 
@@ -250,9 +256,9 @@ type SteeringEngine = {
 
 `update()` is the only method that changes the inputs of the engine. It has three optional values:
 
-- `pathways` replaces the pathway IDs of the Content Description. The engine checks the clones of the current Steering Manifest again. Before the first valid Steering Manifest, it also builds the fallback priority list again.
-- `uri` replaces the steering URI and the stored RELOAD-URI, at the next scheduled request. A `uri` equal to the configured one has no effect. After a 410, a new `uri` sends a request at once, because the base spec forbids more requests only for "that URI" (step 7A).
-- `priority` replaces the priority list until the next valid Steering Manifest. The engine applies it after `pathways`.
+- `pathways` replaces the pathway IDs of the Content Description. The engine keeps the accepted clones whose base pathway is still known. A clone that becomes valid through this call waits for the next Steering Manifest. So a clone always reaches the player through `onManifest` before the engine can select it. Before the first valid Steering Manifest, the engine also builds the fallback priority list again.
+- `uri` replaces the steering URI and the stored RELOAD-URI, at the next scheduled request. A `uri` equal to the configured one has no effect. After the end of steering, a new `uri` sends a request at once. For a 410, the base spec forbids more requests only for "that URI" (step 7A). Responses describes a response to a request that the engine sent before the change.
+- `priority` replaces the priority list until the next valid Steering Manifest. The engine applies it after `pathways`. The end of steering keeps this list (see Responses).
 
 `update()` throws a `TypeError` for the same `uri` and `pathways` values as `createSteeringEngine()`, and for a `priority` that is not an array of strings.
 
@@ -262,14 +268,16 @@ type SteeringEngine = {
 type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>
 ```
 
-The engine calls the requester with `url`, `method: 'GET'`, and `responseType: 'text'`. It reads `status`, `headers`, `data`, and `url` from the response:
+The engine calls the requester with `url`, `method: 'GET'`, and `responseType: 'text'`. The promise of the requester resolves to an object, the response. The engine reads `status`, `headers`, `data`, and `url` from the response:
 
-- `data` is the response body, as a string or as a parsed JSON value.
-- Header names match without regard to case.
+- `data` is the response body: the response text, or a plain object of parsed JSON.
+- Header names match without regard to letter case.
 - `url` is the final URI after redirects. If `url` is absent, the engine uses the request URI.
 - A response without `status` counts as status 200.
 
-The default requester uses `fetch`. A `Requester` function from `@svta/cml-request` has a compatible type. For a steering server on another origin, a browser exposes `Retry-After` only if the server lists the header in `Access-Control-Expose-Headers`.
+The promise must settle, also when the player aborts the request. If the promise never settles, the engine sends no more requests until `stop()` and `start()`. So a player sets a timeout in its requester.
+
+`fetchRequester` is a requester that uses `fetch`. A player passes its own requester to use its network stack, its request hooks, and its CMCD data. A `Requester` function from `@svta/cml-request` has a compatible type. For a steering server on another origin, a browser exposes `Retry-After` only if the server lists the header in `Access-Control-Expose-Headers`.
 
 The first request uses `uri`. Each later request uses the RELOAD-URI of the last valid Steering Manifest. If that Steering Manifest has no RELOAD-URI, the request uses the previous URI. A relative RELOAD-URI resolves against the URI of the response that contains it.
 
@@ -282,6 +290,7 @@ The engine adds two query parameters for the protocol:
 
 - For DASH, the list of reported pathways is the result of `getReportedPathways`. Without that function, the list has every pathway that was selected at any time since the previous request, in order.
 - The engine omits the pathway parameter when the list is empty, or for HLS when `pathway` is undefined.
+- The engine percent-encodes each pathway ID in `_HLS_pathway` and `_DASH_pathway`, before it joins the IDs with commas inside the quotes. An ID of ASCII letters, digits, `_`, `.`, and `-` does not change.
 - The engine omits the throughput parameter when no listed pathway has a throughput. A pathway has no throughput when `getThroughput` returns `undefined`, a negative value, or a value that is not finite.
 - The engine rounds each throughput to an integer.
 - Each parameter replaces a parameter of the same name in the URI. The engine keeps all other parts of the URI unchanged.
@@ -294,22 +303,24 @@ The engine adds two query parameters for the protocol:
 |---|---|---|
 | Status 2xx with a valid Steering Manifest | applies the Steering Manifest | after TTL seconds |
 | Status 2xx with an invalid Steering Manifest | reports a `parse` error and keeps its state | after the previous TTL |
+| Status 2xx with a body that is neither a string nor a plain object | reports a `parse` error and keeps its state | after the previous TTL |
 | Status 2xx with a VERSION other than 1, for DASH | reports a `parse` error and uses the fallback priority list (DASH spec, step 11) | none |
 | Status 410 | reports a `load` error | none |
-| Status 429 with a valid Retry-After | reports a `load` error. For DASH, the TTL becomes the Retry-After value (DASH spec, step 18) | after the Retry-After delay |
+| Status 429 with a valid Retry-After | reports a `load` error. For DASH, the TTL becomes the Retry-After delay, with a minimum of 1 second (DASH spec, step 18) | after the Retry-After delay |
 | Any other status, or a network error | reports a `load` error and keeps its state | after the previous TTL |
+| The promise of the requester resolves to a value that is not an object | reports a `load` error and keeps its state | after the previous TTL |
 
 A Steering Manifest is valid when all of these conditions are true:
 
 - The body parses as a JSON object.
 - VERSION is 1. For DASH, a missing VERSION counts as a VERSION other than 1 (base spec, section 4).
-- TTL is a positive number.
+- TTL is a positive, finite number. The engine never uses a TTL below 1 second, so a TTL below 1 counts as 1. The Steering Manifest stays valid. No spec defines a minimum, and the base spec and the DASH spec allow a longer wait.
 - PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values.
 - A relative RELOAD-URI resolves.
 
 An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
 
-Until the first valid Steering Manifest, the previous TTL is `DEFAULT_TTL`. Retry-After can be a number of seconds, or an HTTP date that ends in `GMT`. A 429 without a valid Retry-After gets the same action as any other status.
+Until the first valid Steering Manifest, the previous TTL is `DEFAULT_TTL`. Retry-After can be a number of seconds, or an HTTP date that ends in `GMT`. A Retry-After value is valid only when its delay is positive and finite. A 429 without a valid Retry-After gets the same action as any other status.
 
 The engine applies a valid Steering Manifest in this order:
 
@@ -318,7 +329,9 @@ The engine applies a valid Steering Manifest in this order:
 3. It calls `onManifest` with the accepted clones.
 4. It selects a pathway.
 
-After a 410, the engine keeps the priority list of the last valid Steering Manifest (base spec, step 7A). If no valid Steering Manifest arrived, the engine uses the fallback priority list: the selected pathway first, then `pathways` in their order.
+A 410, and a VERSION other than 1 for DASH, end steering: the engine sends no more requests. If the priority list comes from `update({ priority })`, the end of steering keeps it. Otherwise, after a 410, the engine keeps the priority list of the last valid Steering Manifest (base spec, step 7A). If no valid Steering Manifest arrived, the engine uses the fallback priority list: the selected pathway first, then `pathways` in their order. A VERSION other than 1 for DASH keeps a list from `update({ priority })` and the clones of the last valid Steering Manifest. Without such a list, the engine drops the clones and uses the fallback priority list.
+
+A response to a request that the engine sent before `update({ uri })` changed the URI applies its Steering Manifest, but not its RELOAD-URI. A 410 or a VERSION other than 1 for DASH in such a response does not end steering. Instead, the engine requests the current URI at once.
 
 ```ts
 type SteeringError =
@@ -356,20 +369,20 @@ A pathway is known when `pathways` contains it, or when it is an accepted clone 
 
 Before the first valid Steering Manifest, the priority list is the fallback priority list when `pathway` is set. Without `pathway`, the list is empty, so the engine selects nothing before the first Steering Manifest.
 
-`priority` returns the selected pathway first, then the other pathways of the priority list that are known and not penalized, in order.
+`priority` returns the selected pathway first, then the other pathways of the priority list that are known and not penalized, in order. When every other pathway is penalized, `priority` holds only the selected pathway. A player that needs more pathways for failover in that case keeps its own list of all pathways.
 
 ### Clones
 
 The engine checks the clones of each valid Steering Manifest in array order. A clone is valid when all of these conditions are true:
 
 - The clone has a string `ID`, a string `BASE-ID`, and a `URI-REPLACEMENT` object (`isValidPathwayClone`).
-- `BASE-ID` is a known pathway or the `ID` of an earlier valid clone.
+- `BASE-ID` is a known pathway or the `ID` of an earlier accepted clone.
 - `ID` is a legal pathway ID (base spec, section 2).
-- No pathway in `pathways` and no earlier valid clone has the same `ID`.
+- No pathway in `pathways` and no earlier accepted clone has the same `ID`.
 - `HOST` is absent, or it is a hostname without a port.
 - Each `PARAMS` name is not empty, and each value is a string.
 
-The engine ignores a clone that is not valid, and a valid clone that `acceptClone` refuses. Only the clones of the current Steering Manifest are known (base spec, section 5). If a later Steering Manifest omits a clone, the engine stops selecting it. If a clone keeps its `ID` but changes its `URI-REPLACEMENT`, the player must build the URIs again. The player finds the change by comparing the clones of `onManifest`.
+The engine ignores a clone that is not valid, and a valid clone that `acceptClone` refuses. A refused clone cannot be the base of a later clone. When `acceptClone` throws, the engine refuses the clone, and the exception follows the rules of Callback errors. Only the clones of the current Steering Manifest are known (base spec, section 5). If a later Steering Manifest omits a clone, the engine stops selecting it. If a clone keeps its `ID` but changes its `URI-REPLACEMENT`, the player must build the URIs again. The player finds the change by comparing the clones of `onManifest`.
 
 ### Penalties
 
@@ -381,6 +394,8 @@ The engine ignores a clone that is not valid, and a valid clone that `acceptClon
 | DASH | the TTL of the last valid Steering Manifest (DASH spec, step 19), or `DEFAULT_TTL` |
 
 The `penalty` property of the configuration replaces the default for both protocols. A new Steering Manifest does not end a penalty, and `update()` does not end a penalty either. When a penalty ends, the engine selects a pathway again (base spec, step 4). A second call for the same pathway restarts its penalty.
+
+A player may call `penalize()` inside `onPathwayChange`. The engine then applies the penalty and selects again at once, inside that `onPathwayChange` call. So the `onPathwayChange` call for the next pathway runs inside the first call. If no pathway qualifies, the selection does not change (base spec, step 5), and the engine does not call `onPathwayChange` again. The player then uses its own list of all pathways (see Pathway selection).
 
 ### URI replacement
 
@@ -397,12 +412,15 @@ function applyUriReplacement(uri: string, replacement: UriReplacement, options?:
 `applyUriReplacement` follows these steps:
 
 1. If `PER-VARIANT-URIS` has `stableVariantId`, or `PER-RENDITION-URIS` has `stableRenditionId`, return that URI (HLS spec, section 7.3).
-2. Resolve `uri` against `baseUri`.
-3. If `HOST` is present, replace the hostname. The port does not change. The function normalizes `HOST` like a URL hostname: lowercase ASCII, and punycode for an internationalized name.
-4. Take the `PARAMS` names in code point order, which is the same as UTF-8 order. For each name, replace the existing query parameter of that name, or append a new parameter. The server sends names and values percent-encoded (base spec, section 5), so the function does not encode them again.
-5. Return the absolute URI.
+2. If `HOST` is absent, and `PARAMS` is absent or empty, return `uri` as given, even when `uri` is relative. The function does not parse `uri`. A parse with `URL` changes a URI that is not canonical, and dash.js calls the function for every segment request.
+3. Resolve `uri` against `baseUri`.
+4. If `HOST` is present, replace the hostname. The port does not change. The function normalizes `HOST` like a URL hostname: lowercase ASCII, and punycode for an internationalized name.
+5. Take the `PARAMS` names in code point order, which is the same as UTF-8 order. For each name, replace the existing query parameter of that name, or append a new parameter. The server sends names and values percent-encoded (base spec, section 5), so the function does not encode them again.
+6. Return the absolute URI.
 
-The function throws a `TypeError` when `uri` is relative and `baseUri` is absent, or when `HOST` is not a hostname. A DASH player passes no stable IDs. The DASH spec tells the player to ignore the per-variant and per-rendition keys (step 13).
+Step 1 applies only when `PER-VARIANT-URIS` or `PER-RENDITION-URIS` is an object, and the URI for the stable ID is absolute. Otherwise, the function applies `HOST` and `PARAMS`.
+
+When `HOST` or `PARAMS` applies, the function throws a `TypeError` for a relative `uri` without `baseUri`. The function also throws a `TypeError` when `HOST` is not a hostname. A DASH player passes no stable IDs. The DASH spec tells the player to ignore the per-variant and per-rendition keys (step 13).
 
 ### Changes to existing exports
 
@@ -425,14 +443,30 @@ The package documentation links to the spec versions of this RFC.
 - The player still does the work that needs its model of the content. This work includes applying the pathway, creating clones, and detecting failures.
 - `@svta/cml-utils` becomes the first peer dependency of the package. The package imports only types from it.
 - The HLS and DASH rules ship together, so a player that uses one protocol also bundles the rules of the other.
-- The engine is larger than the steering code of the players. The table shows the sizes of a local prototype, built with rolldown.
+- The engine is larger than the steering code of the players. The table shows the sizes of the engine, bundled with rolldown and minified.
 - `SteeringError` is a union, so a player checks `type` before it reads `url`, `status`, or `retryDelay`.
 - Some wire behavior differs from the current players. The differences are the quotes in `_HLS_pathway`, the PARAMS values without a second encoding, and the base URI of RELOAD-URI. A steering server that depends on one player can see a difference.
 
-| Import | Minified | gzip |
-|---|---|---|
-| `createSteeringEngine` and `applyUriReplacement` | 9.1 KB | 3.8 KB |
-| `applyUriReplacement` only | 1.3 KB | 0.8 KB |
+| Import | Minified | gzip | brotli |
+|---|---|---|---|
+| `createSteeringEngine` and `applyUriReplacement` | 9.7 KB | 3.9 KB | 3.5 KB |
+| `applyUriReplacement` only | 1.4 KB | 0.8 KB | 0.7 KB |
+
+The four player spikes of the integration map measured the brotli size of each player bundle in three parts:
+
+- The player removed 0.7 KB to 1.9 KB of its own steering code.
+- The player added 0.7 KB to 1.8 KB of adapter code.
+- The engine added 2.8 KB to 3.9 KB.
+
+So the net growth is 2.6 KB to 4.4 KB brotli. The growth comes from rules that the old steering code of the players skipped:
+
+- Clone checks: 0.5 KB.
+- The 429 rules: 0.2 KB.
+- `update()`: 0.2 KB.
+- The callback error rules: 0.2 KB.
+- Configuration checks: 0.3 KB.
+
+The engine also fixes bugs in the old code of three players. The integration map has the full tables. The file `libs/content-steering/config/size-budget.json` sets a size budget for the engine. `npm run size -- --check` fails when a change makes the engine larger than its budget.
 
 ## Rationale and alternatives
 
@@ -491,6 +525,21 @@ The package documentation links to the spec versions of this RFC.
   - Callback errors follow the rule of the CMCD session API RFC. `SteeringError` becomes a union with a `callback` type, and `SteeringErrorType` names the types.
   - The RFC documents the synchronous selection, the `data` URI rule, the checks that depend on the content, the DASH `PARAMS` rule, and the measured sizes.
 - v3 (2026-09-28): `setPriority()` becomes the `priority` value of `update()`, so one method changes every input of the engine.
+- v4 (2026-10-30): changes from the review of the implementation and from the four player spikes:
+  - `update({ pathways })` only removes clones, a refused clone cannot be a base, and an exception of `acceptClone` refuses the clone.
+  - A response to a request from before `update({ uri })` applies no RELOAD-URI and does not end steering.
+  - The end of steering keeps a priority list from `update({ priority })`.
+  - A VERSION other than 1 for DASH keeps a list from `update({ priority })` and the clones of the last valid Steering Manifest.
+  - A TTL must be finite and counts as at least 1 second, and a Retry-After delay must be positive and finite.
+  - `requester` is required, `fetchRequester` is a new export, and the RFC states the contract of the response.
+  - The engine percent-encodes the pathway IDs in the steering query parameters.
+  - `applyUriReplacement` uses a per-variant or per-rendition URI only when the HLS key is an object and the URI is absolute.
+  - The Drawbacks section has the measured sizes, the growth of the four players, and the size budget.
+  - The error messages no longer repeat the URL that `error.url` holds.
+  - `applyUriReplacement` returns `uri` as given when `HOST`, `PARAMS`, and the stable-ID URIs do not apply.
+  - A player may call `penalize()` inside `onPathwayChange` to refuse a pathway that it cannot play.
+  - `priority` holds only the selected pathway when every other pathway is penalized.
+  - The guide describes `stop()` for media that is ended or detached, and the source of the DASH `pathways`.
 
 ## Final Decision
 
