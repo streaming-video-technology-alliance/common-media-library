@@ -307,11 +307,9 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	}
 
 	function send(request: HttpRequest): Promise<HttpResponse> {
-		try {
-			return Promise.resolve(requester(request))
-		} catch (cause) {
-			return Promise.reject(cause)
-		}
+		return new Promise(resolve => {
+			resolve(requester(request))
+		})
 	}
 
 	function receive(url: string, response: HttpResponse, requestGeneration: number): void {

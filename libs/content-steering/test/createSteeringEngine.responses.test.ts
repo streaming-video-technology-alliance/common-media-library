@@ -621,6 +621,32 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].url, 'https://steering.example.com/a/manifest.json?_HLS_pathway=%22CDN-A%22')
 		})
 
+		it('reports a load error with the thrown value when the requester throws without a promise', async () => {
+			const cause = new TypeError('Failed to fetch')
+			const errors: RequestError[] = []
+			const engine = createSteeringEngine({
+				protocol: 'hls',
+				uri: 'https://steering.example.com/a/manifest.json',
+				pathways: ['CDN-A', 'CDN-B'],
+				pathway: 'CDN-A',
+				requester: () => {
+					throw cause
+				},
+				onError: error => {
+					if (error.type !== SteeringErrorType.CALLBACK) {
+						errors.push(error)
+					}
+				},
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].type, 'load')
+			equal(errors[0].cause, cause)
+			equal(engine.pathway, 'CDN-A')
+		})
+
 		it('reports a load error and requests again when the requester resolves a value that is not a response object', async () => {
 			const errors: RequestError[] = []
 			const engine = createSteeringEngine({
