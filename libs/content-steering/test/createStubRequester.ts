@@ -20,16 +20,16 @@ export function createStubRequester(...responses: StubResponse[]): StubRequester
 
 	return {
 		requests,
-		requester: async request => {
+		requester: request => {
 			requests.push(request)
 
 			const next = queue.shift() ?? { status: 500 }
 
 			if (next instanceof Error) {
-				throw next
+				return Promise.reject(next)
 			}
 
-			return { request, ...next }
+			return Promise.resolve({ request, ...next })
 		},
 		respond: (...more) => {
 			queue.push(...more)

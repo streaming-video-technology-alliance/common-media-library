@@ -5,13 +5,17 @@ import {
 	type SteeringEngineConfig,
 } from '@svta/cml-content-steering'
 import { deepEqual, equal } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
 	createStubRequester,
 	flush,
 	manifestResponse,
 	type StubResponse,
 } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 const PRIORITY = ['CDN-A', 'CDN-B', 'CDN-C']
 
@@ -34,17 +38,13 @@ async function started(overrides: Partial<SteeringEngineConfig>, ...responses: S
 }
 
 async function advance(ms: number): Promise<void> {
-	mock.timers.tick(ms)
+	vi.advanceTimersByTime(ms)
 	await flush()
 }
 
 describe('createSteeringEngine penalties', () => {
 	beforeEach(() => {
-		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
-	})
-
-	afterEach(() => {
-		mock.timers.reset()
+		vi.useFakeTimers({ now: 0, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
 	})
 
 	it('selects the next pathway when the selected pathway is penalized', async () => {

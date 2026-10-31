@@ -5,7 +5,7 @@ import {
 	SteeringErrorType,
 } from '@svta/cml-content-steering'
 import { equal } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('SteeringErrorType', () => {
 	it('has the load, parse, and callback values', () => {

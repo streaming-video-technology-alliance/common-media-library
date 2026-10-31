@@ -5,13 +5,17 @@ import {
 	type SteeringError,
 } from '@svta/cml-content-steering'
 import { deepEqual, equal } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
 	createStubRequester,
 	flush,
 	manifestResponse,
 	type StubResponse,
 } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 function clone(
 	id: string,
@@ -54,11 +58,7 @@ async function receive(...responses: StubResponse[]) {
 
 describe('createSteeringEngine clones', () => {
 	beforeEach(() => {
-		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
-	})
-
-	afterEach(() => {
-		mock.timers.reset()
+		vi.useFakeTimers({ now: 0, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
 	})
 
 	it('passes the valid clones to onManifest before it selects a clone', async () => {
@@ -209,7 +209,7 @@ describe('createSteeringEngine clones', () => {
 
 		equal(engine.pathway, 'CDN-A-CLONE')
 
-		mock.timers.tick(60000)
+		vi.advanceTimersByTime(60000)
 		await flush()
 		engine.stop()
 

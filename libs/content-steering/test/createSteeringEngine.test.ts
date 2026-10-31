@@ -4,8 +4,12 @@ import {
 	type SteeringEngineConfig,
 } from '@svta/cml-content-steering'
 import { deepEqual, equal, throws } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import { createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 const MANIFEST = { VERSION: 1, TTL: 300, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
 
@@ -31,7 +35,8 @@ describe('createSteeringEngine', () => {
 			uri: 'https://steering.example.com/manifest.json',
 			pathways: ['CDN-A', 'CDN-B'],
 			pathway: 'CDN-A',
-			requester: async request => ({ request, status: 200, data: JSON.stringify(manifest) }),
+			requester: request =>
+				Promise.resolve({ request, status: 200, data: JSON.stringify(manifest) }),
 			onPathwayChange: pathway => changes.push(pathway),
 		})
 
@@ -100,11 +105,7 @@ describe('createSteeringEngine', () => {
 
 	describe('requests', () => {
 		beforeEach(() => {
-			mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
-		})
-
-		afterEach(() => {
-			mock.timers.reset()
+			vi.useFakeTimers({ now: 0, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
 		})
 
 		it('sends no request before start()', async () => {
@@ -209,7 +210,7 @@ describe('createSteeringEngine', () => {
 
 			await engine.start()
 			engine.penalize('alpha')
-			mock.timers.tick(60000)
+			vi.advanceTimersByTime(60000)
 			await flush()
 			engine.stop()
 
@@ -234,7 +235,7 @@ describe('createSteeringEngine', () => {
 			)
 
 			await engine.start()
-			mock.timers.tick(60000)
+			vi.advanceTimersByTime(60000)
 			await flush()
 			engine.stop()
 
@@ -348,20 +349,20 @@ describe('createSteeringEngine', () => {
 			equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22')
 		})
 
-		it('uses fetch when the requester is fetchRequester', async t => {
-			const fetchMock = t.mock.method(
-				globalThis,
-				'fetch',
-				async () => new Response(JSON.stringify(MANIFEST), { status: 200 }),
-			)
+		it('uses fetch when the requester is fetchRequester', async () => {
+			const fetchMock = vi
+				.spyOn(globalThis, 'fetch')
+				.mockImplementation(() =>
+					Promise.resolve(new Response(JSON.stringify(MANIFEST), { status: 200 })),
+				)
 			const engine = createSteeringEngine(hlsConfig({ requester: fetchRequester }))
 
 			await engine.start()
 			engine.stop()
 
-			equal(fetchMock.mock.callCount(), 1)
+			equal(fetchMock.mock.calls.length, 1)
 			equal(
-				fetchMock.mock.calls[0].arguments[0],
+				fetchMock.mock.calls[0][0],
 				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22',
 			)
 			equal(engine.pathway, 'CDN-B')

@@ -8,13 +8,17 @@ import {
 } from '@svta/cml-content-steering'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, ok, throws } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
 	createStubRequester,
 	flush,
 	manifestResponse,
 	type StubResponse,
 } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 type RequestError = Exclude<SteeringError, { type: typeof SteeringErrorType.CALLBACK }>
 
@@ -54,17 +58,13 @@ function createDeferred(overrides: Partial<SteeringEngineConfig> = {}) {
 }
 
 async function advance(ms: number): Promise<void> {
-	mock.timers.tick(ms)
+	vi.advanceTimersByTime(ms)
 	await flush()
 }
 
 describe('createSteeringEngine update', () => {
 	beforeEach(() => {
-		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
-	})
-
-	afterEach(() => {
-		mock.timers.reset()
+		vi.useFakeTimers({ now: 0, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
 	})
 
 	it('selects a pathway that update() adds', async () => {

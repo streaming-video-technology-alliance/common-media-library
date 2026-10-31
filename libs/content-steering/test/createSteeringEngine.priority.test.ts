@@ -1,12 +1,16 @@
 import { createSteeringEngine, type SteeringEngineConfig } from '@svta/cml-content-steering'
 import { deepEqual, equal, throws } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
 	createStubRequester,
 	flush,
 	manifestResponse,
 	type StubResponse,
 } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 const PATHWAYS = ['CDN-A', 'CDN-B', 'CDN-C']
 
@@ -28,11 +32,7 @@ function create(overrides: Partial<SteeringEngineConfig>, ...responses: StubResp
 
 describe('createSteeringEngine priority', () => {
 	beforeEach(() => {
-		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
-	})
-
-	afterEach(() => {
-		mock.timers.reset()
+		vi.useFakeTimers({ now: 0, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
 	})
 
 	it('lists the selected pathway first and leaves out penalized and unknown pathways', async () => {
@@ -88,7 +88,7 @@ describe('createSteeringEngine priority', () => {
 		engine.update({ priority: ['CDN-B'] })
 		equal(engine.pathway, 'CDN-B')
 
-		mock.timers.tick(60000)
+		vi.advanceTimersByTime(60000)
 		await flush()
 		engine.stop()
 

@@ -6,13 +6,17 @@ import {
 	type SteeringError,
 } from '@svta/cml-content-steering'
 import { deepEqual, equal, ok } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
 	createStubRequester,
 	flush,
 	manifestResponse,
 	type StubResponse,
 } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 const NOW = Date.parse('Sun, 06 Nov 1994 08:49:37 GMT')
 const MANIFEST = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
@@ -42,17 +46,13 @@ function setup(protocol: 'hls' | 'dash', ...responses: StubResponse[]) {
 }
 
 async function advance(ms: number): Promise<void> {
-	mock.timers.tick(ms)
+	vi.advanceTimersByTime(ms)
 	await flush()
 }
 
 describe('createSteeringEngine responses', () => {
 	beforeEach(() => {
-		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: NOW })
-	})
-
-	afterEach(() => {
-		mock.timers.reset()
+		vi.useFakeTimers({ now: NOW, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
 	})
 
 	describe('valid Steering Manifest', () => {
@@ -109,9 +109,9 @@ describe('createSteeringEngine responses', () => {
 		})
 
 		it('keeps the first of each pathway ID in PATHWAY-PRIORITY', async () => {
-			// @ts-expect-error - a pathway ID that is not a string
 			const { engine } = setup(
 				'hls',
+				// @ts-expect-error - a pathway ID that is not a string
 				manifestResponse({ ...MANIFEST, 'PATHWAY-PRIORITY': ['CDN-B', 7, 'CDN-B', 'CDN-A'] }),
 			)
 
@@ -137,12 +137,13 @@ describe('createSteeringEngine responses', () => {
 				protocol: 'hls',
 				uri: 'https://steering.example.com/a/manifest.json',
 				pathways: ['CDN-A', 'CDN-B'],
-				requester: async request => ({
-					request,
-					status: 200,
-					url: 'https://cdn.example.com/b/manifest.json',
-					data: JSON.stringify(manifest),
-				}),
+				requester: request =>
+					Promise.resolve({
+						request,
+						status: 200,
+						url: 'https://cdn.example.com/b/manifest.json',
+						data: JSON.stringify(manifest),
+					}),
 				onManifest: (_manifest, _clones, context) => contexts.push(context),
 			})
 
@@ -207,12 +208,13 @@ describe('createSteeringEngine responses', () => {
 				protocol: 'hls',
 				uri,
 				pathways: ['CDN-A', 'CDN-B'],
-				requester: async request => ({
-					request,
-					status: 200,
-					url: request.url,
-					data: JSON.stringify(manifest),
-				}),
+				requester: request =>
+					Promise.resolve({
+						request,
+						status: 200,
+						url: request.url,
+						data: JSON.stringify(manifest),
+					}),
 				onError: error => {
 					if (error.type !== SteeringErrorType.CALLBACK) {
 						errors.push(error)
@@ -627,7 +629,7 @@ describe('createSteeringEngine responses', () => {
 				pathways: ['CDN-A', 'CDN-B'],
 				pathway: 'CDN-A',
 				// @ts-expect-error - a requester that forgets to return a response
-				requester: async () => undefined,
+				requester: () => Promise.resolve(undefined),
 				onError: error => {
 					if (error.type !== SteeringErrorType.CALLBACK) {
 						errors.push(error)

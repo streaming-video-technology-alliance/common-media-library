@@ -1,6 +1,6 @@
 import { applyUriReplacement } from '@svta/cml-content-steering'
 import { equal, throws } from 'node:assert'
-import { describe, it } from 'node:test'
+import { describe, it } from 'vite-plus/test'
 
 describe('applyUriReplacement', () => {
 	it('provides a valid example', () => {

@@ -7,8 +7,12 @@ import {
 } from '@svta/cml-content-steering'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, throws } from 'node:assert'
-import { afterEach, beforeEach, describe, it, mock } from 'node:test'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import { createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
 
 const MANIFEST = { VERSION: 1, TTL: 300, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
 
@@ -38,17 +42,13 @@ function createDeferredRequester() {
 }
 
 async function advance(ms: number): Promise<void> {
-	mock.timers.tick(ms)
+	vi.advanceTimersByTime(ms)
 	await flush()
 }
 
 describe('createSteeringEngine lifecycle', () => {
 	beforeEach(() => {
-		mock.timers.enable({ apis: ['setTimeout', 'Date'], now: 0 })
-	})
-
-	afterEach(() => {
-		mock.timers.reset()
+		vi.useFakeTimers({ now: 0, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
 	})
 
 	it('resolves the promise of start() after onManifest', async () => {
@@ -77,11 +77,7 @@ describe('createSteeringEngine lifecycle', () => {
 	})
 
 	it('resolves the promise of start() when the requester fails', async () => {
-		const engine = createSteeringEngine(
-			config(async () => {
-				throw new Error('offline')
-			}),
-		)
+		const engine = createSteeringEngine(config(() => Promise.reject(new Error('offline'))))
 
 		await engine.start()
 		engine.stop()
@@ -271,7 +267,7 @@ describe('createSteeringEngine lifecycle', () => {
 		fail = true
 
 		throws(
-			() => mock.timers.tick(1000),
+			() => vi.advanceTimersByTime(1001),
 			error => error === cause,
 		)
 		engine.stop()
@@ -320,7 +316,7 @@ describe('createSteeringEngine lifecycle', () => {
 		await engine.start()
 
 		throws(
-			() => mock.timers.tick(1),
+			() => vi.advanceTimersByTime(1),
 			error => error === cause,
 		)
 		engine.stop()
