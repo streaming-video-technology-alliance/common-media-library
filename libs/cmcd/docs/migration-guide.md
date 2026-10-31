@@ -75,6 +75,7 @@ console.log(report.url)
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
 | `recordEvent(CmcdEventType.ERROR, { ec })` | `recordError(codes, data)`. The codes wait for the next report of every destination. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
+| An error from the interval timer | `onError` in the configuration. Without `onError`, the error throws from the timer callback, as before. |
 | `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |
 | `applyRequestReport()`, deprecated | `createRequestReport()` |
 | `transform` on an event target, to drop reports | `filter` |

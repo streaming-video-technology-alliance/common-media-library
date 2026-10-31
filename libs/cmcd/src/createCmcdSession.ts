@@ -483,7 +483,7 @@ export function createCmcdSession(
 		},
 
 		start(immediate = true) {
-			const { snapshot } = config
+			const { snapshot, onError } = config
 			const ticks: (() => void)[] = []
 
 			stopped = false
@@ -501,7 +501,17 @@ export function createCmcdSession(
 					const tick = (): void =>
 						emit(CMCD_EVENT_TIME_INTERVAL, withoutStallKeys(snapshot()), undefined, [target])
 
-					target.timer = setInterval(tick, target.interval * 1000)
+					const guarded = onError
+						? (): void => {
+								try {
+									tick()
+								} catch (error) {
+									onError(error)
+								}
+							}
+						: tick
+
+					target.timer = setInterval(guarded, target.interval * 1000)
 
 					if (immediate) {
 						ticks.push(tick)

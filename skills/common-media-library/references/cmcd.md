@@ -170,6 +170,7 @@ console.log(report.url)
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
 | `recordEvent(CmcdEventType.ERROR, { ec })` | `recordError(codes, data)`. The codes wait for the next report of every destination. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
+| An error from the interval timer | `onError` in the configuration. Without `onError`, the error throws from the timer callback, as before. |
 | `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |
 | `applyRequestReport()`, deprecated | `createRequestReport()` |
 | `transform` on an event target, to drop reports | `filter` |
@@ -831,7 +832,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 
 - If a filter throws, no target receives the report, and the error goes to the caller.
 - A value that the structured field encoder cannot serialize throws from the call that has it. A `send` target gets the same check. The session encodes the report, discards the line, and queues the report.
-- An error in a timer tick, from `snapshot()` or from encoding, goes to the timer callback.
+- An error in a timer tick, from `snapshot()`, a filter, or encoding, goes to `onError`. Without `onError`, the error throws from the timer callback. The first `t` report of `start()` throws from `start()`.
 - A failed send does not throw. The [delivery](#delivery) table describes what happens instead.
 
 `createCmcdSession()` throws for these configuration values:
@@ -2659,6 +2660,7 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
     cid?: string;
     eventTargets?: readonly CmcdSessionEventReportConfig[];
     snapshot?: () => CmcdSnapshot;
+    onError?: (error: unknown) => void;
 };
 
 // @public

@@ -551,6 +551,7 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
     cid?: string;
     eventTargets?: readonly CmcdSessionEventReportConfig[];
     snapshot?: () => CmcdSnapshot;
+    onError?: (error: unknown) => void;
 };
 
 // @public

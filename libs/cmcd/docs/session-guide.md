@@ -306,7 +306,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 
 - If a filter throws, no target receives the report, and the error goes to the caller.
 - A value that the structured field encoder cannot serialize throws from the call that has it. A `send` target gets the same check. The session encodes the report, discards the line, and queues the report.
-- An error in a timer tick, from `snapshot()` or from encoding, goes to the timer callback.
+- An error in a timer tick, from `snapshot()`, a filter, or encoding, goes to `onError`. Without `onError`, the error throws from the timer callback. The first `t` report of `start()` throws from `start()`.
 - A failed send does not throw. The [delivery](#delivery) table describes what happens instead.
 
 `createCmcdSession()` throws for these configuration values:

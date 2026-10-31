@@ -15,6 +15,7 @@ and this project adheres to
 - `CmcdEventSender` and `CmcdEventSendResult`. An event target has a collector `url` or a `send` function, for a transport that is not HTTP
 - `CmcdSnapshot`, the type of the player state. `snapshot` returns it for the `t` reports, and the player can pass it with each call. It rejects the keys that the session writes, `bs`, `bsd`, `ec`, and `cen`
 - `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` for the `h` event of CTA-5004-B. `validateCmcd()` accepts `h` as a value of `e`
+- `onError` of `CmcdSessionConfig` receives an error of a `t` report timer. Without the handler, the error throws from the timer callback
 
 ### Changed
 

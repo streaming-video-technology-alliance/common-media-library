@@ -5,7 +5,7 @@ import type { CmcdSnapshot } from './CmcdSnapshot.ts'
 /**
  * The configuration of a CMCD session.
  *
- * The members of {@link CmcdSessionRequestReportConfig} are the request mode settings. `configure()` replaces them.
+ * The members of {@link CmcdSessionRequestReportConfig} are the request mode settings. `configure()` changes them.
  *
  * @public
  */
@@ -33,4 +33,11 @@ export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
 	 * Without `snapshot`, `start()` arms no timer.
 	 */
 	snapshot?: () => CmcdSnapshot
+
+	/**
+	 * Receives an error from the timer of a `t` report: `snapshot()`, a filter, or the encoder threw.
+	 * Without `onError`, the error throws from the timer callback.
+	 * The methods of the session throw at their call site, with or without `onError`.
+	 */
+	onError?: (error: unknown) => void
 }

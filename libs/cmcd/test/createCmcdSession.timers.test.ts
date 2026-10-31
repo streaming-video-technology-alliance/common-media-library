@@ -188,6 +188,49 @@ describe('createCmcdSession timers', () => {
 		session.stop()
 	})
 
+	it('gives an error of a timer tick to onError, and keeps the timer', () => {
+		const errors: unknown[] = []
+		let fail = true
+		const { session, posts } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 }],
+			snapshot: () => {
+				if (fail) {
+					throw new Error('snapshot failed')
+				}
+
+				return state
+			},
+			onError: error => errors.push(error),
+		})
+
+		session.start(false)
+		vi.advanceTimersByTime(10_000)
+		fail = false
+		vi.advanceTimersByTime(10_000)
+
+		deepEqual(
+			errors.map(error => (error as Error).message),
+			['snapshot failed'],
+		)
+		equal(posts.length, 1)
+		session.stop()
+	})
+
+	it('throws from start() for the first t report, with onError set', () => {
+		const errors: unknown[] = []
+		const { session } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.TIME_INTERVAL], interval: 10 }],
+			snapshot: () => {
+				throw new Error('snapshot failed')
+			},
+			onError: error => errors.push(error),
+		})
+
+		throws(() => session.start(), /snapshot failed/)
+		equal(errors.length, 0)
+		session.stop()
+	})
+
 	it('runs the first tick of every target when one tick throws', () => {
 		const { session, posts } = setup({
 			eventTargets: [
