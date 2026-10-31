@@ -26,6 +26,7 @@ import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
 import type { CmcdSessionEventReportConfig } from './CmcdSessionEventReportConfig.ts'
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
+import { checkSessionConfig } from './checkSessionConfig.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
 import type { CmcdScopedValues } from './readScopedValues.ts'
@@ -164,6 +165,8 @@ function toDeliver(
  * @param requester - Sends each batch of event reports to a target with a `url`. The default requester uses `fetch`.
  * @returns The session.
  *
+ * @throws If `sid`, `cid`, or the `url`, `send`, `interval`, or `batchSize` of a target is invalid.
+ *
  * @public
  *
  * @example
@@ -173,6 +176,8 @@ export function createCmcdSession(
 	config: CmcdSessionConfig = {},
 	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
 ): CmcdSession {
+	checkSessionConfig(config)
+
 	const sid = config.sid ?? uuid()
 	const timeOrigin = performance.timeOrigin || Date.now() - performance.now()
 	const settings: CmcdSessionRequestReportConfig = {
