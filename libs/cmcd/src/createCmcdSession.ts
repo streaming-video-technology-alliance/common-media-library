@@ -42,6 +42,10 @@ type Requester = (request: HttpRequest) => Promise<{ status: number }>
 
 type Batch = (string | Cmcd)[]
 
+type SendResult = Awaited<ReturnType<CmcdEventSender>>
+
+type Deliver = (batch: Batch) => Promise<SendResult>
+
 type Waiting = {
 	bs: string[]
 	bsd: unknown[]
@@ -65,7 +69,7 @@ type Target = {
 	interval: number
 	filter?: CmcdReportFilter
 	reports: boolean
-	deliver: (batch: Batch) => Promise<number>
+	deliver: Deliver
 	queue: Batch
 	urgent: boolean
 	inFlight: boolean
@@ -107,24 +111,27 @@ function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
 	return fetch(url, init)
 }
 
-function toDeliver(
-	{ url, send }: CmcdSessionEventReportConfig,
-	requester: Requester,
-): Target['deliver'] {
-	if (url !== undefined) {
-		return batch =>
-			requester({
-				url,
-				method: 'POST',
-				headers: { 'Content-Type': CMCD_MIME_TYPE },
-				body: (batch as string[]).join('\n'),
-			}).then(response => response?.status ?? 0)
+function toDeliver({ url, send }: CmcdSessionEventReportConfig, requester: Requester): Deliver {
+	if (url === undefined) {
+		return batch => Promise.resolve(send?.(batch as Parameters<CmcdEventSender>[0]))
 	}
 
 	return batch =>
-		Promise.resolve(send?.(batch as Parameters<CmcdEventSender>[0])).then(result =>
-			(result as CmcdEventSendResult | undefined)?.gone ? 410 : 200,
-		)
+		requester({
+			url,
+			method: 'POST',
+			headers: { 'Content-Type': CMCD_MIME_TYPE },
+			body: (batch as string[]).join('\n'),
+		}).then(response => {
+			const status = response?.status ?? 0
+
+			// CTA-5004-B: back off after a 429 or 5xx response, stop after a 410 response.
+			if (status === 0 || status === 429 || (status >= 500 && status < 600)) {
+				throw new Error(`HTTP ${status}`)
+			}
+
+			return status === 410 ? { gone: true } : undefined
+		})
 }
 
 /**
@@ -310,37 +317,7 @@ export function createCmcdSession(
 
 		target.urgent = false
 
-		const settle = (status?: number): void => {
-			target.inFlight = false
-
-			if (status === 410) {
-				stopTarget(target)
-				return
-			}
-
-			if (target.destination.gone) {
-				return
-			}
-
-			// CTA-5004-B: back off after a 429 or 5xx response.
-			const failed =
-				status === undefined || status === 0 || status === 429 || (status >= 500 && status < 600)
-
-			if (failed) {
-				target.queue.unshift(...batch)
-				target.urgent ||= urgent
-				target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
-
-				if (!stopped) {
-					target.retry = setTimeout(() => {
-						target.retry = undefined
-						send(target)
-					}, target.delay)
-				}
-			} else {
-				target.delay = 0
-			}
-
+		const finish = (failed: boolean): void => {
 			if (target.flushPending) {
 				target.flushPending = false
 				send(target, true)
@@ -349,7 +326,44 @@ export function createCmcdSession(
 			}
 		}
 
-		new Promise<number>(resolve => resolve(target.deliver(batch))).then(settle, () => settle())
+		const delivered = (result: SendResult): void => {
+			target.inFlight = false
+
+			if ((result as CmcdEventSendResult | undefined)?.gone) {
+				stopTarget(target)
+				return
+			}
+
+			if (target.destination.gone) {
+				return
+			}
+
+			target.delay = 0
+			finish(false)
+		}
+
+		const retry = (): void => {
+			target.inFlight = false
+
+			if (target.destination.gone) {
+				return
+			}
+
+			target.queue.unshift(...batch)
+			target.urgent ||= urgent
+			target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
+
+			if (!stopped) {
+				target.retry = setTimeout(() => {
+					target.retry = undefined
+					send(target)
+				}, target.delay)
+			}
+
+			finish(true)
+		}
+
+		new Promise<SendResult>(resolve => resolve(target.deliver(batch))).then(delivered, retry)
 	}
 
 	function emit(
