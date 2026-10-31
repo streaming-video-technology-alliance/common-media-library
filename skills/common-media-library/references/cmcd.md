@@ -7,7 +7,7 @@ Common Media Client Data (CMCD) encoding and decoding.
 
 - Add a CMCD report to a segment request as a query string or as headers: `appendCmcdQuery`, `appendCmcdHeaders`, `toCmcdQuery`, `toCmcdHeaders`
 - Encode or decode CMCD key and value pairs: `encodeCmcd`, `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`
-- Report CMCD v2 events and time intervals to a collector: `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
+- Report CMCD v2 events and time intervals to a collector: `createCmcdSession`, `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
 - Validate a CMCD payload against CTA-5004: `validateCmcd`, `validateCmcdEventReport`
 - Capture the CMCD that a player sends in a test: `CmcdReportRecorder`
 
@@ -64,6 +64,7 @@ session.recordResponseReceived({ request: report, status: 200 })
 ```
 
 The [session guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/session-guide.md) describes the API. The [migration guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md) maps each member of `CmcdReporter` to the session API.
+
 ## Testing CMCD output with `CmcdReportRecorder`
 
 `CmcdReportRecorder` captures the CMCD requests that a player under test
@@ -167,6 +168,7 @@ console.log(report.url)
 | `update({ msd })` | `msd` in the data of any call. The session sends it once to each destination. |
 | The data store in `t` reports | `snapshot`, which returns `CmcdSnapshot` |
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
+| `recordEvent(CmcdEventType.ERROR, { ec })` | `recordError(codes, data)`. The codes wait for the next report of every destination. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
 | `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |
 | `applyRequestReport()`, deprecated | `createRequestReport()` |
@@ -182,6 +184,7 @@ console.log(report.url)
 
 - Without `enabledKeys`, the session reports every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 - The session sends no event by itself. The player compares each new value with the old value, then calls `recordEvent()`.
+- The data of `recordEvent()` leaves out `ec`. The player passes the error codes to `recordError()`, which sends the `e` report.
 - The session reads `msd`, `bs`, and `bsd` from the data of any call and sends them to every destination. `CmcdReporter` reads `msd` from `update()` only.
 - A `bs` flag that stays in the store until the next request becomes `bs: true` in the data of one call. `CmcdSnapshot` rejects `bs` and `bsd`.
 - The session types reject `transform`, and `CmcdSessionConfig` has no `sessionRetention`. Version 3.0.0 removes `transform` from the configuration types.
@@ -639,7 +642,7 @@ console.log(next.headers['CMCD-Request'])
 - Each call advances the sequence number of request mode. Version 1 does not send `sn`.
 - Without `enabledKeys`, the report has every key of the version.
 
-`configure()` replaces `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap` for request mode. It keeps the `sid` and every sequence number. Event targets cannot change after creation.
+`configure()` changes `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap` for request mode. Each member of the argument replaces the current value. A member that the argument leaves out keeps its value. A member set to `undefined` returns to its default. The `sid` and every sequence number stay. Event targets cannot change after creation.
 
 ## Record Events and Responses
 
@@ -840,7 +843,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 | `url` or `send` of a target | Exactly one of the two |
 | `url` of a target | A non-empty string |
 | `send` of a target | A function |
-| `interval` of a target | A finite number, 0 or more |
+| `interval` of a target | A number from 0 to 2147483 |
 | `batchSize` of a target | A positive integer |
 
 The message names the parameter, the valid values, and the received value: `createCmcdSession: eventTargets[1].batchSize must be a positive integer, received 0`.
@@ -2324,7 +2327,7 @@ export type CmcdEvent = CmcdRequest & {
 export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
     version?: typeof CMCD_V2;
     url: string;
-    events?: CmcdEventType[];
+    events?: readonly CmcdEventType[];
     interval?: number;
     batchSize?: number;
     transform?: CmcdEventReportTransform<C>;

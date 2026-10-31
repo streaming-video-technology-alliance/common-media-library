@@ -6,7 +6,7 @@ Common Media Client Data (CMCD) encoding and decoding.
 
 - Add a CMCD report to a segment request as a query string or as headers: `appendCmcdQuery`, `appendCmcdHeaders`, `toCmcdQuery`, `toCmcdHeaders`
 - Encode or decode CMCD key and value pairs: `encodeCmcd`, `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`
-- Report CMCD v2 events and time intervals to a collector: `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
+- Report CMCD v2 events and time intervals to a collector: `createCmcdSession`, `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
 - Validate a CMCD payload against CTA-5004: `validateCmcd`, `validateCmcdEventReport`
 - Capture the CMCD that a player sends in a test: `CmcdReportRecorder`
 
@@ -62,7 +62,8 @@ session.recordEvent(CmcdEventType.PLAY_STATE, { ...state, sta: 'r' })
 session.recordResponseReceived({ request: report, status: 200 })
 ```
 
-The [session guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/session-guide.md) describes the API. The [migration guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md) maps each member of `CmcdReporter` to the session API.
+The [session guide](docs/session-guide.md) describes the API. The [migration guide](docs/migration-guide.md) maps each member of `CmcdReporter` to the session API.
+
 ## Testing CMCD output with `CmcdReportRecorder`
 
 `CmcdReportRecorder` captures the CMCD requests that a player under test

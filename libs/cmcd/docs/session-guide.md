@@ -117,7 +117,7 @@ console.log(next.headers['CMCD-Request'])
 - Each call advances the sequence number of request mode. Version 1 does not send `sn`.
 - Without `enabledKeys`, the report has every key of the version.
 
-`configure()` replaces `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap` for request mode. It keeps the `sid` and every sequence number. Event targets cannot change after creation.
+`configure()` changes `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap` for request mode. Each member of the argument replaces the current value. A member that the argument leaves out keeps its value. A member set to `undefined` returns to its default. The `sid` and every sequence number stay. Event targets cannot change after creation.
 
 ## Record Events and Responses
 

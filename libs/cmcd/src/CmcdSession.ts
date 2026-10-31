@@ -103,8 +103,9 @@ export type CmcdSession = {
 	): void
 
 	/**
-	 * Replaces the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
-	 * The `sid` and every sequence number stay.
+	 * Changes the request mode settings: `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap`.
+	 * Each member of `settings` replaces the current value. A member that `settings` leaves out keeps its value.
+	 * A member set to `undefined` returns to its default. The `sid` and every sequence number stay.
 	 *
 	 * @param settings - The new settings.
 	 */

@@ -73,6 +73,7 @@ console.log(report.url)
 | `update({ msd })` | `msd` in the data of any call. The session sends it once to each destination. |
 | The data store in `t` reports | `snapshot`, which returns `CmcdSnapshot` |
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
+| `recordEvent(CmcdEventType.ERROR, { ec })` | `recordError(codes, data)`. The codes wait for the next report of every destination. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
 | `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |
 | `applyRequestReport()`, deprecated | `createRequestReport()` |
@@ -88,6 +89,7 @@ console.log(report.url)
 
 - Without `enabledKeys`, the session reports every key. In the same case, `CmcdReporter` reports nothing in request mode and only the required keys on a target.
 - The session sends no event by itself. The player compares each new value with the old value, then calls `recordEvent()`.
+- The data of `recordEvent()` leaves out `ec`. The player passes the error codes to `recordError()`, which sends the `e` report.
 - The session reads `msd`, `bs`, and `bsd` from the data of any call and sends them to every destination. `CmcdReporter` reads `msd` from `update()` only.
 - A `bs` flag that stays in the store until the next request becomes `bs: true` in the data of one call. `CmcdSnapshot` rejects `bs` and `bsd`.
 - The session types reject `transform`, and `CmcdSessionConfig` has no `sessionRetention`. Version 3.0.0 removes `transform` from the configuration types.
