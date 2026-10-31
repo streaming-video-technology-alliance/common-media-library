@@ -17,6 +17,7 @@ import { uniqueStrings } from './uniqueStrings.ts'
 
 const MAX_DELAY = 2147483647
 const MIN_TTL = 1
+const SURROGATE = /[\uD800-\uDFFF]/g
 
 type SteeringRequestError = Exclude<SteeringError, { type: typeof STEERING_ERROR_TYPE_CALLBACK }>
 
@@ -588,33 +589,8 @@ function encodePathwayId(id: string): string {
 	try {
 		return encodeURIComponent(id)
 	} catch {
-		return encodeURIComponent(withoutUnpairedSurrogates(id))
+		return encodeURIComponent(id.replace(SURROGATE, '\uFFFD'))
 	}
-}
-
-function withoutUnpairedSurrogates(value: string): string {
-	let result = ''
-
-	for (let i = 0; i < value.length; i++) {
-		const code = value.charCodeAt(i)
-
-		if (code >= 0xd800 && code <= 0xdbff) {
-			const next = value.charCodeAt(i + 1)
-
-			if (next >= 0xdc00 && next <= 0xdfff) {
-				result += value[i] + value[i + 1]
-				i++
-			} else {
-				result += '�'
-			}
-		} else if (code >= 0xdc00 && code <= 0xdfff) {
-			result += '�'
-		} else {
-			result += value[i]
-		}
-	}
-
-	return result
 }
 
 function getHeader(headers: Record<string, string> | undefined, name: string): string | undefined {
