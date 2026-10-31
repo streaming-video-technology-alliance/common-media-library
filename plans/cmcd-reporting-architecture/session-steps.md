@@ -38,9 +38,10 @@ The code of each task ran on 2026-10-30 on a copy of `main` at b291c609a (releas
 | Measurement, final code | Session | `CmcdReporter` |
 |---|---:|---:|
 | Minified with gzip, with its dependencies, `vp pack` | 7140 B | 8791 B |
+| The same, without the `send` code | 6955 B | |
 | One version 2 request report, Node 24 | 7.58 µs | 13.38 µs |
 
-Both APIs in one bundle measure 10793 B. The replay of 2026-10-08 measured 6923 B, 8696 B, and 10556 B with the rolldown CLI, before `send`. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
+Both APIs in one bundle measure 10793 B, and 10626 B without the `send` code. The `send` code costs 185 B with gzip and 612 B before gzip. The measurement removes the copy helpers, the `send` branch of the delivery function, and the configuration checks for `send`. Without those parts, the same bundle command runs again. The replay of 2026-10-08 measured 6923 B, 8696 B, and 10556 B with the rolldown CLI, before `send`. For the same data, the session writes the same request URL as `CmcdReporter`. A bare import of the package bundles to nothing.
 
 The configuration types follow the decisions of Casey of 2026-10-02 and 2026-10-30. `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig` derive from `CmcdRequestReportConfig` and `CmcdEventReportConfig` without `transform`. A `transform` member typed `never` rejects a `CmcdReporter` configuration at compile time. Only `CmcdSessionEventReportConfig` has `filter`. `enabledKeys` accepts a read-only array.
 
