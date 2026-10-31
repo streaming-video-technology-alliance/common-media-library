@@ -398,7 +398,7 @@ The next report drops a waiting `bs`, `bsd`, or `ec` value that the version or `
 
 ### Settings and timers
 
-`configure()` replaces `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap` for request mode. It keeps the `sid` and every sequence number. Event targets cannot change after creation.
+`configure()` changes `version`, `transmissionMode`, `enabledKeys`, and `customHeaderMap` for request mode. Each member of the argument replaces the current value. A member that the argument leaves out keeps its value. A member set to `undefined` returns to its default. The `sid` and every sequence number stay. Event targets cannot change after creation.
 
 `start()` starts one timer for each event target whose events include `t` and whose interval is above 0. Each tick records a `t` report with the data from `snapshot()`, and the filter applies. `start()` sends the first `t` report at once, and `start(false)` waits one interval. `stop()` clears these timers. Without `snapshot`, `start()` starts no timer.
 
@@ -439,7 +439,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 | `url` or `send` of a target | Exactly one of the two |
 | `url` of a target | A non-empty string |
 | `send` of a target | A function |
-| `interval` of a target | A finite number, 0 or more |
+| `interval` of a target | A number from 0 to 2147483 |
 | `batchSize` of a target | A positive integer |
 
 The message names the parameter, the valid values, and the received value: `createCmcdSession: eventTargets[1].batchSize must be a positive integer, received 0`.
