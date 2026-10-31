@@ -24,6 +24,7 @@ The strategic goal is **widespread adoption**. Evaluate every decision against t
 - `npm run typecheck`: Run the typechecker
 - `npm test -w libs/<package>`: Run the tests for a package. Build first: the tests import the bundled `dist/` output of the package and its workspace dependencies.
 - `npm test`: Full validation at the root. It runs lint, build all, typecheck, then every package's tests. The PR checks run this command.
+- `npm run size`: Print the compressed size of each import set that a package budgets in `libs/<package>/config/size-budget.json`. `npm run size -- --check` fails when a size is over its budget plus the tolerance. Raise the budget in the pull request that grows the bundle.
 - `npm run format`: Run the linter with auto-fix
 - `npm run ver <package> <version>`: Bump one package version during release prep. `<package>` is the folder name without the `libs/` prefix. The command updates `package.json` and inserts the new version section and compare links in `CHANGELOG.md`.
 - `npm run prepare-release`: Prepare a release. The command detects packages whose `package.json` version differs from the published npm version. It then cascades patch bumps, with changelog entries, to the packages that depend on them.

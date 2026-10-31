@@ -44,6 +44,7 @@
 		"ver": "node scripts/version.ts",
 		"docs": "npm start -w docs",
 		"notes": "node scripts/createReleaseNotes.ts",
+		"size": "node scripts/size.ts",
 		"typecheck": "tsc --noEmit"
 	},
 	"workspaces": [
