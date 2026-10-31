@@ -188,6 +188,30 @@ describe('createCmcdSession timers', () => {
 		session.stop()
 	})
 
+	it('runs the first tick of every target when one tick throws', () => {
+		const { session, posts } = setup({
+			eventTargets: [
+				{
+					url: A,
+					events: [CmcdEventType.TIME_INTERVAL],
+					interval: 10,
+					filter: () => {
+						throw new Error('filter failed')
+					},
+				},
+				{ url: B, events: [CmcdEventType.TIME_INTERVAL], interval: 10 },
+			],
+			snapshot: () => state,
+		})
+
+		throws(() => session.start(), /filter failed/)
+		deepEqual(
+			posts.map(post => post.url),
+			[B],
+		)
+		session.stop()
+	})
+
 	it('ignores bs and bsd in the data of snapshot()', () => {
 		const stall = { sta: CmcdPlayerState.REBUFFERING, bs: true, bsd: [1200] }
 		const { session, lines } = setup({

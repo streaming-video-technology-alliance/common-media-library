@@ -509,7 +509,19 @@ export function createCmcdSession(
 				}
 			}
 
-			ticks.forEach(tick => tick())
+			let failure: { error: unknown } | undefined
+
+			for (const tick of ticks) {
+				try {
+					tick()
+				} catch (error) {
+					failure ??= { error }
+				}
+			}
+
+			if (failure) {
+				throw failure.error
+			}
 		},
 
 		stop() {
