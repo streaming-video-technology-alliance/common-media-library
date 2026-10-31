@@ -467,9 +467,9 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession` | 7131 B |
-| `CmcdReporter` | 8852 B |
-| Both in one bundle | 10788 B |
+| `createCmcdSession` | 7156 B |
+| `CmcdReporter` | 8853 B |
+| Both in one bundle | 10833 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
