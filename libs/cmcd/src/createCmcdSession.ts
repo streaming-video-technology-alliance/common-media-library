@@ -349,7 +349,7 @@ export function createCmcdSession(
 				return
 			}
 
-			target.queue.unshift(...batch)
+			target.queue = batch.concat(target.queue)
 			target.urgent ||= urgent
 			target.delay = Math.min(target.delay * 2 || MIN_DELAY, MAX_DELAY)
 
