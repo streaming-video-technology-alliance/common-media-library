@@ -497,12 +497,12 @@ The engine also fixes bugs in the old code of three players. The integration map
 ## Unresolved questions
 
 1. **Quotes in `_HLS_pathway`.** Resolved on 2026-11-02: the engine sends the pathway IDs without quotes for both protocols. The HLS spec, section 7.4, shows the pathway ID in quotes. The examples of the DASH spec show no quotes, and hls.js, Shaka Player, and VHS send none.
-2. **HLS penalty duration.** This RFC keeps `DEFAULT_PATHWAY_PENALTY`, which is also the value of hls.js. The HLS spec, section 7.5, says that two minutes is generally enough. Which default is better?
-3. **End of steering in DASH.** The DASH spec abandons all steering in two cases:
+2. **HLS penalty duration.** Resolved on 2026-11-02: the default stays `DEFAULT_PATHWAY_PENALTY`, which is also the value of hls.js. The HLS spec, section 7.5, says that two minutes is generally enough. A player that wants another duration sets `penalty` to a number of milliseconds or to `'ttl'`.
+3. **End of steering in DASH.** Resolved on 2026-11-02: the engine keeps the pathway selection with the fallback priority list. The DASH spec abandons all steering in two cases:
    - A VERSION other than 1 (step 11).
    - A 410 response to the first request (step 17).
 
-   This RFC keeps the pathway selection with the fallback priority list instead, so `penalize()` continues to work. Is this interpretation acceptable?
+   Step 17 says to proceed "as if the ContentSteering element were not present". A player without steering uses the MPD order with the default service location first, which is the fallback priority list. So the player sees the same order, and `penalize()` continues to work on that list.
 4. **SVTA2070 codes.** `SteeringErrorType` documents the codes `2040` and `2041`. Should `SteeringError` also include the codes as numbers? That change adds a peer dependency on `@svta/cml-error-codes`.
 5. **Release tag.** The package exports use `@beta`, and the repository rules require `@public`. Should the engine ship as `@beta` until a player uses it, and as `@public` in version 1.0?
 
