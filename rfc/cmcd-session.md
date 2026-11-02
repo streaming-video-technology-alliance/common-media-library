@@ -383,7 +383,7 @@ Each target is one destination, with its own sequence number, `msd` gate, and wa
 
 The method adds the request-time data from `customData.cmcd`, without the keys that have a destination scope. The request report already gave those keys to every destination. With version 1, the request report percent-encodes `nor`. The method decodes that value, because an event report uses version 2. The `data` argument overrides the derived keys. The method then records an `rr` event and passes the request to the filters.
 
-`recordError()` sends `e=e` with `ec` at once to each selected target that lists `e`. Every other destination receives the codes with its next report, as CTA-5004-B recommends.
+`recordError()` sends `e=e` with `ec` at once to each selected target that lists `e`. Every other destination receives the codes with its next report, as CTA-5004-B recommends. The method throws when `codes` has no error code, because CTA-5004-B requires `ec` on an `e` report.
 
 ### Keys with a destination scope
 
@@ -429,6 +429,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 
 - A filter that throws stops the report for every target, and the caller receives the error.
 - A value that the structured-field encoder cannot serialize throws from the call that produced it. The session checks the `bs`, `bsd`, and `ec` values of a call before they wait. A waiting value cannot fail a later report. A `send` target gets the same check. The session encodes the report and discards the line.
+- `recordError()` throws when `codes` has no error code. The message has the form of a configuration error.
 - An error in a timer tick goes to `onError`. Without `onError`, the error throws from the timer callback, as in `CmcdReporter` today. The source of the error is `snapshot()`, a filter, or the encoder. The first `t` report of `start()` throws from `start()`, with or without `onError`. The methods of the session throw at their call site.
 - A failed send does not throw. The delivery table describes the result.
 
@@ -469,9 +470,9 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession` | 7197 B |
+| `createCmcdSession` | 7230 B |
 | `CmcdReporter` | 8849 B |
-| Both in one bundle | 10869 B |
+| Both in one bundle | 10905 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
