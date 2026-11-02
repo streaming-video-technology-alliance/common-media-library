@@ -1,12 +1,7 @@
 import type { CmcdSessionConfig } from './CmcdSessionConfig.ts'
+import { configError } from './configError.ts'
 
 const MAX_INTERVAL = 2_147_483
-
-function configError(parameter: string, expected: string, received: unknown): Error {
-	const value = typeof received === 'string' ? JSON.stringify(received) : String(received)
-
-	return new Error(`createCmcdSession: ${parameter} must be ${expected}, received ${value}`)
-}
 
 /**
  * Checks the rules of a session configuration that the TypeScript types cannot express.

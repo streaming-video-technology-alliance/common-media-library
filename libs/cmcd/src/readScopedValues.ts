@@ -3,6 +3,7 @@ import { CMCD_KEY_SPECS } from './CMCD_KEY_SPECS.ts'
 import { CMCD_V2 } from './CMCD_V2.ts'
 import type { Cmcd } from './Cmcd.ts'
 import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
+import { configError } from './configError.ts'
 import { normalizeValue } from './normalizeValue.ts'
 import { toBareValue } from './toBareValue.ts'
 import { toTokenString } from './toTokenString.ts'
@@ -55,14 +56,14 @@ function copyItems(value: unknown, key: 'bsd' | 'ec'): unknown[] | undefined {
  * The result has a valid `msd`, the object type of a `bs: true` call, and copies of the `bsd` and `ec` items.
  *
  * @param data - The data of the call.
- * @param ec - The error codes of a `recordError()` call.
+ * @param ec - The `codes` argument of a `recordError()` call.
  * @returns The scoped values.
  *
- * @throws If a `bsd` or `ec` value cannot be encoded.
+ * @throws If a `bsd` or `ec` value cannot be encoded, or if `recordError()` passed no error code.
  *
  * @internal
  */
-export function readScopedValues(data: Cmcd, ec?: readonly string[]): CmcdScopedValues {
+export function readScopedValues(data: Cmcd, ec?: string | readonly string[]): CmcdScopedValues {
 	const scoped: CmcdScopedValues = {}
 	const msd = toBareValue(data.msd)
 
@@ -77,6 +78,11 @@ export function readScopedValues(data: Cmcd, ec?: readonly string[]): CmcdScoped
 	const bsd = copyItems(data.bsd, 'bsd')
 	const codes = copyItems(ec, 'ec')
 	const lists: Record<string, unknown[]> = {}
+
+	// CTA-5004-B: the e token must be accompanied by ec.
+	if (ec !== undefined && !codes) {
+		throw configError('recordError() codes', 'one or more error codes', ec)
+	}
 
 	if (bsd) {
 		lists['bsd'] = scoped.bsd = bsd

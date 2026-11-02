@@ -73,7 +73,7 @@ console.log(report.url)
 | `update({ msd })` | `msd` in the data of any call. The session sends it once to each destination. |
 | The data store in `t` reports | `snapshot`, which returns `CmcdSnapshot` |
 | `recordEvent()`, `createRequestReport()`, `recordResponseReceived()` | The same methods. The data includes the values that persist. |
-| `recordEvent(CmcdEventType.ERROR, { ec })` | `recordError(codes, data)`. The codes wait for the next report of every destination. |
+| `recordEvent(CmcdEventType.ERROR, { ec })` | `recordError(codes, data)`. The codes wait for the next report of every destination. The call throws when `codes` has no error code. |
 | `start()`, `stop()`, `flush()` | The same methods. `stop(true)` becomes `flush()` and then `stop()`. |
 | An error from the interval timer | `onError` in the configuration. Without `onError`, the error throws from the timer callback, as before. |
 | `isRequestReportingEnabled()` | No equivalent. The player decides whether to call `createRequestReport()`. |

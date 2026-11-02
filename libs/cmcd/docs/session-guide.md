@@ -158,7 +158,7 @@ session.recordResponseReceived({
 
 ## Errors, Startup Delay, and Stalls
 
-`recordError()` sends an `e` report at once to each event target that lists `e`. Every other destination, request mode included, sends the error codes in `ec` with its next report.
+`recordError()` sends an `e` report at once to each event target that lists `e`. Every other destination, request mode included, sends the error codes in `ec` with its next report. The call throws when `codes` has no error code, because CTA-5004-B requires `ec` on an `e` report.
 
 Three more keys have a scope that one report cannot cover. The player passes them in the data of any call. The session sends them to every destination:
 
@@ -306,6 +306,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 
 - If a filter throws, no target receives the report, and the error goes to the caller.
 - A value that the structured field encoder cannot serialize throws from the call that has it. A `send` target gets the same check. The session encodes the report, discards the line, and queues the report.
+- `recordError()` throws when `codes` has no error code. The message has the form of a configuration error.
 - An error in a timer tick, from `snapshot()`, a filter, or encoding, goes to `onError`. Without `onError`, the error throws from the timer callback. The first `t` report of `start()` throws from `start()`.
 - A failed send does not throw. The [delivery](#delivery) table describes what happens instead.
 

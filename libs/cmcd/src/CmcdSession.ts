@@ -89,11 +89,12 @@ export type CmcdSession = {
 	 *
 	 * Each selected target that lists `e` sends an `e` report with `ec` at once.
 	 * Every other destination sends the codes with its next report.
+	 * CTA-5004-B requires `ec` on an `e` report, so `codes` must have at least one error code.
 	 *
 	 * @param codes - The error codes.
 	 * @param data - The CMCD data of the error report.
 	 *
-	 * @throws If a filter throws, or if a value cannot be encoded. The call then changes no state.
+	 * @throws If `codes` has no error code, if a filter throws, or if a value cannot be encoded. The call then changes no state.
 	 *
 	 * @example
 	 * {@includeCode ../test/createCmcdSession.errors.test.ts#example}

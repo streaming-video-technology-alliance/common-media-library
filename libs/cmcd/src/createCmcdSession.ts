@@ -371,7 +371,7 @@ export function createCmcdSession(
 		data: Cmcd,
 		request?: DeepReadonly<HttpRequest>,
 		candidates: readonly Target[] = targets,
-		ec?: readonly string[],
+		codes?: string | readonly string[],
 	): void {
 		const report: Cmcd = { ...data, e: type, ts: data.ts ?? Date.now() }
 
@@ -380,7 +380,7 @@ export function createCmcdSession(
 			delete report.bg
 		}
 
-		const scoped = readScopedValues(report, ec)
+		const scoped = readScopedValues(report, codes)
 		const selected = candidates.filter(
 			target =>
 				target.events.includes(type) &&
@@ -481,7 +481,7 @@ export function createCmcdSession(
 		recordError(codes, data = {}) {
 			const ec = typeof codes === 'string' ? [codes] : [...codes]
 
-			emit(CMCD_EVENT_ERROR, { ...data, ec }, undefined, targets, ec)
+			emit(CMCD_EVENT_ERROR, { ...data, ec }, undefined, targets, codes)
 		},
 
 		configure(next) {

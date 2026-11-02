@@ -239,6 +239,23 @@ describe('createCmcdSession errors and keys with a destination scope', () => {
 		deepEqual(lines(), [`e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`])
 	})
 
+	it('throws when codes has no error code, and changes no state', () => {
+		const { session, lines, request } = setup({
+			eventTargets: [{ url: A, events: [CmcdEventType.ERROR] }],
+		})
+
+		for (const codes of [[], '', ['']]) {
+			throws(() => session.recordError(codes), {
+				message: `createCmcdSession: recordError() codes must be one or more error codes, received ${JSON.stringify(codes)}`,
+			})
+		}
+
+		session.recordError('MEDIA_ERR_NETWORK')
+
+		deepEqual(lines(), [`e=e,ec=("MEDIA_ERR_NETWORK"),sid="s1",sn=0,ts=${ts},v=2`])
+		equal(request({}), `${SEGMENT}?CMCD=ec=("MEDIA_ERR_NETWORK"),sid="s1",sn=0,v=2`)
+	})
+
 	it('drops a waiting value that the version or enabledKeys does not allow', () => {
 		const { session, request } = setup({
 			version: 1,
