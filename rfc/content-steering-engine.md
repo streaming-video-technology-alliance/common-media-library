@@ -315,7 +315,7 @@ A Steering Manifest is valid when all of these conditions are true:
 - The body parses as a JSON object.
 - VERSION is 1. For DASH, a missing VERSION counts as a VERSION other than 1 (base spec, section 4).
 - TTL is a positive, finite number. The engine never uses a TTL below 1 second, so a TTL below 1 counts as 1. The Steering Manifest stays valid. No spec defines a minimum, and the base spec and the DASH spec allow a longer wait.
-- PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values.
+- PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values. The DASH spec requires PATHWAY-PRIORITY in clause 6.2 and lists it as optional with the default `[]` in Table 6.3-1. The engine follows clause 6.2.
 - A relative RELOAD-URI resolves.
 
 An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
@@ -474,7 +474,7 @@ The engine also fixes bugs in the old code of three players. The integration map
 - **A processor without I/O.** Each player would implement the timers, the rules for error responses, and the RELOAD-URI resolution. The Motivation table shows that these parts differ the most between the players.
 - **Protocol descriptor objects.** The earlier design used `HLS_CDP` and `DASH_CDP` objects with format callbacks. The protocols differ in behavior as well as format, for example in the 429 rule and the penalty duration. A descriptor would need a callback for each difference. A `protocol` value keeps both behaviors inside the package, where the tests cover them. No third protocol uses content steering today.
 - **A class.** `createSteeringEngine` returns an object type, like `createCmcdSession` in the CMCD session API RFC ([#455](https://github.com/streaming-video-technology-alliance/common-media-library/pull/455)). The implementation can change without a change to the public type.
-- **An injected scheduler.** Tests use the mock timers of `node:test`, like the tests of `CmcdReporter`. A player controls the request timing with `start()` and `stop()`.
+- **An injected scheduler.** Tests use the fake timers of Vitest. A player controls the request timing with `start()` and `stop()`.
 - **Cancellation.** `HttpRequest` has no abort signal. `stop()` ignores late responses instead.
 - **A `setPriority()` method.** The `priority` getter returns the effective order, not the list that a player sets. A method named as a pair of the getter would suggest that the getter returns that list. `update({ priority })` keeps one method for every input of the engine.
 - **A `refresh()` method.** dash.js has a public `triggerSteeringRequest()` that always sends a request. The base spec says that the client MUST wait TTL seconds before it reloads. So this RFC has no method to force a request. The dash.js player can map `triggerSteeringRequest()` to `start()`.

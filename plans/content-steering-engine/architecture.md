@@ -44,10 +44,13 @@ The table maps each rule to the behavior of the engine. An empty cell means that
 | Penalty | steps 3 and 4: the duration is defined by the protocol or by the player | 7.5: two minutes is generally enough | step 19: exclude for the last TTL, even if the next response ranks it first | a timer for each penalty, and a new selection when it ends |
 | Cloning | section 5: steps 1 to 4, clone of a clone, unknown `BASE-ID` ignored, `HOST` not empty, `PARAMS` percent-encoded | 7.3: per-variant and per-rendition URIs replace the result of steps 1 to 4 | step 13: replace the host, replace `PARAMS` of the same name, ignore the per-variant keys | clone checks and `applyUriReplacement` |
 
-The DASH spec has two conflicts with itself:
+The DASH spec has three conflicts with itself:
 
 - Step 7 puts `_DASH_pathway` in quotes. The examples in clauses 8.1, 8.2.2, A.1, and A.3 have no quotes, but A.2 has them. The engine follows step 7.
 - Clause 5.1 defines `@defaultServiceLocation` as a list separated by spaces. The schema of the 6th edition of ISO/IEC 23009-1 defines it as one token. The player passes the value that it applies, so the engine does not depend on this difference.
+- Clause 6.2 marks `PATHWAY-PRIORITY` as REQUIRED. Table 6.3-1 marks it as optional with the default `[]`, and says that a present value has at least one element. The engine follows clause 6.2: a Steering Manifest without a pathway in `PATHWAY-PRIORITY` is a parse error.
+
+The DASH spec does not say what a client does with a missing VERSION. Step 11 ends steering for a VERSION other than 1. Table 6.3-1 marks VERSION as mandatory, and the base spec, section 4, refuses a Steering Manifest without VERSION. The engine ends DASH steering after a missing VERSION, as after a VERSION other than 1.
 
 ## Prior art
 
