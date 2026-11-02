@@ -27,7 +27,8 @@ export type SteeringEngine = {
 
 	/**
 	 * Cancels the timers and ignores any response that arrives later.
-	 * The engine keeps its state.
+	 * The engine keeps its state. The engine does not cancel a request in
+	 * flight, and the next `start()` sends a new request.
 	 */
 	stop(): void
 

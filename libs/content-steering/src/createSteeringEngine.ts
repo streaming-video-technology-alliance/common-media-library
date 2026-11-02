@@ -111,8 +111,14 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	}
 
 	function begin(): Promise<void> {
+		const token = session
+
 		running = true
 		select()
+
+		if (token !== session) {
+			return pending ?? Promise.resolve()
+		}
 
 		if (ended) {
 			return Promise.resolve()
@@ -125,6 +131,10 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return Promise.resolve()
 		}
 
+		return request()
+	}
+
+	function request(): Promise<void> {
 		const promise = new Promise<void>(resolve => {
 			settle = resolve
 		})
@@ -545,7 +555,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		}
 
 		run(false, () => {
-			void load()
+			void request()
 		})
 	}
 

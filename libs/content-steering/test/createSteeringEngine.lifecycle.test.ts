@@ -196,6 +196,86 @@ describe('createSteeringEngine lifecycle', () => {
 		equal(requests.length, 1)
 	})
 
+	it('sends no request when onPathwayChange calls stop() inside start()', async () => {
+		let stopInside = false
+		const { requester, requests } = createStubRequester(
+			manifestResponse(MANIFEST),
+			manifestResponse(MANIFEST),
+		)
+		const engine = createSteeringEngine(
+			config(requester, {
+				penalty: 1000,
+				onPathwayChange: () => {
+					if (stopInside) {
+						engine.stop()
+					}
+				},
+			}),
+		)
+
+		await engine.start()
+		engine.penalize()
+		engine.stop()
+		await advance(300000)
+
+		stopInside = true
+		await engine.start()
+		await flush()
+
+		equal(engine.pathway, 'CDN-B')
+		equal(requests.length, 1)
+	})
+
+	it('returns the promise of a timer request to start()', async () => {
+		const { requester, requests, answers } = createDeferredRequester()
+		const engine = createSteeringEngine(config(requester))
+		let resolved = false
+
+		const first = engine.start()
+		answers[0]({ status: 200, data: JSON.stringify(MANIFEST) })
+		await first
+		await advance(300000)
+		equal(requests.length, 2)
+
+		const second = engine.start()
+		void second.then(() => {
+			resolved = true
+		})
+		await flush()
+		equal(resolved, false)
+
+		answers[1]({ status: 200, data: JSON.stringify(MANIFEST) })
+		await second
+		engine.stop()
+
+		equal(resolved, true)
+	})
+
+	it('sends a new request on start() after stop() during a request and ignores the first response', async () => {
+		const { requester, requests, answers } = createDeferredRequester()
+		const changes: string[] = []
+		const engine = createSteeringEngine(
+			config(requester, { onPathwayChange: pathway => changes.push(pathway) }),
+		)
+
+		const first = engine.start()
+		engine.stop()
+		await first
+
+		const second = engine.start()
+		equal(requests.length, 2)
+
+		answers[0]({ status: 200, data: JSON.stringify(MANIFEST) })
+		await flush()
+		deepEqual(changes, [])
+
+		answers[1]({ status: 200, data: JSON.stringify(MANIFEST) })
+		await second
+		engine.stop()
+
+		deepEqual(changes, ['CDN-B'])
+	})
+
 	it('reports a callback error without a caller to onError and continues', async () => {
 		const cause = new Error('player bug')
 		const errors: SteeringError[] = []
