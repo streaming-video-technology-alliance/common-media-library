@@ -669,16 +669,16 @@ function checkConfig({
 
 	if (pathway !== undefined && !pathways.includes(pathway)) {
 		throw new TypeError(
-			`createSteeringEngine: pathway must be one of pathways. Received ${JSON.stringify(pathway)}.`,
+			`createSteeringEngine: pathway must be one of ${JSON.stringify(pathways)}. Received ${JSON.stringify(pathway)}.`,
 		)
 	}
 
 	if (
 		penalty !== undefined &&
-		(typeof penalty !== 'number' || !Number.isFinite(penalty) || penalty < 0)
+		(typeof penalty !== 'number' || !Number.isFinite(penalty) || penalty <= 0)
 	) {
 		throw new TypeError(
-			`createSteeringEngine: penalty must be a finite number of milliseconds, 0 or more. Received ${JSON.stringify(penalty)}.`,
+			`createSteeringEngine: penalty must be a finite number of milliseconds greater than 0. Received ${JSON.stringify(penalty)}.`,
 		)
 	}
 

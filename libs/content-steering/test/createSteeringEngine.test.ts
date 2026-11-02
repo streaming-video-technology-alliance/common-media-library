@@ -74,15 +74,17 @@ describe('createSteeringEngine', () => {
 		it('throws for a pathway that is not in pathways', () => {
 			throws(() => createSteeringEngine(hlsConfig({ pathway: 'CDN-C' })), {
 				name: 'TypeError',
-				message: /pathway must be one of pathways. Received "CDN-C"/,
+				message: /pathway must be one of \["CDN-A","CDN-B"\]. Received "CDN-C"/,
 			})
 		})
 
-		it('throws for a negative penalty', () => {
-			throws(() => createSteeringEngine(hlsConfig({ penalty: -1 })), {
-				name: 'TypeError',
-				message: /penalty must be a finite number/,
-			})
+		it('throws for a penalty that is not greater than 0', () => {
+			for (const penalty of [-1, 0, NaN]) {
+				throws(() => createSteeringEngine(hlsConfig({ penalty })), {
+					name: 'TypeError',
+					message: /penalty must be a finite number of milliseconds greater than 0/,
+				})
+			}
 		})
 
 		it('throws for a missing requester', () => {
