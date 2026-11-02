@@ -50,6 +50,8 @@ engine.stop()
 
 The example uses a requester that returns a fixed Steering Manifest. `fetchRequester` is a requester that uses `fetch`.
 
+The [steering engine guide](docs/steering-engine.md) covers the player integration: when to start the requests, clones, penalties, errors, and stop and resume.
+
 ### Pathway clones
 
 `applyUriReplacement` builds a URI of a pathway clone from a URI of its base pathway.
