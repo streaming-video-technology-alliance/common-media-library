@@ -247,7 +247,7 @@ describe('createSteeringEngine update', () => {
 		await advance(60000)
 		engine.stop()
 
-		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=CDN-A')
 	})
 
 	it('keeps the RELOAD-URI when update() repeats the configured uri', async () => {
@@ -264,7 +264,7 @@ describe('createSteeringEngine update', () => {
 		await advance(60000)
 		engine.stop()
 
-		equal(requests[1].url, 'https://steering.example.com/reload.json?_DASH_pathway=%22CDN-A%22')
+		equal(requests[1].url, 'https://steering.example.com/reload.json?_DASH_pathway=CDN-A')
 	})
 
 	it('resumes the requests after a 410 when update() sets a new uri', async () => {
@@ -280,7 +280,7 @@ describe('createSteeringEngine update', () => {
 		engine.stop()
 
 		equal(requests.length, 2)
-		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=CDN-A')
 		equal(engine.pathway, 'CDN-B')
 	})
 
@@ -301,7 +301,7 @@ describe('createSteeringEngine update', () => {
 		engine.stop()
 
 		equal(requests.length, 2)
-		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=CDN-A')
 		equal(engine.pathway, 'CDN-B')
 	})
 
@@ -327,7 +327,7 @@ describe('createSteeringEngine update', () => {
 
 		deepEqual(contexts, [
 			{
-				url: 'https://steering.example.com/dash.json?_DASH_pathway=%22CDN-A%22',
+				url: 'https://steering.example.com/dash.json?_DASH_pathway=CDN-A',
 				reloadUri: 'https://steering2.example.com/dash.json',
 			},
 		])
@@ -336,7 +336,7 @@ describe('createSteeringEngine update', () => {
 		engine.stop()
 
 		equal(requests.length, 2)
-		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=CDN-A')
 	})
 
 	it('does not end steering for a stale 410 and requests the current uri at once', async () => {
@@ -365,7 +365,7 @@ describe('createSteeringEngine update', () => {
 		engine.stop()
 
 		equal(requests.length, 2)
-		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=CDN-A')
 	})
 
 	it('does not end steering for a stale DASH VERSION error and requests the current uri at once', async () => {
@@ -397,7 +397,7 @@ describe('createSteeringEngine update', () => {
 		engine.stop()
 
 		equal(requests.length, 2)
-		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=%22CDN-A%22')
+		equal(requests[1].url, 'https://steering2.example.com/dash.json?_DASH_pathway=CDN-A')
 	})
 
 	it('throws for an invalid uri or pathways', () => {

@@ -179,10 +179,7 @@ describe('createSteeringEngine responses', () => {
 			await advance(60000)
 			engine.stop()
 
-			equal(
-				requests[1].url,
-				'https://cdn.example.com/b/next.json?session=1&_HLS_pathway=%22CDN-B%22',
-			)
+			equal(requests[1].url, 'https://cdn.example.com/b/next.json?session=1&_HLS_pathway=CDN-B')
 		})
 
 		it('resolves a relative RELOAD-URI against the request URI without a response URI', async () => {
@@ -197,7 +194,7 @@ describe('createSteeringEngine responses', () => {
 			await advance(60000)
 			engine.stop()
 
-			equal(requests[1].url, 'https://steering.example.com/reload.json?_HLS_pathway=%22CDN-B%22')
+			equal(requests[1].url, 'https://steering.example.com/reload.json?_HLS_pathway=CDN-B')
 		})
 
 		it('keeps the RELOAD-URI for later requests until a Steering Manifest replaces it', async () => {
@@ -219,9 +216,9 @@ describe('createSteeringEngine responses', () => {
 			engine.stop()
 
 			equal(requests.length, 4)
-			equal(requests[1].url, 'https://cdn.example.com/steering/next.json?_HLS_pathway=%22CDN-B%22')
-			equal(requests[2].url, 'https://cdn.example.com/steering/next.json?_HLS_pathway=%22CDN-B%22')
-			equal(requests[3].url, 'https://cdn.example.com/steering/other.json?_HLS_pathway=%22CDN-B%22')
+			equal(requests[1].url, 'https://cdn.example.com/steering/next.json?_HLS_pathway=CDN-B')
+			equal(requests[2].url, 'https://cdn.example.com/steering/next.json?_HLS_pathway=CDN-B')
+			equal(requests[3].url, 'https://cdn.example.com/steering/other.json?_HLS_pathway=CDN-B')
 		})
 
 		it('reports a relative RELOAD-URI of a data URI as a parse error', async () => {
@@ -756,7 +753,7 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].type, 'load')
 			equal(errors[0].status, undefined)
 			equal(errors[0].cause, cause)
-			equal(errors[0].url, 'https://steering.example.com/a/manifest.json?_HLS_pathway=%22CDN-A%22')
+			equal(errors[0].url, 'https://steering.example.com/a/manifest.json?_HLS_pathway=CDN-A')
 		})
 
 		it('reports a load error with the thrown value when the requester throws without a promise', async () => {

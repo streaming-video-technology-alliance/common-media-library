@@ -407,7 +407,7 @@ describe('createSteeringEngine lifecycle', () => {
 		await engine.start()
 		engine.stop()
 
-		equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22')
+		equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A')
 		deepEqual(errors, [
 			{
 				type: SteeringErrorType.CALLBACK,

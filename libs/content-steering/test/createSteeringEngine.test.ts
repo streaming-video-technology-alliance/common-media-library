@@ -127,7 +127,7 @@ describe('createSteeringEngine', () => {
 			equal(requests[0].responseType, 'text')
 		})
 
-		it('adds the HLS pathway in quotes and the rounded throughput', async () => {
+		it('adds the HLS pathway and the rounded throughput', async () => {
 			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
 			const engine = createSteeringEngine(hlsConfig({ requester, getThroughput: () => 6000000.4 }))
 
@@ -136,7 +136,7 @@ describe('createSteeringEngine', () => {
 
 			equal(
 				requests[0].url,
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22&_HLS_throughput=6000000',
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A&_HLS_throughput=6000000',
 			)
 		})
 
@@ -160,10 +160,7 @@ describe('createSteeringEngine', () => {
 				await engine.start()
 				engine.stop()
 
-				equal(
-					requests[0].url,
-					'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22',
-				)
+				equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A')
 			}
 		})
 
@@ -177,7 +174,7 @@ describe('createSteeringEngine', () => {
 
 			equal(
 				requests[0].url,
-				'https://steering.example.com/manifest.json?video=a%20b&_HLS_pathway=%22CDN-A%22',
+				'https://steering.example.com/manifest.json?video=a%20b&_HLS_pathway=CDN-A',
 			)
 		})
 
@@ -197,15 +194,15 @@ describe('createSteeringEngine', () => {
 
 			equal(
 				requests[0].url,
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22&_HLS_throughput=6000000',
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A&_HLS_throughput=6000000',
 			)
-			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-B%22')
+			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-B')
 		})
 
 		it('removes the steering parameters of the uri from a request without parameters', async () => {
 			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
 			const uri =
-				'https://steering.example.com/manifest.json?_DASH_pathway=%22old%22&session=1&_DASH_throughput=1'
+				'https://steering.example.com/manifest.json?_DASH_pathway=old&session=1&_DASH_throughput=1'
 			const engine = createSteeringEngine(
 				hlsConfig({ protocol: 'dash', requester, uri, queryBeforeStart: true }),
 			)
@@ -225,7 +222,7 @@ describe('createSteeringEngine', () => {
 			await engine.start()
 			engine.stop()
 
-			equal(requests[0].url, 'https://steering.example.com?_HLS_pathway=%22CDN-A%22#top')
+			equal(requests[0].url, 'https://steering.example.com?_HLS_pathway=CDN-A#top')
 		})
 
 		it('sends a throughput of 0', async () => {
@@ -237,7 +234,7 @@ describe('createSteeringEngine', () => {
 
 			equal(
 				requests[0].url,
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22&_HLS_throughput=0',
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A&_HLS_throughput=0',
 			)
 		})
 
@@ -256,7 +253,7 @@ describe('createSteeringEngine', () => {
 			await engine.start()
 			engine.stop()
 
-			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=%22CDN-A,CDN-B%22')
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=CDN-A,CDN-B')
 		})
 
 		it('sends the ID of a selected clone', async () => {
@@ -282,10 +279,7 @@ describe('createSteeringEngine', () => {
 			engine.stop()
 
 			equal(engine.pathway, 'CDN-A-CLONE')
-			equal(
-				requests[1].url,
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A-CLONE%22',
-			)
+			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A-CLONE')
 		})
 
 		it('adds no parameters to a data URI', async () => {
@@ -322,11 +316,11 @@ describe('createSteeringEngine', () => {
 
 			equal(
 				requests[0].url,
-				'https://steering.example.com/dash?_DASH_pathway=%22alpha%22&_DASH_throughput=5140000',
+				'https://steering.example.com/dash?_DASH_pathway=alpha&_DASH_throughput=5140000',
 			)
 			equal(
 				requests[1].url,
-				'https://steering.example.com/dash?_DASH_pathway=%22alpha,beta%22&_DASH_throughput=5140000,',
+				'https://steering.example.com/dash?_DASH_pathway=alpha,beta&_DASH_throughput=5140000,',
 			)
 		})
 
@@ -348,7 +342,7 @@ describe('createSteeringEngine', () => {
 			equal(requests[0].url, 'https://steering.example.com/manifest.json')
 			equal(
 				requests[1].url,
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-B%22&_HLS_throughput=1000',
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-B&_HLS_throughput=1000',
 			)
 		})
 
@@ -366,10 +360,7 @@ describe('createSteeringEngine', () => {
 			await engine.start()
 			engine.stop()
 
-			equal(
-				requests[0].url,
-				'https://steering.example.com/dash?_DASH_pathway=%22A%26B,C%3DD%2CE%22',
-			)
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=A%26B,C%3DD%2CE')
 		})
 
 		it('encodes a pathway ID with an unpaired surrogate instead of throwing', async () => {
@@ -384,7 +375,7 @@ describe('createSteeringEngine', () => {
 			equal(requests.length, 1)
 			equal(
 				requests[0].url,
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-%EF%BF%BD%22',
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-%EF%BF%BD',
 			)
 		})
 
@@ -399,7 +390,7 @@ describe('createSteeringEngine', () => {
 
 			equal(
 				requests[0].url,
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22%F0%9F%98%80-%EF%BF%BD%22',
+				'https://steering.example.com/manifest.json?_HLS_pathway=%F0%9F%98%80-%EF%BF%BD',
 			)
 		})
 
@@ -417,7 +408,7 @@ describe('createSteeringEngine', () => {
 			await engine.start()
 			engine.stop()
 
-			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=%22CDN-%EF%BF%BD%22')
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=CDN-%EF%BF%BD')
 		})
 
 		it('lists the pathways of getReportedPathways for DASH', async () => {
@@ -437,7 +428,7 @@ describe('createSteeringEngine', () => {
 
 			equal(
 				requests[0].url,
-				'https://steering.example.com/dash?_DASH_pathway=%22beta,alpha%22&_DASH_throughput=2000,1000',
+				'https://steering.example.com/dash?_DASH_pathway=beta,alpha&_DASH_throughput=2000,1000',
 			)
 		})
 
@@ -467,7 +458,7 @@ describe('createSteeringEngine', () => {
 			await engine.start()
 			engine.stop()
 
-			equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22')
+			equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A')
 		})
 
 		it('uses fetch when the requester is fetchRequester', async () => {
@@ -484,7 +475,7 @@ describe('createSteeringEngine', () => {
 			equal(fetchMock.mock.calls.length, 1)
 			equal(
 				fetchMock.mock.calls[0][0],
-				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22',
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A',
 			)
 			equal(engine.pathway, 'CDN-B')
 		})
