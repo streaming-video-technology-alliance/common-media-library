@@ -1,6 +1,6 @@
 import type { HttpRequester } from '@svta/cml-utils'
 import { fetchRequester } from '@svta/cml-utils'
-import { deepEqual, equal } from 'node:assert'
+import { deepEqual, equal, rejects } from 'node:assert'
 import { afterEach, describe, it, vi } from 'vite-plus/test'
 
 function fakeResponse(body: string | null, init: ResponseInit, url: string): Response {
@@ -34,7 +34,7 @@ describe('fetchRequester', () => {
 		equal(response.data, '{"VERSION":1}')
 		//#endregion example
 		equal(response.request.url, 'https://steering.example.com/manifest.json')
-		equal(response.headers?.['content-type'], 'application/json')
+		deepEqual(response.headers, { 'content-type': 'application/json', 'retry-after': '30' })
 	})
 
 	it('passes the method, the headers, the body, the credentials, and the mode to fetch', async () => {
@@ -70,6 +70,21 @@ describe('fetchRequester', () => {
 		equal(response.status, 204)
 		equal(response.data, '')
 		equal(response.request, request)
+	})
+
+	it('rejects when the response body cannot be read', async () => {
+		const cause = new Error('aborted')
+		vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+			url: '',
+			status: 200,
+			headers: new Headers(),
+			text: () => Promise.reject(cause),
+		} as Response)
+
+		await rejects(
+			fetchRequester({ url: 'https://collector.example.com/cmcd' }),
+			error => error === cause,
+		)
 	})
 
 	it('rejects when fetch rejects', async () => {
