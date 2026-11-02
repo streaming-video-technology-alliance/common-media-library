@@ -286,12 +286,13 @@ The engine adds two query parameters for the protocol:
 
 | Parameter | HLS | DASH |
 |---|---|---|
-| pathway | `_HLS_pathway="<id>"` | `_DASH_pathway="<id>,<id>"` with the list of reported pathways |
+| pathway | `_HLS_pathway=<id>` | `_DASH_pathway=<id>,<id>` with the list of reported pathways |
 | throughput | `_HLS_throughput=<integer>` | `_DASH_throughput=<integer>,<integer>` with one value for each listed pathway, empty when unknown |
 
 - For DASH, the list of reported pathways is the result of `getReportedPathways`. Without that function, the list has every pathway that was selected at any time since the previous request, in order.
 - The engine omits the pathway parameter when the list is empty, or for HLS when `pathway` is undefined.
-- The engine percent-encodes each pathway ID in `_HLS_pathway` and `_DASH_pathway`, before it joins the IDs with commas inside the quotes. An ID of ASCII letters, digits, `_`, `.`, and `-` does not change.
+- The engine percent-encodes each pathway ID in `_HLS_pathway` and `_DASH_pathway`, before it joins the IDs with commas. An ID of ASCII letters, digits, `_`, `.`, and `-` does not change.
+- The engine sends the pathway value without quotes. The HLS spec, section 7.4, and the DASH spec, step 7, show quotes. The examples of the DASH spec have none, and hls.js, Shaka Player, and VHS send none.
 - The engine omits the throughput parameter when no listed pathway has a throughput. A pathway has no throughput when `getThroughput` returns `undefined`, a negative value, or a value that is not finite.
 - The engine rounds each throughput to an integer.
 - Each parameter replaces a parameter of the same name in the URI. The engine keeps all other parts of the URI unchanged.
@@ -446,7 +447,7 @@ The package documentation links to the spec versions of this RFC.
 - The HLS and DASH rules ship together, so a player that uses one protocol also bundles the rules of the other.
 - The engine is larger than the steering code of the players. The table shows the sizes of the engine, bundled with rolldown and minified.
 - `SteeringError` is a union, so a player checks `type` before it reads `url`, `status`, or `retryDelay`.
-- Some wire behavior differs from the current players. The differences are the quotes in `_HLS_pathway`, the PARAMS values without a second encoding, and the base URI of RELOAD-URI. A steering server that depends on one player can see a difference.
+- Some wire behavior differs from the current players. The differences are the `_DASH_pathway` value without quotes, which dash.js sends in quotes, the PARAMS values without a second encoding, and the base URI of RELOAD-URI. A steering server that depends on one player can see a difference.
 
 | Import | Minified | gzip | brotli |
 |---|---|---|---|
@@ -495,7 +496,7 @@ The engine also fixes bugs in the old code of three players. The integration map
 
 ## Unresolved questions
 
-1. **Quotes in `_HLS_pathway`.** The HLS spec, section 7.4, shows the pathway ID in quotes. hls.js, Shaka Player, and VHS send it without quotes. This RFC follows the spec text. Should the engine match the players instead?
+1. **Quotes in `_HLS_pathway`.** Resolved on 2026-11-02: the engine sends the pathway IDs without quotes for both protocols. The HLS spec, section 7.4, shows the pathway ID in quotes. The examples of the DASH spec show no quotes, and hls.js, Shaka Player, and VHS send none.
 2. **HLS penalty duration.** This RFC keeps `DEFAULT_PATHWAY_PENALTY`, which is also the value of hls.js. The HLS spec, section 7.5, says that two minutes is generally enough. Which default is better?
 3. **End of steering in DASH.** The DASH spec abandons all steering in two cases:
    - A VERSION other than 1 (step 11).
