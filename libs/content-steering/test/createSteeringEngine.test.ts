@@ -1,8 +1,5 @@
-import {
-	createSteeringEngine,
-	fetchRequester,
-	type SteeringEngineConfig,
-} from '@svta/cml-content-steering'
+import { createSteeringEngine, type SteeringEngineConfig } from '@svta/cml-content-steering'
+import { fetchRequester } from '@svta/cml-utils'
 import { deepEqual, equal, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import { advance, createStubRequester, flush, manifestResponse } from './createStubRequester.ts'

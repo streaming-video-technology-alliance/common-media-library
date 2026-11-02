@@ -14,10 +14,11 @@ status: draft
 
 ## Summary
 
-Add a content steering engine to `@svta/cml-content-steering`. The engine implements the client side of Pathway-based Content Steering for HLS and DASH players. It requests the Steering Manifest, schedules the next request, and selects the pathway that the player must apply. The player keeps its own model of the content. The player applies the selected pathway, creates the pathway clones, and reports the pathways that fail. A second new function, `applyUriReplacement`, builds the URIs of a clone. A third new function, `fetchRequester`, is a requester that uses `fetch`.
+Add a content steering engine to `@svta/cml-content-steering`. The engine implements the client side of Pathway-based Content Steering for HLS and DASH players. It requests the Steering Manifest, schedules the next request, and selects the pathway that the player must apply. The player keeps its own model of the content. The player applies the selected pathway, creates the pathway clones, and reports the pathways that fail. A second new function, `applyUriReplacement`, builds the URIs of a clone. `fetchRequester` from `@svta/cml-utils` is a requester that uses `fetch`.
 
 ```ts
-import { createSteeringEngine, fetchRequester } from '@svta/cml-content-steering'
+import { createSteeringEngine } from '@svta/cml-content-steering'
+import { fetchRequester } from '@svta/cml-utils'
 
 const engine = createSteeringEngine({
 	protocol: 'hls',
@@ -71,7 +72,8 @@ Create one engine for each Content Description that declares content steering. T
 `getThroughput` returns the throughput estimate of the player for a pathway, in bits per second.
 
 ```ts
-import { createSteeringEngine, fetchRequester } from '@svta/cml-content-steering'
+import { createSteeringEngine } from '@svta/cml-content-steering'
+import { fetchRequester } from '@svta/cml-utils'
 
 // abr and player are objects of the media player
 const engine = createSteeringEngine({
@@ -198,13 +200,12 @@ function onError(error) {
 |---|---|
 | `createSteeringEngine` | function |
 | `applyUriReplacement` | function |
-| `fetchRequester` | function |
 | `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, `STEERING_PROTOCOL_DASH` | constants and type |
 | `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, `STEERING_ERROR_TYPE_CALLBACK` | constants and type |
 | `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError` | types |
 | `UriReplacementOptions` | type |
 
-`SteeringProtocol` and `SteeringErrorType` follow the const enum pattern of the repository. The package gets `@svta/cml-utils` as a peer dependency, for the `HttpRequest`, `HttpResponse`, and `ValueOf` types. The package imports only types from it.
+`SteeringProtocol` and `SteeringErrorType` follow the const enum pattern of the repository. The package gets `@svta/cml-utils` as a peer dependency, for the `HttpRequest`, `HttpRequester`, `HttpResponse`, and `ValueOf` types. The package imports only types from it.
 
 ### Configuration
 
@@ -265,7 +266,7 @@ type SteeringEngine = {
 ### Requests
 
 ```ts
-type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>
+type SteeringRequester = HttpRequester // from @svta/cml-utils: (request: HttpRequest) => Promise<HttpResponse>
 ```
 
 The engine calls the requester with `url`, `method: 'GET'`, and `responseType: 'text'`. The promise of the requester resolves to an object, the response. The engine reads `status`, `headers`, `data`, and `url` from the response:
@@ -277,7 +278,7 @@ The engine calls the requester with `url`, `method: 'GET'`, and `responseType: '
 
 The promise must settle, also when the player aborts the request. If the promise never settles, the engine sends no more requests until `stop()` and `start()`. So a player sets a timeout in its requester.
 
-`fetchRequester` is a requester that uses `fetch`. A player passes its own requester to use its network stack, its request hooks, and its CMCD data. A `Requester` function from `@svta/cml-request` has a compatible type. For a steering server on another origin, a browser exposes `Retry-After` only if the server lists the header in `Access-Control-Expose-Headers`.
+`fetchRequester` from `@svta/cml-utils` is a requester that uses `fetch`. A player passes its own requester to use its network stack, its request hooks, and its CMCD data. A `Requester` function from `@svta/cml-request` has a compatible type. For a steering server on another origin, a browser exposes `Retry-After` only if the server lists the header in `Access-Control-Expose-Headers`.
 
 The first request uses `uri`. Each later request uses the RELOAD-URI of the last valid Steering Manifest. If that Steering Manifest has no RELOAD-URI, the request uses the previous URI. A relative RELOAD-URI resolves against the URI of the response that contains it.
 
@@ -540,6 +541,7 @@ The engine also fixes bugs in the old code of three players. The integration map
   - A player may call `penalize()` inside `onPathwayChange` to refuse a pathway that it cannot play.
   - `priority` holds only the selected pathway when every other pathway is penalized.
   - The guide describes `stop()` for media that is ended or detached, and the source of the DASH `pathways`.
+- v5 (2026-11-02): `fetchRequester` moves to `@svta/cml-utils`, and `SteeringRequester` is the `HttpRequester` type of that package. The CMCD session takes the same function as its requester.
 
 ## Final Decision
 

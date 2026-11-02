@@ -54,7 +54,7 @@ export type SteeringEngineConfig = {
 
 	/**
 	 * The function that sends the Steering Manifest requests.
-	 * `fetchRequester` is a requester that uses `fetch`.
+	 * `fetchRequester` from `@svta/cml-utils` is a requester that uses `fetch`.
 	 * `SteeringRequester` describes the response and the promise.
 	 */
 	requester: SteeringRequester

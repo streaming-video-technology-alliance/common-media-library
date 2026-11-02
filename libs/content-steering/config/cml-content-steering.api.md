@@ -4,8 +4,7 @@
 
 ```ts
 
-import { HttpRequest } from '@svta/cml-utils';
-import { HttpResponse } from '@svta/cml-utils';
+import { HttpRequester } from '@svta/cml-utils';
 import { ValueOf } from '@svta/cml-utils';
 
 // @beta
@@ -19,9 +18,6 @@ export const DEFAULT_PATHWAY_PENALTY = 3e5;
 
 // @beta
 export const DEFAULT_TTL = 300;
-
-// @beta
-export function fetchRequester(request: HttpRequest): Promise<HttpResponse>;
 
 // @beta
 export function isValidPathwayClone(clone: PathwayClone): boolean;
@@ -129,7 +125,7 @@ export const SteeringProtocol: {
 export type SteeringProtocol = ValueOf<typeof SteeringProtocol>;
 
 // @beta
-export type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>;
+export type SteeringRequester = HttpRequester;
 
 // @beta
 export type UriReplacement = {

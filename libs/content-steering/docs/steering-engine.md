@@ -19,10 +19,11 @@ Create one engine for each Content Description that declares content steering. T
 | `pathways` | every `PATHWAY-ID` of the variant streams, and `.` for a variant stream without one | every `@serviceLocation` of the `BaseURL` and `Location` elements |
 | `pathway` | `PATHWAY-ID` of `EXT-X-CONTENT-STEERING` | the `@defaultServiceLocation` value that the player applies |
 
-`requester` sends the requests. `fetchRequester` uses `fetch`. A player with its own request layer passes a function that returns a promise of the response. `getThroughput` returns the throughput estimate of the player for a pathway, in bits per second.
+`requester` sends the requests. `fetchRequester` from `@svta/cml-utils` uses `fetch`. A player with its own request layer passes a function that returns a promise of the response. `getThroughput` returns the throughput estimate of the player for a pathway, in bits per second.
 
 ```typescript
-import { createSteeringEngine, fetchRequester } from '@svta/cml-content-steering'
+import { createSteeringEngine } from '@svta/cml-content-steering'
+import { fetchRequester } from '@svta/cml-utils'
 
 const engine = createSteeringEngine({
 	protocol: 'dash',

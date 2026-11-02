@@ -6,7 +6,6 @@ Content steering for HLS and DASH players. The package implements Pathway-based 
 ## When to use
 
 - Run the content steering client of a player, which requests the Steering Manifest, keeps the request schedule, and selects the pathway: `createSteeringEngine`
-- Send the Steering Manifest requests with `fetch` when the player has no requester of its own: `fetchRequester`
 - Build a URI of a pathway clone from a URI of its base pathway: `applyUriReplacement`
 - Validate a content steering manifest before the player applies it: `isValidSteeringManifest`
 - Validate a pathway clone and its URI replacement: `isValidPathwayClone`
@@ -49,7 +48,7 @@ engine.penalize() // apply CDN-A
 engine.stop()
 ```
 
-The example uses a requester that returns a fixed Steering Manifest. `fetchRequester` is a requester that uses `fetch`.
+The example uses a requester that returns a fixed Steering Manifest. `fetchRequester` from `@svta/cml-utils` is a requester that uses `fetch`.
 
 The [steering engine guide](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/content-steering/docs/steering-engine.md) covers the player integration: when to start the requests, clones, penalties, errors, and stop and resume.
 
@@ -116,10 +115,11 @@ Create one engine for each Content Description that declares content steering. T
 | `pathways` | every `PATHWAY-ID` of the variant streams, and `.` for a variant stream without one | every `@serviceLocation` of the `BaseURL` and `Location` elements |
 | `pathway` | `PATHWAY-ID` of `EXT-X-CONTENT-STEERING` | the `@defaultServiceLocation` value that the player applies |
 
-`requester` sends the requests. `fetchRequester` uses `fetch`. A player with its own request layer passes a function that returns a promise of the response. `getThroughput` returns the throughput estimate of the player for a pathway, in bits per second.
+`requester` sends the requests. `fetchRequester` from `@svta/cml-utils` uses `fetch`. A player with its own request layer passes a function that returns a promise of the response. `getThroughput` returns the throughput estimate of the player for a pathway, in bits per second.
 
 ```typescript
-import { createSteeringEngine, fetchRequester } from '@svta/cml-content-steering'
+import { createSteeringEngine } from '@svta/cml-content-steering'
+import { fetchRequester } from '@svta/cml-utils'
 
 const engine = createSteeringEngine({
 	protocol: 'dash',
@@ -257,8 +257,7 @@ await engine.start()
 
 ```ts
 
-import { HttpRequest } from '@svta/cml-utils';
-import { HttpResponse } from '@svta/cml-utils';
+import { HttpRequester } from '@svta/cml-utils';
 import { ValueOf } from '@svta/cml-utils';
 
 // @beta
@@ -272,9 +271,6 @@ export const DEFAULT_PATHWAY_PENALTY = 3e5;
 
 // @beta
 export const DEFAULT_TTL = 300;
-
-// @beta
-export function fetchRequester(request: HttpRequest): Promise<HttpResponse>;
 
 // @beta
 export function isValidPathwayClone(clone: PathwayClone): boolean;
@@ -382,7 +378,7 @@ export const SteeringProtocol: {
 export type SteeringProtocol = ValueOf<typeof SteeringProtocol>;
 
 // @beta
-export type SteeringRequester = (request: HttpRequest) => Promise<HttpResponse>;
+export type SteeringRequester = HttpRequester;
 
 // @beta
 export type UriReplacement = {

@@ -5,7 +5,6 @@ Content steering for HLS and DASH players. The package implements Pathway-based 
 ## When to use
 
 - Run the content steering client of a player, which requests the Steering Manifest, keeps the request schedule, and selects the pathway: `createSteeringEngine`
-- Send the Steering Manifest requests with `fetch` when the player has no requester of its own: `fetchRequester`
 - Build a URI of a pathway clone from a URI of its base pathway: `applyUriReplacement`
 - Validate a content steering manifest before the player applies it: `isValidSteeringManifest`
 - Validate a pathway clone and its URI replacement: `isValidPathwayClone`
@@ -48,7 +47,7 @@ engine.penalize() // apply CDN-A
 engine.stop()
 ```
 
-The example uses a requester that returns a fixed Steering Manifest. `fetchRequester` is a requester that uses `fetch`.
+The example uses a requester that returns a fixed Steering Manifest. `fetchRequester` from `@svta/cml-utils` is a requester that uses `fetch`.
 
 The [steering engine guide](docs/steering-engine.md) covers the player integration: when to start the requests, clones, penalties, errors, and stop and resume.
 
