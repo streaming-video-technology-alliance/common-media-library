@@ -21,14 +21,12 @@ export function fetchRequester(request: HttpRequest): Promise<HttpResponse> {
 	const { url, method, headers, body, credentials, mode } = request
 
 	return fetch(url, { method, headers, body, credentials, mode }).then(response =>
-		response.text().then(data => {
-			const responseHeaders: Record<string, string> = {}
-
-			response.headers.forEach((value, key) => {
-				responseHeaders[key] = value
-			})
-
-			return { request, url: response.url, status: response.status, headers: responseHeaders, data }
-		}),
+		response.text().then(data => ({
+			request,
+			url: response.url,
+			status: response.status,
+			headers: Object.fromEntries(response.headers),
+			data,
+		})),
 	)
 }

@@ -72,6 +72,22 @@ describe('fetchRequester', () => {
 		equal(response.request, request)
 	})
 
+	it('keeps a response header named __proto__', async () => {
+		const headers = new Headers({ 'Retry-After': '30' })
+
+		headers.append('__proto__', 'x')
+		vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+			fakeResponse(null, { status: 200, headers }, 'https://collector.example.com/cmcd'),
+		)
+
+		const response = await fetchRequester({ url: 'https://collector.example.com/cmcd' })
+
+		deepEqual(Object.entries(response.headers ?? {}).sort(), [
+			['__proto__', 'x'],
+			['retry-after', '30'],
+		])
+	})
+
 	it('rejects when the response body cannot be read', async () => {
 		const cause = new Error('aborted')
 		vi.spyOn(globalThis, 'fetch').mockResolvedValue({
