@@ -464,6 +464,13 @@ export function createCmcdSession(
 			const { cmcd } = (response.request.customData ?? {}) as { cmcd?: Cmcd }
 			const requestData = withoutScopedKeys(cmcd ?? {})
 
+			const nor: unknown = requestData.nor
+
+			// Version 1 writes nor as one percent-encoded path. Version 2 writes a list of paths.
+			if (typeof nor === 'string') {
+				requestData.nor = [decodeURIComponent(nor)]
+			}
+
 			emit(
 				CMCD_EVENT_RESPONSE_RECEIVED,
 				{ ...requestData, ...toResponseKeys(response, timeOrigin), ...data },

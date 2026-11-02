@@ -1,3 +1,4 @@
+import type { CmcdSessionConfig } from '@svta/cml-cmcd'
 import { CmcdEventType, CmcdObjectType, createCmcdSession } from '@svta/cml-cmcd'
 import type { HttpRequest } from '@svta/cml-utils'
 import { deepEqual, equal, ok } from 'node:assert'
@@ -11,10 +12,10 @@ function settle(): Promise<void> {
 	return new Promise(resolve => setImmediate(resolve))
 }
 
-function setup() {
+function setup(config: CmcdSessionConfig = {}) {
 	const posts: HttpRequest[] = []
 	const session = createCmcdSession(
-		{ sid: 's1', eventTargets: [{ url: A, events: [CmcdEventType.RESPONSE_RECEIVED] }] },
+		{ sid: 's1', eventTargets: [{ url: A, events: [CmcdEventType.RESPONSE_RECEIVED] }], ...config },
 		request => {
 			posts.push(request)
 			return Promise.resolve({ status: 200 })
@@ -107,6 +108,24 @@ describe('createCmcdSession responses', () => {
 		deepEqual(lines(), [
 			`br=(3000),bs,bsd=(300),e=rr,msd=700,ot=v,rc=206,sid="s1",sn=0,ts=${ts},ttfbb=60,url="${SEGMENT}",v=2`,
 			`e=rr,rc=404,sid="s1",sn=1,ts=${ts},url="https://cdn.test/v/2.m4s",v=2`,
+		])
+	})
+
+	it('decodes the percent-encoded nor of a version 1 request report', () => {
+		const { session, lines } = setup({ version: 1 })
+
+		const report = session.createRequestReport(
+			{ url: 'https://cdn.test/v/720p/1.m4s' },
+			{ nor: ['https://cdn.test/v/1080p/seg 2.m4s'] },
+		)
+		session.recordResponseReceived({ request: report, status: 200 })
+
+		equal(
+			decodeURIComponent(report.url),
+			'https://cdn.test/v/720p/1.m4s?CMCD=nor="..%2F1080p%2Fseg%25202.m4s",sid="s1"',
+		)
+		deepEqual(lines(), [
+			`e=rr,nor=("../1080p/seg%202.m4s"),rc=200,sid="s1",sn=0,ts=${ts},url="https://cdn.test/v/720p/1.m4s",v=2`,
 		])
 	})
 })

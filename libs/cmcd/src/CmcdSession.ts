@@ -68,6 +68,7 @@ export type CmcdSession = {
 	 * The session derives `url` without the `CMCD` parameter, and `rc` from `status`.
 	 * It derives `ts`, `ttfb`, and `ttlb` from `resourceTiming`.
 	 * It adds the request-time data from `customData.cmcd`, without `msd`, `bs`, `bsd`, and `ec`.
+	 * With version 1, the request report percent-encodes `nor`. The method decodes that value for the version 2 report.
 	 * The `data` argument overrides the derived keys.
 	 *
 	 * @param response - The response. Its `request` is the request report.

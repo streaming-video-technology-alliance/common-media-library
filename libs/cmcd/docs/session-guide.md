@@ -135,7 +135,7 @@ console.log(next.headers['CMCD-Request'])
 
 Resource Timing reports 0 for the `responseStart` of a cross-origin response without the `Timing-Allow-Origin` header. The session then omits `ttfb`.
 
-The report also has the request-time data from `customData.cmcd`. The `data` argument overrides the derived keys. Pass the keys that the session cannot derive there, for example `ttfbb`, `cmsdd`, and `cmsds`.
+The report also has the request-time data from `customData.cmcd`. With version 1, the request report percent-encodes `nor`. The session decodes that value, because an event report uses version 2. The `data` argument overrides the derived keys. Pass the keys that the session cannot derive there, for example `ttfbb`, `cmsdd`, and `cmsds`.
 
 ```typescript
 import { CmcdEventType, CmcdObjectType, createCmcdSession } from '@svta/cml-cmcd'
