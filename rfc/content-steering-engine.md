@@ -320,7 +320,7 @@ A Steering Manifest is valid when all of these conditions are true:
 - PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values. The base spec forbids a duplicate ID but does not say what a client does with one, so the engine keeps the first position. The DASH spec requires PATHWAY-PRIORITY in clause 6.2 and lists it as optional with the default `[]` in Table 6.3-1. The engine follows clause 6.2.
 - A relative RELOAD-URI resolves.
 
-An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. The base spec requires an element in a present array, and the DASH spec gives `[]` as the default, so the engine accepts the empty array. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
+An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. The base spec requires an element in a present array. The DASH spec gives `[]` as the default, so the engine accepts the empty array. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
 
 Until the first valid Steering Manifest, the previous TTL is `DEFAULT_TTL`. Retry-After can be a number of seconds, or an HTTP date that ends in `GMT`. A Retry-After that asks for no wait, such as `0` or a date in the past, counts as absent. A 429 without a Retry-After, or with a Retry-After that counts as absent or is not finite, gets the same action as any other status.
 
@@ -447,7 +447,7 @@ The package documentation links to the spec versions of this RFC.
 - The HLS and DASH rules ship together, so a player that uses one protocol also bundles the rules of the other.
 - The engine is larger than the steering code of the players. The table shows the sizes of the engine, bundled with rolldown and minified.
 - `SteeringError` is a union, so a player checks `type` before it reads `url`, `status`, or `retryDelay`.
-- Some wire behavior differs from the current players. The differences are the `_DASH_pathway` value without quotes, which dash.js sends in quotes, the PARAMS values without a second encoding, and the base URI of RELOAD-URI. A steering server that depends on one player can see a difference.
+- Some wire behavior differs from the current players. The differences are the `_DASH_pathway` value without quotes, the PARAMS values without a second encoding, and the base URI of RELOAD-URI. dash.js sends the quotes. A steering server that depends on one player can see a difference.
 
 | Import | Minified | gzip | brotli |
 |---|---|---|---|
