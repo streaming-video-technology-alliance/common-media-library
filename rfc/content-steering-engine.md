@@ -215,7 +215,7 @@ type SteeringEngineConfig = {
 	uri: string                                             // absolute URI of the first request
 	pathways: readonly string[]                             // pathway IDs of the Content Description
 	pathway?: string                                        // the pathway that the player applies now
-	penalty?: number                                        // milliseconds. See Penalties
+	penalty?: number | 'ttl'                                // milliseconds, or the current TTL. See Penalties
 	queryBeforeStart?: boolean                              // no steering parameters on the first request
 	requester: SteeringRequester
 	getThroughput?: (pathway: string) => number | undefined // bits per second
@@ -233,7 +233,7 @@ type SteeringEngineConfig = {
 - `uri` is not an absolute URI.
 - `pathways` is empty, or it contains a value that is not a string.
 - `pathway` is not in `pathways`.
-- `penalty` is negative or not finite.
+- `penalty` is not `'ttl'` and not a finite number greater than 0.
 - `requester` is not a function.
 
 The checks of `uri` and `pathways` depend on the Content Description. A player must catch the `TypeError` when the Content Description has, for example, no service locations.
@@ -316,13 +316,13 @@ A Steering Manifest is valid when all of these conditions are true:
 
 - The body parses as a JSON object.
 - VERSION is 1. For DASH, a missing VERSION counts as a VERSION other than 1 (base spec, section 4).
-- TTL is a positive, finite number. The engine never uses a TTL below 1 second, so a TTL below 1 counts as 1. The Steering Manifest stays valid. No spec defines a minimum, and the base spec and the DASH spec allow a longer wait.
-- PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values. The DASH spec requires PATHWAY-PRIORITY in clause 6.2 and lists it as optional with the default `[]` in Table 6.3-1. The engine follows clause 6.2.
+- TTL is a finite number greater than 0. The engine never uses a TTL below 1 second, so a TTL between 0 and 1 counts as 1. The Steering Manifest stays valid. No spec defines a minimum, and the base spec and the DASH spec allow a longer wait.
+- PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values. The base spec forbids a duplicate ID but does not say what a client does with one, so the engine keeps the first position. The DASH spec requires PATHWAY-PRIORITY in clause 6.2 and lists it as optional with the default `[]` in Table 6.3-1. The engine follows clause 6.2.
 - A relative RELOAD-URI resolves.
 
-An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
+An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. The base spec requires an element in a present array, and the DASH spec gives `[]` as the default, so the engine accepts the empty array. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
 
-Until the first valid Steering Manifest, the previous TTL is `DEFAULT_TTL`. Retry-After can be a number of seconds, or an HTTP date that ends in `GMT`. A Retry-After value is valid only when its delay is positive and finite. A 429 without a valid Retry-After gets the same action as any other status.
+Until the first valid Steering Manifest, the previous TTL is `DEFAULT_TTL`. Retry-After can be a number of seconds, or an HTTP date that ends in `GMT`. A Retry-After that asks for no wait, such as `0` or a date in the past, counts as absent. A 429 without a Retry-After, or with a Retry-After that counts as absent or is not finite, gets the same action as any other status.
 
 The engine applies a valid Steering Manifest in this order:
 
@@ -395,7 +395,7 @@ The engine ignores a clone that is not valid, and a valid clone that `acceptClon
 | HLS | `DEFAULT_PATHWAY_PENALTY`, 5 minutes |
 | DASH | the TTL of the last valid Steering Manifest (DASH spec, step 19), or `DEFAULT_TTL` |
 
-The `penalty` property of the configuration replaces the default for both protocols. A new Steering Manifest does not end a penalty, and `update()` does not end a penalty either. When a penalty ends, the engine selects a pathway again (base spec, step 4). A second call for the same pathway restarts its penalty.
+The `penalty` property of the configuration replaces the default for both protocols: a number of milliseconds, or `'ttl'` for the current TTL. A new Steering Manifest does not end a penalty, and `update()` does not end a penalty either. When a penalty ends, the engine selects a pathway again (base spec, step 4). A second call for the same pathway restarts its penalty.
 
 A player may call `penalize()` inside `onPathwayChange`. The engine then applies the penalty and selects again at once, inside that `onPathwayChange` call. So the `onPathwayChange` call for the next pathway runs inside the first call. If no pathway qualifies, the selection does not change (base spec, step 5), and the engine does not call `onPathwayChange` again. The player then uses its own list of all pathways (see Pathway selection).
 
