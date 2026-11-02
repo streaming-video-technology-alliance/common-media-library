@@ -10,7 +10,7 @@
 			"imports": [
 				"createSteeringEngine"
 			],
-			"brotli": 3312
+			"brotli": 3428
 		},
 		"applyUriReplacement": {
 			"imports": [
@@ -23,7 +23,7 @@
 				"createSteeringEngine",
 				"applyUriReplacement"
 			],
-			"brotli": 3551
+			"brotli": 3667
 		}
 	}
 }
