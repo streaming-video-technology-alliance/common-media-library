@@ -66,6 +66,7 @@ function isValidReplacement({ HOST, PARAMS }: UriReplacement): boolean {
 	return (
 		typeof PARAMS === 'object' &&
 		PARAMS !== null &&
+		!Array.isArray(PARAMS) &&
 		Object.keys(PARAMS).every(name => name !== '' && typeof PARAMS[name] === 'string')
 	)
 }

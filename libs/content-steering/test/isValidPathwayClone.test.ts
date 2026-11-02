@@ -48,6 +48,7 @@ describe('isValidPathwayClone', () => {
 
 		it('invalid URI-REPLACEMENT', () => {
 			equal(isValidPathwayClone(Object.assign({}, PATHWAY_CLONE, { 'URI-REPLACEMENT': 0 })), false)
+			equal(isValidPathwayClone(Object.assign({}, PATHWAY_CLONE, { 'URI-REPLACEMENT': [] })), false)
 		})
 	})
 })

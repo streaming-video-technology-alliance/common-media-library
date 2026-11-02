@@ -99,6 +99,10 @@ describe('createSteeringEngine clones', () => {
 			clone('C5', 'CDN-A', { PARAMS: { '': 'x' } }),
 			// @ts-expect-error - a PARAMS value that is not a string
 			clone('C6', 'CDN-A', { PARAMS: { token: 1 } }),
+			// @ts-expect-error - a PARAMS array
+			clone('C8', 'CDN-A', { PARAMS: ['abc'] }),
+			// @ts-expect-error - a URI-REPLACEMENT array
+			clone('C9', 'CDN-A', []),
 		]
 		const valid = clone('C7', 'CDN-A', { PARAMS: { token: 'x' } })
 		const duplicate = clone('C7', 'CDN-B')

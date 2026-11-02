@@ -23,6 +23,10 @@ and this project adheres to
 - The package has a peer dependency on `@svta/cml-utils`. The package imports only types from it ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
+### Fixed
+
+- `isValidPathwayClone` rejects a clone whose `URI-REPLACEMENT` is an array ([#608](https://github.com/streaming-video-technology-alliance/common-media-library/pull/608))
+
 ## [0.23.1] - 2025-12-22
 
 ### Fixed
