@@ -34,17 +34,17 @@ export type SteeringEngineConfig = {
 	pathway?: string
 
 	/**
-	 * The penalty duration in milliseconds. The default is
-	 * `DEFAULT_PATHWAY_PENALTY` for HLS.
+	 * The penalty duration in milliseconds, or `'ttl'` for the current TTL.
+	 * The default is `DEFAULT_PATHWAY_PENALTY` for HLS and `'ttl'` for DASH.
 	 *
-	 * For DASH, the default is the current TTL. Before the first valid
-	 * Steering Manifest, the current TTL is `DEFAULT_TTL`. Otherwise, the
-	 * current TTL is the TTL of the last valid Steering Manifest. A DASH 429
-	 * response with a positive Retry-After delay sets the current TTL. This
-	 * 429 response can arrive at any time, even before the first valid
-	 * Steering Manifest. The engine never uses a current TTL below 1 second.
+	 * Before the first valid Steering Manifest, the current TTL is
+	 * `DEFAULT_TTL`. Otherwise, the current TTL is the TTL of the last valid
+	 * Steering Manifest. A DASH 429 response with a positive Retry-After
+	 * delay sets the current TTL. This 429 response can arrive at any time,
+	 * even before the first valid Steering Manifest. The engine never uses a
+	 * current TTL below 1 second.
 	 */
-	penalty?: number
+	penalty?: number | 'ttl'
 
 	/**
 	 * When `true`, the first request has no steering query parameters.

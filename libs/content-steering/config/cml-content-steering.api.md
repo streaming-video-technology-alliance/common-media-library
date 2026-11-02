@@ -67,7 +67,7 @@ export type SteeringEngineConfig = {
     uri: string;
     pathways: readonly string[];
     pathway?: string;
-    penalty?: number;
+    penalty?: number | "ttl";
     queryBeforeStart?: boolean;
     requester: SteeringRequester;
     getThroughput?: (pathway: string) => number | undefined;

@@ -75,13 +75,19 @@ describe('createSteeringEngine', () => {
 			})
 		})
 
-		it('throws for a penalty that is not greater than 0', () => {
+		it('throws for a penalty that is not greater than 0 or not ttl', () => {
 			for (const penalty of [-1, 0, NaN]) {
 				throws(() => createSteeringEngine(hlsConfig({ penalty })), {
 					name: 'TypeError',
-					message: /penalty must be a finite number of milliseconds greater than 0/,
+					message: /penalty must be 'ttl' or a finite number of milliseconds greater than 0/,
 				})
 			}
+			// @ts-expect-error - penalty must be a number or 'ttl'
+			throws(() => createSteeringEngine(hlsConfig({ penalty: '5m' })), {
+				name: 'TypeError',
+				message:
+					/penalty must be 'ttl' or a finite number of milliseconds greater than 0. Received "5m"/,
+			})
 		})
 
 		it('throws for a missing requester', () => {

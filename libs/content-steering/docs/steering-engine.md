@@ -117,7 +117,7 @@ For DASH, put the `PARAMS` of a clone on the final request URI of each segment. 
 
 If all URIs of the selected pathway fail, call `penalize()`. The engine excludes that pathway for the penalty duration and selects the next pathway in the priority list. When the penalty ends, the engine selects again, so the player can return to the preferred pathway. `penalize()` also works before the first Steering Manifest, with the fallback priority list. A player may also call `penalize()` inside `onPathwayChange`, to refuse a pathway that it cannot play.
 
-The default penalty is `DEFAULT_PATHWAY_PENALTY` for HLS and the current TTL for DASH. The `penalty` option of the configuration replaces both defaults.
+The default penalty is `DEFAULT_PATHWAY_PENALTY` for HLS and the current TTL for DASH. The `penalty` option replaces both defaults: a number of milliseconds, or `'ttl'` for the current TTL.
 
 ```typescript
 engine.penalize() // the selected pathway

@@ -1,6 +1,7 @@
 import {
 	createSteeringEngine,
 	DEFAULT_PATHWAY_PENALTY,
+	DEFAULT_TTL,
 	type SteeringEngine,
 	type SteeringEngineConfig,
 } from '@svta/cml-content-steering'
@@ -128,6 +129,48 @@ describe('createSteeringEngine penalties', () => {
 
 		engine.penalize()
 		await advance(1000)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('uses the current TTL as the HLS penalty with penalty ttl', async () => {
+		const { engine } = await started(
+			{ penalty: 'ttl' },
+			manifestResponse({ VERSION: 1, TTL: 10, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
+
+		engine.penalize()
+		equal(engine.pathway, 'CDN-B')
+
+		await advance(9999)
+		equal(engine.pathway, 'CDN-B')
+
+		await advance(1)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+	})
+
+	it('uses DEFAULT_TTL as the penalty with penalty ttl before the first Steering Manifest', async () => {
+		const { requester } = createStubRequester()
+		const engine = createSteeringEngine({
+			protocol: 'hls',
+			uri: 'https://steering.example.com/manifest.json',
+			pathways: PRIORITY,
+			pathway: 'CDN-A',
+			penalty: 'ttl',
+			requester,
+		})
+
+		await engine.start()
+		engine.penalize()
+		equal(engine.pathway, 'CDN-B')
+
+		await advance(DEFAULT_TTL * 1000 - 1)
+		equal(engine.pathway, 'CDN-B')
+
+		await advance(1)
 		engine.stop()
 
 		equal(engine.pathway, 'CDN-A')

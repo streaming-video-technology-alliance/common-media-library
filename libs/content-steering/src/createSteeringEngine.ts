@@ -168,11 +168,16 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return
 		}
 
-		penalties.set(
-			pathway,
-			Date.now() + (penalty ?? (isDash ? ttl * 1000 : DEFAULT_PATHWAY_PENALTY)),
-		)
+		penalties.set(pathway, Date.now() + penaltyDuration())
 		run(true, select)
+	}
+
+	function penaltyDuration(): number {
+		if (typeof penalty === 'number') {
+			return penalty
+		}
+
+		return penalty === 'ttl' || isDash ? ttl * 1000 : DEFAULT_PATHWAY_PENALTY
 	}
 
 	function update(changes: {
@@ -675,10 +680,11 @@ function checkConfig({
 
 	if (
 		penalty !== undefined &&
+		penalty !== 'ttl' &&
 		(typeof penalty !== 'number' || !Number.isFinite(penalty) || penalty <= 0)
 	) {
 		throw new TypeError(
-			`createSteeringEngine: penalty must be a finite number of milliseconds greater than 0. Received ${JSON.stringify(penalty)}.`,
+			`createSteeringEngine: penalty must be 'ttl' or a finite number of milliseconds greater than 0. Received ${JSON.stringify(penalty)}.`,
 		)
 	}
 
