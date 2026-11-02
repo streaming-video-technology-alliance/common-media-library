@@ -9,6 +9,9 @@ import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
  * @param request - The Steering Manifest request.
  * @returns A promise of the response.
  *
+ * @example
+ * {@includeCode ../test/fetchRequester.test.ts#example}
+ *
  * @beta
  */
 export function fetchRequester(request: HttpRequest): Promise<HttpResponse> {
