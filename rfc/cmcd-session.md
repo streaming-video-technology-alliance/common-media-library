@@ -381,7 +381,7 @@ Each target is one destination, with its own sequence number, `msd` gate, and wa
 - `ttfb` is `responseStart` minus `startTime`. The session omits `ttfb` when `responseStart` is missing, earlier than `startTime`, or later than `startTime` plus `duration`. Resource Timing reports 0 for a cross-origin response without the `Timing-Allow-Origin` header. That value is earlier than `startTime`, so the response has no `ttfb`.
 - `ttlb` is `duration`, when `duration` is above 0.
 
-The method adds the request-time data from `customData.cmcd`, without the keys that have a destination scope. The request report already gave those keys to every destination. The `data` argument overrides the derived keys. The method then records an `rr` event and passes the request to the filters.
+The method adds the request-time data from `customData.cmcd`, without the keys that have a destination scope. The request report already gave those keys to every destination. With version 1, the request report percent-encodes `nor`. The method decodes that value, because an event report uses version 2. The `data` argument overrides the derived keys. The method then records an `rr` event and passes the request to the filters.
 
 `recordError()` sends `e=e` with `ec` at once to each selected target that lists `e`. Every other destination receives the codes with its next report, as CTA-5004-B recommends.
 
@@ -469,9 +469,9 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession` | 7176 B |
-| `CmcdReporter` | 8853 B |
-| Both in one bundle | 10847 B |
+| `createCmcdSession` | 7197 B |
+| `CmcdReporter` | 8849 B |
+| Both in one bundle | 10869 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
