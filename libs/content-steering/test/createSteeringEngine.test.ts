@@ -331,6 +331,21 @@ describe('createSteeringEngine', () => {
 			)
 		})
 
+		it('keeps a surrogate pair next to an unpaired surrogate', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, pathways: ['😀-\uD800'], pathway: '😀-\uD800' }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=%22%F0%9F%98%80-%EF%BF%BD%22',
+			)
+		})
+
 		it('encodes a DASH pathway ID with an unpaired surrogate from getReportedPathways', async () => {
 			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
 			const engine = createSteeringEngine({

@@ -21,7 +21,7 @@ import { uniqueStrings } from './uniqueStrings.ts'
 
 const MAX_DELAY = 2147483647
 const MIN_TTL = 1
-const SURROGATE = /[\uD800-\uDFFF]/g
+const SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g
 
 type SteeringRequestError = Exclude<SteeringError, { type: typeof STEERING_ERROR_TYPE_CALLBACK }>
 
