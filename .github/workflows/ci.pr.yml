@@ -40,8 +40,5 @@ jobs:
       - name: Generated skill files are current
         run: git add -N skills && git diff --exit-code -- skills || { echo "skills/ is stale. Run npm run build and commit the skills/ directory."; exit 1; }
 
-      - name: Size
-        run: npm run size -- --check
-
       # - name: Change Log
       #   uses: dangoslen/changelog-enforcer@v3

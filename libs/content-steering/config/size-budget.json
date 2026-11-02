@@ -2,10 +2,16 @@
 	"$comment": [
 		"These are brotli byte budgets for the built package. The tolerance is a fraction of the budget.",
 		"The command `npm run size` prints the sizes. The command `npm run size -- --check` fails when a size is over its budget plus the tolerance.",
-		"Raise a budget in the pull request that grows the bundle. The command `npm run size -- --update` writes the current sizes."
+		"Raise a budget in the pull request that grows the bundle. The command `npm run size -- --update` writes the current sizes.",
+		"The entry without imports measures a bare import of the package. `typeOnlyPeers` fails the check when a bundle imports a peer dependency at runtime."
 	],
 	"tolerance": 0.02,
+	"typeOnlyPeers": true,
 	"entries": {
+		"bare import": {
+			"imports": [],
+			"brotli": 1
+		},
 		"createSteeringEngine": {
 			"imports": [
 				"createSteeringEngine"

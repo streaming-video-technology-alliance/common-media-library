@@ -5,18 +5,9 @@ import { fileURLToPath } from 'node:url'
 import { parseArgs, stripVTControlCharacters } from 'node:util'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
 import { build } from 'vite-plus'
+import { isOverBudget, isRecord, parseBudget, type Entry } from './sizeBudget.ts'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-
-type Entry = {
-	imports: string[]
-	brotli: number
-}
-
-type Budget = {
-	tolerance: number
-	entries: Record<string, Entry>
-}
 
 type Row = {
 	name: string
@@ -25,52 +16,6 @@ type Row = {
 	brotli: number
 	budget: number
 	over: boolean
-}
-
-function fail(file: string, field: string, expected: string, received: unknown): never {
-	throw new Error(`${file}: "${field}" must be ${expected}. Received ${JSON.stringify(received)}.`)
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function isExportName(value: unknown): value is string {
-	return typeof value === 'string' && /^[A-Za-z_$][\w$]*$/.test(value)
-}
-
-function parseBudget(file: string, data: unknown): Budget {
-	if (!isRecord(data)) {
-		fail(file, '(file)', 'an object', data)
-	}
-
-	const { tolerance, entries } = data
-
-	if (typeof tolerance !== 'number' || !Number.isFinite(tolerance) || tolerance < 0) {
-		fail(file, 'tolerance', 'a number of at least 0', tolerance)
-	}
-
-	if (!isRecord(entries) || Object.keys(entries).length === 0) {
-		fail(file, 'entries', 'an object with at least one entry', entries)
-	}
-
-	for (const [name, entry] of Object.entries(entries)) {
-		if (!isRecord(entry)) {
-			fail(file, `entries.${name}`, 'an object', entry)
-		}
-
-		const { imports, brotli } = entry
-
-		if (!Array.isArray(imports) || imports.length === 0 || !imports.every(isExportName)) {
-			fail(file, `entries.${name}.imports`, 'a non-empty array of export names', imports)
-		}
-
-		if (typeof brotli !== 'number' || !Number.isInteger(brotli) || brotli < 0) {
-			fail(file, `entries.${name}.brotli`, 'an integer of at least 0', brotli)
-		}
-	}
-
-	return data as Budget
 }
 
 async function exists(file: string): Promise<boolean> {
@@ -104,19 +49,21 @@ async function measure(
 	name: string,
 	entry: Entry,
 	peers: string[],
+	typeOnlyPeers: boolean,
 	tmp: string,
 	id: string,
 ): Promise<Omit<Row, 'budget' | 'over'>> {
 	const dist = path.join(root, 'libs', pkg, 'dist', 'index.js')
 	const names = entry.imports.join(', ')
 	const input = path.join(tmp, `${id}.entry.js`)
+	const source =
+		entry.imports.length === 0
+			? `import ${JSON.stringify(dist)}\n`
+			: `import { ${names} } from ${JSON.stringify(dist)}\nglobalThis.__cmlSize = [${names}]\n`
 
-	await writeFile(
-		input,
-		`import { ${names} } from ${JSON.stringify(dist)}\nglobalThis.__cmlSize = [${names}]\n`,
-	)
+	await writeFile(input, source)
 
-	let code: Buffer
+	let code: string
 	try {
 		const result = await build({
 			configFile: false,
@@ -133,7 +80,7 @@ async function measure(
 		if (first === undefined || !('output' in first) || first.output.length === 0) {
 			throw new Error('The build returned no output chunk.')
 		}
-		code = Buffer.from(first.output[0].code)
+		code = first.output[0].code
 	} catch (error) {
 		const detail = error instanceof Error ? error.message : String(error)
 		throw new Error(
@@ -141,11 +88,22 @@ async function measure(
 		)
 	}
 
+	if (typeOnlyPeers) {
+		const peer = peers.find(peer => code.includes(peer))
+		if (peer !== undefined) {
+			throw new Error(
+				`The entry "${name}" of ${pkg} imports the peer dependency ${peer} at runtime. The size budget of ${pkg} sets "typeOnlyPeers" to true.`,
+			)
+		}
+	}
+
+	const bytes = Buffer.from(code)
+
 	return {
 		name,
-		minified: code.length,
-		gzip: gzipSync(code, { level: 9 }).length,
-		brotli: brotliCompressSync(code).length,
+		minified: bytes.length,
+		gzip: gzipSync(bytes, { level: 9 }).length,
+		brotli: brotliCompressSync(bytes).length,
 	}
 }
 
@@ -214,9 +172,10 @@ async function sizePackage(pkg: string, tmp: string, update: boolean): Promise<R
 	}
 
 	const peers = await loadPeers(pkg)
+	const typeOnlyPeers = budget.typeOnlyPeers === true
 	const sizes = await Promise.all(
 		Object.entries(budget.entries).map(([name, entry], i) => {
-			return measure(pkg, name, entry, peers, tmp, `${pkg}-${i}`)
+			return measure(pkg, name, entry, peers, typeOnlyPeers, tmp, `${pkg}-${i}`)
 		}),
 	)
 
@@ -228,7 +187,7 @@ async function sizePackage(pkg: string, tmp: string, update: boolean): Promise<R
 		return {
 			...size,
 			budget: entry.brotli,
-			over: size.brotli > entry.brotli * (1 + budget.tolerance),
+			over: isOverBudget(size.brotli, entry.brotli, budget.tolerance),
 		}
 	})
 
@@ -267,15 +226,15 @@ async function main(): Promise<void> {
 
 	const tmp = await mkdtemp(path.join(tmpdir(), 'cml-size-'))
 	try {
-		let over = 0
+		const over: string[] = []
 		for (const pkg of packages) {
 			const rows = await sizePackage(pkg, tmp, values.update === true)
-			over += rows.filter(row => row.over).length
+			over.push(...rows.filter(row => row.over).map(row => `${pkg} "${row.name}"`))
 		}
 
-		if (values.check && over > 0) {
+		if (values.check && over.length > 0) {
 			throw new Error(
-				`Size check failed: ${over} ${over === 1 ? 'entry is' : 'entries are'} over budget plus the tolerance.`,
+				`Size check failed. Over budget plus the tolerance: ${over.join(', ')}. If the growth is intended, raise the budget with: npm run size -- --update`,
 			)
 		}
 	} finally {
