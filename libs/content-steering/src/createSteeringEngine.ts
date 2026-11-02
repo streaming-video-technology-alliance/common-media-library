@@ -292,7 +292,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 	function load(): Promise<void> {
 		const token = session
 		const requestGeneration = generation
-		const url = buildSteeringUri(uri, queryParams())
+		const url = buildSteeringUri(uri, prefix, queryParams())
 
 		sent = true
 		trail = selected === undefined ? [] : [selected]
@@ -602,7 +602,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			return params
 		}
 
-		params[`${prefix}pathway`] = `"${list.map(encodePathwayId).join(',')}"`
+		params[`${prefix}pathway`] = `%22${list.map(encodePathwayId).join(',')}%22`
 
 		const throughputs = list.map(throughputOf)
 

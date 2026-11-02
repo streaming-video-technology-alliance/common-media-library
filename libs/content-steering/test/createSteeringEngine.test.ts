@@ -182,6 +182,53 @@ describe('createSteeringEngine', () => {
 			)
 		})
 
+		it('removes the stale steering parameters of a RELOAD-URI that repeats the request URI', async () => {
+			let throughput: number | undefined = 6000000
+			const { requester, requests } = createStubRequester(
+				manifestResponse({ ...MANIFEST, 'RELOAD-URI': '' }),
+				manifestResponse(MANIFEST),
+			)
+			const engine = createSteeringEngine(hlsConfig({ requester, getThroughput: () => throughput }))
+
+			await engine.start()
+			throughput = undefined
+			vi.advanceTimersByTime(300000)
+			await flush()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22&_HLS_throughput=6000000',
+			)
+			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-B%22')
+		})
+
+		it('removes the steering parameters of the uri from a request without parameters', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const uri =
+				'https://steering.example.com/manifest.json?_DASH_pathway=%22old%22&session=1&_DASH_throughput=1'
+			const engine = createSteeringEngine(
+				hlsConfig({ protocol: 'dash', requester, uri, queryBeforeStart: true }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/manifest.json?session=1')
+		})
+
+		it('keeps the parts of the uri other than the query unchanged', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, uri: 'https://steering.example.com#top' }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com?_HLS_pathway=%22CDN-A%22#top')
+		})
+
 		it('adds no parameters to a data URI', async () => {
 			const uri = `data:application/json,${encodeURIComponent(JSON.stringify(MANIFEST))}`
 			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
