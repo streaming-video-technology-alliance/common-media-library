@@ -75,6 +75,30 @@ describe('createSteeringEngine update', () => {
 		//#endregion example
 	})
 
+	it('selects on update() while the engine is stopped and requests on start()', async () => {
+		const manifest = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+		const { engine, changes, requests } = create(
+			{},
+			manifestResponse(manifest),
+			manifestResponse(manifest),
+		)
+
+		await engine.start()
+		engine.stop()
+		engine.update({ pathways: ['CDN-A'] })
+
+		equal(engine.pathway, 'CDN-A')
+		deepEqual(changes, ['CDN-B', 'CDN-A'])
+
+		await advance(60000)
+		equal(requests.length, 1)
+
+		await engine.start()
+		engine.stop()
+
+		equal(requests.length, 2)
+	})
+
 	it('moves off a pathway that update() removes', async () => {
 		const { engine } = create(
 			{},

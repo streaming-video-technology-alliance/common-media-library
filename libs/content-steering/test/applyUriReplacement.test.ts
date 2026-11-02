@@ -116,6 +116,26 @@ describe('applyUriReplacement', () => {
 		)
 	})
 
+	it('lowercases HOST and converts an internationalized HOST to punycode', () => {
+		equal(
+			applyUriReplacement('https://a.example.com/x', { HOST: 'Backup.Example.COM' }),
+			'https://backup.example.com/x',
+		)
+		equal(
+			applyUriReplacement('https://a.example.com/x', { HOST: 'bücher.example' }),
+			'https://xn--bcher-kva.example/x',
+		)
+	})
+
+	it('orders PARAMS names by code point, not by UTF-16 code unit', () => {
+		equal(
+			applyUriReplacement('https://a.example.com/x', {
+				PARAMS: { '\u{1F600}': '1', Ａ: '2' },
+			}),
+			'https://a.example.com/x?%EF%BC%A1=2&%F0%9F%98%80=1',
+		)
+	})
+
 	describe('HLS stable IDs', () => {
 		const replacement = {
 			HOST: 'cdn-c.example.com',

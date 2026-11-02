@@ -243,6 +243,48 @@ describe('createSteeringEngine penalties', () => {
 		equal(engine.pathway, 'CDN-C')
 	})
 
+	it('changes nothing for penalize() with an unknown pathway', async () => {
+		const { engine, changes } = await started(
+			{},
+			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }),
+		)
+
+		engine.penalize('CDN-X')
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+		deepEqual(changes, [])
+		deepEqual(engine.priority, PRIORITY)
+	})
+
+	it('penalizes a clone and selects it again when the penalty ends', async () => {
+		const { engine, changes } = await started(
+			{ penalty: 1000 },
+			manifestResponse({
+				VERSION: 1,
+				TTL: 3600,
+				'PATHWAY-PRIORITY': ['CDN-A-CLONE', 'CDN-B'],
+				'PATHWAY-CLONES': [
+					{
+						'BASE-ID': 'CDN-A',
+						ID: 'CDN-A-CLONE',
+						'URI-REPLACEMENT': { HOST: 'backup.example.com' },
+					},
+				],
+			}),
+		)
+		equal(engine.pathway, 'CDN-A-CLONE')
+
+		engine.penalize('CDN-A-CLONE')
+		equal(engine.pathway, 'CDN-B')
+
+		await advance(1000)
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A-CLONE')
+		deepEqual(changes, ['CDN-A-CLONE', 'CDN-B', 'CDN-A-CLONE'])
+	})
+
 	it('fails over with the fallback priority list before the first Steering Manifest', async () => {
 		const { requester } = createStubRequester(
 			manifestResponse({ VERSION: 1, TTL: 3600, 'PATHWAY-PRIORITY': PRIORITY }),

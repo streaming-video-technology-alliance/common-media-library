@@ -5,7 +5,7 @@ import {
 } from '@svta/cml-content-steering'
 import { deepEqual, equal, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
-import { createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
+import { advance, createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
 
 afterEach(() => {
 	vi.useRealTimers()
@@ -229,6 +229,66 @@ describe('createSteeringEngine', () => {
 			engine.stop()
 
 			equal(requests[0].url, 'https://steering.example.com?_HLS_pathway=%22CDN-A%22#top')
+		})
+
+		it('sends a throughput of 0', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(hlsConfig({ requester, getThroughput: () => 0 }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A%22&_HLS_throughput=0',
+			)
+		})
+
+		it('omits the DASH throughput when every value is unknown', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['CDN-A', 'CDN-B'],
+				pathway: 'CDN-A',
+				requester,
+				getReportedPathways: () => ['CDN-A', 'CDN-B'],
+				getThroughput: () => undefined,
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=%22CDN-A,CDN-B%22')
+		})
+
+		it('sends the ID of a selected clone', async () => {
+			const manifest = {
+				...MANIFEST,
+				'PATHWAY-PRIORITY': ['CDN-A-CLONE'],
+				'PATHWAY-CLONES': [
+					{
+						'BASE-ID': 'CDN-A',
+						ID: 'CDN-A-CLONE',
+						'URI-REPLACEMENT': { HOST: 'backup.example.com' },
+					},
+				],
+			}
+			const { requester, requests } = createStubRequester(
+				manifestResponse(manifest),
+				manifestResponse(manifest),
+			)
+			const engine = createSteeringEngine(hlsConfig({ requester }))
+
+			await engine.start()
+			await advance(300000)
+			engine.stop()
+
+			equal(engine.pathway, 'CDN-A-CLONE')
+			equal(
+				requests[1].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=%22CDN-A-CLONE%22',
+			)
 		})
 
 		it('adds no parameters to a data URI', async () => {

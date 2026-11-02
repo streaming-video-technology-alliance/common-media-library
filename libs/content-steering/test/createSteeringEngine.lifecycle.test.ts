@@ -265,6 +265,53 @@ describe('createSteeringEngine lifecycle', () => {
 		deepEqual(changes, ['CDN-B'])
 	})
 
+	it('restarts once when onPathwayChange calls stop() and start() inside start()', async () => {
+		let restart = false
+		const { requester, requests } = createStubRequester(
+			manifestResponse(MANIFEST),
+			manifestResponse(MANIFEST),
+		)
+		const engine = createSteeringEngine(
+			config(requester, {
+				penalty: 1000,
+				onPathwayChange: () => {
+					if (restart) {
+						restart = false
+						engine.stop()
+						void engine.start()
+					}
+				},
+			}),
+		)
+
+		await engine.start()
+		engine.penalize()
+		engine.stop()
+		await advance(300000)
+
+		restart = true
+		await engine.start()
+		engine.stop()
+
+		equal(requests.length, 2)
+		equal(engine.pathway, 'CDN-B')
+	})
+
+	it('applies an update() from inside onManifest', async () => {
+		const { requester } = createStubRequester(manifestResponse(MANIFEST))
+		const engine = createSteeringEngine(
+			config(requester, {
+				onManifest: () => engine.update({ priority: ['CDN-A', 'CDN-B'] }),
+			}),
+		)
+
+		await engine.start()
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-A')
+		deepEqual(engine.priority, ['CDN-A', 'CDN-B'])
+	})
+
 	it('reports a callback error without a caller to onError and continues', async () => {
 		const cause = new Error('player bug')
 		const errors: SteeringError[] = []

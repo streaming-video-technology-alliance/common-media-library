@@ -20,6 +20,11 @@ afterEach(() => {
 
 const NOW = Date.parse('Sun, 06 Nov 1994 08:49:37 GMT')
 const MANIFEST = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+const CLONE = {
+	'BASE-ID': 'CDN-A',
+	ID: 'CDN-A-CLONE',
+	'URI-REPLACEMENT': { HOST: 'backup.example.com' },
+}
 
 type RequestError = Exclude<SteeringError, { type: typeof SteeringErrorType.CALLBACK }>
 
@@ -195,6 +200,30 @@ describe('createSteeringEngine responses', () => {
 			equal(requests[1].url, 'https://steering.example.com/reload.json?_HLS_pathway=%22CDN-B%22')
 		})
 
+		it('keeps the RELOAD-URI for later requests until a Steering Manifest replaces it', async () => {
+			const { engine, requests } = setup(
+				'hls',
+				manifestResponse({
+					...MANIFEST,
+					'RELOAD-URI': 'https://cdn.example.com/steering/next.json',
+				}),
+				manifestResponse(MANIFEST),
+				manifestResponse({ ...MANIFEST, 'RELOAD-URI': 'other.json' }),
+				manifestResponse(MANIFEST),
+			)
+
+			await engine.start()
+			await advance(60000)
+			await advance(60000)
+			await advance(60000)
+			engine.stop()
+
+			equal(requests.length, 4)
+			equal(requests[1].url, 'https://cdn.example.com/steering/next.json?_HLS_pathway=%22CDN-B%22')
+			equal(requests[2].url, 'https://cdn.example.com/steering/next.json?_HLS_pathway=%22CDN-B%22')
+			equal(requests[3].url, 'https://cdn.example.com/steering/other.json?_HLS_pathway=%22CDN-B%22')
+		})
+
 		it('reports a relative RELOAD-URI of a data URI as a parse error', async () => {
 			const manifest = { ...MANIFEST, 'RELOAD-URI': 'next.json' }
 			const uri = `data:application/json,${encodeURIComponent(JSON.stringify(manifest))}`
@@ -365,6 +394,54 @@ describe('createSteeringEngine responses', () => {
 
 			ok(errors[0].message.includes('No request follows.'))
 		})
+
+		it('ends the requests after a Steering Manifest without VERSION for DASH', async () => {
+			const { engine, errors, requests } = setup(
+				'dash',
+				manifestResponse({ TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B'] }),
+			)
+
+			await engine.start()
+			await advance(3600000)
+			engine.stop()
+
+			equal(requests.length, 1)
+			ok(errors[0].message.includes('No request follows.'))
+		})
+
+		it('drops the clones after a DASH VERSION error', async () => {
+			const { engine } = setup(
+				'dash',
+				manifestResponse({
+					...MANIFEST,
+					'PATHWAY-PRIORITY': ['CDN-A-CLONE', 'CDN-B'],
+					'PATHWAY-CLONES': [CLONE],
+				}),
+				manifestResponse({ ...MANIFEST, VERSION: 2 }),
+			)
+
+			await engine.start()
+			equal(engine.pathway, 'CDN-A-CLONE')
+
+			await advance(60000)
+			engine.stop()
+
+			equal(engine.pathway, 'CDN-A')
+			deepEqual(engine.priority, ['CDN-A', 'CDN-B'])
+		})
+
+		it('keeps a priority list from update() when a DASH VERSION error ends steering', async () => {
+			const { engine, requests } = setup('dash', manifestResponse({ ...MANIFEST, VERSION: 2 }))
+
+			engine.update({ priority: ['CDN-B', 'CDN-A'] })
+			await engine.start()
+			await advance(3600000)
+			engine.stop()
+
+			equal(requests.length, 1)
+			equal(engine.pathway, 'CDN-B')
+			deepEqual(engine.priority, ['CDN-B', 'CDN-A'])
+		})
 	})
 
 	describe('HTTP 410', () => {
@@ -401,6 +478,25 @@ describe('createSteeringEngine responses', () => {
 			engine.stop()
 
 			equal(engine.pathway, 'CDN-B')
+		})
+
+		it('keeps the clones of the last valid Steering Manifest after a 410', async () => {
+			const { engine } = setup(
+				'hls',
+				manifestResponse({
+					...MANIFEST,
+					'PATHWAY-PRIORITY': ['CDN-A-CLONE', 'CDN-B'],
+					'PATHWAY-CLONES': [CLONE],
+				}),
+				{ status: 410 },
+			)
+
+			await engine.start()
+			await advance(60000)
+			engine.stop()
+
+			equal(engine.pathway, 'CDN-A-CLONE')
+			deepEqual(engine.priority, ['CDN-A-CLONE', 'CDN-B'])
 		})
 
 		it('keeps a priority list from update() when a 410 ends steering', async () => {
@@ -481,6 +577,28 @@ describe('createSteeringEngine responses', () => {
 			engine.stop()
 
 			equal(errors[0].retryDelay, 120000)
+		})
+
+		it('keeps the remaining Retry-After wait across stop() and start()', async () => {
+			const { engine, requests } = setup(
+				'hls',
+				{ status: 429, headers: { 'retry-after': '120' } },
+				manifestResponse(MANIFEST),
+			)
+
+			await engine.start()
+			await advance(30000)
+			engine.stop()
+			await advance(60000)
+
+			await engine.start()
+			await advance(29999)
+			equal(requests.length, 1)
+
+			await advance(1)
+			engine.stop()
+
+			equal(requests.length, 2)
 		})
 
 		it('uses the previous TTL for a Retry-After HTTP date in the past', async () => {
@@ -613,6 +731,19 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].status, 503)
 			equal(errors[0].retryDelay, 60000)
 			equal(engine.pathway, 'CDN-B')
+		})
+
+		it('ignores a Retry-After header on a status other than 429', async () => {
+			const { engine, errors } = setup('hls', {
+				status: 503,
+				headers: { 'retry-after': '5' },
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].status, 503)
+			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
 		})
 
 		it('reports a load error for a network error', async () => {
