@@ -476,6 +476,18 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].retryDelay, 120000)
 		})
 
+		it('requests again at a Retry-After date in the asctime format', async () => {
+			const { engine, errors } = setup('hls', {
+				status: 429,
+				headers: { 'retry-after': 'Sun Nov  6 08:51:37 1994' },
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].retryDelay, 120000)
+		})
+
 		it('uses the previous TTL for a Retry-After HTTP date in the past', async () => {
 			const { engine, errors } = setup('hls', {
 				status: 429,

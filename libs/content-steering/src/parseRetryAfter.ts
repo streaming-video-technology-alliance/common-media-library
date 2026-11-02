@@ -1,5 +1,6 @@
 const DELAY_SECONDS = /^\d+$/
 const HTTP_DATE = /GMT$/
+const ASCTIME = /\d{4}$/
 
 /**
  * Converts a `Retry-After` header value to a delay.
@@ -12,7 +13,7 @@ const HTTP_DATE = /GMT$/
  * @internal
  */
 export function parseRetryAfter(value: string | undefined, now: number): number | undefined {
-	const text = value?.trim()
+	let text = value?.trim()
 
 	if (!text) {
 		return undefined
@@ -23,12 +24,13 @@ export function parseRetryAfter(value: string | undefined, now: number): number 
 		return Number.isFinite(delay) && delay > 0 ? delay : undefined
 	}
 
-	const time = HTTP_DATE.test(text) ? Date.parse(text) : NaN
-
-	if (Number.isNaN(time)) {
+	if (ASCTIME.test(text)) {
+		text += ' GMT'
+	} else if (!HTTP_DATE.test(text)) {
 		return undefined
 	}
 
-	const delay = time - now
+	const delay = Date.parse(text) - now
+
 	return delay > 0 ? delay : undefined
 }
