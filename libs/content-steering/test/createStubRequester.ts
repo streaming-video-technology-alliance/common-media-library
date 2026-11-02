@@ -1,5 +1,6 @@
 import type { SteeringManifest, SteeringRequester } from '@svta/cml-content-steering'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
+import { vi } from 'vite-plus/test'
 
 export type StubResponse = Omit<HttpResponse, 'request'> | Error
 
@@ -7,6 +8,36 @@ export type StubRequester = {
 	readonly requester: SteeringRequester
 	readonly requests: HttpRequest[]
 	respond(...responses: StubResponse[]): void
+}
+
+export type DeferredRequester = {
+	readonly requester: SteeringRequester
+	readonly requests: HttpRequest[]
+	readonly answers: ((response: Omit<HttpResponse, 'request'>) => void)[]
+}
+
+/**
+ * Creates a requester that records each request and answers it when the
+ * test calls the entry of `answers` with the same index.
+ */
+export function createDeferredRequester(): DeferredRequester {
+	const requests: HttpRequest[] = []
+	const answers: ((response: Omit<HttpResponse, 'request'>) => void)[] = []
+	const requester: SteeringRequester = request => {
+		requests.push(request)
+		return new Promise(resolve => answers.push(response => resolve({ request, ...response })))
+	}
+
+	return { requester, requests, answers }
+}
+
+/**
+ * Advances the fake timers and waits for the pending promise callbacks of
+ * the engine.
+ */
+export async function advance(ms: number): Promise<void> {
+	vi.advanceTimersByTime(ms)
+	await flush()
 }
 
 /**

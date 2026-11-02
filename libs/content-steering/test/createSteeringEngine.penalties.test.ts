@@ -7,8 +7,8 @@ import {
 import { deepEqual, equal } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
+	advance,
 	createStubRequester,
-	flush,
 	manifestResponse,
 	type StubResponse,
 } from './createStubRequester.ts'
@@ -35,11 +35,6 @@ async function started(overrides: Partial<SteeringEngineConfig>, ...responses: S
 	await engine.start()
 
 	return { engine, changes }
-}
-
-async function advance(ms: number): Promise<void> {
-	vi.advanceTimersByTime(ms)
-	await flush()
 }
 
 describe('createSteeringEngine penalties', () => {

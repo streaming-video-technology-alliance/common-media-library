@@ -5,10 +5,15 @@ import {
 	type SteeringError,
 	type SteeringRequester,
 } from '@svta/cml-content-steering'
-import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
-import { createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
+import {
+	advance,
+	createDeferredRequester,
+	createStubRequester,
+	flush,
+	manifestResponse,
+} from './createStubRequester.ts'
 
 afterEach(() => {
 	vi.useRealTimers()
@@ -28,22 +33,6 @@ function config(
 		requester,
 		...overrides,
 	}
-}
-
-function createDeferredRequester() {
-	const requests: HttpRequest[] = []
-	const answers: ((response: Omit<HttpResponse, 'request'>) => void)[] = []
-	const requester: SteeringRequester = request => {
-		requests.push(request)
-		return new Promise(resolve => answers.push(response => resolve({ request, ...response })))
-	}
-
-	return { requester, requests, answers }
-}
-
-async function advance(ms: number): Promise<void> {
-	vi.advanceTimersByTime(ms)
-	await flush()
 }
 
 describe('createSteeringEngine lifecycle', () => {

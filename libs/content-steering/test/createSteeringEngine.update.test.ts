@@ -4,12 +4,12 @@ import {
 	type PathwayClone,
 	type SteeringEngineConfig,
 	type SteeringError,
-	type SteeringRequester,
 } from '@svta/cml-content-steering'
-import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { deepEqual, equal, ok, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
+	advance,
+	createDeferredRequester,
 	createStubRequester,
 	flush,
 	manifestResponse,
@@ -39,12 +39,7 @@ function create(overrides: Partial<SteeringEngineConfig>, ...responses: StubResp
 }
 
 function createDeferred(overrides: Partial<SteeringEngineConfig> = {}) {
-	const requests: HttpRequest[] = []
-	const answers: ((response: Omit<HttpResponse, 'request'>) => void)[] = []
-	const requester: SteeringRequester = request => {
-		requests.push(request)
-		return new Promise(resolve => answers.push(response => resolve({ request, ...response })))
-	}
+	const { requester, requests, answers } = createDeferredRequester()
 	const engine = createSteeringEngine({
 		protocol: 'dash',
 		uri: 'https://steering.example.com/dash.json',
@@ -55,11 +50,6 @@ function createDeferred(overrides: Partial<SteeringEngineConfig> = {}) {
 	})
 
 	return { engine, requests, answers }
-}
-
-async function advance(ms: number): Promise<void> {
-	vi.advanceTimersByTime(ms)
-	await flush()
 }
 
 describe('createSteeringEngine update', () => {

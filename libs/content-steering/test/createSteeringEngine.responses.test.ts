@@ -8,8 +8,8 @@ import {
 import { deepEqual, equal, ok } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
+	advance,
 	createStubRequester,
-	flush,
 	manifestResponse,
 	type StubResponse,
 } from './createStubRequester.ts'
@@ -43,11 +43,6 @@ function setup(protocol: 'hls' | 'dash', ...responses: StubResponse[]) {
 	const engine = createSteeringEngine(config)
 
 	return { ...stub, engine, errors, manifests }
-}
-
-async function advance(ms: number): Promise<void> {
-	vi.advanceTimersByTime(ms)
-	await flush()
 }
 
 describe('createSteeringEngine responses', () => {
