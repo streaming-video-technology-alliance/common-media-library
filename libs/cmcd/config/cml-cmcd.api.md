@@ -682,7 +682,7 @@ export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
 // @public
 export function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{
-    status: number;
+    status?: number;
 }>): CmcdSession;
 
 // @public

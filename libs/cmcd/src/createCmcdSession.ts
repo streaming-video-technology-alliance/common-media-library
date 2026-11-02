@@ -26,6 +26,7 @@ import type { CmcdSessionEventReportConfig } from './CmcdSessionEventReportConfi
 import { CMCD_HEADERS } from './CmcdTransmissionMode.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
 import { checkSessionConfig } from './checkSessionConfig.ts'
+import { configError } from './configError.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
 import { prepareCmcdData } from './prepareCmcdData.ts'
 import type { CmcdScopedValues } from './readScopedValues.ts'
@@ -38,7 +39,7 @@ import { toTokenString } from './toTokenString.ts'
 
 type KeyFilter = CmcdEncodeOptions['filter']
 
-type Requester = (request: HttpRequest) => Promise<{ status: number }>
+type Requester = (request: HttpRequest) => Promise<{ status?: number }>
 
 type Batch = (string | Cmcd)[]
 
@@ -105,15 +106,16 @@ function createDestination(): Destination {
 	return { sn: 0, msdSent: false, waiting: { bs: [], bsd: [], ec: [] }, gone: false }
 }
 
-function defaultRequester(request: HttpRequest): Promise<{ status: number }> {
-	const { url, ...init } = request
-
-	return fetch(url, init)
-}
-
-function toDeliver({ url, send }: CmcdSessionEventReportConfig, requester: Requester): Deliver {
+function toDeliver(
+	{ url, send }: CmcdSessionEventReportConfig,
+	requester: Requester | undefined,
+): Deliver {
 	if (url === undefined) {
 		return batch => Promise.resolve(send?.(batch as Parameters<CmcdEventSender>[0]))
+	}
+
+	if (typeof requester !== 'function') {
+		throw configError('requester', 'a function when an event target has a url', requester)
 	}
 
 	return batch =>
@@ -123,7 +125,7 @@ function toDeliver({ url, send }: CmcdSessionEventReportConfig, requester: Reque
 			headers: { 'Content-Type': CMCD_MIME_TYPE },
 			body: (batch as string[]).join('\n'),
 		}).then(response => {
-			const status = response?.status ?? 0
+			const status = response?.status ?? 200
 
 			// CTA-5004-B: back off after a 429 or 5xx response, stop after a 410 response.
 			if (status === 0 || status === 429 || (status >= 500 && status < 600)) {
@@ -142,10 +144,11 @@ function toDeliver({ url, send }: CmcdSessionEventReportConfig, requester: Reque
  * The player passes its CMCD data with each call and decides itself when its state changes.
  *
  * @param config - The configuration of the session.
- * @param requester - Sends each batch of event reports to a target with a `url`. The default requester uses `fetch`.
+ * @param requester - Sends each batch of event reports to a target with a `url`. An event target with a `url` needs the requester. `fetchRequester` from `@svta/cml-utils` sends with `fetch`.
  * @returns The session.
  *
  * @throws If `sid`, `cid`, or the `url`, `send`, `interval`, or `batchSize` of a target is invalid.
+ * Also if an event target has a `url` and `requester` is not a function.
  *
  * @public
  *
@@ -154,7 +157,7 @@ function toDeliver({ url, send }: CmcdSessionEventReportConfig, requester: Reque
  */
 export function createCmcdSession(
 	config: CmcdSessionConfig = {},
-	requester: (request: HttpRequest) => Promise<{ status: number }> = defaultRequester,
+	requester?: (request: HttpRequest) => Promise<{ status?: number }>,
 ): CmcdSession {
 	checkSessionConfig(config)
 

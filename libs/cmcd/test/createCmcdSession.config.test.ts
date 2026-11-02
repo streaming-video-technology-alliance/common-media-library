@@ -100,7 +100,7 @@ describe('createCmcdSession configuration checks', () => {
 		]
 
 		for (const config of configs) {
-			doesNotThrow(() => createCmcdSession(config))
+			doesNotThrow(() => createCmcdSession(config, () => Promise.resolve({ status: 200 })))
 		}
 	})
 })

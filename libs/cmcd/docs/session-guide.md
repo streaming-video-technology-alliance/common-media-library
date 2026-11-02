@@ -29,7 +29,7 @@ const session = createCmcdSession({
 console.log(session.sid)
 ```
 
-The session generates a `sid` when the configuration has none. The second argument sends the event reports, so pass the HTTP client of the player there. Without it, the session sends with `fetch`, without the `keepalive` option.
+The session generates a `sid` when the configuration has none. The second argument sends the event reports, so pass the HTTP client of the player there. An event target with a `url` needs the second argument. `fetchRequester` from `@svta/cml-utils` sends with `fetch`, without the `keepalive` option.
 
 The configuration types are `CmcdSessionRequestReportConfig` for request mode and `CmcdSessionEventReportConfig` for each event target. Both derive from the `CmcdReporter` types without `transform`. A configuration with a `transform` does not compile. Use `filter` on an event target to select the reports of the target. An event target has a collector `url` or a `send` function. The section [Send Reports Without HTTP](#send-reports-without-http) describes `send`.
 
@@ -292,6 +292,8 @@ A target has at most one batch in flight. Reports that arrive meanwhile wait in 
 | 429, 5xx, status 0, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send. |
 | Any other status | The session drops the batch. The wait resets. |
 
+A response without `status` counts as 2xx.
+
 The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. A promise that rejects, or a function that throws, counts as a rejected request. No result drops a batch. A function that cannot deliver a batch resolves.
 
 A queued report shares no list, `SfItem`, or parameter object with the data of the caller. A later change to the data of the caller does not change a queued report. The function must not change a report. The `DeepReadonly` type of `CmcdEventSender` rejects a change at any depth, as the type of `CmcdReportFilter` does.
@@ -321,5 +323,6 @@ Each call builds and encodes all of its reports before it changes any state. A c
 | `send` of a target | A function |
 | `interval` of a target | A number from 0 to 2147483 |
 | `batchSize` of a target | A positive integer |
+| `requester` | A function, when an event target has a `url` |
 
 The message names the parameter, the valid values, and the received value: `createCmcdSession: eventTargets[1].batchSize must be a positive integer, received 0`.

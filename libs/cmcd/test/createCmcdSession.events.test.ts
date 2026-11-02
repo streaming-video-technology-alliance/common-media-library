@@ -301,27 +301,5 @@ describe('createCmcdSession events', () => {
 				`e=ps,sid="s1",sn=1,sta=a,ts=${ts},v=2\ne=ps,sid="s1",sn=2,sta=p,ts=${ts},v=2`,
 			)
 		})
-
-		it('posts with fetch and without keepalive by default', () => {
-			const fetch = vi
-				.spyOn(globalThis, 'fetch')
-				.mockResolvedValue(new Response(null, { status: 200 }))
-			const session = createCmcdSession({
-				sid: 's1',
-				eventTargets: [{ url: A, events: [CmcdEventType.PLAY_STATE] }],
-			})
-
-			session.recordEvent(CmcdEventType.PLAY_STATE, { sta: 'p' })
-
-			equal(fetch.mock.calls.length, 1)
-			deepEqual(fetch.mock.calls[0], [
-				A,
-				{
-					method: 'POST',
-					headers: { 'Content-Type': 'application/cmcd' },
-					body: `e=ps,sid="s1",sn=0,sta=p,ts=${ts},v=2`,
-				},
-			])
-		})
 	})
 })

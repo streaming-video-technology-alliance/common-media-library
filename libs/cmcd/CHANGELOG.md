@@ -11,6 +11,7 @@ and this project adheres to
 ### Added
 
 - `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call, and the session keeps the sequence numbers, the queues, and the timers. The session guide and the migration guide describe the API
+- `createCmcdSession()` takes the requester as the second argument. An event target with a `url` needs the requester. `fetchRequester` from `@svta/cml-utils` sends with `fetch`
 - `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig`, the configuration types of a session. Both derive from the `CmcdReporter` types without `transform`. The `filter` of an event target selects the reports of the target
 - `CmcdEventSender` and `CmcdEventSendResult`. An event target has a collector `url` or a `send` function, for a transport that is not HTTP
 - `CmcdSnapshot`, the type of the player state. `snapshot` returns it for the `t` reports, and the player can pass it with each call. It rejects the keys that the session writes, `bs`, `bsd`, `ec`, and `cen`
