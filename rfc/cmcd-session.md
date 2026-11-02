@@ -348,14 +348,14 @@ type CmcdSession = {
 	flush(): void
 }
 
-function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status: number }>): CmcdSession
+function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{ status?: number }>): CmcdSession
 
 // The parameter widens, so a send function can encode a report without a copy
 // An event report needs { reportingMode: CmcdReportingMode.EVENT }
 function encodeCmcd(cmcd: DeepReadonly<Cmcd>, options?: CmcdEncodeOptions): string
 ```
 
-The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordResponseReceived`, `enabledKeys`, `eventTargets`, `customHeaderMap`, and the `requester` argument. A configuration object without `transform` type-checks against both APIs. The default requester is `fetch`.
+The names follow `CmcdReporter`: `createRequestReport`, `recordEvent`, `recordResponseReceived`, `enabledKeys`, `eventTargets`, `customHeaderMap`, and the `requester` argument. A configuration object without `transform` type-checks against both APIs. An event target with a `url` needs the requester. `fetchRequester` from `@svta/cml-utils` sends with `fetch`.
 
 ### Reports
 
@@ -417,6 +417,8 @@ A target sends its queue when the queue reaches `batchSize`, and on `flush()`. A
 | 429, 5xx, status 0, a rejected request, or a requester that throws | The batch returns to the front of the queue, and the target waits before its next send |
 | Any other status | The session drops the batch. The wait resets. |
 
+A response without `status` counts as 2xx.
+
 The promise of a `send` function takes the place of the response. A promise that resolves counts as 2xx. A result with `gone: true` counts as 410. The session then ignores the result of a call that has not settled for that target. A promise that rejects, or a function that throws, counts as a rejected request. A resolved promise removes the batch from the queue whether or not the function delivered it. If a later retry cannot deliver a batch, the function resolves.
 
 A queued report shares no list, `SfItem`, or parameter object with the data of the caller. `prepareCmcdData()` returns a copy, and the session queues that copy. The `DeepReadonly` type of `CmcdEventSender` rejects a change by the function, as the type of `CmcdReportFilter` does.
@@ -444,6 +446,7 @@ Each call builds and encodes all of its reports before it changes any state. A c
 | `send` of a target | A function |
 | `interval` of a target | A number from 0 to 2147483 |
 | `batchSize` of a target | A positive integer |
+| `requester` | A function, when an event target has a `url` |
 
 The message names the parameter, the valid values, and the received value: `createCmcdSession: eventTargets[1].batchSize must be a positive integer, received 0`.
 
@@ -470,9 +473,9 @@ During a migration, a player must not report one `sid` through both APIs. Each A
 
 | API | Minified with gzip |
 |---|---:|
-| `createCmcdSession` | 7230 B |
+| `createCmcdSession` | 7246 B |
 | `CmcdReporter` | 8849 B |
-| Both in one bundle | 10905 B |
+| Both in one bundle | 10928 B |
 
 | One version 2 request report, Node 24 | Time | Heap |
 |---|---:|---:|
@@ -505,7 +508,7 @@ The implementation writes the same request output as `CmcdReporter`, byte for by
 - **`includeOnce()`, or keys derived from `sta`.** A method for the keys with a destination scope adds a call that the key rules make unnecessary. The session could derive `msd`, `bs`, and `bsd` from the play states. In shaka-player, no starting state exists. In dash.js, `bs` and `bsd` have an object type that `sta` does not show.
 - **No keys without `enabledKeys`.** This default of `CmcdReporter` makes each player pass the full key list. hls.js, dash.js, and shaka-player all pass the full key list. The data of each call already selects the keys.
 - **A queue limit.** A limit bounds the memory that a long outage of a collector uses. A limit also drops reports, and a `batchSize` above the limit never fills. The session has no limit, like `CmcdReporter`.
-- **`keepalive` in the default requester.** The option lets a send finish after the page closes. Browsers reject a `keepalive` body over 64 KiB, and a batch after an outage can be larger. A player that needs `keepalive` passes its own requester.
+- **`keepalive` in `fetchRequester`.** The option lets a send finish after the page closes. Browsers reject a `keepalive` body over 64 KiB, and a batch after an outage can be larger. A player that needs `keepalive` passes its own requester.
 - **The retry rule of `CmcdReporter`.** `CmcdReporter` sends a failed batch again with the next send. During an outage, each new event then sends the whole queue to the failing collector.
 - **Timers in the player.** shaka-player 5.2.0 shows the lifecycle risk of timers in the library. Each target has its own interval, though, so the session must manage the timers. `start()` and `stop()` keep the lifecycle explicit.
 - **A store, as in `update()`, without the automatic events.** One store gives one way to pass data, but the session would keep player state again. The `t` reports would have old `bl` and `mtp` values unless the player updates the store before each tick. Each key would need a rule for whether it persists, and two players in one session would overwrite one store. `CmcdReporter` also merges its store with the data of each call, so its players already use two sources.
