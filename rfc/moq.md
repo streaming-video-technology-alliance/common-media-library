@@ -13,7 +13,7 @@ status: draft
 
 ## Summary
 
-A new package, `@svta/cml-moq`, implements the parts of the MOQT Streaming Format that a web player reads before playback starts. The sources are [draft-ietf-moq-msf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-msf/01/) (MSF) and the CMAF extension of MSF, [draft-ietf-moq-cmsf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-cmsf/01/) (CMSF). The package has five parts:
+A new package, `@svta/cml-moq`, implements the parts of the MOQT Streaming Format that a web player reads before playback starts. The sources are [draft-ietf-moq-msf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-msf/01/) (MSF) and the CMAF extension of MSF, [draft-ietf-moq-cmsf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-cmsf/01/) (CMSF). The CMCD draft, [draft-wilaw-moq-cmcd-event-timeline-00](https://datatracker.ietf.org/doc/draft-wilaw-moq-cmcd-event-timeline/00/), adds one event type and one track field for CMCD reports. The package has five parts:
 
 - the catalog as TypeScript types
 - a catalog decoder with delta updates and variable substitution
@@ -45,6 +45,8 @@ MSF defines the catalog, the URL form, and the timeline tracks for every MOQT pl
 CMSF maps onto packages that CML already has. The content protection scheme values equal `EncryptionScheme` in `@svta/cml-drm`. The four DRM system IDs in CMSF equal the UUID constants in the same package. The catalog `altGroup` and `renderGroup` fields are the switching set and selection set of `@svta/cml-cmaf-ham`. A package that converts the catalog to those types reuses the EME code that players already run.
 
 The repo names domain packages when the specification name is not stable. `drm` covers EME, CENC, and three key systems. `cta` covers several CTA standards. The datatracker shows that draft-ietf-moq-msf replaced draft-ietf-moq-warp, so the format name changed once already. The package name `moq` follows the `drm` and `cta` precedent.
+
+The CMCD draft sends CMCD reports from the player over an event timeline track. The catalog side of the CMCD draft is one event type and one track field. The report side belongs to `@svta/cml-cmcd`. The [CMCD session RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/486) defines a `send` function per event target for that purpose.
 
 ## Guide-level explanation
 
@@ -131,20 +133,20 @@ const initData = parseInitDataFromContentProtection(moqContentProtectionToDrm(pr
 
 ### Scope
 
-The package implements these sections of the two drafts:
+The package implements these sections of the three drafts:
 
-| Area | MSF | CMSF |
-| --- | --- | --- |
-| Catalog fields and examples | 5.1, 5.2, 5.6 | 3.5, 4.1, 5 |
-| Delta updates | 5.1.6, 5.3 | |
-| Variable substitution | 5.4, 5.2.43 | |
-| Media timeline and template | 7 | |
-| Event timeline | 8 | 3.6 |
-| URL and fragment | 11.1 | |
-| String form of track names | transport 8.8, 11.1.2 | |
-| Content protection | | 4 |
+| Area | MSF | CMSF | CMCD draft |
+| --- | --- | --- | --- |
+| Catalog fields and examples | 5.1, 5.2, 5.6 | 3.5, 4.1, 5 | 4.2, 4.3, 5 |
+| Delta updates | 5.1.6, 5.3 | | |
+| Variable substitution | 5.4, 5.2.43 | | |
+| Media timeline and template | 7 | | |
+| Event timeline | 8 | 3.6 | 4.2.1 |
+| URL and fragment | 11.1 | | |
+| String form of track names | transport 8.8, 11.1.2 | | |
+| Content protection | | 4 | |
 
-The package leaves out LOC packaging, MoQ Secure Objects, and the MOQLOG and MOQMETRICS payloads. The package also leaves out the compression property and every MOQT control or data message.
+The package leaves out LOC packaging, MoQ Secure Objects, and the MOQLOG and MOQMETRICS payloads. The package also leaves out the compression property and every MOQT control or data message. The package leaves out sections 3 and 4.2 of the CMCD draft, the rules for the content and timing of each CMCD record. The cmcd package owns those rules.
 
 ### Types
 
@@ -154,7 +156,7 @@ All types are type-only exports. They cost nothing at runtime.
 | --- | --- |
 | `MoqCatalog` | The root fields: `version`, `generatedAt`, `isComplete`, `tracks`, `publishTracks`, `initDataList`, `contentProtections` |
 | `MoqCatalogDelta` | A delta update object: `deltaUpdate`, `generatedAt`, `isComplete` |
-| `MoqCatalogTrack` | Every track field of MSF section 5.2 plus the CMSF fields `maxGrpSapStartingType`, `maxObjSapStartingType`, and `contentProtectionRefIDs` |
+| `MoqCatalogTrack` | Every track field of MSF section 5.2, the CMSF fields `maxGrpSapStartingType`, `maxObjSapStartingType`, and `contentProtectionRefIDs`, and the CMCD draft field `cmcdConfig` |
 | `MoqDeltaOperation` | `{ op, tracks }` |
 | `MoqInitData` | `{ id, type: 'inline', data }` |
 | `MoqBuffers` | `{ target?, min?, max? }` |
@@ -174,11 +176,12 @@ All types are type-only exports. They cost nothing at runtime.
 | `MoqMediaTimeline` | The object that `createMoqMediaTimeline` returns |
 | `MoqEventTimelineEntry<T>` | One of `{ t }`, `{ l }`, or `{ m }` plus `data: T` |
 | `MoqSapTimelineData` | `[sapType: 0 \| 1 \| 2 \| 3, earliestPresentationTime: number]` |
+| `MoqCmcdConfig` | `{ events, interval?, enabledKeys, sid?, batchCount?, batchInterval? }`, the `cmcdConfig` field of CMCD draft section 4.3 |
 | `MoqCatalogDecodeOptions` | `{ variables? }` |
 
 `MoqCatalog` declares `deltaUpdate?: never`, so `update.deltaUpdate` narrows the union that `decodeMoqCatalog` returns. Location IDs are JSON numbers. JSON has no 64-bit integer, so the types use `number` and not `bigint`.
 
-Fields with a closed value set use a string literal union. Fields that the drafts leave open, such as `role` and `eventType`, are `string`. The constants below give autocomplete for the registered values of the open fields.
+Fields with a closed value set use a string literal union. Fields that the drafts leave open, such as `role` and `eventType`, are `string`. The constants below give autocomplete for the registered values of the open fields. The `events` and `enabledKeys` members of `MoqCmcdConfig` are `string[]`. See unresolved question 9.
 
 ### Constants
 
@@ -188,7 +191,7 @@ The constants follow the const enum pattern of the repo. Each constant lives in 
 | --- | --- |
 | `MoqPackaging` | `loc`, `cmaf`, `mediatimeline`, `eventtimeline`, `moqlog`, `moqmetrics` |
 | `MoqTrackRole` | The ten roles of MSF section 5.2.6 |
-| `MoqEventType` | The four registered types of MSF section 14.2 and `org.ietf.moq.cmsf.sap` |
+| `MoqEventType` | The four registered types of MSF section 14.2, `org.ietf.moq.cmsf.sap`, and `urn:cta:cmcd:2026` from CMCD draft section 7 |
 | `MoqAuthScheme` | `privacy-pass`, `cat` |
 | `MoqAccessibilityScheme` | The two SCTE schemes of MSF section 5.2.44 |
 | `MoqDeltaOp` | `add`, `remove`, `clone` |
@@ -224,6 +227,7 @@ Catalog decoding:
 - The decoder accepts the version strings `1` and `draft-01`. See unresolved question 1.
 - Every track in an independent catalog, and every track in an `add` operation, needs `name`, `packaging`, and `isLive`. Tracks in `remove` and `clone` operations follow the field rules of MSF section 5.1.6.
 - The decoder keeps unknown fields on the decoded objects. The decoder also keeps unknown values in open fields. A player skips the tracks that the player cannot use.
+- The decoder keeps `cmcdConfig` as written and does not validate the members. A player that builds a CMCD event target from the field validates the values at that point.
 - Variable substitution runs on the text before parsing. The replacement is one regular expression pass over `%name%` references. A value with a character outside `A-Z a-z 0-9 - _ @` throws. A reference without a value throws. See unresolved question 3.
 
 Delta updates:
@@ -269,6 +273,15 @@ These points in the -01 texts need a decision in the implementation and a report
 4. MSF section 11.3 names the message SUBSCRIBE_DONE. Transport draft-22 names the message PUBLISH_DONE.
 5. MSF section 5.2.36 cites transport section 3.1.1 for the URI scheme. Transport draft-22 defines the scheme in section 6.1.
 6. CMSF cites transport draft-18 as the normative reference. The current transport draft is 22.
+7. MSF section 5.2.5 states that event types are not centrally registered. MSF section 14.2 creates a registry for the same field.
+
+These points in the CMCD draft need a report to the author:
+
+1. The CMCD draft writes the record index as `T` in section 4.2 and in the example of section 4.2.1. MSF section 8.1 and the example of MSF section 8.4.1 use `t`. `decodeMoqEventTimeline` rejects the record of the CMCD draft as printed.
+2. CMCD draft section 4.2.1 states that every value is a string. The example in the same section sends `bl`, `bsd`, and `v` as numbers. CTA-5004-B types the three keys as integers.
+3. CMCD draft section 4.2 requires a new group for every record. MSF section 8.3 requires the first object of every group to contain all accumulated records. Under both rules, every CMCD group repeats the full report history.
+4. The publish tracks in CMCD draft section 5 have no `depends` array and no `mimeType`. MSF section 8.2 requires both fields on an event timeline track.
+5. The namespaces in CMCD draft section 5 are path strings, such as `example.com/collection/cmcd/health`. Point 3 of the MSF list applies.
 
 ### Dependencies and packaging
 
@@ -282,6 +295,7 @@ These points in the -01 texts need a decision in the implementation and a report
   - the delta sequences of MSF sections 5.6.4 and 5.6.5
   - the timeline and the template of MSF section 7, and the SAP timeline of CMSF section 3.6.2
   - the URLs of MSF section 11.1.3
+  - the three publish tracks of CMCD draft section 5, and the record of CMCD draft section 4.2.1 with the index key written as `t`
 
 ## Drawbacks
 
@@ -289,6 +303,7 @@ These points in the -01 texts need a decision in the implementation and a report
 - The drafts say little about malformed catalogs. The strictness rules above are decisions of this RFC, not of the drafts.
 - `@svta/cml-drm` becomes a peer dependency for every adopter, including adopters who import only types. The bundle cost is zero. The install cost is one more package.
 - The first release has no encoder. Publishers get the types and nothing else.
+- The CMCD draft is an individual submission at revision -00, not a working group draft. The `cmcdConfig` field and the event type can change or disappear.
 
 ## Rationale and alternatives
 
@@ -314,6 +329,7 @@ These points in the -01 texts need a decision in the implementation and a report
 6. Compression: the MSF_COMPRESSION property ID is still TBD, and reading the property needs the transport layer. The proposal leaves gzip to the player through `DecompressionStream`. Is that acceptable for the first release?
 7. Should `remove` of an unknown track throw, or should the operation be ignored?
 8. Should `MoqFullTrackName` use bytes instead of strings? The MSF catalog uses strings, and the proposal follows the catalog.
+9. Should `MoqCmcdConfig` import `CmcdEventType` and `CmcdKey` from `@svta/cml-cmcd`? The proposal uses `string[]`, because the import adds a peer dependency for two types.
 
 ## Future possibilities
 
@@ -323,11 +339,13 @@ These points in the -01 texts need a decision in the implementation and a report
 - A validator for the CMSF object and group rules of sections 3.3 and 3.4, built with the chunk splitter.
 - A catalog to CMAF-HAM mapper next to the DASH and HLS mappers.
 - Decoders for the SCTE-35 and WebVTT event timeline payloads once the referenced drafts exist.
+- A bridge from `cmcdConfig` to a cmcd event target. The bridge maps `events`, `enabledKeys`, and `sid` without change. The bridge converts `interval` from milliseconds to seconds and `batchCount` to `batchSize`. The bridge publishes `{ t: ts, data }` records through the `send` function of the [CMCD session RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/486). `batchInterval` has no cmcd counterpart yet.
 - MOQT registry constants, if adopters ask for the constants after the transport draft stabilizes.
 
 ## Revision history
 
 - v1 (2026-10-26): initial draft.
+- v2 (2026-11-03): add the catalog side of the CMCD draft, with the inconsistencies of that draft.
 
 ## Final Decision
 
