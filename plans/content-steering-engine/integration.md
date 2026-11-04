@@ -13,14 +13,32 @@ Four analyses read each player at the commits of the [design record](architectur
 | Shaka Player | The engine fits the location model, where Shaka asks for URIs when it needs them. | The steering manager shrinks. The total code grows, because of a port. | The Closure build cannot use the npm module. Shaka has no read access to the priority list or the penalties. | `priority` resolves the API gap. The Closure port remains. |
 | VHS | The engine fits the exclusion model. | About 720 lines become 230. | None in the API. The build needs Babel for `@svta/*` and must inline CML. | `acceptClone` and `update()` remove two workarounds. The build changes remain. |
 
-In all four players, the gain is spec compliance and shared maintenance, not smaller code. The engine is larger than the controllers it replaces:
+In all four players, the gain is spec compliance and shared maintenance, not smaller code. The engine is larger than the controllers it replaces, because the controllers skip rules that the engine implements. The spikes measured the growth of each player as three parts, in brotli bytes of the main bundle. The method is four builds per player. The builds are the pinned commit, the same commit with the old steering module stubbed, the spike, and the spike with the engine stubbed.
 
-| Measurement | Minified | Compressed |
+| Player, bundle | Old steering code removed | Adapter and wiring added | Engine | Net growth |
+|---|---|---|---|---|
+| hls.js, `hls.light.min.js` | 1,850 | 1,555 | 3,410 | 3,115 |
+| dash.js, `dash.all.min.js` | 1,162 | 1,831 | 2,808 | 3,477 |
+| VHS, `videojs-http-streaming.min.js` | 1,168 | 733 | 3,053 | 2,618 |
+| Shaka Player, compiled bundle and the engine file | 743 | 1,221 | 3,927 | 4,405 |
+
+The removed code offsets 20% to 55% of the engine, and the adapter takes most of that offset back. The VHS "old" number counts the controller module only, so its old and new wiring in the playlist controller both land in the adapter column. The Shaka engine is a separate file, so its compiled bundle alone grows 478 bytes. These numbers predate the three size trims of the engine, which remove about 160 bytes brotli.
+
+What the engine bytes buy, measured by removing one part at a time from the engine (3,686 bytes brotli before the trims, 3,523 after):
+
+| Part of the engine | Brotli bytes | Rule or fix |
 |---|---|---|
-| Engine and `applyUriReplacement`, rolldown (plan Task 3) | 7.6 KB | 3.2 KB gzip |
-| Engine in the hls.js build | 7.8 KB | 2.9 KB brotli |
-| hls.js light build, growth | | 2.4 KB brotli |
-| Current Shaka steering manager, rolldown | 4.1 KB | 1.3 KB gzip |
+| Pathway clones | 545 | Base spec section 5. Clone checks, BASE-ID chains, `acceptClone`. |
+| Error messages | 405 | Actionable messages for adopters. The trims shortened them. |
+| Configuration checks | 281 | `TypeError` for values from the content, such as an empty pathway list. |
+| `update()` | 216 | MPD updates and the hls.js setter, without a new engine. |
+| 429 and Retry-After | 166 | Base spec section 7, with HTTP dates. hls.js stopped steering after a 429. |
+| Callback error routing | 165 | The rule of the CMCD session API RFC. |
+| Pathway ID encoding | 105 | IDs with reserved characters stay intact in the query. |
+| DASH rules in an HLS build | 97 | Rollup drops them in hls.js. webpack keeps them in dash.js. |
+| Default `fetch` requester | 94 | Now a separate export, so a player with its own requester pays nothing. |
+
+The old code also misses fixes that the engine has. In hls.js, a 429 stopped steering, and a clone of an embedded audio group threw. In VHS, a failure before the first manifest caused a retry loop, and a DASH refresh stopped steering. In dash.js, the Annex I parameters never reached a steering request.
 
 ## Gaps in the API
 
@@ -56,7 +74,7 @@ Gaps 1, 2, 3, and 4 affect most players. Together they are the smallest change t
 - **Syntax level.** The published packages contain ES2020 syntax (`??`, `?.`), although `tsconfig.json` sets ES2019. `@svta/cml-cmcd` 2.7.0 has 25 `??` and 21 `?.`. VHS supports Chrome 53 and does not transpile `node_modules`. Proposal: choose a syntax target for all CML packages, and set it for tsdown.
 - **Babel loose mode.** hls.js transpiles `@svta/*` code to ES5 in loose mode. In that mode, `Math.min(...map.values())` becomes `Math.min.apply(Math, iterator)`, which returns `Infinity`. The penalty timer then never fires. An `async` function also adds the regenerator runtime. The Phase 1 code of the plan avoids both constructs, and a loose ES5 build of the engine was checked. Proposal: add both rules to `.claude/rules/code-quality.md`.
 - **ES modules only.** VHS also ships a CommonJS build. It must inline CML, because a `require()` of an ES module fails before Node 20.19 and 22.12.
-- **Release tags.** hls.js adds CML packages to `bundledPackages` in its API Extractor configuration. Then the `@beta` tags cause `ae-incompatible-release-tags`. This finding is evidence for unresolved question 5 of the RFC.
+- **Release tags.** hls.js adds CML packages to `bundledPackages` in its API Extractor configuration. Then the `@beta` tags cause `ae-incompatible-release-tags`. This finding is evidence for unresolved question 2 of the RFC.
 - **Closure Compiler.** Shaka compiles one Closure input with ADVANCED renaming and conformance rules. The rules forbid `setTimeout` and `fetch`. PR #10060 ported `@svta/cml-cmcd` by hand to `third_party/cml-cmcd`. A port of the engine needs bracket access for the JSON fields, no `fetchRequester`, and `shaka.util.Timer` or a conformance exception.
 
 ## hls.js
@@ -265,7 +283,7 @@ Task 8 fills this table with the results of Tasks 4 to 7.
 
 | Player | Engine commit | Tests run | Result | Blockers confirmed | New findings |
 |---|---|---|---|---|---|
-| hls.js | | | | | |
-| dash.js | | | | | |
-| Shaka Player | | | | | |
-| VHS | | | | | |
+| hls.js | `99ff4ef76` (hls.js `c721313f`, spike `32b323a01`) | Type check, ESLint, es-check, steering suite (20 tests before, 63 after), unit suite (1204 before, 1247 after), build, `size:check`, and a smoke test of `hls.light.min.js` in headless Chrome | Works. The unit suite passes. Five old tests have new expectations for documented behavior changes. `size:check` fails: `hls.light.min.js` grows 3.1 KiB brotli (97.9 to 101.0 KiB). That is 1.4 KiB over the limit and about 3.5 KiB over the budget. | Gaps 4 and 9 resolved: their tests fail when the fix is removed. Gaps 2, 3, 5, 6, 7, 17, and 18 confirmed. Gap 16: a placeholder URI works, and the engine never starts. So an optional `uri` is a decision, not a blocker. | The engine needs an absolute `uri` even without a Steering Server (iframe player, setter, redundant streams). The old refresh skipped requests while the media was missing or ended. `stop()` and `start()` can replace that, with new hls.js media wiring. The `pathwayPriority` getter now returns the effective order, because it reads `engine.priority`. Old bugs that the engine fixes: a 429 stopped steering, and a clone of an embedded-audio group threw a `TypeError`. |
+| dash.js | `99ff4ef76` (dash.js `acddd0cf`, spike `e57aa4a67`) | Controller tests (32 before, 63 after), 14 tests in new files, 5 neighbor suites, lint, `tsc`, `npm test` (4098 pass in Chrome and Firefox), modern and legacy builds, and a live stream in Chrome (livesim2, run by the controller) | Works. The live stream passes: the first request has no `_DASH_` parameters, later requests have `_DASH_pathway=%22…%22`, and audio and video follow PATHWAY-PRIORITY. The controller and the requester grow by 77 code lines (the analysis estimated 50 fewer). `dash.all` grows about 4.5 KB gzip. | Gaps 2, 10, and 11 needed and resolved. Gap 1 works, but no stream or test changed the URI or the pathways. Gap 12: only `triggerSteeringRequest()` needs a forced request. | `pathways` must come from the raw MPD, because the BaseURL tree holds the clones. `applyUriReplacement` returns `new URL().href` even when nothing changes, so a URL that is not canonical changes (default port, dot segments). A string VERSION ends steering. An old dash.js bug: the Annex I parameters never reached steering requests. The `dash.reporting` growth (3.8 KB gzip) comes from the six-entry build. Built alone, it grows 0.6 KB. |
+| Shaka Player | `99ff4ef76` (Shaka `91ca4dbd`, spike `7aa1c0e8a`) | ContentSteering unit tests (25 before, 48 after), 8 new library-build tests in the compiled build, the full unit suite (4107 pass, and the same 11 tests fail at the pinned commit), and `check.py` | The plugin path works in the uncompiled and the compiled build. `check.py` rejects the IIFE in `third_party/`. The IIFE has ES2020 syntax, and Shaka outputs ES5 by default. Karma hides that, because it passes `third_party/**` through Babel. So a plugin needs an ES5 build of the engine, or Shaka needs a port that Closure compiles. | Closure: 14 boundary names need externs. The strict checks of Shaka catch only 4 of them (5 with a required field). The other names compile and are renamed without an error. `engine.priority` resolves the access to the priority list. Gaps 1, 2, 3, 4, 7, 8, 9, 11, 14, 18, and 19 confirmed. For gap 8, Shaka needs `update({ priority })` to keep a default list with several values. | The `banLocation` prefix rule of this document fails for HLS segment URIs. The spike matches the directory of the location instead. A repeated failure on a penalized pathway penalizes another pathway, because `engine.priority` leaves out penalized pathways. The fix is in Shaka. The `try`/`catch` of gap 7 hides a missing extern in a release build. Compiled Shaka today renames `ID` and `HOST`, so its clones never resolve. When every pathway is penalized, `getLocations` returns one URI. |
+| VHS | `99ff4ef76` (VHS `a9f9d7ac`, spike `0a640fa`) | Steering subset (60 tests before, 83 after), unit suite (1403 before, 1426 after, 7 skipped both times), a search of the production build for `??` and `?.`, and a smoke test of `min.js` in headless Chrome | Works. The engine fits the exclusion model. The steering code goes from 761 to 530 lines (the analysis estimated 230). `min.js` grows 7.1 KB (3.3 KB gzip). The production build has no `??` and no `?.`. | No API blocker, as the analysis predicted. Gaps 1, 3, 4, 5, 6, 7, 8, 11, 13, 14, 15, and 18 confirmed. | The requester must settle when the request is aborted, because `@videojs/xhr` never calls back after `abort()`. The adapter of this document misses that. VHS calls `penalize()` inside `onPathwayChange` to refuse a pathway without a playable variant. The RFC does not document that call. The engine and the player can then select different pathways when no pathway is left. VHS also accepts the draft key `SERVICE-LOCATION-PRIORITY`, so its adapter maps it. dash.js and Shaka read only PATHWAY-PRIORITY. The Babel `exclude` change is not needed: VHS already transpiles `node_modules`. |

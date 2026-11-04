@@ -21,7 +21,6 @@ The first design is from 2026-04-13. A review against draft-05 of the base spec 
 | HTTP 410 | requests stopped, no fallback | fallback priority list (base spec, step 7A) |
 | Relative content URIs | no base URI in `applyUriReplacement` | `baseUri` option (base spec, section 5) |
 | `_DASH_throughput` | divided by 1000 | integer bits per second (DASH spec, step 7) |
-| `_DASH_pathway` | no quotes | in quotes (DASH spec, step 7) |
 | HLS per-variant URIs | `PARAMS` applied after them | they replace the result of `HOST` and `PARAMS` (HLS spec, section 7.3) |
 | DASH `proxyServerURL` | supported | removed, because ETSI TS 103 998 V1.1.1 does not define it |
 | Penalty duration | one default for both protocols | the TTL for DASH (DASH spec, step 19) |
@@ -33,7 +32,7 @@ The table maps each rule to the behavior of the engine. An empty cell means that
 | Topic | Base spec | HLS spec | DASH spec | Engine |
 |---|---|---|---|---|
 | Initial pathway | step 1: apply the initial pathway until the first Steering Manifest | 4.4.6.6: `PATHWAY-ID` MUST be applied until then | steps 5 and 7: with `@queryBeforeStart`, the first request has no parameters | `pathway`, the fallback priority list, and `queryBeforeStart` |
-| Query parameters | section 6: send the pathway and the throughput | 7.4: `_HLS_pathway="<id>"` and integer bits per second | step 7: a quoted list of the pathways since the previous request, and integer bits per second for each | the RFC table. The quotes for HLS are unresolved question 1 |
+| Query parameters | section 6: send the pathway and the throughput | 7.4: `_HLS_pathway="<id>"` and integer bits per second | step 7: a quoted list of the pathways since the previous request, and integer bits per second for each | the RFC table. The engine sends no quotes, like the examples of the DASH spec and the HLS players (decision of 2026-11-02) |
 | Request timing | section 4 and step 6: wait TTL seconds after a load | | step 9: set the timer at receipt | a timer at receipt |
 | RELOAD-URI | section 4: relative to the current Steering Manifest URI. A `data` base MUST produce an error | 4.4.6.6: `SERVER-URI` can be a `data` URI | step 10: relative to the current server URI | resolved against the response URI. A failure makes the Steering Manifest invalid |
 | VERSION | section 4: refuse a VERSION that is missing or unknown | | step 11: abort all steering | HLS: invalid Steering Manifest. DASH: no more requests and the fallback priority list |
@@ -44,10 +43,13 @@ The table maps each rule to the behavior of the engine. An empty cell means that
 | Penalty | steps 3 and 4: the duration is defined by the protocol or by the player | 7.5: two minutes is generally enough | step 19: exclude for the last TTL, even if the next response ranks it first | a timer for each penalty, and a new selection when it ends |
 | Cloning | section 5: steps 1 to 4, clone of a clone, unknown `BASE-ID` ignored, `HOST` not empty, `PARAMS` percent-encoded | 7.3: per-variant and per-rendition URIs replace the result of steps 1 to 4 | step 13: replace the host, replace `PARAMS` of the same name, ignore the per-variant keys | clone checks and `applyUriReplacement` |
 
-The DASH spec has two conflicts with itself:
+The DASH spec has three conflicts with itself:
 
-- Step 7 puts `_DASH_pathway` in quotes. The examples in clauses 8.1, 8.2.2, A.1, and A.3 have no quotes, but A.2 has them. The engine follows step 7.
+- Step 7 puts `_DASH_pathway` in quotes. The examples in clauses 8.1, 8.2.2, A.1, and A.3 have no quotes, but A.2 has them. The engine follows the examples and sends no quotes.
 - Clause 5.1 defines `@defaultServiceLocation` as a list separated by spaces. The schema of the 6th edition of ISO/IEC 23009-1 defines it as one token. The player passes the value that it applies, so the engine does not depend on this difference.
+- Clause 6.2 marks `PATHWAY-PRIORITY` as REQUIRED. Table 6.3-1 marks it as optional with the default `[]`, and says that a present value has at least one element. The engine follows clause 6.2: a Steering Manifest without a pathway in `PATHWAY-PRIORITY` is a parse error.
+
+The DASH spec does not say what a client does with a missing VERSION. Step 11 ends steering for a VERSION other than 1. Table 6.3-1 marks VERSION as mandatory, and the base spec, section 4, refuses a Steering Manifest without VERSION. The engine ends DASH steering after a missing VERSION, as after a VERSION other than 1.
 
 ## Prior art
 
@@ -104,7 +106,7 @@ The code rules of the repository require that tests import from the package name
 - A stub requester records each request and returns fixed responses.
 - The fixtures include the examples of the base spec, section 8, and the examples of the DASH spec, clause 8.
 - Each row of the response table of the RFC has a test for each protocol.
-- Tests compare the exact request URI for HLS and for DASH, including the quotes and the lists.
+- Tests compare the exact request URI for HLS and for DASH, including the lists.
 - Tests for `applyUriReplacement` cover relative URIs, a port, existing query parameters, percent-encoded values, and the per-variant and per-rendition keys.
 
 ## Follow-up after acceptance
