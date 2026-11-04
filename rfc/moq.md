@@ -278,7 +278,7 @@ These points in the -01 texts need a decision in the implementation and a report
 These points in the CMCD draft need a report to the author:
 
 1. The CMCD draft writes the record index as `T` in section 4.2 and in the example of section 4.2.1. MSF section 8.1 and the example of MSF section 8.4.1 use `t`. `decodeMoqEventTimeline` rejects the record of the CMCD draft as printed.
-2. CMCD draft section 4.2.1 states that every value is a string. The example in the same section sends `bl`, `bsd`, and `v` as numbers. CTA-5004-B types the three keys as integers.
+2. CMCD draft section 4.2.1 states that every value is a string. The example in the same section sends `bl`, `bsd`, and `v` as numbers. CTA-5004-B types `v` as an integer, and `bl` and `bsd` as inner lists of integers with token identifiers. The example also writes `bl` and `bsd` as bare numbers, not as inner lists.
 3. CMCD draft section 4.2 requires a new group for every record. MSF section 8.3 requires the first object of every group to contain all accumulated records. Under both rules, every CMCD group repeats the full report history.
 4. The publish tracks in CMCD draft section 5 have no `depends` array and no `mimeType`. MSF section 8.2 requires both fields on an event timeline track.
 5. The namespaces in CMCD draft section 5 are path strings, such as `example.com/collection/cmcd/health`. Point 3 of the MSF list applies.
