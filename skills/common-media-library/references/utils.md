@@ -11,6 +11,7 @@ Common utility functions for media processing.
 - Compute the time to first byte, the transfer duration, and the bandwidth in bits per second of a `ResourceTiming` sample: `getTimeToFirstByte`, `getTransferDuration`, `getBandwidthBps`
 - Unescape HTML entities in a manifest or a caption string: `unescapeHtml`
 - Generate a UUID for a session or a content id: `uuid`
+- Send an `HttpRequest` with `fetch` and receive an `HttpResponse`: `fetchRequester`, `HttpRequester`
 
 Do not write your own hex, base64, or UUID conversion. Open an issue for a conversion that is missing.
 
@@ -119,6 +120,9 @@ export type Encoding = ValueOf<typeof Encoding>;
 export type ExclusiveRecord<K extends PropertyKey, V> = { [P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, never>> extends (infer O) ? { [Q in keyof O]: O[Q]; } : never; }[K];
 
 // @public
+export function fetchRequester(request: HttpRequest): Promise<HttpResponse>;
+
+// @public
 export function getBandwidthBps(sample: ResourceTiming): number;
 
 // @public
@@ -145,6 +149,9 @@ export type HttpRequest<D = any> = {
     timeout?: number;
     customData?: D;
 };
+
+// @public
+export type HttpRequester = (request: HttpRequest) => Promise<HttpResponse>;
 
 // @public
 export type HttpResponse<R extends HttpRequest = HttpRequest> = {

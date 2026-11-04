@@ -231,9 +231,9 @@ function copyItemValue(value: unknown): unknown {
  * `CmcdCustomValue` admit only primitives, `SfItem<primitive>`, and arrays of
  * those. `decodeCmcd` also returns an `SfItem` that wraps a list, and the
  * copy includes that list. `SfItem.params` is a flat record. The reporter calls this function
- * where a transform is configured, at session end on the ended session's
- * store, and on the request's stored player-facing view. The session-end
- * copy detaches the frozen snapshot from caller-held references.
+ * where a transform is configured, and at session end on the ended session's
+ * store. The session-end copy detaches the frozen snapshot from caller-held
+ * references. `prepareCmcdData` returns a copy, so the request path needs no call.
  */
 function copyReportValues(data: Cmcd): Cmcd {
 	const record = data as Record<string, unknown>
@@ -394,6 +394,9 @@ type CmcdSession<C> = {
  *                `Record<string, unknown>`.
  *
  * @see {@link https://cta-wave.github.io/Resources/common-media-client-data--cta-5004-b.html#reporting-modes-when-we-send-data | CTA-5004-B Reporting Modes}
+ *
+ * @deprecated Use {@link createCmcdSession} instead. The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member of `CmcdReporter` to the session API.
+ * Version 3.0.0 removes `CmcdReporter`.
  *
  * @public
  */
@@ -1250,13 +1253,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
 
 		const options = createEncodingOptions(CMCD_REQUEST_MODE, this.config, report.url)
 
-		// The player-facing view is detached from the persistent store:
-		// prepareCmcdData builds a fresh object but copies values by
-		// reference, and players read this object to identify requests, so a
-		// shared array would leak mutation into the store. The reporter never
-		// reads it back; the response path works from the encoded snapshot on
-		// the provenance record.
-		const cmcd = copyReportValues(prepareCmcdData(cmcdData, options))
+		const cmcd = prepareCmcdData(cmcdData, options)
 		;(report.customData as { cmcd: Cmcd }).cmcd = cmcd
 
 		if (sendMsd && cmcd.msd !== undefined) {

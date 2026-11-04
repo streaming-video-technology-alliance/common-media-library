@@ -100,7 +100,7 @@ Common Media Client Data (CMCD) encoding and decoding
 
 - Add a CMCD report to a segment request as a query string or as headers: `appendCmcdQuery`, `appendCmcdHeaders`, `toCmcdQuery`, `toCmcdHeaders`
 - Encode or decode CMCD key and value pairs: `encodeCmcd`, `decodeCmcd`, `fromCmcdQuery`, `fromCmcdHeaders`
-- Report CMCD v2 events and time intervals to a collector: `CmcdReporter`, `createFetchTransport`, `createXhrTransport`
+- Report CMCD v2 events and time intervals to a collector: `createCmcdSession`, `createFetchTransport`, `createXhrTransport`
 - Validate a CMCD payload against CTA-5004: `validateCmcd`, `validateCmcdEventReport`
 - Capture the CMCD that a player sends in a test: `CmcdReportRecorder`
 
@@ -272,6 +272,7 @@ Common utility functions for media processing
 - Compute the time to first byte, the transfer duration, and the bandwidth in bits per second of a `ResourceTiming` sample: `getTimeToFirstByte`, `getTransferDuration`, `getBandwidthBps`
 - Unescape HTML entities in a manifest or a caption string: `unescapeHtml`
 - Generate a UUID for a session or a content id: `uuid`
+- Send an `HttpRequest` with `fetch` and receive an `HttpResponse`: `fetchRequester`, `HttpRequester`
 
 Do not write your own hex, base64, or UUID conversion. Open an issue for a conversion that is missing.
 

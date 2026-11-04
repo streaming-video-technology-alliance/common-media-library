@@ -698,4 +698,46 @@ describe('prepareCmcdData', () => {
 			deepEqual(Object.keys(data), ['e', 'rc', 'ts', 'url', 'v'])
 		})
 	})
+
+	describe('copy', () => {
+		it('shares no list, SfItem, or parameter object with the input', () => {
+			const blParams = { v: true }
+			const blItem = toCmcdValue<number, { v: boolean }>(1000, blParams)
+			const bl = [blItem]
+			const brParams = { v: true }
+			const wrapperParams = { x: 1 }
+			const br = new SfItem([toCmcdValue(3000, brParams)], wrapperParams)
+			const norParams = { r: '0-999' }
+			const nor = [toCmcdValue('https://cdn.example.com/a/seg-2.m4s', norParams)]
+			const customParams = { p: 1 }
+			const custom = [toCmcdValue<string, { p: number }>('a', customParams)]
+			const data = prepareCmcdData({ bl, br, nor, 'com.example-list': custom })
+
+			blItem.value = 5
+			blParams.v = false
+			bl.push(toCmcdValue(2000))
+			brParams.v = false
+			wrapperParams.x = 2
+			norParams.r = '1-2'
+			customParams.p = 2
+			custom.push(toCmcdValue('b'))
+
+			deepEqual(data['bl'], [new SfItem(1000, { v: true })])
+			deepEqual(data['br'], new SfItem([new SfItem(3000, { v: true })], { x: 1 }))
+			deepEqual(data['nor'], [new SfItem('https://cdn.example.com/a/seg-2.m4s', { r: '0-999' })])
+			deepEqual(data['com.example-list'], [new SfItem('a', { p: 1 })])
+		})
+
+		it('copies the result of a formatter', () => {
+			const calls: string[] = []
+			const params = { v: true }
+			const item = toCmcdValue(5000, params)
+			const data = prepareCmcdData({ br: [item] }, { formatters: { br: countCalls(calls, 'br') } })
+
+			params.v = false
+
+			deepEqual(calls, ['br'])
+			deepEqual(data['br'], [new SfItem(5000, { v: true })])
+		})
+	})
 })

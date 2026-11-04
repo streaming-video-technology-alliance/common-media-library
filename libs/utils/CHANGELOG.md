@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `fetchRequester` sends an `HttpRequest` with `fetch` and resolves with an `HttpResponse`. The response has the response text as `data` and every response header in `headers`
+- `HttpRequester`, the type of a function that sends an `HttpRequest` and resolves with an `HttpResponse`
+
 ## [1.7.0] - 2026-10-26
 
 ### Added
