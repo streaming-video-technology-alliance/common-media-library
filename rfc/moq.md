@@ -143,10 +143,12 @@ The package implements these sections of the three drafts:
 | Media timeline and template | 7 | | |
 | Event timeline | 8 | 3.6 | 4.2.1 |
 | URL and fragment | 11.1 | | |
-| String form of track names | transport 8.8, 11.1.2 | | |
+| String form of track names | transport 8.8, 11.1.2, name mapping of the editor's copy | | |
 | Content protection | | 4 | |
 
 The package leaves out LOC packaging, MoQ Secure Objects, and the MOQLOG and MOQMETRICS payloads. The package also leaves out the compression property and every MOQT control or data message. The package leaves out sections 3 and 4.2 of the CMCD draft, the rules for the content and timing of each CMCD record. The cmcd package owns those rules.
+
+The editor's copy of MSF is the text on the main branch of the [MSF repository](https://github.com/moq-wg/msf). The package takes the namespace rule from the editor's copy, because MSF -01 has no such rule. See point 3 of the draft inconsistencies.
 
 ### Types
 
@@ -209,6 +211,7 @@ The constants follow the const enum pattern of the repo. Each constant lives in 
 | `parseMoqUri(uri): MoqUri` | Splits a `moqt` URI and parses an `msf` fragment |
 | `encodeMoqTrackName(track): string` | Renders a full track name in the string form of transport section 8.8 |
 | `decodeMoqTrackName(text): MoqFullTrackName` | Parses that string form |
+| `decodeMoqNamespace(text): string[]` | Splits a catalog namespace string into the tuple fields, with the rules of the editor's copy |
 | `decodeMoqMediaTimeline(text): MoqMediaTimelineEntry[]` | Parses and validates a media timeline payload |
 | `decodeMoqEventTimeline<T>(text): MoqEventTimelineEntry<T>[]` | Parses and validates an event timeline payload |
 | `createMoqMediaTimeline(source?): MoqMediaTimeline` | Creates a timeline from entries or a template, with `reset`, `append`, `locationAt`, and `entryAt` |
@@ -227,12 +230,13 @@ Catalog decoding:
 - The decoder accepts the version strings `1` and `draft-01`. See unresolved question 1.
 - Every track in an independent catalog, and every track in an `add` operation, needs `name`, `packaging`, and `isLive`. Tracks in `remove` and `clone` operations follow the field rules of MSF section 5.1.6.
 - The decoder keeps unknown fields on the decoded objects. The decoder also keeps unknown values in open fields. A player skips the tracks that the player cannot use.
+- A `namespace` value follows the editor's copy: a non-empty string with 1 to 32 non-empty fields between `/` characters. A violation throws an `Error` that names the field.
 - The decoder keeps `cmcdConfig` as written and does not validate the members. A player that builds a CMCD event target from the field validates the values at that point.
 - Variable substitution runs on the text before parsing. The replacement is one regular expression pass over `%name%` references. A value with a character outside `A-Z a-z 0-9 - _ @` throws. A reference without a value throws. See unresolved question 3.
 
 Delta updates:
 
-- Tracks match on the pair of `namespace` and `name`. A missing `namespace` matches a missing `namespace`, because both inherit the namespace of the catalog track.
+- Tracks match on the pair of `namespace` and `name`. The match is an exact string comparison with no normalization, the rule of the editor's copy. A missing `namespace` matches a missing `namespace`, because both inherit the namespace of the catalog track.
 - `add` throws when the track exists. `remove` throws when the track does not exist. See unresolved question 7.
 - `clone` copies every field of the parent except `name`, then applies the fields of the operation. The result does not contain `parentName` or `parentNamespace`.
 - `generatedAt` and `isComplete` from the delta replace the base values when present.
@@ -251,6 +255,7 @@ URIs and names:
 - `connectUrl` is the same URI with the scheme `https` and without the fragment. This value is the WebTransport URL of transport section 6.2.1.
 - The fragment is parsed when the fragment type is `msf`. Another fragment type leaves `fragment` undefined. `href` keeps the raw fragment.
 - Repeated range parameters produce one array per parameter. The player processes the union, as MSF section 11.1.1 requires. The first value of `connection` and `c4m` wins.
+- `decodeMoqNamespace` applies the namespace check of the catalog decoder and returns the fields. The function does not normalize the text, so two strings with different code points are two different namespaces.
 - `decodeMoqTrackName` rejects a period that is not followed by two lowercase hexadecimal digits. The function also rejects an escaped byte that the format represents literally. Both rules keep the mapping bijective. The bytes decode as UTF-8, and invalid UTF-8 throws.
 
 Content protection:
@@ -269,7 +274,7 @@ These points in the -01 texts need a decision in the implementation and a report
 
 1. MSF section 5.1.1 defines the version string as `draft-XX`. The examples in MSF section 5.6 and CMSF section 5 use `"1"`.
 2. MSF section 5.2 names the field `mimeType`. The examples use both `mimeType` and `mimetype`.
-3. MSF section 5.2.2 types `namespace` as one string, and the examples write `conference.example.com/conference123/alice`. A MOQT namespace is a tuple, and MSF section 11.1.2 renders tuples with hyphens and `.xx` escapes. The drafts do not say how the string maps to the tuple.
+3. MSF section 5.2.2 types `namespace` as one string and does not say how the string maps to the MOQT tuple. The editor's copy resolves this point. [PR 210](https://github.com/moq-wg/msf/pull/210) (merged 2026-10-28) splits the string at every `/`. Each namespace has 1 to 32 non-empty fields. Each field maps to UTF-8 bytes without normalization. The package follows the editor's copy.
 4. MSF section 11.3 names the message SUBSCRIBE_DONE. Transport draft-22 names the message PUBLISH_DONE.
 5. MSF section 5.2.36 cites transport section 3.1.1 for the URI scheme. Transport draft-22 defines the scheme in section 6.1.
 6. CMSF cites transport draft-18 as the normative reference. The current transport draft is 22.
@@ -281,7 +286,6 @@ These points in the CMCD draft need a report to the author:
 2. CMCD draft section 4.2.1 states that every value is a string. The example in the same section sends `bl`, `bsd`, and `v` as numbers. CTA-5004-B types `v` as an integer, and `bl` and `bsd` as inner lists of integers with token identifiers. The example also writes `bl` and `bsd` as bare numbers, not as inner lists.
 3. CMCD draft section 4.2 requires a new group for every record. MSF section 8.3 requires the first object of every group to contain all accumulated records. Under both rules, every CMCD group repeats the full report history.
 4. The publish tracks in CMCD draft section 5 have no `depends` array and no `mimeType`. MSF section 8.2 requires both fields on an event timeline track.
-5. The namespaces in CMCD draft section 5 are path strings, such as `example.com/collection/cmcd/health`. Point 3 of the MSF list applies.
 
 ### Dependencies and packaging
 
@@ -295,11 +299,12 @@ These points in the CMCD draft need a report to the author:
   - the delta sequences of MSF sections 5.6.4 and 5.6.5
   - the timeline and the template of MSF section 7, and the SAP timeline of CMSF section 3.6.2
   - the URLs of MSF section 11.1.3
+  - the namespace `example.com/live/channel1` and the track name `café` of the editor's copy
   - the three publish tracks of CMCD draft section 5, and the record of CMCD draft section 4.2.1 with the index key written as `t`
 
 ## Drawbacks
 
-- Both drafts are at revision -01, and both replaced earlier drafts with other names. Field names and value sets can change before the RFC stage. A field rename is a breaking change for TypeScript adopters even when the runtime does not change.
+- Both drafts are at revision -01, and both replaced earlier drafts with other names. Field names and value sets can change before the RFC stage. A field rename is a breaking change for TypeScript adopters even when the runtime does not change. The namespace rule is from the editor's copy and not from a published revision, so the rule can still change before MSF -02.
 - The drafts say little about malformed catalogs. The strictness rules above are decisions of this RFC, not of the drafts.
 - `@svta/cml-drm` becomes a peer dependency for every adopter, including adopters who import only types. The bundle cost is zero. The install cost is one more package.
 - The first release has no encoder. Publishers get the types and nothing else.
@@ -322,7 +327,7 @@ These points in the CMCD draft need a report to the author:
 ## Unresolved questions
 
 1. Which version strings does `decodeMoqCatalog` accept? The proposal accepts `1` and `draft-01` until the drafts agree.
-2. How does the catalog `namespace` string map to the MOQT namespace tuple? The proposal keeps the string as written and does not split the string. `decodeMoqTrackName` handles the hyphen form of the fragment only.
+2. Should `decodeMoqCatalog` split `namespace` into the tuple, or keep the string? The proposal keeps the string, so `MoqCatalogTrack` mirrors the catalog JSON, and adds `decodeMoqNamespace` for the split.
 3. Should a `%name%` reference without a value throw, or remain in the text? The proposal throws, because a token field with a literal `%token%` value sends a wrong credential.
 4. Which PlayReady key system string comes first in `getMoqKeySystems`?
 5. Should the map from system ID to key system move to `@svta/cml-drm`? The DASH `schemeIdUri` has the same need.
@@ -346,6 +351,7 @@ These points in the CMCD draft need a report to the author:
 
 - v1 (2026-10-26): initial draft.
 - v2 (2026-11-03): add the catalog side of the CMCD draft, with the inconsistencies of that draft.
+- v3 (2026-11-03): follow the namespace rule of the MSF editor's copy, add `decodeMoqNamespace`, and remove the CMCD draft point on namespaces.
 
 ## Final Decision
 
