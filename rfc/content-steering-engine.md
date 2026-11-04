@@ -215,7 +215,7 @@ type SteeringEngineConfig = {
 	uri: string                                             // absolute URI of the first request
 	pathways: readonly string[]                             // pathway IDs of the Content Description
 	pathway?: string                                        // the pathway that the player applies now
-	penalty?: number | 'ttl'                                // milliseconds, or 'ttl' for the current TTL. See Penalties
+	penalty?: number | 'ttl'                                // milliseconds, or the current TTL. See Penalties
 	queryBeforeStart?: boolean                              // no steering parameters on the first request
 	requester: SteeringRequester
 	getThroughput?: (pathway: string) => number | undefined // bits per second
@@ -292,7 +292,7 @@ The engine adds two query parameters for the protocol:
 - For DASH, the list of reported pathways is the result of `getReportedPathways`. Without that function, the list has every pathway that was selected at any time since the previous request, in order.
 - The engine omits the pathway parameter when the list is empty, or for HLS when `pathway` is undefined.
 - The engine percent-encodes each pathway ID in `_HLS_pathway` and `_DASH_pathway`, before it joins the IDs with commas. An ID of ASCII letters, digits, `_`, `.`, and `-` does not change.
-- The pathway parameter has no quotes. The HLS spec, section 7.4, and the DASH spec, step 7, show quotes. The examples of the DASH spec, hls.js, Shaka Player, and VHS send no quotes.
+- The engine sends the pathway value without quotes. The HLS spec, section 7.4, and the DASH spec, step 7, show quotes. The examples of the DASH spec have none, and hls.js, Shaka Player, and VHS send none.
 - The engine omits the throughput parameter when no listed pathway has a throughput. A pathway has no throughput when `getThroughput` returns `undefined`, a negative value, or a value that is not finite.
 - The engine rounds each throughput to an integer.
 - Each parameter replaces a parameter of the same name in the URI. The engine keeps all other parts of the URI unchanged.
@@ -316,13 +316,13 @@ A Steering Manifest is valid when all of these conditions are true:
 
 - The body parses as a JSON object.
 - VERSION is 1. For DASH, a missing VERSION counts as a VERSION other than 1 (base spec, section 4).
-- TTL is a positive, finite number. The engine never uses a TTL below 1 second, so a TTL below 1 counts as 1. The Steering Manifest stays valid. No spec defines a minimum, and the base spec and the DASH spec allow a longer wait.
-- PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values.
+- TTL is a finite number greater than 0. The engine never uses a TTL below 1 second, so a TTL between 0 and 1 counts as 1. The Steering Manifest stays valid. No spec defines a minimum, and the base spec and the DASH spec allow a longer wait.
+- PATHWAY-PRIORITY has at least one string. The engine keeps the first of each string and ignores other values. The base spec forbids a duplicate ID but does not say what a client does with one, so the engine keeps the first position. The DASH spec requires PATHWAY-PRIORITY in clause 6.2 and lists it as optional with the default `[]` in Table 6.3-1. The engine follows clause 6.2.
 - A relative RELOAD-URI resolves.
 
-An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
+An invalid clone does not make the Steering Manifest invalid (see Clones). An absent or empty `PATHWAY-CLONES` array means no clones. The base spec requires an element in a present array. The DASH spec gives `[]` as the default, so the engine accepts the empty array. `isValidSteeringManifest` does not change. It remains strict, for the check of what a steering server sends.
 
-Until the first valid Steering Manifest, the previous TTL is `DEFAULT_TTL`. Retry-After can be a number of seconds, or an HTTP date that ends in `GMT`. A Retry-After value is valid only when its delay is positive and finite. A 429 without a valid Retry-After gets the same action as any other status.
+Until the first valid Steering Manifest, the previous TTL is `DEFAULT_TTL`. Retry-After can be a number of seconds, or an HTTP date that ends in `GMT`. A Retry-After that asks for no wait, such as `0` or a date in the past, counts as absent. A 429 without a Retry-After, or with a Retry-After that counts as absent or is not finite, gets the same action as any other status.
 
 The engine applies a valid Steering Manifest in this order:
 
@@ -331,7 +331,7 @@ The engine applies a valid Steering Manifest in this order:
 3. It calls `onManifest` with the accepted clones.
 4. It selects a pathway.
 
-A 410, and a VERSION other than 1 for DASH, end steering: the engine sends no more requests. If the priority list comes from `update({ priority })`, the end of steering keeps it. Otherwise, after a 410, the engine keeps the priority list of the last valid Steering Manifest (base spec, step 7A). If no valid Steering Manifest arrived, the engine uses the fallback priority list: the selected pathway first, then `pathways` in their order. A VERSION other than 1 for DASH keeps a list from `update({ priority })` and the clones of the last valid Steering Manifest. Without such a list, the engine drops the clones and uses the fallback priority list. The DASH spec abandons all steering after a 410 or a VERSION other than 1 (steps 17 and 11). The engine keeps the pathway selection instead, so `penalize()` and `priority` continue to work.
+A 410, and a VERSION other than 1 for DASH, end steering: the engine sends no more requests. If the priority list comes from `update({ priority })`, the end of steering keeps it. Otherwise, after a 410, the engine keeps the priority list of the last valid Steering Manifest (base spec, step 7A). If no valid Steering Manifest arrived, the engine uses the fallback priority list: the selected pathway first, then `pathways` in their order. A VERSION other than 1 for DASH keeps a list from `update({ priority })` and the clones of the last valid Steering Manifest. Without such a list, the engine drops the clones and uses the fallback priority list.
 
 A response to a request that the engine sent before `update({ uri })` changed the URI applies its Steering Manifest, but not its RELOAD-URI. A 410 or a VERSION other than 1 for DASH in such a response does not end steering. Instead, the engine requests the current URI at once.
 
@@ -395,7 +395,7 @@ The engine ignores a clone that is not valid, and a valid clone that `acceptClon
 | HLS | `DEFAULT_PATHWAY_PENALTY`, 5 minutes |
 | DASH | the current TTL (DASH spec, step 19) |
 
-The current TTL is the TTL of the last valid Steering Manifest. Before the first valid Steering Manifest, the current TTL is `DEFAULT_TTL`. For DASH, a 429 with a valid Retry-After also sets the current TTL (see Responses). The `penalty` property of the configuration replaces the default for both protocols: a number of milliseconds, or `'ttl'` for the current TTL. `DEFAULT_PATHWAY_PENALTY` is 5 minutes, the value of hls.js. The HLS spec, section 7.5, says that two minutes is generally enough. A player that wants a shorter penalty sets `penalty`.
+The current TTL is the TTL of the last valid Steering Manifest. Before the first valid Steering Manifest, the current TTL is `DEFAULT_TTL`. For DASH, a 429 with a valid Retry-After also sets the current TTL (see Responses). The `penalty` property of the configuration replaces the default for both protocols: a number of milliseconds, or `'ttl'` for the current TTL.
 
 A new Steering Manifest does not end a penalty, and `update()` does not end a penalty either. When a penalty ends, the engine selects a pathway again (base spec, step 4). A second call for the same pathway restarts its penalty.
 
@@ -449,7 +449,7 @@ The package documentation links to the spec versions of this RFC.
 - The HLS and DASH rules ship together, so a player that uses one protocol also bundles the rules of the other.
 - The engine is larger than the steering code of the players. The table shows the sizes of the engine, bundled with rolldown and minified.
 - `SteeringError` is a union, so a player checks `type` before it reads `url`, `status`, or `retryDelay`.
-- Some wire behavior differs from the current players. The differences are the PARAMS values without a second encoding, the base URI of RELOAD-URI, and the quotes that dash.js sends in `_DASH_pathway`. A steering server that depends on one player can see a difference.
+- Some wire behavior differs from the current players. The differences are the `_DASH_pathway` value without quotes, the PARAMS values without a second encoding, and the base URI of RELOAD-URI. dash.js sends the quotes. A steering server that depends on one player can see a difference.
 
 | Import | Minified | gzip | brotli |
 |---|---|---|---|
@@ -478,7 +478,7 @@ The engine also fixes bugs in the old code of three players. The integration map
 - **A processor without I/O.** Each player would implement the timers, the rules for error responses, and the RELOAD-URI resolution. The Motivation table shows that these parts differ the most between the players.
 - **Protocol descriptor objects.** The earlier design used `HLS_CDP` and `DASH_CDP` objects with format callbacks. The protocols differ in behavior as well as format, for example in the 429 rule and the penalty duration. A descriptor would need a callback for each difference. A `protocol` value keeps both behaviors inside the package, where the tests cover them. No third protocol uses content steering today.
 - **A class.** `createSteeringEngine` returns an object type, like `createCmcdSession` in the CMCD session API RFC ([#455](https://github.com/streaming-video-technology-alliance/common-media-library/pull/455)). The implementation can change without a change to the public type.
-- **An injected scheduler.** Tests use the mock timers of `node:test`, like the tests of `CmcdReporter`. A player controls the request timing with `start()` and `stop()`.
+- **An injected scheduler.** Tests use the fake timers of Vitest. A player controls the request timing with `start()` and `stop()`.
 - **Cancellation.** `HttpRequest` has no abort signal. `stop()` ignores late responses instead.
 - **A `setPriority()` method.** The `priority` getter returns the effective order, not the list that a player sets. A method named as a pair of the getter would suggest that the getter returns that list. `update({ priority })` keeps one method for every input of the engine.
 - **A `refresh()` method.** dash.js has a public `triggerSteeringRequest()` that always sends a request. The base spec says that the client MUST wait TTL seconds before it reloads. So this RFC has no method to force a request. The dash.js player can map `triggerSteeringRequest()` to `start()`.
@@ -498,8 +498,15 @@ The engine also fixes bugs in the old code of three players. The integration map
 
 ## Unresolved questions
 
-1. **SVTA2070 codes.** `SteeringErrorType` documents the codes `2040` and `2041`. Should `SteeringError` also include the codes as numbers? That change adds a peer dependency on `@svta/cml-error-codes`.
-2. **Release tag.** The package exports use `@beta`, and the repository rules require `@public`. Should the engine ship as `@beta` until a player uses it, and as `@public` in version 1.0?
+1. **Quotes in `_HLS_pathway`.** Resolved on 2026-11-02: the engine sends the pathway IDs without quotes for both protocols. The HLS spec, section 7.4, shows the pathway ID in quotes. The examples of the DASH spec show no quotes, and hls.js, Shaka Player, and VHS send none.
+2. **HLS penalty duration.** Resolved on 2026-11-02: the default stays `DEFAULT_PATHWAY_PENALTY`, which is also the value of hls.js. The HLS spec, section 7.5, says that two minutes is generally enough. A player that wants another duration sets `penalty` to a number of milliseconds or to `'ttl'`.
+3. **End of steering in DASH.** Resolved on 2026-11-02: the engine keeps the pathway selection with the fallback priority list. The DASH spec abandons all steering in two cases:
+   - A VERSION other than 1 (step 11).
+   - A 410 response to the first request (step 17).
+
+   Step 17 says to proceed "as if the ContentSteering element were not present". A player without steering uses the MPD order with the default service location first, which is the fallback priority list. So the player sees the same order, and `penalize()` continues to work on that list.
+4. **SVTA2070 codes.** `SteeringErrorType` documents the codes `2040` and `2041`. Should `SteeringError` also include the codes as numbers? That change adds a peer dependency on `@svta/cml-error-codes`.
+5. **Release tag.** The package exports use `@beta`, and the repository rules require `@public`. Should the engine ship as `@beta` until a player uses it, and as `@public` in version 1.0?
 
 ## Future possibilities
 
@@ -507,7 +514,7 @@ The engine also fixes bugs in the old code of three players. The integration map
 - An `onPriorityChange` callback, if a player needs a push instead of the `priority` getter.
 - A `refresh()` method, if DASH-IF needs the current behavior of `triggerSteeringRequest()`.
 - Support the DASH `proxyServerURL` attribute if a published DASH spec defines it. Only the 2022 community review draft of DASH-IF defines it today.
-- Add the SVTA2070 codes to `SteeringError` (see unresolved question 1).
+- Add the SVTA2070 codes to `SteeringError` (see unresolved question 4).
 
 ## Revision history
 
@@ -538,10 +545,12 @@ The engine also fixes bugs in the old code of three players. The integration map
   - `priority` holds only the selected pathway when every other pathway is penalized.
   - The guide describes `stop()` for media that is ended or detached, and the source of the DASH `pathways`.
 - v5 (2026-11-02): `fetchRequester` moves to `@svta/cml-utils`, and `SteeringRequester` is the `HttpRequester` type of that package. The CMCD session takes the same function as its requester.
-- v6 (2026-11-03): decisions on the first three unresolved questions, after the review of the implementation:
-  - The pathway parameter has no quotes, like hls.js, Shaka Player, VHS, and the examples of the DASH spec.
-  - `penalty` accepts `'ttl'` for the current TTL, and a number must be greater than 0. `DEFAULT_PATHWAY_PENALTY` remains 5 minutes for HLS.
-  - After a 410 or a DASH VERSION other than 1, the engine keeps the pathway selection, so `penalize()` continues to work.
+- v6 (2026-11-03): the RFC branch takes the edits from the review of the implementation ([#608](https://github.com/streaming-video-technology-alliance/common-media-library/pull/608)):
+  - Question 1 is resolved: the pathway parameter has no quotes.
+  - Question 2 is resolved: `DEFAULT_PATHWAY_PENALTY` remains the HLS default, and `penalty` accepts `'ttl'`.
+  - Question 3 is resolved: after a 410 or a DASH VERSION other than 1, the engine keeps the pathway selection.
+  - A `penalty` number must be greater than 0. A TTL between 0 and 1 counts as 1. A duplicate ID in PATHWAY-PRIORITY keeps the first position. A Retry-After that asks for no wait counts as absent.
+  - Penalties defines the current TTL. Tests use the fake timers of Vitest.
 
 ## Final Decision
 
