@@ -4,7 +4,7 @@ import type { ValueOf } from '@svta/cml-utils'
  * A Steering Manifest request failed. The error has the SVTA2070 code 2040.
  *
  *
- * @beta
+ * @public
  */
 export const STEERING_ERROR_TYPE_LOAD = 'load' as const
 
@@ -12,7 +12,7 @@ export const STEERING_ERROR_TYPE_LOAD = 'load' as const
  * A Steering Manifest is not valid. The error has the SVTA2070 code 2041.
  *
  *
- * @beta
+ * @public
  */
 export const STEERING_ERROR_TYPE_PARSE = 'parse' as const
 
@@ -20,7 +20,7 @@ export const STEERING_ERROR_TYPE_PARSE = 'parse' as const
  * A callback of the player threw, and no caller can receive the exception.
  *
  *
- * @beta
+ * @public
  */
 export const STEERING_ERROR_TYPE_CALLBACK = 'callback' as const
 
@@ -29,7 +29,7 @@ export const STEERING_ERROR_TYPE_CALLBACK = 'callback' as const
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const SteeringErrorType = {
 	/**
@@ -49,6 +49,6 @@ export const SteeringErrorType = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type SteeringErrorType = ValueOf<typeof SteeringErrorType>

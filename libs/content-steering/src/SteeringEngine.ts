@@ -2,7 +2,7 @@
  * A content steering engine.
  *
  *
- * @beta
+ * @public
  */
 export type SteeringEngine = {
 	/**

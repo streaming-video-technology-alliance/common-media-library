@@ -8,7 +8,7 @@ import type { SteeringRequester } from './SteeringRequester.ts'
  * The configuration of a content steering engine.
  *
  *
- * @beta
+ * @public
  */
 export type SteeringEngineConfig = {
 	/**

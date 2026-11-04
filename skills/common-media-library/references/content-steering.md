@@ -262,47 +262,47 @@ import { SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR } from '@svta/cml-error-codes
 import { SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR } from '@svta/cml-error-codes';
 import { ValueOf } from '@svta/cml-utils';
 
-// @beta
+// @public
 export function applyUriReplacement(uri: string, replacement: UriReplacement, options?: UriReplacementOptions): string;
 
-// @beta
+// @public
 export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngine;
 
-// @beta
+// @public
 export const DEFAULT_PATHWAY_PENALTY = 3e5;
 
-// @beta
+// @public
 export const DEFAULT_TTL = 300;
 
-// @beta
+// @public
 export function isValidPathwayClone(clone: PathwayClone): boolean;
 
-// @beta
+// @public
 export function isValidSteeringManifest(manifest: SteeringManifest): boolean;
 
-// @beta
+// @public
 export type PathwayClone = {
     "BASE-ID": string;
     ID: string;
     "URI-REPLACEMENT": UriReplacement;
 };
 
-// @beta
+// @public
 export const STEERING_ERROR_TYPE_CALLBACK: "callback";
 
-// @beta
+// @public
 export const STEERING_ERROR_TYPE_LOAD: "load";
 
-// @beta
+// @public
 export const STEERING_ERROR_TYPE_PARSE: "parse";
 
-// @beta
+// @public
 export const STEERING_PROTOCOL_DASH: "dash";
 
-// @beta
+// @public
 export const STEERING_PROTOCOL_HLS: "hls";
 
-// @beta
+// @public
 export type SteeringEngine = {
     readonly pathway: string | undefined;
     readonly priority: readonly string[];
@@ -316,7 +316,7 @@ export type SteeringEngine = {
     }): void;
 };
 
-// @beta
+// @public
 export type SteeringEngineConfig = {
     protocol: SteeringProtocol;
     uri: string;
@@ -336,7 +336,7 @@ export type SteeringEngineConfig = {
     onError?: (error: SteeringError) => void;
 };
 
-// @beta
+// @public
 export type SteeringError = {
     readonly type: typeof STEERING_ERROR_TYPE_LOAD | typeof STEERING_ERROR_TYPE_PARSE;
     readonly code: typeof SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR | typeof SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR;
@@ -352,17 +352,17 @@ export type SteeringError = {
     readonly message: string;
 };
 
-// @beta
+// @public
 export const SteeringErrorType: {
     readonly LOAD: typeof STEERING_ERROR_TYPE_LOAD;
     readonly PARSE: typeof STEERING_ERROR_TYPE_PARSE;
     readonly CALLBACK: typeof STEERING_ERROR_TYPE_CALLBACK;
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type SteeringErrorType = ValueOf<typeof SteeringErrorType>;
 
-// @beta
+// @public
 export type SteeringManifest = {
     VERSION: number;
     TTL: number;
@@ -371,19 +371,19 @@ export type SteeringManifest = {
     "PATHWAY-CLONES"?: PathwayClone[];
 };
 
-// @beta
+// @public
 export const SteeringProtocol: {
     readonly HLS: typeof STEERING_PROTOCOL_HLS;
     readonly DASH: typeof STEERING_PROTOCOL_DASH;
 };
 
-// @beta (undocumented)
+// @public (undocumented)
 export type SteeringProtocol = ValueOf<typeof SteeringProtocol>;
 
-// @beta
+// @public
 export type SteeringRequester = HttpRequester;
 
-// @beta
+// @public
 export type UriReplacement = {
     HOST?: string;
     PARAMS?: Record<string, string>;
@@ -391,7 +391,7 @@ export type UriReplacement = {
     "PER-RENDITION-URIS"?: Record<string, string>;
 };
 
-// @beta
+// @public
 export type UriReplacementOptions = {
     baseUri?: string;
     stableVariantId?: string;

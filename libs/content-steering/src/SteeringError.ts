@@ -14,7 +14,7 @@ import type {
  * `SteeringErrorType` lists the values of `type`.
  *
  *
- * @beta
+ * @public
  */
 export type SteeringError =
 	| {

@@ -6,7 +6,7 @@ import type { UriReplacement } from './UriReplacement.ts'
  * Options for `applyUriReplacement`.
  *
  *
- * @beta
+ * @public
  */
 export type UriReplacementOptions = {
 	/**
@@ -43,7 +43,7 @@ export type UriReplacementOptions = {
  * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-05#section-5 | Pathway Cloning}
  * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-22#section-7.3 | HLS Pathway Cloning}
  *
- * @beta
+ * @public
  */
 export function applyUriReplacement(
 	uri: string,

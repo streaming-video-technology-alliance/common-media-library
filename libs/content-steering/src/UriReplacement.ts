@@ -2,7 +2,7 @@
  * A URI replacement for content steering.
  *
  *
- * @beta
+ * @public
  */
 export type UriReplacement = {
 	/**

@@ -12,6 +12,6 @@ import type { HttpRequester } from '@svta/cml-utils'
  * `fetchRequester` from `@svta/cml-utils` is a requester that uses `fetch`.
  * A `Requester` function from `@svta/cml-request` has a compatible type.
  *
- * @beta
+ * @public
  */
 export type SteeringRequester = HttpRequester

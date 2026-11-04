@@ -60,7 +60,7 @@ type Failure = {
  *
  * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-05#section-7 | Steering Client Responsibilities}
  *
- * @beta
+ * @public
  */
 export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngine {
 	checkConfig(config)

@@ -22,6 +22,7 @@ and this project adheres to
 - `UriReplacement` has the optional HLS keys `PER-VARIANT-URIS` and `PER-RENDITION-URIS` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - The package has peer dependencies on `@svta/cml-error-codes` and `@svta/cml-utils`. The package imports only types from `@svta/cml-utils` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- Every export has the `@public` release tag. Before, the exports had `@beta` ([#471](https://github.com/streaming-video-technology-alliance/common-media-library/pull/471))
 
 ### Fixed
 

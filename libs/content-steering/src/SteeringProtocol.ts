@@ -4,7 +4,7 @@ import type { ValueOf } from '@svta/cml-utils'
  * The HLS protocol for content steering.
  *
  *
- * @beta
+ * @public
  */
 export const STEERING_PROTOCOL_HLS = 'hls' as const
 
@@ -12,7 +12,7 @@ export const STEERING_PROTOCOL_HLS = 'hls' as const
  * The DASH protocol for content steering.
  *
  *
- * @beta
+ * @public
  */
 export const STEERING_PROTOCOL_DASH = 'dash' as const
 
@@ -21,7 +21,7 @@ export const STEERING_PROTOCOL_DASH = 'dash' as const
  *
  * @enum
  *
- * @beta
+ * @public
  */
 export const SteeringProtocol = {
 	/**
@@ -36,6 +36,6 @@ export const SteeringProtocol = {
 } as const
 
 /**
- * @beta
+ * @public
  */
 export type SteeringProtocol = ValueOf<typeof SteeringProtocol>

@@ -3,7 +3,7 @@
  *
  * @packageDocumentation
  *
- * @beta
+ * @public
  *
  * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-content-steering-05 | Pathway-based Content Steering}
  * @see {@link https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-22#section-7 | HTTP Live Streaming 2nd Edition, section 7}
