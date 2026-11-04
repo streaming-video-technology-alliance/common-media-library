@@ -13,7 +13,7 @@ status: draft
 
 ## Summary
 
-A new package, `@svta/cml-moq`, implements the parts of the MOQT Streaming Format that a web player reads before playback starts. The sources are [draft-ietf-moq-msf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-msf/01/) (MSF) and the CMAF extension of MSF, [draft-ietf-moq-cmsf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-cmsf/01/) (CMSF). The CMCD draft, [draft-wilaw-moq-cmcd-event-timeline-00](https://datatracker.ietf.org/doc/draft-wilaw-moq-cmcd-event-timeline/00/), adds one event type and one track field for CMCD reports. The package has five parts:
+A new package, `@svta/cml-moq`, implements the parts of the MOQT Streaming Format (MSF) that a web player reads before playback starts. The MSF source is the [editor's copy](https://moq-wg.github.io/msf/draft-ietf-moq-msf.html), the text on the main branch of the [MSF repository](https://github.com/moq-wg/msf). This RFC describes the copy of 2026-11-02, commit `47c05bc`. The published revision, [draft-ietf-moq-msf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-msf/01/), is older than the editor's copy. The differences cover the catalog fields, the delta operations, the event timeline keys, and the namespace rule. The second source is the CMAF extension of MSF, [draft-ietf-moq-cmsf-01](https://datatracker.ietf.org/doc/draft-ietf-moq-cmsf/01/) (CMSF). The third source, the CMCD draft [draft-wilaw-moq-cmcd-event-timeline-00](https://datatracker.ietf.org/doc/draft-wilaw-moq-cmcd-event-timeline/00/), adds one event type and one track field for CMCD reports. The package has five parts:
 
 - the catalog as TypeScript types
 - a catalog decoder with delta updates and variable substitution
@@ -139,16 +139,16 @@ The package implements these sections of the three drafts:
 | --- | --- | --- | --- |
 | Catalog fields and examples | 5.1, 5.2, 5.6 | 3.5, 4.1, 5 | 4.2, 4.3, 5 |
 | Delta updates | 5.1.6, 5.3 | | |
-| Variable substitution | 5.4, 5.2.43 | | |
-| Media timeline and template | 7 | | |
+| Variable substitution | 5.4, 5.2.44 | | |
+| Media timeline and template | 7, 11.6 | | |
 | Event timeline | 8 | 3.6 | 4.2.1 |
 | URL and fragment | 11.1 | | |
-| String form of track names | transport 8.8, 11.1.2, name mapping of the editor's copy | | |
+| String form of track names | transport 8.8, 11.1.2, 11.2 | | |
 | Content protection | | 4 | |
 
-The package leaves out LOC packaging, MoQ Secure Objects, and the MOQLOG and MOQMETRICS payloads. The package also leaves out the compression property and every MOQT control or data message. The package leaves out sections 3 and 4.2 of the CMCD draft, the rules for the content and timing of each CMCD record. The cmcd package owns those rules.
+The package leaves out LOC packaging, MoQ Secure Objects, and the MOQLOG and MOQMETRICS payloads. The package also leaves out the rules for track switching in MSF sections 4.3 and 6.3. The MSF properties of section 12 and every MOQT control or data message are also outside the package. The properties contain the compression flag, the initialization data, and the header of an event timeline. The transport layer reads the properties, and the player applies the values before a payload reaches this package. The package leaves out sections 3 and 4.2 of the CMCD draft, the rules for the content and timing of each CMCD record. The cmcd package owns those rules.
 
-The editor's copy of MSF is the text on the main branch of the [MSF repository](https://github.com/moq-wg/msf). The package takes the namespace rule from the editor's copy, because MSF -01 has no such rule. See point 3 of the draft inconsistencies.
+MSF section numbers in this RFC are the numbers of the rendered editor's copy of 2026-11-02. The numbers change when the editors merge a pull request. The editor's copy has no published revision yet. The Draft inconsistencies section lists each difference from MSF -01 with the pull request that made the change.
 
 ### Types
 
@@ -157,10 +157,10 @@ All types are type-only exports. They cost nothing at runtime.
 | Type | Contents |
 | --- | --- |
 | `MoqCatalog` | The root fields: `version`, `generatedAt`, `isComplete`, `tracks`, `publishTracks`, `initDataList`, `contentProtections` |
-| `MoqCatalogDelta` | A delta update object: `deltaUpdate`, `generatedAt`, `isComplete` |
-| `MoqCatalogTrack` | Every track field of MSF section 5.2, the CMSF fields `maxGrpSapStartingType`, `maxObjSapStartingType`, and `contentProtectionRefIDs`, and the CMCD draft field `cmcdConfig` |
+| `MoqCatalogDelta` | A delta update object: `deltaUpdate`, `generatedAt` |
+| `MoqCatalogTrack` | Every track field of MSF section 5.2, the CMSF fields `maxGrpSapStartingType`, `maxObjSapStartingType`, and `contentProtectionRefIDs`, and the CMCD draft field `cmcdConfig`. `depends` is `(string \| number)[]`, a track name or a render group per entry |
 | `MoqDeltaOperation` | `{ op, tracks }` |
-| `MoqInitData` | `{ id, type: 'inline', data }` |
+| `MoqInitData` | `{ id, type, data }`, with `type` one of `inline`, `track-property`, or `object-property` |
 | `MoqBuffers` | `{ target?, min?, max? }` |
 | `MoqAuthInfo` | A record from scheme name to scheme configuration |
 | `MoqAccessibility` | `{ scheme, value }` |
@@ -176,12 +176,14 @@ All types are type-only exports. They cost nothing at runtime.
 | `MoqMediaTimelineEntry` | `[mediaTime: number, location: MoqLocation, wallclock: number]` |
 | `MoqMediaTimelineTemplate` | The six template values of MSF section 7.4.1 |
 | `MoqMediaTimeline` | The object that `createMoqMediaTimeline` returns |
-| `MoqEventTimelineEntry<T>` | One of `{ t }`, `{ l }`, or `{ m }` plus `data: T` |
+| `MoqEventTimelineEntry<T>` | One of `{ T }`, `{ L }`, or `{ M }` plus `data: T` |
 | `MoqSapTimelineData` | `[sapType: 0 \| 1 \| 2 \| 3, earliestPresentationTime: number]` |
 | `MoqCmcdConfig` | `{ events, interval?, enabledKeys, sid?, batchCount?, batchInterval? }`, the `cmcdConfig` field of CMCD draft section 4.3 |
 | `MoqCatalogDecodeOptions` | `{ variables? }` |
 
 `MoqCatalog` declares `deltaUpdate?: never`, so `update.deltaUpdate` narrows the union that `decodeMoqCatalog` returns. Location IDs are JSON numbers. JSON has no 64-bit integer, so the types use `number` and not `bigint`.
+
+The editor's copy adds three track fields to the fields of MSF -01. `packagingMetadata` is an optional string. `accessibleWindowTime` and `keyframeSpacing` are optional numbers.
 
 Fields with a closed value set use a string literal union. Fields that the drafts leave open, such as `role` and `eventType`, are `string`. The constants below give autocomplete for the registered values of the open fields. The `events` and `enabledKeys` members of `MoqCmcdConfig` are `string[]`. See unresolved question 9.
 
@@ -191,12 +193,13 @@ The constants follow the const enum pattern of the repo. Each constant lives in 
 
 | Export | Values |
 | --- | --- |
-| `MoqPackaging` | `loc`, `cmaf`, `mediatimeline`, `eventtimeline`, `moqlog`, `moqmetrics` |
-| `MoqTrackRole` | The ten roles of MSF section 5.2.6 |
-| `MoqEventType` | The four registered types of MSF section 14.2, `org.ietf.moq.cmsf.sap`, and `urn:cta:cmcd:2026` from CMCD draft section 7 |
+| `MoqPackaging` | `loc`, `cmaf`, `mediatimeline`, `eventtimeline`, `moqlog`, `moqmetrics`, `catalog` |
+| `MoqTrackRole` | The eleven roles of MSF section 5.2.7 |
+| `MoqEventType` | `org.ietf.moq.cmsf.sap` from CMSF section 3.6 and `urn:cta:cmcd:2026` from CMCD draft section 7. The MSF registry of section 14.2 has no initial entries |
 | `MoqAuthScheme` | `privacy-pass`, `cat` |
-| `MoqAccessibilityScheme` | The two SCTE schemes of MSF section 5.2.44 |
-| `MoqDeltaOp` | `add`, `remove`, `clone` |
+| `MoqAccessibilityScheme` | The two SCTE schemes of MSF section 5.2.45 |
+| `MoqDeltaOp` | `add`, `remove`, `clone`, `update` |
+| `MoqInitDataType` | `inline`, `track-property`, `object-property` |
 | `MoqConnectionType` | `q`, `wt` |
 | `MOQ_CATALOG_TRACK_NAME` | `catalog` |
 | `MOQ_MSF_FRAGMENT_TYPE` | `msf` |
@@ -206,12 +209,12 @@ The constants follow the const enum pattern of the repo. Each constant lives in 
 | Function | Purpose |
 | --- | --- |
 | `decodeMoqCatalog(text, options?): MoqCatalog \| MoqCatalogDelta` | Parses and validates a catalog object, with variable substitution |
-| `applyMoqDeltaUpdate(catalog, delta): MoqCatalog` | Applies the `add`, `remove`, and `clone` operations and returns a new catalog |
-| `getMoqInitData(catalog, track): Uint8Array<ArrayBuffer> \| undefined` | Resolves `initRef` and decodes the inline Base64 data |
+| `applyMoqDeltaUpdate(catalog, delta): MoqCatalog` | Applies the `add`, `remove`, `clone`, and `update` operations and returns a new catalog |
+| `getMoqInitData(catalog, track): Uint8Array<ArrayBuffer> \| undefined` | Resolves `initRef` and decodes the Base64 data of an `inline` entry |
 | `parseMoqUri(uri): MoqUri` | Splits a `moqt` URI and parses an `msf` fragment |
 | `encodeMoqTrackName(track): string` | Renders a full track name in the string form of transport section 8.8 |
 | `decodeMoqTrackName(text): MoqFullTrackName` | Parses that string form |
-| `decodeMoqNamespace(text): string[]` | Splits a catalog namespace string into the tuple fields, with the rules of the editor's copy |
+| `decodeMoqNamespace(text): string[]` | Splits a catalog namespace string into the tuple fields, with the rules of MSF section 5.2.2 |
 | `decodeMoqMediaTimeline(text): MoqMediaTimelineEntry[]` | Parses and validates a media timeline payload |
 | `decodeMoqEventTimeline<T>(text): MoqEventTimelineEntry<T>[]` | Parses and validates an event timeline payload |
 | `createMoqMediaTimeline(source?): MoqMediaTimeline` | Creates a timeline from entries or a template, with `reset`, `append`, `locationAt`, and `entryAt` |
@@ -226,28 +229,34 @@ The timeline is a factory function and not a class. The repo rule reserves class
 Catalog decoding:
 
 - `JSON.parse` errors propagate unchanged.
-- An independent catalog needs `version` and `tracks`. A delta needs `deltaUpdate` with at least one operation and must not contain `tracks` or `version`. A violation throws an `Error` that names the field.
+- An independent catalog needs `version` and `tracks`. A delta needs `deltaUpdate` with at least one operation and `generatedAt`. MSF section 5.3 allows no other root field in a delta. A violation throws an `Error` that names the field.
 - The decoder accepts the version strings `1` and `draft-01`. See unresolved question 1.
-- Every track in an independent catalog, and every track in an `add` operation, needs `name`, `packaging`, and `isLive`. Tracks in `remove` and `clone` operations follow the field rules of MSF section 5.1.6.
+- Every track in an independent catalog, and every track in an `add` operation, needs `name`, `packaging`, and `isLive`. Tracks in `remove`, `clone`, and `update` operations follow the field rules of MSF section 5.1.6. The decoder does not check the fields that MSF section 5.2.4.1 requires per packaging and role. See unresolved question 11.
 - The decoder keeps unknown fields on the decoded objects. The decoder also keeps unknown values in open fields. A player skips the tracks that the player cannot use.
-- A `namespace` value follows the editor's copy: a non-empty string with 1 to 32 non-empty fields between `/` characters. A violation throws an `Error` that names the field.
+- A `namespace` value follows MSF section 5.2.2: a non-empty string with 1 to 32 non-empty fields between `/` characters. A violation throws an `Error` that names the field. A `name` value may be the empty string. A name or namespace field with an unpaired surrogate also throws, the rule of MSF section 11.2.1.
+- A `depends` entry is a string for a track name or a number for a render group. The decoder checks that every entry resolves within the catalog. MSF section 5.2.15 calls a catalog with an unresolved entry invalid. See unresolved question 12.
+- The decoder keeps `packagingMetadata` as a string. MSF section 5.2.5 defines keys for LOC packaging only.
+- `getMoqInitData` decodes an entry of type `inline`. For the two property types the function returns `undefined`. The transport layer delivers that data in the properties of MSF section 12.2.
 - The decoder keeps `cmcdConfig` as written and does not validate the members. A player that builds a CMCD event target from the field validates the values at that point.
 - Variable substitution runs on the text before parsing. The replacement is one regular expression pass over `%name%` references. A value with a character outside `A-Z a-z 0-9 - _ @` throws. A reference without a value throws. See unresolved question 3.
 
 Delta updates:
 
-- Tracks match on the pair of `namespace` and `name`. The match is an exact string comparison with no normalization, the rule of the editor's copy. A missing `namespace` matches a missing `namespace`, because both inherit the namespace of the catalog track.
-- `add` throws when the track exists. `remove` throws when the track does not exist. See unresolved question 7.
-- `clone` copies every field of the parent except `name`, then applies the fields of the operation. The result does not contain `parentName` or `parentNamespace`.
-- `generatedAt` and `isComplete` from the delta replace the base values when present.
+- Tracks match on the pair of `namespace` and `name`. The match is an exact string comparison with no normalization. MSF section 11.2.2 compares the mapped bytes, and a comparison of the decoded strings gives the same result. A missing `namespace` matches a missing `namespace`, because both inherit the namespace of the catalog track.
+- `add` throws when the track exists. `remove` and `update` throw when the track does not exist. See unresolved question 7.
+- `clone` copies every field of the parent except `name`, then applies the fields of the operation. `update` applies the fields of the operation to the existing track. Neither result contains `parentName` or `parentNamespace`.
+- An `update` track object names the track with `parentName`, as MSF section 5.1.6 requires. The example of MSF section 5.6.4 uses `name` instead. See point 7 of the draft inconsistencies.
+- `generatedAt` from the delta replaces the base value.
 - The function returns a new catalog with a new `tracks` array. The input catalog does not change.
 
 Timelines:
 
-- `decodeMoqMediaTimeline` checks that every record is an array of a number, a location, and a number. `decodeMoqEventTimeline` checks that every record has exactly one of `t`, `l`, or `m` and a `data` field.
+- `decodeMoqMediaTimeline` checks that every record is an array of a number, a location, and a number. `decodeMoqEventTimeline` checks that every record has exactly one of `T`, `L`, or `M` and a `data` field. A record with a lowercase key throws. See unresolved question 10.
+- `decodeMoqEventTimeline` takes no header. The MSF_EVENT_TIMELINE_HEADER property of MSF section 12.3.1 belongs to the decoder of each event type.
 - `locationAt({ mediaTime })` returns the location of the last entry with a media time at or below the query. The query returns `undefined` before the first entry. `locationAt({ wallclock })` works the same way on the wallclock values.
 - A template timeline computes the entry index from the start and delta values and clamps the index at 0. A template with a `deltaWallclock` of 0 returns `undefined` for wallclock lookups.
-- `append` keeps the entries sorted by media time and drops an entry whose location is already present.
+- `append` keeps the entries sorted by media time and drops an entry whose location is already present. MSF section 7.1 does not require increasing group numbers, so the entries never sort by location.
+- The timeline does not apply `accessibleWindowTime`. See unresolved question 13.
 
 URIs and names:
 
@@ -270,22 +279,31 @@ The package runs per catalog or timeline object, never per media object. Media p
 
 ### Draft inconsistencies
 
-These points in the -01 texts need a decision in the implementation and a report to the working group:
+These points in the MSF editor's copy need a decision here and a report to the working group:
 
-1. MSF section 5.1.1 defines the version string as `draft-XX`. The examples in MSF section 5.6 and CMSF section 5 use `"1"`.
-2. MSF section 5.2 names the field `mimeType`. The examples use both `mimeType` and `mimetype`.
-3. MSF section 5.2.2 types `namespace` as one string and does not say how the string maps to the MOQT tuple. The editor's copy resolves this point. [PR 210](https://github.com/moq-wg/msf/pull/210) (merged 2026-10-28) splits the string at every `/`. Each namespace has 1 to 32 non-empty fields. Each field maps to UTF-8 bytes without normalization. The package follows the editor's copy.
-4. MSF section 11.3 names the message SUBSCRIBE_DONE. Transport draft-22 names the message PUBLISH_DONE.
-5. MSF section 5.2.36 cites transport section 3.1.1 for the URI scheme. Transport draft-22 defines the scheme in section 6.1.
-6. CMSF cites transport draft-18 as the normative reference. The current transport draft is 22.
-7. MSF section 5.2.5 states that event types are not centrally registered. MSF section 14.2 creates a registry for the same field.
+1. MSF section 5.1.1 defines the version string as `draft-XX`. [PR 177](https://github.com/moq-wg/msf/pull/177) changed the examples of section 5.6 to `draft-01`. The example of section 5.6.16 and the three catalogs of CMSF section 5 still use `"1"`.
+2. MSF section 11.4 names the message SUBSCRIBE_DONE. Transport draft-22 names the message PUBLISH_DONE.
+3. MSF section 5.2.37 cites transport section 3.1.1 for the URI scheme. Transport draft-22 defines the scheme in section 6.1.
+4. CMSF cites transport draft-18 and MSF -01 as the normative references. The editor's copy of MSF cites transport draft-19, and the current transport draft is 22.
+5. MSF section 5.2.6 states that event types are not centrally registered. MSF section 14.2 creates a registry for the same field. [PR 192](https://github.com/moq-wg/msf/pull/192) emptied the registry and kept both statements.
+6. MSF section 5.2.4.1, from [PR 212](https://github.com/moq-wg/msf/pull/212), lists `namespace` as required on every track. Section 5.2.2 marks the field optional, with the namespace of the catalog track as the default.
+7. MSF section 5.1.6, from [PR 187](https://github.com/moq-wg/msf/pull/187), requires `parentName` in each track object of an `update` operation. The example of section 5.6.4 names the updated track with `name`.
+8. MSF section 5.3, from PR 187, requires `generatedAt` in every delta update. Section 5.1.2 states that a catalog with `isLive` false should not include the field. A delta update of a VOD catalog cannot follow both rules.
+9. Table 2 of MSF section 5.2 omits `template`, `connectionUri`, `token`, `encryptionScheme`, `cipherSuite`, `keyId`, `trackBaseKey`, and `accessibleWindowTime`. Each of those fields has a section under 5.2.
 
-These points in the CMCD draft need a report to the author. The CMCD draft follows the editor's copy of MSF. Points 1, 3, and 4 hold against MSF -01, the revision the CMCD draft cites. The points do not hold against the editor's copy:
+These points of MSF -01 are resolved in the editor's copy:
 
-1. The CMCD draft writes the record index as `T` in section 4.2 and in the example of section 4.2.1. MSF section 8.1 and the example of MSF section 8.4.1 use `t`. `decodeMoqEventTimeline` rejects the record of the CMCD draft as printed.
-2. CMCD draft section 4.2.1 states that every value is a string. The example in the same section sends `bl`, `bsd`, and `v` as numbers. CTA-5004-B types `v` as an integer, and `bl` and `bsd` as inner lists of integers with token identifiers. The example also writes `bl` and `bsd` as bare numbers, not as inner lists.
-3. CMCD draft section 4.2 requires a new group for every record. MSF section 8.3 requires the first object of every group to contain all accumulated records. Under both rules, every CMCD group repeats the full report history.
-4. The publish tracks in CMCD draft section 5 have no `depends` array and no `mimeType`. MSF section 8.2 requires both fields on an event timeline track.
+- The examples of MSF -01 wrote the field `mimeType` as both `mimeType` and `mimetype`. PR 177 corrected the examples.
+- MSF -01 did not say how the `namespace` string maps to the MOQT tuple. [PR 210](https://github.com/moq-wg/msf/pull/210) (merged 2026-10-28) splits the string at every `/`. Each namespace has 1 to 32 non-empty fields. Each field maps to UTF-8 bytes without normalization. Section 11.2 compares names by the mapped bytes.
+- MSF -01 wrote the event timeline index keys as `t`, `l`, and `m`. [PR 195](https://github.com/moq-wg/msf/pull/195) changed the keys to `T`, `L`, and `M`.
+- MSF -01 required `depends` and `mimeType` on every event timeline track. MSF -01 also required the full record history in the first object of every group. [PR 206](https://github.com/moq-wg/msf/pull/206) requires `packaging` and `eventType` only. `depends` is required when the index refers to media timeline tracks. The event type defines the group mapping, and the history rule became a SHOULD.
+- MSF -01 left the MSF_COMPRESSION property ID as TBD. [PR 186](https://github.com/moq-wg/msf/pull/186) set the property type to 0x78.
+
+These points in the CMCD draft need a report to the author:
+
+1. CMCD draft section 4.2.1 states that every value is a string. The example in the same section sends `bl`, `bsd`, and `v` as numbers. CTA-5004-B types `v` as an integer, and `bl` and `bsd` as inner lists of integers with token identifiers. The example also writes `bl` and `bsd` as bare numbers, not as inner lists.
+
+The CMCD draft cites MSF -01 and follows the editor's copy. Three points of v2 of this RFC held against MSF -01 only. The record index `T` of CMCD draft section 4.2 is the key of PR 195. CMCD draft section 4.2 puts each record in a new group. PR 206 leaves the group mapping to the event type. The publish tracks of CMCD draft section 5 have no `depends` and no `mimeType`, and PR 206 requires neither.
 
 ### Dependencies and packaging
 
@@ -295,17 +313,19 @@ These points in the CMCD draft need a report to the author. The CMCD draft follo
 - The README needs the `## When to use` section that feeds the generated agent docs. `site/scripts/groups.ts` lists the package under Delivery.
 - The public types use no syntax newer than TypeScript 5.7, so the minimum version in the root README does not change. `getMoqInitData` allocates and returns `Uint8Array<ArrayBuffer>`.
 - Tests use the draft examples as fixtures:
-  - the sixteen examples of MSF section 5.6 and the three catalogs of CMSF section 5
-  - the delta sequences of MSF sections 5.6.4 and 5.6.5
-  - the timeline and the template of MSF section 7, and the SAP timeline of CMSF section 3.6.2
+  - the seventeen examples of MSF section 5.6 and the three catalogs of CMSF section 5
+  - the delta sequences of MSF sections 5.6.4 and 5.6.5, with the `update` operation
+  - the timeline and the template of MSF section 7, and the three event timeline payloads of section 8.5
+  - the SAP timeline of CMSF section 3.6.2 with the index key written as `L`
   - the URLs of MSF section 11.1.3
-  - the namespace `example.com/live/channel1` and the track name `café` of the editor's copy
-  - the three publish tracks of CMCD draft section 5, and the record of CMCD draft section 4.2.1 with the index key written as `t`
+  - the namespace `example.com/live/channel1` of MSF section 5.2.2 and the string mappings of section 11.2.5
+  - the three publish tracks of CMCD draft section 5, and the record of CMCD draft section 4.2.1
 
 ## Drawbacks
 
-- Both drafts are at revision -01, and both replaced earlier drafts with other names. Field names and value sets can change before the RFC stage. A field rename is a breaking change for TypeScript adopters even when the runtime does not change. The namespace rule is from the editor's copy and not from a published revision, so the rule can still change before MSF -02.
-- The drafts say little about malformed catalogs. The strictness rules above are decisions of this RFC, not of the drafts.
+- The RFC follows the MSF editor's copy and not a published revision. The editors merged seven pull requests in the week before this revision. Each one changed a catalog or timeline rule. Every MSF rule in this RFC can change before MSF -02. A field rename is a breaking change for TypeScript adopters even when the runtime does not change.
+- CMSF is at revision -01 and still cites MSF -01. The SAP timeline of CMSF section 3.6.2 uses the index keys of MSF -01. See unresolved question 10.
+- The drafts define parser errors for the namespace, the name mapping, and `depends` only. The other strictness rules above are decisions of this RFC, not of the drafts.
 - `@svta/cml-drm` becomes a peer dependency for every adopter, including adopters who import only types. The bundle cost is zero. The install cost is one more package.
 - The first release has no encoder. Publishers get the types and nothing else.
 - The CMCD draft is an individual submission at revision -00, not a working group draft. The `cmcdConfig` field and the event type can change or disappear.
@@ -331,19 +351,25 @@ These points in the CMCD draft need a report to the author. The CMCD draft follo
 3. Should a `%name%` reference without a value throw, or remain in the text? The proposal throws, because a token field with a literal `%token%` value sends a wrong credential.
 4. Which PlayReady key system string comes first in `getMoqKeySystems`?
 5. Should the map from system ID to key system move to `@svta/cml-drm`? The DASH `schemeIdUri` has the same need.
-6. Compression: the MSF_COMPRESSION property ID is still TBD, and reading the property needs the transport layer. The proposal leaves gzip to the player through `DecompressionStream`. Is that acceptable for the first release?
+6. Compression: the MSF_COMPRESSION property has the type 0x78 in MSF section 12.1, and reading the property needs the transport layer. The proposal leaves gzip to the player through `DecompressionStream`. Is that acceptable for the first release?
 7. Should `remove` of an unknown track throw, or should the operation be ignored?
 8. Should `MoqFullTrackName` use bytes instead of strings? The MSF catalog uses strings, and the proposal follows the catalog.
 9. Should `MoqCmcdConfig` import `CmcdEventType` and `CmcdKey` from `@svta/cml-cmcd`? The proposal uses `string[]`, because the import adds a peer dependency for two types.
+10. Should the decoders accept the lowercase index keys `t`, `l`, and `m` of MSF -01? The editor's copy requires the uppercase keys. The SAP timeline of CMSF section 3.6.2 and the [SCTE-35 event timeline draft](https://github.com/wilaw/SCTE35-over-MSF-Event-Timeline) still use the lowercase keys. The proposal rejects the lowercase keys and reports both documents upstream. The alternative accepts both forms and returns the uppercase key, at the cost of one more check per record.
+11. Should `decodeMoqCatalog` check the fields that MSF section 5.2.4.1 requires per packaging and role? The table lists `codec` and `framerate` for LOC video, and `codec`, `samplerate`, and `channelConfig` for LOC audio. The proposal checks `name`, `packaging`, and `isLive` only. When a per-role field is missing, the player loses one track and not the catalog.
+12. Should an unresolved `depends` entry throw? MSF section 5.2.15 calls such a catalog invalid. The check needs one pass over the tracks after every independent catalog and after every delta. The proposal throws in `decodeMoqCatalog` and in `applyMoqDeltaUpdate`.
+13. How does a player apply `accessibleWindowTime` with the timeline? MSF section 5.2.46 defines the start of the window as the earliest entry with a wallclock time above a threshold. `locationAt` returns the last entry at or below a query, one entry earlier than the rule asks. The proposal adds a `mode` option to `locationAt` and `entryAt`. The default `floor` keeps the current result, and `ceil` returns the first entry above the query.
 
 ## Future possibilities
 
 - `encodeMoqCatalog` for publishers, with the field order rule of MSF section 5.1.7.
-- Compression support once the MSF_COMPRESSION property ID is assigned.
+- Compression support, once a transport library exposes the MSF_COMPRESSION property of MSF section 12.1.
+- A decoder for `packagingMetadata`, when CMSF defines keys for the `cmaf` packaging. MSF section 5.2.5 defines the `streamMapping` key for LOC only.
+- A function for the switch points of `keyframeSpacing`, MSF section 6.3.2, if the abr package needs one.
 - A CMAF chunk splitter in `@svta/cml-iso-bmff`. LL-HLS parts and LL-DASH chunks need the same code, so the splitter does not belong in this package.
 - A validator for the CMSF object and group rules of sections 3.3 and 3.4, built with the chunk splitter.
 - A catalog to CMAF-HAM mapper next to the DASH and HLS mappers.
-- Decoders for the SCTE-35 and WebVTT event timeline payloads once the referenced drafts exist.
+- Decoders for the SCTE-35, WebVTT, and IMSC1 event timeline payloads. The three drafts are individual submissions on the datatracker, and the SCTE-35 draft defines two event types. Those decoders take the header of the MSF_EVENT_TIMELINE_HEADER property, MSF section 12.3.1.
 - A bridge from `cmcdConfig` to a cmcd event target. The bridge maps `events`, `enabledKeys`, and `sid` without change. The bridge converts `interval` from milliseconds to seconds and `batchCount` to `batchSize`. The bridge publishes `{ t: ts, data }` records through the `send` function of the [CMCD session RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/486). `batchInterval` has no cmcd counterpart yet.
 - MOQT registry constants, if adopters ask for the constants after the transport draft stabilizes.
 
@@ -352,6 +378,8 @@ These points in the CMCD draft need a report to the author. The CMCD draft follo
 - v1 (2026-10-26): initial draft.
 - v2 (2026-11-03): add the catalog side of the CMCD draft, with the inconsistencies of that draft.
 - v3 (2026-11-03): follow the namespace rule of the MSF editor's copy, add `decodeMoqNamespace`, and remove the CMCD draft point on namespaces.
+- v4 (2026-11-03): note that the CMCD draft follows the MSF editor's copy.
+- v5 (2026-11-03): describe the MSF editor's copy of 2026-11-02 instead of MSF -01. The revision adds the `update` operation, the `catalog` packaging, the `data` role, and the uppercase index keys. The revision also adds `depends` with render groups, three track fields, and the resolved -01 points.
 
 ## Final Decision
 
