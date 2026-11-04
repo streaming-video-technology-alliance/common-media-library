@@ -205,7 +205,7 @@ function onError(error) {
 | `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError` | types |
 | `UriReplacementOptions` | type |
 
-`SteeringProtocol` and `SteeringErrorType` follow the const enum pattern of the repository. The package gets `@svta/cml-utils` as a peer dependency, for the `HttpRequest`, `HttpRequester`, `HttpResponse`, and `ValueOf` types. The package imports only types from it.
+`SteeringProtocol` and `SteeringErrorType` follow the const enum pattern of the repository. The package gets two peer dependencies. `@svta/cml-utils` provides the `HttpRequest`, `HttpRequester`, `HttpResponse`, and `ValueOf` types, and the package imports only types from it. `@svta/cml-error-codes` provides the two SVTA2070 constants for `code` in `SteeringError`.
 
 ### Configuration
 
@@ -339,6 +339,7 @@ A response to a request that the engine sent before `update({ uri })` changed th
 type SteeringError =
 	| {
 		readonly type: typeof STEERING_ERROR_TYPE_LOAD | typeof STEERING_ERROR_TYPE_PARSE
+		readonly code: 2040 | 2041      // the SVTA2070 code. See below
 		readonly url: string            // the request URI
 		readonly status?: number        // the HTTP status, if the server responded
 		readonly cause?: unknown        // the exception, for network and JSON errors
@@ -353,7 +354,7 @@ type SteeringError =
 	}
 ```
 
-`load` matches the SVTA2070 code `2040` (content steering manifest load error), and `parse` matches `2041` (unable to parse content steering manifest). `callback` is an error of the player and has no SVTA2070 code. To read `url`, `status`, or `retryDelay`, a player first checks that `type` is not `callback`.
+`code` holds the SVTA2070 code: `SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR` (2040) for `load`, and `SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR` (2041) for `parse`. The engine imports the two constants from `@svta/cml-error-codes`, not the enum object, so an adopter bundles only the two numbers. `callback` is an error of the player and has no SVTA2070 code. To read `url`, `status`, or `retryDelay`, a player first checks that `type` is not `callback`.
 
 ### Callback errors
 
@@ -445,7 +446,7 @@ The package documentation links to the spec versions of this RFC.
 
 - The engine owns its timers. A player cannot run the request timer on its own scheduler.
 - The player still does the work that needs its model of the content. This work includes applying the pathway, creating clones, and detecting failures.
-- `@svta/cml-utils` becomes the first peer dependency of the package. The package imports only types from it.
+- `@svta/cml-utils` and `@svta/cml-error-codes` become the first peer dependencies of the package. The package imports only types from `@svta/cml-utils`, and two constants from `@svta/cml-error-codes`.
 - The HLS and DASH rules ship together, so a player that uses one protocol also bundles the rules of the other.
 - The engine is larger than the steering code of the players. The table shows the sizes of the engine, bundled with rolldown and minified.
 - `SteeringError` is a union, so a player checks `type` before it reads `url`, `status`, or `retryDelay`.
@@ -453,8 +454,8 @@ The package documentation links to the spec versions of this RFC.
 
 | Import | Minified | gzip | brotli |
 |---|---|---|---|
-| `createSteeringEngine` and `applyUriReplacement` | 9.7 KB | 3.9 KB | 3.5 KB |
-| `applyUriReplacement` only | 1.4 KB | 0.8 KB | 0.7 KB |
+| `createSteeringEngine` and `applyUriReplacement` | 10.3 KB | 4.2 KB | 3.8 KB |
+| `applyUriReplacement` only | 1.5 KB | 0.8 KB | 0.7 KB |
 
 The four player spikes of the integration map measured the brotli size of each player bundle in three parts:
 
@@ -505,7 +506,7 @@ The engine also fixes bugs in the old code of three players. The integration map
    - A 410 response to the first request (step 17).
 
    Step 17 says to proceed "as if the ContentSteering element were not present". A player without steering uses the MPD order with the default service location first, which is the fallback priority list. So the player sees the same order, and `penalize()` continues to work on that list.
-4. **SVTA2070 codes.** `SteeringErrorType` documents the codes `2040` and `2041`. Should `SteeringError` also include the codes as numbers? That change adds a peer dependency on `@svta/cml-error-codes`.
+4. **SVTA2070 codes.** Resolved on 2026-11-03: a `load` or `parse` error has `code`, the SVTA2070 code as a number. The engine imports the two constants from `@svta/cml-error-codes`, which becomes a peer dependency. The field costs 13 bytes brotli in a bundle that includes that package.
 5. **Release tag.** The package exports use `@beta`, and the repository rules require `@public`. Should the engine ship as `@beta` until a player uses it, and as `@public` in version 1.0?
 
 ## Future possibilities
@@ -514,7 +515,6 @@ The engine also fixes bugs in the old code of three players. The integration map
 - An `onPriorityChange` callback, if a player needs a push instead of the `priority` getter.
 - A `refresh()` method, if DASH-IF needs the current behavior of `triggerSteeringRequest()`.
 - Support the DASH `proxyServerURL` attribute if a published DASH spec defines it. Only the 2022 community review draft of DASH-IF defines it today.
-- Add the SVTA2070 codes to `SteeringError` (see unresolved question 4).
 
 ## Revision history
 
@@ -551,6 +551,7 @@ The engine also fixes bugs in the old code of three players. The integration map
   - Question 3 is resolved: after a 410 or a DASH VERSION other than 1, the engine keeps the pathway selection.
   - A `penalty` number must be greater than 0. A TTL between 0 and 1 counts as 1. A duplicate ID in PATHWAY-PRIORITY keeps the first position. A Retry-After that asks for no wait counts as absent.
   - Penalties defines the current TTL. Tests use the fake timers of Vitest.
+- v7 (2026-11-03): question 4 is resolved. `SteeringError` has `code`, with the two SVTA2070 constants from `@svta/cml-error-codes`. The size table has the current sizes.
 
 ## Final Decision
 
