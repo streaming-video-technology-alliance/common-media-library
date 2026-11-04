@@ -1,0 +1,489 @@
+import { createSteeringEngine, type SteeringEngineConfig } from '@svta/cml-content-steering'
+import { fetchRequester } from '@svta/cml-utils'
+import { deepEqual, equal, throws } from 'node:assert'
+import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
+import { advance, createStubRequester, flush, manifestResponse } from './createStubRequester.ts'
+
+afterEach(() => {
+	vi.useRealTimers()
+})
+
+const MANIFEST = { VERSION: 1, TTL: 300, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+
+function hlsConfig(overrides: Partial<SteeringEngineConfig> = {}): SteeringEngineConfig {
+	return {
+		protocol: 'hls',
+		uri: 'https://steering.example.com/manifest.json',
+		pathways: ['CDN-A', 'CDN-B'],
+		pathway: 'CDN-A',
+		requester: createStubRequester().requester,
+		...overrides,
+	}
+}
+
+describe('createSteeringEngine', () => {
+	it('provides a valid example', async () => {
+		//#region example
+		const manifest = { VERSION: 1, TTL: 300, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+		const changes: string[] = []
+
+		const engine = createSteeringEngine({
+			protocol: 'hls',
+			uri: 'https://steering.example.com/manifest.json',
+			pathways: ['CDN-A', 'CDN-B'],
+			pathway: 'CDN-A',
+			requester: request =>
+				Promise.resolve({ request, status: 200, data: JSON.stringify(manifest) }),
+			onPathwayChange: pathway => changes.push(pathway),
+		})
+
+		await engine.start()
+		engine.stop()
+
+		equal(engine.pathway, 'CDN-B')
+		deepEqual(changes, ['CDN-B'])
+		//#endregion example
+	})
+
+	describe('configuration', () => {
+		it('throws for an unknown protocol', () => {
+			// @ts-expect-error - invalid protocol
+			throws(() => createSteeringEngine(hlsConfig({ protocol: 'smooth' })), {
+				name: 'TypeError',
+				message: /protocol must be 'hls' or 'dash'. Received "smooth"/,
+			})
+		})
+
+		it('throws for a relative uri', () => {
+			throws(() => createSteeringEngine(hlsConfig({ uri: '/steering' })), {
+				name: 'TypeError',
+				message: /uri must be an absolute URI. Received "\/steering"/,
+			})
+		})
+
+		it('throws for empty pathways', () => {
+			throws(() => createSteeringEngine(hlsConfig({ pathways: [], pathway: undefined })), {
+				name: 'TypeError',
+				message: /pathways must be a non-empty array of strings/,
+			})
+		})
+
+		it('throws for a pathway that is not in pathways', () => {
+			throws(() => createSteeringEngine(hlsConfig({ pathway: 'CDN-C' })), {
+				name: 'TypeError',
+				message: /pathway must be one of \["CDN-A","CDN-B"\]. Received "CDN-C"/,
+			})
+		})
+
+		it('throws for a penalty that is not greater than 0 or not ttl', () => {
+			for (const penalty of [-1, 0, NaN]) {
+				throws(() => createSteeringEngine(hlsConfig({ penalty })), {
+					name: 'TypeError',
+					message: /penalty must be 'ttl' or a finite number of milliseconds greater than 0/,
+				})
+			}
+			// @ts-expect-error - penalty must be a number or 'ttl'
+			throws(() => createSteeringEngine(hlsConfig({ penalty: '5m' })), {
+				name: 'TypeError',
+				message:
+					/penalty must be 'ttl' or a finite number of milliseconds greater than 0. Received "5m"/,
+			})
+		})
+
+		it('throws for a missing requester', () => {
+			throws(() => createSteeringEngine(hlsConfig({ requester: undefined })), {
+				name: 'TypeError',
+				message: 'createSteeringEngine: requester must be a function. Received undefined.',
+			})
+			// @ts-expect-error - requester must be a function
+			throws(() => createSteeringEngine(hlsConfig({ requester: 'fetch' })), {
+				name: 'TypeError',
+				message: 'createSteeringEngine: requester must be a function. Received "fetch".',
+			})
+		})
+
+		it('starts with the configured pathway', () => {
+			equal(createSteeringEngine(hlsConfig()).pathway, 'CDN-A')
+			equal(createSteeringEngine(hlsConfig({ pathway: undefined })).pathway, undefined)
+		})
+	})
+
+	describe('requests', () => {
+		beforeEach(() => {
+			vi.useFakeTimers({ now: 0, toFake: ['setTimeout', 'clearTimeout', 'Date'] })
+		})
+
+		it('sends no request before start()', async () => {
+			const { requester, requests } = createStubRequester()
+
+			createSteeringEngine(hlsConfig({ requester }))
+			await flush()
+
+			equal(requests.length, 0)
+		})
+
+		it('sends a GET request with responseType text', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(hlsConfig({ requester }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].method, 'GET')
+			equal(requests[0].responseType, 'text')
+		})
+
+		it('adds the HLS pathway and the rounded throughput', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(hlsConfig({ requester, getThroughput: () => 6000000.4 }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A&_HLS_throughput=6000000',
+			)
+		})
+
+		it('omits the parameters when no pathway is selected', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, pathway: undefined, getThroughput: () => 1000 }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/manifest.json')
+		})
+
+		it('omits a throughput that is unknown, negative, or not finite', async () => {
+			for (const value of [undefined, -1, NaN, Infinity]) {
+				const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+				const engine = createSteeringEngine(hlsConfig({ requester, getThroughput: () => value }))
+
+				await engine.start()
+				engine.stop()
+
+				equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A')
+			}
+		})
+
+		it('replaces a parameter of the same name and keeps the other parameters', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const uri = 'https://steering.example.com/manifest.json?video=a%20b&_HLS_pathway=old'
+			const engine = createSteeringEngine(hlsConfig({ requester, uri }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?video=a%20b&_HLS_pathway=CDN-A',
+			)
+		})
+
+		it('removes the stale steering parameters of a RELOAD-URI that repeats the request URI', async () => {
+			let throughput: number | undefined = 6000000
+			const { requester, requests } = createStubRequester(
+				manifestResponse({ ...MANIFEST, 'RELOAD-URI': '' }),
+				manifestResponse(MANIFEST),
+			)
+			const engine = createSteeringEngine(hlsConfig({ requester, getThroughput: () => throughput }))
+
+			await engine.start()
+			throughput = undefined
+			vi.advanceTimersByTime(300000)
+			await flush()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A&_HLS_throughput=6000000',
+			)
+			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-B')
+		})
+
+		it('removes the steering parameters of the uri from a request without parameters', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const uri =
+				'https://steering.example.com/manifest.json?_DASH_pathway=old&session=1&_DASH_throughput=1'
+			const engine = createSteeringEngine(
+				hlsConfig({ protocol: 'dash', requester, uri, queryBeforeStart: true }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/manifest.json?session=1')
+		})
+
+		it('keeps the parts of the uri other than the query unchanged', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, uri: 'https://steering.example.com#top' }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com?_HLS_pathway=CDN-A#top')
+		})
+
+		it('sends a throughput of 0', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(hlsConfig({ requester, getThroughput: () => 0 }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A&_HLS_throughput=0',
+			)
+		})
+
+		it('omits the DASH throughput when every value is unknown', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['CDN-A', 'CDN-B'],
+				pathway: 'CDN-A',
+				requester,
+				getReportedPathways: () => ['CDN-A', 'CDN-B'],
+				getThroughput: () => undefined,
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=CDN-A,CDN-B')
+		})
+
+		it('sends the ID of a selected clone', async () => {
+			const manifest = {
+				...MANIFEST,
+				'PATHWAY-PRIORITY': ['CDN-A-CLONE'],
+				'PATHWAY-CLONES': [
+					{
+						'BASE-ID': 'CDN-A',
+						ID: 'CDN-A-CLONE',
+						'URI-REPLACEMENT': { HOST: 'backup.example.com' },
+					},
+				],
+			}
+			const { requester, requests } = createStubRequester(
+				manifestResponse(manifest),
+				manifestResponse(manifest),
+			)
+			const engine = createSteeringEngine(hlsConfig({ requester }))
+
+			await engine.start()
+			await advance(300000)
+			engine.stop()
+
+			equal(engine.pathway, 'CDN-A-CLONE')
+			equal(requests[1].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A-CLONE')
+		})
+
+		it('adds no parameters to a data URI', async () => {
+			const uri = `data:application/json,${encodeURIComponent(JSON.stringify(MANIFEST))}`
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(hlsConfig({ requester, uri, getThroughput: () => 1000 }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, uri)
+		})
+
+		it('lists every DASH pathway selected since the previous request', async () => {
+			const manifest = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['alpha', 'beta'] }
+			const { requester, requests } = createStubRequester(
+				manifestResponse(manifest),
+				manifestResponse(manifest),
+			)
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['alpha', 'beta'],
+				pathway: 'alpha',
+				requester,
+				getThroughput: pathway => (pathway === 'alpha' ? 5140000 : undefined),
+			})
+
+			await engine.start()
+			engine.penalize('alpha')
+			vi.advanceTimersByTime(60000)
+			await flush()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/dash?_DASH_pathway=alpha&_DASH_throughput=5140000',
+			)
+			equal(
+				requests[1].url,
+				'https://steering.example.com/dash?_DASH_pathway=alpha,beta&_DASH_throughput=5140000,',
+			)
+		})
+
+		it('sends no steering parameters on the first request with queryBeforeStart', async () => {
+			const manifest = { VERSION: 1, TTL: 60, 'PATHWAY-PRIORITY': ['CDN-B', 'CDN-A'] }
+			const { requester, requests } = createStubRequester(
+				manifestResponse(manifest),
+				manifestResponse(manifest),
+			)
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, queryBeforeStart: true, getThroughput: () => 1000 }),
+			)
+
+			await engine.start()
+			vi.advanceTimersByTime(60000)
+			await flush()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/manifest.json')
+			equal(
+				requests[1].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-B&_HLS_throughput=1000',
+			)
+		})
+
+		it('encodes DASH pathway IDs that contain reserved characters', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['A&B', 'C=D,E'],
+				pathway: 'A&B',
+				requester,
+				getReportedPathways: () => ['A&B', 'C=D,E'],
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=A%26B,C%3DD%2CE')
+		})
+
+		it('encodes a pathway ID with an unpaired surrogate instead of throwing', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, pathways: ['CDN-\uD800'], pathway: 'CDN-\uD800' }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests.length, 1)
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-%EF%BF%BD',
+			)
+		})
+
+		it('keeps a surrogate pair next to an unpaired surrogate', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, pathways: ['😀-\uD800'], pathway: '😀-\uD800' }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/manifest.json?_HLS_pathway=%F0%9F%98%80-%EF%BF%BD',
+			)
+		})
+
+		it('encodes a DASH pathway ID with an unpaired surrogate from getReportedPathways', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['CDN-A'],
+				pathway: 'CDN-A',
+				requester,
+				getReportedPathways: () => ['CDN-\uDC00'],
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash?_DASH_pathway=CDN-%EF%BF%BD')
+		})
+
+		it('lists the pathways of getReportedPathways for DASH', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['alpha', 'beta'],
+				pathway: 'alpha',
+				requester,
+				getReportedPathways: () => ['beta', 'alpha', 'beta'],
+				getThroughput: pathway => (pathway === 'beta' ? 2000 : 1000),
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(
+				requests[0].url,
+				'https://steering.example.com/dash?_DASH_pathway=beta,alpha&_DASH_throughput=2000,1000',
+			)
+		})
+
+		it('omits the DASH parameters when getReportedPathways returns an empty list', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine({
+				protocol: 'dash',
+				uri: 'https://steering.example.com/dash',
+				pathways: ['alpha'],
+				pathway: 'alpha',
+				requester,
+				getReportedPathways: () => [],
+			})
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/dash')
+		})
+
+		it('ignores getReportedPathways for HLS', async () => {
+			const { requester, requests } = createStubRequester(manifestResponse(MANIFEST))
+			const engine = createSteeringEngine(
+				hlsConfig({ requester, getReportedPathways: () => ['CDN-B'] }),
+			)
+
+			await engine.start()
+			engine.stop()
+
+			equal(requests[0].url, 'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A')
+		})
+
+		it('uses fetch when the requester is fetchRequester', async () => {
+			const fetchMock = vi
+				.spyOn(globalThis, 'fetch')
+				.mockImplementation(() =>
+					Promise.resolve(new Response(JSON.stringify(MANIFEST), { status: 200 })),
+				)
+			const engine = createSteeringEngine(hlsConfig({ requester: fetchRequester }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(fetchMock.mock.calls.length, 1)
+			equal(
+				fetchMock.mock.calls[0][0],
+				'https://steering.example.com/manifest.json?_HLS_pathway=CDN-A',
+			)
+			equal(engine.pathway, 'CDN-B')
+		})
+	})
+})

@@ -7,7 +7,7 @@ import type { PathwayClone } from './PathwayClone.ts'
  * @returns `true` if the pathway clone is valid, `false` otherwise.
  *
  *
- * @beta
+ * @public
  */
 export function isValidPathwayClone(clone: PathwayClone): boolean {
 	if (typeof clone !== 'object' || !clone) {
@@ -20,7 +20,8 @@ export function isValidPathwayClone(clone: PathwayClone): boolean {
 		typeof ID !== 'string' ||
 		typeof BASE_ID !== 'string' ||
 		URI_REPLACEMENT == null ||
-		typeof URI_REPLACEMENT !== 'object'
+		typeof URI_REPLACEMENT !== 'object' ||
+		Array.isArray(URI_REPLACEMENT)
 	) {
 		return false
 	}

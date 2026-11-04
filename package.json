@@ -35,7 +35,7 @@
 		"format": "vp lint --fix . && vp fmt .",
 		"lint": "vp lint .",
 		"build": "node scripts/buildAll.ts",
-		"pretest": "npm run lint && vp fmt --check . && npm run build && npm run typecheck",
+		"pretest": "npm run lint && vp fmt --check . && npm run build && npm run typecheck && npm run size -- --check",
 		"test": "vp test --run",
 		"start": "npm start -w dev",
 		"prepare-release": "node scripts/prepareRelease.ts",
@@ -44,6 +44,7 @@
 		"ver": "node scripts/version.ts",
 		"site": "npm start -w site",
 		"notes": "node scripts/createReleaseNotes.ts",
+		"size": "node scripts/size.ts",
 		"typecheck": "vp lint --type-aware --type-check ."
 	},
 	"workspaces": [

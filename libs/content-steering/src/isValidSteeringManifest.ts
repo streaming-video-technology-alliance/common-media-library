@@ -8,7 +8,7 @@ import type { SteeringManifest } from './SteeringManifest.ts'
  * @returns `true` if the steering manifest is valid, `false` otherwise.
  *
  *
- * @beta
+ * @public
  */
 export function isValidSteeringManifest(manifest: SteeringManifest): boolean {
 	if (!manifest) {

@@ -10,6 +10,7 @@ Common utility functions for media processing.
 - Compute the time to first byte, the transfer duration, and the bandwidth in bits per second of a `ResourceTiming` sample: `getTimeToFirstByte`, `getTransferDuration`, `getBandwidthBps`
 - Unescape HTML entities in a manifest or a caption string: `unescapeHtml`
 - Generate a UUID for a session or a content id: `uuid`
+- Send an `HttpRequest` with `fetch` and receive an `HttpResponse`: `fetchRequester`, `HttpRequester`
 
 Do not write your own hex, base64, or UUID conversion. Open an issue for a conversion that is missing.
 

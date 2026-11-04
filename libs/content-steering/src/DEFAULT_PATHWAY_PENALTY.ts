@@ -2,6 +2,6 @@
  * The default penalty for a pathway in milliseconds.
  *
  *
- * @beta
+ * @public
  */
 export const DEFAULT_PATHWAY_PENALTY = 300000

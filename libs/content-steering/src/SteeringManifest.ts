@@ -4,7 +4,7 @@ import type { PathwayClone } from './PathwayClone.ts'
  * A manifest for content steering.
  *
  *
- * @beta
+ * @public
  */
 export type SteeringManifest = {
 	/**
