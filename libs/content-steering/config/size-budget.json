@@ -3,10 +3,12 @@
 		"These are brotli byte budgets for the built package. The tolerance is a fraction of the budget.",
 		"The command `npm run size` prints the sizes. The command `npm run size -- --check` fails when a size is over its budget plus the tolerance.",
 		"Raise a budget in the pull request that grows the bundle. The command `npm run size -- --update` writes the current sizes.",
-		"The entry without imports measures a bare import of the package. `typeOnlyPeers` fails the check when a bundle imports a peer dependency at runtime."
+		"The entry without imports measures a bare import of the package. `typeOnlyPeers` fails the check when a bundle imports a listed peer dependency at runtime. The value `true` lists every peer dependency."
 	],
 	"tolerance": 0.02,
-	"typeOnlyPeers": true,
+	"typeOnlyPeers": [
+		"@svta/cml-utils"
+	],
 	"entries": {
 		"bare import": {
 			"imports": [],
@@ -16,7 +18,7 @@
 			"imports": [
 				"createSteeringEngine"
 			],
-			"brotli": 3456
+			"brotli": 3547
 		},
 		"applyUriReplacement": {
 			"imports": [
@@ -29,7 +31,7 @@
 				"createSteeringEngine",
 				"applyUriReplacement"
 			],
-			"brotli": 3675
+			"brotli": 3775
 		}
 	}
 }

@@ -49,7 +49,7 @@ async function measure(
 	name: string,
 	entry: Entry,
 	peers: string[],
-	typeOnlyPeers: boolean,
+	typeOnlyPeers: string[],
 	tmp: string,
 	id: string,
 ): Promise<Omit<Row, 'budget' | 'over'>> {
@@ -73,7 +73,11 @@ async function measure(
 				minify: true,
 				write: false,
 				target: 'esnext',
-				rolldownOptions: { external: peers, output: { minify: { codegen: true } } },
+				rolldownOptions: {
+					external: peers,
+					treeshake: { moduleSideEffects: 'no-external' },
+					output: { minify: { codegen: true } },
+				},
 			},
 		})
 		const first = Array.isArray(result) ? result[0] : result
@@ -88,13 +92,11 @@ async function measure(
 		)
 	}
 
-	if (typeOnlyPeers) {
-		const peer = peers.find(peer => code.includes(peer))
-		if (peer !== undefined) {
-			throw new Error(
-				`The entry "${name}" of ${pkg} imports the peer dependency ${peer} at runtime. The size budget of ${pkg} sets "typeOnlyPeers" to true.`,
-			)
-		}
+	const peer = typeOnlyPeers.find(peer => code.includes(peer))
+	if (peer !== undefined) {
+		throw new Error(
+			`The entry "${name}" of ${pkg} imports the peer dependency ${peer} at runtime. The size budget of ${pkg} lists ${peer} in "typeOnlyPeers".`,
+		)
 	}
 
 	const bytes = Buffer.from(code)
@@ -172,7 +174,12 @@ async function sizePackage(pkg: string, tmp: string, update: boolean): Promise<R
 	}
 
 	const peers = await loadPeers(pkg)
-	const typeOnlyPeers = budget.typeOnlyPeers === true
+	const typeOnlyPeers =
+		budget.typeOnlyPeers === true
+			? peers
+			: Array.isArray(budget.typeOnlyPeers)
+				? budget.typeOnlyPeers
+				: []
 	const sizes = await Promise.all(
 		Object.entries(budget.entries).map(([name, entry], i) => {
 			return measure(pkg, name, entry, peers, typeOnlyPeers, tmp, `${pkg}-${i}`)

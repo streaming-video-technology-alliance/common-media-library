@@ -50,6 +50,7 @@
 		}
 	},
 	"peerDependencies": {
+		"@svta/cml-error-codes": "*",
 		"@svta/cml-utils": "*"
 	}
 }

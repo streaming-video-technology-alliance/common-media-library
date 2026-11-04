@@ -5,7 +5,7 @@ import {
 	type SteeringError,
 	type SteeringRequester,
 } from '@svta/cml-content-steering'
-import { deepEqual, equal, throws } from 'node:assert'
+import { deepEqual, equal, ok, throws } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
 	advance,
@@ -337,6 +337,7 @@ describe('createSteeringEngine lifecycle', () => {
 				message: 'The onManifest callback threw.',
 			},
 		])
+		ok(!('code' in errors[0]))
 	})
 
 	it('throws a callback error to the caller of penalize() after it selects', async () => {

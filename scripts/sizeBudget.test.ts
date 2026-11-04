@@ -34,9 +34,17 @@ describe('parseBudget', () => {
 		throws(() => parseBudget(FILE, []), { message: /"\(file\)" must be an object/ })
 	})
 
-	it('rejects a typeOnlyPeers value that is not a boolean', () => {
+	it('accepts a typeOnlyPeers list of package names', () => {
+		const budget = parseBudget(FILE, { ...BUDGET, typeOnlyPeers: ['@svta/cml-utils'] })
+		deepEqual(budget.typeOnlyPeers, ['@svta/cml-utils'])
+	})
+
+	it('rejects a typeOnlyPeers value that is not a boolean or a list of package names', () => {
 		throws(() => parseBudget(FILE, { ...BUDGET, typeOnlyPeers: 'yes' }), {
-			message: /"typeOnlyPeers" must be a boolean/,
+			message: /"typeOnlyPeers" must be a boolean or an array of package names/,
+		})
+		throws(() => parseBudget(FILE, { ...BUDGET, typeOnlyPeers: [1] }), {
+			message: /"typeOnlyPeers" must be a boolean or an array of package names/,
 		})
 	})
 

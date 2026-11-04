@@ -5,6 +5,8 @@
 ```ts
 
 import { HttpRequester } from '@svta/cml-utils';
+import { SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR } from '@svta/cml-error-codes';
+import { SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR } from '@svta/cml-error-codes';
 import { ValueOf } from '@svta/cml-utils';
 
 // @beta
@@ -84,6 +86,7 @@ export type SteeringEngineConfig = {
 // @beta
 export type SteeringError = {
     readonly type: typeof STEERING_ERROR_TYPE_LOAD | typeof STEERING_ERROR_TYPE_PARSE;
+    readonly code: typeof SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR | typeof SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR;
     readonly url: string;
     readonly status?: number;
     readonly cause?: unknown;

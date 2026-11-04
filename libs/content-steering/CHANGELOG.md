@@ -15,11 +15,12 @@ and this project adheres to
 - The guide `docs/steering-engine.md`, which covers the player integration of the engine ([#608](https://github.com/streaming-video-technology-alliance/common-media-library/pull/608))
 - `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, and `STEERING_PROTOCOL_DASH` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, and `STEERING_ERROR_TYPE_CALLBACK` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- `code` on a `load` or `parse` `SteeringError`. The value is the SVTA2070 code from `@svta/cml-error-codes` ([#471](https://github.com/streaming-video-technology-alliance/common-media-library/pull/471))
 
 ### Changed
 
 - `UriReplacement` has the optional HLS keys `PER-VARIANT-URIS` and `PER-RENDITION-URIS` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
-- The package has a peer dependency on `@svta/cml-utils`. The package imports only types from it ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- The package has peer dependencies on `@svta/cml-error-codes` and `@svta/cml-utils`. The package imports only types from `@svta/cml-utils` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 
 ### Fixed

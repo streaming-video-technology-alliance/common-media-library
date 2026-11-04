@@ -5,6 +5,10 @@ import {
 	type SteeringEngineConfig,
 	type SteeringError,
 } from '@svta/cml-content-steering'
+import {
+	SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
+	SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR,
+} from '@svta/cml-error-codes'
 import { deepEqual, equal, ok } from 'node:assert'
 import { afterEach, beforeEach, describe, it, vi } from 'vite-plus/test'
 import {
@@ -804,6 +808,28 @@ describe('createSteeringEngine responses', () => {
 			equal(errors[0].type, 'load')
 			equal(errors[0].retryDelay, DEFAULT_TTL * 1000)
 			equal(engine.pathway, 'CDN-A')
+		})
+	})
+
+	describe('SVTA2070 codes', () => {
+		it('sets the load code on a request error', async () => {
+			const { engine, errors } = setup('hls', { status: 500 })
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].type, 'load')
+			equal(errors[0].code, SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR)
+		})
+
+		it('sets the parse code on an invalid Steering Manifest', async () => {
+			const { engine, errors } = setup('hls', manifestResponse({ ...MANIFEST, TTL: 0 }))
+
+			await engine.start()
+			engine.stop()
+
+			equal(errors[0].type, 'parse')
+			equal(errors[0].code, SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR)
 		})
 	})
 })

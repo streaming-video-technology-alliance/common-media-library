@@ -5,7 +5,7 @@ export type Entry = {
 
 export type Budget = {
 	tolerance: number
-	typeOnlyPeers?: boolean
+	typeOnlyPeers?: boolean | string[]
 	entries: Record<string, Entry>
 }
 
@@ -42,8 +42,12 @@ export function parseBudget(file: string, data: unknown): Budget {
 		fail(file, 'tolerance', 'a number of at least 0', tolerance)
 	}
 
-	if (typeOnlyPeers !== undefined && typeof typeOnlyPeers !== 'boolean') {
-		fail(file, 'typeOnlyPeers', 'a boolean', typeOnlyPeers)
+	if (
+		typeOnlyPeers !== undefined &&
+		typeof typeOnlyPeers !== 'boolean' &&
+		!(Array.isArray(typeOnlyPeers) && typeOnlyPeers.every(peer => typeof peer === 'string'))
+	) {
+		fail(file, 'typeOnlyPeers', 'a boolean or an array of package names', typeOnlyPeers)
 	}
 
 	if (!isRecord(entries) || Object.keys(entries).length === 0) {

@@ -1,3 +1,7 @@
+import {
+	SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
+	SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR,
+} from '@svta/cml-error-codes'
 import type { HttpRequest, HttpResponse } from '@svta/cml-utils'
 import { buildSteeringUri } from './buildSteeringUri.ts'
 import { DEFAULT_PATHWAY_PENALTY } from './DEFAULT_PATHWAY_PENALTY.ts'
@@ -312,6 +316,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				if (token === session) {
 					retry({
 						type: STEERING_ERROR_TYPE_LOAD,
+						code: SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
 						url,
 						cause,
 						message: `The Steering Manifest request failed.`,
@@ -331,6 +336,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 		if (typeof response !== 'object' || response === null) {
 			retry({
 				type: STEERING_ERROR_TYPE_LOAD,
+				code: SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
 				url,
 				message: `The requester did not return a response object.`,
 			})
@@ -354,11 +360,21 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				)
 			} else if (isDash && result.version) {
 				if (stale) {
-					retry({ type: STEERING_ERROR_TYPE_PARSE, url, status, message: result.error }, 0)
+					retry(
+						{
+							type: STEERING_ERROR_TYPE_PARSE,
+							code: SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR,
+							url,
+							status,
+							message: result.error,
+						},
+						0,
+					)
 				} else {
 					end()
 					report({
 						type: STEERING_ERROR_TYPE_PARSE,
+						code: SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR,
 						url,
 						status,
 						message: `${result.error} No request follows.`,
@@ -371,6 +387,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			} else {
 				retry({
 					type: STEERING_ERROR_TYPE_PARSE,
+					code: SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR,
 					url,
 					status,
 					cause: result.cause,
@@ -385,6 +402,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				retry(
 					{
 						type: STEERING_ERROR_TYPE_LOAD,
+						code: SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
 						url,
 						status,
 						message: `The steering server returned status 410.`,
@@ -395,6 +413,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 				end()
 				report({
 					type: STEERING_ERROR_TYPE_LOAD,
+					code: SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
 					url,
 					status,
 					message: `The steering server returned status 410. No request follows.`,
@@ -420,6 +439,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 			retry(
 				{
 					type: STEERING_ERROR_TYPE_LOAD,
+					code: SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
 					url,
 					status,
 					message: `The steering server returned status 429.`,
@@ -431,6 +451,7 @@ export function createSteeringEngine(config: SteeringEngineConfig): SteeringEngi
 
 		retry({
 			type: STEERING_ERROR_TYPE_LOAD,
+			code: SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
 			url,
 			status,
 			message: `The Steering Manifest request failed with status ${status}.`,

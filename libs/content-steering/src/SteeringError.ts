@@ -1,4 +1,8 @@
 import type {
+	SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR,
+	SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR,
+} from '@svta/cml-error-codes'
+import type {
 	STEERING_ERROR_TYPE_CALLBACK,
 	STEERING_ERROR_TYPE_LOAD,
 	STEERING_ERROR_TYPE_PARSE,
@@ -18,6 +22,14 @@ export type SteeringError =
 			 * `load` when the request fails, and `parse` when the Steering Manifest is not valid.
 			 */
 			readonly type: typeof STEERING_ERROR_TYPE_LOAD | typeof STEERING_ERROR_TYPE_PARSE
+
+			/**
+			 * The SVTA2070 code: `SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR` for `load`,
+			 * and `SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR` for `parse`.
+			 */
+			readonly code:
+				| typeof SVTA_CONTENT_STEERING_MANIFEST_LOAD_ERROR
+				| typeof SVTA_CONTENT_STEERING_MANIFEST_PARSE_ERROR
 
 			/**
 			 * The request URI.

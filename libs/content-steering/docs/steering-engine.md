@@ -128,7 +128,7 @@ engine.penalize('beta') // a specific pathway
 
 `onError` receives the request errors and the Steering Manifest errors. It also receives the exceptions of callbacks when no caller can receive them. A callback that throws inside `penalize()` or `update()` throws to the caller of that method. Without `onError`, the engine throws a callback exception from a timer callback.
 
-`error.type` is a `SteeringErrorType` value: `load` for a request failure, `parse` for an invalid Steering Manifest, and `callback` for an exception of a callback. A `load` or `parse` error has `url`, `status`, `cause`, and `retryDelay`. `retryDelay` is absent when no request follows.
+`error.type` is a `SteeringErrorType` value: `load` for a request failure, `parse` for an invalid Steering Manifest, and `callback` for an exception of a callback. A `load` or `parse` error has `code`, `url`, `status`, `cause`, and `retryDelay`. `code` is the SVTA2070 code from `@svta/cml-error-codes`: 2040 for `load` and 2041 for `parse`. `retryDelay` is absent when no request follows.
 
 ```typescript
 import { SteeringErrorType, type SteeringError } from '@svta/cml-content-steering'

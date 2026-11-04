@@ -1,7 +1,7 @@
 import type { ValueOf } from '@svta/cml-utils'
 
 /**
- * A Steering Manifest request failed. Matches the SVTA2070 code 2040.
+ * A Steering Manifest request failed. The error has the SVTA2070 code 2040.
  *
  *
  * @beta
@@ -9,7 +9,7 @@ import type { ValueOf } from '@svta/cml-utils'
 export const STEERING_ERROR_TYPE_LOAD = 'load' as const
 
 /**
- * A Steering Manifest is not valid. Matches the SVTA2070 code 2041.
+ * A Steering Manifest is not valid. The error has the SVTA2070 code 2041.
  *
  *
  * @beta
