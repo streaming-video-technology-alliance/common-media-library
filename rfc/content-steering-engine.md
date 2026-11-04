@@ -393,9 +393,11 @@ The engine ignores a clone that is not valid, and a valid clone that `acceptClon
 | Protocol | Default penalty duration |
 |---|---|
 | HLS | `DEFAULT_PATHWAY_PENALTY`, 5 minutes |
-| DASH | the TTL of the last valid Steering Manifest (DASH spec, step 19), or `DEFAULT_TTL` |
+| DASH | the current TTL (DASH spec, step 19) |
 
-The `penalty` property of the configuration replaces the default for both protocols: a number of milliseconds, or `'ttl'` for the current TTL. A new Steering Manifest does not end a penalty, and `update()` does not end a penalty either. When a penalty ends, the engine selects a pathway again (base spec, step 4). A second call for the same pathway restarts its penalty.
+The current TTL is the TTL of the last valid Steering Manifest. Before the first valid Steering Manifest, the current TTL is `DEFAULT_TTL`. For DASH, a 429 with a valid Retry-After also sets the current TTL (see Responses). The `penalty` property of the configuration replaces the default for both protocols: a number of milliseconds, or `'ttl'` for the current TTL.
+
+A new Steering Manifest does not end a penalty, and `update()` does not end a penalty either. When a penalty ends, the engine selects a pathway again (base spec, step 4). A second call for the same pathway restarts its penalty.
 
 A player may call `penalize()` inside `onPathwayChange`. The engine then applies the penalty and selects again at once, inside that `onPathwayChange` call. So the `onPathwayChange` call for the next pathway runs inside the first call. If no pathway qualifies, the selection does not change (base spec, step 5), and the engine does not call `onPathwayChange` again. The player then uses its own list of all pathways (see Pathway selection).
 
@@ -543,6 +545,12 @@ The engine also fixes bugs in the old code of three players. The integration map
   - `priority` holds only the selected pathway when every other pathway is penalized.
   - The guide describes `stop()` for media that is ended or detached, and the source of the DASH `pathways`.
 - v5 (2026-11-02): `fetchRequester` moves to `@svta/cml-utils`, and `SteeringRequester` is the `HttpRequester` type of that package. The CMCD session takes the same function as its requester.
+- v6 (2026-11-03): the RFC branch takes the edits from the review of the implementation ([#608](https://github.com/streaming-video-technology-alliance/common-media-library/pull/608)):
+  - Question 1 is resolved: the pathway parameter has no quotes.
+  - Question 2 is resolved: `DEFAULT_PATHWAY_PENALTY` remains the HLS default, and `penalty` accepts `'ttl'`.
+  - Question 3 is resolved: after a 410 or a DASH VERSION other than 1, the engine keeps the pathway selection.
+  - A `penalty` number must be greater than 0. A TTL between 0 and 1 counts as 1. A duplicate ID in PATHWAY-PRIORITY keeps the first position. A Retry-After that asks for no wait counts as absent.
+  - Penalties defines the current TTL. Tests use the fake timers of Vitest.
 
 ## Final Decision
 
