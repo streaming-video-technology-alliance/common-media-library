@@ -205,7 +205,7 @@ function onError(error) {
 | `SteeringEngine`, `SteeringEngineConfig`, `SteeringRequester`, `SteeringError` | types |
 | `UriReplacementOptions` | type |
 
-`SteeringProtocol` and `SteeringErrorType` follow the const enum pattern of the repository. The package gets two peer dependencies. `@svta/cml-utils` provides the `HttpRequest`, `HttpRequester`, `HttpResponse`, and `ValueOf` types, and the package imports only types from it. `@svta/cml-error-codes` provides the two SVTA2070 constants for `code` in `SteeringError`.
+`SteeringProtocol` and `SteeringErrorType` follow the const enum pattern of the repository. Every export of the package has the `@public` release tag. The package gets two peer dependencies. `@svta/cml-utils` provides the `HttpRequest`, `HttpRequester`, `HttpResponse`, and `ValueOf` types, and the package imports only types from it. `@svta/cml-error-codes` provides the two SVTA2070 constants for `code` in `SteeringError`.
 
 ### Configuration
 
@@ -507,7 +507,7 @@ The engine also fixes bugs in the old code of three players. The integration map
 
    Step 17 says to proceed "as if the ContentSteering element were not present". A player without steering uses the MPD order with the default service location first, which is the fallback priority list. So the player sees the same order, and `penalize()` continues to work on that list.
 4. **SVTA2070 codes.** Resolved on 2026-11-03: a `load` or `parse` error has `code`, the SVTA2070 code as a number. The engine imports the two constants from `@svta/cml-error-codes`, which becomes a peer dependency. The field costs 13 bytes brotli in a bundle that includes that package.
-5. **Release tag.** The package exports use `@beta`, and the repository rules require `@public`. Should the engine ship as `@beta` until a player uses it, and as `@public` in version 1.0?
+5. **Release tag.** Resolved on 2026-11-03: every export of the package is `@public`, as the repository rules require. Before, the exports of the package used `@beta`. The API report is the only output of api-extractor, so the tag trims nothing. A `@beta` type raises `ae-incompatible-release-tags` in a player that bundles the package types, as the hls.js spike showed.
 
 ## Future possibilities
 
@@ -552,6 +552,7 @@ The engine also fixes bugs in the old code of three players. The integration map
   - A `penalty` number must be greater than 0. A TTL between 0 and 1 counts as 1. A duplicate ID in PATHWAY-PRIORITY keeps the first position. A Retry-After that asks for no wait counts as absent.
   - Penalties defines the current TTL. Tests use the fake timers of Vitest.
 - v7 (2026-11-03): question 4 is resolved. `SteeringError` has `code`, with the two SVTA2070 constants from `@svta/cml-error-codes`. The size table has the current sizes.
+- v8 (2026-11-03): question 5 is resolved. Every export of the package is `@public`.
 
 ## Final Decision
 
