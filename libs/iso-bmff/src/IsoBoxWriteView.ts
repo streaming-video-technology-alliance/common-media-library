@@ -139,8 +139,7 @@ export class IsoBoxWriteView {
 				break
 
 			case 8:
-				// Warning: JavaScript cannot handle 64-bit integers natively.
-				// This will give unexpected results for integers >= 2^53
+				// A number loses precision for integers >= 2^53.
 				const s1 = Math.floor(value / Math.pow(2, 32))
 				const s2 = value - s1 * Math.pow(2, 32)
 				dataView.setUint32(cursor, s1)
