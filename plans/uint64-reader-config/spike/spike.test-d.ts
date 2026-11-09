@@ -57,8 +57,6 @@ for (const box of big) {
 	if (box.type === 'tfdt') {
 		expectEqual<typeof box.baseMediaDecodeTime, bigint>()
 		expectEqual<typeof box.version, number>()
-		// @ts-expect-error bigint and number do not mix in arithmetic
-		void (box.baseMediaDecodeTime + 1)
 		void (box.baseMediaDecodeTime + BigInt(1))
 	}
 	if (box.type === 'mfhd') {

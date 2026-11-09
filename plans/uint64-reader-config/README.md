@@ -28,12 +28,12 @@ npx -p typescript@5.7.3 tsc -p plans/uint64-reader-config/spike/tsconfig.ts57.js
 The runtime measurement for the Reference-level explanation of the RFC.
 
 - `patch.py` copies the built package and writes four variants of it. Variant A branches in the `read` dispatch. Variant B adds a `readWideUint` arrow field that holds the branch. Variant C picks the method in the constructor and aliases `readUint` when the option is off. Variant D adds a `readWideUint` prototype method.
-- `bench.mjs` reads a buffer of 30000 boxes (`tfdt`, `mfhd`, `sidx`) with one variant and prints the median time per box.
+- `bench.ts` reads a buffer of 30000 boxes (`tfdt`, `mfhd`, `sidx`) with one variant and prints the median time per box.
 
 ```sh
 npm run build -w libs/iso-bmff
 mkdir -p /tmp/bench && cd /tmp/bench && echo '{"type":"module"}' > package.json && ln -s <repo>/node_modules node_modules
 python3 <repo>/plans/uint64-reader-config/bench/patch.py .
-cp <repo>/plans/uint64-reader-config/bench/bench.mjs .
-node bench.mjs base.js && node bench.mjs variantC.js && node bench.mjs variantC.js bigint
+cp <repo>/plans/uint64-reader-config/bench/bench.ts .
+node bench.ts base.js && node bench.ts variantC.js && node bench.ts variantC.js bigint
 ```
