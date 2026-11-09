@@ -14,7 +14,6 @@ import { readString } from './utils/readString.ts'
 import { readTemplate } from './utils/readTemplate.ts'
 import { readTerminatedString } from './utils/readTerminatedString.ts'
 import { readUint } from './utils/readUint.ts'
-import { readUint64 } from './utils/readUint64.ts'
 import { readUtf8String } from './utils/readUtf8String.ts'
 import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
 
@@ -184,7 +183,7 @@ export class IsoBoxReadView {
 	 * @returns The unsigned integer as a `bigint`.
 	 */
 	readUint64 = (): bigint => {
-		const value = readUint64(this.dataView, this.offset)
+		const value = this.dataView.getBigUint64(this.cursor)
 		this.offset += 8
 		return value
 	}
