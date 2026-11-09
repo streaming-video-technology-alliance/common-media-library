@@ -267,6 +267,27 @@ const stream = await transport.createBidirectionalStream();
 readableStream.pipeTo(stream.writable);
 ```
 
+## Writing 64-bit fields
+
+The built-in writers take every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
+
+If your code has the exact value as a `bigint`, write the box with `IsoBoxWriteView` and call `writeUint64`:
+
+```typescript
+import { IsoBoxWriteView } from "@svta/cml-iso-bmff";
+
+const writeTfdt64 = (baseMediaDecodeTime: bigint) => {
+	const writer = new IsoBoxWriteView("tfdt", 20);
+	writer.writeFullBox(1, 0);
+	writer.writeUint64(baseMediaDecodeTime);
+	return writer;
+};
+
+const tfdt = writeTfdt64(BigInt("17900000000000000"));
+```
+
+The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects. `IsoBoxReadView.readUint64` is the matching method for reading a `bigint`.
+
 ## Type safety
 
 In TypeScript, cast raw box objects to a box type for type safety. There are two ways. The first way uses a box type from the library:
