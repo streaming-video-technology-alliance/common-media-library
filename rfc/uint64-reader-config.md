@@ -1,0 +1,295 @@
+---
+status: draft
+---
+
+# RFC: `int64` reader option for exact 64-bit fields
+
+| | |
+|---|---|
+| **Author** | Casey Occhialini |
+| **Date** | 2026-11-09 |
+| **Package** | `@svta/cml-iso-bmff` |
+| **Breaking change** | No |
+| **Issue** | [#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611) |
+
+## Summary
+
+A new option on `IsoBoxReadViewConfig` selects the JavaScript type of every 64-bit integer field that the built-in readers return. The default is `'number'`. It keeps today's values and today's types. With `'bigint'`, the eleven affected box types carry `bigint` fields, and the result type of `readIsoBoxes` follows the option without a cast.
+
+```ts
+import { readIsoBoxes, readTfdt } from '@svta/cml-iso-bmff'
+
+const boxes = readIsoBoxes(buffer, { int64: 'bigint', readers: { tfdt: readTfdt } })
+
+for (const box of boxes) {
+	if (box.type === 'tfdt') {
+		box.baseMediaDecodeTime // bigint
+	}
+}
+```
+
+Issue #611 calls the option `uint64`. This RFC proposes the name `int64`, because one affected field, `mediaTime` in `elst`, is signed.
+
+The RFC also fixes a typing defect in `IsoBoxReaderReturn` that affects the documented workaround today. Section [Result type inference](#result-type-inference) describes the defect.
+
+**Recommendation**: implement, in two pull requests. The first pull request fixes `IsoBoxReaderReturn`. The second adds the option. Section [Rationale and alternatives](#rationale-and-alternatives) gives the reasons, and section [Drawbacks](#drawbacks) gives the case against.
+
+## Motivation
+
+A `number` holds integers up to 2^53 - 1 exactly. `IsoBoxReadView.readUint(8)` assembles two 32-bit halves into a `number`, so a 64-bit field above that limit rounds to an even value. Every built-in reader of a 64-bit field uses that path.
+
+The limit is reached in practice. Smooth Streaming and some DASH live encoders write `tfdt` with a 10 MHz timescale and a wall-clock origin. The current Unix time in 10 MHz ticks is about 1.79e16. 2^53 is about 9.01e15. The built-in `tfdt` reader returns a wrong `baseMediaDecodeTime` for such a segment. A player that adjusts the value and writes the segment back corrupts the timestamp. The library's sixth priority is spec compliance, and a reader that returns a wrong value for a valid file does not meet it.
+
+The affected fields, all 64 bits in version 1 of the box and 32 bits in version 0 unless noted:
+
+| Box | Field | Signed | Reaches 2^53 in practice |
+|---|---|---|---|
+| `tfdt` | `baseMediaDecodeTime` | no | yes, at 10 MHz |
+| `sidx` | `earliestPresentationTime` | no | yes, at 10 MHz |
+| `sidx` | `firstOffset` | no | no, a byte offset |
+| `tfra` | `time` (per entry) | no | yes, at 10 MHz |
+| `tfra` | `moofOffset` (per entry) | no | no, a byte offset |
+| `prft` | `mediaTime` | no | yes, at 10 MHz |
+| `emsg` | `presentationTime` (64 bits in every version 1 box) | no | yes, at 10 MHz |
+| `mehd` | `fragmentDuration` | no | rarely, a duration |
+| `mvhd` | `creationTime`, `modificationTime`, `duration` | no | no, seconds since 1904 and a duration |
+| `mdhd` | `creationTime`, `modificationTime`, `duration` | no | no |
+| `tkhd` | `creationTime`, `modificationTime`, `duration` | no | no |
+| `elst` | `segmentDuration` (per entry) | no | rarely |
+| `elst` | `mediaTime` (per entry) | yes | yes, at 10 MHz |
+| `tfhd` | `baseDataOffset` (64 bits in every box that sets the flag) | no | no, a byte offset |
+
+The option covers every row, so an adopter does not need to know which fields can overflow. The practical value is in the six time fields.
+
+`largesize` on the box header is not in the table. It is a byte count, the reader uses it in arithmetic, and no file reaches 2^53 bytes. It stays a `number`.
+
+### The extension point today
+
+PR #612 added `IsoBoxReadView.readUint64`, which returns a `bigint`, and the matching `IsoBoxWriteView.writeUint64`. The reading guide shows a custom `tfdt` reader that uses it. The custom reader works, with two limits:
+
+- The adopter copies one reader per affected box. A `sidx` reader with its reference loop is about 40 lines, and `mvhd` has 14 fields.
+- The result type is wrong. `IsoBoxReaderReturn` adds every built-in box type to the result union, including the `tfdt` type that the custom reader replaces. `box.type === 'tfdt'` therefore narrows to `number | bigint`, not `bigint`. The spike file `plans/uint64-reader-config/spike/published-types.ts` reproduces this against the published package.
+
+## Guide-level explanation
+
+### Turning the option on
+
+Pass `int64: 'bigint'` in the reader configuration. The built-in readers then return every 64-bit field as a `bigint`, and the types follow.
+
+```ts
+import { defaultReaderConfig, readIsoBoxes } from '@svta/cml-iso-bmff'
+
+const boxes = readIsoBoxes(buffer, { ...defaultReaderConfig(), int64: 'bigint' })
+
+for (const box of boxes) {
+	if (box.type === 'sidx') {
+		const seconds = Number(box.earliestPresentationTime / BigInt(box.timescale))
+	}
+}
+```
+
+The option also applies to a view that the adopter constructs directly, and to the child boxes of a container. A `moof` read with `int64: 'bigint'` holds a `traf` whose `tfdt` has a `bigint` field, and the type of `box.boxes` says so.
+
+### Version 0 boxes
+
+A version 0 `tfdt` stores `baseMediaDecodeTime` in 32 bits. With `int64: 'bigint'`, the reader returns that field as a `bigint` too. The field has one type for both versions, so the adopter does not branch on `version`.
+
+### Custom readers
+
+A custom reader does not change. A reader written as `(view: IsoBoxReadView) => ...` compiles with the option on and off, and the result type keeps whatever the reader returns. The option changes the built-in readers only.
+
+A custom reader that wants to follow the option is generic over it and reads the field with `readWideUint`:
+
+```ts
+import type { IsoBoxReadView, IsoInt64 } from '@svta/cml-iso-bmff'
+
+const readTfdt = <I extends IsoInt64>(view: IsoBoxReadView<I>) => {
+	const { version, flags } = view.readFullBox()
+	return {
+		type: 'tfdt' as const,
+		version,
+		flags,
+		baseMediaDecodeTime: view.readWideUint(version === 1 ? 8 : 4),
+	}
+}
+```
+
+### Writing boxes back
+
+The built-in writers accept a box with `number` fields and a box with `bigint` fields. A box read with `int64: 'bigint'` writes back without conversion, and `IsoBoxWriteViewConfig` gets no option.
+
+```ts
+import { readIsoBoxes, readTfdt, writeIsoBox, writeTfdt } from '@svta/cml-iso-bmff'
+
+const [tfdt] = readIsoBoxes(buffer, { int64: 'bigint', readers: { tfdt: readTfdt } })
+
+if (tfdt?.type === 'tfdt') {
+	tfdt.baseMediaDecodeTime += BigInt(90000)
+	const bytes = writeIsoBox(tfdt, { writers: { tfdt: writeTfdt } })
+}
+```
+
+### Runtimes without BigInt
+
+The package targets ES2019 and `BigInt` is ES2020. With the option off, or absent, no code path references `BigInt`, so nothing changes for a runtime without it. With `int64: 'bigint'` on such a runtime, the `IsoBoxReadView` constructor throws a `TypeError` that names the option and the missing global.
+
+## Reference-level explanation
+
+### The option
+
+```ts
+/** The JavaScript type of a 64-bit integer field. */
+export type IsoInt64 = 'number' | 'bigint'
+
+/** Resolves the option to the field type. */
+export type IsoInt64Value<I extends IsoInt64> = { number: number; bigint: bigint }[I]
+
+export type IsoBoxReadViewConfig<I extends IsoInt64 = 'number'> = {
+	readers?: IsoBoxReaderMap
+	/**
+	 * The JavaScript type of the 64-bit integer fields that the built-in readers return.
+	 * @defaultValue 'number'
+	 */
+	int64?: I
+}
+```
+
+### Types that gain a parameter
+
+Every declaration below gains a type parameter `I extends IsoInt64 = 'number'`. The default keeps every existing reference, such as `TrackFragmentBaseMediaDecodeTimeBox` or `ParsedIsoBox`, equal to today's type.
+
+| Group | Declarations |
+|---|---|
+| Affected box types | `TrackFragmentBaseMediaDecodeTimeBox`, `SegmentIndexBox`, `TrackFragmentRandomAccessBox`, `ProducerReferenceTimeBox`, `EventMessageBoxV1` and `EventMessageBox`, `MovieExtendsHeaderBox`, `MovieHeaderBox`, `MediaHeaderBox`, `TrackHeaderBox`, `EditListBox`, `TrackFragmentHeaderBox` |
+| Entry types | `TrackFragmentRandomAccessEntry`, `EditListEntry` |
+| Containers of an affected box, and their child unions | `TrackFragmentBox`, `MovieFragmentBox`, `MovieBox`, `TrackBox`, `MediaBox`, `MovieExtendsBox`, `MovieFragmentRandomAccessBox`, `EditBox` |
+| Maps and derived types | `IsoBoxMap`, `IsoBox`, `IsoBoxContainerMap`, `IsoBoxContainer`, `ParsedBox`, `ParsedIsoBox`, `IsoTypedParsedBox`, `IsoBoxReaderReturn` |
+| Reader plumbing | `IsoBoxReadViewConfig`, `IsoBoxReadView`, `IsoBoxReader` (third parameter) |
+| Functions | `readIsoBoxes`, `isIsoBoxType`, `isContainer`, and the 11 built-in readers of the affected boxes |
+
+That is about 45 public declarations. Containers that hold no affected box, such as `SampleTableBox`, do not change. The writers of the affected boxes change their parameter type to the `IsoInt64` instantiation, which accepts both field types.
+
+### New view methods
+
+| Method | Signature | Behavior |
+|---|---|---|
+| `IsoBoxReadView.readWideUint` | `(size: 4 \| 8) => IsoInt64Value<I>` | With `'number'`, the same function as `readUint`. With `'bigint'`, `readUint64()` for 8 bytes and `BigInt(readUint(4))` for 4 bytes. |
+| `IsoBoxReadView.readWideInt` | `(size: 4 \| 8) => IsoInt64Value<I>` | The signed form. Uses `DataView.getBigInt64` for 8 bytes and `BigInt(readInt(4))` for 4 bytes. |
+| `IsoBoxWriteView.writeWideUint` | `(value: number \| bigint, size: 4 \| 8) => void` | A `number` goes to `writeUint(value, size)`. A `bigint` goes to `writeUint64` for 8 bytes and `writeUint(Number(value), 4)` for 4 bytes. Throws `RangeError` when a `bigint` does not fit the size. |
+| `IsoBoxWriteView.writeWideInt` | `(value: number \| bigint, size: 4 \| 8) => void` | The signed form, with `DataView.setBigInt64`. |
+
+`readUint`, `readInt`, `readUint64`, `writeUint`, `writeInt`, and `writeUint64` do not change. The built-in readers of the affected fields call the wide methods instead of `readUint(size)` and `readInt(size)`. The matching writers call the wide write methods.
+
+The writer does not need an option. The value carries its own type, and `typeof value === 'bigint'` costs one check per 64-bit field.
+
+### Where the branch lives
+
+The branch lives in the four wide methods, not in the `read` dispatch, for two reasons:
+
+1. A branch in `read(UINT, 8)` cannot give a version 0 field the `bigint` type, because the dispatch sees a 4-byte read. The reader must say that the field is a wide field. A call to a different method says it.
+2. `readUint` and `read` stay on the path they are on today. The option costs nothing on a read of any other field.
+
+The benchmark in `plans/uint64-reader-config/bench` compares the built package against four patched copies. It reads 30000 boxes (`tfdt` version 1, `mfhd`, `sidx` version 1) with three readers and reports the median time per box. Variants B, C, and D ran six times with the option off and three times with the option on, on Node 24. Variant A ran four times in each mode in an earlier series, where the base ranged from 1140 to 1314.
+
+| Variant | Where the branch lives | Option off, ns per box (min to max) | Option on, ns per box |
+|---|---|---|---|
+| Base | No option | 1140 to 1776 | |
+| A | In the `read` dispatch, on size 8 | 1144 to 1275 | 1169 to 1361 |
+| B | In a `readWideUint` arrow field, one more closure per view | 959 to 1531 | 1134 to 1576 |
+| C | Chosen in the constructor. Off: an alias of `readUint` | 1236 to 1281 | 741 to 1574 |
+| D | In a `readWideUint` prototype method | 1118 to 1304 | 1216 to 1296 |
+
+No variant separates from the base. The spread between runs of one variant is larger than the difference between variants. Two things dominate the cost of one box. The constructor of its `IsoBoxReadView` allocates about twenty arrow-function fields, and a generator yields the box. One more property read and comparison per 64-bit field does not register against that.
+
+The proposal is variant C. With the option off, the constructor assigns `readWideUint = this.readUint`. A reader of a 64-bit field then calls the same function it calls today, with no extra closure and no extra call. With the option on, the constructor assigns a closure that holds the branch. The one cost that the option adds to the default path is the comparison in the constructor. Variant D, a prototype method, has no per-instance cost either. But the other view methods are arrow fields that readers destructure, and a prototype method would be the one exception.
+
+Each wide method adds about 200 bytes of source before minification. Every adopter of `IsoBoxReadView` carries the two read methods, because the class is one unit for tree shaking. The wide write methods ship only with `IsoBoxWriteView`. No module-level statement references `BigInt` or the option, so the tree-shaking behavior of the package does not change.
+
+### Result type inference
+
+The spike in `plans/uint64-reader-config/spike` models the plumbing with one affected box, one unaffected box, and one container. `spike.test-d.ts` compiles under TypeScript 6.0.3 with the root `tsconfig.json` options and under TypeScript 5.7.3, the minimum version that the type declarations support. The test asserts every case in the guide above and asserts that every call without the option returns today's types.
+
+Two details of the model need explanation, because they are not obvious from the code.
+
+**Generic built-in readers.** A built-in reader of an affected box is generic: `readTfdt<I extends IsoInt64>(view: IsoBoxReadView<I>): TrackFragmentBaseMediaDecodeTimeBox<I>`. `IsoBoxReaderReturn` derives the result type from the reader functions in `R` with `infer`. TypeScript instantiates a generic function with its constraint before `infer`, which would give `number | bigint`. Two measures avoid that:
+
+- `IsoBoxReaderMap` becomes `Record<IsoBoxType, IsoBoxReader | IsoBoxReader<unknown, IsoBoxType, 'bigint'>>`. TypeScript instantiates a generic function reference against a contextual type that has one call signature. The spike showed the effect with today's single-signature map. `readTfdt` in `{ readers: { tfdt: readTfdt } }` is instantiated with `'number'` before `readIsoBoxes` sees it, and `int64: 'bigint'` then changes nothing. A union of two signatures has no single contextual signature, so the reader keeps its type parameter.
+- `IsoBoxReaderReturn` checks each reader against `IsoBoxMap<I>[K]` in both directions before it uses `infer`. A generic built-in reader passes the check, because TypeScript instantiates it properly in an assignability check. The result is the map type for the option. A custom reader that returns more or fewer fields fails the check and keeps its inferred type.
+
+A third approach, a reader map parameterized by the option, was tested and rejected. With `int64: 'bigint'`, a custom reader written as `(view: IsoBoxReadView) => ...` no longer matched the first overload of `readIsoBoxes`. TypeScript silently chose the second overload. The result type then claimed a `bigint` field that the custom reader did not produce.
+
+**The default union.** Today `IsoBoxReaderReturn<R>` is the union of the reader results and `ParsedIsoBox`, and `ParsedIsoBox` includes every built-in box type. A custom `tfdt` reader therefore narrows to its own type or the built-in `tfdt` type. The fix excludes the box types that `R` overrides:
+
+```ts
+export type IsoBoxReaderReturn<R, I extends IsoInt64 = 'number'> =
+	| { [K in keyof R]: IsoBoxReaderBox<R[K], K, I> }[keyof R]
+	| ParsedBox<Exclude<IsoBox<I>, { type: keyof R }> | Box, I>
+```
+
+The fix is independent of the option. It makes the result of a `readUint64` custom reader `bigint` instead of `number | bigint`. A custom reader that adds a field sees that field after narrowing. The change narrows a result type, so existing assignments keep compiling. The first pull request ships this fix alone.
+
+**Limits.** A generic custom reader resolves to the option only when it returns exactly a built-in box type. A generic custom reader with an extra field infers `number | bigint` for the wide field. The guide documents the two supported forms: a non-generic reader with `readUint64`, and a generic reader that returns a built-in box type.
+
+### Compatibility
+
+- No runtime behavior changes when the option is absent. The default readers produce the same objects.
+- Every public type keeps its meaning when written without a type argument. The spike asserts this for the view, the parsed box types, and the result of `readIsoBoxes`.
+- The type declarations keep working on TypeScript 5.7. The spike compiles under 5.7.3.
+- `IsoBoxReadView<'bigint'>` is not assignable to `IsoBoxReadView<'number'>` or the reverse. A generic reader accepts both.
+- The API report `libs/iso-bmff/config/cml-iso-bmff.api.md` changes for every declaration in the table above.
+
+## Drawbacks
+
+- **Type parameter noise.** About 45 declarations gain a parameter. Hover text shows `TrackFragmentBaseMediaDecodeTimeBox<"number">` where it shows `TrackFragmentBaseMediaDecodeTimeBox` today. Adopters who never set the option see the parameter in every box type.
+- **Inference that depends on compiler details.** The union in `IsoBoxReaderMap` and the two-way check in `IsoBoxReaderReturn` rely on how TypeScript instantiates generic functions. A future TypeScript release could change either, and a maintainer could simplify the union away without seeing why it exists. The type tests from the spike move into the package test suite to guard both.
+- **Partial coverage of custom readers.** A generic custom reader with extra fields does not follow the option.
+- **Duplicate methods.** The view gains two read methods that differ from `readUint` and `readInt` only in the option branch, and the writer gains two.
+- **Size.** Every adopter of the read view carries about 400 bytes more source for a feature most of them do not use.
+- **Need.** Six fields can overflow in practice, and the known downstream adopter needs one of them. The custom reader with `readUint64` covers that adopter today, with the `IsoBoxReaderReturn` fix.
+
+## Rationale and alternatives
+
+### Why the option is worth its cost
+
+The built-in readers return wrong values for valid files. The documented workaround is correct for one box and expensive for a player that needs exact `tfdt`, `sidx`, `tfra`, `prft`, `emsg`, and `elst` values. Such a player copies six readers and keeps them in step with the package. The option gives exact values and exact types for every 64-bit field with one line, and it costs nothing when it is off.
+
+The alternative that the maintainers may prefer is to stop after the first pull request. That fix makes the documented workaround type-correct, and the second pull request can wait for a second adopter who needs more than `tfdt`. The RFC asks the reviewers to make that call.
+
+### Rejected in issue #611
+
+- **Change the fields to `bigint`.** Breaks every adopter that does arithmetic on those fields. Not acceptable in a 1.x release.
+- **Return `number | bigint` from `readUint(8)`.** Every caller branches on the type of the value.
+- **A helper in `@svta/cml-utils`.** `readUint` is private to the package, and the method belongs next to it.
+
+### Rejected in this RFC
+
+- **A branch in the `read` dispatch.** A version 0 field would stay a `number` while a version 1 field became a `bigint`. That is the union that #611 rejected. See [Where the branch lives](#where-the-branch-lives).
+- **A parallel set of box types**, such as `TrackFragmentBaseMediaDecodeTimeBox64` and `IsoBoxMap64`. Eleven box types, eight containers, and every derived type exist twice. The generic parameter with a default gives the same two instantiations from one declaration.
+- **A conditional type keyed on the configuration literal**, such as `IsoBoxReaderReturn<R, C extends IsoBoxReadViewConfig>`. This is a notation for the same design. The box types still need a parameter, and the configuration type still carries the option. The generic parameter is the simpler notation.
+- **A second set of readers**, such as `readTfdt64`, with no option. The readers tree-shake perfectly and nothing branches at runtime. Against it: eleven near-duplicate exports, and no way to switch `defaultReaderConfig()` without a parameter that is an option by another name. The box types still need the parameter so that `ParsedIsoBox<'bigint'>` exists.
+- **A `bigint` option on `IsoBoxWriteViewConfig`.** The value carries its type. The writers accept both and check `typeof` once per 64-bit field.
+- **Throwing on overflow**, as shaka-player does. A thrown error at a `tfdt` read stops playback of a valid stream. The rounding bug is better than a hard stop, and the option removes both.
+
+## Prior art
+
+- shaka-player: `DataViewReader.readUint64` throws `JS_INTEGER_OVERFLOW` when the high word exceeds `0x1FFFFF`, that is, when the value reaches 2^53.
+- hls.js: `mp4-tools.ts` builds 64-bit values as `number` from two 32-bit halves for `tfdt` and `sidx`. Only the `emsg` path checks `Number.isSafeInteger`.
+- Both libraries predate `BigInt` in their minimum runtimes. CML targets ES2019 for the same reason, which is why the option is off by default and never references `BigInt` at module load.
+
+## Unresolved questions
+
+1. **Name.** `int64` as proposed, `uint64` as in #611, or a boolean such as `bigint: true`. The literal union matches the package's other options and gives autocomplete.
+2. **Method names.** `readWideUint` and `readWideInt`, or another word for "follows the option". Overloading `readUint64` was rejected, because it returns `bigint` without the option today.
+3. **Version 0 fields.** This RFC gives them the `bigint` type with the option on, for one field type per box. The alternative, `bigint` in version 1 only, is the rejected union.
+4. **Scope.** All 64-bit fields, as proposed, or the six time fields only. The RFC prefers all, so the adopter does not need the table in [Motivation](#motivation).
+5. **BigInt-less runtime with the option on.** Throw in the constructor, as proposed, or throw at the first 64-bit read.
+6. **Ship the `IsoBoxReaderReturn` fix first.** The RFC proposes a separate pull request. Reviewers may prefer one.
+
+## Future possibilities
+
+- A major release could flip the default to `'bigint'`. The type parameter makes that a one-line change in the declarations and a migration note for adopters.
+- `IsoBoxReadView.readInt64`, the signed partner of `readUint64`, for custom readers of signed fields. `readWideInt` needs the same `getBigInt64` call, so the method falls out of the implementation.
+
+## Final Decision
+
+Pending review.
