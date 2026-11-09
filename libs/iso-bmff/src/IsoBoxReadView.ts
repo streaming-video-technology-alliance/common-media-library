@@ -14,6 +14,7 @@ import { readString } from './utils/readString.ts'
 import { readTemplate } from './utils/readTemplate.ts'
 import { readTerminatedString } from './utils/readTerminatedString.ts'
 import { readUint } from './utils/readUint.ts'
+import { readUint64 } from './utils/readUint64.ts'
 import { readUtf8String } from './utils/readUtf8String.ts'
 import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
 
@@ -171,6 +172,21 @@ export class IsoBoxReadView {
 	 */
 	readUint = (size: number): number => {
 		return this.read(UINT, size)
+	}
+
+	/**
+	 * Reads a 64-bit unsigned integer from the data view as a `bigint`.
+	 *
+	 * `readUint(8)` returns a `number` and loses precision above 2^53 - 1.
+	 * Use this method for a 64-bit field whose value can exceed that limit,
+	 * such as `baseMediaDecodeTime` in a version 1 `tfdt` box.
+	 *
+	 * @returns The unsigned integer as a `bigint`.
+	 */
+	readUint64 = (): bigint => {
+		const value = readUint64(this.dataView, this.offset)
+		this.offset += 8
+		return value
 	}
 
 	/**

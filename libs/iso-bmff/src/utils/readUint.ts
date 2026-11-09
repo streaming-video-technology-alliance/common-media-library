@@ -25,8 +25,8 @@ export function readUint(dataView: DataView, offset: number, size: number): numb
 			break
 
 		case 8:
-			// Warning: JavaScript cannot handle 64-bit integers natively.
-			// This will give unexpected results for integers >= 2^53
+			// A number loses precision for integers >= 2^53.
+			// IsoBoxReadView.readUint64 returns the exact value as a bigint.
 			s1 = dataView.getUint32(cursor)
 			s2 = dataView.getUint32(cursor + 4)
 			value = s1 * Math.pow(2, 32) + s2

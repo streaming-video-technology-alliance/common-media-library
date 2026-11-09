@@ -486,6 +486,7 @@ export class IsoBoxReadView {
     readString: (size: number) => string;
     readTemplate: (size: number) => number;
     readUint: (size: number) => number;
+    readUint64: () => bigint;
     readUtf8: (size?: number) => string;
     slice: (offset: number, size: number) => IsoBoxReadView;
 }
@@ -522,6 +523,7 @@ export class IsoBoxWriteView {
     writeTemplate: (value: number, size: number) => void;
     writeTerminatedString: (value: string) => void;
     writeUint: (value: number, size: number) => void;
+    writeUint64: (value: bigint) => void;
     writeUtf8TerminatedString: (value: string) => void;
 }
 
