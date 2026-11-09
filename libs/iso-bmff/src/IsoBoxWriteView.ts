@@ -103,8 +103,7 @@ export class IsoBoxWriteView {
 	 * @throws RangeError if `value` is negative or greater than 2^64 - 1.
 	 */
 	writeUint64 = (value: bigint): void => {
-		// BigInt is referenced only here, so a runtime without BigInt can still import the package.
-		if (value < BigInt(0) || value > BigInt('0xffffffffffffffff')) {
+		if (BigInt.asUintN(64, value) !== value) {
 			throw new RangeError(
 				`writeUint64: value must be in the range 0 to 2^64 - 1, received ${value}`,
 			)
