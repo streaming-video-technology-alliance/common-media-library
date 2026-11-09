@@ -69,8 +69,12 @@ describe('IsoBoxReadView.readUint64', function () {
 	})
 
 	it('should throw on a box too short for the value', function () {
+		// A version 1 tfdt whose declared size leaves four bytes for the eight-byte field.
+		const short = TFDT_V1.slice(0, 16)
+		short[3] = 0x10
+
 		assert.throws(() => {
-			readIsoBoxes(TFDT_V1.subarray(0, 16), { readers: { tfdt: readTfdt64 } })
+			readIsoBoxes(short, { readers: { tfdt: readTfdt64 } })
 		}, RangeError)
 	})
 })
