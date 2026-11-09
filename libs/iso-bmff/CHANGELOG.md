@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `IsoBoxReadView.readUint64` and `IsoBoxWriteView.writeUint64` read and write a 64-bit unsigned integer as a `bigint`. `readUint(8)` and `writeUint(value, 8)` use a `number`, which loses precision above 2^53 - 1. A custom reader for a 64-bit field, such as `baseMediaDecodeTime` in a version 1 `tfdt` box, can now keep the exact value ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+
 ### Changed
 
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.

@@ -72,6 +72,35 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
+## Reading 64-bit fields
+
+The built-in readers return every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
+
+If your code needs the exact value, write a custom reader that calls `readUint64`. The method returns a `bigint`:
+
+```typescript
+import { readIsoBoxes, type IsoBoxReadView } from "@svta/cml-iso-bmff";
+
+const readTfdt64 = (view: IsoBoxReadView) => {
+	const { version, flags } = view.readFullBox();
+	const baseMediaDecodeTime =
+		version === 1 ? view.readUint64() : BigInt(view.readUint(4));
+	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+};
+
+const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
+	r.arrayBuffer(),
+);
+
+const boxes = readIsoBoxes(buffer, {
+	readers: {
+		tfdt: readTfdt64,
+	},
+});
+```
+
+`IsoBoxWriteView.writeUint64` is the matching method for writing a `bigint`.
+
 <!-- libs/iso-bmff/docs/utilities.md -->
 ---
 title: Utilities
@@ -237,6 +266,27 @@ const readableStream = createIsoBoxReadableStream(boxes, defaultWriterConfig());
 const stream = await transport.createBidirectionalStream();
 readableStream.pipeTo(stream.writable);
 ```
+
+## Writing 64-bit fields
+
+The built-in writers take every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
+
+If your code has the exact value as a `bigint`, write the box with `IsoBoxWriteView` and call `writeUint64`:
+
+```typescript
+import { IsoBoxWriteView } from "@svta/cml-iso-bmff";
+
+const writeTfdt64 = (baseMediaDecodeTime: bigint) => {
+	const writer = new IsoBoxWriteView("tfdt", 20);
+	writer.writeFullBox(1, 0);
+	writer.writeUint64(baseMediaDecodeTime);
+	return writer;
+};
+
+const tfdt = writeTfdt64(BigInt("17900000000000000"));
+```
+
+The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects. `IsoBoxReadView.readUint64` is the matching method for reading a `bigint`.
 
 ## Type safety
 
@@ -766,6 +816,7 @@ export class IsoBoxReadView {
     readString: (size: number) => string;
     readTemplate: (size: number) => number;
     readUint: (size: number) => number;
+    readUint64: () => bigint;
     readUtf8: (size?: number) => string;
     slice: (offset: number, size: number) => IsoBoxReadView;
 }
@@ -802,6 +853,7 @@ export class IsoBoxWriteView {
     writeTemplate: (value: number, size: number) => void;
     writeTerminatedString: (value: string) => void;
     writeUint: (value: number, size: number) => void;
+    writeUint64: (value: bigint) => void;
     writeUtf8TerminatedString: (value: string) => void;
 }
 

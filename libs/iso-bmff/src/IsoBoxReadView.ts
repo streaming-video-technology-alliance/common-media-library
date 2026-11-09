@@ -174,6 +174,24 @@ export class IsoBoxReadView {
 	}
 
 	/**
+	 * Reads a 64-bit unsigned integer from the data view as a `bigint`.
+	 *
+	 * `readUint(8)` returns a `number` and loses precision above 2^53 - 1.
+	 * Use this method for a 64-bit field whose value can exceed that limit,
+	 * such as `baseMediaDecodeTime` in a version 1 `tfdt` box.
+	 *
+	 * @returns The unsigned integer as a `bigint`.
+	 *
+	 * @example
+	 * {@includeCode ../test/readUint64.test.ts#example}
+	 */
+	readUint64 = (): bigint => {
+		const value = this.dataView.getBigUint64(this.cursor)
+		this.offset += 8
+		return value
+	}
+
+	/**
 	 * Reads a signed integer from the data view.
 	 *
 	 * @param size - The size of the integer in bytes.
