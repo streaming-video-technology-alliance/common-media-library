@@ -40,7 +40,18 @@ describe('IsoBoxReadView.readUint64', function () {
 		assert.ok(box)
 		assert.strictEqual(box.type, 'tfdt')
 		assert.strictEqual(box.baseMediaDecodeTime, BigInt('9007199254740993'))
-		assert.strictEqual(Number(box.baseMediaDecodeTime), 2 ** 53)
+	})
+
+	it('should read the value that readUint(8) rounds', function () {
+		const readTfdt = (view: IsoBoxReadView) => {
+			const { version, flags } = view.readFullBox()
+			return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime: view.readUint(8) }
+		}
+		const [box] = readIsoBoxes(TFDT_V1, { readers: { tfdt: readTfdt } })
+
+		assert.ok(box)
+		assert.strictEqual(box.type, 'tfdt')
+		assert.strictEqual(box.baseMediaDecodeTime, 2 ** 53)
 	})
 
 	it('should read the maximum value', function () {
