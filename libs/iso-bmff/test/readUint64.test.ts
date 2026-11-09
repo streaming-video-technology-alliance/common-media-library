@@ -11,10 +11,26 @@ const readTfdt64 = (view: IsoBoxReadView) => {
 
 // A version 1 tfdt box. baseMediaDecodeTime is 2^53 + 1, which a number cannot hold.
 const TFDT_V1 = new Uint8Array([
-	0x00, 0x00, 0x00, 0x14, // size = 20
-	0x74, 0x66, 0x64, 0x74, // 'tfdt'
-	0x01, 0x00, 0x00, 0x00, // version = 1, flags = 0
-	0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, // baseMediaDecodeTime
+	0x00,
+	0x00,
+	0x00,
+	0x14, // size = 20
+	0x74,
+	0x66,
+	0x64,
+	0x74, // 'tfdt'
+	0x01,
+	0x00,
+	0x00,
+	0x00, // version = 1, flags = 0
+	0x00,
+	0x20,
+	0x00,
+	0x00,
+	0x00,
+	0x00,
+	0x00,
+	0x01, // baseMediaDecodeTime
 ])
 
 describe('IsoBoxReadView.readUint64', function () {
@@ -24,7 +40,7 @@ describe('IsoBoxReadView.readUint64', function () {
 		assert.ok(box)
 		assert.strictEqual(box.type, 'tfdt')
 		assert.strictEqual(box.baseMediaDecodeTime, BigInt('9007199254740993'))
-		assert.notStrictEqual(Number(box.baseMediaDecodeTime), 9007199254740993)
+		assert.strictEqual(Number(box.baseMediaDecodeTime), 2 ** 53)
 	})
 
 	it('should read the maximum value', function () {
