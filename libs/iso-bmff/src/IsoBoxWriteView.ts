@@ -2,8 +2,6 @@ import { encodeText } from '@svta/cml-utils'
 import { TEMPLATE, UINT } from './IsoBoxFields.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 
-const MAX_UINT64 = BigInt('0xffffffffffffffff')
-
 /**
  * A view for writing ISO BMFF data.
  *
@@ -105,7 +103,8 @@ export class IsoBoxWriteView {
 	 * @throws RangeError if `value` is negative or greater than 2^64 - 1.
 	 */
 	writeUint64 = (value: bigint): void => {
-		if (value < BigInt(0) || value > MAX_UINT64) {
+		// BigInt is referenced only here, so a runtime without BigInt can still import the package.
+		if (value < BigInt(0) || value > BigInt('0xffffffffffffffff')) {
 			throw new RangeError(
 				`writeUint64: value must be in the range 0 to 2^64 - 1, received ${value}`,
 			)
