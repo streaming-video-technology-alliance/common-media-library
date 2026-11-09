@@ -181,6 +181,9 @@ export class IsoBoxReadView {
 	 * such as `baseMediaDecodeTime` in a version 1 `tfdt` box.
 	 *
 	 * @returns The unsigned integer as a `bigint`.
+	 *
+	 * @example
+	 * {@includeCode ../test/readUint64.test.ts#example}
 	 */
 	readUint64 = (): bigint => {
 		const value = this.dataView.getBigUint64(this.cursor)

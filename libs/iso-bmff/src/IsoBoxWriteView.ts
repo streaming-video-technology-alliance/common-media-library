@@ -101,6 +101,9 @@ export class IsoBoxWriteView {
 	 *
 	 * @param value - The value to write, from 0 to 2^64 - 1.
 	 * @throws RangeError if `value` is negative or greater than 2^64 - 1.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeUint64.test.ts#example}
 	 */
 	writeUint64 = (value: bigint): void => {
 		if (BigInt.asUintN(64, value) !== value) {
