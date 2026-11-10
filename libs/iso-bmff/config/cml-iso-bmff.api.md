@@ -463,8 +463,8 @@ export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view
 export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
 
 // @public
-export type IsoBoxReaderReturn<T> = { [K in keyof T]: T[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never; }[keyof T] | ParsedBox<([IsoBoxType] extends [keyof T] ? IsoBox : Exclude<IsoBox, {
-    type: keyof T;
+export type IsoBoxReaderReturn<T, R = NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]>> = { [K in keyof T]: T[K] extends ((...args: never[]) => infer B) ? ParsedBox<B> : never; }[keyof T] | ParsedBox<([string] extends [R] ? IsoBox : Exclude<IsoBox, {
+    type: R;
 }>) | Box>;
 
 // @public

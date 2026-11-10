@@ -6,6 +6,8 @@ import {
 	readFtyp,
 	readIsoBoxes,
 	readStsd,
+	readTfdt,
+	readUrl,
 	type IsoBoxReadView,
 } from './util/box.ts'
 
@@ -105,6 +107,47 @@ describe('readIsoBoxes', function () {
 			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
 		} else {
 			assert.fail('expected a tfdt box')
+		}
+	})
+
+	it('should keep the built-in box type when its reader is optional', function () {
+		// A version 0 tfdt box with baseMediaDecodeTime = 1.
+		const bytes = new Uint8Array([
+			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x01,
+		])
+		const readers: { tfdt?: typeof readTfdt } = {}
+
+		const [box] = readIsoBoxes(bytes.buffer, { readers })
+
+		assert.ok(box)
+		// The reader may be absent, so the built-in tfdt type stays in the union.
+		if (box.type === 'tfdt') {
+			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+		} else {
+			assert.fail('expected a tfdt box')
+		}
+	})
+
+	it('should exclude the built-in url box type for a trimmed url key', function () {
+		// A 'url ' box with the self-contained flag set and no location.
+		const bytes = new Uint8Array([
+			0x00, 0x00, 0x00, 0x0c, 0x75, 0x72, 0x6c, 0x20, 0x00, 0x00, 0x00, 0x01,
+		])
+		const readUrlCustom = (view: IsoBoxReadView) => ({
+			...readUrl(view),
+			custom: true,
+		})
+
+		// The view looks a reader up by the trimmed type too, so `url` replaces `'url '`.
+		const [box] = readIsoBoxes(bytes.buffer, { readers: { url: readUrlCustom } })
+
+		assert.ok(box)
+		if (box.type === 'url ') {
+			expectType<Equal<typeof box.custom, boolean>>(true)
+			assert.strictEqual(box.custom, true)
+		} else {
+			assert.fail('expected a url box')
 		}
 	})
 })
