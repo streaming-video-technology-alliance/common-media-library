@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-10
+
 ### Added
 
 - `IsoBoxReadView.readUint64` and `IsoBoxWriteView.writeUint64` read and write a 64-bit unsigned integer as a `bigint`. `readUint(8)` and `writeUint(value, 8)` use a `number`, which loses precision above 2^53 - 1. A custom reader for a 64-bit field, such as `baseMediaDecodeTime` in a version 1 `tfdt` box, can now keep the exact value ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
@@ -209,7 +211,8 @@ Official stable release. No changes since 1.0.0-beta.2.
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.7...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.1.0...HEAD
+[1.1.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.7...iso-bmff-v1.1.0
 [1.0.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.6...iso-bmff-v1.0.7
 [1.0.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.5...iso-bmff-v1.0.6
 [1.0.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/iso-bmff-v1.0.4...iso-bmff-v1.0.5
