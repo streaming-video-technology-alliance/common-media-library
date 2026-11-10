@@ -1,0 +1,27 @@
+import { assert, describe, it, IsoBoxReadView } from './util/box.ts'
+
+const CASES: [value: number, bytes: number[]][] = [
+	[-1, [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]],
+	[2147483648, [0x00, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00]],
+	[-2, [0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe]],
+	[1024, [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00]],
+]
+
+describe('IsoBoxReadView.readInt', function () {
+	for (const [value, bytes] of CASES) {
+		it(`should read ${value} from eight bytes`, function () {
+			const view = new IsoBoxReadView(new Uint8Array(bytes))
+
+			assert.strictEqual(view.readInt(8), value)
+		})
+	}
+
+	it('should read an array of 64-bit signed integers', function () {
+		const view = new IsoBoxReadView(new Uint8Array(CASES.flatMap(([, bytes]) => bytes)))
+
+		assert.deepStrictEqual(
+			view.readArray('int', 8, CASES.length),
+			CASES.map(([value]) => value),
+		)
+	})
+})
