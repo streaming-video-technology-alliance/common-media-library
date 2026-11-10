@@ -17,18 +17,18 @@ and this project adheres to
 - `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReaderReturn` now includes the return type of an optional reader and no longer includes `undefined` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReadView.readInt(8)` now returns the correct value for a signed 64-bit integer such as -1. `readElst` now returns the correct `mediaTime` for a version 1 `elst` box, where -1 marks an empty edit. Earlier releases return -4294967297 for -1.
-- `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value. The bytes `00 01 80 00` now read as 1.5. The fix applies to `rate`, `volume`, `matrix`, `width`, `height`, `horizresolution`, `vertresolution`, and `samplerate` in the built-in readers.
-- `readMvhd` and `readTkhd` now read `rate`, `volume`, and `matrix` as signed values. A `matrix` entry of -1, as in a rotated video, now reads as -1.
-- `readTkhd` now reads `layer` and `alternateGroup` as signed values. A `layer` of -1 now reads as -1.
+- `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value, so the bytes `00 01 80 00` read as 1.5. Earlier releases return 8193 for these bytes. The built-in readers now return the correct fraction of `rate`, `volume`, `matrix`, `width`, `height`, `horizresolution`, `vertresolution`, and `samplerate`.
+- `readMvhd` and `readTkhd` now read `rate`, `volume`, and `matrix` as signed values. A `matrix` entry of -1, as in a rotated video, now reads as -1. Earlier releases return 65535 for this entry.
+- `readTkhd` now reads `layer` and `alternateGroup` as signed values. A `layer` of -1 now reads as -1. Earlier releases return 65535 for this `layer`.
 - `readMvhd` and `readTkhd` now read the `matrix` entries u, v, and w (indexes 2, 5, and 8) as 2.30 values. The entry w of the identity matrix now reads as 1. Code that compares w with 16384 must compare with 1.
-- `writeMvhd` and `writeTkhd` now write the `matrix` entries u, v, and w as 2.30 values. The identity matrix is now `[1, 0, 0, 0, 1, 0, 0, 0, 1]`. A caller that passes 16384 for w must now pass 1.
+- `writeMvhd` and `writeTkhd` now write the `matrix` entries u, v, and w as 2.30 values. The identity matrix is now `[1, 0, 0, 0, 1, 0, 0, 0, 1]`. A caller that passes 16384 for w must now pass 1, because 16384 now writes 0.
 - `readSmhd` now reads `balance` as a signed 8.8 value. Full right now reads as 1, and full left reads as -1. Earlier releases return 256 and 65280.
 - `writeSmhd` now writes `balance` as a signed 8.8 value. A caller that passes 256 for full right must now pass 1, because 256 now writes 0.
 
 ### Changed
 
 - The documentation of `IsoBoxReadView.readTemplate` now states that a template is an unsigned fixed-point value.
-- The documentation of the `matrix` field of `MovieHeaderBox` and `TrackHeaderBox` now states the entry order and the identity matrix.
+- The documentation of the `matrix` field of `MovieHeaderBox` and `TrackHeaderBox` now states the entry order and the identity matrix. The documentation also states the stored formats.
 - The documentation of the `balance` field of `SoundMediaHeaderBox` now states the values for full left, center, and full right.
 - The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.

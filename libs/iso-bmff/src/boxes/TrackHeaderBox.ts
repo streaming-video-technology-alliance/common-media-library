@@ -20,6 +20,7 @@ export type TrackHeaderBox = FullBox & {
 	/**
 	 * The transformation matrix in the order a, b, u, c, d, v, x, y, w.
 	 * The identity matrix is `[1, 0, 0, 0, 1, 0, 0, 0, 1]`.
+	 * The box stores u, v, and w as 2.30 values, and the other entries as 16.16 values.
 	 */
 	matrix: number[]
 	width: number
