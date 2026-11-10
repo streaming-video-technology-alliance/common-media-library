@@ -9,6 +9,15 @@ import {
 	type IsoBoxReadView,
 } from './util/box.ts'
 
+/** `true` when `A` and `B` are the same type, otherwise `false`. */
+type Equal<A, B> =
+	(<X>() => X extends A ? 1 : 2) extends <X>() => X extends B ? 1 : 2 ? true : false
+
+/** Compile-time assertion. `expectType<Equal<A, B>>(true)` compiles only when `A` and `B` are the same type. */
+function expectType<T>(value: T): T {
+	return value
+}
+
 describe('readIsoBoxes', function () {
 	it('should read a buffer', function () {
 		// #region example
@@ -52,5 +61,50 @@ describe('readIsoBoxes', function () {
 		const box = boxes[0]
 		assert.strictEqual(box.type, 'test')
 		assert.strictEqual(box.value, 0xffffffff)
+	})
+
+	it('should narrow a custom reader of a built-in box to the return type of that reader', function () {
+		// A version 1 tfdt box with baseMediaDecodeTime = 2^53 + 1.
+		const bytes = new Uint8Array([
+			0x00, 0x00, 0x00, 0x14, 0x74, 0x66, 0x64, 0x74, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x01,
+		])
+		const readTfdt64 = (view: IsoBoxReadView) => {
+			const { version, flags } = view.readFullBox()
+			const baseMediaDecodeTime = version === 1 ? view.readUint64() : BigInt(view.readUint(4))
+			return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime, exact: true }
+		}
+
+		const [box] = readIsoBoxes(bytes.buffer, { readers: { tfdt: readTfdt64 } })
+
+		assert.ok(box)
+		if (box.type === 'tfdt') {
+			// The built-in tfdt type is not part of the union, so the field is a bigint,
+			// not `number | bigint`, and the extra field of the custom reader is visible.
+			expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
+			expectType<Equal<typeof box.exact, boolean>>(true)
+			assert.strictEqual(box.baseMediaDecodeTime, BigInt('9007199254740993'))
+			assert.strictEqual(box.exact, true)
+		} else {
+			assert.fail('expected a tfdt box')
+		}
+	})
+
+	it('should keep the built-in box types when the reader map has no literal keys', function () {
+		// A version 0 tfdt box with baseMediaDecodeTime = 1.
+		const bytes = new Uint8Array([
+			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x01,
+		])
+		const name: string = 'ftyp'
+		// The key is not a literal, so `keyof` the map is `string` and no built-in type is excluded.
+		const [box] = readIsoBoxes(bytes.buffer, { readers: { [name]: readFtyp } })
+
+		assert.ok(box)
+		if (box.type === 'tfdt') {
+			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+		} else {
+			assert.fail('expected a tfdt box')
+		}
 	})
 })

@@ -463,7 +463,9 @@ export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view
 export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
 
 // @public
-export type IsoBoxReaderReturn<T> = { [K in keyof T]: T[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never; }[keyof T] | ParsedIsoBox;
+export type IsoBoxReaderReturn<T> = { [K in keyof T]: T[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never; }[keyof T] | ParsedBox<([IsoBoxType] extends [keyof T] ? IsoBox : Exclude<IsoBox, {
+    type: keyof T;
+}>) | Box>;
 
 // @public
 export class IsoBoxReadView {
