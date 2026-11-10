@@ -22,11 +22,14 @@ and this project adheres to
 - `readTkhd` now reads `layer` and `alternateGroup` as signed values. A `layer` of -1 now reads as -1.
 - `readMvhd` and `readTkhd` now read the `matrix` entries u, v, and w (indexes 2, 5, and 8) as 2.30 values. The entry w of the identity matrix now reads as 1. Code that compares w with 16384 must compare with 1.
 - `writeMvhd` and `writeTkhd` now write the `matrix` entries u, v, and w as 2.30 values. The identity matrix is now `[1, 0, 0, 0, 1, 0, 0, 0, 1]`. A caller that passes 16384 for w must now pass 1.
+- `readSmhd` now reads `balance` as a signed 8.8 value. Full right now reads as 1, and full left reads as -1. Earlier releases return 256 and 65280.
+- `writeSmhd` now writes `balance` as a signed 8.8 value. A caller that passes 256 for full right must now pass 1, because 256 now writes 0.
 
 ### Changed
 
 - The documentation of `IsoBoxReadView.readTemplate` now states that a template is an unsigned fixed-point value.
 - The documentation of the `matrix` field of `MovieHeaderBox` and `TrackHeaderBox` now states the entry order and the identity matrix.
+- The documentation of the `balance` field of `SoundMediaHeaderBox` now states the values for full left, center, and full right.
 - The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
 - `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.
