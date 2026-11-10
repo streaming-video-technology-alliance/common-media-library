@@ -4,7 +4,7 @@ import type { UriReplacement } from './UriReplacement.ts'
  * A pathway clone for content steering.
  *
  *
- * @beta
+ * @public
  */
 export type PathwayClone = {
 	/**

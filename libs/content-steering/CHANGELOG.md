@@ -8,9 +8,25 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `applyUriReplacement`, which builds a URI of a pathway clone from a URI of its base pathway ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- `createSteeringEngine`, a content steering engine for HLS and DASH players ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- The guide `docs/steering-engine.md`, which covers the player integration of the engine ([#608](https://github.com/streaming-video-technology-alliance/common-media-library/pull/608))
+- `SteeringProtocol`, `STEERING_PROTOCOL_HLS`, and `STEERING_PROTOCOL_DASH` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- `SteeringErrorType`, `STEERING_ERROR_TYPE_LOAD`, `STEERING_ERROR_TYPE_PARSE`, and `STEERING_ERROR_TYPE_CALLBACK` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- `code` on a `load` or `parse` `SteeringError`. The value is the SVTA2070 code from `@svta/cml-error-codes` ([#471](https://github.com/streaming-video-technology-alliance/common-media-library/pull/471))
+
 ### Changed
 
+- `UriReplacement` has the optional HLS keys `PER-VARIANT-URIS` and `PER-RENDITION-URIS` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
+- The package has peer dependencies on `@svta/cml-error-codes` and `@svta/cml-utils`. The package imports only types from `@svta/cml-utils` ([#61](https://github.com/streaming-video-technology-alliance/common-media-library/issues/61))
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- Every export has the `@public` release tag. Before, the exports had `@beta` ([#471](https://github.com/streaming-video-technology-alliance/common-media-library/pull/471))
+
+### Fixed
+
+- `isValidPathwayClone` rejects a clone whose `URI-REPLACEMENT` is an array ([#608](https://github.com/streaming-video-technology-alliance/common-media-library/pull/608))
 
 ## [0.23.1] - 2025-12-22
 
