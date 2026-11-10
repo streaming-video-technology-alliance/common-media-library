@@ -29,7 +29,8 @@ export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 		volume: readInt(2) / 256,
 		reserved1: readUint(2),
 		reserved2: readArray(UINT, 4, 2),
-		matrix: readArray(INT, 4, 9).map(value => value / 65536),
+		// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
+		matrix: readArray(INT, 4, 9).map((value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000)),
 		preDefined: readArray(UINT, 4, 6),
 		nextTrackId: readUint(4),
 	}

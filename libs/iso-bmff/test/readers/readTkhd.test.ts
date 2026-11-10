@@ -5,6 +5,9 @@ const IDENTITY = [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000]
 // A rotation of 90 degrees with a horizontal translation of 1080.
 const ROTATION = [0, 0x10000, 0, -0x10000, 0, 0, 1080 * 0x10000, 0, 0x40000000]
 
+// The entries u and v are -0.5 and 1.5.
+const PROJECTION = [0x10000, 0, -0x20000000, 0, 0x10000, 0x60000000, 0, 0, 0x40000000]
+
 // A version 0 tkhd box. The arguments are the stored integers of the fixed-point fields.
 function createTkhd(volume: number, matrix: number[], width: number, height: number): Uint8Array {
 	const bytes = new Uint8Array(92)
@@ -33,11 +36,10 @@ function read(bytes: Uint8Array) {
 describe('readTkhd', function () {
 	it('should read the default values', function () {
 		const box = read(createTkhd(0x0100, IDENTITY, 1920 * 0x10000, 1080 * 0x10000))
-		const [a, b, , c, d, , x, y] = box.matrix
 
 		assert.strictEqual(box.trackId, 1)
 		assert.strictEqual(box.volume, 1)
-		assert.deepStrictEqual([a, b, c, d, x, y], [1, 0, 0, 1, 0, 0])
+		assert.deepStrictEqual(box.matrix, [1, 0, 0, 0, 1, 0, 0, 0, 1])
 		assert.strictEqual(box.width, 1920)
 		assert.strictEqual(box.height, 1080)
 	})
@@ -63,9 +65,14 @@ describe('readTkhd', function () {
 
 	it('should read a negative matrix entry', function () {
 		const box = read(createTkhd(0, ROTATION, 1920 * 0x10000, 1080 * 0x10000))
-		const [a, b, , c, d, , x, y] = box.matrix
 
-		assert.deepStrictEqual([a, b, c, d, x, y], [0, 1, -1, 0, 1080, 0])
+		assert.deepStrictEqual(box.matrix, [0, 1, 0, -1, 0, 0, 1080, 0, 1])
+	})
+
+	it('should read u, v, and w as 2.30 values', function () {
+		const box = read(createTkhd(0, PROJECTION, 0, 0))
+
+		assert.deepStrictEqual(box.matrix, [1, 0, -0.5, 0, 1, 1.5, 0, 0, 1])
 	})
 
 	it('should read the width and the height as unsigned values', function () {
@@ -76,7 +83,7 @@ describe('readTkhd', function () {
 	})
 
 	it('should read values that writeTkhd writes back as the same bytes', function () {
-		const bytes = createTkhd(-0x80, ROTATION, 0x9c408000, 1080 * 0x10000)
+		const bytes = createTkhd(-0x80, PROJECTION, 0x9c408000, 1080 * 0x10000)
 		const view = new DataView(bytes.buffer)
 		view.setInt16(40, -1)
 		view.setInt16(42, -2)

@@ -5,6 +5,9 @@ const IDENTITY = [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000]
 // A rotation of 90 degrees with a horizontal translation of 1080.
 const ROTATION = [0, 0x10000, 0, -0x10000, 0, 0, 1080 * 0x10000, 0, 0x40000000]
 
+// The entries u and v are -0.5 and 1.5.
+const PROJECTION = [0x10000, 0, -0x20000000, 0, 0x10000, 0x60000000, 0, 0, 0x40000000]
+
 // A version 0 mvhd box. The arguments are the stored integers of the fixed-point fields.
 function createMvhd(rate: number, volume: number, matrix: number[]): Uint8Array {
 	const bytes = new Uint8Array(108)
@@ -33,12 +36,11 @@ function read(bytes: Uint8Array) {
 describe('readMvhd', function () {
 	it('should read the default values', function () {
 		const box = read(createMvhd(0x10000, 0x0100, IDENTITY))
-		const [a, b, , c, d, , x, y] = box.matrix
 
 		assert.strictEqual(box.timescale, 1000)
 		assert.strictEqual(box.rate, 1)
 		assert.strictEqual(box.volume, 1)
-		assert.deepStrictEqual([a, b, c, d, x, y], [1, 0, 0, 1, 0, 0])
+		assert.deepStrictEqual(box.matrix, [1, 0, 0, 0, 1, 0, 0, 0, 1])
 		assert.strictEqual(box.nextTrackId, 2)
 	})
 
@@ -54,13 +56,18 @@ describe('readMvhd', function () {
 
 	it('should read a negative matrix entry', function () {
 		const box = read(createMvhd(0x10000, 0x0100, ROTATION))
-		const [a, b, , c, d, , x, y] = box.matrix
 
-		assert.deepStrictEqual([a, b, c, d, x, y], [0, 1, -1, 0, 1080, 0])
+		assert.deepStrictEqual(box.matrix, [0, 1, 0, -1, 0, 0, 1080, 0, 1])
+	})
+
+	it('should read u, v, and w as 2.30 values', function () {
+		const box = read(createMvhd(0x10000, 0x0100, PROJECTION))
+
+		assert.deepStrictEqual(box.matrix, [1, 0, -0.5, 0, 1, 1.5, 0, 0, 1])
 	})
 
 	it('should read values that writeMvhd writes back as the same bytes', function () {
-		const bytes = createMvhd(-0x8000, -0x80, ROTATION)
+		const bytes = createMvhd(-0x8000, -0x80, PROJECTION)
 		const writer = writeMvhd(read(bytes))
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)

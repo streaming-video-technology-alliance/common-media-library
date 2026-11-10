@@ -29,7 +29,10 @@ export function readTkhd(view: IsoBoxReadView): TrackHeaderBox {
 		alternateGroup: view.readInt(2),
 		volume: view.readInt(2) / 256,
 		reserved3: view.readUint(2),
-		matrix: view.readArray(INT, 4, 9).map(value => value / 65536),
+		// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
+		matrix: view
+			.readArray(INT, 4, 9)
+			.map((value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000)),
 		width: view.readTemplate(4),
 		height: view.readTemplate(4),
 	}

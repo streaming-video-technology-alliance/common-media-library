@@ -17,6 +17,10 @@ export type TrackHeaderBox = FullBox & {
 	alternateGroup: number
 	volume: number
 	reserved3: number
+	/**
+	 * The transformation matrix in the order a, b, u, c, d, v, x, y, w.
+	 * The identity matrix is `[1, 0, 0, 0, 1, 0, 0, 0, 1]`.
+	 */
 	matrix: number[]
 	width: number
 	height: number
