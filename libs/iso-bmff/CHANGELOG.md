@@ -14,11 +14,13 @@ and this project adheres to
 
 ### Fixed
 
-- `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReaderReturn` now includes the return type of an optional reader and no longer includes `undefined` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 
 ### Changed
 
+- The result type of `readIsoBoxes` now has only the box types that the reader map parses, the container types, and the header-only box type. A built-in type whose reader is not in the map is no longer in the union, and `box.type === 'tfdt'` is then a compile error. To keep your code compiling, register the reader of each box type that it narrows to, or spread `defaultReaderConfig().readers` into the map ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `readIsoBoxes` without a configuration now returns `ParsedBox<IsoBoxContainer | Box>[]` instead of `ParsedIsoBox[]`. Every box of that result is a container or header-only. The type no longer names a built-in box that the call did not parse ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `defaultReaderConfig` now returns `{ readers: DefaultReaderMap }`. The new `DefaultReaderMap` type lists the built-in reader of every box type. The result of `readIsoBoxes` with the default configuration therefore has every built-in box type ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
 - `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.

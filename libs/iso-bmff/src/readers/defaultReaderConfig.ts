@@ -1,4 +1,3 @@
-import type { IsoBoxReadViewConfig } from '../IsoBoxReadViewConfig.ts'
 import { readArdi } from './readArdi.ts'
 import { readAvc1 } from './readAvc1.ts'
 import { readAvc2 } from './readAvc2.ts'
@@ -61,13 +60,92 @@ import { readVttC } from './readVttC.ts'
 import { readVtte } from './readVtte.ts'
 
 /**
- * Create a default reader configuration with all available readers pre-configured.
+ * The reader map of `defaultReaderConfig`. Every key is a box type and the
+ * value is the built-in reader of that box.
  *
- * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ * Spread the map into a custom map to replace one reader. The result type of
+ * `readIsoBoxes` then has the return type of the custom reader and the
+ * built-in types of the other boxes.
+ *
+ * @example
+ * {@includeCode ../../test/readIsoBoxes.test.ts#spread}
  *
  * @public
  */
-export function defaultReaderConfig(): IsoBoxReadViewConfig {
+export type DefaultReaderMap = {
+	ardi: typeof readArdi
+	avc1: typeof readAvc1
+	avc2: typeof readAvc2
+	avc3: typeof readAvc3
+	avc4: typeof readAvc4
+	ctts: typeof readCtts
+	dref: typeof readDref
+	elng: typeof readElng
+	elst: typeof readElst
+	emsg: typeof readEmsg
+	enca: typeof readEnca
+	encv: typeof readEncv
+	free: typeof readFree
+	frma: typeof readFrma
+	ftyp: typeof readFtyp
+	hdlr: typeof readHdlr
+	hev1: typeof readHev1
+	hvc1: typeof readHvc1
+	iden: typeof readIden
+	imda: typeof readImda
+	kind: typeof readKind
+	labl: typeof readLabl
+	mdat: typeof readMdat
+	mdhd: typeof readMdhd
+	mehd: typeof readMehd
+	meta: typeof readMeta
+	mfhd: typeof readMfhd
+	mfro: typeof readMfro
+	mp4a: typeof readMp4a
+	mvhd: typeof readMvhd
+	payl: typeof readPayl
+	prft: typeof readPrft
+	prsl: typeof readPrsl
+	pssh: typeof readPssh
+	schm: typeof readSchm
+	sdtp: typeof readSdtp
+	sidx: typeof readSidx
+	skip: typeof readSkip
+	smhd: typeof readSmhd
+	ssix: typeof readSsix
+	sthd: typeof readSthd
+	stsd: typeof readStsd
+	stss: typeof readStss
+	sttg: typeof readSttg
+	stts: typeof readStts
+	styp: typeof readStyp
+	subs: typeof readSubs
+	tenc: typeof readTenc
+	tfdt: typeof readTfdt
+	tfhd: typeof readTfhd
+	tfra: typeof readTfra
+	tkhd: typeof readTkhd
+	trex: typeof readTrex
+	trun: typeof readTrun
+	'url ': typeof readUrl
+	'urn ': typeof readUrn
+	vlab: typeof readVlab
+	vmhd: typeof readVmhd
+	vttC: typeof readVttC
+	vtte: typeof readVtte
+}
+
+/**
+ * Create a default reader configuration with all available readers pre-configured.
+ *
+ * The result type of `readIsoBoxes` with this configuration has every box
+ * type that a built-in reader returns.
+ *
+ * @returns A configuration whose `readers` is a `DefaultReaderMap`
+ *
+ * @public
+ */
+export function defaultReaderConfig(): { readers: DefaultReaderMap } {
 	return {
 		readers: {
 			ardi: readArdi,

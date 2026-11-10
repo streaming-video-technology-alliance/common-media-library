@@ -140,7 +140,73 @@ export type DecodingTimeToSampleBox = FullBox & {
 };
 
 // @public
-export function defaultReaderConfig(): IsoBoxReadViewConfig;
+export function defaultReaderConfig(): {
+    readers: DefaultReaderMap;
+};
+
+// @public
+export type DefaultReaderMap = {
+    ardi: typeof readArdi;
+    avc1: typeof readAvc1;
+    avc2: typeof readAvc2;
+    avc3: typeof readAvc3;
+    avc4: typeof readAvc4;
+    ctts: typeof readCtts;
+    dref: typeof readDref;
+    elng: typeof readElng;
+    elst: typeof readElst;
+    emsg: typeof readEmsg;
+    enca: typeof readEnca;
+    encv: typeof readEncv;
+    free: typeof readFree;
+    frma: typeof readFrma;
+    ftyp: typeof readFtyp;
+    hdlr: typeof readHdlr;
+    hev1: typeof readHev1;
+    hvc1: typeof readHvc1;
+    iden: typeof readIden;
+    imda: typeof readImda;
+    kind: typeof readKind;
+    labl: typeof readLabl;
+    mdat: typeof readMdat;
+    mdhd: typeof readMdhd;
+    mehd: typeof readMehd;
+    meta: typeof readMeta;
+    mfhd: typeof readMfhd;
+    mfro: typeof readMfro;
+    mp4a: typeof readMp4a;
+    mvhd: typeof readMvhd;
+    payl: typeof readPayl;
+    prft: typeof readPrft;
+    prsl: typeof readPrsl;
+    pssh: typeof readPssh;
+    schm: typeof readSchm;
+    sdtp: typeof readSdtp;
+    sidx: typeof readSidx;
+    skip: typeof readSkip;
+    smhd: typeof readSmhd;
+    ssix: typeof readSsix;
+    sthd: typeof readSthd;
+    stsd: typeof readStsd;
+    stss: typeof readStss;
+    sttg: typeof readSttg;
+    stts: typeof readStts;
+    styp: typeof readStyp;
+    subs: typeof readSubs;
+    tenc: typeof readTenc;
+    tfdt: typeof readTfdt;
+    tfhd: typeof readTfhd;
+    tfra: typeof readTfra;
+    tkhd: typeof readTkhd;
+    trex: typeof readTrex;
+    trun: typeof readTrun;
+    "url ": typeof readUrl;
+    "urn ": typeof readUrn;
+    vlab: typeof readVlab;
+    vmhd: typeof readVmhd;
+    vttC: typeof readVttC;
+    vtte: typeof readVtte;
+};
 
 // @public
 export function defaultWriterConfig(): IsoBoxWriteViewConfig;
@@ -463,9 +529,9 @@ export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view
 export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
 
 // @public
-export type IsoBoxReaderReturn<T> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? ParsedBox<B> : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? ParsedBox<([string] extends [R] ? IsoBox : Exclude<IsoBox, {
-    type: R;
-}>) | Box> : never);
+export type IsoBoxReaderReturn<R> = NonNullable<{ [K in keyof R]: NonNullable<R[K]> extends ((...args: never[]) => infer B) ? unknown extends B ? never : ParsedBox<B> : never; }[keyof R]> | ParsedBox<([IsoBoxType] extends [keyof R] ? IsoBox : Exclude<IsoBoxContainer, {
+    type: keyof R;
+}>) | Box>;
 
 // @public
 export class IsoBoxReadView {
@@ -876,7 +942,10 @@ export function readIsoBoxes<const R extends IsoBoxReaderMap>(raw: IsoBoxData, c
     readers: R;
 }): IsoBoxReaderReturn<R>[];
 
-// @public (undocumented)
+// @public
+export function readIsoBoxes(raw: IsoBoxData): ParsedBox<IsoBoxContainer | Box>[];
+
+// @public
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[];
 
 // @public

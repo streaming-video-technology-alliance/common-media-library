@@ -42,9 +42,35 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
+A box without a reader keeps only its header fields: `type`, `size`, and `view`. A container box also has its child boxes in `boxes`. The result type follows the reader map. With the map above, `box.type === "ftyp"` narrows to `FileTypeBox`, and `box.type === "mvhd"` is a compile error, because no reader parses that box.
+
+Register the reader of every box type that your code narrows to:
+
+```typescript
+import { findIsoBox, readIsoBoxes, readMvhd } from "@svta/cml-iso-bmff";
+
+const buffer = await fetch("https://example.com/bbb.mp4").then((r) =>
+	r.arrayBuffer(),
+);
+
+const boxes = readIsoBoxes(buffer, {
+	readers: {
+		mvhd: readMvhd,
+	},
+});
+
+const mvhd = findIsoBox(boxes, (box) => box.type === "mvhd");
+
+if (mvhd) {
+	console.log(mvhd.timescale);
+}
+```
+
+To replace one built-in reader and keep the types of the other built-in boxes, spread the readers of `defaultReaderConfig()` into the map. The section [Reading 64-bit fields](#reading-64-bit-fields) shows an example.
+
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. `box.type === "emsg"` therefore narrows to the return type of the custom reader.
+A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader, so `box.type === "emsg"` narrows to the return type of that reader.
 
 HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
@@ -82,7 +108,7 @@ for (const box of boxes) {
 }
 ```
 
-The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
+The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. `box.type === "url "` narrows to the return type of that reader.
 
 ## Reading 64-bit fields
 
@@ -108,6 +134,31 @@ const boxes = readIsoBoxes(buffer, {
 	readers: {
 		tfdt: readTfdt64,
 	},
+});
+```
+
+To keep the other built-in readers, spread the readers of `defaultReaderConfig()` and replace the `tfdt` entry. The result type then has the `bigint` field for `tfdt` and the built-in type of every other box:
+
+```typescript
+import {
+	defaultReaderConfig,
+	readIsoBoxes,
+	type IsoBoxReadView,
+} from "@svta/cml-iso-bmff";
+
+const readTfdt64 = (view: IsoBoxReadView) => {
+	const { version, flags } = view.readFullBox();
+	const baseMediaDecodeTime =
+		version === 1 ? view.readUint64() : BigInt(view.readUint(4));
+	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+};
+
+const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
+	r.arrayBuffer(),
+);
+
+const boxes = readIsoBoxes(buffer, {
+	readers: { ...defaultReaderConfig().readers, tfdt: readTfdt64 },
 });
 ```
 

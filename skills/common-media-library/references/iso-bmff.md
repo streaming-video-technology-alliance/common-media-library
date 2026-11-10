@@ -72,9 +72,35 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
+A box without a reader keeps only its header fields: `type`, `size`, and `view`. A container box also has its child boxes in `boxes`. The result type follows the reader map. With the map above, `box.type === "ftyp"` narrows to `FileTypeBox`, and `box.type === "mvhd"` is a compile error, because no reader parses that box.
+
+Register the reader of every box type that your code narrows to:
+
+```typescript
+import { findIsoBox, readIsoBoxes, readMvhd } from "@svta/cml-iso-bmff";
+
+const buffer = await fetch("https://example.com/bbb.mp4").then((r) =>
+	r.arrayBuffer(),
+);
+
+const boxes = readIsoBoxes(buffer, {
+	readers: {
+		mvhd: readMvhd,
+	},
+});
+
+const mvhd = findIsoBox(boxes, (box) => box.type === "mvhd");
+
+if (mvhd) {
+	console.log(mvhd.timescale);
+}
+```
+
+To replace one built-in reader and keep the types of the other built-in boxes, spread the readers of `defaultReaderConfig()` into the map. The section [Reading 64-bit fields](#reading-64-bit-fields) shows an example.
+
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. `box.type === "emsg"` therefore narrows to the return type of the custom reader.
+A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader, so `box.type === "emsg"` narrows to the return type of that reader.
 
 HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
@@ -112,7 +138,7 @@ for (const box of boxes) {
 }
 ```
 
-The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
+The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. `box.type === "url "` narrows to the return type of that reader.
 
 ## Reading 64-bit fields
 
@@ -138,6 +164,31 @@ const boxes = readIsoBoxes(buffer, {
 	readers: {
 		tfdt: readTfdt64,
 	},
+});
+```
+
+To keep the other built-in readers, spread the readers of `defaultReaderConfig()` and replace the `tfdt` entry. The result type then has the `bigint` field for `tfdt` and the built-in type of every other box:
+
+```typescript
+import {
+	defaultReaderConfig,
+	readIsoBoxes,
+	type IsoBoxReadView,
+} from "@svta/cml-iso-bmff";
+
+const readTfdt64 = (view: IsoBoxReadView) => {
+	const { version, flags } = view.readFullBox();
+	const baseMediaDecodeTime =
+		version === 1 ? view.readUint64() : BigInt(view.readUint(4));
+	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+};
+
+const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
+	r.arrayBuffer(),
+);
+
+const boxes = readIsoBoxes(buffer, {
+	readers: { ...defaultReaderConfig().readers, tfdt: readTfdt64 },
 });
 ```
 
@@ -512,7 +563,73 @@ export type DecodingTimeToSampleBox = FullBox & {
 };
 
 // @public
-export function defaultReaderConfig(): IsoBoxReadViewConfig;
+export function defaultReaderConfig(): {
+    readers: DefaultReaderMap;
+};
+
+// @public
+export type DefaultReaderMap = {
+    ardi: typeof readArdi;
+    avc1: typeof readAvc1;
+    avc2: typeof readAvc2;
+    avc3: typeof readAvc3;
+    avc4: typeof readAvc4;
+    ctts: typeof readCtts;
+    dref: typeof readDref;
+    elng: typeof readElng;
+    elst: typeof readElst;
+    emsg: typeof readEmsg;
+    enca: typeof readEnca;
+    encv: typeof readEncv;
+    free: typeof readFree;
+    frma: typeof readFrma;
+    ftyp: typeof readFtyp;
+    hdlr: typeof readHdlr;
+    hev1: typeof readHev1;
+    hvc1: typeof readHvc1;
+    iden: typeof readIden;
+    imda: typeof readImda;
+    kind: typeof readKind;
+    labl: typeof readLabl;
+    mdat: typeof readMdat;
+    mdhd: typeof readMdhd;
+    mehd: typeof readMehd;
+    meta: typeof readMeta;
+    mfhd: typeof readMfhd;
+    mfro: typeof readMfro;
+    mp4a: typeof readMp4a;
+    mvhd: typeof readMvhd;
+    payl: typeof readPayl;
+    prft: typeof readPrft;
+    prsl: typeof readPrsl;
+    pssh: typeof readPssh;
+    schm: typeof readSchm;
+    sdtp: typeof readSdtp;
+    sidx: typeof readSidx;
+    skip: typeof readSkip;
+    smhd: typeof readSmhd;
+    ssix: typeof readSsix;
+    sthd: typeof readSthd;
+    stsd: typeof readStsd;
+    stss: typeof readStss;
+    sttg: typeof readSttg;
+    stts: typeof readStts;
+    styp: typeof readStyp;
+    subs: typeof readSubs;
+    tenc: typeof readTenc;
+    tfdt: typeof readTfdt;
+    tfhd: typeof readTfhd;
+    tfra: typeof readTfra;
+    tkhd: typeof readTkhd;
+    trex: typeof readTrex;
+    trun: typeof readTrun;
+    "url ": typeof readUrl;
+    "urn ": typeof readUrn;
+    vlab: typeof readVlab;
+    vmhd: typeof readVmhd;
+    vttC: typeof readVttC;
+    vtte: typeof readVtte;
+};
 
 // @public
 export function defaultWriterConfig(): IsoBoxWriteViewConfig;
@@ -835,9 +952,9 @@ export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view
 export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
 
 // @public
-export type IsoBoxReaderReturn<T> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? ParsedBox<B> : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? ParsedBox<([string] extends [R] ? IsoBox : Exclude<IsoBox, {
-    type: R;
-}>) | Box> : never);
+export type IsoBoxReaderReturn<R> = NonNullable<{ [K in keyof R]: NonNullable<R[K]> extends ((...args: never[]) => infer B) ? unknown extends B ? never : ParsedBox<B> : never; }[keyof R]> | ParsedBox<([IsoBoxType] extends [keyof R] ? IsoBox : Exclude<IsoBoxContainer, {
+    type: keyof R;
+}>) | Box>;
 
 // @public
 export class IsoBoxReadView {
@@ -1248,7 +1365,10 @@ export function readIsoBoxes<const R extends IsoBoxReaderMap>(raw: IsoBoxData, c
     readers: R;
 }): IsoBoxReaderReturn<R>[];
 
-// @public (undocumented)
+// @public
+export function readIsoBoxes(raw: IsoBoxData): ParsedBox<IsoBoxContainer | Box>[];
+
+// @public
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[];
 
 // @public

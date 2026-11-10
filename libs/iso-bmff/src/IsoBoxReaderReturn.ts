@@ -1,44 +1,41 @@
 import type { Box } from './boxes/Box.ts'
 import type { IsoBox } from './IsoBox.ts'
+import type { IsoBoxContainer } from './IsoBoxContainer.ts'
+import type { IsoBoxType } from './IsoBoxType.ts'
 import type { ParsedBox } from './ParsedBox.ts'
 
 /**
- * Return type for the ISO box reader.
+ * The result type of `readIsoBoxes` for the reader map `R`.
  *
- * Creates a discriminated union of all box types returned by the readers,
- * plus ParsedBox for unknown/container boxes. This enables type narrowing
- * via `box.type === 'xxxx'`.
+ * The type is a union of the boxes that the readers of `R` return.
+ * `box.type === 'xxxx'` therefore narrows to the return type of the reader
+ * under that key. An optional reader adds its return type without `undefined`.
+ * A reader typed to return `unknown`, such as a value of `IsoBoxReaderMap`,
+ * adds nothing.
  *
- * The union does not include a built-in box type whose reader `T` replaces.
- * A custom reader therefore narrows to its own return type only. The replaced
- * box types are:
+ * The union also has the boxes that the view returns without a reader:
  *
- * - Every key whose value is a required reader. An optional reader may be
- *   absent. The union then keeps the built-in type of that box and adds the
- *   return type of the reader.
- * - A `url` or `urn` key also replaces `'url '` or `'urn '`. The view finds a
- *   reader by the trimmed type as well.
- * - When a key is not a literal, such as `string` from a computed key, every
- *   built-in box type stays.
+ * - When every key of `R` is a literal, the view reads the children of a
+ *   container box and only the header of every other box. The union therefore
+ *   has every container type whose key is not in `R`, and `ParsedBox<Box>` for
+ *   a header-only box. A built-in box type whose key is not in `R` is not in
+ *   the union.
+ * - A key of `R` may not be a literal, such as `string` from a computed key or
+ *   the `IsoBoxType` pattern of `IsoBoxReaderMap`. The map may then contain a
+ *   reader for any box, so the union has every built-in box type.
  *
  * @public
  */
-export type IsoBoxReaderReturn<T> =
+export type IsoBoxReaderReturn<R> =
 	| NonNullable<
 			{
-				[K in keyof T]: NonNullable<T[K]> extends (...args: never[]) => infer B
-					? ParsedBox<B>
+				[K in keyof R]: NonNullable<R[K]> extends (...args: never[]) => infer B
+					? unknown extends B
+						? never
+						: ParsedBox<B>
 					: never
-			}[keyof T]
+			}[keyof R]
 	  >
-	| (NonNullable<
-			{
-				[K in keyof T]: T[K] extends (...args: never[]) => unknown
-					? K extends 'url' | 'urn'
-						? K | `${K} `
-						: K
-					: never
-			}[keyof T]
-	  > extends infer R
-			? ParsedBox<([string] extends [R] ? IsoBox : Exclude<IsoBox, { type: R }>) | Box>
-			: never)
+	| ParsedBox<
+			([IsoBoxType] extends [keyof R] ? IsoBox : Exclude<IsoBoxContainer, { type: keyof R }>) | Box
+	  >

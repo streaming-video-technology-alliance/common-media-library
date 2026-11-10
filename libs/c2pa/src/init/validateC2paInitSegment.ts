@@ -1,4 +1,4 @@
-import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
+import { findIsoBox, readIsoBoxes, readMdat } from '@svta/cml-iso-bmff'
 import { CborTag, decodeCbor } from '../cbor/readCborItem.ts'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
@@ -240,7 +240,7 @@ async function validateSessionKeys(
  * @public
  */
 export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSegmentValidation> {
-	const boxes = readIsoBoxes(bytes)
+	const boxes = readIsoBoxes(bytes, { readers: { mdat: readMdat } })
 	if (findIsoBox(boxes, box => box.type === 'mdat')) {
 		return {
 			manifest: null,
