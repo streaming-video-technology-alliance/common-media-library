@@ -32,7 +32,7 @@ Issue #611 calls the option `uint64`. This RFC proposes the name `int64`, becaus
 
 The RFC also fixes a typing defect in `IsoBoxReaderReturn` that affects the documented workaround today. Section [Result type inference](#result-type-inference) describes the defect.
 
-**Recommendation**: implement, in two pull requests. The first pull request fixes `IsoBoxReaderReturn`. The second adds the option. Section [Rationale and alternatives](#rationale-and-alternatives) gives the reasons, and section [Drawbacks](#drawbacks) gives the case against.
+**Recommendation**: implement, in two pull requests. The first, [#614](https://github.com/streaming-video-technology-alliance/common-media-library/pull/614), fixed `IsoBoxReaderReturn` and is merged. The second adds the option. Section [Rationale and alternatives](#rationale-and-alternatives) gives the reasons, and section [Drawbacks](#drawbacks) gives the case against.
 
 ## Motivation
 
@@ -68,7 +68,7 @@ The option covers every row, so an adopter does not need to know which fields ca
 PR #612 added `IsoBoxReadView.readUint64`, which returns a `bigint`, and the matching `IsoBoxWriteView.writeUint64`. The reading guide shows a custom `tfdt` reader that uses it. The custom reader works, with two limits:
 
 - The adopter copies one reader per affected box. A `sidx` reader with its reference loop is about 40 lines, and `mvhd` has 14 fields.
-- The result type is wrong. `IsoBoxReaderReturn` adds every built-in box type to the result union, including the `tfdt` type that the custom reader replaces. `box.type === 'tfdt'` therefore narrows to `number | bigint`, not `bigint`. The spike file `plans/uint64-reader-config/spike/published-types.ts` reproduces this against the published package.
+- The result type was wrong until #614. `IsoBoxReaderReturn` added every built-in box type to the result union, including the `tfdt` type that the custom reader replaces. `box.type === 'tfdt'` therefore narrowed to `number | bigint`, not `bigint`. The spike file `plans/uint64-reader-config/spike/published-types.ts` reproduces this against the published package, which does not have the fix yet.
 
 ## Guide-level explanation
 
@@ -222,15 +222,15 @@ Three details of the model need explanation, because they are not obvious from t
 - A reader of the `'number'` view, which is every custom reader written today, infers `'number'`. With `int64: 'bigint'` the two candidates conflict, TypeScript keeps the explicit option, and the reader fails to type check against the `bigint` view. This is the one new compile error for existing code, and it needs the option to appear.
 - A non-generic reader of the wide view `IsoBoxReadView<IsoInt64>` infers the full union, and every 64-bit field becomes `number | bigint`. The built-in readers of unaffected boxes are therefore generic over the option. A generic function adds no inference candidate, and it accepts a view of either mode when called directly. `NoInfer` was tested as the alternative and rejected, because it also stops the contextual instantiation of the generic readers.
 
-**The default union.** Today `IsoBoxReaderReturn<R>` is the union of the reader results and `ParsedIsoBox`, and `ParsedIsoBox` includes every built-in box type. A custom `tfdt` reader therefore narrows to its own type or the built-in `tfdt` type. The fix excludes the box types that `R` overrides:
+**The default union.** Before #614, `IsoBoxReaderReturn<T>` was the union of the reader results and `ParsedIsoBox`, and `ParsedIsoBox` includes every built-in box type. A custom `tfdt` reader therefore narrowed to its own type or the built-in `tfdt` type. #614 excludes the box types that the required reader keys of `T` replace, with the `url` and `urn` aliases expanded. When a key is not a literal, every built-in type stays. The type binds the replaced types with an `extends infer R` clause and keeps one parameter. The option adds `I` as the second parameter and threads it into `ParsedBox` and `IsoBox`:
 
 ```ts
-export type IsoBoxReaderReturn<R, I extends IsoInt64 = 'number'> =
-	| { [K in keyof R]: R[K] extends (...args: never[]) => infer B ? ParsedBox<B, I> : never }[keyof R]
-	| ParsedBox<Exclude<IsoBox<I>, { type: keyof R }> | Box, I>
+export type IsoBoxReaderReturn<T, I extends IsoInt64 = 'number'> =
+	| NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends (...args: never[]) => infer B ? ParsedBox<B, I> : never }[keyof T]>
+	| (ReplacedType<T> extends infer R ? ParsedBox<([string] extends [R] ? IsoBox<I> : Exclude<IsoBox<I>, { type: R }>) | Box, I> : never)
 ```
 
-The fix is independent of the option. It makes the result of a `readUint64` custom reader `bigint` instead of `number | bigint`. A custom reader that adds a field sees that field after narrowing. The change narrows a result type, so existing assignments keep compiling. The first pull request ships this fix alone.
+`ReplacedType<T>` stands for the inline mapped type of #614. The spike models the exclusion in its simpler form, with `keyof T`, because the model has no optional or aliased keys. The fix shipped on its own and is independent of the option.
 
 **Variance of the view.** `IsoBoxReadView<'bigint'>` must be assignable to `IsoBoxReadView<IsoInt64>`, so that `IsoBoxStreamable<IsoInt64>` accepts a parsed box of either mode. The view therefore stores its readers as `IsoBoxReaderMap`, the default instantiation, and the option as `I`. If the private field were `IsoBoxReadViewConfig<I>`, the readers would put `I` in a parameter position and make the view invariant. The constructor casts the readers once.
 
@@ -258,7 +258,7 @@ The fix is independent of the option. It makes the result of a `readUint64` cust
 
 The built-in readers return wrong values for valid files. The documented workaround is correct for one box and expensive for a player that needs exact `tfdt`, `sidx`, `tfra`, `prft`, `emsg`, and `elst` values. Such a player copies six readers and keeps them in step with the package. The option gives exact values and exact types for every 64-bit field with one line, and it costs nothing when it is off.
 
-The alternative that the maintainers may prefer is to stop after the first pull request. That fix makes the documented workaround type-correct, and the second pull request can wait for a second adopter who needs more than `tfdt`. The RFC asks the reviewers to make that call.
+The alternative that the maintainers may prefer is to stop after #614. That fix makes the documented workaround type-correct, and the second pull request can wait for a second adopter who needs more than `tfdt`. The RFC asks the reviewers to make that call.
 
 ### Rejected in issue #611
 
