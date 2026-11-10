@@ -6,7 +6,6 @@ import {
 	readFtyp,
 	readIsoBoxes,
 	readStsd,
-	readTfdt,
 	readUrl,
 	type IsoBoxReadView,
 } from './util/box.ts'
@@ -18,6 +17,13 @@ type Equal<A, B> =
 /** Compile-time assertion. `expectType<Equal<A, B>>(true)` compiles only when `A` and `B` are the same type. */
 function expectType<T>(value: T): T {
 	return value
+}
+
+/** A tfdt reader that keeps the 64-bit field exact. */
+const readTfdt64 = (view: IsoBoxReadView) => {
+	const { version, flags } = view.readFullBox()
+	const baseMediaDecodeTime = version === 1 ? view.readUint64() : BigInt(view.readUint(4))
+	return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime, exact: true }
 }
 
 describe('readIsoBoxes', function () {
@@ -71,12 +77,6 @@ describe('readIsoBoxes', function () {
 			0x00, 0x00, 0x00, 0x14, 0x74, 0x66, 0x64, 0x74, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x01,
 		])
-		const readTfdt64 = (view: IsoBoxReadView) => {
-			const { version, flags } = view.readFullBox()
-			const baseMediaDecodeTime = version === 1 ? view.readUint64() : BigInt(view.readUint(4))
-			return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime, exact: true }
-		}
-
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { tfdt: readTfdt64 } })
 
 		assert.ok(box)
@@ -116,14 +116,27 @@ describe('readIsoBoxes', function () {
 			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x01,
 		])
-		const readers: { tfdt?: typeof readTfdt } = {}
+		const readers: { tfdt?: typeof readTfdt64 } = {}
 
-		const [box] = readIsoBoxes(bytes.buffer, { readers })
+		const boxes = readIsoBoxes(bytes.buffer, { readers })
+		const [box] = boxes
 
+		// An absent reader does not add `undefined` to the union.
+		expectType<Equal<undefined extends (typeof boxes)[number] ? true : false, false>>(true)
 		assert.ok(box)
-		// The reader may be absent, so the built-in tfdt type stays in the union.
+		// The reader may be absent, so the union has the built-in tfdt type next to the custom type.
 		if (box.type === 'tfdt') {
-			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+			expectType<Equal<typeof box.baseMediaDecodeTime, number | bigint>>(true)
+		} else {
+			assert.fail('expected a tfdt box')
+		}
+
+		readers.tfdt = readTfdt64
+		const [exact] = readIsoBoxes(bytes.buffer, { readers })
+
+		assert.ok(exact)
+		if (exact.type === 'tfdt') {
+			assert.strictEqual(exact.baseMediaDecodeTime, BigInt(1))
 		} else {
 			assert.fail('expected a tfdt box')
 		}
@@ -139,7 +152,7 @@ describe('readIsoBoxes', function () {
 			custom: true,
 		})
 
-		// The view looks a reader up by the trimmed type too, so `url` replaces `'url '`.
+		// The view also finds a reader by the trimmed type, so `url` replaces `'url '`.
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { url: readUrlCustom } })
 
 		assert.ok(box)

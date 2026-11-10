@@ -14,11 +14,12 @@ and this project adheres to
 
 ### Fixed
 
-- `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader. Before this change, `box.type === 'tfdt'` narrowed to the union of the custom type and the built-in type, so a custom reader that returned `baseMediaDecodeTime` as a `bigint` gave `number | bigint` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
-- The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
+- `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `IsoBoxReaderReturn` now includes the return type of an optional reader and no longer includes `undefined` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 
 ### Changed
 
+- The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
 - `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.

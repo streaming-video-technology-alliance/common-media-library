@@ -44,9 +44,9 @@ const boxes = readIsoBoxes(buffer, {
 
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to its result. The result type of `readIsoBoxes` follows the custom reader. A box type that a key of the reader map names is not part of the default union, so `box.type === "emsg"` narrows to the return type of the custom reader only.
+A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. `box.type === "emsg"` therefore narrows to the return type of the custom reader.
 
-HLS and DASH streams carry ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
+HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
 ```typescript
 import { ID3_SCHEME_ID_URI, getId3Frames, type Id3Frame } from "@svta/cml-id3";
@@ -82,7 +82,7 @@ for (const box of boxes) {
 }
 ```
 
-The view looks a reader up by the exact type and by the trimmed type. A reader under the key `url` reads the `url ` box, and the result type treats it as a replacement of the built-in `url ` type.
+The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
 
 ## Reading 64-bit fields
 
