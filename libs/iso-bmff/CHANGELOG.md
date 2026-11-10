@@ -19,11 +19,11 @@ and this project adheres to
 - `IsoBoxReadView.readInt(8)` now returns the correct value for a signed 64-bit integer such as -1. `readElst` now returns the correct `mediaTime` for a version 1 `elst` box, where -1 marks an empty edit. Earlier releases return -4294967297 for -1.
 - `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value. The bytes `00 01 80 00` now read as 1.5. The fix applies to `rate`, `volume`, `matrix`, `width`, `height`, `horizresolution`, `vertresolution`, and `samplerate` in the built-in readers.
 - `readMvhd` and `readTkhd` now read `rate`, `volume`, and `matrix` as signed values. A `matrix` entry of -1, as in a rotated video, now reads as -1.
+- `readTkhd` now reads `layer` and `alternateGroup` as signed values. A `layer` of -1 now reads as -1.
 
 ### Changed
 
 - The documentation of `IsoBoxReadView.readTemplate` now states that a template is an unsigned fixed-point value.
-
 - The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
 - `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.

@@ -42,6 +42,20 @@ describe('readTkhd', function () {
 		assert.strictEqual(box.height, 1080)
 	})
 
+	it('should read a negative layer', function () {
+		const bytes = createTkhd(0, IDENTITY, 0, 0)
+		new DataView(bytes.buffer).setInt16(40, -1)
+
+		assert.strictEqual(read(bytes).layer, -1)
+	})
+
+	it('should read a negative alternate group', function () {
+		const bytes = createTkhd(0, IDENTITY, 0, 0)
+		new DataView(bytes.buffer).setInt16(42, -2)
+
+		assert.strictEqual(read(bytes).alternateGroup, -2)
+	})
+
 	it('should read a negative volume', function () {
 		assert.strictEqual(read(createTkhd(-0x0100, IDENTITY, 0, 0)).volume, -1)
 		assert.strictEqual(read(createTkhd(-0x80, IDENTITY, 0, 0)).volume, -0.5)
@@ -63,6 +77,10 @@ describe('readTkhd', function () {
 
 	it('should read values that writeTkhd writes back as the same bytes', function () {
 		const bytes = createTkhd(-0x80, ROTATION, 0x9c408000, 1080 * 0x10000)
+		const view = new DataView(bytes.buffer)
+		view.setInt16(40, -1)
+		view.setInt16(42, -2)
+
 		const writer = writeTkhd(read(bytes))
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)
