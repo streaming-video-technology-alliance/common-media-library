@@ -3,6 +3,8 @@
 
 Common Media Request and Response types.
 
+Documentation: [cml.svta.org/packages/request](https://cml.svta.org/packages/request/)
+
 ## When to use
 
 - Type a segment, manifest, or license request that a player passes through a plugin: `CommonMediaRequest`

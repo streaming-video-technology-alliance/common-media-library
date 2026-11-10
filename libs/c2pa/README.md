@@ -2,6 +2,8 @@
 
 C2PA (Coalition for Content Provenance and Authenticity) live video validation for BMFF and MP4 containers.
 
+Documentation: [cml.svta.org/packages/c2pa](https://cml.svta.org/packages/c2pa/)
+
 Supported C2PA segment validation methods:
 
 - **§19.3 Per-segment C2PA Manifest Box**: each segment embeds a full C2PA manifest with a COSE signature

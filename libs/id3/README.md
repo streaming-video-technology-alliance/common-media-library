@@ -2,6 +2,8 @@
 
 ID3 tag parsing functionality.
 
+Documentation: [cml.svta.org/packages/id3](https://cml.svta.org/packages/id3/)
+
 ## When to use
 
 - Read the ID3 frames in an HLS timed metadata sample or an emsg payload: `getId3Frames`, `Id3Frame`

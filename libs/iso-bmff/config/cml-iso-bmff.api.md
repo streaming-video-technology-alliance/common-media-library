@@ -463,7 +463,9 @@ export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view
 export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
 
 // @public
-export type IsoBoxReaderReturn<T> = { [K in keyof T]: T[K] extends ((...args: never[]) => infer R) ? ParsedBox<R> : never; }[keyof T] | ParsedIsoBox;
+export type IsoBoxReaderReturn<T> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? ParsedBox<B> : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? ParsedBox<([string] extends [R] ? IsoBox : Exclude<IsoBox, {
+    type: R;
+}>) | Box> : never);
 
 // @public
 export class IsoBoxReadView {
@@ -486,6 +488,7 @@ export class IsoBoxReadView {
     readString: (size: number) => string;
     readTemplate: (size: number) => number;
     readUint: (size: number) => number;
+    readUint64: () => bigint;
     readUtf8: (size?: number) => string;
     slice: (offset: number, size: number) => IsoBoxReadView;
 }
@@ -522,6 +525,7 @@ export class IsoBoxWriteView {
     writeTemplate: (value: number, size: number) => void;
     writeTerminatedString: (value: string) => void;
     writeUint: (value: number, size: number) => void;
+    writeUint64: (value: bigint) => void;
     writeUtf8TerminatedString: (value: string) => void;
 }
 

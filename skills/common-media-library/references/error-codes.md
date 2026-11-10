@@ -3,6 +3,8 @@
 
 SVTA2070 standardized streaming error codes.
 
+Documentation: [cml.svta.org/packages/error-codes](https://cml.svta.org/packages/error-codes/)
+
 This package is the reference implementation of [SVTA2070: Standardized Error Codes](https://www.svta.org/product/svta2070/). The specification defines one error vocabulary for every video player. Each code is a short integer. The thousands digits identify the category, such as Playback or Network. The last three digits identify the specific error. HTTP response statuses and IAB VAST error codes embed into the scheme at their own values.
 
 ## When to use

@@ -3,6 +3,8 @@
 
 Bitrate selection functionality.
 
+Documentation: [cml.svta.org/packages/abr](https://cml.svta.org/packages/abr/)
+
 The package defines `BitrateSelector`, the type that every bitrate selection algorithm implements. A selector takes a bitrate ladder, the buffer level, and a throughput estimate. It returns one index into the ladder. The package ships two selectors. `createThroughputSelector` creates a rate-based selector that picks the highest rung that the throughput estimate sustains. `createBolaSelector` creates a buffer-based selector that implements BOLA.
 
 The package implements the [bitrate selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/526) and the [BOLA selector RFC](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/rfc/bola-abr-selector/index.md). Every export is marked `@beta`.

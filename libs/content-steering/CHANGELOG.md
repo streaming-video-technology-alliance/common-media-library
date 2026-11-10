@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/content-steering](https://cml.svta.org/packages/content-steering/).
 
 ## [0.23.1] - 2025-12-22
 

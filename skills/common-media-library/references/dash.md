@@ -3,6 +3,8 @@
 
 DASH manifest parsing functionality.
 
+Documentation: [cml.svta.org/packages/dash](https://cml.svta.org/packages/dash/)
+
 ## When to use
 
 - Expand a DASH SegmentTemplate URL with the $RepresentationID$, $Number$, $Bandwidth$, and $Time$ identifiers and their format tags: `processUriTemplate`

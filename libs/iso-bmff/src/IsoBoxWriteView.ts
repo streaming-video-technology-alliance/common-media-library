@@ -80,8 +80,8 @@ export class IsoBoxWriteView {
 				break
 
 			case 8: {
-				// Warning: JavaScript cannot handle 64-bit integers natively.
-				// This will give unexpected results for integers >= 2^53
+				// A number loses precision for integers >= 2^53.
+				// writeUint64 writes the exact value from a bigint.
 				const s1 = Math.floor(value / Math.pow(2, 32))
 				const s2 = value - s1 * Math.pow(2, 32)
 				dataView.setUint32(cursor, s1)
@@ -91,6 +91,29 @@ export class IsoBoxWriteView {
 		}
 
 		this.cursor += size
+	}
+
+	/**
+	 * Writes a 64-bit unsigned integer to the data view from a `bigint`.
+	 *
+	 * `writeUint(value, 8)` takes a `number` and loses precision above 2^53 - 1.
+	 * Use this method for a 64-bit field whose value can exceed that limit.
+	 *
+	 * @param value - The value to write, from 0 to 2^64 - 1.
+	 * @throws RangeError if `value` is negative or greater than 2^64 - 1.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeUint64.test.ts#example}
+	 */
+	writeUint64 = (value: bigint): void => {
+		if (BigInt.asUintN(64, value) !== value) {
+			throw new RangeError(
+				`writeUint64: value must be in the range 0 to 2^64 - 1, received ${value}`,
+			)
+		}
+
+		this.dataView.setBigUint64(this.cursor, value)
+		this.cursor += 8
 	}
 
 	/**
@@ -116,8 +139,7 @@ export class IsoBoxWriteView {
 				break
 
 			case 8:
-				// Warning: JavaScript cannot handle 64-bit integers natively.
-				// This will give unexpected results for integers >= 2^53
+				// A number loses precision for integers >= 2^53.
 				const s1 = Math.floor(value / Math.pow(2, 32))
 				const s2 = value - s1 * Math.pow(2, 32)
 				dataView.setUint32(cursor, s1)

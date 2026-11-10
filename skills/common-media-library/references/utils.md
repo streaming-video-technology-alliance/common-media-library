@@ -3,6 +3,8 @@
 
 Common utility functions for media processing.
 
+Documentation: [cml.svta.org/packages/utils](https://cml.svta.org/packages/utils/)
+
 ## When to use
 
 - Convert between hex, base64, UUID strings, and byte arrays: `hexToArrayBuffer`, `arrayBufferToHex`, `arrayBufferToUuid`, `uuidToArrayBuffer`, `decodeBase64`, `encodeBase64`

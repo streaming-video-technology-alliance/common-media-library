@@ -24,6 +24,7 @@ and this project adheres to
 - `events` of `CmcdEventReportConfig` accepts a read-only array
 - `encodeCmcd()` accepts a deeply read-only object
 - `prepareCmcdData()` returns a copy. The result shares no list, `SfItem`, or parameter object with the input. Before, the result shared the parameter objects and the lists of custom keys with the input
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/cmcd](https://cml.svta.org/packages/cmcd/).
 
 ### Deprecated
 

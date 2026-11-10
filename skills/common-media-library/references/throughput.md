@@ -3,6 +3,8 @@
 
 Throughput estimation functionality.
 
+Documentation: [cml.svta.org/packages/throughput](https://cml.svta.org/packages/throughput/)
+
 ## When to use
 
 - Estimate throughput from segment downloads with an exponentially weighted moving average: `EwmaEstimator`
