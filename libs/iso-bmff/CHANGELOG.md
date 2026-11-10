@@ -15,6 +15,7 @@ and this project adheres to
 ### Fixed
 
 - `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader. Before this change, `box.type === 'tfdt'` narrowed to the union of the custom type and the built-in type, so a custom reader that returned `baseMediaDecodeTime` as a `bigint` gave `number | bigint` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 
 ### Changed
 

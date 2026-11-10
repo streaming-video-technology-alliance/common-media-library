@@ -42,6 +42,48 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
+## Extending a built-in reader
+
+A custom reader can call a built-in reader and add fields to its result. The result type of `readIsoBoxes` follows the custom reader. A box type that a key of the reader map names is not part of the default union, so `box.type === "emsg"` narrows to the return type of the custom reader only.
+
+HLS and DASH streams carry ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
+
+```typescript
+import { ID3_SCHEME_ID_URI, getId3Frames, type Id3Frame } from "@svta/cml-id3";
+import {
+	readEmsg,
+	readIsoBoxes,
+	type IsoBoxReadView,
+} from "@svta/cml-iso-bmff";
+
+const readEmsgWithId3 = (view: IsoBoxReadView) => {
+	const emsg = readEmsg(view);
+	const frames: Id3Frame[] =
+		emsg.schemeIdUri === ID3_SCHEME_ID_URI
+			? getId3Frames(emsg.messageData)
+			: [];
+	return { ...emsg, frames };
+};
+
+const segment = await fetch("https://example.com/segment.m4s").then((r) =>
+	r.arrayBuffer(),
+);
+
+const boxes = readIsoBoxes(segment, {
+	readers: {
+		emsg: readEmsgWithId3,
+	},
+});
+
+for (const box of boxes) {
+	if (box.type === "emsg") {
+		console.log(box.frames);
+	}
+}
+```
+
+The view looks a reader up by the exact type and by the trimmed type. A reader under the key `url` reads the `url ` box, and the result type treats it as a replacement of the built-in `url ` type.
+
 ## Reading 64-bit fields
 
 The built-in readers return every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
