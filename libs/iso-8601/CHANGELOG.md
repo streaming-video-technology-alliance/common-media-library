@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/iso-8601](https://cml.svta.org/packages/iso-8601/).
+
 ## [1.0.3] - 2026-10-26
 
 ### Changed

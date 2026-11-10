@@ -2,6 +2,8 @@
 
 ISO Base Media File Format (ISO BMFF) parsing.
 
+Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/)
+
 ## When to use
 
 - Parse the boxes of an init or media segment, with full content for the box types that you need: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`

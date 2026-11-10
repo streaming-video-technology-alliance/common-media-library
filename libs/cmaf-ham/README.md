@@ -2,6 +2,8 @@
 
 A collection of tools for working with Common Media Application Format - Hypothetical Application Model (CMAF-HAM).
 
+Documentation: [cml.svta.org/packages/cmaf-ham](https://cml.svta.org/packages/cmaf-ham/)
+
 ## When to use
 
 - Parse a DASH MPD into the CMAF-HAM presentation model: `dashToHam`

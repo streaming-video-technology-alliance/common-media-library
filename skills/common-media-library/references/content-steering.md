@@ -3,6 +3,8 @@
 
 Content steering functionality.
 
+Documentation: [cml.svta.org/packages/content-steering](https://cml.svta.org/packages/content-steering/)
+
 ## When to use
 
 - Validate a content steering manifest before the player applies it: `isValidSteeringManifest`

@@ -2,6 +2,8 @@
 
 ISO 8601 date/time handling functionality.
 
+Documentation: [cml.svta.org/packages/iso-8601](https://cml.svta.org/packages/iso-8601/)
+
 ## When to use
 
 - Convert a DASH or HLS ISO 8601 duration such as PT1M30S to seconds: `decodeIso8601Duration`
