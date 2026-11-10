@@ -1,9 +1,11 @@
-import { deepEqual, equal, ok } from 'node:assert'
+import { deepEqual, doesNotThrow, equal, ok } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	describe,
 	it,
+	defaultReaderConfig,
 	defaultWriterConfig,
+	filterIsoBoxes,
 	readFtyp,
 	readIsoBoxes,
 	writeFtyp,
@@ -16,8 +18,18 @@ import {
 	writeTfhd,
 	writeTrun,
 	type IsoBoxStreamable,
+	type ParsedIsoBox,
 } from './util/box.ts'
+import { fixtureFiles } from './util/fixtureFiles.ts'
+import { parseFile } from './util/parseFile.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
+
+function sampleTableBytes(boxes: ParsedIsoBox[]): Uint8Array[] {
+	return filterIsoBoxes(
+		boxes,
+		box => box.type === 'stco' || box.type === 'stsc' || box.type === 'stsz',
+	).map(({ view }) => new Uint8Array(view.buffer, view.byteOffset, view.byteLength))
+}
 
 describe('writeIsoBoxes', function () {
 	it('should write to a parsed file', async function () {
@@ -144,6 +156,33 @@ describe('writeIsoBoxes', function () {
 
 		const isoFile = await readFile(new URL('./fixtures/subsample.m4s', import.meta.url))
 		deepEqual(isoFile, reduceUint8Arrays(bytes))
+	})
+
+	it('should write every fixture that the default readers parse', function () {
+		const files = fixtureFiles()
+
+		ok(files.length > 0)
+
+		for (const file of files) {
+			const boxes = parseFile(file, defaultReaderConfig())
+
+			doesNotThrow(() => writeIsoBoxes(boxes, defaultWriterConfig()), file)
+		}
+	})
+
+	it('should keep the bytes of the stco, stsc, and stsz boxes of every fixture', function () {
+		let count = 0
+
+		for (const file of fixtureFiles()) {
+			const boxes = parseFile(file, defaultReaderConfig())
+			const original = sampleTableBytes(boxes)
+			const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
+
+			deepEqual(sampleTableBytes(readIsoBoxes(written)), original, file)
+			count += original.length
+		}
+
+		ok(count > 0)
 	})
 
 	it('should exit if boxes are empty', function () {

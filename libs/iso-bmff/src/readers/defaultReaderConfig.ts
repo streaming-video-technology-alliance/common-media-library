@@ -39,9 +39,12 @@ import { readSidx } from './readSidx.ts'
 import { readSkip } from './readSkip.ts'
 import { readSmhd } from './readSmhd.ts'
 import { readSsix } from './readSsix.ts'
+import { readStco } from './readStco.ts'
 import { readSthd } from './readSthd.ts'
+import { readStsc } from './readStsc.ts'
 import { readStsd } from './readStsd.ts'
 import { readStss } from './readStss.ts'
+import { readStsz } from './readStsz.ts'
 import { readSttg } from './readSttg.ts'
 import { readStts } from './readStts.ts'
 import { readStyp } from './readStyp.ts'
@@ -110,9 +113,12 @@ export function defaultReaderConfig(): IsoBoxReadViewConfig {
 			skip: readSkip,
 			smhd: readSmhd,
 			ssix: readSsix,
+			stco: readStco,
 			sthd: readSthd,
+			stsc: readStsc,
 			stsd: readStsd,
 			stss: readStss,
+			stsz: readStsz,
 			sttg: readSttg,
 			stts: readStts,
 			styp: readStyp,
