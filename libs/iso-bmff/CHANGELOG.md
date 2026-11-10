@@ -17,8 +17,11 @@ and this project adheres to
 - `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReaderReturn` now includes the return type of an optional reader and no longer includes `undefined` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value. The bytes `00 01 80 00` now read as 1.5. The fix applies to `rate`, `volume`, `matrix`, `width`, `height`, `horizresolution`, `vertresolution`, and `samplerate` in the built-in readers.
+- `readMvhd` and `readTkhd` now read `rate`, `volume`, and `matrix` as signed values. A `matrix` entry of -1, as in a rotated video, now reads as -1.
 
 ### Changed
+
+- The documentation of `IsoBoxReadView.readTemplate` now states that a template is an unsigned fixed-point value.
 
 - The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.

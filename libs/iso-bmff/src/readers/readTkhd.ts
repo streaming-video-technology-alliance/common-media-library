@@ -1,5 +1,5 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
-import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
+import { INT, UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -27,9 +27,9 @@ export function readTkhd(view: IsoBoxReadView): TrackHeaderBox {
 		reserved2: view.readArray(UINT, 4, 2),
 		layer: view.readUint(2),
 		alternateGroup: view.readUint(2),
-		volume: view.readTemplate(2),
+		volume: view.readInt(2) / 256,
 		reserved3: view.readUint(2),
-		matrix: view.readArray(TEMPLATE, 4, 9),
+		matrix: view.readArray(INT, 4, 9).map(value => value / 65536),
 		width: view.readTemplate(4),
 		height: view.readTemplate(4),
 	}

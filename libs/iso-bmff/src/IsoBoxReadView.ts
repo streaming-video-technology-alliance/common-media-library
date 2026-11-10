@@ -212,7 +212,8 @@ export class IsoBoxReadView {
 	}
 
 	/**
-	 * Reads a template from the data view.
+	 * Reads a template from the data view. A template is an unsigned fixed-point value.
+	 * Half of the bytes hold the integer part, and half hold the fraction.
 	 *
 	 * @param size - The size of the template in bytes.
 	 * @returns The template.

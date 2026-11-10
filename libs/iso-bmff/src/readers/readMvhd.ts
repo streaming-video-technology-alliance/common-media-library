@@ -1,5 +1,5 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
-import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
+import { INT, UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 
 /**
@@ -12,7 +12,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  * @public
  */
 export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
-	const { readUint, readTemplate, readArray } = view
+	const { readUint, readInt, readArray } = view
 
 	const { version, flags } = view.readFullBox()
 	const size = version == 1 ? 8 : 4
@@ -25,11 +25,11 @@ export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 		modificationTime: readUint(size),
 		timescale: readUint(4),
 		duration: readUint(size),
-		rate: readTemplate(4),
-		volume: readTemplate(2),
+		rate: readInt(4) / 65536,
+		volume: readInt(2) / 256,
 		reserved1: readUint(2),
 		reserved2: readArray(UINT, 4, 2),
-		matrix: readArray(TEMPLATE, 4, 9),
+		matrix: readArray(INT, 4, 9).map(value => value / 65536),
 		preDefined: readArray(UINT, 4, 6),
 		nextTrackId: readUint(4),
 	}
