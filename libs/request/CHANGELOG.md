@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/request](https://cml.svta.org/packages/request/).
 
 ## [1.0.22] - 2026-10-18
 

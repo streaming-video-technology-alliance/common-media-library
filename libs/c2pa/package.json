@@ -9,7 +9,7 @@
 		"Valentina Giusti <234478367+valentinamgiusti@users.noreply.github.com>"
 	],
 	"type": "module",
-	"homepage": "https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/c2pa",
+	"homepage": "https://cml.svta.org/packages/c2pa/",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/streaming-video-technology-alliance/common-media-library.git"

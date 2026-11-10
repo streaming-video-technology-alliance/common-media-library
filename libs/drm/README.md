@@ -2,6 +2,8 @@
 
 Digital Rights Management (DRM) functionality.
 
+Documentation: [cml.svta.org/packages/drm](https://cml.svta.org/packages/drm/)
+
 ## When to use
 
 - Parse the pssh boxes in init data and find the one for a key system: `parsePsshList`, `getPsshForKeySystem`, `getPsshData`

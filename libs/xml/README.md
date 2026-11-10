@@ -2,6 +2,8 @@
 
 XML parsing utilities.
 
+Documentation: [cml.svta.org/packages/xml](https://cml.svta.org/packages/xml/)
+
 ## When to use
 
 - Parse a DASH MPD or another XML document into a node tree: `parseXml`
