@@ -12,6 +12,7 @@ and this project adheres to
 
 - `WebVttParser` sets the flag that reuses the current line in a separate statement. The condition that ends a cue no longer contains the assignment. The parser output does not change ([#578](https://github.com/streaming-video-technology-alliance/common-media-library/issues/578)).
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/webvtt](https://cml.svta.org/packages/webvtt/).
 
 ## [1.0.10] - 2026-10-18
 

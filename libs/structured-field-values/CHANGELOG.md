@@ -12,6 +12,7 @@ and this project adheres to
 
 - `parseByteSequence` throws a parse error instead of a `TypeError` when the byte sequence contains a line break. Every other input reports the same error as before.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/structured-field-values](https://cml.svta.org/packages/structured-field-values/).
 
 ## [1.1.7] - 2026-10-18
 

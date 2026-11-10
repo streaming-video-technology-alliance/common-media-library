@@ -25,6 +25,7 @@ and this project adheres to
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
 - Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/).
 
 ## [1.0.7] - 2026-10-18
 

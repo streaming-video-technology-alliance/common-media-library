@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/utils](https://cml.svta.org/packages/utils/).
+
 ## [1.7.0] - 2026-10-26
 
 ### Added
