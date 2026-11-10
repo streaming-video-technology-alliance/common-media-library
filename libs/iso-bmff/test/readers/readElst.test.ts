@@ -20,6 +20,7 @@ describe('readElst', function () {
 		assert.strictEqual(box.type, 'elst')
 		assert.strictEqual(box.version, 1)
 		assert.strictEqual(box.entryCount, 4)
+		assert.strictEqual(box.entries[0].segmentDuration, 1000)
 		assert.strictEqual(box.entries[0].mediaTime, -1)
 		assert.strictEqual(box.entries[1].mediaTime, 2147483648)
 		assert.strictEqual(box.entries[2].mediaTime, -2)
