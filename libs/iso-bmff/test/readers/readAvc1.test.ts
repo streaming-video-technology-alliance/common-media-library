@@ -4,6 +4,7 @@ import {
 	filterBoxes,
 	it,
 	readAvc1,
+	readIsoBoxes,
 	readStsd,
 	type VisualSampleEntryBox,
 } from '../util/box.ts'
@@ -43,5 +44,22 @@ describe('readAvc1', function () {
 		assert.strictEqual(box.depth, 24)
 		assert.strictEqual(box.preDefined3, -1)
 		assert.strictEqual(box.boxes.length, 2)
+	})
+
+	it('should read the fraction of the resolution', function () {
+		const bytes = new Uint8Array(86)
+		const view = new DataView(bytes.buffer)
+
+		view.setUint32(0, bytes.length)
+		view.setUint32(4, 0x61766331) // 'avc1'
+		view.setUint32(36, 0x00488000) // horizresolution
+		view.setUint32(40, 0x012c4000) // vertresolution
+
+		const [box] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
+
+		assert.ok(box)
+		assert.strictEqual(box.type, 'avc1')
+		assert.strictEqual(box.horizresolution, 72.5)
+		assert.strictEqual(box.vertresolution, 300.25)
 	})
 })
