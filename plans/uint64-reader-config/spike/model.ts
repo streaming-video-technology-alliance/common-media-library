@@ -87,6 +87,8 @@ export type IsoBoxReaderMap<I extends IsoInt64 = 'number'> = Record<
  */
 export type IsoBoxReadViewConfig<I extends IsoInt64 = 'number'> = {
 	readers?: IsoBoxReaderMap<I>
+	/** What the view does when a 64-bit field is outside the safe integer range in number mode. */
+	int64Overflow?: 'ignore' | 'throw' | ((error: RangeError) => void)
 } & ([I] extends ['bigint'] ? { int64: I } : { int64?: I })
 
 // ---------- the view (declaration only) ----------

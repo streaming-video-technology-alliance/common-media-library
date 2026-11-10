@@ -28,6 +28,8 @@ for (const box of boxes) {
 }
 ```
 
+A second option, `int64Overflow`, reports a 64-bit value that a `number` cannot hold when the first option is off. It throws or calls a function, and it costs nothing when it is absent.
+
 Issue #611 calls the option `uint64`. This RFC proposes the name `int64`, because one affected field, `mediaTime` in `elst`, is signed.
 
 The RFC also fixes a typing defect in `IsoBoxReaderReturn` that affects the documented workaround today. Section [Result type inference](#result-type-inference) describes the defect.
@@ -131,9 +133,26 @@ if (tfdt?.type === 'tfdt') {
 }
 ```
 
+### Detecting overflow without bigint
+
+A player that keeps `number` fields can still find out when a value was rounded. `int64Overflow: 'throw'` makes the view throw a `RangeError` when a 64-bit field is outside the safe integer range. A function receives the same error instead of a throw, so the player can log it and continue:
+
+```typescript
+import { readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, {
+	int64Overflow: (error) => console.warn(error.message),
+	readers: {
+		tfdt: readTfdt,
+	},
+});
+```
+
+The option checks the 64-bit fields that the built-in readers read, in both versions of a box. It does not check `readUint(8)` in a custom reader. With `int64: 'bigint'` nothing is rounded, and the option has no effect.
+
 ### Runtimes without BigInt
 
-The package targets ES2019 and `BigInt` is ES2020. With the option off, or absent, no code path references `BigInt`, so nothing changes for a runtime without it. With `int64: 'bigint'` on such a runtime, the `IsoBoxReadView` constructor throws a `TypeError` that names the option and the missing global.
+The package targets ES2019 and `BigInt` is ES2020. With the option off, or absent, no code path references `BigInt`, so nothing changes for a runtime without it. `int64Overflow` does not need `BigInt` either. The check reads the high 32-bit word, and the error message prints the value in hexadecimal from the two words. With `int64: 'bigint'` on such a runtime, the `IsoBoxReadView` constructor throws a `TypeError` that names the option and the missing global.
 
 ## Reference-level explanation
 
@@ -149,6 +168,13 @@ export type IsoInt64Value<I extends IsoInt64> = { number: number; bigint: bigint
 /** The option is optional for the default mode and required for `'bigint'`. */
 export type IsoBoxReadViewConfig<I extends IsoInt64 = 'number'> = {
 	readers?: IsoBoxReaderMap<I>
+	/**
+	 * What the view does when `int64` is `'number'` and a 64-bit field is outside
+	 * the safe integer range. `'throw'` throws a `RangeError`. A function receives
+	 * that error and the view continues with the rounded value.
+	 * @defaultValue 'ignore'
+	 */
+	int64Overflow?: 'ignore' | 'throw' | ((error: RangeError) => void)
 } & ([I] extends ['bigint'] ? { int64: I } : { int64?: I })
 ```
 
@@ -185,6 +211,20 @@ That is about 100 public declarations. Containers that hold no affected box, suc
 
 The writer does not need an option. The value carries its own type, and `typeof value === 'bigint'` costs one check per 64-bit field.
 
+### Overflow detection
+
+`int64Overflow` applies to `readWideUint` and `readWideInt` when `int64` is `'number'`. A 64-bit value is outside the safe integer range when its magnitude exceeds 2^53 - 1. For an unsigned field that is the case when the high 32-bit word exceeds `0x1FFFFF`, which is the check that shaka-player uses. For a signed field the check is the same on the magnitude. The check reads the two words that `readUint(8)` reads today, so it needs no `BigInt` and no extra memory access.
+
+| Value | Behavior |
+|---|---|
+| `'ignore'`, or absent | The field is the rounded `number`, as today. |
+| `'throw'` | The view throws a `RangeError`. The message names the method, prints the 64-bit value in hexadecimal, and says that `int64: 'bigint'` reads it exactly. The cursor does not advance. |
+| A function | The view calls the function with the same `RangeError` and returns the rounded `number`. The adopter logs, counts, or throws. |
+
+A 4-byte field never overflows, so a version 0 box never reports. `readUint(8)` and `readInt(8)` do not check, because they are on the path of every reader today and the option must not slow that path. A custom reader that wants the check calls `readWideUint`.
+
+With `int64: 'bigint'` the option has no effect, and the documentation says so. A type that rejects the combination is possible but adds a conditional to the configuration type for little gain.
+
 ### Where the branch lives
 
 The branch lives in the four wide methods, not in the `read` dispatch, for two reasons:
@@ -204,7 +244,7 @@ The benchmark in `plans/uint64-reader-config/bench` compares the built package a
 
 No variant separates from the base. The spread between runs of one variant is larger than the difference between variants. Two things dominate the cost of one box. The constructor of its `IsoBoxReadView` allocates about twenty arrow-function fields, and a generator yields the box. One more property read and comparison per 64-bit field does not register against that.
 
-The proposal is variant C. With the option off, the constructor assigns `readWideUint = this.readUint`. A reader of a 64-bit field then calls the same function it calls today, with no extra closure and no extra call. With the option on, the constructor assigns a closure that holds the branch. The one cost that the option adds to the default path is the comparison in the constructor. Variant D, a prototype method, has no per-instance cost either. But the other view methods are arrow fields that readers destructure, and a prototype method would be the one exception.
+The proposal is variant C. With both options off, the constructor assigns `readWideUint = this.readUint`. A reader of a 64-bit field then calls the same function it calls today, with no extra closure and no extra call. With `int64: 'bigint'`, the constructor assigns a closure that reads a `bigint`. With `int64Overflow` set, it assigns a closure that reads the two words, checks the high word, and reports. The one cost that the options add to the default path is the comparison in the constructor. Variant D, a prototype method, has no per-instance cost either. But the other view methods are arrow fields that readers destructure, and a prototype method would be the one exception.
 
 The size cost is in the view class, not in the readers. Variant B, which adds one wide read method, is 201 bytes larger than the base build before minification and 55 bytes larger after gzip. The two read methods together add about 400 bytes of source and about 110 bytes after gzip. Every adopter of `IsoBoxReadView` carries both methods, because the class is one unit for tree shaking. A reader of an affected box changes one call from `readUint` to `readWideUint`. That adds a few bytes per reader, and only for the readers that the adopter imports. The wide write methods ship only with `IsoBoxWriteView`. No module-level statement references `BigInt` or the option, so the tree-shaking behavior of the package does not change.
 
@@ -239,6 +279,7 @@ export type IsoBoxReaderReturn<T, I extends IsoInt64 = 'number'> =
 - No runtime behavior changes when the option is absent. The default readers produce the same objects.
 - Every public type keeps its meaning when written without a type argument. The spike asserts this for the view, the parsed box types, and the result of `readIsoBoxes`.
 - The type declarations keep working on TypeScript 5.7. The spike compiles under 5.7.3.
+- `int64Overflow` changes no type. The result of `readIsoBoxes` is the same with and without it.
 - `IsoBoxReadView<'bigint'>` is not assignable to `IsoBoxReadView<'number'>` or the reverse. Both are assignable to `IsoBoxReadView<IsoInt64>`, and a generic reader accepts both.
 - One new compile error exists, and only with the option on. A custom reader of the default view, `(view: IsoBoxReadView) => ...`, cannot be registered with `int64: 'bigint'`. The fix is to make the reader generic.
 - The API report `libs/iso-bmff/config/cml-iso-bmff.api.md` changes for every declaration in the table above.
@@ -248,6 +289,7 @@ export type IsoBoxReaderReturn<T, I extends IsoInt64 = 'number'> =
 - **Type parameter noise.** About 100 declarations gain a parameter, including all 66 built-in readers. Hover text shows `TrackFragmentBaseMediaDecodeTimeBox<"number">` where it shows `TrackFragmentBaseMediaDecodeTimeBox` today. Adopters who never set the option see the parameter in every box type and every reader.
 - **Inference that depends on compiler details.** The design relies on two compiler behaviors. TypeScript instantiates a generic function against a contextual signature, and some reader parameters add inference candidates. A future TypeScript release could change either. The type tests from the spike move into the package test suite to guard both.
 - **Custom readers and the option.** A custom reader written today cannot be combined with `int64: 'bigint'` without a change to its signature. The error is clear and the fix is one type parameter, but it is a step that the guide has to explain.
+- **Two options.** `int64Overflow` is a second option for the same problem. It exists for adopters who cannot or do not want to move to `bigint` and still need to know when a value is wrong. A function value also puts a callback into a configuration object that holds plain values today.
 - **Duplicate methods.** The view gains two read methods that differ from `readUint` and `readInt` only in the option branch, and the writer gains two.
 - **Size.** Every adopter of the read view carries the two wide read methods for a feature most of them do not use. Together they add about 400 bytes of source and about 110 bytes after gzip.
 - **Need.** Six fields can overflow in practice, and the known downstream adopter needs one of them. The custom reader with `readUint64` covers that adopter today, with the `IsoBoxReaderReturn` fix.
@@ -292,6 +334,7 @@ The alternative that the maintainers may prefer is to stop after #614. That fix 
 5. **BigInt-less runtime with the option on.** Throw in the constructor, as proposed, or throw at the first 64-bit read.
 6. **Ship the `IsoBoxReaderReturn` fix first.** The RFC proposes a separate pull request. Reviewers may prefer one.
 7. **Generic unaffected readers.** All 66 built-in readers become generic so that each accepts a view of either mode. The alternative keeps the 55 unaffected readers as they are, and a direct call with a `bigint` view then needs a cast.
+8. **Form of `int64Overflow`.** A function value, as proposed, or a `'warn'` literal that calls `console.warn`. The function keeps console calls out of the library and lets the adopter choose the logger. The literal is simpler to type and to document.
 
 ## Future possibilities
 

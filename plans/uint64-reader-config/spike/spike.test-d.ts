@@ -206,6 +206,17 @@ readIsoBoxes<'bigint'>(buffer, {})
 new IsoBoxReadView<'bigint'>(buffer)
 void new IsoBoxReadView<'bigint'>(buffer, { int64: 'bigint' })
 
+// 12b. The overflow option changes no type.
+export const withOverflow = readIsoBoxes(buffer, {
+	int64Overflow: 'throw',
+	readers: { tfdt: readTfdt },
+})
+export type _12b = Expect<Equal<typeof withOverflow, typeof defaults>>
+export const withReporter = readIsoBoxes(buffer, { int64Overflow: error => void error.message })
+export type _12c = Expect<Equal<typeof withReporter, ParsedIsoBox[]>>
+// @ts-expect-error 'warn' is not a value of int64Overflow
+readIsoBoxes(buffer, { int64Overflow: 'warn' })
+
 // 13. A box read with bigint is not assignable to the number type, and the other way round.
 declare const tfdtBig: TrackFragmentBaseMediaDecodeTimeBox<'bigint'>
 declare const tfdtNum: TrackFragmentBaseMediaDecodeTimeBox
