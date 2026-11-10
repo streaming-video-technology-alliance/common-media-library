@@ -12,6 +12,7 @@ and this project adheres to
 
 - `toUint8` accepts `AllowSharedBufferSource`, the type that `TextDecoder.decode` uses. The view check uses `ArrayBuffer.isView`, so a view created in another realm keeps its `byteOffset`.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/id3](https://cml.svta.org/packages/id3/).
 
 ## [1.0.10] - 2026-10-18
 

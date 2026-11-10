@@ -37,7 +37,7 @@ const apiSidebar: SidebarItem[] = [
 ]
 
 describe('packageSidebar', () => {
-	it('lists Overview, API, and Changelog for a package without guides', () => {
+	it('lists Overview, API, Changelog, GitHub, and npm for a package without guides', () => {
 		deepEqual(packageSidebar(utils, apiSidebar, false), [
 			{
 				text: '@svta/cml-utils',
@@ -45,6 +45,11 @@ describe('packageSidebar', () => {
 					{ text: 'Overview', link: '/packages/utils/' },
 					{ text: 'API', link: '/api/utils/' },
 					{ text: 'Changelog', link: '/packages/utils/changelog' },
+					{
+						text: 'GitHub',
+						link: 'https://github.com/streaming-video-technology-alliance/common-media-library/tree/main/libs/utils',
+					},
+					{ text: 'npm', link: 'https://www.npmjs.com/package/@svta/cml-utils' },
 				],
 			},
 		])

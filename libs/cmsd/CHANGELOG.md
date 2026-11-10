@@ -12,6 +12,7 @@ and this project adheres to
 
 - `CmsdValue` no longer lists `CmsdObjectType`, `CmsdStreamingFormat`, and `CmsdStreamType`. `string` already covers the three, so the type is unchanged.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/cmsd](https://cml.svta.org/packages/cmsd/).
 
 ## [1.1.2] - 2026-10-18
 

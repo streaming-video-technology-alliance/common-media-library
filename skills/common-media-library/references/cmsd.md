@@ -3,6 +3,8 @@
 
 Common Media Server Data (CMSD) encoding and decoding.
 
+Documentation: [cml.svta.org/packages/cmsd](https://cml.svta.org/packages/cmsd/)
+
 ## When to use
 
 - Decode the CMSD-Static and CMSD-Dynamic response headers: `decodeCmsdStatic`, `decodeCmsdDynamic`

@@ -1,5 +1,8 @@
 import type { PackageInfo } from './packages.ts'
 
+export const repoUrl = 'https://github.com/streaming-video-technology-alliance/common-media-library'
+const npmUrl = 'https://www.npmjs.com/package/'
+
 // The same shape as VitePress's DefaultTheme.SidebarItem. Declared here so that root `tsc`
 // does not load the vitepress type declarations.
 export type SidebarItem = {
@@ -36,6 +39,8 @@ export function packageSidebar(
 			? { text: 'API', link: `/api/${pkg.folder}/`, collapsed: true, items: api?.items ?? [] }
 			: { text: 'API', link: `/api/${pkg.folder}/` },
 		{ text: 'Changelog', link: `/packages/${pkg.folder}/changelog` },
+		{ text: 'GitHub', link: `${repoUrl}/tree/main/libs/${pkg.folder}` },
+		{ text: 'npm', link: `${npmUrl}${pkg.name}` },
 	)
 
 	return [{ text: pkg.name, items }]
