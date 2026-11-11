@@ -19,7 +19,8 @@ export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView {
 	const totalSize = headerSize + cueIdSize
 
 	const writer = new IsoBoxWriteView('iden', totalSize)
-	writer.writeUtf8TerminatedString(box.cueId)
+	writer.writeBytes(cueIdBytes)
+	writer.writeUint(0, 1)
 
 	return writer
 }
