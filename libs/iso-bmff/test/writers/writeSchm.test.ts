@@ -8,6 +8,10 @@ import {
 	type SchemeTypeBox,
 } from '../util/box.ts'
 
+// 'é日😀' has one character of two, three, and four UTF-8 bytes.
+const TEXT = 'é日😀'
+const TEXT_BYTES = [0xc3, 0xa9, 0xe6, 0x97, 0xa5, 0xf0, 0x9f, 0x98, 0x80]
+
 function schm(flags: number, schemeUri?: string): SchemeTypeBox {
 	return {
 		type: 'schm',
@@ -87,6 +91,38 @@ describe('writeSchm', function () {
 		)
 	})
 
+	it('should write the UTF-8 bytes of a schemeUri that is not ASCII', function () {
+		const writer = writeSchm(schm(1, TEXT))
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([
+				0,
+				0,
+				0,
+				30,
+				115,
+				99,
+				104,
+				109,
+				0,
+				0,
+				0,
+				1,
+				99,
+				101,
+				110,
+				99,
+				0,
+				1,
+				0,
+				0,
+				...TEXT_BYTES,
+				0,
+			]),
+		)
+	})
+
 	it('should not write the schemeUri when flag 0x000001 is not set', function () {
 		const writer = writeSchm(schm(0, 'urn:a'))
 
@@ -123,7 +159,7 @@ describe('writeSchm', function () {
 		assert.deepStrictEqual(new Uint8Array(writeSchm(parsed).buffer), input)
 	})
 
-	for (const box of [schm(1, 'urn:a'), schm(1, ''), schm(0)]) {
+	for (const box of [schm(1, 'urn:a'), schm(1, TEXT), schm(1, ''), schm(0)]) {
 		it(`should write a box that readSchm reads with flags ${box.flags} and the schemeUri ${JSON.stringify(box.schemeUri)}`, function () {
 			const [parsed] = readIsoBoxes(new Uint8Array(writeSchm(box).buffer), {
 				readers: { schm: readSchm },

@@ -4,11 +4,16 @@ import {
 	filterBoxes,
 	it,
 	readDref,
+	readIsoBoxes,
 	readUrl,
 	writeUrl,
 	type DataEntryUrlBox,
 	type ParsedBox,
 } from '../util/box.ts'
+
+// 'é日😀' has one character of two, three, and four UTF-8 bytes.
+const TEXT = 'é日😀'
+const TEXT_BYTES = [0xc3, 0xa9, 0xe6, 0x97, 0xa5, 0xf0, 0x9f, 0x98, 0x80]
 
 describe('writeUrl', function () {
 	it('should write no location string when flag 0x000001 is set', function () {
@@ -98,6 +103,32 @@ describe('writeUrl', function () {
 			new Uint8Array([0, 0, 0, 14, 117, 114, 108, 32, 0, 0, 0, 2, 97, 0]),
 		)
 	})
+
+	it('should write the UTF-8 bytes of a location that is not ASCII', function () {
+		const writer = writeUrl({ type: 'url ', version: 0, flags: 0, location: TEXT })
+
+		// size: 12 + 9 location bytes + 1 null terminator = 22
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([0, 0, 0, 22, 117, 114, 108, 32, 0, 0, 0, 0, ...TEXT_BYTES, 0]),
+		)
+	})
+
+	for (const text of ['a.mp4', '', TEXT]) {
+		it(`should write a box that readUrl reads with the location '${text}'`, function () {
+			const box: DataEntryUrlBox = { type: 'url ', version: 0, flags: 0, location: text }
+			const [parsed] = readIsoBoxes(new Uint8Array(writeUrl(box).buffer), {
+				readers: { 'url ': readUrl },
+			})
+
+			assert.ok(parsed)
+			assert.strictEqual(parsed.type, 'url ')
+
+			const { type, version, flags, location } = parsed
+
+			assert.deepStrictEqual({ type, version, flags, location }, box)
+		})
+	}
 
 	it('should write the bytes of a parsed box that has flag 0x000001', function () {
 		const [dref] = filterBoxes('captions.mp4', 'dref', {

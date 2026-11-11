@@ -14,6 +14,6 @@ export function readUrl(view: IsoBoxReadView): DataEntryUrlBox {
 	return {
 		type: 'url ',
 		...view.readFullBox(),
-		location: view.readString(-1),
+		location: view.readUtf8(-1),
 	}
 }
