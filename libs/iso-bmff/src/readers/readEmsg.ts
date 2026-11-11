@@ -11,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  * @public
  */
 export function readEmsg(view: IsoBoxReadView): EventMessageBox {
-	const { readUint, readString, readData } = view
+	const { readUint, readUtf8, readData } = view
 	const { version, flags } = view.readFullBox()
 
 	if (version === 1) {
@@ -23,8 +23,8 @@ export function readEmsg(view: IsoBoxReadView): EventMessageBox {
 			presentationTime: readUint(8),
 			eventDuration: readUint(4),
 			id: readUint(4),
-			schemeIdUri: readString(-1),
-			value: readString(-1),
+			schemeIdUri: readUtf8(-1),
+			value: readUtf8(-1),
 			messageData: readData(-1),
 		}
 	}
@@ -33,8 +33,8 @@ export function readEmsg(view: IsoBoxReadView): EventMessageBox {
 		type: 'emsg',
 		version: 0,
 		flags,
-		schemeIdUri: readString(-1),
-		value: readString(-1),
+		schemeIdUri: readUtf8(-1),
+		value: readUtf8(-1),
 		timescale: readUint(4),
 		presentationTimeDelta: readUint(4),
 		eventDuration: readUint(4),

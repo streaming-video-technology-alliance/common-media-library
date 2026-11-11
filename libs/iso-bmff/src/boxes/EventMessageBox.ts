@@ -7,7 +7,9 @@ import type { FullBox } from './FullBox.ts'
  */
 export type EventMessageBoxBase = FullBox & {
 	type: 'emsg'
+	/** The URI that identifies the message scheme. The box stores a null-terminated UTF-8 string. */
 	schemeIdUri: string
+	/** The value of the event. The box stores a null-terminated UTF-8 string. */
 	value: string
 	timescale: number
 	eventDuration: number

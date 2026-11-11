@@ -163,8 +163,13 @@ export class IsoBoxWriteView {
 
 	/**
 	 * Writes a null terminated string to the data view.
+	 * The method writes one byte for each character.
+	 * For text that is not ASCII, use `writeUtf8TerminatedString`.
 	 *
 	 * @param value - The value to write.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeTerminatedString.test.ts#example}
 	 */
 	writeTerminatedString = (value: string): void => {
 		for (let c = 0, len = value.length; c < len; c++) {

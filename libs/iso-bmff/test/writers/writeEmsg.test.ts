@@ -1,6 +1,143 @@
 import { assert, describe, it, readEmsg, readIsoBoxes, writeEmsg } from '../util/box.ts'
 
+const SCHEME = [0x75, 0x72, 0x6e, 0x3a, 0xc3, 0xa9] // 'urn:é'
+const VALUE = [0xe6, 0x97, 0xa5, 0xe6, 0x9c, 0xac] // '日本'
+
 describe('writeEmsg', function () {
+	it('should write UTF-8 strings in a version 0 box', function () {
+		const writer = writeEmsg({
+			type: 'emsg',
+			version: 0,
+			flags: 0,
+			schemeIdUri: 'urn:é',
+			value: '日本',
+			timescale: 1000,
+			presentationTimeDelta: 5,
+			eventDuration: 10,
+			id: 7,
+			messageData: new Uint8Array([0xff]),
+		})
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([
+				0x00,
+				0x00,
+				0x00,
+				0x2b, // size
+				0x65,
+				0x6d,
+				0x73,
+				0x67, // type
+				0x00,
+				0x00,
+				0x00,
+				0x00, // version + flags
+				...SCHEME,
+				0x00, // schemeIdUri + terminator
+				...VALUE,
+				0x00, // value + terminator
+				0x00,
+				0x00,
+				0x03,
+				0xe8, // timescale
+				0x00,
+				0x00,
+				0x00,
+				0x05, // presentationTimeDelta
+				0x00,
+				0x00,
+				0x00,
+				0x0a, // eventDuration
+				0x00,
+				0x00,
+				0x00,
+				0x07, // id
+				0xff, // messageData
+			]),
+		)
+	})
+
+	it('should write UTF-8 strings in a version 1 box', function () {
+		const writer = writeEmsg({
+			type: 'emsg',
+			version: 1,
+			flags: 0,
+			timescale: 1000,
+			presentationTime: 5,
+			eventDuration: 10,
+			id: 7,
+			schemeIdUri: 'urn:é',
+			value: '日本',
+			messageData: new Uint8Array([0xff]),
+		})
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([
+				0x00,
+				0x00,
+				0x00,
+				0x2f, // size
+				0x65,
+				0x6d,
+				0x73,
+				0x67, // type
+				0x01,
+				0x00,
+				0x00,
+				0x00, // version + flags
+				0x00,
+				0x00,
+				0x03,
+				0xe8, // timescale
+				0x00,
+				0x00,
+				0x00,
+				0x00, // presentationTime (hi)
+				0x00,
+				0x00,
+				0x00,
+				0x05, // presentationTime (lo)
+				0x00,
+				0x00,
+				0x00,
+				0x0a, // eventDuration
+				0x00,
+				0x00,
+				0x00,
+				0x07, // id
+				...SCHEME,
+				0x00, // schemeIdUri + terminator
+				...VALUE,
+				0x00, // value + terminator
+				0xff, // messageData
+			]),
+		)
+	})
+
+	it('should read back a version 0 box whose value has the character U+0100', function () {
+		const writer = writeEmsg({
+			type: 'emsg',
+			version: 0,
+			flags: 0,
+			schemeIdUri: 'urn:a',
+			value: 'AĀB',
+			timescale: 1000,
+			presentationTimeDelta: 5,
+			eventDuration: 10,
+			id: 7,
+			messageData: new Uint8Array([0xff]),
+		})
+
+		const [box] = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
+
+		assert.strictEqual(box.type, 'emsg')
+		assert.strictEqual(box.value, 'AĀB')
+		assert.strictEqual(box.timescale, 1000)
+		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array([0xff]))
+	})
+
 	it('should write a version 1 EventMessageBox that can be read back correctly', function () {
 		const box = {
 			type: 'emsg' as const,
