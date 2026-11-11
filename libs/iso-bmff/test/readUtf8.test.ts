@@ -7,7 +7,9 @@ import {
 	readIsoBoxes,
 	readKind,
 	readLabl,
+	readPayl,
 	readPrsl,
+	readVttC,
 	writeElng,
 	writeIsoBox,
 	writeKind,
@@ -72,6 +74,8 @@ describe('IsoBoxReadView.readUtf8', function () {
 		const view = new IsoBoxReadView(new Uint8Array([...NIHON, ...MAIN]))
 
 		assert.strictEqual(view.readUtf8(-1), '日本main')
+		assert.strictEqual(view.cursor, 10)
+		assert.strictEqual(view.bytesRemaining, 0)
 		assert.strictEqual(view.done, true)
 	})
 
@@ -80,7 +84,97 @@ describe('IsoBoxReadView.readUtf8', function () {
 		const view = new IsoBoxReadView(buffer.subarray(0, 6))
 
 		assert.strictEqual(view.readUtf8(-1), '日本')
+		assert.strictEqual(view.cursor, 6)
+		assert.strictEqual(view.bytesRemaining, 0)
 		assert.strictEqual(view.done, true)
+	})
+
+	it('should not move the view when no bytes remain', function () {
+		const view = new IsoBoxReadView(new Uint8Array([0x2a]))
+
+		assert.strictEqual(view.readUint(1), 0x2a)
+		assert.strictEqual(view.readUtf8(-1), '')
+		assert.strictEqual(view.cursor, 1)
+		assert.strictEqual(view.bytesRemaining, 0)
+	})
+
+	it('should read to the end of the view when the call has no size', function () {
+		const view = new IsoBoxReadView(new Uint8Array([...NIHON, ...MAIN]))
+
+		assert.strictEqual(view.readUtf8(), '日本main')
+		assert.strictEqual(view.cursor, 10)
+		assert.strictEqual(view.done, true)
+	})
+
+	it('should stop at the end of a view that ends inside a buffer when the call has no size', function () {
+		const buffer = new Uint8Array([...NIHON, ...MAIN])
+		const view = new IsoBoxReadView(buffer.subarray(0, 6))
+
+		assert.strictEqual(view.readUtf8(), '日本')
+		assert.strictEqual(view.cursor, 6)
+		assert.strictEqual(view.done, true)
+	})
+
+	it('should not move the view backward when the view is past the end', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		view.jump(6)
+
+		assert.strictEqual(view.readUtf8(), '')
+		assert.strictEqual(view.cursor, 6)
+	})
+
+	it('should read the number of bytes of a positive size', function () {
+		const view = new IsoBoxReadView(new Uint8Array([...NIHON, ...MAIN]))
+
+		assert.strictEqual(view.readUtf8(6), '日本')
+		assert.strictEqual(view.cursor, 6)
+		assert.strictEqual(view.readUtf8(4), 'main')
+		assert.strictEqual(view.done, true)
+	})
+
+	it('should leave the view at the end of a payl box that has no null byte', function () {
+		// A `payl` box with the cue text 'Hi' and no null byte.
+		const bytes = new Uint8Array([0, 0, 0, 10, 0x70, 0x61, 0x79, 0x6c, 0x48, 0x69])
+		let bytesRemaining = NaN
+
+		const [payl] = readIsoBoxes(bytes, {
+			readers: {
+				payl: (view: IsoBoxReadView) => {
+					const box = readPayl(view)
+					bytesRemaining = view.bytesRemaining
+					return box
+				},
+			},
+		})
+
+		assert.ok(payl)
+		assert.strictEqual(payl.type, 'payl')
+		assert.strictEqual(payl.cueText, 'Hi')
+		assert.strictEqual(bytesRemaining, 0)
+	})
+
+	it('should leave the view at the end of a vttC box', function () {
+		// A `vttC` box with the config 'WEBVTT'.
+		const bytes = new Uint8Array([
+			0, 0, 0, 14, 0x76, 0x74, 0x74, 0x43, 0x57, 0x45, 0x42, 0x56, 0x54, 0x54,
+		])
+		let bytesRemaining = NaN
+
+		const [vttC] = readIsoBoxes(bytes, {
+			readers: {
+				vttC: (view: IsoBoxReadView) => {
+					const box = readVttC(view)
+					bytesRemaining = view.bytesRemaining
+					return box
+				},
+			},
+		})
+
+		assert.ok(vttC)
+		assert.strictEqual(vttC.type, 'vttC')
+		assert.strictEqual(vttC.config, 'WEBVTT')
+		assert.strictEqual(bytesRemaining, 0)
 	})
 
 	for (const schemeUri of ['urn:é', 'urn:日本']) {
