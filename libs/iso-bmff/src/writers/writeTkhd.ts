@@ -1,5 +1,5 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
-import { TEMPLATE, UINT } from '../IsoBoxFields.ts'
+import { INT, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -58,7 +58,13 @@ export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView {
 	writer.writeUint(box.alternateGroup, 2)
 	writer.writeTemplate(box.volume, 2)
 	writer.writeUint(box.reserved3, 2)
-	writer.writeArray(box.matrix, TEMPLATE, 4, 9)
+	// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
+	writer.writeArray(
+		box.matrix.map((value, i) => Math.round(value * (i % 3 === 2 ? 0x40000000 : 0x10000))),
+		INT,
+		4,
+		9,
+	)
 	writer.writeTemplate(box.width, 4)
 	writer.writeTemplate(box.height, 4)
 

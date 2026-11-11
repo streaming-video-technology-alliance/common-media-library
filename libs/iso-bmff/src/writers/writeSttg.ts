@@ -15,11 +15,11 @@ export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView {
 	const settingsBytes = encodeText(box.settings)
 
 	const headerSize = 8
-	const settingsSize = settingsBytes.length + 1 // null-terminated
+	const settingsSize = settingsBytes.length
 	const totalSize = headerSize + settingsSize
 
 	const writer = new IsoBoxWriteView('sttg', totalSize)
-	writer.writeUtf8TerminatedString(box.settings)
+	writer.writeBytes(settingsBytes)
 
 	return writer
 }

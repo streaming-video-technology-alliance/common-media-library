@@ -12,6 +12,7 @@ and this project adheres to
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/error-codes](https://cml.svta.org/packages/error-codes/).
 
 ## [0.1.2] - 2026-10-18
 

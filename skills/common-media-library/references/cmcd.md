@@ -3,6 +3,8 @@
 
 Common Media Client Data (CMCD) encoding and decoding.
 
+Documentation: [cml.svta.org/packages/cmcd](https://cml.svta.org/packages/cmcd/)
+
 ## When to use
 
 - Add a CMCD report to a segment request as a query string or as headers: `appendCmcdQuery`, `appendCmcdHeaders`, `toCmcdQuery`, `toCmcdHeaders`

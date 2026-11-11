@@ -2,6 +2,8 @@
 
 RFC8941 Structured Field Values implementation.
 
+Documentation: [cml.svta.org/packages/structured-field-values](https://cml.svta.org/packages/structured-field-values/)
+
 ## When to use
 
 - Decode an RFC 8941 header such as CMCD, CMSD, or Priority into items, lists, or dictionaries: `decodeSfDict`, `decodeSfList`, `decodeSfItem`

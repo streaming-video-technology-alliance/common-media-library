@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/abr](https://cml.svta.org/packages/abr/).
+
 ## [0.3.0] - 2026-10-26
 
 ### Added

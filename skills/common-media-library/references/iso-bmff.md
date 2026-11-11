@@ -3,6 +3,8 @@
 
 ISO Base Media File Format (ISO BMFF) parsing.
 
+Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/)
+
 ## When to use
 
 - Parse the boxes of an init or media segment, with full content for the box types that you need: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`
@@ -1312,13 +1314,22 @@ export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox;
 export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox;
 
 // @public
+export function readStco(view: IsoBoxReadView): ChunkOffsetBox;
+
+// @public
 export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox;
+
+// @public
+export function readStsc(view: IsoBoxReadView): SampleToChunkBox;
 
 // @public
 export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E>;
 
 // @public
 export function readStss(view: IsoBoxReadView): SyncSampleBox;
+
+// @public
+export function readStsz(view: IsoBoxReadView): SampleSizeBox;
 
 // @public
 export function readSttg(view: IsoBoxReadView): WebVttSettingsBox;

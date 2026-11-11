@@ -7,15 +7,14 @@ import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 import type { ParsedBox } from './ParsedBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
+import { getTerminatedStringLength } from './utils/getTerminatedStringLength.ts'
 import { isContainer } from './utils/isContainer.ts'
 import { readData } from './utils/readData.ts'
 import { readInt } from './utils/readInt.ts'
 import { readString } from './utils/readString.ts'
 import { readTemplate } from './utils/readTemplate.ts'
-import { readTerminatedString } from './utils/readTerminatedString.ts'
 import { readUint } from './utils/readUint.ts'
 import { readUtf8String } from './utils/readUtf8String.ts'
-import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
@@ -129,9 +128,9 @@ export class IsoBoxReadView {
 
 			case STRING:
 				if (size === -1) {
-					const text = readTerminatedString(dataView, offset)
-					result = text
-					cursor = text.length + 1
+					const length = getTerminatedStringLength(dataView, offset)
+					result = readString(dataView, offset, length)
+					cursor = length < this.bytesRemaining ? length + 1 : length
 				} else {
 					result = readString(dataView, offset, size)
 				}
@@ -146,11 +145,12 @@ export class IsoBoxReadView {
 
 			case UTF8:
 				if (size === -1) {
-					const text = readUtf8TerminatedString(dataView, offset)
-					result = text
-					cursor = text.length + 1
+					const length = getTerminatedStringLength(dataView, offset)
+					result = readUtf8String(dataView, offset, length)
+					cursor = length < this.bytesRemaining ? length + 1 : length
 				} else {
-					result = readUtf8String(dataView, offset)
+					cursor = size > 0 ? size : Math.max(this.bytesRemaining, 0)
+					result = readUtf8String(dataView, offset, cursor)
 				}
 				break
 
@@ -204,18 +204,22 @@ export class IsoBoxReadView {
 	/**
 	 * Reads a string from the data view.
 	 *
-	 * @param size - The size of the string in bytes.
+	 * @param size - The size of the string in bytes. With `-1`, the method reads to the first null byte or to the end of the view.
 	 * @returns The string.
+	 *
+	 * @example
+	 * {@includeCode ../test/readString.test.ts#example}
 	 */
 	readString = (size: number): string => {
 		return this.read(STRING, size)
 	}
 
 	/**
-	 * Reads a template from the data view.
+	 * Reads an unsigned fixed-point value from the data view.
+	 * Half of the bytes hold the integer part, and half hold the fraction.
 	 *
-	 * @param size - The size of the template in bytes.
-	 * @returns The template.
+	 * @param size - The size of the value in bytes.
+	 * @returns The value.
 	 */
 	readTemplate = (size: number): number => {
 		return this.read(TEMPLATE, size)
@@ -234,8 +238,11 @@ export class IsoBoxReadView {
 	/**
 	 * Reads a UTF-8 string from the data view.
 	 *
-	 * @param size - The size of the string in bytes.
+	 * @param size - The size of the string in bytes. With `-1`, the method reads to the first null byte or to the end of the view. With no size, the method reads to the end of the view.
 	 * @returns The UTF-8 string.
+	 *
+	 * @example
+	 * {@includeCode ../test/readUtf8.test.ts#example}
 	 */
 	readUtf8 = (size?: number): string => {
 		return this.read(UTF8, size)

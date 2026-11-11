@@ -3,6 +3,8 @@
 
 WebVTT parsing and rendering functionality.
 
+Documentation: [cml.svta.org/packages/webvtt](https://cml.svta.org/packages/webvtt/)
+
 ## When to use
 
 - Parse a WebVTT file or segment into cues, regions, and styles: `parseWebVtt`, `WebVttParser`
