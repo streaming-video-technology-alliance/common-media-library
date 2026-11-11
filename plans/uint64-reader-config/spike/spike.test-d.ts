@@ -13,6 +13,7 @@ import {
 	writeIsoBox,
 	writeTfdt,
 	type IsoBoxReaderMap,
+	type IsoBoxReadViewConfig,
 	type IsoInt64,
 	type IsoInt64Reader,
 	type ParsedBox,
@@ -179,7 +180,7 @@ for (const box of readIsoBoxes(buffer, { readers: { tfdt: readTfdt64 } })) {
 	}
 }
 
-// 10. A custom reader that follows the option is generic, like the built-in readers.
+// 10. A custom reader that follows the option is generic, like the built-in readers of affected boxes.
 const readTfdtAware = <V extends IsoInt64>(view: IsoBoxReadView<V>) => {
 	const { version, flags } = view.readFullBox()
 	return {
@@ -408,19 +409,20 @@ for (const box of readIsoBoxes(buffer, {
 	}
 }
 
-// 23. Probe for RFC question 7. A reader of an unaffected box that is not generic and takes a view of either mode.
-declare function readMfhdWide(view: IsoBoxReadView<IsoInt64>): {
-	type: 'mfhd'
-	sequenceNumber: number
-}
-for (const box of readIsoBoxes(buffer, { readers: { tfdt: readTfdt, mfhd: readMfhdWide } })) {
+// 23. A reader of an unaffected box has no type parameter and takes a view of either mode.
+//     `readMfhd` has that form. The same holds for a custom reader that does not follow the option.
+const readFreeEither = (view: IsoBoxReadView<IsoInt64>) => ({
+	type: 'free' as const,
+	size: view.readUint(4),
+})
+for (const box of readIsoBoxes(buffer, { readers: { tfdt: readTfdt, free: readFreeEither } })) {
 	if (box.type === 'tfdt') {
 		expectEqual<typeof box.baseMediaDecodeTime, number>()
 	}
 }
 for (const box of readIsoBoxes(buffer, {
 	int64: readInt64AsBigInt,
-	readers: { tfdt: readTfdt, mfhd: readMfhdWide },
+	readers: { tfdt: readTfdt, mfhd: readMfhd, free: readFreeEither },
 })) {
 	if (box.type === 'tfdt') {
 		expectEqual<typeof box.baseMediaDecodeTime, bigint>()
@@ -428,12 +430,51 @@ for (const box of readIsoBoxes(buffer, {
 	if (box.type === 'mfhd') {
 		expectEqual<typeof box.sequenceNumber, number>()
 	}
+	if (box.type === 'free') {
+		expectEqual<typeof box.size, number>()
+	}
 }
-void readMfhdWide(bigView)
-void readMfhdWide(numView)
+void readFreeEither(bigView)
+void readFreeEither(numView)
+// A typed configuration and a typed map accept such a reader in both modes.
+export const typedBig: IsoBoxReadViewConfig<bigint> = {
+	int64: readInt64AsBigInt,
+	readers: { tfdt: readTfdt, mfhd: readMfhd, free: readFreeEither },
+}
+export const typedNumber: IsoBoxReadViewConfig = { readers: { tfdt: readTfdt, mfhd: readMfhd } }
+export const typedBigMap: IsoBoxReaderMap<bigint> = { mfhd: readMfhd, free: readFreeEither }
+// Readers next to the spread of the default configuration.
+for (const box of readIsoBoxes(buffer, {
+	...defaultReaderConfig({ int64: readInt64AsBigInt }),
+	readers: { tfdt: readTfdt, mfhd: readMfhd },
+})) {
+	if (box.type === 'tfdt') {
+		expectEqual<typeof box.baseMediaDecodeTime, bigint>()
+	}
+}
+// A reader of the view of either mode that reads a wide field gets the union type, in both modes.
+// A reader that follows the option is generic, as in case 10.
+const readUnionEither = (view: IsoBoxReadView<IsoInt64>) => ({
+	type: 'cust' as const,
+	value: view.readWideUint(8),
+})
+for (const box of readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: { cust: readUnionEither },
+})) {
+	if (box.type === 'cust') {
+		expectEqual<typeof box.value, number | bigint>()
+	}
+}
+// The rejected form, a generic reader of an unaffected box, also registers in both modes.
+declare function readMfhdGeneric<V extends IsoInt64>(
+	view: IsoBoxReadView<V>,
+): { type: 'mfhd'; sequenceNumber: number }
+void readIsoBoxes(buffer, { readers: { mfhd: readMfhdGeneric } })
+void readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: { mfhd: readMfhdGeneric } })
 
 // 24. A reader from a factory, such as `createAudioSampleEntryReader`, registers in both modes.
-//     The factory returns a generic reader, so that reader takes a view of either mode.
+//     The factory returns a reader with no type parameter that takes a view of either mode.
 for (const box of readIsoBoxes(buffer, {
 	readers: { tfdt: readTfdt, 'ec-3': createSampleEntryReader('ec-3') },
 })) {

@@ -192,18 +192,16 @@ export declare function readTfdt<V extends IsoInt64>(
 	view: IsoBoxReadView<V>,
 ): TrackFragmentBaseMediaDecodeTimeBox<V>
 
-/** A built-in reader of an unaffected box is generic too. Its return type does not use `V`. */
-export declare function readMfhd<V extends IsoInt64>(
-	view: IsoBoxReadView<V>,
-): MovieFragmentHeaderBox
+/** A built-in reader of an unaffected box has no type parameter. It takes a view of either mode. */
+export declare function readMfhd(view: IsoBoxReadView<IsoInt64>): MovieFragmentHeaderBox
 
 /**
- * A reader factory returns a generic reader, so that reader takes a view of either mode.
+ * A reader factory returns a reader of the same form: no type parameter, and a view of either mode.
  * The real package has `createAudioSampleEntryReader` and `createVisualSampleEntryReader`.
  */
 export declare function createSampleEntryReader<T extends string>(
 	type: T,
-): <V extends IsoInt64>(view: IsoBoxReadView<V>) => { type: T; dataReferenceIndex: number }
+): (view: IsoBoxReadView<IsoInt64>) => { type: T; dataReferenceIndex: number }
 
 /** `defaultReaderConfig` gains an optional argument that selects the mode of the returned configuration. */
 export declare function defaultReaderConfig<V extends IsoInt64 = number>(options?: {

@@ -37,16 +37,20 @@ report() { # the base label, then the other labels of the group
 pack base base/entry.ts
 pack proposal proposal/entry.ts
 pack proposalBigint proposal/entryBigint.ts
-pack proposalBigintNoCheck proposal/entryBigintNoCheck.ts
 pack proposalOverflow proposal/entryOverflow.ts
-pack proposalOverflowShort proposal/entryOverflowShort.ts
 pack proposalBoth proposal/entryBoth.ts
+# The forms of the two functions that the RFC rejected.
+pack rejectedBigintCheck proposal/entryBigintCheck.ts
+pack rejectedOverflowDecimal proposal/entryOverflowDecimal.ts
+pack rejectedOverflowHex proposal/entryOverflowHex.ts
+pack rejectedOverflowHexHint proposal/entryOverflowHexHint.ts
 pack inViewBigint inViewBigint/entry.ts
 pack inViewLiteral inViewLiteral/entry.ts
 pack inViewFunction inViewFunction/entry.ts
 pack inViewLiteralShort inViewLiteralShort/entry.ts
 pack inViewFunctionShort inViewFunctionShort/entry.ts
-report base proposal proposalBigint proposalBigintNoCheck proposalOverflow proposalOverflowShort proposalBoth \
+report base proposal proposalBigint proposalOverflow proposalBoth \
+	rejectedBigintCheck rejectedOverflowDecimal rejectedOverflowHex rejectedOverflowHexHint \
 	inViewBigint inViewLiteral inViewFunction inViewLiteralShort inViewFunctionShort
 
 # The write view. Every bundle contains IsoBoxWriteView.

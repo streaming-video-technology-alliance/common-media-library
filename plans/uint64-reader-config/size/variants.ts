@@ -69,23 +69,39 @@ ${
 }
 `
 
+type OverflowMessage = 'none' | 'decimal' | 'hex' | 'hexHint'
+
+const hexBody = (hint: string): string => `\t\t\tconst low = view.readUint(4)
+\t\t\tif (high > 0x1fffff || high < -0x200000) {
+\t\t\t\tconst hex = (word: number) => (word >>> 0).toString(16).padStart(8, '0')
+\t\t\t\tonOverflow(new RangeError(\`0x\${hex(high)}\${hex(low)} is outside the safe integer range${hint}\`))
+\t\t\t}
+\t\t\treturn high * 4294967296 + low`
+
+// The 8-byte branch of the overflow reader, for each form of the message.
+const overflowBody: Record<OverflowMessage, string> = {
+	none: `\t\t\tconst low = view.readUint(4)
+\t\t\tif (high > 0x1fffff || high < -0x200000) {
+\t\t\t\tonOverflow(new RangeError('64-bit value is outside the safe integer range'))
+\t\t\t}
+\t\t\treturn high * 4294967296 + low`,
+	decimal: `\t\t\tconst value = high * 4294967296 + view.readUint(4)
+\t\t\tif (high > 0x1fffff || high < -0x200000) {
+\t\t\t\tonOverflow(new RangeError(\`A 64-bit value near \${value} is outside the safe integer range\`))
+\t\t\t}
+\t\t\treturn value`,
+	hex: hexBody(''),
+	hexHint: hexBody('. Use readInt64AsBigInt to read the exact value.'),
+}
+
 const overflowFunction = (
-	value: boolean,
+	message: OverflowMessage,
 ): string => `import type { IsoBoxReadView } from './IsoBoxReadView.ts'
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void) {
 \treturn (view: IsoBoxReadView, size: 4 | 8, signed: boolean): number => {
 \t\tif (size === 8) {
 \t\t\tconst high = signed ? view.readInt(4) : view.readUint(4)
-\t\t\tconst low = view.readUint(4)
-\t\t\tif (high > 0x1fffff || high < -0x200000) {
-${
-	value
-		? `\t\t\t\tconst hex = (word: number) => (word >>> 0).toString(16).padStart(8, '0')
-\t\t\t\tonOverflow(new RangeError(\`0x\${hex(high)}\${hex(low)} is outside the safe integer range. Use readInt64AsBigInt to read the exact value.\`))`
-		: "\t\t\t\tonOverflow(new RangeError('64-bit value is outside the safe integer range'))"
-}
-\t\t\t}
-\t\t\treturn high * 4294967296 + low
+${overflowBody[message]}
 \t\t}
 \t\treturn signed ? view.readInt(size) : view.readUint(size)
 \t}
@@ -93,16 +109,22 @@ ${
 `
 
 const proposal = join(out, 'proposal')
-writeFileSync(join(proposal, 'bigint.ts'), bigintFunction(true))
-writeFileSync(join(proposal, 'bigintNoCheck.ts'), bigintFunction(false))
-writeFileSync(join(proposal, 'overflow.ts'), overflowFunction(true))
-writeFileSync(join(proposal, 'overflowShort.ts'), overflowFunction(false))
+// The proposal: no `BigInt` check, and a message with no value.
+writeFileSync(join(proposal, 'bigint.ts'), bigintFunction(false))
+writeFileSync(join(proposal, 'overflow.ts'), overflowFunction('none'))
+// The forms of the two functions that the RFC rejected.
+writeFileSync(join(proposal, 'bigintCheck.ts'), bigintFunction(true))
+writeFileSync(join(proposal, 'overflowDecimal.ts'), overflowFunction('decimal'))
+writeFileSync(join(proposal, 'overflowHex.ts'), overflowFunction('hex'))
+writeFileSync(join(proposal, 'overflowHexHint.ts'), overflowFunction('hexHint'))
 const functionEntries: Record<string, string[]> = {
 	entryBigint: ['bigint'],
-	entryBigintNoCheck: ['bigintNoCheck'],
 	entryOverflow: ['overflow'],
-	entryOverflowShort: ['overflowShort'],
 	entryBoth: ['bigint', 'overflow'],
+	entryBigintCheck: ['bigintCheck'],
+	entryOverflowDecimal: ['overflowDecimal'],
+	entryOverflowHex: ['overflowHex'],
+	entryOverflowHexHint: ['overflowHexHint'],
 }
 for (const [entry, modules] of Object.entries(functionEntries)) {
 	const lines = modules.map(module => `export * from './${module}.ts'\n`)
