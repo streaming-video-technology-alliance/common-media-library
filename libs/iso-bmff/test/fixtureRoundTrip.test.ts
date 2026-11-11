@@ -22,28 +22,6 @@ import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 // - offsets: after the write, a chunk offset or a moof offset addresses other bytes.
 // The test fails when a line and the result differ, so a fix removes its lines.
 const EXCEPTIONS: Record<string, number> = {
-	// Issue 623: writeUrl writes a location that flag 0x000001 forbids.
-	'SRMP_AC4.mp4/url /bytes': 1,
-	'captions.mp4/url /bytes': 1,
-	'captions_fragmented.mp4/url /bytes': 1,
-	'editlist.mp4/url /bytes': 1,
-	'hvc1_init.mp4/url /bytes': 1,
-	'spliced_10000.m4v/url /bytes': 1,
-	'test_frag.mp4/url /bytes': 2,
-	'time_to_sample.mp4/url /bytes': 2,
-
-	// Issue 623: the url box grows by one byte and moves the media data.
-	'captions.mp4/stco/offsets': 30,
-	'editlist.mp4/stco/offsets': 1,
-	'test_frag.mp4/tfra/offsets': 3,
-
-	// Issue 624: writePrsl omits an empty tag that the flags declare.
-	'SRMP_AC4.mp4/prsl/bytes': 6,
-	'SRMP_AC4.mp4/prsl/values': 6,
-
-	// Issue 630: readUtf8(-1) moves past a string by the character count.
-	'SRMP_AC4.mp4/labl/remaining': 1,
-
 	// Issue 635: a string with no null byte moves the view past the end of the box.
 	'240fps_go_pro_hero_4.mp4/hdlr/remaining': 3,
 	'SRMP_AC4.mp4/url /remaining': 1,
