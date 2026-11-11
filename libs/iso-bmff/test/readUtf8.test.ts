@@ -133,9 +133,9 @@ describe('IsoBoxReadView.readUtf8', function () {
 		assert.strictEqual(view.done, true)
 	})
 
-	it('should stop at the end of the view when a positive size exceeds the bytes that remain', function () {
-		const buffer = new Uint8Array([...MAIN, ...NIHON])
-		const view = new IsoBoxReadView(buffer.subarray(0, 4))
+	it('should stop at the end of a view inside a buffer when a positive size exceeds the bytes that remain', function () {
+		const buffer = new Uint8Array([0x01, 0x02, ...MAIN, ...NIHON])
+		const view = new IsoBoxReadView(buffer.subarray(2, 6))
 
 		view.jump(2)
 
@@ -144,14 +144,23 @@ describe('IsoBoxReadView.readUtf8', function () {
 		assert.strictEqual(view.bytesRemaining, 0)
 	})
 
-	it('should stop at the end of the buffer when a positive size exceeds the bytes that remain', function () {
+	it('should compare a positive size with the bytes that remain, not with the size of the view', function () {
 		const view = new IsoBoxReadView(new Uint8Array(MAIN))
 
 		view.jump(2)
 
-		assert.strictEqual(view.readUtf8(8), 'in')
+		assert.strictEqual(view.readUtf8(3), 'in')
 		assert.strictEqual(view.cursor, 4)
 		assert.strictEqual(view.bytesRemaining, 0)
+	})
+
+	it('should not move the view when the view is past the end and the size is positive', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		view.jump(6)
+
+		assert.strictEqual(view.readUtf8(4), '')
+		assert.strictEqual(view.cursor, 6)
 	})
 
 	it('should leave the view at the end of a payl box that has no null byte', function () {
