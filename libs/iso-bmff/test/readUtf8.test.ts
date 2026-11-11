@@ -133,6 +133,27 @@ describe('IsoBoxReadView.readUtf8', function () {
 		assert.strictEqual(view.done, true)
 	})
 
+	it('should stop at the end of the view when a positive size exceeds the bytes that remain', function () {
+		const buffer = new Uint8Array([...MAIN, ...NIHON])
+		const view = new IsoBoxReadView(buffer.subarray(0, 4))
+
+		view.jump(2)
+
+		assert.strictEqual(view.readUtf8(8), 'in')
+		assert.strictEqual(view.cursor, 4)
+		assert.strictEqual(view.bytesRemaining, 0)
+	})
+
+	it('should stop at the end of the buffer when a positive size exceeds the bytes that remain', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		view.jump(2)
+
+		assert.strictEqual(view.readUtf8(8), 'in')
+		assert.strictEqual(view.cursor, 4)
+		assert.strictEqual(view.bytesRemaining, 0)
+	})
+
 	it('should leave the view at the end of a payl box that has no null byte', function () {
 		// A `payl` box with the cue text 'Hi' and no null byte.
 		const bytes = new Uint8Array([0, 0, 0, 10, 0x70, 0x61, 0x79, 0x6c, 0x48, 0x69])
