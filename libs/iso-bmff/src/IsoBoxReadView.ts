@@ -7,6 +7,7 @@ import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 import type { ParsedBox } from './ParsedBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
+import { getTerminatedStringLength } from './utils/getTerminatedStringLength.ts'
 import { isContainer } from './utils/isContainer.ts'
 import { readData } from './utils/readData.ts'
 import { readInt } from './utils/readInt.ts'
@@ -15,7 +16,6 @@ import { readTemplate } from './utils/readTemplate.ts'
 import { readTerminatedString } from './utils/readTerminatedString.ts'
 import { readUint } from './utils/readUint.ts'
 import { readUtf8String } from './utils/readUtf8String.ts'
-import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
@@ -146,9 +146,9 @@ export class IsoBoxReadView {
 
 			case UTF8:
 				if (size === -1) {
-					const text = readUtf8TerminatedString(dataView, offset)
-					result = text
-					cursor = text.length + 1
+					const length = getTerminatedStringLength(dataView, offset)
+					result = readUtf8String(dataView, offset, length)
+					cursor = length + 1
 				} else {
 					result = readUtf8String(dataView, offset)
 				}
