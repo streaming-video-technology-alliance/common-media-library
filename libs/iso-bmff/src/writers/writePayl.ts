@@ -15,12 +15,11 @@ export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView {
 	const cueTextBytes = encodeText(box.cueText)
 
 	const headerSize = 8
-	const cueTextSize = cueTextBytes.length + 1 // null-terminated
+	const cueTextSize = cueTextBytes.length
 	const totalSize = headerSize + cueTextSize
 
 	const writer = new IsoBoxWriteView('payl', totalSize)
 	writer.writeBytes(cueTextBytes)
-	writer.writeUint(0, 1)
 
 	return writer
 }
