@@ -215,10 +215,11 @@ export class IsoBoxReadView {
 	}
 
 	/**
-	 * Reads a template from the data view.
+	 * Reads an unsigned fixed-point value from the data view.
+	 * Half of the bytes hold the integer part, and half hold the fraction.
 	 *
-	 * @param size - The size of the template in bytes.
-	 * @returns The template.
+	 * @param size - The size of the value in bytes.
+	 * @returns The value.
 	 */
 	readTemplate = (size: number): number => {
 		return this.read(TEMPLATE, size)

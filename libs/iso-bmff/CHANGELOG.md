@@ -27,9 +27,21 @@ and this project adheres to
 - `defaultReaderConfig()` now includes readers for the `stco`, `stsc`, and `stsz` boxes. `writeIsoBoxes` with `defaultWriterConfig()` now writes the `stco`, `stsc`, and `stsz` boxes that `readIsoBoxes` reads with `defaultReaderConfig()`. Earlier releases throw a `RangeError` for `stco` and `stsc`, and write `stsz` without the sample sizes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
 - `writeUrl` no longer writes the `location` string when flag `0x000001` is set, even when `location` is not empty. Earlier releases add a null byte, so the `url ` box and the enclosing `dref` box are one byte too long ([#623](https://github.com/streaming-video-technology-alliance/common-media-library/issues/623)).
 - `writeIden`, `writePayl`, `writeSttg`, and `writeVlab` now write the string of the box with no null byte after the string. `readIden`, `readPayl`, `readSttg`, and `readVlab` still read the same string from a box that has the null byte. Earlier releases write a null byte after the string ([#636](https://github.com/streaming-video-technology-alliance/common-media-library/issues/636)).
+- `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value, so the bytes `00 01 80 00` read as 1.5. Earlier releases return 8193 for these bytes. The built-in readers now return the correct fraction of `rate`, `volume`, `matrix`, `width`, `height`, `horizresolution`, `vertresolution`, and `samplerate`.
+- `readMvhd` now reads `rate` as a signed value. A `rate` of -1 now reads as -1. Earlier releases return 65535 for this `rate`.
+- `readMvhd` and `readTkhd` now read `volume` and `matrix` as signed values. A `matrix` entry of -1, as in a rotated video, now reads as -1. Earlier releases return 65535 for this entry.
+- `readTkhd` now reads `layer` and `alternateGroup` as signed values. A `layer` of -1 now reads as -1. Earlier releases return 65535 for this `layer`.
+- `readMvhd` and `readTkhd` now read the `matrix` entries u, v, and w (indexes 2, 5, and 8) as 2.30 values. The entry w of the identity matrix now reads as 1. If your code compares w with 16384, compare w with 1.
+- `writeMvhd` and `writeTkhd` now write the `matrix` entries u, v, and w as 2.30 values. If your code passes 16384 for w, pass 1. The value 16384 now writes 0.
+- `readSmhd` now reads `balance` as a signed 8.8 value. The `balance` for full right reads as 1, and the `balance` for full left reads as -1. Earlier releases return 256 for full right and 65280 for full left.
+- `writeSmhd` now writes `balance` as a signed 8.8 value. If your code passes 256 for full right, pass 1. The value 256 now writes 0.
 
 ### Changed
 
+- The documentation of `IsoBoxReadView.readTemplate` now states that the method reads an unsigned fixed-point value.
+- The documentation of `IsoBoxWriteView.writeTemplate` and of the `TEMPLATE` field type now describes a fixed-point value. The `writeTemplate` documentation states the sizes 2 and 4 and the storage of a negative value.
+- The documentation of the `matrix` field of `MovieHeaderBox` and `TrackHeaderBox` now states the entry order and the identity matrix. The documentation also states the stored formats.
+- The documentation of the `balance` field of `SoundMediaHeaderBox` now states the values for full left, center, and full right.
 - The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
 - `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.

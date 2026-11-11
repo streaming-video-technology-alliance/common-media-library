@@ -22,7 +22,7 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('smhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
-	writer.writeUint(box.balance, 2)
+	writer.writeTemplate(box.balance, 2)
 	writer.writeUint(box.reserved, 2)
 
 	return writer

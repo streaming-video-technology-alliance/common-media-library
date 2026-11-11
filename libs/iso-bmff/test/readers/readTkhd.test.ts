@@ -1,0 +1,152 @@
+import { assert, describe, it, readIsoBoxes, readTkhd, writeTkhd } from '../util/box.ts'
+
+const IDENTITY = [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000]
+
+// A rotation of 90 degrees with a horizontal translation of 1080.
+const ROTATION = [0, 0x10000, 0, -0x10000, 0, 0, 1080 * 0x10000, 0, 0x40000000]
+
+// The entries u and v are -0.5 and 1.5.
+const PROJECTION = [0x10000, 0, -0x20000000, 0, 0x10000, 0x60000000, 0, 0, 0x40000000]
+
+// The entries a, b, u, and v hold the smallest and the largest stored integers.
+const LIMITS = [-0x80000000, 0x7fffffff, -0x80000000, 0, 0x10000, 0x7fffffff, 0, 0, 0x40000000]
+
+// A tkhd box. The arguments are the stored integers of the fixed-point fields.
+function createTkhd(
+	volume: number,
+	matrix: number[],
+	width: number,
+	height: number,
+	version: number = 0,
+): Uint8Array {
+	const shift = version === 1 ? 12 : 0
+	const bytes = new Uint8Array(92 + shift)
+	const view = new DataView(bytes.buffer)
+
+	view.setUint32(0, bytes.length)
+	view.setUint32(4, 0x746b6864) // 'tkhd'
+	view.setUint8(8, version)
+	view.setUint32(version === 1 ? 28 : 20, 1) // track_ID
+	view.setInt16(44 + shift, volume)
+	matrix.forEach((value, i) => view.setInt32(48 + shift + i * 4, value))
+	view.setUint32(84 + shift, width)
+	view.setUint32(88 + shift, height)
+
+	return bytes
+}
+
+function read(bytes: Uint8Array) {
+	const [box] = readIsoBoxes(bytes, { readers: { tkhd: readTkhd } })
+
+	assert.ok(box)
+	assert.strictEqual(box.type, 'tkhd')
+
+	return box
+}
+
+describe('readTkhd', function () {
+	it('should read the default values', function () {
+		const box = read(createTkhd(0x0100, IDENTITY, 1920 * 0x10000, 1080 * 0x10000))
+
+		assert.strictEqual(box.trackId, 1)
+		assert.strictEqual(box.volume, 1)
+		assert.deepStrictEqual(box.matrix, [1, 0, 0, 0, 1, 0, 0, 0, 1])
+		assert.strictEqual(box.width, 1920)
+		assert.strictEqual(box.height, 1080)
+	})
+
+	it('should read a negative layer', function () {
+		const bytes = createTkhd(0, IDENTITY, 0, 0)
+		new DataView(bytes.buffer).setInt16(40, -1)
+
+		assert.strictEqual(read(bytes).layer, -1)
+	})
+
+	it('should read a negative alternate group', function () {
+		const bytes = createTkhd(0, IDENTITY, 0, 0)
+		new DataView(bytes.buffer).setInt16(42, -2)
+
+		assert.strictEqual(read(bytes).alternateGroup, -2)
+	})
+
+	it('should read a negative volume', function () {
+		assert.strictEqual(read(createTkhd(-0x0100, IDENTITY, 0, 0)).volume, -1)
+		assert.strictEqual(read(createTkhd(-0x80, IDENTITY, 0, 0)).volume, -0.5)
+	})
+
+	it('should read a negative matrix entry', function () {
+		const box = read(createTkhd(0, ROTATION, 1920 * 0x10000, 1080 * 0x10000))
+
+		assert.deepStrictEqual(box.matrix, [0, 1, 0, -1, 0, 0, 1080, 0, 1])
+	})
+
+	it('should read u, v, and w as 2.30 values', function () {
+		const box = read(createTkhd(0, PROJECTION, 0, 0))
+
+		assert.deepStrictEqual(box.matrix, [1, 0, -0.5, 0, 1, 1.5, 0, 0, 1])
+	})
+
+	it('should read the width and the height as unsigned values', function () {
+		const box = read(createTkhd(0, IDENTITY, 0x9c408000, 0xffff0000))
+
+		assert.strictEqual(box.width, 40000.5)
+		assert.strictEqual(box.height, 65535)
+	})
+
+	it('should read the smallest and the largest values', function () {
+		const bytes = createTkhd(-0x8000, LIMITS, 0xffffffff, 0)
+		const view = new DataView(bytes.buffer)
+		view.setInt16(40, -0x8000)
+		view.setInt16(42, 0x7fff)
+
+		const box = read(bytes)
+
+		assert.strictEqual(box.layer, -32768)
+		assert.strictEqual(box.alternateGroup, 32767)
+		assert.strictEqual(box.volume, -128)
+		assert.strictEqual(read(createTkhd(0x7fff, IDENTITY, 0, 0)).volume, 127.99609375)
+		assert.deepStrictEqual(
+			box.matrix,
+			[-32768, 32767.999984741211, -2, 0, 1, 1.9999999990686774, 0, 0, 1],
+		)
+		assert.strictEqual(box.width, 65535.99998474121)
+	})
+
+	it('should read a version 1 box', function () {
+		const bytes = createTkhd(-0x80, PROJECTION, 1920 * 0x10000, 1080 * 0x10000, 1)
+		const view = new DataView(bytes.buffer)
+		view.setInt16(52, -1)
+		view.setInt16(54, -2)
+
+		const box = read(bytes)
+
+		assert.strictEqual(box.version, 1)
+		assert.strictEqual(box.trackId, 1)
+		assert.strictEqual(box.layer, -1)
+		assert.strictEqual(box.alternateGroup, -2)
+		assert.strictEqual(box.volume, -0.5)
+		assert.deepStrictEqual(box.matrix, [1, 0, -0.5, 0, 1, 1.5, 0, 0, 1])
+		assert.strictEqual(box.width, 1920)
+		assert.strictEqual(box.height, 1080)
+	})
+
+	it('should read values that writeTkhd writes back as the same bytes', function () {
+		const boxes = [
+			createTkhd(-0x80, PROJECTION, 0x9c408000, 1080 * 0x10000),
+			createTkhd(-0x80, PROJECTION, 0x9c408000, 1080 * 0x10000, 1),
+			createTkhd(-0x8000, LIMITS, 0xffffffff, 0),
+			createTkhd(0x7fff, LIMITS, 0, 0xffffffff),
+		]
+
+		for (const bytes of boxes) {
+			const shift = bytes.length - 92
+			const view = new DataView(bytes.buffer)
+			view.setInt16(40 + shift, -1)
+			view.setInt16(42 + shift, -2)
+
+			const writer = writeTkhd(read(bytes))
+
+			assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)
+		}
+	})
+})

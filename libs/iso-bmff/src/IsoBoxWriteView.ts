@@ -227,10 +227,12 @@ export class IsoBoxWriteView {
 	}
 
 	/**
-	 * Writes a template to the data view.
+	 * Writes a fixed-point value to the data view. Half of the bytes hold the integer part,
+	 * and half hold the fraction. The method stores a negative value as a two's complement
+	 * number.
 	 *
 	 * @param value - The value to write.
-	 * @param size - The size, in bytes, of the template.
+	 * @param size - The size, in bytes, of the value: 2 or 4.
 	 */
 	writeTemplate = (value: number, size: number): void => {
 		const shift = size === 4 ? 16 : 8
