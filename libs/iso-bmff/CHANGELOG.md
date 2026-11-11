@@ -29,7 +29,7 @@ and this project adheres to
 
 ### Changed
 
-- The documentation of `IsoBoxReadView.readTemplate` now states that a template is an unsigned fixed-point value.
+- The documentation of `IsoBoxReadView.readTemplate` now states that the method reads an unsigned fixed-point value.
 - The documentation of the `matrix` field of `MovieHeaderBox` and `TrackHeaderBox` now states the entry order and the identity matrix. The documentation also states the stored formats.
 - The documentation of the `balance` field of `SoundMediaHeaderBox` now states the values for full left, center, and full right.
 - The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
