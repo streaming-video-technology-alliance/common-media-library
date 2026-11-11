@@ -102,6 +102,73 @@ describe('writePrsl', function () {
 		)
 	})
 
+	it('should write an empty tag before a tag that is not empty', function () {
+		const writer = writePrsl(
+			{
+				type: 'prsl',
+				version: 0,
+				flags: 0x5000,
+				groupId: 1,
+				numEntitiesInGroup: 0,
+				entities: [],
+				preselectionTag: '',
+				interleavingTag: 'b',
+				boxes: [],
+			},
+			{ writers: {} },
+		)
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([
+				0, 0, 0, 23, 112, 114, 115, 108, 0, 0, 80, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 98, 0,
+			]),
+		)
+	})
+
+	it('should write a selection priority of 0 when flag 0x2000 is set and the box has no value', function () {
+		const writer = writePrsl(
+			{
+				type: 'prsl',
+				version: 0,
+				flags: 0x2000,
+				groupId: 1,
+				numEntitiesInGroup: 0,
+				entities: [],
+				boxes: [],
+			},
+			{ writers: {} },
+		)
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([0, 0, 0, 21, 112, 114, 115, 108, 0, 0, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]),
+		)
+	})
+
+	it('should write a tag as UTF-8 bytes', function () {
+		const writer = writePrsl(
+			{
+				type: 'prsl',
+				version: 0,
+				flags: 0x1000,
+				groupId: 1,
+				numEntitiesInGroup: 0,
+				entities: [],
+				preselectionTag: 'é',
+				boxes: [],
+			},
+			{ writers: {} },
+		)
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([
+				0, 0, 0, 23, 112, 114, 115, 108, 0, 0, 16, 0, 0, 0, 0, 1, 0, 0, 0, 0, 195, 169, 0,
+			]),
+		)
+	})
+
 	it('should write the tags and the selection priority that the flags declare', function () {
 		const writer = writePrsl(
 			{
@@ -191,7 +258,7 @@ describe('writePrsl', function () {
 			const input = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 
 			assert.strictEqual(box.interleavingTag, '')
-			assert.deepStrictEqual(writeIsoBox(box, defaultWriterConfig()), new Uint8Array(input))
+			assert.deepStrictEqual(writeIsoBox(box, defaultWriterConfig()), input)
 		}
 	})
 })

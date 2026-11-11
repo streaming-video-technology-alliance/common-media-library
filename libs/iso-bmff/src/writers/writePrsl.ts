@@ -8,6 +8,9 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 /**
  * Write a `PreselectionGroupBox` to an `IsoBoxWriteView`.
  *
+ * The writer writes `preselectionTag` when flag `0x1000` is set and `interleavingTag` when flag `0x4000` is set.
+ * The writer writes an empty string for a missing tag.
+ *
  * @param box - The `PreselectionGroupBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` to use
  *
