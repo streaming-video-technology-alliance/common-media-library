@@ -18,7 +18,9 @@ and this project adheres to
 - `IsoBoxReadView.readUtf8(-1)` now moves the view to the byte after the null byte of a string that has multi-byte characters. `readKind`, `readLabl`, and `readPrsl` now return the correct fields after such a string. Earlier releases return an empty `value` for a `kind` box with the `schemeUri` `urn:é` ([#630](https://github.com/streaming-video-technology-alliance/common-media-library/issues/630)).
 - `IsoBoxReadView.readUtf8(-1)` and `IsoBoxReadView.readString(-1)` now stop at the end of the view when the string has no null byte. Earlier releases move the view one byte past the end, and `bytesRemaining` is -1 ([#635](https://github.com/streaming-video-technology-alliance/common-media-library/issues/635)).
 - `IsoBoxReadView.readUtf8()` with no size now moves the view to the end of the view. Earlier releases return the string and do not move the view ([#635](https://github.com/streaming-video-technology-alliance/common-media-library/issues/635)).
-- `IsoBoxReadView.readUtf8(size)` with a positive `size` now reads `size` bytes. Earlier releases read every byte up to the end of the view ([#635](https://github.com/streaming-video-technology-alliance/common-media-library/issues/635)).
+- `IsoBoxReadView.readUtf8(size)` with a positive `size` now reads `size` bytes. With a `size` that exceeds the bytes that remain, the method reads to the end of the view and stops there. Earlier releases read every byte up to the end of the view ([#635](https://github.com/streaming-video-technology-alliance/common-media-library/issues/635)).
+- `IsoBoxReadView.readUtf8(0)` now reads no bytes and returns an empty string. Earlier releases return the string up to the end of the view ([#635](https://github.com/streaming-video-technology-alliance/common-media-library/issues/635)).
+- The `hdlr`, `url `, `urn `, and `schm` readers and writers now use UTF-8 for the `name`, `location`, and `schemeUri` strings. Earlier releases return `å,` for a `name` of `日本` after `writeHdlr` and `readHdlr` ([#631](https://github.com/streaming-video-technology-alliance/common-media-library/issues/631)).
 - `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReaderReturn` now includes the return type of an optional reader and no longer includes `undefined` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `writeSchm` now writes the null terminator of an empty `schemeUri` when flag `0x000001` is set. The writer writes an empty string for a missing `schemeUri` ([#628](https://github.com/streaming-video-technology-alliance/common-media-library/issues/628)).
@@ -35,6 +37,7 @@ and this project adheres to
 - `writeMvhd` and `writeTkhd` now write the `matrix` entries u, v, and w as 2.30 values. If your code passes 16384 for w, pass 1. The value 16384 now writes 0.
 - `readSmhd` now reads `balance` as a signed 8.8 value. The `balance` for full right reads as 1, and the `balance` for full left reads as -1. Earlier releases return 256 for full right and 65280 for full left.
 - `writeSmhd` now writes `balance` as a signed 8.8 value. If your code passes 256 for full right, pass 1. The value 256 now writes 0.
+- `readEmsg` and `writeEmsg` now read and write `schemeIdUri` and `value` as UTF-8, as ISO/IEC 23009-1 defines the fields. Earlier releases use one byte for each character, so a character that is not ASCII gives wrong bytes or a wrong string. A string with only ASCII characters reads and writes the same bytes as before ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
 
 ### Changed
 
@@ -50,6 +53,7 @@ and this project adheres to
 - Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/).
 - `writeElng`, `writeIden`, `writeKind`, `writeLabl`, `writePayl`, `writeSttg`, and `writeVlab` now encode each string one time. The written bytes of `writeElng`, `writeKind`, and `writeLabl` do not change ([#632](https://github.com/streaming-video-technology-alliance/common-media-library/issues/632)).
+- `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
 
 ## [1.0.7] - 2026-10-18
 

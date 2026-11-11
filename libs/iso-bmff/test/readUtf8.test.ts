@@ -133,6 +133,44 @@ describe('IsoBoxReadView.readUtf8', function () {
 		assert.strictEqual(view.done, true)
 	})
 
+	it('should read no bytes when the size is 0', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		assert.strictEqual(view.readUtf8(0), '')
+		assert.strictEqual(view.cursor, 0)
+		assert.strictEqual(view.readUtf8(4), 'main')
+	})
+
+	it('should stop at the end of a view inside a buffer when a positive size exceeds the bytes that remain', function () {
+		const buffer = new Uint8Array([0x01, 0x02, ...MAIN, ...NIHON])
+		const view = new IsoBoxReadView(buffer.subarray(2, 6))
+
+		view.jump(2)
+
+		assert.strictEqual(view.readUtf8(8), 'in')
+		assert.strictEqual(view.cursor, 4)
+		assert.strictEqual(view.bytesRemaining, 0)
+	})
+
+	it('should compare a positive size with the bytes that remain, not with the size of the view', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		view.jump(2)
+
+		assert.strictEqual(view.readUtf8(3), 'in')
+		assert.strictEqual(view.cursor, 4)
+		assert.strictEqual(view.bytesRemaining, 0)
+	})
+
+	it('should not move the view when the view is past the end and the size is positive', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		view.jump(6)
+
+		assert.strictEqual(view.readUtf8(4), '')
+		assert.strictEqual(view.cursor, 6)
+	})
+
 	it('should leave the view at the end of a payl box that has no null byte', function () {
 		// A `payl` box with the cue text 'Hi' and no null byte.
 		const bytes = new Uint8Array([0, 0, 0, 10, 0x70, 0x61, 0x79, 0x6c, 0x48, 0x69])
