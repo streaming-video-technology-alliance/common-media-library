@@ -30,7 +30,7 @@ for (const box of boxes) {
 
 A second exported function, `createInt64OverflowReader`, keeps `number` fields and reports a 64-bit value that a `number` cannot hold. The adopter passes a callback that throws or logs.
 
-The option takes a function so that a bundler can remove a function that the adopter does not import. An adopter who uses neither function ships 48 more bytes after gzip.
+The option takes a function so that a bundler can remove a function that the adopter does not import. An adopter who uses neither function ships 47 more bytes after gzip.
 
 Issue #611 calls the option `uint64`. This RFC proposes the name `int64`, because one affected field, `mediaTime` in `elst`, is signed.
 
@@ -215,9 +215,9 @@ Every declaration below gains a type parameter `V extends IsoInt64 = number`. Th
 | Maps and derived types | `IsoBoxMap`, `IsoBox`, `IsoBoxContainerMap`, `IsoBoxContainer`, `ParsedBox`, `ParsedIsoBox`, `IsoTypedParsedBox`, `IsoBoxReaderReturn` |
 | Reader plumbing | `IsoBoxReadViewConfig`, `IsoBoxReadView`, `IsoBoxReader` (third parameter), `IsoBoxReaderMap` |
 | Writer input | `IsoBoxStreamable`, and the box parameter of `IsoBoxWriter` |
-| Functions | `readIsoBoxes`, `isIsoBoxType`, `isContainer`, `defaultReaderConfig` (new optional argument), and all 66 built-in readers |
+| Functions | `readIsoBoxes`, `isIsoBoxType`, `isContainer`, `defaultReaderConfig` (new optional argument), and all 65 built-in readers |
 
-That is about 100 public declarations. Containers that hold no affected box, such as `SampleTableBox`, do not change. Every built-in reader becomes generic over the field type, because every reader has to accept a view of either mode. The 11 readers of affected boxes use the parameter in their return type. The other 55 do not. Question 7 covers an alternative for those 55 readers.
+That is about 100 public declarations. Containers that hold no affected box, such as `SampleTableBox`, do not change. Every built-in reader becomes generic over the field type, because every reader has to accept a view of either mode. The 11 readers of affected boxes use the parameter in their return type. The other 54 do not. Question 7 covers an alternative for those 54 readers.
 
 Four exports are new: the types `IsoInt64` and `IsoInt64Reader`, and the functions `readInt64AsBigInt` and `createInt64OverflowReader`.
 
@@ -283,16 +283,16 @@ In the rows without overflow, variant E does not separate from the code in the v
 
 The size cost has two parts. The view class is one unit for tree shaking, because its methods are arrow-function fields inside the constructor. Every adopter of `IsoBoxReadView` ships the code inside the view, with or without the option. The two exported functions are separate units, and a bundler removes a function that the adopter does not import.
 
-The table shows the growth of a bundle that contains the view class. The bundler is `vp pack` of vite-plus 1.3.0 with minification, and `@svta/cml-utils` is external. The base bundle is 3917 bytes. After gzip the base bundle is 1574 bytes. The scripts are in `plans/uint64-reader-config/size`.
+The table shows the growth of a bundle that contains the view class. The bundler is `vp pack` of vite-plus 1.3.0 with minification, and `@svta/cml-utils` is external. The base bundle is 3763 bytes. After gzip the base bundle is 1550 bytes. The scripts are in `plans/uint64-reader-config/size`.
 
 | The adopter | Growth in bytes, minified | Growth in bytes, after gzip |
 |---|---|---|
-| Does not set the option | 160 | 48 |
+| Does not set the option | 160 | 47 |
 | Imports `readInt64AsBigInt` | 418 | 155 |
-| Imports `createInt64OverflowReader` | 545 | 266 |
-| Imports both functions | 803 | 359 |
+| Imports `createInt64OverflowReader` | 545 | 263 |
+| Imports both functions | 803 | 360 |
 
-Two trims of the exported functions are possible. Without its `BigInt` check, `readInt64AsBigInt` is 46 bytes smaller after gzip. With a message that omits the value, `createInt64OverflowReader` is 59 bytes smaller after gzip. Questions 5 and 8 cover the two trims.
+Two trims of the exported functions are possible. Without its `BigInt` check, `readInt64AsBigInt` is 48 bytes smaller after gzip. With a message that omits the value, `createInt64OverflowReader` is 58 bytes smaller after gzip. Questions 5 and 8 cover the two trims.
 
 A reader of an affected box changes one call from `readUint` to `readWideUint`. That adds a few bytes per reader, and only for the readers that the adopter imports. The wide write methods are fields of `IsoBoxWriteView`, so every adopter of the write view ships them. The two wide write methods add 120 bytes after gzip to a bundle that contains the write view. No module-level statement references `BigInt` or the option, so the tree-shaking behavior of the package does not change.
 
@@ -350,7 +350,7 @@ export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> =
 
 ## Drawbacks
 
-- **Type parameter noise.** About 100 declarations gain a parameter, including all 66 built-in readers. Hover text shows `TrackFragmentBaseMediaDecodeTimeBox<number>` where it shows `TrackFragmentBaseMediaDecodeTimeBox` today. Adopters who never set the option see the parameter in every box type and every reader.
+- **Type parameter noise.** About 100 declarations gain a parameter, including all 65 built-in readers. Hover text shows `TrackFragmentBaseMediaDecodeTimeBox<number>` where it shows `TrackFragmentBaseMediaDecodeTimeBox` today. Adopters who never set the option see the parameter in every box type and every reader.
 - **Inference that depends on compiler details.** The design relies on three compiler behaviors. TypeScript instantiates a generic function against a contextual signature. `NoInfer` keeps the readers out of the inference. TypeScript uses the constraint for a generic reader in a variable. A future TypeScript release could change any of the three. The type tests from the spike move into the package test suite to guard all three.
 - **Custom readers and the option.** A custom reader written today cannot be combined with `readInt64AsBigInt` without a change to its signature. The error is clear and the fix is one type parameter, but it is a step that the guide has to explain. A generic custom reader in a variable also needs a type argument.
 - **A function as the option value.** The other options of the package take plain values. Here the adopter imports a function and passes it, and autocomplete does not list the two exported functions. Section [Rejected in this RFC](#rejected-in-this-rfc) shows the size cost of string values.
@@ -380,7 +380,7 @@ The alternative that the maintainers may prefer is to stop after #614. That fix 
 - **A reader map that accepts readers of both views**, as a union of two signatures or as one signature with a union parameter. Both let a custom reader of the default view register with `readInt64AsBigInt`. The union of signatures removes the contextual typing of inline readers, and the union parameter does not instantiate the generic built-in readers with the option. See [Result type inference](#result-type-inference).
 - **A second set of readers**, such as `readTfdt64`, with no option. The readers tree-shake perfectly and nothing branches at runtime. Against it: eleven near-duplicate exports, and no way to switch `defaultReaderConfig()` without a parameter that is an option by another name. The box types still need the parameter so that `ParsedIsoBox<bigint>` exists.
 - **A `bigint` option on `IsoBoxWriteViewConfig`.** The value carries its type. The writers accept both and check `typeof` once per 64-bit field.
-- **String values for the option, with the code in the view.** An earlier draft of this RFC had `int64: 'number' | 'bigint'` and a second option, `int64Overflow`, with the values `'ignore'`, `'throw'`, or a function. String values give autocomplete. But the view class then contains the code of both features, and every adopter ships that code. In that draft the view class grew by 379 bytes after gzip. The smallest form of that draft, a function-only `int64Overflow` with a short message, grew the view class by 294 bytes. The proposal grows the view class by 48 bytes.
+- **String values for the option, with the code in the view.** An earlier draft of this RFC had `int64: 'number' | 'bigint'` and a second option, `int64Overflow`, with the values `'ignore'`, `'throw'`, or a function. String values give autocomplete. But the view class then contains the code of both features, and every adopter ships that code. In that draft the view class grew by 381 bytes after gzip. The smallest form of that draft, a function-only `int64Overflow` with a short message, grew the view class by 294 bytes. The proposal grows the view class by 47 bytes.
 - **Wide write functions outside the view.** Two exported functions, `writeWideUint(writer, value, size)` and `writeWideInt(writer, value, size)`, replace the two wide write methods. An adopter who writes no affected box then ships no code for the feature. An adopter who writes affected boxes without `elst` ships 27 fewer bytes after gzip than with the methods. An adopter who writes `elst` ships 26 more. The RFC keeps the methods, so that the read view and the write view have the same API. A custom reader and a custom writer each call a wide method of the view.
 - **Throwing on overflow**, as shaka-player does. A thrown error at a `tfdt` read stops playback of a valid stream. The rounding bug is better than a hard stop, and the option removes both.
 
@@ -396,10 +396,10 @@ The alternative that the maintainers may prefer is to stop after #614. That fix 
 2. **Names of the methods and functions.** `readWideUint` and `readWideInt`, or another word for "follows the option". Overloading `readUint64` was rejected, because it returns `bigint` without the option today. `readInt64AsBigInt`, `createInt64OverflowReader`, and `IsoInt64Reader` are working names.
 3. **Version 0 fields.** This RFC gives them the `bigint` type with `readInt64AsBigInt`, for one field type per box. The alternative, `bigint` in version 1 only, is the rejected union.
 4. **Scope.** All 64-bit fields, as proposed, or the six time fields only. The RFC prefers all, so the adopter does not need the table in [Motivation](#motivation).
-5. **BigInt-less runtime.** `readInt64AsBigInt` checks for `BigInt` and throws a `TypeError` with its own message, as proposed. Without the check, the runtime throws its own error, and the function is 46 bytes smaller after gzip.
+5. **BigInt-less runtime.** `readInt64AsBigInt` checks for `BigInt` and throws a `TypeError` with its own message, as proposed. Without the check, the runtime throws its own error, and the function is 48 bytes smaller after gzip.
 6. **Ship the `IsoBoxReaderReturn` fix first.** The RFC proposes a separate pull request. Reviewers may prefer one.
-7. **Generic unaffected readers.** All 66 built-in readers become generic, as proposed, so that each accepts a view of either mode. The alternative gives the 55 unaffected readers the parameter type `IsoBoxReadView<IsoInt64>` and no type parameter. One case of the spike shows that such a reader registers in both modes. The API report then has 55 fewer type parameters.
-8. **Overflow message.** The `RangeError` message prints the value in hexadecimal, as proposed. A message without the value makes `createInt64OverflowReader` 59 bytes smaller after gzip.
+7. **Generic unaffected readers.** All 65 built-in readers become generic, as proposed, so that each accepts a view of either mode. The alternative gives the 54 unaffected readers the parameter type `IsoBoxReadView<IsoInt64>` and no type parameter. One case of the spike shows that such a reader registers in both modes. The API report then has 54 fewer type parameters.
+8. **Overflow message.** The `RangeError` message prints the value in hexadecimal, as proposed. A message without the value makes `createInt64OverflowReader` 58 bytes smaller after gzip.
 
 ## Future possibilities
 

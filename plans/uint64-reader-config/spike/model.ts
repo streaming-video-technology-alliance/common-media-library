@@ -1,6 +1,6 @@
 // Type-level spike for the `int64` reader option (RFC: rfc/uint64-reader-config.md).
 // A reduced model of the iso-bmff type plumbing. Nothing here is imported by libs/.
-// The real package has 11 affected box types, 8 affected container types, and 66 readers.
+// The real package has 11 affected box types, 8 affected container types, and 65 readers.
 // The model keeps one of each kind: tfdt (affected), mfhd (not affected), traf (container).
 // The option holds a function. The return type of the function is the type of every 64-bit field.
 
