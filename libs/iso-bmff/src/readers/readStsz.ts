@@ -5,7 +5,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 /**
  * Parse a `SampleSizeBox` from an `IsoBoxReadView`.
  *
- * The result has an `entrySize` list only when `sampleSize` is 0.
+ * When `sampleSize` is not 0, `entrySize` is `undefined`.
  *
  * ISO/IEC 14496-12:2012 - 8.7.3 Sample Size Box
  *

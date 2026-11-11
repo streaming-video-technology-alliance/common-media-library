@@ -57,6 +57,46 @@ describe('readStco', function () {
 		assert.deepStrictEqual(box.chunkOffset, [])
 	})
 
+	it('should read a chunk offset of 2^31 or greater as unsigned', function () {
+		const data = new Uint8Array([
+			0,
+			0,
+			0,
+			24, // size
+			115,
+			116,
+			99,
+			111, // type (stco)
+			0, // version
+			0,
+			0,
+			0, // flags
+			0,
+			0,
+			0,
+			2, // entryCount
+			128,
+			0,
+			0,
+			0, // chunkOffset[0] (2147483648)
+			255,
+			255,
+			255,
+			255, // chunkOffset[1] (4294967295)
+		])
+
+		const boxes = readIsoBoxes(data, { readers: { stco: readStco } })
+		const box = boxes[0]
+
+		assert.strictEqual(boxes.length, 1)
+
+		assert.strictEqual(box.type, 'stco')
+		assert.strictEqual(box.entryCount, 2)
+		assert.deepStrictEqual(box.chunkOffset, [2147483648, 4294967295])
+
+		assert.deepStrictEqual(new Uint8Array(writeStco(box).buffer), data)
+	})
+
 	it('should return a box that writeStco writes as the original bytes', function () {
 		let count = 0
 
