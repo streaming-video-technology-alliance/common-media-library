@@ -204,6 +204,8 @@ export class IsoBoxReadView {
 
 	/**
 	 * Reads a string from the data view.
+	 * The method reads one character for each byte.
+	 * For UTF-8 text, use `readUtf8`.
 	 *
 	 * @param size - The size of the string in bytes. With `-1`, the method reads to the first null byte or to the end of the view.
 	 * @returns The string.
