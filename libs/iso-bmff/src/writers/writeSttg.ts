@@ -19,7 +19,8 @@ export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView {
 	const totalSize = headerSize + settingsSize
 
 	const writer = new IsoBoxWriteView('sttg', totalSize)
-	writer.writeUtf8TerminatedString(box.settings)
+	writer.writeBytes(settingsBytes)
+	writer.writeUint(0, 1)
 
 	return writer
 }

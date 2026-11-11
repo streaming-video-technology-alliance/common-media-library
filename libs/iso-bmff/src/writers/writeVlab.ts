@@ -19,7 +19,8 @@ export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView {
 	const totalSize = headerSize + sourceLabelSize
 
 	const writer = new IsoBoxWriteView('vlab', totalSize)
-	writer.writeUtf8TerminatedString(box.sourceLabel)
+	writer.writeBytes(sourceLabelBytes)
+	writer.writeUint(0, 1)
 
 	return writer
 }
