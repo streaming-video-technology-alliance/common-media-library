@@ -56,4 +56,37 @@ describe('IsoBoxReadView.readData', function () {
 		assert.deepStrictEqual(Array.from(view.readData(-1)), [0x61, 0x69, 0x6e])
 		assert.strictEqual(view.cursor, 4)
 	})
+
+	it('should read no bytes when the view is past its end and the size is -1', function () {
+		const buffer = new Uint8Array([0x01, 0x02, ...MAIN, ...NEXT])
+		const view = new IsoBoxReadView(buffer.subarray(2, 6))
+
+		view.jump(6)
+
+		assert.deepStrictEqual(Array.from(view.readData(-1)), [])
+		assert.strictEqual(view.cursor, 6)
+	})
+
+	it('should read no bytes when the view is past its end and the size is positive', function () {
+		const buffer = new Uint8Array([0x01, 0x02, ...MAIN, ...NEXT])
+		const view = new IsoBoxReadView(buffer.subarray(2, 6))
+
+		view.jump(6)
+
+		assert.deepStrictEqual(Array.from(view.readData(4)), [])
+		assert.strictEqual(view.cursor, 6)
+	})
+
+	it('should return a view of the buffer, not a copy', function () {
+		const buffer = new Uint8Array([0x01, 0x02, ...MAIN, ...NEXT])
+		const view = new IsoBoxReadView(buffer.subarray(2, 6))
+
+		view.jump(1)
+
+		const data = view.readData(2)
+
+		assert.strictEqual(data.buffer, buffer.buffer)
+		assert.strictEqual(data.byteOffset, 3)
+		assert.strictEqual(data.length, 2)
+	})
 })

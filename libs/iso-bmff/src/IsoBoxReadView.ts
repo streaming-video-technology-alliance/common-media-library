@@ -231,8 +231,8 @@ export class IsoBoxReadView {
 	/**
 	 * Reads a byte array from the data view.
 	 *
-	 * @param size - The size of the data in bytes. With `-1`, the method reads to the end of the view. With a size that exceeds the bytes that remain, the method reads to the end of the view.
-	 * @returns The data.
+	 * @param size - The size of the data in bytes. With `-1` or a size that exceeds the bytes that remain, the method reads to the end of the view. With `0`, the method reads no bytes.
+	 * @returns The data. The array shares memory with the buffer of the view.
 	 *
 	 * @example
 	 * {@includeCode ../test/readData.test.ts#example}
