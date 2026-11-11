@@ -11,12 +11,14 @@ and this project adheres to
 ### Added
 
 - `IsoBoxReadView.readUint64` and `IsoBoxWriteView.writeUint64` read and write a 64-bit unsigned integer as a `bigint`. `readUint(8)` and `writeUint(value, 8)` use a `number`, which loses precision above 2^53 - 1. A custom reader for a 64-bit field, such as `baseMediaDecodeTime` in a version 1 `tfdt` box, can now keep the exact value ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `readStco`, `readStsc`, and `readStsz` are new readers for the `stco`, `stsc`, and `stsz` boxes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
 
 ### Fixed
 
 - `IsoBoxReaderReturn` no longer adds the built-in type of a box whose reader the configuration replaces. The result of `readIsoBoxes` with a custom `tfdt` reader now narrows to the return type of that reader ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReaderReturn` now includes the return type of an optional reader and no longer includes `undefined` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReadView.readInt(8)` now returns the correct value for a signed 64-bit integer such as -1. `readElst` now returns the correct `mediaTime` for a version 1 `elst` box, where -1 marks an empty edit. Earlier releases return -4294967297 for -1.
+- `defaultReaderConfig()` now includes readers for the `stco`, `stsc`, and `stsz` boxes. `writeIsoBoxes` with `defaultWriterConfig()` now writes the `stco`, `stsc`, and `stsz` boxes that `readIsoBoxes` reads with `defaultReaderConfig()`. Earlier releases throw a `RangeError` for `stco` and `stsc`, and write `stsz` without the sample sizes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
 - `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value, so the bytes `00 01 80 00` read as 1.5. Earlier releases return 8193 for these bytes. The built-in readers now return the correct fraction of `rate`, `volume`, `matrix`, `width`, `height`, `horizresolution`, `vertresolution`, and `samplerate`.
 - `readMvhd` and `readTkhd` now read `rate`, `volume`, and `matrix` as signed values. A `matrix` entry of -1, as in a rotated video, now reads as -1. Earlier releases return 65535 for this entry.
 - `readTkhd` now reads `layer` and `alternateGroup` as signed values. A `layer` of -1 now reads as -1. Earlier releases return 65535 for this `layer`.
