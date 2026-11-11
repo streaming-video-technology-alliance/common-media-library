@@ -18,6 +18,6 @@ export function readHdlr(view: IsoBoxReadView): HandlerReferenceBox {
 		preDefined: view.readUint(4),
 		handlerType: view.readString(4),
 		reserved: view.readArray(UINT, 4, 3),
-		name: view.readString(-1),
+		name: view.readUtf8(-1),
 	}
 }
