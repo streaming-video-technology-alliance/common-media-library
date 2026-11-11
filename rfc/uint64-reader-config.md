@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: `int64` reader option for exact 64-bit fields
@@ -410,7 +410,9 @@ No open questions remain. The Final Decision section records the decisions.
 
 ## Final Decision
 
-The questions of this RFC are decided. The acceptance of the RFC is pending.
+Accepted on 2026-11-11. The second pull request adds the option.
+
+The working files of this RFC, in `plans/uint64-reader-config/`, are not on `main`. Commit 0718985e1 of #613 contains them.
 
 Decided on 2026-11-10:
 
