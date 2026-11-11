@@ -9,7 +9,10 @@ type BenchPackage = Package & {
 	readInt64AsBigInt?: unknown
 	createInt64OverflowReader?: (onOverflow: () => void) => unknown
 }
-type BenchConfig = IsoBoxReadViewConfig & { int64?: unknown; int64Overflow?: () => void }
+type BenchConfig = Pick<IsoBoxReadViewConfig, 'readers'> & {
+	int64?: unknown
+	int64Overflow?: () => void
+}
 
 const [, , mod = 'base.js', mode] = process.argv
 const pkg = (await import(`./${mod}`)) as BenchPackage
@@ -59,14 +62,16 @@ if (mode === 'checked') {
 }
 
 // Sanity: the field type follows the mode when the variant supports it.
-const first = readIsoBoxes(buffer, config)[0] as { baseMediaDecodeTime?: unknown } | undefined
+const first = readIsoBoxes(buffer, config as IsoBoxReadViewConfig)[0] as
+	| { baseMediaDecodeTime?: unknown }
+	| undefined
 const sample = typeof first?.baseMediaDecodeTime
 
-for (let i = 0; i < 100; i++) readIsoBoxes(buffer, config) // warm up
+for (let i = 0; i < 100; i++) readIsoBoxes(buffer, config as IsoBoxReadViewConfig) // warm up
 const times: number[] = []
 for (let i = 0; i < 100; i++) {
 	const t0 = process.hrtime.bigint()
-	readIsoBoxes(buffer, config)
+	readIsoBoxes(buffer, config as IsoBoxReadViewConfig)
 	times.push(Number(process.hrtime.bigint() - t0))
 }
 times.sort((a, b) => a - b)

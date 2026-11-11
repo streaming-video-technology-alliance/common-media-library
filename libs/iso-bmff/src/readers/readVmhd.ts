@@ -1,6 +1,7 @@
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `VideoMediaHeaderBox` from an `IsoBoxReadView`.
@@ -11,7 +12,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readVmhd(view: IsoBoxReadView): VideoMediaHeaderBox {
+export function readVmhd(view: IsoBoxReadView<IsoInt64>): VideoMediaHeaderBox {
 	return {
 		type: 'vmhd',
 		...view.readFullBox(),

@@ -1,6 +1,7 @@
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `TrackEncryptionBox` from an `IsoBoxReadView`.
@@ -11,7 +12,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTenc(view: IsoBoxReadView): TrackEncryptionBox {
+export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox {
 	return {
 		type: 'tenc',
 		...view.readFullBox(),

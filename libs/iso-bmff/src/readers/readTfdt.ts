@@ -1,5 +1,6 @@
 import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragmentBaseMediaDecodeTimeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `TrackFragmentBaseMediaDecodeTimeBox` from an `IsoBoxReadView`.
@@ -10,13 +11,15 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTfdt(view: IsoBoxReadView): TrackFragmentBaseMediaDecodeTimeBox {
+export function readTfdt<V extends IsoInt64>(
+	view: IsoBoxReadView<V>,
+): TrackFragmentBaseMediaDecodeTimeBox<V> {
 	const { version, flags } = view.readFullBox()
 
 	return {
 		type: 'tfdt',
 		version,
 		flags,
-		baseMediaDecodeTime: view.readUint(version == 1 ? 8 : 4),
+		baseMediaDecodeTime: view.readWideUint(version == 1 ? 8 : 4),
 	}
 }

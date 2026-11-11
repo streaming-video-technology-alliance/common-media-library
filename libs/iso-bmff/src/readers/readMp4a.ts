@@ -1,5 +1,6 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
 
 /**
@@ -11,6 +12,6 @@ import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
  *
  * @public
  */
-export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<'mp4a'> {
+export function readMp4a(view: IsoBoxReadView<IsoInt64>): AudioSampleEntryBox<'mp4a'> {
 	return readAudioSampleEntryBox('mp4a', view)
 }

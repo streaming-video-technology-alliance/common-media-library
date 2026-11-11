@@ -1,5 +1,6 @@
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `EventMessageBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readEmsg(view: IsoBoxReadView): EventMessageBox {
+export function readEmsg<V extends IsoInt64>(view: IsoBoxReadView<V>): EventMessageBox<V> {
 	const { readUint, readUtf8, readData } = view
 	const { version, flags } = view.readFullBox()
 
@@ -20,7 +21,7 @@ export function readEmsg(view: IsoBoxReadView): EventMessageBox {
 			version: 1,
 			flags,
 			timescale: readUint(4),
-			presentationTime: readUint(8),
+			presentationTime: view.readWideUint(8),
 			eventDuration: readUint(4),
 			id: readUint(4),
 			schemeIdUri: readUtf8(-1),

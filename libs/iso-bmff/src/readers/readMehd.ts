@@ -1,5 +1,6 @@
 import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `MovieExtendsHeaderBox` from an `IsoBoxReadView`.
@@ -10,13 +11,13 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMehd(view: IsoBoxReadView): MovieExtendsHeaderBox {
+export function readMehd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieExtendsHeaderBox<V> {
 	const { version, flags } = view.readFullBox()
 
 	return {
 		type: 'mehd',
 		version,
 		flags,
-		fragmentDuration: view.readUint(version === 1 ? 8 : 4),
+		fragmentDuration: view.readWideUint(version === 1 ? 8 : 4),
 	}
 }

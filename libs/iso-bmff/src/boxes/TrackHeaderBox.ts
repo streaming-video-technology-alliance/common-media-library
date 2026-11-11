@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -5,13 +6,13 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type TrackHeaderBox = FullBox & {
+export type TrackHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'tkhd'
-	creationTime: number
-	modificationTime: number
+	creationTime: V
+	modificationTime: V
 	trackId: number
 	reserved1: number
-	duration: number
+	duration: V
 	reserved2: number[]
 	layer: number
 	alternateGroup: number

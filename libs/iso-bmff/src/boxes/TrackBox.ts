@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { EditBox } from './EditBox.ts'
 import type { MediaBox } from './MediaBox.ts'
 import type { TrackHeaderBox } from './TrackHeaderBox.ts'
@@ -9,14 +10,19 @@ import type { UserDataBox } from './UserDataBox.ts'
  *
  * @public
  */
-export type TrackBoxChild = TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox
+export type TrackBoxChild<V extends IsoInt64 = number> =
+	| TrackHeaderBox<V>
+	| TrackReferenceBox
+	| EditBox<V>
+	| MediaBox<V>
+	| UserDataBox
 
 /**
  * Track Box - 'trak' - Container
  *
  * @public
  */
-export type TrackBox = {
+export type TrackBox<V extends IsoInt64 = number> = {
 	type: 'trak'
-	boxes: TrackBoxChild[]
+	boxes: TrackBoxChild<V>[]
 }

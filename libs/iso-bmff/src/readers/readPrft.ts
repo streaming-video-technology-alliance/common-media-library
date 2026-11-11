@@ -1,5 +1,6 @@
 import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `ProducerReferenceTimeBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readPrft(view: IsoBoxReadView): ProducerReferenceTimeBox {
+export function readPrft<V extends IsoInt64>(view: IsoBoxReadView<V>): ProducerReferenceTimeBox<V> {
 	const { version, flags } = view.readFullBox()
 
 	return {
@@ -20,6 +21,6 @@ export function readPrft(view: IsoBoxReadView): ProducerReferenceTimeBox {
 		referenceTrackId: view.readUint(4),
 		ntpTimestampSec: view.readUint(4),
 		ntpTimestampFrac: view.readUint(4),
-		mediaTime: view.readUint(version === 1 ? 8 : 4),
+		mediaTime: view.readWideUint(version === 1 ? 8 : 4),
 	}
 }

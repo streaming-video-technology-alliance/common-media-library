@@ -12,6 +12,19 @@ and this project adheres to
 
 - `IsoBoxReadView.readUint64` and `IsoBoxWriteView.writeUint64` read and write a 64-bit unsigned integer as a `bigint`. `readUint(8)` and `writeUint(value, 8)` use a `number`, which loses precision above 2^53 - 1. A custom reader for a 64-bit field, such as `baseMediaDecodeTime` in a version 1 `tfdt` box, can now keep the exact value ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `readStco`, `readStsc`, and `readStsz` are new readers for the `stco`, `stsc`, and `stsz` boxes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
+- `IsoBoxReadViewConfig` has a new `int64` option. The option takes a function that reads every 64-bit integer field of the built-in readers. With no option, the readers return the same values and the same types as before ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `readInt64AsBigInt` is a new function for the `int64` option. The built-in readers then return every 64-bit integer field as a `bigint` with the exact value. The result type of `readIsoBoxes` follows the option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `createInt64OverflowReader` is a new function for the `int64` option. The built-in readers keep `number` fields. The function calls a callback with a `RangeError` when a 64-bit value is outside the safe integer range ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `IsoBoxReadView.readWideUint` and `IsoBoxReadView.readWideInt` read a field of 4 or 8 bytes with the function of the `int64` option. A custom reader calls these methods to follow the option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `defaultReaderConfig` takes an optional argument with the `int64` option. The readers of the returned configuration have the types of that option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `IsoInt64Reader` is the type of a function for the `int64` option. `IsoInt64` is the type `number | bigint` of a 64-bit integer field ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+
+### Changed
+
+- The box types with 64-bit integer fields, their container types, `ParsedIsoBox`, `IsoBoxReadView`, and the related types have a new type parameter. The parameter is the type of the 64-bit integer fields. The default is `number`, so existing references do not change ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- The built-in readers of boxes with no 64-bit integer field now take `IsoBoxReadView<IsoInt64>`, which accepts a view with `number` fields or `bigint` fields. The readers from `createAudioSampleEntryReader` and `createVisualSampleEntryReader` take the same view ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `isIsoBoxType` now narrows a box with `bigint` fields to the built-in box type with `bigint` fields ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- With `readInt64AsBigInt`, a custom reader of the type `(view: IsoBoxReadView) => ...` is a compile error. Type the view as `IsoBoxReadView<IsoInt64>`, or make the reader generic and call `readWideUint` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 
 ### Fixed
 

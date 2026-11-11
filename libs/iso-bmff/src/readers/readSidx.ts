@@ -1,6 +1,7 @@
 import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
 import type { SegmentIndexReference } from '../boxes/SegmentIndexReference.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `SegmentIndexBox` from an `IsoBoxReadView`.
@@ -11,16 +12,16 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSidx(view: IsoBoxReadView): SegmentIndexBox {
-	const { readUint } = view
+export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIndexBox<V> {
+	const { readUint, readWideUint } = view
 	const { version, flags } = view.readFullBox()
 	const v1 = version === 1
 	const size = v1 ? 8 : 4
 
 	const referenceId = readUint(4)
 	const timescale = readUint(4)
-	const earliestPresentationTime = readUint(size)
-	const firstOffset = readUint(size)
+	const earliestPresentationTime = readWideUint(size)
+	const firstOffset = readWideUint(size)
 	const reserved = readUint(2)
 	const referenceCount = readUint(2)
 	const references = view.readEntries<SegmentIndexReference>(referenceCount, () => {

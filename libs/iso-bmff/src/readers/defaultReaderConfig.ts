@@ -1,4 +1,6 @@
 import type { IsoBoxReadViewConfig } from '../IsoBoxReadViewConfig.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { IsoInt64Reader } from '../IsoInt64Reader.ts'
 import { readArdi } from './readArdi.ts'
 import { readAvc1 } from './readAvc1.ts'
 import { readAvc2 } from './readAvc2.ts'
@@ -66,12 +68,26 @@ import { readVtte } from './readVtte.ts'
 /**
  * Create a default reader configuration with all available readers pre-configured.
  *
+ * The `int64` option selects the type of every 64-bit integer field.
+ * The readers of the configuration have the types of that option.
+ * Pass the option here and do not add it to the configuration afterward.
+ *
+ * @param options - The options for the configuration.
  * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ *
+ * @example
+ * {@includeCode ../../test/readers/defaultReaderConfig.test.ts#example}
  *
  * @public
  */
-export function defaultReaderConfig(): IsoBoxReadViewConfig {
+export function defaultReaderConfig<V extends IsoInt64 = number>(options?: {
+	/**
+	 * The function that reads every 64-bit integer field of the built-in readers.
+	 */
+	int64?: IsoInt64Reader<V>
+}): IsoBoxReadViewConfig<V> {
 	return {
+		...options,
 		readers: {
 			ardi: readArdi,
 			avc1: readAvc1,
@@ -137,5 +153,5 @@ export function defaultReaderConfig(): IsoBoxReadViewConfig {
 			vttC: readVttC,
 			vtte: readVtte,
 		},
-	}
+	} as IsoBoxReadViewConfig<V>
 }

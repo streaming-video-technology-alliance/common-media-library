@@ -1,6 +1,7 @@
 import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
 import type { TrackFragmentRandomAccessEntry } from '../boxes/TrackFragmentRandomAccessEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `TrackFragmentRandomAccessBox` from an `IsoBoxReadView`.
@@ -11,7 +12,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox {
+export function readTfra<V extends IsoInt64>(
+	view: IsoBoxReadView<V>,
+): TrackFragmentRandomAccessBox<V> {
 	const { version, flags } = view.readFullBox()
 	const trackId = view.readUint(4)
 	const reserved = view.readUint(4)
@@ -22,9 +25,9 @@ export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox {
 
 	const numberOfEntry = view.readUint(4)
 
-	const entries = view.readEntries<TrackFragmentRandomAccessEntry>(numberOfEntry, () => ({
-		time: view.readUint(version === 1 ? 8 : 4),
-		moofOffset: view.readUint(version === 1 ? 8 : 4),
+	const entries = view.readEntries<TrackFragmentRandomAccessEntry<V>>(numberOfEntry, () => ({
+		time: view.readWideUint(version === 1 ? 8 : 4),
+		moofOffset: view.readWideUint(version === 1 ? 8 : 4),
 		trafNumber: view.readUint(lengthSizeOfTrafNum + 1),
 		trunNumber: view.readUint(lengthSizeOfTrunNum + 1),
 		sampleNumber: view.readUint(lengthSizeOfSampleNum + 1),
