@@ -2,6 +2,7 @@
 // Every `@ts-expect-error` line must fail to compile, and every other line must compile.
 import {
 	createInt64OverflowReader,
+	createSampleEntryReader,
 	defaultReaderConfig,
 	IsoBoxReadView,
 	isIsoBoxType,
@@ -11,6 +12,7 @@ import {
 	readTfdt,
 	writeIsoBox,
 	writeTfdt,
+	type IsoBoxReaderMap,
 	type IsoInt64,
 	type IsoInt64Reader,
 	type ParsedBox,
@@ -429,3 +431,47 @@ for (const box of readIsoBoxes(buffer, {
 }
 void readMfhdWide(bigView)
 void readMfhdWide(numView)
+
+// 24. A reader from a factory, such as `createAudioSampleEntryReader`, registers in both modes.
+//     The factory returns a generic reader, so that reader takes a view of either mode.
+for (const box of readIsoBoxes(buffer, {
+	readers: { tfdt: readTfdt, 'ec-3': createSampleEntryReader('ec-3') },
+})) {
+	if (box.type === 'tfdt') {
+		expectEqual<typeof box.baseMediaDecodeTime, number>()
+	}
+	if (box.type === 'ec-3') {
+		expectEqual<typeof box.dataReferenceIndex, number>()
+	}
+}
+for (const box of readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: { tfdt: readTfdt, 'ec-3': createSampleEntryReader('ec-3') },
+})) {
+	if (box.type === 'tfdt') {
+		expectEqual<typeof box.baseMediaDecodeTime, bigint>()
+	}
+	if (box.type === 'ec-3') {
+		expectEqual<typeof box.dataReferenceIndex, number>()
+	}
+}
+// A reader from a factory in a stored map keeps the mode of the call.
+const storedFactory = { tfdt: readTfdt, 'ec-3': createSampleEntryReader('ec-3') }
+for (const box of readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: storedFactory })) {
+	if (box.type === 'tfdt') {
+		expectEqual<typeof box.baseMediaDecodeTime, bigint>()
+	}
+}
+// A map of the type `IsoBoxReaderMap` takes a reader from a factory by assignment.
+// `@svta/cml-drm` builds its readers map in this way.
+const dynamicReaders: IsoBoxReaderMap = {}
+dynamicReaders['ec-3'] = createSampleEntryReader('ec-3')
+void dynamicReaders
+// The factory of today returns a reader of the number view. The bigint function rejects that reader.
+declare function createSampleEntryReaderToday<T extends string>(
+	type: T,
+): (view: IsoBoxReadView) => { type: T; dataReferenceIndex: number }
+const readerToday = createSampleEntryReaderToday('ec-3')
+void readIsoBoxes(buffer, { readers: { 'ec-3': readerToday } })
+// @ts-expect-error a reader of the number view cannot take a bigint view
+readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: { 'ec-3': readerToday } })

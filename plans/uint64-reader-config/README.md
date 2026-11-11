@@ -4,7 +4,7 @@ These files are working artifacts for the RFC. They exist on the feature branch 
 
 ## `spike/`
 
-A type-level model of the proposed changes. The model reduces the package to one affected box (`tfdt`), one unaffected box (`mfhd`), and one container (`traf`). Nothing in `libs/` imports it.
+A type-level model of the proposed changes. The model reduces the package to one affected box (`tfdt`), one unaffected box (`mfhd`), one container (`traf`), and one reader factory. Nothing in `libs/` imports it.
 
 - `model.ts` is the proposed type plumbing.
 - `spike.test-d.ts` is the test. Every `@ts-expect-error` line must fail to compile and every other line must compile.

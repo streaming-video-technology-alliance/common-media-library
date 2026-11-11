@@ -215,9 +215,11 @@ Every declaration below gains a type parameter `V extends IsoInt64 = number`. Th
 | Maps and derived types | `IsoBoxMap`, `IsoBox`, `IsoBoxContainerMap`, `IsoBoxContainer`, `ParsedBox`, `ParsedIsoBox`, `IsoTypedParsedBox`, `IsoBoxReaderReturn` |
 | Reader plumbing | `IsoBoxReadViewConfig`, `IsoBoxReadView`, `IsoBoxReader` (third parameter), `IsoBoxReaderMap` |
 | Writer input | `IsoBoxStreamable`, and the box parameter of `IsoBoxWriter` |
-| Functions | `readIsoBoxes`, `isIsoBoxType`, `isContainer`, `defaultReaderConfig` (new optional argument), and all 65 built-in readers |
+| Functions | `readIsoBoxes`, `isIsoBoxType`, `isContainer`, `defaultReaderConfig` (new optional argument), all 65 built-in readers, and the reader that `createAudioSampleEntryReader` or `createVisualSampleEntryReader` returns |
 
 That is about 100 public declarations. Containers that hold no affected box, such as `SampleTableBox`, do not change. Every built-in reader becomes generic over the field type, because every reader has to accept a view of either mode. The 11 readers of affected boxes use the parameter in their return type. The other 54 do not. Question 7 covers an alternative for those 54 readers.
+
+The two reader factories, `createAudioSampleEntryReader` and `createVisualSampleEntryReader`, return a generic reader. That reader also accepts a view of either mode, so the reader registers with and without the option. Today, each factory returns a reader of the default view, and `readInt64AsBigInt` rejects that reader. The spike asserts these three cases. The spike also asserts the assignment of such a reader to an `IsoBoxReaderMap`. `@svta/cml-drm` builds its readers map with that assignment.
 
 Four exports are new: the types `IsoInt64` and `IsoInt64Reader`, and the functions `readInt64AsBigInt` and `createInt64OverflowReader`.
 
@@ -298,7 +300,7 @@ A reader of an affected box changes one call from `readUint` to `readWideUint`. 
 
 ### Result type inference
 
-The spike in `plans/uint64-reader-config/spike` models the plumbing with one affected box, one unaffected box, and one container. `spike.test-d.ts` compiles under TypeScript 6.0.3 with the root `tsconfig.json` options and under TypeScript 5.7.3, the minimum version that the type declarations support. The test asserts every case in the guide above and every compile error named in this RFC. It also asserts that every call without the option returns today's types.
+The spike in `plans/uint64-reader-config/spike` models the plumbing with one affected box, one unaffected box, one container, and one reader factory. `spike.test-d.ts` compiles under TypeScript 6.0.3 with the root `tsconfig.json` options and under TypeScript 5.7.3, the minimum version that the type declarations support. The test asserts every case in the guide above and every compile error named in this RFC. It also asserts that every call without the option returns today's types.
 
 Five details of the model need explanation, because they are not obvious from the code.
 

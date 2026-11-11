@@ -1,7 +1,7 @@
 // Type-level spike for the `int64` reader option (RFC: rfc/uint64-reader-config.md).
 // A reduced model of the iso-bmff type plumbing. Nothing here is imported by libs/.
-// The real package has 11 affected box types, 8 affected container types, and 65 readers.
-// The model keeps one of each kind: tfdt (affected), mfhd (not affected), traf (container).
+// The real package has 11 affected box types, 8 affected container types, 65 readers, and 2 reader factories.
+// The model keeps one of each kind: tfdt (affected), mfhd (not affected), traf (container), and one factory.
 // The option holds a function. The return type of the function is the type of every 64-bit field.
 
 // ---------- the option ----------
@@ -196,6 +196,14 @@ export declare function readTfdt<V extends IsoInt64>(
 export declare function readMfhd<V extends IsoInt64>(
 	view: IsoBoxReadView<V>,
 ): MovieFragmentHeaderBox
+
+/**
+ * A reader factory returns a generic reader, so that reader takes a view of either mode.
+ * The real package has `createAudioSampleEntryReader` and `createVisualSampleEntryReader`.
+ */
+export declare function createSampleEntryReader<T extends string>(
+	type: T,
+): <V extends IsoInt64>(view: IsoBoxReadView<V>) => { type: T; dataReferenceIndex: number }
 
 /** `defaultReaderConfig` gains an optional argument that selects the mode of the returned configuration. */
 export declare function defaultReaderConfig<V extends IsoInt64 = number>(options?: {
