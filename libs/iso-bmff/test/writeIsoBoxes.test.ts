@@ -24,11 +24,18 @@ import { fixtureFiles } from './util/fixtureFiles.ts'
 import { parseFile } from './util/parseFile.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 
+function boxBytes(boxes: ParsedIsoBox[], types: string[]): Uint8Array[] {
+	return filterIsoBoxes(boxes, box => types.includes(box.type)).map(
+		({ view }) => new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
+	)
+}
+
 function sampleTableBytes(boxes: ParsedIsoBox[]): Uint8Array[] {
-	return filterIsoBoxes(
-		boxes,
-		box => box.type === 'stco' || box.type === 'stsc' || box.type === 'stsz',
-	).map(({ view }) => new Uint8Array(view.buffer, view.byteOffset, view.byteLength))
+	return boxBytes(boxes, ['stco', 'stsc', 'stsz'])
+}
+
+function headerBytes(boxes: ParsedIsoBox[]): Uint8Array[] {
+	return boxBytes(boxes, ['mvhd', 'tkhd', 'smhd'])
 }
 
 describe('writeIsoBoxes', function () {
@@ -179,6 +186,21 @@ describe('writeIsoBoxes', function () {
 			const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
 
 			deepEqual(sampleTableBytes(readIsoBoxes(written)), original, file)
+			count += original.length
+		}
+
+		ok(count > 0)
+	})
+
+	it('should keep the bytes of the mvhd, tkhd, and smhd boxes of every fixture', function () {
+		let count = 0
+
+		for (const file of fixtureFiles()) {
+			const boxes = parseFile(file, defaultReaderConfig())
+			const original = headerBytes(boxes)
+			const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
+
+			deepEqual(headerBytes(readIsoBoxes(written)), original, file)
 			count += original.length
 		}
 

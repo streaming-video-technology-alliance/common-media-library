@@ -27,6 +27,14 @@ describe('IsoBoxReadView.readTemplate', function () {
 		assert.strictEqual(readTemplate([0x01, 0x80], 2), 1.5)
 	})
 
+	it('should read a 16.16 value with the top bit set as an unsigned value', function () {
+		assert.strictEqual(readTemplate([0x80, 0x00, 0x00, 0x00], 4), 32768)
+	})
+
+	it('should read an 8.8 value with the top bit set as an unsigned value', function () {
+		assert.strictEqual(readTemplate([0xff, 0x80], 2), 255.5)
+	})
+
 	it('should advance the cursor by the size of the value', function () {
 		const view = new IsoBoxReadView(new Uint8Array([0x00, 0x01, 0x80, 0x00, 0x01, 0x80]))
 
