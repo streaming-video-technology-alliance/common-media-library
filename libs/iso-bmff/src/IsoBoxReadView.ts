@@ -150,7 +150,7 @@ export class IsoBoxReadView {
 					cursor = length < this.bytesRemaining ? length + 1 : length
 				} else {
 					const remaining = Math.max(this.bytesRemaining, 0)
-					cursor = size > 0 && size < remaining ? size : remaining
+					cursor = size >= 0 && size < remaining ? size : remaining
 					result = readUtf8String(dataView, offset, cursor)
 				}
 				break
@@ -245,7 +245,7 @@ export class IsoBoxReadView {
 	 * @example
 	 * {@includeCode ../test/readUtf8.test.ts#example}
 	 */
-	readUtf8 = (size?: number): string => {
+	readUtf8 = (size: number = Infinity): string => {
 		return this.read(UTF8, size)
 	}
 

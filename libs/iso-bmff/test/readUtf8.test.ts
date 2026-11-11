@@ -133,6 +133,14 @@ describe('IsoBoxReadView.readUtf8', function () {
 		assert.strictEqual(view.done, true)
 	})
 
+	it('should read no bytes when the size is 0', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		assert.strictEqual(view.readUtf8(0), '')
+		assert.strictEqual(view.cursor, 0)
+		assert.strictEqual(view.readUtf8(4), 'main')
+	})
+
 	it('should stop at the end of a view inside a buffer when a positive size exceeds the bytes that remain', function () {
 		const buffer = new Uint8Array([0x01, 0x02, ...MAIN, ...NIHON])
 		const view = new IsoBoxReadView(buffer.subarray(2, 6))
