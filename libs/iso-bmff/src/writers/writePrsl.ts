@@ -19,10 +19,8 @@ export function writePrsl(
 	box: PreselectionGroupBox,
 	config: IsoBoxWriteViewConfig,
 ): IsoBoxWriteView {
-	const preselectionTagBytes =
-		box.flags & 0x1000 && box.preselectionTag ? encodeText(box.preselectionTag) : null
-	const interleavingTagBytes =
-		box.flags & 0x4000 && box.interleavingTag ? encodeText(box.interleavingTag) : null
+	const preselectionTagBytes = box.flags & 0x1000 ? encodeText(box.preselectionTag ?? '') : null
+	const interleavingTagBytes = box.flags & 0x4000 ? encodeText(box.interleavingTag ?? '') : null
 
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -55,16 +53,16 @@ export function writePrsl(
 		writer.writeUint(entity.entityId, 4)
 	}
 
-	if (preselectionTagBytes && box.preselectionTag) {
-		writer.writeUtf8TerminatedString(box.preselectionTag)
+	if (preselectionTagBytes) {
+		writer.writeUtf8TerminatedString(box.preselectionTag ?? '')
 	}
 
 	if (box.flags & 0x2000) {
 		writer.writeUint(box.selectionPriority ?? 0, 1)
 	}
 
-	if (interleavingTagBytes && box.interleavingTag) {
-		writer.writeUtf8TerminatedString(box.interleavingTag)
+	if (interleavingTagBytes) {
+		writer.writeUtf8TerminatedString(box.interleavingTag ?? '')
 	}
 
 	writer.writeBytes(bytes)
