@@ -203,10 +203,6 @@ The adopter in issue #297 searched by function name. Only a function with that n
 1. **Name for `vttc`.** `readVttCue` and `writeVttCue`, as proposed. One alternative is `readVttc` and `writeVttc` in files with other names. The other alternative is no functions for `vttc`.
 2. **Default configurations.** The RFC keeps the container functions out of `defaultReaderConfig()` and `defaultWriterConfig()`. The alternative adds the container functions for a complete list, at the byte cost in [Drawbacks](#drawbacks).
 
-## Future possibilities
-
-- The `stco`, `stsc`, and `stsz` boxes have writers and no readers. Issue [#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619) reports that defect. The defect is not part of this RFC.
-
 ## Final Decision
 
 Pending review.
