@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"allowImportingTsExtensions": true,
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"noEmit": true,
+		"noImplicitAny": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUnusedParameters": true,
+		"rewriteRelativeImportExtensions": true,
+		"strict": true,
+		"target": "ES2019",
+		"types": [],
+		"verbatimModuleSyntax": true
+	},
+	"include": ["model.ts", "spike.test-d.ts"]
+}
