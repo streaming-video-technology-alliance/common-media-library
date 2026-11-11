@@ -19,7 +19,7 @@ and this project adheres to
 - `IsoBoxReaderReturn` now includes the return type of an optional reader and no longer includes `undefined` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReadView.readInt(8)` now returns the correct value for a signed 64-bit integer such as -1. `readElst` now returns the correct `mediaTime` for a version 1 `elst` box, where -1 marks an empty edit. Earlier releases return -4294967297 for -1.
 - `defaultReaderConfig()` now includes readers for the `stco`, `stsc`, and `stsz` boxes. `writeIsoBoxes` with `defaultWriterConfig()` now writes the `stco`, `stsc`, and `stsz` boxes that `readIsoBoxes` reads with `defaultReaderConfig()`. Earlier releases throw a `RangeError` for `stco` and `stsc`, and write `stsz` without the sample sizes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
-- `writeUrl` no longer writes the `location` string when flag `0x000001` is set. The writer omits `location` for that flag even when `location` is not empty. Earlier releases write a null byte for an empty `location`, so the box is one byte too long ([#623](https://github.com/streaming-video-technology-alliance/common-media-library/issues/623)).
+- `writeUrl` no longer writes the `location` string when flag `0x000001` is set, even when `location` is not empty. Earlier releases add a null byte, so the `url ` box and the enclosing `dref` box are one byte too long ([#623](https://github.com/streaming-video-technology-alliance/common-media-library/issues/623)).
 
 ### Changed
 

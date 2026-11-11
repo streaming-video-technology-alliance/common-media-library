@@ -1,4 +1,14 @@
-import { assert, describe, filterBoxes, it, readDref, readUrl, writeUrl } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	filterBoxes,
+	it,
+	readDref,
+	readUrl,
+	writeUrl,
+	type DataEntryUrlBox,
+	type ParsedBox,
+} from '../util/box.ts'
 
 describe('writeUrl', function () {
 	it('should write no location string when flag 0x000001 is set', function () {
@@ -56,8 +66,10 @@ describe('writeUrl', function () {
 	it('should write the null terminator of an empty location when flag 0x000001 is not set', function () {
 		const writer = writeUrl({ type: 'url ', version: 0, flags: 0, location: '' })
 
-		assert.strictEqual(writer.byteLength, 13)
-		assert.strictEqual(new Uint8Array(writer.buffer)[12], 0)
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([0, 0, 0, 13, 117, 114, 108, 32, 0, 0, 0, 0, 0]),
+		)
 	})
 
 	it('should omit a location that is not empty when flag 0x000001 is set', function () {
@@ -66,6 +78,24 @@ describe('writeUrl', function () {
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
 			new Uint8Array([0, 0, 0, 12, 117, 114, 108, 32, 0, 0, 0, 1]),
+		)
+	})
+
+	it('should write no location string when flag 0x000001 is set with another flag', function () {
+		const writer = writeUrl({ type: 'url ', version: 0, flags: 3, location: 'a' })
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([0, 0, 0, 12, 117, 114, 108, 32, 0, 0, 0, 3]),
+		)
+	})
+
+	it('should write the location string when only another flag is set', function () {
+		const writer = writeUrl({ type: 'url ', version: 0, flags: 2, location: 'a' })
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([0, 0, 0, 14, 117, 114, 108, 32, 0, 0, 0, 2, 97, 0]),
 		)
 	})
 
@@ -78,9 +108,9 @@ describe('writeUrl', function () {
 		assert.strictEqual(entry.type, 'url ')
 		assert.strictEqual(entry.flags, 1)
 
-		const { view } = entry as unknown as { view: DataView }
+		const { view } = entry as ParsedBox<DataEntryUrlBox>
 		const input = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 
-		assert.deepStrictEqual(new Uint8Array(writeUrl(entry).buffer), new Uint8Array(input))
+		assert.deepStrictEqual(new Uint8Array(writeUrl(entry).buffer), input)
 	})
 })
