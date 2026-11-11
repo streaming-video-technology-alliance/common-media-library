@@ -35,6 +35,7 @@ and this project adheres to
 - `writeMvhd` and `writeTkhd` now write the `matrix` entries u, v, and w as 2.30 values. If your code passes 16384 for w, pass 1. The value 16384 now writes 0.
 - `readSmhd` now reads `balance` as a signed 8.8 value. The `balance` for full right reads as 1, and the `balance` for full left reads as -1. Earlier releases return 256 for full right and 65280 for full left.
 - `writeSmhd` now writes `balance` as a signed 8.8 value. If your code passes 256 for full right, pass 1. The value 256 now writes 0.
+- `readEmsg` and `writeEmsg` now read and write `schemeIdUri` and `value` as UTF-8, as ISO/IEC 23009-1 defines the fields. Earlier releases use one byte for each character, so a character that is not ASCII gives wrong bytes or a wrong string. A string with only ASCII characters reads and writes the same bytes as before ([#631](https://github.com/streaming-video-technology-alliance/common-media-library/issues/631)).
 
 ### Changed
 
