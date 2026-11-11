@@ -26,6 +26,7 @@ and this project adheres to
 - `writePrsl` now writes every tag that the flags declare. The writer writes an empty string for an empty or missing `preselectionTag` or `interleavingTag`. Earlier releases omit an empty tag, and a read of the written box returns no child boxes ([#624](https://github.com/streaming-video-technology-alliance/common-media-library/issues/624)).
 - `defaultReaderConfig()` now includes readers for the `stco`, `stsc`, and `stsz` boxes. `writeIsoBoxes` with `defaultWriterConfig()` now writes the `stco`, `stsc`, and `stsz` boxes that `readIsoBoxes` reads with `defaultReaderConfig()`. Earlier releases throw a `RangeError` for `stco` and `stsc`, and write `stsz` without the sample sizes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
 - `writeUrl` no longer writes the `location` string when flag `0x000001` is set, even when `location` is not empty. Earlier releases add a null byte, so the `url ` box and the enclosing `dref` box are one byte too long ([#623](https://github.com/streaming-video-technology-alliance/common-media-library/issues/623)).
+- `writeIden`, `writePayl`, `writeSttg`, and `writeVlab` now write the string of the box with no null byte after the string. `readIden`, `readPayl`, `readSttg`, and `readVlab` still read the same string from a box that has the null byte. Earlier releases write a null byte after the string ([#636](https://github.com/streaming-video-technology-alliance/common-media-library/issues/636)).
 
 ### Changed
 
@@ -36,7 +37,7 @@ and this project adheres to
 - The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
 - Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/).
-- `writeElng`, `writeIden`, `writeKind`, `writeLabl`, `writePayl`, `writeSttg`, and `writeVlab` now encode each string one time. The written bytes do not change ([#632](https://github.com/streaming-video-technology-alliance/common-media-library/issues/632)).
+- `writeElng`, `writeIden`, `writeKind`, `writeLabl`, `writePayl`, `writeSttg`, and `writeVlab` now encode each string one time. The written bytes of `writeElng`, `writeKind`, and `writeLabl` do not change ([#632](https://github.com/streaming-video-technology-alliance/common-media-library/issues/632)).
 
 ## [1.0.7] - 2026-10-18
 

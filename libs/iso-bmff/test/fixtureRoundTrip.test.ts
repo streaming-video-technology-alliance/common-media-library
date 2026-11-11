@@ -22,12 +22,6 @@ import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 // - offsets: after the write, a chunk offset or a moof offset addresses other bytes.
 // The test fails when a line and the result differ, so a fix removes its lines.
 const EXCEPTIONS: Record<string, number> = {
-	// Issue 636: the writer adds a null byte after the string.
-	'vttc.mp4/iden/bytes': 2,
-	'vttc.mp4/payl/bytes': 1,
-	'vttc.mp4/sttg/bytes': 1,
-	'webvtt.m4s/payl/bytes': 3,
-
 	// PR 620: readTemplate and writeTemplate use a wrong divisor for the fraction.
 	'240fps_go_pro_hero_4.mp4/tkhd/bytes': 1,
 	'time_to_sample.mp4/tkhd/bytes': 1,
