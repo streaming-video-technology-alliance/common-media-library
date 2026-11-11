@@ -123,7 +123,7 @@ export declare function writeMoov(box: MovieBox, config: IsoBoxWriteViewConfig):
 | `trak` | `TrackBox` | `readTrak` | `writeTrak` |
 | `tref` | `TrackReferenceBox` | `readTref` | `writeTref` |
 | `udta` | `UserDataBox` | `readUdta` | `writeUdta` |
-| `vttc` | `WebVttCueBox` | `readVttCue` | `writeVttCue` |
+| `vttc` | `WebVttCueBox` | `readVttc` | `writeVttc` |
 
 ### Contract
 
@@ -135,20 +135,17 @@ export declare function writeMoov(box: MovieBox, config: IsoBoxWriteViewConfig):
 - **Existing exports.** `CONTAINERS` and `isContainer` do not change.
 - **Bundle size.** Each function is a function declaration. A bundle that does not import a function does not contain that function.
 
-### The name for `vttc`
+### The functions for `vttc`
 
-The naming rule gives `readVttc` and `writeVttc` for the `vttc` box. The package already exports `readVttC` and `writeVttC` for the `vttC` box.
+The naming rule gives `readVttc` and `writeVttc` for the `vttc` box. The package already exports `readVttC` and `writeVttC` for the `vttC` box. The RFC follows the naming rule, so `readVttc` and `readVttC` differ only in the case of one letter.
 
-`readVttc` and `readVttC` differ only in the case of one letter. That difference causes two problems:
-
-- Each function has a separate file. `readVttc.ts` and `readVttC.ts` are the same file on a file system that ignores case. The default file systems of macOS and Windows ignore case.
-- An adopter can import the wrong function through a mistake in one letter.
-
-This RFC proposes `readVttCue` and `writeVttCue`, after the `WebVttCueBox` type.
+Each function of the package has a file with the name of the function. `readVttc.ts` and `readVttC.ts` are the same file on a file system that ignores case. The default file systems of macOS and Windows ignore case. For that reason, the functions for `vttc` are in `readVttCue.ts` and `writeVttCue.ts`. The file names are not part of the public API.
 
 ### Default configurations
 
 `defaultReaderConfig()` and `defaultWriterConfig()` do not gain the container functions. Automatic container handling gives the same result, so the entries add bytes and no behavior. [Drawbacks](#drawbacks) shows the byte cost.
+
+The guides and the TSDoc state that each default configuration contains every reader or every writer. Those statements change to exclude the container functions.
 
 ### Documentation and tests
 
@@ -156,6 +153,7 @@ This RFC proposes `readVttCue` and `writeVttCue`, after the `WebVttCueBox` type.
 - The note in each guide names the container functions.
 - The "When to use" section of the README names `readMoov` and `writeMoov`.
 - Each function gets a test.
+- A test checks that every box type in `CONTAINERS` has a reader and a writer.
 
 ### Results of a trial build
 
@@ -171,7 +169,7 @@ The results of a trial build of the 38 functions match the contract. The trial b
 
 - **API surface.** The package gains 38 public exports. The removal of an export is a breaking change.
 - **Two equal configurations.** A configuration with container entries and a configuration without container entries give the same result. An adopter can conclude that the map needs a container entry. The TSDoc and the guides must state that the entry is optional.
-- **One exception to the naming rule.** `readVttCue` and `writeVttCue` do not follow the naming rule.
+- **Two names that differ only in case.** `readVttc` and `readVttC` differ in one letter. A map with `readVttC` under the `vttc` key compiles, because the map types accept any function under any key.
 - **Size.** Each imported container function adds bytes. The table after this list shows the measured byte cost.
 
 The bundler is `vp pack` with `--minify` and ESM output. `@svta/cml-utils` is external. Each "before" value is the same bundle without the container functions. The base of the trial build is `main` at commit `35c512e61`.
@@ -196,12 +194,15 @@ The adopter in issue #297 searched by function name. Only a function with that n
 - **One general pair.** `readContainer` and `writeContainer` add 2 exports. A search for `writeMoov` still finds nothing.
 - **Documentation only.** The guides already have the note that [Motivation](#motivation) describes.
 - **One shared function under 19 names.** An example is `export { writeContainerBox as writeMoov }`. Each name then accepts every container box type, so a call of `writeMoov` with a `moof` box compiles. The `name` property of each function is also the name of the shared function.
+- **Other names for `vttc`.** `readVttCue` and `writeVttCue` differ from `readVttC` by more than case. Those names do not follow the naming rule.
+- **Functions for the common box types only.** A later addition of a function is not a breaking change. A search for a missing name, such as `writeSinf`, still finds nothing.
+- **Container functions in the default configurations.** The entries complete the list of each default configuration and change no result. [Drawbacks](#drawbacks) shows the byte cost.
+- **An optional `config` argument for the writers.** A call of `writeMoov` with one argument then compiles. That call fails at run time for a typed child box, because the call has no writer for the child box.
 - **Required map entries.** The package removes automatic container handling, and every container box needs a map entry. That change breaks existing adopter code. An adopter who wants a `tfdt` box must then also list `moof` and `traf`.
 
 ## Unresolved questions
 
-1. **Name for `vttc`.** `readVttCue` and `writeVttCue`, as proposed. One alternative is `readVttc` and `writeVttc` in files with other names. The other alternative is no functions for `vttc`.
-2. **Default configurations.** The RFC keeps the container functions out of `defaultReaderConfig()` and `defaultWriterConfig()`. The alternative adds the container functions for a complete list, at the byte cost in [Drawbacks](#drawbacks).
+None.
 
 ## Final Decision
 
