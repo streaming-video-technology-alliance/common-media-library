@@ -22,21 +22,6 @@ import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 // - offsets: after the write, a chunk offset or a moof offset addresses other bytes.
 // The test fails when a line and the result differ, so a fix removes its lines.
 const EXCEPTIONS: Record<string, number> = {
-	// Issue 635: a string with no null byte moves the view past the end of the box.
-	'240fps_go_pro_hero_4.mp4/hdlr/remaining': 3,
-	'SRMP_AC4.mp4/url /remaining': 1,
-	'captions.mp4/url /remaining': 1,
-	'captions_fragmented.mp4/url /remaining': 1,
-	'editlist.mp4/url /remaining': 1,
-	'hvc1_init.mp4/url /remaining': 1,
-	'spliced_10000.m4v/url /remaining': 1,
-	'test_frag.mp4/url /remaining': 2,
-	'time_to_sample.mp4/url /remaining': 2,
-	'vttc.mp4/iden/remaining': 2,
-	'vttc.mp4/payl/remaining': 1,
-	'vttc.mp4/sttg/remaining': 1,
-	'webvtt.m4s/payl/remaining': 3,
-
 	// Issue 636: the writer adds a null byte after the string.
 	'vttc.mp4/iden/bytes': 2,
 	'vttc.mp4/payl/bytes': 1,
