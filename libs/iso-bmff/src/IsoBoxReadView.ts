@@ -231,8 +231,11 @@ export class IsoBoxReadView {
 	/**
 	 * Reads a byte array from the data view.
 	 *
-	 * @param size - The size of the data in bytes.
+	 * @param size - The size of the data in bytes. With `-1`, the method reads to the end of the view. With a size that exceeds the bytes that remain, the method reads to the end of the view.
 	 * @returns The data.
+	 *
+	 * @example
+	 * {@includeCode ../test/readData.test.ts#example}
 	 */
 	readData = (size: number): Uint8Array => {
 		return this.read(DATA, size)
