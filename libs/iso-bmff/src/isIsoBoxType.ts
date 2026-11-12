@@ -22,6 +22,15 @@ export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64>(
 ): box is IsoBoxMap<V>[T]
 
 /**
+ * Check if a value of an unknown type is a box of a specific type. This is a type guard function.
+ *
+ * The value narrows to the built-in box type with `number` fields.
+ *
+ * @param type - The type to check for
+ * @param box - The value to check
+ *
+ * @returns `true` if the value is a box of the specified type, `false` otherwise
+ *
  * @public
  */
 export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T]

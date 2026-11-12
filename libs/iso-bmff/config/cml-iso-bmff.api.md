@@ -307,7 +307,7 @@ export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64>(type
     view: IsoBoxReadView<V>;
 }): box is IsoBoxMap<V>[T];
 
-// @public (undocumented)
+// @public
 export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T];
 
 // @public
