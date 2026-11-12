@@ -7,6 +7,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2012 - 8.6.6 Edit List Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `EditListBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box

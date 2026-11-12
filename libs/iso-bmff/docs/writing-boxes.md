@@ -121,9 +121,70 @@ readableStream.pipeTo(stream.writable);
 
 ## Writing 64-bit fields
 
-The built-in writers take every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
+The built-in writers take each 64-bit field as a `number` or as a `bigint`. A `number` holds integers up to 2^53 - 1 exactly, and a `bigint` holds the exact value. The guide [Reading 64-bit fields](reading-boxes.md#reading-64-bit-fields) lists the fields.
 
-If your code has the exact value as a `bigint`, write the box with `IsoBoxWriteView` and call `writeUint64`:
+A box that `readIsoBoxes` reads with `readInt64AsBigInt` has `bigint` fields. The writers write that box with no conversion, and the writer configuration needs no option:
+
+```typescript
+import {
+	readInt64AsBigInt,
+	readIsoBoxes,
+	readTfdt,
+	writeIsoBox,
+	writeTfdt,
+} from "@svta/cml-iso-bmff";
+
+const [tfdt] = readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: {
+		tfdt: readTfdt,
+	},
+});
+
+if (tfdt?.type === "tfdt") {
+	tfdt.baseMediaDecodeTime += BigInt(90000);
+
+	const bytes = writeIsoBox(tfdt, { writers: { tfdt: writeTfdt } });
+}
+```
+
+A raw box object can hold a `bigint` too:
+
+```typescript
+import { writeIsoBox, writeTfdt } from "@svta/cml-iso-bmff";
+
+const bytes = writeIsoBox(
+	{
+		type: "tfdt",
+		version: 1,
+		flags: 0,
+		baseMediaDecodeTime: BigInt("17900000000000000"),
+	},
+	{ writers: { tfdt: writeTfdt } },
+);
+```
+
+A writer throws a `RangeError` for a `bigint` that does not fit the field. One example is a value above 2^32 - 1 in a version 0 box.
+
+A custom writer calls `writeWideUint` or `writeWideInt` on `IsoBoxWriteView`. Both methods take a `number` or a `bigint`, and the size of the field in bytes, 4 or 8:
+
+```typescript
+import {
+	IsoBoxWriteView,
+	type IsoInt64,
+	type TrackFragmentBaseMediaDecodeTimeBox,
+} from "@svta/cml-iso-bmff";
+
+const writeTfdtWide = (box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>) => {
+	const size = box.version === 1 ? 8 : 4;
+	const writer = new IsoBoxWriteView("tfdt", 12 + size);
+	writer.writeFullBox(box.version, box.flags);
+	writer.writeWideUint(box.baseMediaDecodeTime, size);
+	return writer;
+};
+```
+
+`writeUint64` writes a 64-bit field from a `bigint` only:
 
 ```typescript
 import { IsoBoxWriteView } from "@svta/cml-iso-bmff";
@@ -138,7 +199,7 @@ const writeTfdt64 = (baseMediaDecodeTime: bigint) => {
 const tfdt = writeTfdt64(BigInt("17900000000000000"));
 ```
 
-The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects. `IsoBoxReadView.readUint64` is the matching method for reading a `bigint`.
+The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects.
 
 ## Type safety
 

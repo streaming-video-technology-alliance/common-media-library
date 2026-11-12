@@ -8,6 +8,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 23009-1 - 5.10.3.3 Event Message Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `EventMessageBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box

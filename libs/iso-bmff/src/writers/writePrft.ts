@@ -7,6 +7,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `ProducerReferenceTimeBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box

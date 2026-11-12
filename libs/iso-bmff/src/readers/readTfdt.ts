@@ -5,6 +5,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 /**
  * Parse a `TrackFragmentBaseMediaDecodeTimeBox` from an `IsoBoxReadView`.
  *
+ * The 64-bit integer fields of the result have the type that the `int64` option of the view returns.
+ * With no option, they are numbers.
+ *
  * @param view - The `IsoBoxReadView` to read data from
  *
  * @returns A parsed `TrackFragmentBaseMediaDecodeTimeBox`

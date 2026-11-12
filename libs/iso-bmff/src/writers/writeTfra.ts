@@ -7,6 +7,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `TrackFragmentRandomAccessBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
