@@ -51,9 +51,14 @@ The size measurement for the Reference-level explanation of the RFC.
 - `variants.ts` copies `libs/iso-bmff/src` to a directory and writes one patched copy per variant. The `proposal` variant is the design of the RFC. Its `rejected` bundles contain the forms of the two exported functions that the RFC rejected: a `BigInt` check, and three messages with a value. The `inView` variants hold string values and the code of both features in the view, as an earlier draft of the RFC did. The `writeInView` variant adds the two wide write methods to the write view. The `writeFunctions` variant has the same code as functions outside the view.
 - `measure.sh` bundles every variant with `vp pack` and prints the minified, gzip, and brotli bytes with the growth over the base.
 
+- `real.sh` measures the implementation. It bundles `libs/iso-bmff/src` of the branch and of a base commit with the same options. `variants.ts` patches the source of the base, so it no longer runs on the branch.
+
 The directory must be outside the repo, so that `@svta/cml-utils` stays external.
 
 ```sh
 node plans/uint64-reader-config/size/variants.ts /tmp/int64-size
 bash plans/uint64-reader-config/size/measure.sh /tmp/int64-size
+
+# The implementation against origin/main
+bash plans/uint64-reader-config/size/real.sh /tmp/int64-size-real
 ```
