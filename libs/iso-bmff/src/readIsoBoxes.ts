@@ -43,10 +43,21 @@ export function readIsoBoxes<V extends IsoInt64 = number>(
 		? [config: IsoBoxReadViewConfig<V>]
 		: [config?: IsoBoxReadViewConfig<V>]
 ): ParsedIsoBox<V>[]
-export function readIsoBoxes(
-	raw: IsoBoxData,
-	config?: IsoBoxReadViewConfig<IsoInt64>,
-): ParsedIsoBox<IsoInt64>[] {
+
+/**
+ * Reads ISO boxes from a data source with `number` fields.
+ *
+ * `Parameters<typeof readIsoBoxes>` and `ReturnType<typeof readIsoBoxes>` resolve to this signature.
+ *
+ * @param raw - The raw ISO data
+ * @param config - The configuration for the IsoView
+ *
+ * @returns The parsed boxes
+ *
+ * @public
+ */
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[]
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[] {
 	const boxes = []
 
 	for (const box of new IsoBoxReadView(raw, config)) {

@@ -865,9 +865,9 @@ export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]>>(bo
 export function isFullBox(box: any): box is FullBox;
 
 // @public
-export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64>(type: T, box: IsoBox<V> | {
+export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
     view: IsoBoxReadView<V>;
-}): box is IsoBoxMap<V>[T];
+} | null | undefined): box is IsoBoxMap<V>[T];
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T];
@@ -1469,6 +1469,9 @@ export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoIn
 
 // @public
 export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadViewConfig<V>] : [config?: IsoBoxReadViewConfig<V>]): ParsedIsoBox<V>[];
+
+// @public
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[];
 
 // @public
 export function readKind(view: IsoBoxReadView<IsoInt64>): TrackKindBox;

@@ -16,9 +16,9 @@ import type { IsoInt64 } from './IsoInt64.ts'
  *
  * @public
  */
-export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64>(
+export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(
 	type: T,
-	box: IsoBox<V> | { view: IsoBoxReadView<V> },
+	box: IsoBox<V> | { view: IsoBoxReadView<V> } | null | undefined,
 ): box is IsoBoxMap<V>[T]
 
 /**

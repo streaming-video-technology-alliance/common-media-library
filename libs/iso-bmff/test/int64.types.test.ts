@@ -4,6 +4,7 @@ import {
 	createInt64OverflowReader,
 	defaultReaderConfig,
 	describe,
+	findIsoBox,
 	isContainer,
 	isIsoBoxType,
 	IsoBoxReadView,
@@ -16,6 +17,9 @@ import {
 	writeIsoBox,
 	writeIsoBoxes,
 	writeTfdt,
+	type Box,
+	type IsoBox,
+	type IsoBoxData,
 	type IsoBoxReaderMap,
 	type IsoBoxReadViewConfig,
 	type IsoInt64,
@@ -297,6 +301,86 @@ describe('int64 option types', function () {
 		} else {
 			assert.fail('expected a tfdt box')
 		}
+	})
+
+	it('5d. narrows a box that can be null or undefined with isIsoBoxType', function () {
+		const big = readIsoBoxes(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const plain = readIsoBoxes(buffer, defaultReaderConfig())
+		let count = 0
+
+		const optional = big.at(0)
+		expectType<Equal<typeof optional, ParsedIsoBox<bigint> | undefined>>(true)
+		if (isIsoBoxType('tfdt', optional)) {
+			expectType<Equal<typeof optional.baseMediaDecodeTime, bigint>>(true)
+			// @ts-expect-error a bigint field is not a number
+			const asNumber: number = optional.baseMediaDecodeTime
+			assert.strictEqual(asNumber, EXACT)
+			count++
+		}
+
+		const found = findIsoBox(big, box => box.size > 0)
+		expectType<Equal<typeof found, ParsedIsoBox<bigint> | null>>(true)
+		if (isIsoBoxType('tfdt', found)) {
+			expectType<Equal<typeof found.baseMediaDecodeTime, bigint>>(true)
+			assert.strictEqual(found.baseMediaDecodeTime, EXACT)
+			count++
+		}
+
+		const first = big.find(box => box.type === 'tfdt')
+		if (isIsoBoxType('tfdt', first)) {
+			expectType<Equal<typeof first.baseMediaDecodeTime, bigint>>(true)
+			assert.strictEqual(first.baseMediaDecodeTime, EXACT)
+			count++
+		}
+
+		const custom = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: { tfdt: readTfdt } })
+		const customFirst = custom.at(0)
+		if (isIsoBoxType('tfdt', customFirst)) {
+			expectType<Equal<typeof customFirst.baseMediaDecodeTime, bigint>>(true)
+			assert.strictEqual(customFirst.baseMediaDecodeTime, EXACT)
+			count++
+		}
+
+		const narrowIsoBox = (box: IsoBox<bigint> | undefined): boolean => {
+			if (isIsoBoxType('tfdt', box)) {
+				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
+				return true
+			}
+			return false
+		}
+		assert.strictEqual(narrowIsoBox(first), true)
+		assert.strictEqual(narrowIsoBox(undefined), false)
+
+		// A box with number fields that can be null or undefined keeps number fields.
+		const optionalNumber = plain.at(0)
+		if (isIsoBoxType('tfdt', optionalNumber)) {
+			expectType<Equal<typeof optionalNumber.baseMediaDecodeTime, number>>(true)
+			assert.strictEqual(optionalNumber.baseMediaDecodeTime + 1, ROUNDED + 1)
+			count++
+		}
+
+		const foundNumber = findIsoBox(plain, box => box.size > 0)
+		expectType<Equal<typeof foundNumber, ParsedIsoBox | null>>(true)
+		if (isIsoBoxType('tfdt', foundNumber)) {
+			expectType<Equal<typeof foundNumber.baseMediaDecodeTime, number>>(true)
+			count++
+		}
+		if (isIsoBoxType<'tfdt'>('tfdt', foundNumber)) {
+			expectType<Equal<typeof foundNumber.baseMediaDecodeTime, number>>(true)
+			count++
+		}
+
+		// A value of the type `Box` narrows to number fields, as before.
+		const base: Box = new IsoBoxReadView(buffer).readBox()
+		if (isIsoBoxType('tfdt', base)) {
+			expectType<Equal<typeof base.baseMediaDecodeTime, number>>(true)
+			assert.strictEqual(base.baseMediaDecodeTime, undefined)
+			count++
+		}
+
+		assert.strictEqual(count, 8)
+		assert.strictEqual(isIsoBoxType('tfdt', null), false)
+		assert.strictEqual(isIsoBoxType('tfdt', undefined), false)
 	})
 
 	it('5c. narrows a box of either mode with isContainer', function () {
@@ -768,6 +852,34 @@ describe('int64 option types', function () {
 			Equal<ReturnType<typeof readTfdt<bigint>>, TrackFragmentBaseMediaDecodeTimeBox<bigint>>
 		>(true)
 		assert.strictEqual(typeof readTfdt, 'function')
+	})
+
+	it('20e. keeps the utility types of readIsoBoxes', function () {
+		expectType<
+			Equal<Parameters<typeof readIsoBoxes>, [raw: IsoBoxData, config?: IsoBoxReadViewConfig]>
+		>(true)
+		expectType<Equal<ReturnType<typeof readIsoBoxes>, ParsedIsoBox[]>>(true)
+
+		const args: Parameters<typeof readIsoBoxes> = [buffer, { readers: { tfdt: readTfdt } }]
+		const boxes: ReturnType<typeof readIsoBoxes> = readIsoBoxes(...args)
+		let count = 0
+
+		for (const box of boxes) {
+			if (box.type === 'tfdt') {
+				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+				assert.strictEqual(box.baseMediaDecodeTime, ROUNDED)
+				count++
+			}
+		}
+
+		assert.strictEqual(count, 1)
+	})
+
+	it('20f. gives the utility types of the other generic members the fields of either mode', function () {
+		expectType<Equal<ReturnType<typeof defaultReaderConfig>, IsoBoxReadViewConfig<IsoInt64>>>(true)
+		expectType<Equal<InstanceType<typeof IsoBoxReadView>, IsoBoxReadView<IsoInt64>>>(true)
+		expectType<Equal<Parameters<typeof readTfdt>[0], IsoBoxReadView<IsoInt64>>>(true)
+		assert.strictEqual(typeof defaultReaderConfig, 'function')
 	})
 
 	it('21. gives a stored generic custom reader the union type', function () {
