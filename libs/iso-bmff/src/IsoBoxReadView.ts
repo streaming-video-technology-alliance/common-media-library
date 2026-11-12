@@ -36,7 +36,8 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	private truncated: boolean = false
 
 	/**
-	 * Reads an unsigned integer field of 4 or 8 bytes that is 64 bits in one version of its box.
+	 * Reads an unsigned integer field of 4 or 8 bytes.
+	 * The field is 64 bits in one version of its box.
 	 *
 	 * With no `int64` option, this method is the same function as `readUint`.
 	 * With the option, this method returns the result of the `int64` function.
@@ -50,7 +51,8 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	readWideUint: (size: 4 | 8) => V
 
 	/**
-	 * Reads a signed integer field of 4 or 8 bytes that is 64 bits in one version of its box.
+	 * Reads a signed integer field of 4 or 8 bytes.
+	 * The field is 64 bits in one version of its box.
 	 *
 	 * With no `int64` option, this method is the same function as `readInt`.
 	 * With the option, this method returns the result of the `int64` function.

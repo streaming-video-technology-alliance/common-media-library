@@ -207,14 +207,14 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
-The types of the result do not change, and the function does not need `BigInt`. The function checks the fields of the table above. It does not check a call of `readUint(8)` in a custom reader. A configuration takes one function for the option. It therefore selects `bigint` fields or the report, not both.
+The types of the result do not change, and the function does not need `BigInt`. The function checks the fields of the table above. The function does not check a call of `readUint(8)` in a custom reader. A configuration takes one function for the option. The configuration selects `bigint` fields or the report, not both.
 
 ### Custom readers and the option
 
 A custom reader of the type `(view: IsoBoxReadView) => ...` works with no option and with `createInt64OverflowReader`. With `readInt64AsBigInt`, that reader is a compile error, because the view then has `bigint` fields. Use one of two forms:
 
 - A reader that reads no 64-bit field takes `IsoBoxReadView<IsoInt64>`. That type accepts the view of every configuration.
-- A reader that follows the option is generic. It reads each 64-bit field with `readWideUint` or `readWideInt`.
+- A reader that follows the option is generic. That reader reads each 64-bit field with `readWideUint` or `readWideInt`.
 
 `readWideUint` and `readWideInt` take the size of the field in bytes, 4 or 8. With no option, they return a `number`, as `readUint` and `readInt` do. With the option, they return the result of the `int64` function:
 
