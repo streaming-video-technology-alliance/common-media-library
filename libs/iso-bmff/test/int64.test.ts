@@ -1,6 +1,7 @@
 import {
 	assert,
 	createInt64OverflowReader,
+	createIsoBoxReadableStream,
 	defaultReaderConfig,
 	defaultWriterConfig,
 	describe,
@@ -358,6 +359,24 @@ describe('int64 option', function () {
 			source,
 			tfdt.bytes([LOW], 8),
 		])
+	})
+
+	it('should write boxes with bigint fields to a readable stream', async function () {
+		const tfdt = WIDE_BOXES.find(box => box.type === 'tfdt')
+		const elst = WIDE_BOXES.find(box => box.type === 'elst')
+		assert.ok(tfdt && elst)
+
+		const source = [tfdt.bytes([HIGH], 8), elst.bytes(wideValues(elst, HIGH), 8)]
+		const boxes = source.flatMap(bytes =>
+			readIsoBoxes(bytes, defaultReaderConfig({ int64: readInt64AsBigInt })),
+		)
+		const chunks: Uint8Array[] = []
+
+		for await (const chunk of createIsoBoxReadableStream(boxes, defaultWriterConfig())) {
+			chunks.push(chunk)
+		}
+
+		assert.deepStrictEqual(chunks, source)
 	})
 
 	it('should apply the option to a view that the caller constructs', function () {
