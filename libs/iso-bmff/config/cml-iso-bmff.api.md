@@ -150,6 +150,11 @@ export function defaultReaderConfig<V extends IsoInt64 = number>(...options: [V]
 }]): IsoBoxReadViewConfig<V>;
 
 // @public
+export function defaultReaderConfig(options?: {
+    int64?: IsoInt64Reader;
+}): IsoBoxReadViewConfig;
+
+// @public
 export function defaultWriterConfig(): IsoBoxWriteViewConfig;
 
 // @public

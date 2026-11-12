@@ -875,11 +875,36 @@ describe('int64 option types', function () {
 		assert.strictEqual(count, 1)
 	})
 
-	it('20f. gives the utility types of the other generic members the fields of either mode', function () {
-		expectType<Equal<ReturnType<typeof defaultReaderConfig>, IsoBoxReadViewConfig<IsoInt64>>>(true)
+	it('20f. keeps the utility types of defaultReaderConfig', function () {
+		expectType<
+			Equal<Parameters<typeof defaultReaderConfig>, [options?: { int64?: IsoInt64Reader }]>
+		>(true)
+		expectType<Equal<ReturnType<typeof defaultReaderConfig>, IsoBoxReadViewConfig>>(true)
+
+		const errors: RangeError[] = []
+		const args: Parameters<typeof defaultReaderConfig> = [
+			{ int64: createInt64OverflowReader(error => errors.push(error)) },
+		]
+		const config: ReturnType<typeof defaultReaderConfig> = defaultReaderConfig(...args)
+		let count = 0
+
+		for (const box of readIsoBoxes(buffer, config)) {
+			if (box.type === 'tfdt') {
+				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+				assert.strictEqual(box.baseMediaDecodeTime, ROUNDED)
+				count++
+			}
+		}
+
+		assert.strictEqual(count, 1)
+		// The `traf` box of the buffer has a second `tfdt` box.
+		assert.strictEqual(errors.length, 2)
+	})
+
+	it('20g. gives the utility types of the other generic members the fields of either mode', function () {
 		expectType<Equal<InstanceType<typeof IsoBoxReadView>, IsoBoxReadView<IsoInt64>>>(true)
 		expectType<Equal<Parameters<typeof readTfdt>[0], IsoBoxReadView<IsoInt64>>>(true)
-		assert.strictEqual(typeof defaultReaderConfig, 'function')
+		assert.strictEqual(typeof readTfdt, 'function')
 	})
 
 	it('21. gives a stored generic custom reader the union type', function () {

@@ -99,9 +99,24 @@ export function defaultReaderConfig<V extends IsoInt64 = number>(
 				},
 			]
 ): IsoBoxReadViewConfig<V>
+
+/**
+ * Create a default reader configuration with `number` fields.
+ *
+ * `Parameters<typeof defaultReaderConfig>` and `ReturnType<typeof defaultReaderConfig>` resolve to this signature.
+ *
+ * @param options - The options for the configuration
+ * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ *
+ * @public
+ */
 export function defaultReaderConfig(options?: {
-	int64?: IsoInt64Reader<IsoInt64>
-}): IsoBoxReadViewConfig<IsoInt64> {
+	/**
+	 * The function that reads every 64-bit integer field of the built-in readers.
+	 */
+	int64?: IsoInt64Reader
+}): IsoBoxReadViewConfig
+export function defaultReaderConfig(options?: { int64?: IsoInt64Reader }): IsoBoxReadViewConfig {
 	return {
 		...options,
 		readers: {
