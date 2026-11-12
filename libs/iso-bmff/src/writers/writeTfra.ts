@@ -1,4 +1,5 @@
 import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView {
+export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const timeSize = v1 ? 8 : 4
 	const entrySize =
@@ -44,8 +45,8 @@ export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView {
 	writer.writeUint(box.numberOfEntry, 4)
 
 	for (const entry of box.entries) {
-		writer.writeUint(entry.time, timeSize)
-		writer.writeUint(entry.moofOffset, timeSize)
+		writer.writeWideUint(entry.time, timeSize)
+		writer.writeWideUint(entry.moofOffset, timeSize)
 		writer.writeUint(entry.trafNumber, box.lengthSizeOfTrafNum + 1)
 		writer.writeUint(entry.trunNumber, box.lengthSizeOfTrunNum + 1)
 		writer.writeUint(entry.sampleNumber, box.lengthSizeOfSampleNum + 1)

@@ -2,11 +2,15 @@ import {
 	assert,
 	createInt64OverflowReader,
 	defaultReaderConfig,
+	defaultWriterConfig,
 	describe,
 	it,
 	IsoBoxReadView,
 	readInt64AsBigInt,
 	readIsoBoxes,
+	writeIsoBox,
+	writeIsoBoxes,
+	writeTfdt,
 } from './util/box.ts'
 import { bigintFields, boxBytes, valueAt, WIDE_BOXES, wideValues } from './util/wideBoxes.ts'
 
@@ -107,9 +111,60 @@ describe('int64 option', function () {
 				assert.strictEqual(errors.length, 1)
 			})
 
+			it('should write a box with bigint fields back to the same bytes', function () {
+				const source = box.bytes(high, 8)
+				const config = defaultReaderConfig({ int64: readInt64AsBigInt })
+				const [parsed] = readIsoBoxes(source, config)
+
+				assert.ok(parsed)
+
+				const written = writeIsoBox(parsed, defaultWriterConfig())
+
+				assert.deepStrictEqual(written, source)
+				assert.deepStrictEqual(bigintFields(readIsoBoxes(written, config)[0]), expected(high))
+			})
+
+			it('should write a box with number fields back to the same bytes', function () {
+				const safe = wideValues(box, BigInt(Number.MAX_SAFE_INTEGER) - BigInt(8), BigInt(1))
+				const source = box.bytes(safe, 8)
+				const [parsed] = readIsoBoxes(source, defaultReaderConfig())
+
+				assert.ok(parsed)
+				assert.deepStrictEqual(writeIsoBox(parsed, defaultWriterConfig()), source)
+			})
+
 			if (box.fixed) {
 				return
 			}
+
+			it('should write a version 0 box with bigint fields back to the same bytes', function () {
+				const source = box.bytes(low, 4)
+				const [parsed] = readIsoBoxes(source, defaultReaderConfig({ int64: readInt64AsBigInt }))
+
+				assert.ok(parsed)
+				assert.deepStrictEqual(writeIsoBox(parsed, defaultWriterConfig()), source)
+			})
+
+			it('should write a version 0 box with number fields back to the same bytes', function () {
+				const source = box.bytes(low, 4)
+				const [parsed] = readIsoBoxes(source, defaultReaderConfig())
+
+				assert.ok(parsed)
+				assert.deepStrictEqual(writeIsoBox(parsed, defaultWriterConfig()), source)
+			})
+
+			it('should throw a RangeError for a bigint that does not fit a version 0 field', function () {
+				const [parsed] = readIsoBoxes(
+					box.bytes(high, 8),
+					defaultReaderConfig({ int64: readInt64AsBigInt }),
+				)
+
+				assert.ok(parsed)
+				assert.throws(
+					() => writeIsoBox({ ...parsed, version: 0 } as typeof parsed, defaultWriterConfig()),
+					RangeError,
+				)
+			})
 
 			it('should read a version 0 field as a bigint with readInt64AsBigInt', function () {
 				const [parsed] = readIsoBoxes(
@@ -262,6 +317,47 @@ describe('int64 option', function () {
 		const [time] = child.boxes
 		assert.strictEqual(time.type, 'tfdt')
 		assert.strictEqual(time.baseMediaDecodeTime, HIGH)
+	})
+
+	it('should write a container with bigint fields back to the same bytes', function () {
+		const tfdt = WIDE_BOXES.find(box => box.type === 'tfdt')
+		const tfhd = WIDE_BOXES.find(box => box.type === 'tfhd')
+		assert.ok(tfdt && tfhd)
+
+		const traf = boxBytes('traf', tfhd.bytes([HIGH], 8), tfdt.bytes([HIGH + BigInt(2)], 8))
+		const moof = boxBytes('moof', boxBytes('mfhd', [0, 1], [0, 3], [7, 4]), traf)
+		const boxes = readIsoBoxes(moof, defaultReaderConfig({ int64: readInt64AsBigInt }))
+
+		assert.deepStrictEqual(writeIsoBoxes(boxes, defaultWriterConfig()), [moof])
+	})
+
+	it('should write a box object with a bigint field', function () {
+		const writer = writeTfdt({ type: 'tfdt', version: 1, flags: 0, baseMediaDecodeTime: HIGH })
+		const bytes = writeIsoBox(
+			{ type: 'tfdt', version: 1, flags: 0, baseMediaDecodeTime: HIGH },
+			defaultWriterConfig(),
+		)
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			boxBytes('tfdt', [1, 1], [0, 3], [HIGH, 8]),
+		)
+		assert.deepStrictEqual(bytes, boxBytes('tfdt', [1, 1], [0, 3], [HIGH, 8]))
+	})
+
+	it('should write boxes with number fields and bigint fields in one list', function () {
+		const tfdt = WIDE_BOXES.find(box => box.type === 'tfdt')
+		assert.ok(tfdt)
+
+		const source = tfdt.bytes([HIGH], 8)
+		const [big] = readIsoBoxes(source, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const [plain] = readIsoBoxes(tfdt.bytes([LOW], 8), defaultReaderConfig())
+
+		assert.ok(big && plain)
+		assert.deepStrictEqual(writeIsoBoxes([big, plain], defaultWriterConfig()), [
+			source,
+			tfdt.bytes([LOW], 8),
+		])
 	})
 
 	it('should apply the option to a view that the caller constructs', function () {

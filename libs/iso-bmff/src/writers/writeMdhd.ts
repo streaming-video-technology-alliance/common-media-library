@@ -1,4 +1,5 @@
 import type { MediaHeaderBox } from '../boxes/MediaHeaderBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView {
+export function writeMdhd(box: MediaHeaderBox<IsoInt64>): IsoBoxWriteView {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -25,10 +26,10 @@ export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('mdhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
-	writer.writeUint(box.creationTime, size)
-	writer.writeUint(box.modificationTime, size)
+	writer.writeWideUint(box.creationTime, size)
+	writer.writeWideUint(box.modificationTime, size)
 	writer.writeUint(box.timescale, 4)
-	writer.writeUint(box.duration, size)
+	writer.writeWideUint(box.duration, size)
 
 	// Encode ISO-639-2/T language code as 3 5-bit integers in a 16-bit value
 	// Format: bits 14-10 (char1), bits 9-5 (char2), bits 4-0 (char3)

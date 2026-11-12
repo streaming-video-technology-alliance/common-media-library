@@ -1,4 +1,5 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { INT, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -13,7 +14,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView {
+export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -43,10 +44,10 @@ export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('mvhd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
-	writer.writeUint(box.creationTime, size)
-	writer.writeUint(box.modificationTime, size)
+	writer.writeWideUint(box.creationTime, size)
+	writer.writeWideUint(box.modificationTime, size)
 	writer.writeUint(box.timescale, 4)
-	writer.writeUint(box.duration, size)
+	writer.writeWideUint(box.duration, size)
 	writer.writeTemplate(box.rate, 4)
 	writer.writeTemplate(box.volume, 2)
 	writer.writeUint(box.reserved1, 2)

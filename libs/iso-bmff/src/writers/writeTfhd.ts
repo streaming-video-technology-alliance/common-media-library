@@ -1,4 +1,5 @@
 import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
+export function writeTfhd(box: TrackFragmentHeaderBox<IsoInt64>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
@@ -37,7 +38,7 @@ export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
 	writer.writeUint(box.trackId, 4)
 
 	if (box.flags & 0x01) {
-		writer.writeUint(box.baseDataOffset ?? 0, 8)
+		writer.writeWideUint(box.baseDataOffset ?? 0, 8)
 	}
 
 	if (box.flags & 0x02) {

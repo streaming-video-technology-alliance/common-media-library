@@ -1,4 +1,5 @@
 import type { EditListBox } from '../boxes/EditListBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeElst(box: EditListBox): IsoBoxWriteView {
+export function writeElst(box: EditListBox<IsoInt64>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -28,8 +29,8 @@ export function writeElst(box: EditListBox): IsoBoxWriteView {
 	writer.writeUint(box.entryCount, 4)
 
 	for (const entry of box.entries) {
-		writer.writeUint(entry.segmentDuration, size)
-		writer.writeInt(entry.mediaTime, size)
+		writer.writeWideUint(entry.segmentDuration, size)
+		writer.writeWideInt(entry.mediaTime, size)
 		writer.writeInt(entry.mediaRateInteger, 2)
 		writer.writeInt(entry.mediaRateFraction, 2)
 	}

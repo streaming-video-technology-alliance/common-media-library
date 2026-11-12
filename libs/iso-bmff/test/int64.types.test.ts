@@ -12,10 +12,14 @@ import {
 	readIsoBoxes,
 	readMfhd,
 	readTfdt,
+	writeIsoBox,
+	writeIsoBoxes,
+	writeTfdt,
 	type IsoBoxReaderMap,
 	type IsoBoxReadViewConfig,
 	type IsoInt64,
 	type IsoInt64Reader,
+	type IsoBoxStreamable,
 	type ParsedBox,
 	type ParsedIsoBox,
 	type TrackFragmentBaseMediaDecodeTimeBox,
@@ -539,6 +543,51 @@ describe('int64 option types', function () {
 
 		expectType<Equal<ReturnType<typeof readTfdt<bigint>>['baseMediaDecodeTime'], bigint>>(true)
 		expectType<Equal<ReturnType<typeof readTfdt<number>>['baseMediaDecodeTime'], number>>(true)
+	})
+
+	it('16. passes a box of either mode to the writers', function () {
+		const writers = { tfdt: writeTfdt }
+		const big = readIsoBoxes(buffer, {
+			int64: readInt64AsBigInt,
+			readers: { tfdt: readTfdt, mfhd: readMfhd },
+		})
+		const defaults = readIsoBoxes(buffer, { readers: { tfdt: readTfdt, mfhd: readMfhd } })
+		const tfdtBytes = new Uint8Array(TFDT)
+
+		for (const box of big) {
+			if (box.type === 'tfdt') {
+				assert.deepStrictEqual(writeIsoBox(box, { writers }), tfdtBytes)
+				assert.deepStrictEqual(new Uint8Array(writeTfdt(box).buffer), tfdtBytes)
+			}
+		}
+
+		for (const box of defaults) {
+			if (box.type === 'tfdt') {
+				assert.strictEqual(writeIsoBox(box, { writers }).length, 20)
+				assert.strictEqual(writeTfdt(box).byteLength, 20)
+			}
+		}
+
+		const tfdtBig: TrackFragmentBaseMediaDecodeTimeBox<bigint> = {
+			type: 'tfdt',
+			version: 1,
+			flags: 0,
+			baseMediaDecodeTime: EXACT,
+		}
+		const tfdtNum: TrackFragmentBaseMediaDecodeTimeBox = { ...tfdtBig, baseMediaDecodeTime: 1 }
+		assert.deepStrictEqual(writeIsoBox(tfdtBig, { writers }), tfdtBytes)
+		assert.strictEqual(writeIsoBox(tfdtNum, { writers }).length, 20)
+
+		const bigPlain = readIsoBoxes(buffer, { int64: readInt64AsBigInt })
+		const plain = readIsoBoxes(buffer)
+		const source = [new Uint8Array(TFDT), new Uint8Array(MFHD), new Uint8Array(TRAF)]
+		assert.deepStrictEqual(writeIsoBoxes(bigPlain, { writers: {} }), source)
+		assert.deepStrictEqual(writeIsoBoxes(plain, { writers: {} }), source)
+
+		// A list for the writers holds boxes of either mode.
+		const mixed: IsoBoxStreamable<IsoInt64>[] = [...bigPlain, ...plain, tfdtBig, tfdtNum]
+		assert.strictEqual(writeIsoBoxes(mixed, { writers }).length, 8)
+		expectType<Equal<IsoBoxStreamable, IsoBoxStreamable<number>>>(true)
 	})
 
 	it('17. infers the mode of a view from the function', function () {

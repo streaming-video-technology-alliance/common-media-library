@@ -92,7 +92,7 @@ export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (vi
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
 
 // @public
 export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntryBox<T>;
@@ -463,7 +463,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 //
 // @public
 export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
-    constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig);
+    constructor(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig);
 }
 
 // @public
@@ -545,6 +545,8 @@ export class IsoBoxWriteView {
     writeUint: (value: number, size: number) => void;
     writeUint64: (value: bigint) => void;
     writeUtf8TerminatedString: (value: string) => void;
+    writeWideInt: (value: number | bigint, size: 4 | 8) => void;
+    writeWideUint: (value: number | bigint, size: 4 | 8) => void;
 }
 
 // @public
@@ -1564,10 +1566,10 @@ export function writeDref(box: DataReferenceBox, config: IsoBoxWriteViewConfig):
 export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView;
 
 // @public
-export function writeElst(box: EditListBox): IsoBoxWriteView;
+export function writeElst(box: EditListBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeEmsg(box: EventMessageBox): IsoBoxWriteView;
+export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writeEnca(box: AudioSampleEntryBox<"enca">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
@@ -1600,10 +1602,10 @@ export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
 export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 
 // @public
-export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBox(box: IsoBoxStreamable<IsoInt64>, config?: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>[];
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>[];
 
 // @public
 export function writeKind(box: TrackKindBox): IsoBoxWriteView;
@@ -1615,10 +1617,10 @@ export function writeLabl(box: LabelBox): IsoBoxWriteView;
 export function writeMdat(box: MediaDataBox): IsoBoxWriteView;
 
 // @public
-export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView;
+export function writeMdhd(box: MediaHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView;
+export function writeMehd(box: MovieExtendsHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writeMeta(box: MetaBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
@@ -1633,13 +1635,13 @@ export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteV
 export function writeMp4a(box: AudioSampleEntryBox<"mp4a">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView;
+export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView;
 
 // @public
-export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView;
+export function writePrft(box: ProducerReferenceTimeBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
@@ -1654,7 +1656,7 @@ export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView;
 export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView;
 
 // @public
-export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView;
+export function writeSidx(box: SegmentIndexBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writeSkip(box: FreeSpaceBox<"skip">): IsoBoxWriteView;
@@ -1699,16 +1701,16 @@ export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView;
 export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView;
 
 // @public
-export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWriteView;
+export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView;
+export function writeTfhd(box: TrackFragmentHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView;
+export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView;
+export function writeTkhd(box: TrackHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView;

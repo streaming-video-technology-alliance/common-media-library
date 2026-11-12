@@ -117,6 +117,63 @@ export class IsoBoxWriteView {
 	}
 
 	/**
+	 * Writes an unsigned integer field of 4 or 8 bytes from a `number` or a `bigint`.
+	 *
+	 * Use this method for a field that is 64 bits in one version of its box.
+	 * A box that `readIsoBoxes` reads with `readInt64AsBigInt` holds such a field as a `bigint`.
+	 * The method writes a `number` as `writeUint` does, and a `bigint` with the exact value.
+	 *
+	 * @param value - The value to write.
+	 * @param size - The size, in bytes, of the value.
+	 * @throws RangeError if `value` is a `bigint` that is negative or does not fit in `size` bytes.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeWideUint.test.ts#example}
+	 */
+	writeWideUint = (value: number | bigint, size: 4 | 8): void => {
+		if (typeof value !== 'bigint') {
+			this.writeUint(value, size)
+		} else if (size === 8) {
+			this.writeUint64(value)
+		} else {
+			if (BigInt.asUintN(32, value) !== value) {
+				throw new RangeError(
+					`writeWideUint: value must be in the range 0 to 2^32 - 1, received ${value}`,
+				)
+			}
+
+			this.writeUint(Number(value), 4)
+		}
+	}
+
+	/**
+	 * Writes a signed integer field of 4 or 8 bytes from a `number` or a `bigint`.
+	 *
+	 * Use this method for a field that is 64 bits in one version of its box.
+	 * The method writes a `number` as `writeInt` does, and a `bigint` with the exact value.
+	 *
+	 * @param value - The value to write.
+	 * @param size - The size, in bytes, of the value.
+	 * @throws RangeError if `value` is a `bigint` that does not fit in `size` bytes.
+	 */
+	writeWideInt = (value: number | bigint, size: 4 | 8): void => {
+		if (typeof value !== 'bigint') {
+			this.writeInt(value, size)
+		} else {
+			if (BigInt.asIntN(size * 8, value) !== value) {
+				throw new RangeError(`writeWideInt: value must fit in ${size} bytes, received ${value}`)
+			}
+
+			if (size === 8) {
+				this.dataView.setBigInt64(this.cursor, value)
+				this.cursor += 8
+			} else {
+				this.writeInt(Number(value), 4)
+			}
+		}
+	}
+
+	/**
 	 * Writes an int to the data view.
 	 *
 	 * @param value - The value to write.

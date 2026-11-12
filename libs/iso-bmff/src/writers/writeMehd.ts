@@ -1,4 +1,5 @@
 import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView {
+export function writeMehd(box: MovieExtendsHeaderBox<IsoInt64>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -22,7 +23,7 @@ export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView {
 
 	const writer = new IsoBoxWriteView('mehd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
-	writer.writeUint(box.fragmentDuration, size)
+	writer.writeWideUint(box.fragmentDuration, size)
 
 	return writer
 }

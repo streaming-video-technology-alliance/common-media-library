@@ -1,4 +1,5 @@
 import { encodeText } from '@svta/cml-utils'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -13,7 +14,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
+export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView {
 	const schemeIdUriBytes = encodeText(box.schemeIdUri)
 	const valueBytes = encodeText(box.value)
 
@@ -48,7 +49,7 @@ export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
 		writer.writeUint(box.id, 4)
 	} else {
 		writer.writeUint(box.timescale, 4)
-		writer.writeUint(box.presentationTime ?? 0, 8)
+		writer.writeWideUint(box.presentationTime ?? 0, 8)
 		writer.writeUint(box.eventDuration, 4)
 		writer.writeUint(box.id, 4)
 		writer.writeBytes(schemeIdUriBytes)

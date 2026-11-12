@@ -1,4 +1,5 @@
 import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -12,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
+export function writeSidx(box: SegmentIndexBox<IsoInt64>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -40,8 +41,8 @@ export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
 
 	writer.writeUint(box.referenceId, 4)
 	writer.writeUint(box.timescale, 4)
-	writer.writeUint(box.earliestPresentationTime, size)
-	writer.writeUint(box.firstOffset, size)
+	writer.writeWideUint(box.earliestPresentationTime, size)
+	writer.writeWideUint(box.firstOffset, size)
 	writer.writeUint(box.reserved ?? 0, 2)
 	writer.writeUint(box.references.length, 2)
 
