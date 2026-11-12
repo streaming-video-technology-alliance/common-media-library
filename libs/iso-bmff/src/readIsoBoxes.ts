@@ -28,11 +28,20 @@ export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoIn
 ): IsoBoxReaderReturn<R, V>[]
 
 /**
+ * Reads ISO boxes from a data source with no readers map in the type of the configuration.
+ *
+ * @param raw - The raw ISO data
+ * @param config - The configuration for the IsoView. The configuration is required when `V` is `bigint`.
+ *
+ * @returns The parsed boxes
+ *
  * @public
  */
 export function readIsoBoxes<V extends IsoInt64 = number>(
 	raw: IsoBoxData,
-	config?: IsoBoxReadViewConfig<V>,
+	...config: [V] extends [bigint]
+		? [config: IsoBoxReadViewConfig<V>]
+		: [config?: IsoBoxReadViewConfig<V>]
 ): ParsedIsoBox<V>[]
 export function readIsoBoxes(
 	raw: IsoBoxData,

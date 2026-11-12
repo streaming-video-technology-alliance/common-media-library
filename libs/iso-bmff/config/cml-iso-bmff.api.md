@@ -143,9 +143,11 @@ export type DecodingTimeToSampleBox = FullBox & {
 };
 
 // @public
-export function defaultReaderConfig<V extends IsoInt64 = number>(options?: {
+export function defaultReaderConfig<V extends IsoInt64 = number>(...options: [V] extends [bigint] ? [options: {
+    int64: IsoInt64Reader<V>;
+}] : [options?: {
     int64?: IsoInt64Reader<V>;
-}): IsoBoxReadViewConfig<V>;
+}]): IsoBoxReadViewConfig<V>;
 
 // @public
 export function defaultWriterConfig(): IsoBoxWriteViewConfig;
@@ -905,8 +907,8 @@ export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoIn
     readers: R;
 }): IsoBoxReaderReturn<R, V>[];
 
-// @public (undocumented)
-export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadViewConfig<V>): ParsedIsoBox<V>[];
+// @public
+export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadViewConfig<V>] : [config?: IsoBoxReadViewConfig<V>]): ParsedIsoBox<V>[];
 
 // @public
 export function readKind(view: IsoBoxReadView<IsoInt64>): TrackKindBox;

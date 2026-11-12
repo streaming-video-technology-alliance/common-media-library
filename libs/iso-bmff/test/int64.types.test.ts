@@ -463,6 +463,43 @@ describe('int64 option types', function () {
 		void new IsoBoxReadView<bigint>(buffer, { int64: readInt64AsBigInt })
 	})
 
+	it('12a. rejects a bigint type with no function for the option', function () {
+		// @ts-expect-error the bigint instantiation requires a configuration
+		readIsoBoxes<bigint>(buffer)
+		// @ts-expect-error a bigint result type requires a configuration
+		const claimed: ParsedIsoBox<bigint>[] = readIsoBoxes(buffer)
+		// @ts-expect-error the bigint instantiation requires the option
+		void defaultReaderConfig<bigint>()
+		// @ts-expect-error the bigint instantiation requires the option
+		void defaultReaderConfig<bigint>({})
+		// @ts-expect-error a bigint configuration type requires the option
+		const claimedConfig: IsoBoxReadViewConfig<bigint> = defaultReaderConfig()
+		// @ts-expect-error a bigint view type requires a configuration
+		const claimedView = new IsoBoxReadView<bigint>(buffer)
+
+		assert.strictEqual(claimed.length, 3)
+		assert.strictEqual(claimedConfig.int64, undefined)
+		assert.strictEqual(claimedView.readWideUint, claimedView.readUint)
+
+		// The calls with no type argument and the calls with the function compile.
+		const plain: ParsedIsoBox[] = readIsoBoxes(buffer, undefined)
+		const big: ParsedIsoBox<bigint>[] = readIsoBoxes(buffer, { int64: readInt64AsBigInt })
+		const either: ParsedIsoBox<IsoInt64>[] = readIsoBoxes<IsoInt64>(buffer)
+		const config: IsoBoxReadViewConfig = defaultReaderConfig({})
+		const bigConfig: IsoBoxReadViewConfig<bigint> = defaultReaderConfig({
+			int64: readInt64AsBigInt,
+		})
+		const explicit = defaultReaderConfig<bigint>({ int64: readInt64AsBigInt })
+		const none = defaultReaderConfig(undefined)
+
+		expectType<Equal<typeof explicit, IsoBoxReadViewConfig<bigint>>>(true)
+		expectType<Equal<typeof none, IsoBoxReadViewConfig>>(true)
+		assert.strictEqual(plain.length + big.length + either.length, 9)
+		assert.strictEqual(config.int64, undefined)
+		assert.strictEqual(bigConfig.int64, explicit.int64)
+		assert.strictEqual(none.int64, undefined)
+	})
+
 	it('12b. changes no type with the overflow function', function () {
 		const defaults = readIsoBoxes(buffer, { readers: { tfdt: readTfdt, mfhd: readMfhd } })
 		const errors: RangeError[] = []
