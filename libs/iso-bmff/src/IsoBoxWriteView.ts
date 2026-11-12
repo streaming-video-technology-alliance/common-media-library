@@ -117,6 +117,40 @@ export class IsoBoxWriteView {
 	}
 
 	/**
+	 * Writes an int to the data view.
+	 *
+	 * @param value - The value to write.
+	 * @param size - The size, in bytes, of the value.
+	 */
+	writeInt = (value: number, size: number): void => {
+		const { dataView, cursor } = this
+
+		switch (size) {
+			case 1:
+				dataView.setInt8(cursor, value)
+				break
+
+			case 2:
+				dataView.setInt16(cursor, value)
+				break
+
+			case 4:
+				dataView.setInt32(cursor, value)
+				break
+
+			case 8:
+				// A number loses precision for integers >= 2^53.
+				const s1 = Math.floor(value / Math.pow(2, 32))
+				const s2 = value - s1 * Math.pow(2, 32)
+				dataView.setUint32(cursor, s1)
+				dataView.setUint32(cursor + 4, s2)
+				break
+		}
+
+		this.cursor += size
+	}
+
+	/**
 	 * Writes an unsigned integer field of 4 or 8 bytes from a `number` or a `bigint`.
 	 *
 	 * Use this method for a field that is 64 bits in one version of its box.
@@ -171,40 +205,6 @@ export class IsoBoxWriteView {
 				this.writeInt(Number(value), 4)
 			}
 		}
-	}
-
-	/**
-	 * Writes an int to the data view.
-	 *
-	 * @param value - The value to write.
-	 * @param size - The size, in bytes, of the value.
-	 */
-	writeInt = (value: number, size: number): void => {
-		const { dataView, cursor } = this
-
-		switch (size) {
-			case 1:
-				dataView.setInt8(cursor, value)
-				break
-
-			case 2:
-				dataView.setInt16(cursor, value)
-				break
-
-			case 4:
-				dataView.setInt32(cursor, value)
-				break
-
-			case 8:
-				// A number loses precision for integers >= 2^53.
-				const s1 = Math.floor(value / Math.pow(2, 32))
-				const s2 = value - s1 * Math.pow(2, 32)
-				dataView.setUint32(cursor, s1)
-				dataView.setUint32(cursor + 4, s2)
-				break
-		}
-
-		this.cursor += size
 	}
 
 	/**
