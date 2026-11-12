@@ -10,6 +10,7 @@ import {
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
+	readEmsg,
 	readMfhd,
 	readTfdt,
 	writeIsoBox,
@@ -689,6 +690,47 @@ describe('int64 option types', function () {
 				expectType<Equal<typeof box.extra, string>>(true)
 			}
 		}
+	})
+
+	it('20b. gives a stored reader of a box with two versions the mode of the call', function () {
+		const stored = { emsg: readEmsg }
+
+		for (const box of readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: stored })) {
+			if (box.type === 'emsg' && box.version === 1) {
+				expectType<Equal<typeof box.presentationTime, bigint>>(true)
+			}
+			if (box.type === 'emsg' && box.version === 0) {
+				expectType<Equal<typeof box.presentationTimeDelta, number>>(true)
+			}
+		}
+
+		for (const box of readIsoBoxes(buffer, { readers: stored })) {
+			if (box.type === 'emsg' && box.version === 1) {
+				expectType<Equal<typeof box.presentationTime, number>>(true)
+			}
+		}
+
+		assert.strictEqual(readIsoBoxes(buffer, { readers: stored }).length, 3)
+	})
+
+	it('20c. keeps the any of a reader that returns any', function () {
+		const readAny = (view: IsoBoxReadView): any => ({ value: view.readUint(4) })
+		const boxes = readIsoBoxes(buffer, { readers: { mfhd: readAny } })
+
+		expectType<Equal<(typeof boxes)[number], any>>(true)
+		assert.strictEqual(boxes.length, 3)
+	})
+
+	it('20d. gives the return type of a built-in reader a mode with a type argument', function () {
+		// The return type of a generic reader with no type argument has the fields of either mode.
+		expectType<Equal<ReturnType<typeof readTfdt>['baseMediaDecodeTime'], number | bigint>>(true)
+		expectType<Equal<ReturnType<typeof readTfdt<number>>, TrackFragmentBaseMediaDecodeTimeBox>>(
+			true,
+		)
+		expectType<
+			Equal<ReturnType<typeof readTfdt<bigint>>, TrackFragmentBaseMediaDecodeTimeBox<bigint>>
+		>(true)
+		assert.strictEqual(typeof readTfdt, 'function')
 	})
 
 	it('21. gives a stored generic custom reader the union type', function () {

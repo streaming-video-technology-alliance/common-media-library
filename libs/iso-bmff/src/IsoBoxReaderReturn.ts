@@ -28,6 +28,7 @@ import type { ParsedBox } from './ParsedBox.ts'
  * TypeScript does not instantiate a generic reader that the map holds in a variable.
  * The return type of that reader is then the built-in box type with `number | bigint` fields.
  * The union replaces that type with the built-in box type with `V` fields.
+ * A reader that returns `any` keeps `any`.
  *
  * @public
  */
@@ -36,13 +37,15 @@ export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> =
 			{
 				[K in keyof T]: NonNullable<T[K]> extends (...args: never[]) => infer B
 					? ParsedBox<
-							[B] extends [{ type: infer N extends keyof IsoBoxMap }]
-								? [B] extends [IsoBoxMap<IsoInt64>[N]]
-									? [IsoBoxMap<IsoInt64>[N]] extends [B]
-										? IsoBoxMap<V>[N]
+							0 extends 1 & B
+								? B
+								: [B] extends [{ type: infer N extends keyof IsoBoxMap }]
+									? [B] extends [IsoBoxMap<IsoInt64>[N]]
+										? [IsoBoxMap<IsoInt64>[N]] extends [B]
+											? IsoBoxMap<V>[N]
+											: B
 										: B
-									: B
-								: B,
+									: B,
 							V
 						>
 					: never
