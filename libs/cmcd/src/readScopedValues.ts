@@ -1,0 +1,100 @@
+import { encodeSfDict } from '@svta/cml-structured-field-values'
+import { CMCD_KEY_SPECS } from './CMCD_KEY_SPECS.ts'
+import { CMCD_V2 } from './CMCD_V2.ts'
+import type { Cmcd } from './Cmcd.ts'
+import { CMCD_EVENT_MODE } from './CmcdReportingMode.ts'
+import { configError } from './configError.ts'
+import { normalizeValue } from './normalizeValue.ts'
+import { toBareValue } from './toBareValue.ts'
+import { toTokenString } from './toTokenString.ts'
+
+/**
+ * The values of one call that every destination of a CMCD session receives.
+ *
+ * @internal
+ */
+export type CmcdScopedValues = {
+	/**
+	 * A valid `msd`, rounded to an integer.
+	 */
+	msd?: number
+
+	/**
+	 * The object type of a `bs: true` call. An empty string matches every object type.
+	 */
+	bs?: string
+
+	/**
+	 * A copy of the `bsd` items.
+	 */
+	bsd?: unknown[]
+
+	/**
+	 * A copy of the `ec` items.
+	 */
+	ec?: unknown[]
+}
+
+const MAX_INTEGER = 999_999_999_999_999
+
+function copyItems(value: unknown, key: 'bsd' | 'ec'): unknown[] | undefined {
+	if (value == null) {
+		return undefined
+	}
+
+	const list = normalizeValue(toBareValue(value), CMCD_KEY_SPECS[key], {
+		version: CMCD_V2,
+		reportingMode: CMCD_EVENT_MODE,
+	}) as unknown[] | undefined
+
+	return list
+}
+
+/**
+ * Reads the values of a call that have a destination scope.
+ *
+ * The result has a valid `msd`, the object type of a `bs: true` call, and copies of the `bsd` and `ec` items.
+ *
+ * @param data - The data of the call.
+ * @param ec - The `codes` argument of a `recordError()` call.
+ * @returns The scoped values.
+ *
+ * @throws If a `bsd` or `ec` value cannot be encoded, or if `recordError()` passed no error code.
+ *
+ * @internal
+ */
+export function readScopedValues(data: Cmcd, ec?: string | readonly string[]): CmcdScopedValues {
+	const scoped: CmcdScopedValues = {}
+	const msd = toBareValue(data.msd)
+
+	if (typeof msd === 'number' && msd >= 0 && Math.round(msd) <= MAX_INTEGER) {
+		scoped.msd = Math.round(msd)
+	}
+
+	if (toBareValue(data.bs) === true) {
+		scoped.bs = toTokenString(data.ot) ?? ''
+	}
+
+	const bsd = copyItems(data.bsd, 'bsd')
+	const codes = copyItems(ec, 'ec')
+	const lists: Record<string, unknown[]> = {}
+
+	// CTA-5004-B: the e token must be accompanied by ec.
+	if (ec !== undefined && !codes) {
+		throw configError('recordError() codes', 'one or more error codes', ec)
+	}
+
+	if (bsd) {
+		lists['bsd'] = scoped.bsd = bsd
+	}
+
+	if (codes) {
+		lists['ec'] = scoped.ec = codes
+	}
+
+	if (bsd || codes) {
+		encodeSfDict(lists)
+	}
+
+	return scoped
+}

@@ -2,6 +2,7 @@ import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import type { CmcdFormatterOptions } from './CmcdFormatterOptions.ts'
 import type { CmcdKeySpec } from './CmcdKeySpec.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
+import { copyCmcdValue } from './copyCmcdValue.ts'
 import { formatNor } from './formatNor.ts'
 import { toTokenString } from './toTokenString.ts'
 
@@ -56,7 +57,7 @@ function normalizeBare(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 			}
 
 			if (Array.isArray(value)) {
-				return value.length > 0 ? value : undefined
+				return value.length > 0 ? copyCmcdValue(value) : undefined
 			}
 
 			return typeof value === 'boolean' || typeof value === 'symbol' || value instanceof SfToken
@@ -72,7 +73,7 @@ function normalizeItem(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 	if (value instanceof SfItem) {
 		const bare = normalizeBare(value.value, spec, version)
 
-		return bare === undefined ? undefined : new SfItem(bare, value.params)
+		return bare === undefined ? undefined : new SfItem(bare, value.params && { ...value.params })
 	}
 
 	return normalizeBare(value, spec, version)
@@ -99,7 +100,7 @@ function normalizeList(value: unknown, spec: CmcdKeySpec, version: CmcdVersion):
 		return undefined
 	}
 
-	return wrapper ? new SfItem(list, wrapper.params) : list
+	return wrapper ? new SfItem(list, wrapper.params && { ...wrapper.params }) : list
 }
 
 /**

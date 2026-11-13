@@ -54,6 +54,9 @@ export type Encoding = ValueOf<typeof Encoding>;
 export type ExclusiveRecord<K extends PropertyKey, V> = { [P in K]: Record<P, V> & Partial<Record<Exclude<K, P>, never>> extends (infer O) ? { [Q in keyof O]: O[Q]; } : never; }[K];
 
 // @public
+export function fetchRequester(request: HttpRequest): Promise<HttpResponse>;
+
+// @public
 export function getBandwidthBps(sample: ResourceTiming): number;
 
 // @public
@@ -80,6 +83,9 @@ export type HttpRequest<D = any> = {
     timeout?: number;
     customData?: D;
 };
+
+// @public
+export type HttpRequester = (request: HttpRequest) => Promise<HttpResponse>;
 
 // @public
 export type HttpResponse<R extends HttpRequest = HttpRequest> = {

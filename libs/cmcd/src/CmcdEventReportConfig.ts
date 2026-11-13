@@ -31,7 +31,7 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 *
 	 * @defaultValue `undefined`
 	 */
-	events?: CmcdEventType[]
+	events?: readonly CmcdEventType[]
 
 	/**
 	 * When the time interval event is sent, the interval in seconds at
@@ -60,6 +60,9 @@ export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfi
 	 * accept the event still receive a report cancelled by this transform.
 	 *
 	 * @defaultValue `undefined`
+	 *
+	 * @deprecated The session types reject `transform`. A {@link CmcdReportFilter} on the event target drops reports, and the data of each call changes them.
+	 * The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member to the session API. Version 3.0.0 removes this member.
 	 *
 	 * @example
 	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}

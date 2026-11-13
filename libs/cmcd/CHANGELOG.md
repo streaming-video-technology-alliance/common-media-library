@@ -8,9 +8,29 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `createCmcdSession()` reports CMCD for one `sid`. The player passes its CMCD data with each call, and the session keeps the sequence numbers, the queues, and the timers. The session guide and the migration guide describe the API
+- `createCmcdSession()` takes the requester as the second argument. An event target with a `url` needs the requester. `fetchRequester` from `@svta/cml-utils` sends with `fetch`
+- `CmcdSessionRequestReportConfig` and `CmcdSessionEventReportConfig`, the configuration types of a session. Both derive from the `CmcdReporter` types without `transform`. The `filter` of an event target selects the reports of the target
+- `CmcdEventSender` and `CmcdEventSendResult`. An event target has a collector `url` or a `send` function, for a transport that is not HTTP
+- `CmcdSnapshot`, the type of the player state. `snapshot` returns it for the `t` reports, and the player can pass it with each call. It rejects the keys that the session writes, `bs`, `bsd`, `ec`, and `cen`
+- `CMCD_EVENT_HOSTNAME` and `CmcdEventType.HOSTNAME` for the `h` event of CTA-5004-B. `validateCmcd()` accepts `h` as a value of `e`
+- `onError` of `CmcdSessionConfig` receives an error of a `t` report timer. Without the handler, the error throws from the timer callback
+
 ### Changed
 
+- `enabledKeys` of `CmcdReportConfig` accepts a read-only array
+- `events` of `CmcdEventReportConfig` accepts a read-only array
+- `encodeCmcd()` accepts a deeply read-only object
+- `prepareCmcdData()` returns a copy. The result shares no list, `SfItem`, or parameter object with the input. Before, the result shared the parameter objects and the lists of custom keys with the input
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/cmcd](https://cml.svta.org/packages/cmcd/).
+
+### Deprecated
+
+- `CmcdReporter` and `CmcdReporterConfig`. Use `createCmcdSession()`. The migration guide maps each member to the session API, and version 3.0.0 removes both
+- `CmcdReporterCustomData`, `CmcdTransformRequest`, `CmcdRequestReportTransform`, `CmcdEventReportTransform`, and the `transform` members of `CmcdRequestReportConfig` and `CmcdEventReportConfig`. A `filter` on an event target drops reports, and the data of each call changes them. Version 3.0.0 removes them
+- `CMCD_REQUEST_PROVENANCE` and `CmcdRequestProvenance`. With a session, the player keeps the old session object and records late responses there. Version 3.0.0 removes both
 
 ## [2.8.4] - 2026-10-26
 

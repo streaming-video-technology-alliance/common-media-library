@@ -1,3 +1,4 @@
+import type { DeepReadonly } from '@svta/cml-utils'
 import type { Cmcd } from './Cmcd.ts'
 import type { CmcdEncodeOptions } from './CmcdEncodeOptions.ts'
 import { encodePreparedCmcd } from './encodePreparedCmcd.ts'
@@ -18,7 +19,7 @@ import { prepareCmcdData } from './prepareCmcdData.ts'
  * @example
  * {@includeCode ../test/encodeCmcd.test.ts#example}
  */
-export function encodeCmcd(cmcd: Cmcd, options: CmcdEncodeOptions = {}): string {
+export function encodeCmcd(cmcd: DeepReadonly<Cmcd>, options: CmcdEncodeOptions = {}): string {
 	if (!cmcd) {
 		return ''
 	}

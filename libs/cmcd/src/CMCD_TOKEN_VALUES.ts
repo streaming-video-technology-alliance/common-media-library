@@ -23,6 +23,7 @@ export const CMCD_TOKEN_VALUES: Record<string, readonly string[]> = {
 		'abe',
 		'sk',
 		'ce',
+		'h',
 	] as const,
 	ot: ['m', 'a', 'v', 'av', 'i', 'c', 'tt', 'k', 'o'] as const,
 	sf: ['d', 'h', 's', 'o'] as const,

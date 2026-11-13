@@ -44,6 +44,9 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
 	 *
 	 * @defaultValue `undefined`
 	 *
+	 * @deprecated The session types reject `transform`. For a request that the player does not report, skip the `createRequestReport()` call.
+	 * The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member to the session API. Version 3.0.0 removes this member.
+	 *
 	 * @example
 	 * {@includeCode ../test/CmcdReporter.test.ts#example-transform}
 	 */

@@ -54,6 +54,9 @@ export const CMCD_EVENT_CUSTOM_EVENT: "ce";
 export const CMCD_EVENT_ERROR: "e";
 
 // @public
+export const CMCD_EVENT_HOSTNAME: "h";
+
+// @public
 export const CMCD_EVENT_KEYS: readonly ["cen", "e", "h", "ts"];
 
 // @public
@@ -146,7 +149,7 @@ export const CMCD_REQUEST_KEYS: readonly ["ab", "bg", "bl", "br", "bs", "bsa", "
 // @public
 export const CMCD_REQUEST_MODE: "request";
 
-// @public
+// @public @deprecated
 export const CMCD_REQUEST_PROVENANCE: unique symbol;
 
 // @public
@@ -216,14 +219,22 @@ export type CmcdEvent = CmcdRequest & {
 export type CmcdEventReportConfig<C = Record<string, unknown>> = CmcdReportConfig & {
     version?: typeof CMCD_V2;
     url: string;
-    events?: CmcdEventType[];
+    events?: readonly CmcdEventType[];
     interval?: number;
     batchSize?: number;
     transform?: CmcdEventReportTransform<C>;
 };
 
-// @public
+// @public @deprecated
 export type CmcdEventReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C> | undefined) => Cmcd | null;
+
+// @public
+export type CmcdEventSender = (reports: readonly DeepReadonly<Cmcd & Required<Pick<Cmcd, "e" | "sid" | "sn" | "ts" | "v">>>[]) => Promise<CmcdEventSendResult | void>;
+
+// @public
+export type CmcdEventSendResult = {
+    readonly gone?: boolean;
+};
 
 // @public
 export type CmcdEventsValidationResult = CmcdValidationResult & {
@@ -250,6 +261,7 @@ export const CmcdEventType: {
     readonly AD_BREAK_END: typeof CMCD_EVENT_AD_BREAK_END;
     readonly SKIP: typeof CMCD_EVENT_SKIP;
     readonly CUSTOM_EVENT: typeof CMCD_EVENT_CUSTOM_EVENT;
+    readonly HOSTNAME: typeof CMCD_EVENT_HOSTNAME;
 };
 
 // @public (undocumented)
@@ -359,10 +371,10 @@ export type CmcdRecordedRequestType = ValueOf<typeof CmcdRecordedRequestType>;
 // @public
 export type CmcdReportConfig = {
     version?: CmcdVersion;
-    enabledKeys?: CmcdKey[];
+    enabledKeys?: readonly CmcdKey[];
 };
 
-// @public
+// @public @deprecated
 export class CmcdReporter<C = Record<string, unknown>> {
     constructor(config: Partial<CmcdReporterConfig<C>>, requester?: (request: HttpRequest) => Promise<{
         status: number;
@@ -382,7 +394,7 @@ export class CmcdReporter<C = Record<string, unknown>> {
     update(data: Partial<Cmcd>): void;
 }
 
-// @public
+// @public @deprecated
 export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportConfig<C> & {
     sid?: string;
     cid?: string;
@@ -390,8 +402,11 @@ export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportC
     sessionRetention?: number;
 };
 
-// @public
+// @public @deprecated
 export type CmcdReporterCustomData<C> = Record<string, unknown> extends C ? any : C;
+
+// @public
+export type CmcdReportFilter = (report: DeepReadonly<Cmcd>, request?: DeepReadonly<HttpRequest>) => boolean;
 
 // @public
 export const CmcdReportingMode: {
@@ -479,7 +494,7 @@ export type CmcdRequestDeliver = (request: HttpRequest) => Response | undefined;
 // @public
 export type CmcdRequestKey = keyof CmcdRequest | "nrr";
 
-// @public
+// @public @deprecated
 export type CmcdRequestProvenance = {
     readonly sid: string;
     readonly cid?: string;
@@ -502,7 +517,7 @@ export type CmcdRequestReportConfig<C = Record<string, unknown>> = CmcdReportCon
     transform?: CmcdRequestReportTransform<C>;
 };
 
-// @public
+// @public @deprecated
 export type CmcdRequestReportTransform<C = Record<string, unknown>> = (data: Cmcd, request: CmcdTransformRequest<C>) => Cmcd | null;
 
 // @public
@@ -515,6 +530,58 @@ export type CmcdResponse = CmcdRequest & {
     ttfbb?: number;
     ttlb?: number;
     url?: string;
+};
+
+// @public
+export type CmcdSession = {
+    readonly sid: string;
+    createRequestReport<R extends HttpRequest>(request: R, data?: Omit<CmcdRequest, "sid" | "sn" | "v" | "ec">): R & CmcdRequestReport<R["customData"]>;
+    recordEvent(type: CmcdEventType, data?: Omit<Cmcd, "sid" | "sn" | "e" | "v" | "ec">, request?: Readonly<HttpRequest>): void;
+    recordResponseReceived(response: HttpResponse, data?: Omit<Cmcd, "sid" | "sn" | "e" | "v" | "ec">): void;
+    recordError(codes: string | readonly string[], data?: Omit<CmcdEvent, "sid" | "sn" | "e" | "v" | "ec">): void;
+    configure(settings: CmcdSessionRequestReportConfig): void;
+    start(immediate?: boolean): void;
+    stop(): void;
+    flush(): void;
+};
+
+// @public
+export type CmcdSessionConfig = CmcdSessionRequestReportConfig & {
+    sid?: string;
+    cid?: string;
+    eventTargets?: readonly CmcdSessionEventReportConfig[];
+    snapshot?: () => CmcdSnapshot;
+    onError?: (error: unknown) => void;
+};
+
+// @public
+export type CmcdSessionEventReportConfig = Omit<CmcdEventReportConfig, "transform" | "url"> & {
+    filter?: CmcdReportFilter;
+    transform?: never;
+} & ({
+    url: string;
+    send?: never;
+} | {
+    url?: never;
+    send: CmcdEventSender;
+});
+
+// @public
+export type CmcdSessionRequestReportConfig = Omit<CmcdRequestReportConfig, "transform"> & {
+    transform?: never;
+};
+
+// @public
+export type CmcdSnapshot = Omit<CmcdEvent, "bs" | "bsd" | "cen" | "e" | "ec" | "sid" | "sn" | "ts" | "v"> & {
+    bs?: never;
+    bsd?: never;
+    cen?: never;
+    e?: never;
+    ec?: never;
+    sid?: never;
+    sn?: never;
+    ts?: never;
+    v?: never;
 };
 
 // @public
@@ -538,7 +605,7 @@ export const CmcdStreamType: {
 // @public (undocumented)
 export type CmcdStreamType = ValueOf<typeof CmcdStreamType>;
 
-// @public
+// @public @deprecated
 export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<Omit<HttpRequest, "customData" | "headers">> & {
     readonly headers?: Readonly<Record<string, string>>;
     readonly customData?: DeepReadonly<C>;
@@ -614,6 +681,11 @@ export type CmcdValue = ValueOf<Cmcd>;
 export type CmcdVersion = typeof CMCD_V1 | typeof CMCD_V2;
 
 // @public
+export function createCmcdSession(config?: CmcdSessionConfig, requester?: (request: HttpRequest) => Promise<{
+    status?: number;
+}>): CmcdSession;
+
+// @public
 export function createFetchTransport(): CmcdTransportAdapter;
 
 // @public
@@ -628,7 +700,7 @@ export function decodeCmcd(cmcd: string, options: CmcdDecodeOptions & {
 export function decodeCmcd<T extends CmcdData = CmcdData>(cmcd: string, options?: CmcdDecodeOptions): T;
 
 // @public
-export function encodeCmcd(cmcd: Cmcd, options?: CmcdEncodeOptions): string;
+export function encodeCmcd(cmcd: DeepReadonly<Cmcd>, options?: CmcdEncodeOptions): string;
 
 // @public
 export function fromCmcdHeaders(headers: Record<string, string> | Headers, options: CmcdDecodeOptions & {

@@ -1,4 +1,4 @@
-import { validateCmcdValues } from '@svta/cml-cmcd'
+import { CmcdEventType, validateCmcdValues } from '@svta/cml-cmcd'
 import { SfItem, SfToken } from '@svta/cml-structured-field-values'
 import { deepEqual, equal, match } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
@@ -56,6 +56,13 @@ describe('validateCmcdValues', () => {
 	it('accepts valid token value', () => {
 		const result = validateCmcdValues({ ot: 'v', sf: 'd', st: 'l' })
 		equal(result.valid, true)
+	})
+
+	it('accepts every event type as the value of e', () => {
+		for (const e of Object.values(CmcdEventType)) {
+			const result = validateCmcdValues({ e })
+			equal(result.valid, true, e)
+		}
 	})
 
 	it('reports error when bl is not a multiple of 100 (v1)', () => {
