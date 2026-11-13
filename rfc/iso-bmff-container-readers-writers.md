@@ -159,7 +159,7 @@ Each function of the package has a file with the name of the function. `readVttc
 
 ### Default configurations
 
-`defaultReaderConfig()` and `defaultWriterConfig()` do not gain the container functions. Automatic container handling gives the same result, so the entries add bytes and no behavior. [Rejected alternatives](#rejected-alternatives) shows the byte cost.
+`defaultReaderConfig()` and `defaultWriterConfig()` do not gain the container functions. Automatic container handling gives the same result, so the entries add bytes and no behavior.
 
 The guides and the TSDoc state that each default configuration contains every reader or every writer. Those statements change to exclude the container functions.
 
@@ -212,7 +212,7 @@ The adopter in issue #297 searched by function name. Only a function with that n
 - **One shared function under 19 names.** An example is `export { writeContainerBox as writeMoov }`. Each name then accepts every container box type, so a call of `writeMoov` with a `moof` box compiles. The `name` property of each function is also the name of the shared function.
 - **Other names for `vttc`.** `readVttCue` and `writeVttCue` differ from `readVttC` by more than case. Those names do not follow the naming rule.
 - **Functions for the common box types only.** A later addition of a function is not a breaking change. A search for a missing name, such as `writeSinf`, still finds nothing.
-- **Container functions in the default configurations.** The entries complete the list of each default configuration and change no result. In a local build with the entries, a minified bundle with `defaultWriterConfig()` grows by 741 B. A minified bundle with `defaultReaderConfig()` grows by 1197 B.
+- **Container functions in the default configurations.** The entries complete the list of each default configuration and change no result. [Default configurations](#default-configurations) states the reason for the rejection.
 - **An optional `config` argument for the writers.** A call of `writeMoov` with one argument then compiles. That call fails at run time for a typed child box, because the call has no writer for the child box.
 - **Required map entries.** The package removes automatic container handling, and every container box needs a map entry. That change breaks existing adopter code. An adopter who wants a `tfdt` box must then also list `moof` and `traf`.
 
