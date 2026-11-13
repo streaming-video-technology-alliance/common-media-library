@@ -23,7 +23,7 @@ export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecif
 
 	if (version > 0) {
 		kidCount = readUint(4)
-		kid = readArray(UINT, 1, kidCount)
+		kid = readArray(UINT, 1, kidCount * 16)
 	}
 
 	const dataSize = readUint(4)
