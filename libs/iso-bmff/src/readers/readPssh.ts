@@ -10,6 +10,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @returns A parsed `ProtectionSystemSpecificHeaderBox`
  *
+ * @example
+ * {@includeCode ../../test/readers/readPssh.test.ts#example}
+ *
  * @public
  */
 export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecificHeaderBox {

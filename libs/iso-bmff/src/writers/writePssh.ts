@@ -11,6 +11,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *
+ * @example
+ * {@includeCode ../../test/writers/writePssh.test.ts#example}
+ *
  * @public
  */
 export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView {
