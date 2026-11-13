@@ -94,13 +94,27 @@ assert(moof.byteLength === 24)
 
 ### Functions
 
-Every container reader has the signature of `readMoov`. Every container writer has the signature of `writeMoov`.
+[#654](https://github.com/streaming-video-technology-alliance/common-media-library/pull/654) implements the functions. The signatures in this section match that implementation.
+
+The `int64` reader option of [#645](https://github.com/streaming-video-technology-alliance/common-media-library/pull/645) added a type parameter `V` to the TypeScript types of 8 container boxes. The 8 box types are `edts`, `mdia`, `mfra`, `moof`, `moov`, `mvex`, `traf`, and `trak`. `V` is the type of the 64-bit integer fields of the child boxes: `number` or `bigint`. `IsoInt64` is the union of those two types. The TypeScript types of the other 11 container boxes have no type parameter.
+
+The functions for the 8 box types have the signatures of `readMoov` and `writeMoov`. The functions for the other 11 box types have the signatures of `readDinf` and `writeDinf`.
 
 ```ts
-import type { IsoBoxReadView, IsoBoxWriteView, IsoBoxWriteViewConfig, MovieBox } from '@svta/cml-iso-bmff'
+import type {
+	DataInformationBox,
+	IsoBoxReadView,
+	IsoBoxWriteView,
+	IsoBoxWriteViewConfig,
+	IsoInt64,
+	MovieBox,
+} from '@svta/cml-iso-bmff'
 
-export declare function readMoov(view: IsoBoxReadView): MovieBox
-export declare function writeMoov(box: MovieBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView
+export declare function readMoov<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieBox<V>
+export declare function writeMoov(box: MovieBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView
+
+export declare function readDinf(view: IsoBoxReadView<IsoInt64>): DataInformationBox
+export declare function writeDinf(box: DataInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView
 ```
 
 | Box type | Box | Reader | Writer |
@@ -129,9 +143,11 @@ export declare function writeMoov(box: MovieBox, config: IsoBoxWriteViewConfig):
 
 - **Reader.** A container reader returns the `type` and the `boxes` of the container box. The reader reads each child box with the readers of the same configuration.
 - **Writer.** A container writer writes the box header and then each child box. The writer writes each child box with the writers in `config`. `config` is a required argument, as for `writeMeta`.
+- **Field type of a reader.** The `int64` option of the view returns a `number` or a `bigint`. A reader with the type parameter returns the 64-bit integer fields of the child boxes with that type. With no option, those fields are numbers. Each of the other 11 readers accepts a view with any `int64` option, as `readMeta` does.
+- **Field type of a writer.** A writer for one of the 8 box types accepts both types. Each 64-bit integer field of a child box is a `number` or a `bigint`.
 - **Automatic container handling.** The RFC keeps automatic container handling. The result is the same with a map entry and without a map entry.
 - **One box type per function.** TypeScript rejects a call of `writeMoov` with a `moof` box.
-- **Result type.** The result type of `readIsoBoxes` still narrows a `moov` box to `MovieBox`.
+- **Result type.** The result type of `readIsoBoxes` still narrows a `moov` box to `MovieBox`. If the `int64` option returns a `bigint`, the result type narrows the box to `MovieBox<bigint>`.
 - **Existing exports.** `CONTAINERS` and `isContainer` do not change.
 - **Bundle size.** Each function is a function declaration. A bundle that does not import a function does not contain that function.
 
@@ -172,16 +188,18 @@ The results of a trial build of the 38 functions match the contract. The trial b
 - **Two names that differ only in case.** `readVttc` and `readVttC` differ in one letter. A map with `readVttC` under the `vttc` key compiles, because the map types accept any function under any key.
 - **Size.** Each imported container function adds bytes. The table after this list shows the measured byte cost.
 
-The bundler is `vp pack` with `--minify` and ESM output. `@svta/cml-utils` is external. Each "before" value is the same bundle without the container functions. The base of the trial build is `main` at commit `35c512e61`.
+The bundler is `vp pack` with `--minify` and ESM output. `@svta/cml-utils` is external. Each "before" value is the same bundle without the container functions.
+
+The table shows the sizes of the implementation in [#654](https://github.com/streaming-video-technology-alliance/common-media-library/pull/654). The base of that implementation is `main` at commit `2aca3e3e9`. For the last two rows, a local change added the container functions to the default configurations. The implementation does not contain that change.
 
 | Bundle | Minified before | Minified change | Gzipped before | Gzipped change |
 |---|---|---|---|---|
-| `writeIsoBoxes`, `writeMfhd`, and `writeMoof` | 3102 B | +45 B | 1261 B | +12 B |
-| `writeIsoBoxes`, `writeMfhd`, and all 19 container writers | 3102 B | +858 B | 1261 B | +174 B |
-| `readIsoBoxes`, `readMfhd`, and `readMoof` | 4115 B | +68 B | 1658 B | +20 B |
-| `readIsoBoxes`, `readMfhd`, and all 19 container readers | 4115 B | +1295 B | 1658 B | +259 B |
-| `writeIsoBoxes` and `defaultWriterConfig()` with the container writers (not proposed) | 17162 B | +741 B | 4538 B | +160 B |
-| `readIsoBoxes` and `defaultReaderConfig()` with the container readers (not proposed) | 14301 B | +1197 B | 4355 B | +241 B |
+| `writeIsoBoxes`, `writeMfhd`, and `writeMoof` | 3600 B | +45 B | 1349 B | +13 B |
+| `writeIsoBoxes`, `writeMfhd`, and all 19 container writers | 3600 B | +855 B | 1349 B | +169 B |
+| `readIsoBoxes`, `readMfhd`, and `readMoof` | 4111 B | +68 B | 1663 B | +22 B |
+| `readIsoBoxes`, `readMfhd`, and all 19 container readers | 4111 B | +1292 B | 1663 B | +257 B |
+| `writeIsoBoxes` and `defaultWriterConfig()` with the container writers (not proposed) | 17654 B | +741 B | 4613 B | +159 B |
+| `readIsoBoxes` and `defaultReaderConfig()` with the container readers (not proposed) | 15096 B | +1197 B | 4510 B | +234 B |
 
 ## Rationale and alternatives
 
