@@ -15,6 +15,8 @@ If you provide raw box objects, also provide a configuration object that names t
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
 
+A write omits the bytes of a source box that the reader stops before. See [Incomplete boxes](reading-boxes.md#incomplete-boxes).
+
 ## Using default config
 
 If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer except the container writers:

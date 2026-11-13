@@ -63,6 +63,9 @@ and this project adheres to
 - `readSmhd` now reads `balance` as a signed 8.8 value. The `balance` for full right reads as 1, and the `balance` for full left reads as -1. Earlier releases return 256 for full right and 65280 for full left.
 - `writeSmhd` now writes `balance` as a signed 8.8 value. If your code passes 256 for full right, pass 1. The value 256 now writes 0.
 - `readEmsg` and `writeEmsg` now read and write `schemeIdUri` and `value` as UTF-8, as ISO/IEC 23009-1 defines the fields. Earlier releases use one byte for each character, so a character that is not ASCII gives wrong bytes or a wrong string. A string with only ASCII characters reads and writes the same bytes as before ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
+- `readIsoBoxes` no longer throws a `RangeError` when the data ends inside a box header. The function returns the boxes before that header. The function now reads a sample entry or a `udta` box with 4 zero bytes after the last child box ([#650](https://github.com/streaming-video-technology-alliance/common-media-library/issues/650)).
+- `writeIsoBoxes` omits the bytes that `readIsoBoxes` stops before. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes ([#650](https://github.com/streaming-video-technology-alliance/common-media-library/issues/650)).
+- `IsoBoxReadView.readBox` now throws an `Error` with the message `Truncated box` when the view ends inside a box header. Earlier releases throw a `RangeError` for that view ([#650](https://github.com/streaming-video-technology-alliance/common-media-library/issues/650)).
 
 ### Changed
 
@@ -76,6 +79,7 @@ and this project adheres to
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
 - Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+- The reading guide has a section on incomplete boxes, and the writing guide links to that section. The documentation of `readIsoBoxes`, `IsoBoxReadView.readBox`, and `IsoBoxReadView.readBoxes` now states where the read stops ([#650](https://github.com/streaming-video-technology-alliance/common-media-library/issues/650)).
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/).
 - `writeElng`, `writeIden`, `writeKind`, `writeLabl`, `writePayl`, `writeSttg`, and `writeVlab` now encode each string one time. The written bytes of `writeElng`, `writeKind`, and `writeLabl` do not change ([#632](https://github.com/streaming-video-technology-alliance/common-media-library/issues/632)).
 - `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
