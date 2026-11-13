@@ -354,32 +354,43 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	 * Reads a raw box from the data view.
 	 *
 	 * @returns The box.
+	 *
+	 * @throws Error with the message `Truncated box` if the view ends inside the header or the body of the box.
 	 */
 	readBox = (): ParsedBox<Box, V> => {
-		const { dataView, offset } = this
+		const { dataView, offset, bytesRemaining } = this
 
 		// read box size and type without advancing the cursor in case the box is truncated
-		let cursor = 0
-		const size = readUint(dataView, offset, 4)
-		const type = readString(dataView, offset + 4, 4)
-		const box = { size, type } as ParsedBox<Box, V>
+		let cursor = 8
+		let actualSize = 0
+		let box: ParsedBox<Box, V> | undefined
 
-		cursor += 8
+		if (bytesRemaining >= cursor) {
+			const size = readUint(dataView, offset, 4)
+			const type = readString(dataView, offset + 4, 4)
 
-		if (box.size === 1) {
-			box.largesize = readUint(dataView, offset + cursor, 8)
-			cursor += 8
+			box = { size, type } as ParsedBox<Box, V>
+			actualSize = size
+
+			if (size === 1) {
+				cursor = actualSize = 16
+
+				if (bytesRemaining >= cursor) {
+					box.largesize = actualSize = readUint(dataView, offset + 8, 8)
+				}
+			} else if (size === 0) {
+				actualSize = bytesRemaining
+			}
 		}
 
-		const actualSize = box.size === 0 ? this.bytesRemaining : (box.largesize ?? box.size)
-		if (this.cursor + actualSize > dataView.byteLength) {
+		if (!box || actualSize > bytesRemaining) {
 			this.truncated = true
 			throw new Error('Truncated box')
 		}
 
 		this.jump(cursor)
 
-		if (type === 'uuid') {
+		if (box.type === 'uuid') {
 			box.usertype = this.readArray('uint', 1, 16)
 		}
 
@@ -390,6 +401,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 
 	/**
 	 * Reads a number of boxes from the data view.
+	 * The method stops before a box if the view ends inside the header or the body of that box.
 	 *
 	 * @param length - The number of boxes to read.
 	 * @returns The boxes.
@@ -427,6 +439,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 
 	/**
 	 * Iterates over the boxes in the data view.
+	 * The iteration stops before a box if the view ends inside the header or the body of that box.
 	 *
 	 * @returns A generator of boxes.
 	 */
