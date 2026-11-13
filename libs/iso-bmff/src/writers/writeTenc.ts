@@ -17,7 +17,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
-	const { version, defaultIsEncrypted, defaultConstantIvSize } = box
+	const { version, defaultIsEncrypted, defaultConstantIv } = box
+	const defaultConstantIvSize = box.defaultConstantIvSize ?? defaultConstantIv?.length
 	const headerSize = 8
 	const fullBoxSize = 4
 	const defaultIsEncryptedSize = 3
@@ -48,7 +49,7 @@ export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
 
 	if (defaultConstantIvSize !== undefined) {
 		writer.writeUint(defaultConstantIvSize, 1)
-		writer.writeArray(box.defaultConstantIv ?? [], UINT, 1, defaultConstantIvSize)
+		writer.writeArray(defaultConstantIv ?? [], UINT, 1, defaultConstantIvSize)
 	}
 
 	return writer

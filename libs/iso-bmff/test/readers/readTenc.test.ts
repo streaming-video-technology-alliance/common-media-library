@@ -29,6 +29,7 @@ function fields(box: TrackEncryptionBox): Omit<TrackEncryptionBox, 'type'> {
 		version: box.version,
 		flags: box.flags,
 		defaultIsEncrypted: box.defaultIsEncrypted,
+		defaultIsProtected: box.defaultIsProtected,
 		defaultIvSize: box.defaultIvSize,
 		defaultKid: box.defaultKid,
 		defaultCryptByteBlock: box.defaultCryptByteBlock,
@@ -52,7 +53,7 @@ describe('readTenc', function () {
 		const [tenc] = readIsoBoxes(bytes, { readers: { tenc: readTenc } })
 
 		assert.strictEqual(tenc.type, 'tenc')
-		assert.strictEqual(tenc.defaultIsEncrypted & 0xff, 1)
+		assert.strictEqual(tenc.defaultIsProtected, 1)
 		assert.strictEqual(tenc.defaultIvSize, 0)
 		assert.strictEqual(tenc.defaultCryptByteBlock, 1)
 		assert.strictEqual(tenc.defaultSkipByteBlock, 9)
@@ -67,6 +68,7 @@ describe('readTenc', function () {
 			version: 1,
 			flags: 0,
 			defaultIsEncrypted: 0x001901,
+			defaultIsProtected: 1,
 			defaultIvSize: 0,
 			defaultKid: KID,
 			defaultCryptByteBlock: 1,
@@ -83,6 +85,7 @@ describe('readTenc', function () {
 			version: 0,
 			flags: 0,
 			defaultIsEncrypted: 1,
+			defaultIsProtected: 1,
 			defaultIvSize: 0,
 			defaultKid: KID,
 			defaultCryptByteBlock: undefined,
@@ -99,6 +102,7 @@ describe('readTenc', function () {
 			version: 0,
 			flags: 0,
 			defaultIsEncrypted: 1,
+			defaultIsProtected: 1,
 			defaultIvSize: 8,
 			defaultKid: KID,
 			defaultCryptByteBlock: undefined,
@@ -115,6 +119,7 @@ describe('readTenc', function () {
 			version: 1,
 			flags: 0,
 			defaultIsEncrypted: 0x005a01,
+			defaultIsProtected: 1,
 			defaultIvSize: 16,
 			defaultKid: KID,
 			defaultCryptByteBlock: 5,
@@ -131,6 +136,7 @@ describe('readTenc', function () {
 			version: 1,
 			flags: 0,
 			defaultIsEncrypted: 0,
+			defaultIsProtected: 0,
 			defaultIvSize: 0,
 			defaultKid: KID,
 			defaultCryptByteBlock: 0,
@@ -172,6 +178,7 @@ describe('readTenc', function () {
 			version: 0,
 			flags: 0,
 			defaultIsEncrypted: 1,
+			defaultIsProtected: 1,
 			defaultIvSize: 0,
 			defaultKid: KID,
 			defaultCryptByteBlock: undefined,

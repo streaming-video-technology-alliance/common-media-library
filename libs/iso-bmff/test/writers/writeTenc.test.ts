@@ -174,10 +174,34 @@ describe('writeTenc', function () {
 		assert.deepStrictEqual(short, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 4, 161, 162, 0, 0))
 	})
 
-	it('should write no constant IV for a box with no defaultConstantIvSize', function () {
+	it('should take the size from defaultConstantIv for a box with no defaultConstantIvSize', function () {
 		const bytes = write(tenc({ defaultConstantIv: IV }))
 
-		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID))
+		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 16, ...IV))
+	})
+
+	it('should write defaultConstantIvSize bytes of a longer defaultConstantIv', function () {
+		const bytes = write(tenc({ defaultConstantIvSize: 8, defaultConstantIv: IV }))
+
+		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 8, ...IV.slice(0, 8)))
+	})
+
+	it('should write the lowest byte of defaultIsEncrypted and not defaultIsProtected', function () {
+		const bytes = write(tenc({ defaultIsEncrypted: 1, defaultIvSize: 8, defaultIsProtected: 0 }))
+
+		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
+	})
+
+	it('should write a changed defaultIsEncrypted of a box that readTenc reads', function () {
+		const [parsed] = readIsoBoxes(tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID), {
+			readers: { tenc: readTenc },
+		})
+
+		assert.strictEqual(parsed.type, 'tenc')
+
+		parsed.defaultIsEncrypted = 0
+
+		assert.deepStrictEqual(write(parsed), tencBox(0, 0, 0, 0, 0, 0, 0, 8, ...KID))
 	})
 
 	for (const [name, source] of SOURCES) {

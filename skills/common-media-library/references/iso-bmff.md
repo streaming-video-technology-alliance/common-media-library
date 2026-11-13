@@ -1972,6 +1972,7 @@ export type TrackEncryptionBox = FullBox & {
     defaultIsEncrypted: number;
     defaultIvSize: number;
     defaultKid: number[];
+    defaultIsProtected?: number;
     defaultCryptByteBlock?: number;
     defaultSkipByteBlock?: number;
     defaultConstantIvSize?: number;
