@@ -1082,4 +1082,87 @@ describe('int64 option types', function () {
 		// @ts-expect-error a reader of the number view cannot take a bigint view
 		readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: { 'ec-3': readerToday } })
 	})
+
+	it('25. forwards the option through a function with a type parameter', function () {
+		// A function that forwards a configuration of either mode.
+		function readWith<V extends IsoInt64 = number>(
+			raw: IsoBoxData,
+			config: IsoBoxReadViewConfig<V>,
+		): ParsedIsoBox<V>[] {
+			return readIsoBoxes(raw, config)
+		}
+
+		// A function that forwards the function of the option to the default configuration.
+		function readDefaults<V extends IsoInt64>(
+			raw: IsoBoxData,
+			int64: IsoInt64Reader<V>,
+		): ParsedIsoBox<V>[] {
+			return readIsoBoxes(raw, defaultReaderConfig({ int64 }))
+		}
+
+		// A function that forwards the function of the option to a view.
+		function viewWith<V extends IsoInt64>(
+			raw: IsoBoxData,
+			int64: IsoInt64Reader<V>,
+		): IsoBoxReadView<V> {
+			return new IsoBoxReadView(raw, { int64 })
+		}
+
+		const exact = readWith(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		expectType<Equal<typeof exact, ParsedIsoBox<bigint>[]>>(true)
+		for (const box of exact) {
+			if (box.type === 'tfdt') {
+				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
+				assert.strictEqual(box.baseMediaDecodeTime, EXACT)
+			}
+		}
+
+		const plain = readWith(buffer, defaultReaderConfig())
+		expectType<Equal<typeof plain, ParsedIsoBox[]>>(true)
+		for (const box of plain) {
+			if (box.type === 'tfdt') {
+				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+				assert.strictEqual(box.baseMediaDecodeTime, ROUNDED)
+			}
+		}
+
+		const inline = readWith(buffer, { readers: { tfdt: readTfdt } })
+		expectType<Equal<typeof inline, ParsedIsoBox[]>>(true)
+		assert.strictEqual(inline.length, 3)
+
+		const fromFunction = readDefaults(buffer, readInt64AsBigInt)
+		expectType<Equal<typeof fromFunction, ParsedIsoBox<bigint>[]>>(true)
+		for (const box of fromFunction) {
+			if (box.type === 'tfdt') {
+				assert.strictEqual(box.baseMediaDecodeTime, EXACT)
+			}
+		}
+
+		let calls = 0
+		const checked = readDefaults(
+			buffer,
+			createInt64OverflowReader(() => {
+				calls++
+			}),
+		)
+		expectType<Equal<typeof checked, ParsedIsoBox[]>>(true)
+		assert.strictEqual(checked.length, 3)
+		// The buffer holds the tfdt box two times: at the top level and inside the traf box.
+		assert.strictEqual(calls, 2)
+
+		const view = viewWith(buffer, readInt64AsBigInt)
+		expectType<Equal<typeof view, IsoBoxReadView<bigint>>>(true)
+		assert.strictEqual(view.readWideUint(4), BigInt(TFDT.length))
+
+		// A parameter of the type `IsoBoxReadViewConfig<IsoInt64>` does not replace the type parameter.
+		function readEither(
+			raw: IsoBoxData,
+			config: IsoBoxReadViewConfig<IsoInt64>,
+		): ParsedIsoBox<IsoInt64>[] {
+			return readIsoBoxes(raw, config)
+		}
+		void readEither(buffer, defaultReaderConfig())
+		// @ts-expect-error a configuration with bigint readers is not a configuration of either mode
+		readEither(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))
+	})
 })
