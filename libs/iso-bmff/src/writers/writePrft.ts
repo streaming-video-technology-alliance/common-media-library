@@ -1,4 +1,5 @@
 import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -6,13 +7,16 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `ProducerReferenceTimeBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
-export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView {
+export function writePrft(box: ProducerReferenceTimeBox<IsoInt64>): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const mediaTimeSize = v1 ? 8 : 4
 	const headerSize = 8
@@ -34,7 +38,7 @@ export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView {
 	writer.writeUint(box.referenceTrackId, 4)
 	writer.writeUint(box.ntpTimestampSec, 4)
 	writer.writeUint(box.ntpTimestampFrac, 4)
-	writer.writeUint(box.mediaTime, mediaTimeSize)
+	writer.writeWideUint(box.mediaTime, mediaTimeSize)
 
 	return writer
 }

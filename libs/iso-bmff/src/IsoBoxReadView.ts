@@ -1,10 +1,14 @@
 import { isArrayBufferLike } from '@svta/cml-utils'
+import type { Box } from './boxes/Box.ts'
 import type { FullBox } from './boxes/FullBox.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import { DATA, INT, STRING, TEMPLATE, UINT, UTF8, type IsoBoxFields } from './IsoBoxFields.ts'
+import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
+import type { IsoInt64 } from './IsoInt64.ts'
+import type { IsoInt64Reader } from './IsoInt64Reader.ts'
 import type { ParsedBox } from './ParsedBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 import { getTerminatedStringLength } from './utils/getTerminatedStringLength.ts'
@@ -20,13 +24,43 @@ import { readUtf8String } from './utils/readUtf8String.ts'
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
  * It implements the iterator protocol, so it can be used in a for...of loop.
  *
+ * The type parameter `V` is the type of every 64-bit integer field that the built-in readers return.
+ * TypeScript infers `V` from the `int64` option of the configuration.
+ *
  * @public
  */
-export class IsoBoxReadView {
+export class IsoBoxReadView<V extends IsoInt64 = number> {
 	private dataView: DataView
 	private offset: number
-	private config: IsoBoxReadViewConfig
+	private config: { readers?: IsoBoxReaderMap; int64?: IsoInt64Reader<V> }
 	private truncated: boolean = false
+
+	/**
+	 * Reads an unsigned integer field of 4 or 8 bytes.
+	 * The field is 64 bits in one version of its box.
+	 *
+	 * With no `int64` option, this method is the same function as `readUint`.
+	 * With the option, this method returns the result of the `int64` function.
+	 *
+	 * @param size - The size of the field in bytes.
+	 * @returns The value of the field.
+	 *
+	 * @example
+	 * {@includeCode ../test/readWideUint.test.ts#example}
+	 */
+	readWideUint: (size: 4 | 8) => V
+
+	/**
+	 * Reads a signed integer field of 4 or 8 bytes.
+	 * The field is 64 bits in one version of its box.
+	 *
+	 * With no `int64` option, this method is the same function as `readInt`.
+	 * With the option, this method returns the result of the `int64` function.
+	 *
+	 * @param size - The size of the field in bytes.
+	 * @returns The value of the field.
+	 */
+	readWideInt: (size: 4 | 8) => V
 
 	/**
 	 * Creates a new IsoView instance. Similar to DataView, but with additional
@@ -34,9 +68,15 @@ export class IsoBoxReadView {
 	 * so it can be used in a for...of loop.
 	 *
 	 * @param raw - The raw data to view.
-	 * @param config - The configuration for the IsoView.
+	 * @param config - The configuration for the IsoView. The configuration is required when `V` is `bigint`.
 	 */
-	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
+	constructor(
+		raw: IsoBoxData,
+		...config: [V] extends [bigint]
+			? [config: IsoBoxReadViewConfig<V>]
+			: [config?: IsoBoxReadViewConfig<V>]
+	)
+	constructor(raw: IsoBoxData, config?: IsoBoxReadView<V>['config']) {
 		this.dataView = isArrayBufferLike(raw)
 			? new DataView(raw)
 			: raw instanceof DataView
@@ -44,6 +84,16 @@ export class IsoBoxReadView {
 				: new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
+
+		const { int64 } = this.config
+
+		if (int64) {
+			this.readWideUint = size => int64(this, size, false)
+			this.readWideInt = size => int64(this, size, true)
+		} else {
+			this.readWideUint = this.readUint as IsoBoxReadView<V>['readWideUint']
+			this.readWideInt = this.readInt as IsoBoxReadView<V>['readWideInt']
+		}
 	}
 
 	/**
@@ -94,9 +144,12 @@ export class IsoBoxReadView {
 	 * @param size - The size of the slice.
 	 * @returns A new IsoView instance.
 	 */
-	slice = (offset: number, size: number): IsoBoxReadView => {
+	slice = (offset: number, size: number): IsoBoxReadView<V> => {
 		const dataView = new DataView(this.dataView.buffer, offset, size)
-		const isoView = new IsoBoxReadView(dataView, this.config)
+		const isoView = new IsoBoxReadView(
+			dataView,
+			this.config as IsoBoxReadViewConfig<IsoInt64>,
+		) as IsoBoxReadView<V>
 		const headerSize = this.offset - offset
 		const bodySize = size - headerSize
 
@@ -302,14 +355,14 @@ export class IsoBoxReadView {
 	 *
 	 * @returns The box.
 	 */
-	readBox = (): ParsedBox => {
+	readBox = (): ParsedBox<Box, V> => {
 		const { dataView, offset } = this
 
 		// read box size and type without advancing the cursor in case the box is truncated
 		let cursor = 0
 		const size = readUint(dataView, offset, 4)
 		const type = readString(dataView, offset + 4, 4)
-		const box = { size, type } as ParsedBox
+		const box = { size, type } as ParsedBox<Box, V>
 
 		cursor += 8
 
@@ -341,7 +394,7 @@ export class IsoBoxReadView {
 	 * @param length - The number of boxes to read.
 	 * @returns The boxes.
 	 */
-	readBoxes = <T = IsoBox>(length: number = -1): T[] => {
+	readBoxes = <T = IsoBox<V>>(length: number = -1): T[] => {
 		const result: T[] = []
 
 		for (const box of this) {
@@ -377,17 +430,17 @@ export class IsoBoxReadView {
 	 *
 	 * @returns A generator of boxes.
 	 */
-	*[Symbol.iterator](): Generator<ParsedIsoBox> {
+	*[Symbol.iterator](): Generator<ParsedIsoBox<V>> {
 		const { readers = {} } = this.config
 
 		while (!this.done) {
 			try {
-				const box = this.readBox() as ParsedIsoBox
+				const box = this.readBox() as ParsedIsoBox<V>
 				const { type, view } = box
 				const parser = readers[type] || readers[type.trim()] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
-					Object.assign(box, parser(view, type))
+					Object.assign(box, parser(view as IsoBoxReadView, type))
 				}
 
 				// Some boxes, like meta, parse their child boxes themselves.

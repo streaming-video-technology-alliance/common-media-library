@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -5,7 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type MovieExtendsHeaderBox = FullBox & {
+export type MovieExtendsHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'mehd'
-	fragmentDuration: number
+	fragmentDuration: V
 }

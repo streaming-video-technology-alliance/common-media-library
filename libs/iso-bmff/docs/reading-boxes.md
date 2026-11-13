@@ -86,9 +86,137 @@ The view finds a reader by the exact type and by the trimmed type. A reader unde
 
 ## Reading 64-bit fields
 
-The built-in readers return every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
+The built-in readers return every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit, and the reader then returns a rounded value. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
 
-If your code needs the exact value, write a custom reader that calls `readUint64`. The method returns a `bigint`:
+The `int64` option of the configuration takes a function that reads every 64-bit field of the built-in readers. The package exports two functions for the option. `readInt64AsBigInt` returns the exact value as a `bigint`. `createInt64OverflowReader` keeps the `number` and reports a rounded value.
+
+The option applies to these fields:
+
+| Box                    | Fields                                          |
+| ---------------------- | ----------------------------------------------- |
+| `tfdt`                 | `baseMediaDecodeTime`                           |
+| `sidx`                 | `earliestPresentationTime`, `firstOffset`       |
+| `tfra`                 | `time` and `moofOffset` of each entry           |
+| `prft`                 | `mediaTime`                                     |
+| `emsg`                 | `presentationTime` of a version 1 box           |
+| `mehd`                 | `fragmentDuration`                              |
+| `mvhd`, `mdhd`, `tkhd` | `creationTime`, `modificationTime`, `duration`  |
+| `elst`                 | `segmentDuration` and `mediaTime` of each entry |
+| `tfhd`                 | `baseDataOffset`                                |
+
+### Exact values as `bigint`
+
+Pass `readInt64AsBigInt` as the `int64` option. The built-in readers then return each field of the table as a `bigint`. The result type of `readIsoBoxes` follows the option:
+
+```typescript
+import {
+	defaultReaderConfig,
+	readInt64AsBigInt,
+	readIsoBoxes,
+} from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(
+	buffer,
+	defaultReaderConfig({ int64: readInt64AsBigInt }),
+);
+
+for (const box of boxes) {
+	if (box.type === "sidx") {
+		// earliestPresentationTime is a bigint.
+		const seconds = box.earliestPresentationTime / BigInt(box.timescale);
+		console.log(seconds);
+	}
+}
+```
+
+Pass the option as the argument of `defaultReaderConfig`. The readers of the returned configuration have the types of that option. If you add `readInt64AsBigInt` to the result of `defaultReaderConfig()` afterward, the code does not compile.
+
+The option works the same way with specific readers:
+
+```typescript
+import { readInt64AsBigInt, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: {
+		tfdt: readTfdt,
+	},
+});
+
+for (const box of boxes) {
+	if (box.type === "tfdt") {
+		// baseMediaDecodeTime is a bigint.
+		console.log(box.baseMediaDecodeTime);
+	}
+}
+```
+
+Each field has one type for every version of its box. A version 0 `tfdt` box stores `baseMediaDecodeTime` in 32 bits. The reader returns that field as a `bigint` too, so your code does not test `version`. The option also applies to the child boxes of a container.
+
+`readInt64AsBigInt` needs `BigInt` and does not test for it. On a runtime without `BigInt`, the read of a 64-bit field fails with the error of the runtime. If your code supports such a runtime, test `typeof BigInt === "function"` before you pass the function.
+
+### Reporting a rounded value
+
+If your code keeps `number` fields, use `createInt64OverflowReader`. The function takes a callback and returns a function for the `int64` option. When a 64-bit value is outside the safe integer range, the callback receives a `RangeError`. If the callback returns, the read continues with the rounded value. If the callback throws, the read stops with that error.
+
+```typescript
+import {
+	createInt64OverflowReader,
+	readIsoBoxes,
+	readTfdt,
+} from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, {
+	int64: createInt64OverflowReader((error) => console.warn(error.message)),
+	readers: {
+		tfdt: readTfdt,
+	},
+});
+```
+
+The types of the result do not change, and the function does not need `BigInt`. The function checks the fields of the table above. The function does not check a call of `readUint(8)` in a custom reader. A configuration takes one function for the option. The configuration selects `bigint` fields or the report, not both.
+
+### Custom readers and the option
+
+A custom reader of the type `(view: IsoBoxReadView) => ...` works with no option and with `createInt64OverflowReader`. With `readInt64AsBigInt`, that reader is a compile error, because the view then has `bigint` fields. Use one of two forms:
+
+- A reader that reads no 64-bit field takes `IsoBoxReadView<IsoInt64>`. That type accepts the view of every configuration.
+- A reader that follows the option is generic. That reader reads each 64-bit field with `readWideUint` or `readWideInt`.
+
+`readWideUint` and `readWideInt` take the size of the field in bytes, 4 or 8. With no option, they return a `number`, as `readUint` and `readInt` do. With the option, they return the result of the `int64` function:
+
+```typescript
+import {
+	readInt64AsBigInt,
+	readIsoBoxes,
+	type IsoBoxReadView,
+	type IsoInt64,
+} from "@svta/cml-iso-bmff";
+
+const readTfdtWide = <V extends IsoInt64>(view: IsoBoxReadView<V>) => {
+	const { version, flags } = view.readFullBox();
+	const baseMediaDecodeTime = view.readWideUint(version === 1 ? 8 : 4);
+	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+};
+
+// baseMediaDecodeTime is a bigint in this result.
+const boxes = readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: {
+		tfdt: readTfdtWide,
+	},
+});
+
+// A readers map in a variable needs a type argument for a generic custom reader.
+const readers = { tfdt: readTfdtWide<bigint> };
+const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
+```
+
+A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`.
+
+### A custom reader for one field
+
+If your code needs the exact value of one field only, a custom reader can call `readUint64`. The method returns a `bigint` and needs no option:
 
 ```typescript
 import { readIsoBoxes, type IsoBoxReadView } from "@svta/cml-iso-bmff";
@@ -100,10 +228,6 @@ const readTfdt64 = (view: IsoBoxReadView) => {
 	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
 };
 
-const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
-	r.arrayBuffer(),
-);
-
 const boxes = readIsoBoxes(buffer, {
 	readers: {
 		tfdt: readTfdt64,
@@ -111,4 +235,4 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
-`IsoBoxWriteView.writeUint64` is the matching method for writing a `bigint`.
+The built-in writers write a `bigint` field with the exact value. See [Writing 64-bit fields](writing-boxes.md#writing-64-bit-fields).

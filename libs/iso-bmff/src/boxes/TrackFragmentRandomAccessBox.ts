@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 import type { TrackFragmentRandomAccessEntry } from './TrackFragmentRandomAccessEntry.ts'
 
@@ -6,7 +7,7 @@ import type { TrackFragmentRandomAccessEntry } from './TrackFragmentRandomAccess
  *
  * @public
  */
-export type TrackFragmentRandomAccessBox = FullBox & {
+export type TrackFragmentRandomAccessBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'tfra'
 	trackId: number
 	reserved: number
@@ -14,5 +15,5 @@ export type TrackFragmentRandomAccessBox = FullBox & {
 	lengthSizeOfTrafNum: number
 	lengthSizeOfTrunNum: number
 	lengthSizeOfSampleNum: number
-	entries: TrackFragmentRandomAccessEntry[]
+	entries: TrackFragmentRandomAccessEntry<V>[]
 }
