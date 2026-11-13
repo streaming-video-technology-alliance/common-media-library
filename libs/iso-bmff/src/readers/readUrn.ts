@@ -14,7 +14,7 @@ export function readUrn(view: IsoBoxReadView): DataEntryUrnBox {
 	return {
 		type: 'urn ',
 		...view.readFullBox(),
-		name: view.readString(-1),
-		location: view.readString(-1),
+		name: view.readUtf8(-1),
+		location: view.readUtf8(-1),
 	}
 }

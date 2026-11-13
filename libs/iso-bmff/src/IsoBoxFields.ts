@@ -15,7 +15,7 @@ export const UTF8 = 'utf8' as const
 export const UINT = 'uint' as const
 
 /**
- * The template field type
+ * The fixed-point field type
  *
  * @public
  */
