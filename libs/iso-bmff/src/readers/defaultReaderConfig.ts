@@ -66,14 +66,15 @@ import { readVttC } from './readVttC.ts'
 import { readVtte } from './readVtte.ts'
 
 /**
- * Create a default reader configuration with all available readers pre-configured.
+ * Create a default reader configuration with every reader except the container readers, such as `readMoov`.
+ * `readIsoBoxes` reads a container box that has no reader.
  *
  * The `int64` option selects the type of every 64-bit integer field.
  * The readers of the configuration have the types of that option.
  * Pass the option here and do not add it to the configuration afterward.
  *
  * @param options - The options for the configuration. The `int64` option is required when `V` is `bigint`.
- * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured, except the container readers
  *
  * @example
  * {@includeCode ../../test/readers/defaultReaderConfig.test.ts#example}
@@ -106,7 +107,7 @@ export function defaultReaderConfig<V extends IsoInt64 = number>(
  * `Parameters<typeof defaultReaderConfig>` and `ReturnType<typeof defaultReaderConfig>` resolve to this signature.
  *
  * @param options - The options for the configuration
- * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured, except the container readers
  *
  * @public
  */

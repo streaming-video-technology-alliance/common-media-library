@@ -1,8 +1,8 @@
-import { assert, describe, isContainer, it, parseContainer } from '../util/box.ts'
+import { assert, describe, isContainer, it, parseFile, readMoov } from '../util/box.ts'
 
 describe('readMoov', function () {
 	it('should correctly parse the box', function () {
-		const box = parseContainer('captions.mp4', -3)
+		const box = parseFile('captions.mp4', { readers: { moov: readMoov } }).at(-3)
 
 		assert.ok(box)
 		assert.strictEqual(box.type, 'moov')

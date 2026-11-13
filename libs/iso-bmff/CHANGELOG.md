@@ -19,6 +19,8 @@ and this project adheres to
 - `defaultReaderConfig` takes an optional argument with the `int64` option. The readers of the returned configuration have the types of that option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxWriteView.writeWideUint` and `IsoBoxWriteView.writeWideInt` write a field of 4 or 8 bytes from a `number` or a `bigint`. The methods throw a `RangeError` for a `bigint` that does not fit the size ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoInt64Reader` is the type of a function for the `int64` option. `IsoInt64` is the type `number | bigint` of a 64-bit integer field ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- Each container box type in `CONTAINERS` now has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result. `readVttc` reads the `vttc` box, and `readVttC` reads the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
+- Each container box type in `CONTAINERS` now has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes. `writeVttc` writes the `vttc` box, and `writeVttC` writes the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
 
 ### Changed
 

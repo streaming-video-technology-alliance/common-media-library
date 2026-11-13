@@ -12,8 +12,8 @@ Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/is
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read 64-bit fields, such as a tfdt time at a 10 MHz timescale, with the exact value: `readInt64AsBigInt`, `createInt64OverflowReader`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
-- Write boxes to a ReadableStream: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
-- Write or patch boxes, such as inserting emsg or rewriting tfdt: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`
+- Write or patch boxes, such as inserting emsg or rewriting tfdt, to byte arrays or a ReadableStream: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`, `createIsoBoxReadableStream`, `IsoBoxReadableStream`
+- Read or write a container box, such as moov or moof, with an optional named function: `readMoov`, `writeMoov`
 - Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
 
 Do not write your own box parser, box walker, or box writer. Open an issue for a box that is missing.
@@ -41,11 +41,11 @@ description: Parse ISO BMFF boxes from a buffer
 The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To parse the content of a box, provide a reader function for that box type.
 
 > [!NOTE]
-> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types.
+> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultReaderConfig()`. It returns a configuration with every available reader:
+If tree shaking is not a concern, use `defaultReaderConfig()`. It returns a configuration with every available reader except the container readers:
 
 ```typescript
 import { defaultReaderConfig, readIsoBoxes } from "@svta/cml-iso-bmff";
@@ -366,11 +366,11 @@ The `writeIsoBoxes` function writes boxes. It takes an array of streamable items
 If you provide raw box objects, also provide a configuration object that names the writers for those box types.
 
 > [!NOTE]
-> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types.
+> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer:
+If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer except the container writers:
 
 ```typescript
 import { defaultWriterConfig, writeIsoBoxes, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
@@ -1459,7 +1459,13 @@ export function readAvc4(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"
 export function readCtts(view: IsoBoxReadView<IsoInt64>): CompositionTimeToSampleBox;
 
 // @public
+export function readDinf(view: IsoBoxReadView<IsoInt64>): DataInformationBox;
+
+// @public
 export function readDref(view: IsoBoxReadView<IsoInt64>): DataReferenceBox;
+
+// @public
+export function readEdts<V extends IsoInt64>(view: IsoBoxReadView<V>): EditBox<V>;
 
 // @public
 export function readElng(view: IsoBoxReadView<IsoInt64>): ExtendedLanguageBox;
@@ -1484,6 +1490,9 @@ export function readFrma(view: IsoBoxReadView<IsoInt64>): OriginalFormatBox;
 
 // @public
 export function readFtyp(view: IsoBoxReadView<IsoInt64>): FileTypeBox;
+
+// @public
+export function readGrpl(view: IsoBoxReadView<IsoInt64>): GroupsListBox;
 
 // @public
 export function readHdlr(view: IsoBoxReadView<IsoInt64>): HandlerReferenceBox;
@@ -1527,6 +1536,12 @@ export function readMdat(view: IsoBoxReadView<IsoInt64>): MediaDataBox;
 export function readMdhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MediaHeaderBox<V>;
 
 // @public
+export function readMdia<V extends IsoInt64>(view: IsoBoxReadView<V>): MediaBox<V>;
+
+// @public
+export function readMeco(view: IsoBoxReadView<IsoInt64>): AdditionalMetadataContainerBox;
+
+// @public
 export function readMehd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieExtendsHeaderBox<V>;
 
 // @public
@@ -1536,10 +1551,25 @@ export function readMeta(view: IsoBoxReadView<IsoInt64>): MetaBox;
 export function readMfhd(view: IsoBoxReadView<IsoInt64>): MovieFragmentHeaderBox;
 
 // @public
+export function readMfra<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieFragmentRandomAccessBox<V>;
+
+// @public
 export function readMfro(view: IsoBoxReadView<IsoInt64>): MovieFragmentRandomAccessOffsetBox;
 
 // @public
+export function readMinf(view: IsoBoxReadView<IsoInt64>): MediaInformationBox;
+
+// @public
+export function readMoof<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieFragmentBox<V>;
+
+// @public
+export function readMoov<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieBox<V>;
+
+// @public
 export function readMp4a(view: IsoBoxReadView<IsoInt64>): AudioSampleEntryBox<"mp4a">;
+
+// @public
+export function readMvex<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieExtendsBox<V>;
 
 // @public
 export function readMvhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieHeaderBox<V>;
@@ -1557,6 +1587,9 @@ export function readPrsl(view: IsoBoxReadView<IsoInt64>): PreselectionGroupBox;
 export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecificHeaderBox;
 
 // @public
+export function readSchi(view: IsoBoxReadView<IsoInt64>): SchemeInformationBox;
+
+// @public
 export function readSchm(view: IsoBoxReadView<IsoInt64>): SchemeTypeBox;
 
 // @public
@@ -1564,6 +1597,9 @@ export function readSdtp(view: IsoBoxReadView<IsoInt64>): SampleDependencyTypeBo
 
 // @public
 export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIndexBox<V>;
+
+// @public
+export function readSinf(view: IsoBoxReadView<IsoInt64>): ProtectionSchemeInformationBox;
 
 // @public
 export function readSkip(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox<"skip">;
@@ -1575,10 +1611,16 @@ export function readSmhd(view: IsoBoxReadView<IsoInt64>): SoundMediaHeaderBox;
 export function readSsix(view: IsoBoxReadView<IsoInt64>): SubsegmentIndexBox;
 
 // @public
+export function readStbl(view: IsoBoxReadView<IsoInt64>): SampleTableBox;
+
+// @public
 export function readStco(view: IsoBoxReadView<IsoInt64>): ChunkOffsetBox;
 
 // @public
 export function readSthd(view: IsoBoxReadView<IsoInt64>): SubtitleMediaHeaderBox;
+
+// @public
+export function readStrk(view: IsoBoxReadView<IsoInt64>): SubTrackBox;
 
 // @public
 export function readStsc(view: IsoBoxReadView<IsoInt64>): SampleToChunkBox;
@@ -1620,10 +1662,22 @@ export function readTfra<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFrag
 export function readTkhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackHeaderBox<V>;
 
 // @public
+export function readTraf<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentBox<V>;
+
+// @public
+export function readTrak<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackBox<V>;
+
+// @public
+export function readTref(view: IsoBoxReadView<IsoInt64>): TrackReferenceBox;
+
+// @public
 export function readTrex(view: IsoBoxReadView<IsoInt64>): TrackExtendsBox;
 
 // @public
 export function readTrun(view: IsoBoxReadView<IsoInt64>): TrackRunBox;
+
+// @public
+export function readUdta(view: IsoBoxReadView<IsoInt64>): UserDataBox;
 
 // @public
 export function readUrl(view: IsoBoxReadView<IsoInt64>): DataEntryUrlBox;
@@ -1642,6 +1696,9 @@ export function readVmhd(view: IsoBoxReadView<IsoInt64>): VideoMediaHeaderBox;
 
 // @public
 export function readVttC(view: IsoBoxReadView<IsoInt64>): WebVttConfigurationBox;
+
+// @public
+export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox;
 
 // @public
 export function readVtte(_: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
@@ -2166,7 +2223,13 @@ export function writeAvc4(box: VisualSampleEntryBox<"avc4">, config: IsoBoxWrite
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
 
 // @public
+export function writeDinf(box: DataInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeDref(box: DataReferenceBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeEdts(box: EditBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView;
@@ -2191,6 +2254,9 @@ export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView;
 
 // @public
 export function writeFtyp(box: FileTypeBox): IsoBoxWriteView;
+
+// @public
+export function writeGrpl(box: GroupsListBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView;
@@ -2226,6 +2292,12 @@ export function writeMdat(box: MediaDataBox): IsoBoxWriteView;
 export function writeMdhd(box: MediaHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
+export function writeMdia(box: MediaBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMeco(box: AdditionalMetadataContainerBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeMehd(box: MovieExtendsHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
@@ -2235,10 +2307,25 @@ export function writeMeta(box: MetaBox, config: IsoBoxWriteViewConfig): IsoBoxWr
 export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeMfra(box: MovieFragmentRandomAccessBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView;
 
 // @public
+export function writeMinf(box: MediaInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMoof(box: MovieFragmentBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMoov(box: MovieBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeMp4a(box: AudioSampleEntryBox<"mp4a">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMvex(box: MovieExtendsBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView;
@@ -2256,6 +2343,9 @@ export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConf
 export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeSchi(box: SchemeInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView;
 
 // @public
@@ -2263,6 +2353,9 @@ export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView;
 
 // @public
 export function writeSidx(box: SegmentIndexBox<IsoInt64>): IsoBoxWriteView;
+
+// @public
+export function writeSinf(box: ProtectionSchemeInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeSkip(box: FreeSpaceBox<"skip">): IsoBoxWriteView;
@@ -2274,10 +2367,16 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView;
 export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView;
 
 // @public
+export function writeStbl(box: SampleTableBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeStco(box: ChunkOffsetBox): IsoBoxWriteView;
 
 // @public
 export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeStrk(box: SubTrackBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeStsc(box: SampleToChunkBox): IsoBoxWriteView;
@@ -2319,10 +2418,22 @@ export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWr
 export function writeTkhd(box: TrackHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
+export function writeTraf(box: TrackFragmentBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeTrak(box: TrackBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeTref(box: TrackReferenceBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView;
 
 // @public
 export function writeTrun(box: TrackRunBox): IsoBoxWriteView;
+
+// @public
+export function writeUdta(box: UserDataBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
@@ -2341,6 +2452,9 @@ export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView;
 
 // @public
 export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
+
+// @public
+export function writeVttc(box: WebVttCueBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;
