@@ -188,6 +188,8 @@ Each field has one type for every version of its box. A version 0 `tfdt` box sto
 
 `readInt64AsBigInt` needs `BigInt` and does not test for it. On a runtime without `BigInt`, the read of a 64-bit field fails with the error of the runtime. If your code supports such a runtime, test `typeof BigInt === "function"` before you pass the function.
 
+`JSON.stringify` throws a `TypeError` for a `bigint`. To serialize a box with `bigint` fields, pass a replacer function that converts each `bigint` to a string.
+
 ### Reporting a rounded value
 
 If your code keeps `number` fields, use `createInt64OverflowReader`. The function takes a callback and returns a function for the `int64` option. When a 64-bit value is outside the safe integer range, the callback receives a `RangeError`. If the callback returns, the read continues with the rounded value. If the callback throws, the read stops with that error.
@@ -246,6 +248,40 @@ const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
 ```
 
 A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`.
+
+### A function that forwards the option
+
+Your code can have a function that takes a configuration and passes that configuration to `readIsoBoxes`. Give the function a type parameter for the type of the 64-bit fields. The result type then follows the configuration of each call:
+
+```typescript
+import {
+	defaultReaderConfig,
+	readInt64AsBigInt,
+	readIsoBoxes,
+	type IsoBoxData,
+	type IsoBoxReadViewConfig,
+	type IsoInt64,
+	type ParsedIsoBox,
+} from "@svta/cml-iso-bmff";
+
+function readSegment<V extends IsoInt64 = number>(
+	data: IsoBoxData,
+	config: IsoBoxReadViewConfig<V>,
+): ParsedIsoBox<V>[] {
+	return readIsoBoxes(data, config);
+}
+
+// The 64-bit fields are numbers in this result.
+const plain = readSegment(buffer, defaultReaderConfig());
+
+// The 64-bit fields are bigints in this result.
+const exact = readSegment(
+	buffer,
+	defaultReaderConfig({ int64: readInt64AsBigInt }),
+);
+```
+
+Do not type the parameter as `IsoBoxReadViewConfig<IsoInt64>`. That type does not accept the result of `defaultReaderConfig({ int64: readInt64AsBigInt })`.
 
 ### A custom reader for one field
 
