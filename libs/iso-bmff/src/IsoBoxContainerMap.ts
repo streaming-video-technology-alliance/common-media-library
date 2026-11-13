@@ -27,9 +27,9 @@ import type { IsoInt64 } from './IsoInt64.ts'
 export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
 	dinf: DataInformationBox
 	edts: EditBox<V>
-	grpl: GroupsListBox
+	grpl: GroupsListBox<V>
 	mdia: MediaBox<V>
-	meco: AdditionalMetadataContainerBox
+	meco: AdditionalMetadataContainerBox<V>
 	mfra: MovieFragmentRandomAccessBox<V>
 	minf: MediaInformationBox
 	moof: MovieFragmentBox<V>
@@ -38,10 +38,10 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
 	schi: SchemeInformationBox
 	sinf: ProtectionSchemeInformationBox
 	stbl: SampleTableBox
-	strk: SubTrackBox
+	strk: SubTrackBox<V>
 	traf: TrackFragmentBox<V>
 	trak: TrackBox<V>
 	tref: TrackReferenceBox
-	udta: UserDataBox
+	udta: UserDataBox<V>
 	vttc: WebVttCueBox
 }

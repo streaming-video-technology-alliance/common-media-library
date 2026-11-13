@@ -14,9 +14,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readGrpl(view: IsoBoxReadView<IsoInt64>): GroupsListBox {
+export function readGrpl<V extends IsoInt64>(view: IsoBoxReadView<V>): GroupsListBox<V> {
 	return {
 		type: 'grpl',
-		boxes: view.readBoxes<GroupsListBoxChild>(),
+		boxes: view.readBoxes<GroupsListBoxChild<V>>(),
 	}
 }

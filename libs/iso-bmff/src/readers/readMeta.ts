@@ -11,10 +11,10 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readMeta(view: IsoBoxReadView<IsoInt64>): MetaBox {
+export function readMeta<V extends IsoInt64>(view: IsoBoxReadView<V>): MetaBox<V> {
 	return {
 		type: 'meta',
 		...view.readFullBox(),
-		boxes: view.readBoxes<MetaBoxChild>(),
+		boxes: view.readBoxes<MetaBoxChild<V>>(),
 	}
 }

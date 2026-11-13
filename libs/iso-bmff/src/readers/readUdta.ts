@@ -14,9 +14,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readUdta(view: IsoBoxReadView<IsoInt64>): UserDataBox {
+export function readUdta<V extends IsoInt64>(view: IsoBoxReadView<V>): UserDataBox<V> {
 	return {
 		type: 'udta',
-		boxes: view.readBoxes<UserDataBoxChild>(),
+		boxes: view.readBoxes<UserDataBoxChild<V>>(),
 	}
 }

@@ -445,13 +445,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 
 				// Some boxes, like meta, parse their child boxes themselves.
 				if (isContainer(box) && !box.boxes) {
-					const boxes = []
-
-					for (const child of view) {
-						boxes.push(child)
-					}
-
-					box.boxes = boxes
+					;(box as { boxes: unknown }).boxes = view.readBoxes()
 				}
 
 				yield box
