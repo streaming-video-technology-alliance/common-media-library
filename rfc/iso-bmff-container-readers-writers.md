@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: Named readers and writers for container boxes
@@ -223,4 +223,4 @@ None.
 
 ## Final Decision
 
-Pending review.
+Accepted on 2026-11-12. The RFC PR #622 carries the functions and the contract above. The implementation PR #654 follows the signatures in [Functions](#functions).
