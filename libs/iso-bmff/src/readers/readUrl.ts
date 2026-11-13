@@ -1,5 +1,6 @@
 import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `DataEntryUrlBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readUrl(view: IsoBoxReadView): DataEntryUrlBox {
+export function readUrl(view: IsoBoxReadView<IsoInt64>): DataEntryUrlBox {
 	return {
 		type: 'url ',
 		...view.readFullBox(),

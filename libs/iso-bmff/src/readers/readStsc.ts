@@ -1,6 +1,7 @@
 import type { SampleToChunkBox } from '../boxes/SampleToChunkBox.ts'
 import type { SampleToChunkEntry } from '../boxes/SampleToChunkEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `SampleToChunkBox` from an `IsoBoxReadView`.
@@ -16,7 +17,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readStsc(view: IsoBoxReadView): SampleToChunkBox {
+export function readStsc(view: IsoBoxReadView<IsoInt64>): SampleToChunkBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 

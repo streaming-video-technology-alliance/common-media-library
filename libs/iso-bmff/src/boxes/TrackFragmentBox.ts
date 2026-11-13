@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { SampleAuxiliaryInformationOffsetsBox } from './SampleAuxiliaryInformationOffsetsBox.ts'
 import type { SampleAuxiliaryInformationSizesBox } from './SampleAuxiliaryInformationSizesBox.ts'
 import type { SampleEncryptionBox } from './SampleEncryptionBox.ts'
@@ -11,9 +12,9 @@ import type { TrackRunBox } from './TrackRunBox.ts'
  *
  * @public
  */
-export type TrackFragmentBoxChild =
-	| TrackFragmentHeaderBox
-	| TrackFragmentBaseMediaDecodeTimeBox
+export type TrackFragmentBoxChild<V extends IsoInt64 = number> =
+	| TrackFragmentHeaderBox<V>
+	| TrackFragmentBaseMediaDecodeTimeBox<V>
 	| TrackRunBox
 	| SampleAuxiliaryInformationSizesBox
 	| SampleAuxiliaryInformationOffsetsBox
@@ -25,7 +26,7 @@ export type TrackFragmentBoxChild =
  *
  * @public
  */
-export type TrackFragmentBox = {
+export type TrackFragmentBox<V extends IsoInt64 = number> = {
 	type: 'traf'
-	boxes: TrackFragmentBoxChild[]
+	boxes: TrackFragmentBoxChild<V>[]
 }

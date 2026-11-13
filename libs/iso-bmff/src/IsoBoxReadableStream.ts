@@ -1,4 +1,5 @@
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
+import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
 import { createWriterConfig } from './utils/createWriterConfig.ts'
 import { writeIsoBox } from './writeIsoBox.ts'
@@ -31,7 +32,7 @@ export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
 	 * @param boxes - The boxes to stream.
 	 * @param config - The configuration for the stream.
 	 */
-	constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig) {
+	constructor(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig) {
 		const iterator = boxes[Symbol.iterator]()
 		const cfg = createWriterConfig(config)
 

@@ -1,5 +1,6 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
 
@@ -27,6 +28,6 @@ import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
  */
 export function createVisualSampleEntryReader<T extends IsoBoxType>(
 	type: T,
-): (view: IsoBoxReadView) => VisualSampleEntryBox<T> {
-	return (view: IsoBoxReadView) => readVisualSampleEntryBox<T>(type, view)
+): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntryBox<T> {
+	return (view: IsoBoxReadView<IsoInt64>) => readVisualSampleEntryBox<T>(type, view)
 }

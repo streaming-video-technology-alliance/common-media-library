@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { EditListEntry } from './EditListEntry.ts'
 import type { FullBox } from './FullBox.ts'
 
@@ -6,8 +7,8 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type EditListBox = FullBox & {
+export type EditListBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'elst'
 	entryCount: number
-	entries: EditListEntry[]
+	entries: EditListEntry<V>[]
 }
