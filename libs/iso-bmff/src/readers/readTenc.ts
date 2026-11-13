@@ -39,7 +39,7 @@ export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox {
 
 	if (defaultIsProtected === 1 && defaultIvSize === 0 && !view.done) {
 		box.defaultConstantIvSize = view.readUint(1)
-		box.defaultConstantIv = Array.from(view.readData(box.defaultConstantIvSize))
+		box.defaultConstantIv = view.readArray(UINT, 1, box.defaultConstantIvSize)
 	}
 
 	return box

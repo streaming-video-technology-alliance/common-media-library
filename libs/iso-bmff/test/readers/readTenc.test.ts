@@ -188,9 +188,9 @@ describe('readTenc', function () {
 		})
 	})
 
-	it('should read the bytes that remain when the box ends before the end of the constant IV', function () {
+	it('should throw a RangeError when the box ends before the end of the constant IV', function () {
 		// default_constant_IV_size is 16, and the box has 8 bytes of the constant IV.
-		// A free box follows the tenc box.
+		// A free box of 16 bytes follows the tenc box.
 		const bytes = new Uint8Array([
 			...tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 16, ...IV.slice(0, 8)),
 			0,
@@ -203,12 +203,6 @@ describe('readTenc', function () {
 			101,
 			...IV.slice(8),
 		])
-		const boxes = readIsoBoxes(bytes, { readers: { tenc: readTenc } })
-		const [tenc] = boxes
-
-		assert.strictEqual(boxes.length, 2)
-		assert.strictEqual(tenc.type, 'tenc')
-		assert.strictEqual(tenc.defaultConstantIvSize, 16)
-		assert.deepStrictEqual(tenc.defaultConstantIv, IV.slice(0, 8))
+		assert.throws(() => readIsoBoxes(bytes, { readers: { tenc: readTenc } }), RangeError)
 	})
 })
