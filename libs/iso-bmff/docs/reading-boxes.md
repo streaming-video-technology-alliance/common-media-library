@@ -8,11 +8,11 @@ description: Parse ISO BMFF boxes from a buffer
 The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To parse the content of a box, provide a reader function for that box type.
 
 > [!NOTE]
-> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types.
+> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultReaderConfig()`. It returns a configuration with every available reader:
+If tree shaking is not a concern, use `defaultReaderConfig()`. It returns a configuration with every available reader except the container readers:
 
 ```typescript
 import { defaultReaderConfig, readIsoBoxes } from "@svta/cml-iso-bmff";

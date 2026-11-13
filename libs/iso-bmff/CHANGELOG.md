@@ -12,6 +12,8 @@ and this project adheres to
 
 - `IsoBoxReadView.readUint64` and `IsoBoxWriteView.writeUint64` read and write a 64-bit unsigned integer as a `bigint`. `readUint(8)` and `writeUint(value, 8)` use a `number`, which loses precision above 2^53 - 1. A custom reader for a 64-bit field, such as `baseMediaDecodeTime` in a version 1 `tfdt` box, can now keep the exact value ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `readStco`, `readStsc`, and `readStsz` are new readers for the `stco`, `stsc`, and `stsz` boxes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
+- Each container box type in `CONTAINERS` now has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result. `readVttc` reads the `vttc` box, and `readVttC` reads the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
+- Each container box type in `CONTAINERS` now has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes. `writeVttc` writes the `vttc` box, and `writeVttC` writes the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
 
 ### Fixed
 

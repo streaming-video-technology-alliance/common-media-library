@@ -13,6 +13,7 @@ import {
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
+import { values } from './util/values.ts'
 
 // Known defects. A line is `fixture/box type/check` and the count of boxes that fail the check.
 // The box type `file` is the whole fixture. The checks:
@@ -117,23 +118,6 @@ function bytes(view: ArrayBufferView): Uint8Array {
 
 function same(a: Uint8Array, b: Uint8Array): boolean {
 	return Buffer.compare(a, b) === 0
-}
-
-// The fields of a box without `view` and `size`. The bytes check covers both.
-function values(value: unknown): unknown {
-	if (Array.isArray(value)) {
-		return value.map(values)
-	}
-
-	if (value === null || typeof value !== 'object' || ArrayBuffer.isView(value)) {
-		return value
-	}
-
-	return Object.fromEntries(
-		Object.entries(value)
-			.filter(([key]) => key !== 'view' && key !== 'size')
-			.map(([key, field]): [string, unknown] => [key, values(field)]),
-	)
 }
 
 // `traverseIsoBoxes` does not yield the entries of the dref and stsd boxes.

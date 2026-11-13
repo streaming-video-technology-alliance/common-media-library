@@ -218,6 +218,7 @@ ISO Base Media File Format (ISOBMFF) parsing functionality
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
 - Write boxes to a ReadableStream: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
 - Write or patch boxes, such as inserting emsg or rewriting tfdt: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`
+- Read or write a container box, such as moov or moof, with a named function: `readMoov`, `writeMoov`
 - Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
 
 Do not write your own box parser, box walker, or box writer. Open an issue for a box that is missing.

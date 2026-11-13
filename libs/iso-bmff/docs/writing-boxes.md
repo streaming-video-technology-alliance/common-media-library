@@ -13,11 +13,11 @@ The `writeIsoBoxes` function writes boxes. It takes an array of streamable items
 If you provide raw box objects, also provide a configuration object that names the writers for those box types.
 
 > [!NOTE]
-> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types.
+> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer:
+If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer except the container writers:
 
 ```typescript
 import { defaultWriterConfig, writeIsoBoxes, type IsoBoxStreamable } from "@svta/cml-iso-bmff";

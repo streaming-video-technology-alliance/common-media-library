@@ -830,7 +830,13 @@ export function readAvc4(view: IsoBoxReadView): VisualSampleEntryBox<"avc4">;
 export function readCtts(view: IsoBoxReadView): CompositionTimeToSampleBox;
 
 // @public
+export function readDinf(view: IsoBoxReadView): DataInformationBox;
+
+// @public
 export function readDref(view: IsoBoxReadView): DataReferenceBox;
+
+// @public
+export function readEdts(view: IsoBoxReadView): EditBox;
 
 // @public
 export function readElng(view: IsoBoxReadView): ExtendedLanguageBox;
@@ -855,6 +861,9 @@ export function readFrma(view: IsoBoxReadView): OriginalFormatBox;
 
 // @public
 export function readFtyp(view: IsoBoxReadView): FileTypeBox;
+
+// @public
+export function readGrpl(view: IsoBoxReadView): GroupsListBox;
 
 // @public
 export function readHdlr(view: IsoBoxReadView): HandlerReferenceBox;
@@ -892,6 +901,12 @@ export function readMdat(view: IsoBoxReadView): MediaDataBox;
 export function readMdhd(view: IsoBoxReadView): MediaHeaderBox;
 
 // @public
+export function readMdia(view: IsoBoxReadView): MediaBox;
+
+// @public
+export function readMeco(view: IsoBoxReadView): AdditionalMetadataContainerBox;
+
+// @public
 export function readMehd(view: IsoBoxReadView): MovieExtendsHeaderBox;
 
 // @public
@@ -901,10 +916,25 @@ export function readMeta(view: IsoBoxReadView): MetaBox;
 export function readMfhd(view: IsoBoxReadView): MovieFragmentHeaderBox;
 
 // @public
+export function readMfra(view: IsoBoxReadView): MovieFragmentRandomAccessBox;
+
+// @public
 export function readMfro(view: IsoBoxReadView): MovieFragmentRandomAccessOffsetBox;
 
 // @public
+export function readMinf(view: IsoBoxReadView): MediaInformationBox;
+
+// @public
+export function readMoof(view: IsoBoxReadView): MovieFragmentBox;
+
+// @public
+export function readMoov(view: IsoBoxReadView): MovieBox;
+
+// @public
 export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<"mp4a">;
+
+// @public
+export function readMvex(view: IsoBoxReadView): MovieExtendsBox;
 
 // @public
 export function readMvhd(view: IsoBoxReadView): MovieHeaderBox;
@@ -922,6 +952,9 @@ export function readPrsl(view: IsoBoxReadView): PreselectionGroupBox;
 export function readPssh(view: IsoBoxReadView): ProtectionSystemSpecificHeaderBox;
 
 // @public
+export function readSchi(view: IsoBoxReadView): SchemeInformationBox;
+
+// @public
 export function readSchm(view: IsoBoxReadView): SchemeTypeBox;
 
 // @public
@@ -929,6 +962,9 @@ export function readSdtp(view: IsoBoxReadView): SampleDependencyTypeBox;
 
 // @public
 export function readSidx(view: IsoBoxReadView): SegmentIndexBox;
+
+// @public
+export function readSinf(view: IsoBoxReadView): ProtectionSchemeInformationBox;
 
 // @public
 export function readSkip(view: IsoBoxReadView): FreeSpaceBox<"skip">;
@@ -940,10 +976,16 @@ export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox;
 export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox;
 
 // @public
+export function readStbl(view: IsoBoxReadView): SampleTableBox;
+
+// @public
 export function readStco(view: IsoBoxReadView): ChunkOffsetBox;
 
 // @public
 export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox;
+
+// @public
+export function readStrk(view: IsoBoxReadView): SubTrackBox;
 
 // @public
 export function readStsc(view: IsoBoxReadView): SampleToChunkBox;
@@ -985,10 +1027,22 @@ export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox;
 export function readTkhd(view: IsoBoxReadView): TrackHeaderBox;
 
 // @public
+export function readTraf(view: IsoBoxReadView): TrackFragmentBox;
+
+// @public
+export function readTrak(view: IsoBoxReadView): TrackBox;
+
+// @public
+export function readTref(view: IsoBoxReadView): TrackReferenceBox;
+
+// @public
 export function readTrex(view: IsoBoxReadView): TrackExtendsBox;
 
 // @public
 export function readTrun(view: IsoBoxReadView): TrackRunBox;
+
+// @public
+export function readUdta(view: IsoBoxReadView): UserDataBox;
 
 // @public
 export function readUrl(view: IsoBoxReadView): DataEntryUrlBox;
@@ -1007,6 +1061,9 @@ export function readVmhd(view: IsoBoxReadView): VideoMediaHeaderBox;
 
 // @public
 export function readVttC(view: IsoBoxReadView): WebVttConfigurationBox;
+
+// @public
+export function readVttc(view: IsoBoxReadView): WebVttCueBox;
 
 // @public
 export function readVtte(_: IsoBoxReadView): WebVttEmptySampleBox;
@@ -1531,7 +1588,13 @@ export function writeAvc4(box: VisualSampleEntryBox<"avc4">, config: IsoBoxWrite
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
 
 // @public
+export function writeDinf(box: DataInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeDref(box: DataReferenceBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeEdts(box: EditBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView;
@@ -1556,6 +1619,9 @@ export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView;
 
 // @public
 export function writeFtyp(box: FileTypeBox): IsoBoxWriteView;
+
+// @public
+export function writeGrpl(box: GroupsListBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView;
@@ -1591,6 +1657,12 @@ export function writeMdat(box: MediaDataBox): IsoBoxWriteView;
 export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeMdia(box: MediaBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMeco(box: AdditionalMetadataContainerBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView;
 
 // @public
@@ -1600,10 +1672,25 @@ export function writeMeta(box: MetaBox, config: IsoBoxWriteViewConfig): IsoBoxWr
 export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeMfra(box: MovieFragmentRandomAccessBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView;
 
 // @public
+export function writeMinf(box: MediaInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMoof(box: MovieFragmentBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMoov(box: MovieBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeMp4a(box: AudioSampleEntryBox<"mp4a">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMvex(box: MovieExtendsBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView;
@@ -1621,6 +1708,9 @@ export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConf
 export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeSchi(box: SchemeInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView;
 
 // @public
@@ -1628,6 +1718,9 @@ export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView;
 
 // @public
 export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView;
+
+// @public
+export function writeSinf(box: ProtectionSchemeInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeSkip(box: FreeSpaceBox<"skip">): IsoBoxWriteView;
@@ -1639,10 +1732,16 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView;
 export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView;
 
 // @public
+export function writeStbl(box: SampleTableBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeStco(box: ChunkOffsetBox): IsoBoxWriteView;
 
 // @public
 export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeStrk(box: SubTrackBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeStsc(box: SampleToChunkBox): IsoBoxWriteView;
@@ -1684,10 +1783,22 @@ export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView;
 export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeTraf(box: TrackFragmentBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeTrak(box: TrackBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeTref(box: TrackReferenceBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView;
 
 // @public
 export function writeTrun(box: TrackRunBox): IsoBoxWriteView;
+
+// @public
+export function writeUdta(box: UserDataBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
@@ -1706,6 +1817,9 @@ export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView;
 
 // @public
 export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
+
+// @public
+export function writeVttc(box: WebVttCueBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;

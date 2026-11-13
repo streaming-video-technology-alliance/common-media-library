@@ -65,8 +65,10 @@ import { readVtte } from './readVtte.ts'
 
 /**
  * Create a default reader configuration with all available readers pre-configured.
+ * The configuration does not contain the container readers, such as `readMoov`.
+ * `readIsoBoxes` reads a container box that has no reader.
  *
- * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured, except the container readers
  *
  * @public
  */
