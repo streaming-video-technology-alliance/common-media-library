@@ -3,6 +3,7 @@ import type {
 	ProtectionSchemeInformationBoxChild,
 } from '../boxes/ProtectionSchemeInformationBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `ProtectionSchemeInformationBox` from an `IsoBoxReadView`.
@@ -16,7 +17,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSinf(view: IsoBoxReadView): ProtectionSchemeInformationBox {
+export function readSinf(view: IsoBoxReadView<IsoInt64>): ProtectionSchemeInformationBox {
 	return {
 		type: 'sinf',
 		boxes: view.readBoxes<ProtectionSchemeInformationBoxChild>(),

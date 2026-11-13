@@ -1,5 +1,6 @@
 import type { DataInformationBox, DataInformationBoxChild } from '../boxes/DataInformationBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `DataInformationBox` from an `IsoBoxReadView`.
@@ -13,7 +14,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readDinf(view: IsoBoxReadView): DataInformationBox {
+export function readDinf(view: IsoBoxReadView<IsoInt64>): DataInformationBox {
 	return {
 		type: 'dinf',
 		boxes: view.readBoxes<DataInformationBoxChild>(),

@@ -1,5 +1,6 @@
 import type { MediaInformationBox, MediaInformationBoxChild } from '../boxes/MediaInformationBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `MediaInformationBox` from an `IsoBoxReadView`.
@@ -13,7 +14,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMinf(view: IsoBoxReadView): MediaInformationBox {
+export function readMinf(view: IsoBoxReadView<IsoInt64>): MediaInformationBox {
 	return {
 		type: 'minf',
 		boxes: view.readBoxes<MediaInformationBoxChild>(),

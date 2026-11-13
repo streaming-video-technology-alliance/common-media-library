@@ -10,6 +10,7 @@ import {
 	readDinf,
 	readEdts,
 	readGrpl,
+	readInt64AsBigInt,
 	readIsoBoxes,
 	readMdia,
 	readMeco,
@@ -24,6 +25,7 @@ import {
 	readSinf,
 	readStbl,
 	readStrk,
+	readTfdt,
 	readTraf,
 	readTrak,
 	readTref,
@@ -31,14 +33,22 @@ import {
 	readVttc,
 	type IsoBoxContainerMap,
 	type IsoBoxReader,
+	type IsoBoxType,
+	type IsoInt64,
 	type MovieBoxChild,
 } from './util/box.ts'
-import { boxBytes } from './util/boxBytes.ts'
+import { expectType, type Equal } from './util/expectType.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
 import { values } from './util/values.ts'
+import { boxBytes } from './util/wideBoxes.ts'
 
-const READERS: { [K in keyof IsoBoxContainerMap]: IsoBoxReader<IsoBoxContainerMap[K]> } = {
+type ContainerReaders<V extends IsoInt64> = {
+	[K in keyof IsoBoxContainerMap<V>]: IsoBoxReader<IsoBoxContainerMap<V>[K], IsoBoxType, V>
+}
+
+// Each reader accepts a view with number fields and a view with bigint fields.
+const CONTAINER_READERS = {
 	dinf: readDinf,
 	edts: readEdts,
 	grpl: readGrpl,
@@ -58,13 +68,18 @@ const READERS: { [K in keyof IsoBoxContainerMap]: IsoBoxReader<IsoBoxContainerMa
 	tref: readTref,
 	udta: readUdta,
 	vttc: readVttc,
-}
+} satisfies ContainerReaders<number> & ContainerReaders<bigint>
+
+const READERS: ContainerReaders<number> = CONTAINER_READERS
 
 const TYPES = Object.keys(READERS) as (keyof IsoBoxContainerMap)[]
 
 // An mfhd box with the sequence number 1.
 const MFHD = boxBytes('mfhd', Uint8Array.of(0, 0, 0, 0, 0, 0, 0, 1))
 const MFHD_VALUES = { type: 'mfhd', version: 0, flags: 0, sequenceNumber: 1 }
+
+// 2^53 + 1. A number cannot hold this value.
+const EXACT = BigInt('9007199254740993')
 
 describe('container readers', function () {
 	it('should have a reader for every box type in CONTAINERS', function () {
@@ -136,5 +151,35 @@ describe('container readers', function () {
 
 		assert.strictEqual(children.length, 2)
 		assert.strictEqual(mvhd?.type, 'mvhd')
+	})
+
+	it('should give the child boxes bigint fields with readInt64AsBigInt', function () {
+		const tfdt = boxBytes('tfdt', [1, 1], [0, 3], [EXACT, 8])
+		const boxes = readIsoBoxes(boxBytes('moof', boxBytes('traf', tfdt)), {
+			int64: readInt64AsBigInt,
+			readers: { moof: readMoof, traf: readTraf, tfdt: readTfdt },
+		})
+		let value: bigint | undefined
+
+		for (const moof of boxes) {
+			if (moof.type !== 'moof') {
+				continue
+			}
+
+			for (const traf of moof.boxes) {
+				if (traf.type !== 'traf') {
+					continue
+				}
+
+				for (const child of traf.boxes) {
+					if (child.type === 'tfdt') {
+						expectType<Equal<typeof child.baseMediaDecodeTime, bigint>>(true)
+						value = child.baseMediaDecodeTime
+					}
+				}
+			}
+		}
+
+		assert.strictEqual(value, EXACT)
 	})
 })

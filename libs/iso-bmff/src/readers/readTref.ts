@@ -1,5 +1,6 @@
 import type { TrackReferenceBox, TrackReferenceBoxChild } from '../boxes/TrackReferenceBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `TrackReferenceBox` from an `IsoBoxReadView`.
@@ -13,7 +14,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTref(view: IsoBoxReadView): TrackReferenceBox {
+export function readTref(view: IsoBoxReadView<IsoInt64>): TrackReferenceBox {
 	return {
 		type: 'tref',
 		boxes: view.readBoxes<TrackReferenceBoxChild>(),

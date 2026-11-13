@@ -3,6 +3,7 @@ import type {
 	SchemeInformationBoxChild,
 } from '../boxes/SchemeInformationBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `SchemeInformationBox` from an `IsoBoxReadView`.
@@ -16,7 +17,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSchi(view: IsoBoxReadView): SchemeInformationBox {
+export function readSchi(view: IsoBoxReadView<IsoInt64>): SchemeInformationBox {
 	return {
 		type: 'schi',
 		boxes: view.readBoxes<SchemeInformationBoxChild>(),

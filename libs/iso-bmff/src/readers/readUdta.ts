@@ -1,5 +1,6 @@
 import type { UserDataBox, UserDataBoxChild } from '../boxes/UserDataBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `UserDataBox` from an `IsoBoxReadView`.
@@ -13,7 +14,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readUdta(view: IsoBoxReadView): UserDataBox {
+export function readUdta(view: IsoBoxReadView<IsoInt64>): UserDataBox {
 	return {
 		type: 'udta',
 		boxes: view.readBoxes<UserDataBoxChild>(),

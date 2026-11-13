@@ -1,5 +1,6 @@
 import type { SampleTableBox, SampleTableBoxChild } from '../boxes/SampleTableBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `SampleTableBox` from an `IsoBoxReadView`.
@@ -13,7 +14,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readStbl(view: IsoBoxReadView): SampleTableBox {
+export function readStbl(view: IsoBoxReadView<IsoInt64>): SampleTableBox {
 	return {
 		type: 'stbl',
 		boxes: view.readBoxes<SampleTableBoxChild>(),

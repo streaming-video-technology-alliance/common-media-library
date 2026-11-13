@@ -3,6 +3,7 @@ import type {
 	AdditionalMetadataContainerBoxChild,
 } from '../boxes/AdditionalMetadataContainerBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `AdditionalMetadataContainerBox` from an `IsoBoxReadView`.
@@ -16,7 +17,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMeco(view: IsoBoxReadView): AdditionalMetadataContainerBox {
+export function readMeco(view: IsoBoxReadView<IsoInt64>): AdditionalMetadataContainerBox {
 	return {
 		type: 'meco',
 		boxes: view.readBoxes<AdditionalMetadataContainerBoxChild>(),

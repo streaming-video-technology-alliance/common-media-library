@@ -1,5 +1,6 @@
 import type { SubTrackBox, SubTrackBoxChild } from '../boxes/SubTrackBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `SubTrackBox` from an `IsoBoxReadView`.
@@ -13,7 +14,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readStrk(view: IsoBoxReadView): SubTrackBox {
+export function readStrk(view: IsoBoxReadView<IsoInt64>): SubTrackBox {
 	return {
 		type: 'strk',
 		boxes: view.readBoxes<SubTrackBoxChild>(),

@@ -1,6 +1,7 @@
 import type { EditBox } from '../boxes/EditBox.ts'
 import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
@@ -9,6 +10,8 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  * The `writers` map does not need an entry for the `edts` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.
  *
+ * Each 64-bit integer field of a child box is a `number` or a `bigint`.
+ *
  * @param box - The `EditBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
@@ -16,6 +19,6 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * @public
  */
-export function writeEdts(box: EditBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
+export function writeEdts(box: EditBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
 	return writeContainerBox(box, config)
 }

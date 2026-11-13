@@ -26,6 +26,7 @@ import {
 	writeSinf,
 	writeStbl,
 	writeStrk,
+	writeTfdt,
 	writeTraf,
 	writeTrak,
 	writeTref,
@@ -33,21 +34,24 @@ import {
 	writeVttc,
 	type IsoBoxContainerMap,
 	type IsoBoxWriteViewConfig,
+	type IsoInt64,
 	type MovieFragmentBox,
 	type MovieFragmentHeaderBox,
+	type TrackFragmentBaseMediaDecodeTimeBox,
+	type TrackFragmentBox,
 } from './util/box.ts'
-import { boxBytes } from './util/boxBytes.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
+import { boxBytes } from './util/wideBoxes.ts'
 
 type ContainerType = keyof IsoBoxContainerMap
 
+// A container box with number fields or bigint fields in the child boxes.
+type ContainerBoxes = IsoBoxContainerMap<IsoInt64>
+
 type ContainerWriters = {
-	[K in ContainerType]: (
-		box: IsoBoxContainerMap[K],
-		config: IsoBoxWriteViewConfig,
-	) => IsoBoxWriteView
+	[K in ContainerType]: (box: ContainerBoxes[K], config: IsoBoxWriteViewConfig) => IsoBoxWriteView
 }
 
 const WRITERS: ContainerWriters = {
@@ -79,8 +83,8 @@ const MFHD: MovieFragmentHeaderBox = { type: 'mfhd', version: 0, flags: 0, seque
 const MFHD_BYTES = boxBytes('mfhd', Uint8Array.of(0, 0, 0, 0, 0, 0, 0, 1))
 const CONFIG: IsoBoxWriteViewConfig = { writers: { mfhd: writeMfhd } }
 
-function containerBox<K extends ContainerType>(type: K, boxes: unknown[]): IsoBoxContainerMap[K] {
-	return { type, boxes } as IsoBoxContainerMap[K]
+function containerBox<K extends ContainerType>(type: K, boxes: unknown[]): ContainerBoxes[K] {
+	return { type, boxes } as ContainerBoxes[K]
 }
 
 // A direct call of the writer for the box type.
@@ -152,6 +156,25 @@ describe('container writers', function () {
 				file,
 			)
 		}
+	})
+
+	it('should write child boxes with bigint fields', function () {
+		// 2^53 + 1. A number cannot hold this value.
+		const exact = BigInt('9007199254740993')
+		const tfdt: TrackFragmentBaseMediaDecodeTimeBox<bigint> = {
+			type: 'tfdt',
+			version: 1,
+			flags: 0,
+			baseMediaDecodeTime: exact,
+		}
+		const traf: TrackFragmentBox<bigint> = { type: 'traf', boxes: [tfdt] }
+		const moof: MovieFragmentBox<bigint> = { type: 'moof', boxes: [traf] }
+		const view = writeMoof(moof, { writers: { traf: writeTraf, tfdt: writeTfdt } })
+
+		deepStrictEqual(
+			bytes(view),
+			boxBytes('moof', boxBytes('traf', boxBytes('tfdt', [1, 1], [0, 3], [exact, 8]))),
+		)
 	})
 
 	it('should reject a box of another type at compile time', function () {
