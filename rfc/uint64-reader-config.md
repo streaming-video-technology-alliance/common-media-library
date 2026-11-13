@@ -382,6 +382,7 @@ export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> =
 - Without the option, three utility types change. A utility type over a generic declaration uses the constraint `number | bigint`.
   - `ReturnType<typeof readTfdt>` has `number | bigint` fields, and the other ten generic readers have the same change. The replacement is the box type, such as `TrackFragmentBaseMediaDecodeTimeBox`, or `ReturnType<typeof readTfdt<number>>`.
   - `InstanceType<typeof IsoBoxReadView>` and `Parameters<typeof readTfdt>[0]` are `IsoBoxReadView<IsoInt64>`. The replacement is the type `IsoBoxReadView`.
+- Without the option, the parameter types of the writers also change. `Parameters<typeof writeTfdt>[0]` has `number | bigint` fields, and the other ten writers of the affected boxes have the same change. The first parameter of `writeIsoBox`, `writeIsoBoxes`, and `createIsoBoxReadableStream` uses `IsoBoxStreamable<IsoInt64>`. The replacement is the box type, such as `TrackFragmentBaseMediaDecodeTimeBox`, or the type `IsoBoxStreamable`.
 - `Required<IsoBoxReadViewConfig>` has a required `int64` key. The replacement for a configuration with required readers is `Required<Pick<IsoBoxReadViewConfig, 'readers'>>`.
 - `Parameters<typeof readIsoBoxes>`, `ReturnType<typeof readIsoBoxes>`, and `ReturnType<typeof defaultReaderConfig>` do not change. Section [The option](#the-option) shows the signatures that keep those types.
 - The API report `libs/iso-bmff/config/cml-iso-bmff.api.md` changes for every declaration in the table above. The report also changes for `isContainer`, for the other 54 built-in readers, and for the two reader factories.
@@ -391,7 +392,7 @@ export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> =
 - **Type parameter noise.** About 60 declarations gain a parameter. Hover text shows `TrackFragmentBaseMediaDecodeTimeBox<number>` where it shows `TrackFragmentBaseMediaDecodeTimeBox` today. Adopters who never set the option see the parameter in the affected box types and in their 11 readers. The other 54 readers show `IsoBoxReadView<IsoInt64>` as the type of the view.
 - **Inference that depends on compiler details.** The design relies on three compiler behaviors. TypeScript instantiates a generic function against a contextual signature. `NoInfer` keeps the readers out of the inference. TypeScript uses the constraint for a generic reader in a variable. A future TypeScript release could change any of the three. The type tests from the spike move into the package test suite to guard all three.
 - **Custom readers and the option.** A custom reader written today cannot be combined with `readInt64AsBigInt` without a change to its signature. The error is clear, and the fix is one type argument or one type parameter. The guide has to explain that step. A generic custom reader in a variable also needs a type argument.
-- **Utility types.** Three utility types over the generic declarations change without the option. Section [Compatibility](#compatibility) lists the three types and the replacement for each.
+- **Utility types.** Three utility types over the generic declarations and the parameter types of the writers change without the option. Section [Compatibility](#compatibility) lists each case and its replacement.
 - **A function as the option value.** The other options of the package take plain values. Here the adopter imports a function and passes it, and autocomplete does not list the two exported functions. Section [Rejected in this RFC](#rejected-in-this-rfc) shows the size cost of string values.
 - **Duplicate methods.** The view gains two read methods that differ from `readUint` and `readInt` only in the option branch, and the writer gains two.
 - **Size.** Every adopter of the read view ships the two wide read methods for a feature most of them do not use. Every adopter of the write view ships the two wide write methods. Section [Where the branch lives](#where-the-branch-lives) shows both costs.
@@ -472,5 +473,9 @@ Amended on 2026-11-12, to match the implementation in [#645](https://github.com/
 - **Compatibility.** The section now lists three utility types, `Required<IsoBoxReadViewConfig>`, and the subclass override.
 - **Memory.** Each view has two more fields on the default path.
 - **Header.** The row "Breaking change" names the changes that exist without the option.
+
+Amended on 2026-11-12, after the merge of [#645](https://github.com/streaming-video-technology-alliance/common-media-library/pull/645):
+
+- **Compatibility.** The section now lists the parameter types of the writers.
 
 The `IsoBoxReaderReturn` fix shipped on its own in #614.
