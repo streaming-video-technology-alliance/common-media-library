@@ -21,6 +21,9 @@ and this project adheres to
 - `IsoInt64Reader` is the type of a function for the `int64` option. `IsoInt64` is the type `number | bigint` of a 64-bit integer field ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - Each container box type in `CONTAINERS` now has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result. `readVttc` reads the `vttc` box, and `readVttC` reads the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
 - Each container box type in `CONTAINERS` now has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes. `writeVttc` writes the `vttc` box, and `writeVttC` writes the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
+- `TrackEncryptionBox` has the new optional fields `defaultConstantIvSize` and `defaultConstantIv`. `readTenc` sets the fields for a `tenc` box with a constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `TrackEncryptionBox` has the new optional fields `defaultCryptByteBlock` and `defaultSkipByteBlock`. `readTenc` sets the fields for a `tenc` box of version 1 or above. The value of `defaultIsEncrypted` does not change ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `writeTenc` now writes `defaultCryptByteBlock` and `defaultSkipByteBlock` to a `tenc` box of version 1 or above. With no pattern field, the writer writes the pattern bits of `defaultIsEncrypted`. To change the pattern of a box from `readTenc`, change the pattern fields ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 
 ### Changed
 
@@ -63,6 +66,7 @@ and this project adheres to
 - `readSmhd` now reads `balance` as a signed 8.8 value. The `balance` for full right reads as 1, and the `balance` for full left reads as -1. Earlier releases return 256 for full right and 65280 for full left.
 - `writeSmhd` now writes `balance` as a signed 8.8 value. If your code passes 256 for full right, pass 1. The value 256 now writes 0.
 - `readEmsg` and `writeEmsg` now read and write `schemeIdUri` and `value` as UTF-8, as ISO/IEC 23009-1 defines the fields. Earlier releases use one byte for each character, so a character that is not ASCII gives wrong bytes or a wrong string. A string with only ASCII characters reads and writes the same bytes as before ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
+- `writeTenc` now writes the constant IV of a `tenc` box that has `defaultConstantIvSize`. A read and then a write of the box returns the source bytes. Earlier releases write 32 bytes and drop the constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 
 ### Changed
 
