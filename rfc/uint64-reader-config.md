@@ -9,7 +9,7 @@ status: accepted
 | **Author** | Casey Occhialini |
 | **Date** | 2026-11-09 |
 | **Package** | `@svta/cml-iso-bmff` |
-| **Breaking change** | No |
+| **Breaking change** | No (some utility types and one subclass behavior change, see [Compatibility](#compatibility)) |
 | **Issue** | [#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611) |
 
 ## Summary
@@ -471,5 +471,6 @@ Amended on 2026-11-12, to match the implementation in [#645](https://github.com/
 - **Helper type.** The helper type is inline in `IsoBoxReaderReturn`.
 - **Compatibility.** The section now lists three utility types, `Required<IsoBoxReadViewConfig>`, and the subclass override.
 - **Memory.** Each view has two more fields on the default path.
+- **Header.** The row "Breaking change" names the changes that exist without the option.
 
 The `IsoBoxReaderReturn` fix shipped on its own in #614.
