@@ -86,6 +86,15 @@ describe('container readers', function () {
 		deepStrictEqual(TYPES, CONTAINERS)
 	})
 
+	it('should have no entry in the default configuration', function () {
+		const { readers = {} } = defaultReaderConfig()
+
+		deepStrictEqual(
+			CONTAINERS.filter(type => type in readers),
+			[],
+		)
+	})
+
 	for (const type of TYPES) {
 		const reader = READERS[type]
 		const name = `read${type[0].toUpperCase()}${type.slice(1)}`

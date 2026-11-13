@@ -105,6 +105,15 @@ describe('container writers', function () {
 		deepStrictEqual(TYPES, CONTAINERS)
 	})
 
+	it('should have no entry in the default configuration', function () {
+		const { writers } = defaultWriterConfig()
+
+		deepStrictEqual(
+			CONTAINERS.filter(type => type in writers),
+			[],
+		)
+	})
+
 	for (const type of TYPES) {
 		const writer = WRITERS[type]
 		const name = `write${type[0].toUpperCase()}${type.slice(1)}`

@@ -5,7 +5,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
- * Write a `EditBox` to an `IsoBoxWriteView`.
+ * Write an `EditBox` to an `IsoBoxWriteView`.
  *
  * The `writers` map does not need an entry for the `edts` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.

@@ -4,7 +4,7 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
- * Write a `AdditionalMetadataContainerBox` to an `IsoBoxWriteView`.
+ * Write an `AdditionalMetadataContainerBox` to an `IsoBoxWriteView`.
  *
  * The `writers` map does not need an entry for the `meco` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.

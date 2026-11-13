@@ -66,8 +66,7 @@ import { readVttC } from './readVttC.ts'
 import { readVtte } from './readVtte.ts'
 
 /**
- * Create a default reader configuration with all available readers pre-configured.
- * The configuration does not contain the container readers, such as `readMoov`.
+ * Create a default reader configuration with every reader except the container readers, such as `readMoov`.
  * `readIsoBoxes` reads a container box that has no reader.
  *
  * The `int64` option selects the type of every 64-bit integer field.

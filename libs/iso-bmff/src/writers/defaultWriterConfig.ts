@@ -64,8 +64,7 @@ import { writeVttC } from './writeVttC.ts'
 import { writeVtte } from './writeVtte.ts'
 
 /**
- * Create a default writer configuration with all available writers pre-configured.
- * The configuration does not contain the container writers, such as `writeMoov`.
+ * Create a default writer configuration with every writer except the container writers, such as `writeMoov`.
  * `writeIsoBoxes` writes a container box that has no writer.
  *
  * @returns An `IsoBoxWriteViewConfig` with all available writers pre-configured, except the container writers
