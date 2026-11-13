@@ -155,7 +155,7 @@ export declare function writeDinf(box: DataInformationBox, config: IsoBoxWriteVi
 
 The naming rule gives `readVttc` and `writeVttc` for the `vttc` box. The package already exports `readVttC` and `writeVttC` for the `vttC` box. The RFC follows the naming rule, so `readVttc` and `readVttC` differ only in the case of one letter.
 
-Each function of the package has a file with the name of the function. `readVttc.ts` and `readVttC.ts` are the same file on a file system that ignores case. The default file systems of macOS and Windows ignore case. For that reason, the functions for `vttc` are in `readVttCue.ts` and `writeVttCue.ts`. The file names are not part of the public API.
+Each function of the package has a file with the name of the function. `readVttc.ts` and `readVttC.ts` are the same file on a file system that ignores case. The default file systems of macOS and Windows ignore case. For that reason, the functions for `vttc` are in `readVttCue.ts` and `writeVttCue.ts`. The file names are not part of the public API. The page names of `readVttC` and `writeVttC` on the site change. [Drawbacks](#drawbacks) states the effect.
 
 ### Default configurations
 
@@ -186,6 +186,7 @@ The results of a trial build of the 38 functions match the contract. The trial b
 - **API surface.** The package gains 38 public exports. The removal of an export is a breaking change.
 - **Two equal configurations.** A configuration with container entries and a configuration without container entries give the same result. An adopter can conclude that the map needs a container entry. The TSDoc and the guides must state that the entry is optional.
 - **Two names that differ only in case.** `readVttc` and `readVttC` differ in one letter. A map with `readVttC` under the `vttc` key compiles, because the map types accept any function under any key.
+- **Page names on the site.** TypeDoc compares the page names of the API reference in lower case. The page of `readVttC` moves to `functions/readVttC-1`, and the page of `writeVttC` moves to `functions/writeVttC-1`. Links to the two current page URLs stop working. The two redirects from the URLs of the earlier site also stop working.
 - **Size.** Each imported container function adds bytes. The table after this list shows the measured byte cost.
 
 The bundler is `vp pack` with `--minify` and ESM output. `@svta/cml-utils` is external. Each "before" value is the same bundle without the container functions.
