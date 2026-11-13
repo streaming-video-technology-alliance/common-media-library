@@ -1,9 +1,13 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
 import { INT, UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `MovieHeaderBox` from an `IsoBoxReadView`.
+ *
+ * The 64-bit integer fields of the result have the type that the `int64` option of the view returns.
+ * With no option, they are numbers.
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
@@ -11,8 +15,8 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
-	const { readUint, readInt, readArray } = view
+export function readMvhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieHeaderBox<V> {
+	const { readUint, readWideUint, readInt, readArray } = view
 
 	const { version, flags } = view.readFullBox()
 	const size = version == 1 ? 8 : 4
@@ -21,10 +25,10 @@ export function readMvhd(view: IsoBoxReadView): MovieHeaderBox {
 		type: 'mvhd',
 		version,
 		flags,
-		creationTime: readUint(size),
-		modificationTime: readUint(size),
+		creationTime: readWideUint(size),
+		modificationTime: readWideUint(size),
 		timescale: readUint(4),
-		duration: readUint(size),
+		duration: readWideUint(size),
 		rate: readInt(4) / 65536,
 		volume: readInt(2) / 256,
 		reserved1: readUint(2),

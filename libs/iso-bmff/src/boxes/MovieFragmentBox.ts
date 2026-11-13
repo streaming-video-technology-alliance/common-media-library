@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { MovieFragmentHeaderBox } from './MovieFragmentHeaderBox.ts'
 import type { TrackFragmentBox } from './TrackFragmentBox.ts'
 
@@ -6,14 +7,16 @@ import type { TrackFragmentBox } from './TrackFragmentBox.ts'
  *
  * @public
  */
-export type MovieFragmentBoxChild = MovieFragmentHeaderBox | TrackFragmentBox
+export type MovieFragmentBoxChild<V extends IsoInt64 = number> =
+	| MovieFragmentHeaderBox
+	| TrackFragmentBox<V>
 
 /**
  * Movie Fragment Box - 'moof' - Container
  *
  * @public
  */
-export type MovieFragmentBox = {
+export type MovieFragmentBox<V extends IsoInt64 = number> = {
 	type: 'moof'
-	boxes: MovieFragmentBoxChild[]
+	boxes: MovieFragmentBoxChild<V>[]
 }

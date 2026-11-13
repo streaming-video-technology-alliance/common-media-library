@@ -1,6 +1,7 @@
 import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
 import { STRING } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `FileTypeBox` from an `IsoBoxReadView`.
@@ -11,7 +12,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readFtyp(view: IsoBoxReadView): FileTypeBox {
+export function readFtyp(view: IsoBoxReadView<IsoInt64>): FileTypeBox {
 	const size = 4
 	const majorBrand = view.readString(4)
 	const minorVersion = view.readUint(4)

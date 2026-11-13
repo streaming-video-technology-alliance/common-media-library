@@ -1,6 +1,7 @@
 import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
 import type { TrackRunSample } from '../boxes/TrackRunSample.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `TrackRunBox` from an `IsoBoxReadView`.
@@ -11,7 +12,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readTrun(view: IsoBoxReadView): TrackRunBox {
+export function readTrun(view: IsoBoxReadView<IsoInt64>): TrackRunBox {
 	const { version, flags } = view.readFullBox()
 	const sampleCount = view.readUint(4)
 	let dataOffset: number | undefined

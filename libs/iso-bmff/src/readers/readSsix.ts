@@ -1,4 +1,5 @@
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 
 /**
@@ -10,7 +11,7 @@ import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
  *
  * @public
  */
-export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox {
+export function readSsix(view: IsoBoxReadView<IsoInt64>): SubsegmentIndexBox {
 	const { version, flags } = view.readFullBox()
 	const subsegmentCount = view.readUint(4)
 	const subsegments = view.readEntries(subsegmentCount, () => {

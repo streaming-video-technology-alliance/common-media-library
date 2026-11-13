@@ -1,4 +1,5 @@
 import { encodeText } from '@svta/cml-utils'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -7,13 +8,16 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 23009-1 - 5.10.3.3 Event Message Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `EventMessageBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
-export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
+export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView {
 	const schemeIdUriBytes = encodeText(box.schemeIdUri)
 	const valueBytes = encodeText(box.value)
 
@@ -48,7 +52,7 @@ export function writeEmsg(box: EventMessageBox): IsoBoxWriteView {
 		writer.writeUint(box.id, 4)
 	} else {
 		writer.writeUint(box.timescale, 4)
-		writer.writeUint(box.presentationTime ?? 0, 8)
+		writer.writeWideUint(box.presentationTime ?? 0, 8)
 		writer.writeUint(box.eventDuration, 4)
 		writer.writeUint(box.id, 4)
 		writer.writeBytes(schemeIdUriBytes)

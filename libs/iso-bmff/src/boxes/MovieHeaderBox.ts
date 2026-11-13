@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -5,12 +6,12 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type MovieHeaderBox = FullBox & {
+export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'mvhd'
-	creationTime: number
-	modificationTime: number
+	creationTime: V
+	modificationTime: V
 	timescale: number
-	duration: number
+	duration: V
 	rate: number
 	volume: number
 	reserved1: number

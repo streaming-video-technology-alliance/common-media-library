@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -34,9 +35,9 @@ export type EventMessageBoxV0 = EventMessageBoxBase & {
  *
  * @public
  */
-export type EventMessageBoxV1 = EventMessageBoxBase & {
+export type EventMessageBoxV1<V extends IsoInt64 = number> = EventMessageBoxBase & {
 	version: 1
-	presentationTime: number
+	presentationTime: V
 }
 
 /**
@@ -47,4 +48,4 @@ export type EventMessageBoxV1 = EventMessageBoxBase & {
  *
  * @public
  */
-export type EventMessageBox = EventMessageBoxV0 | EventMessageBoxV1
+export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V>

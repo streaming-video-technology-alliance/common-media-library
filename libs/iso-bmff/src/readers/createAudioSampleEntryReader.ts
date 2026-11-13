@@ -1,5 +1,6 @@
 import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
 
@@ -27,6 +28,6 @@ import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
  */
 export function createAudioSampleEntryReader<T extends IsoBoxType>(
 	type: T,
-): (view: IsoBoxReadView) => AudioSampleEntryBox<T> {
-	return (view: IsoBoxReadView) => readAudioSampleEntryBox<T>(type, view)
+): (view: IsoBoxReadView<IsoInt64>) => AudioSampleEntryBox<T> {
+	return (view: IsoBoxReadView<IsoInt64>) => readAudioSampleEntryBox<T>(type, view)
 }

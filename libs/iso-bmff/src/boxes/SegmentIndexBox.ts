@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 import type { SegmentIndexReference } from './SegmentIndexReference.ts'
 
@@ -6,12 +7,12 @@ import type { SegmentIndexReference } from './SegmentIndexReference.ts'
  *
  * @public
  */
-export type SegmentIndexBox = FullBox & {
+export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'sidx'
 	referenceId: number
 	timescale: number
-	earliestPresentationTime: number
-	firstOffset: number
+	earliestPresentationTime: V
+	firstOffset: V
 	reserved: number
 	references: SegmentIndexReference[]
 }

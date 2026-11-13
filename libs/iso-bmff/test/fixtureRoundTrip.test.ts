@@ -5,9 +5,12 @@ import {
 	defaultWriterConfig,
 	describe,
 	it,
+	readInt64AsBigInt,
 	readIsoBoxes,
 	writeIsoBox,
 	writeIsoBoxes,
+	type IsoBoxData,
+	type IsoInt64,
 	type ParsedIsoBox,
 } from './util/box.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
@@ -98,13 +101,25 @@ const BOXES: Record<string, number> = {
 	vtte: 1,
 }
 
-const readerConfig = defaultReaderConfig()
-const { readers = {} } = readerConfig
+const { readers = {} } = defaultReaderConfig()
 const { writers } = defaultWriterConfig()
+
+type Read = (data: IsoBoxData) => ParsedIsoBox<IsoInt64>[]
+
+// The test runs one time for each line: the name of the test, the type of the 64-bit fields, and the read function.
+// The counts and the known defects are the same for both.
+const MODES: [string, string, Read][] = [
+	['the default configs', 'number', data => readIsoBoxes(data, defaultReaderConfig())],
+	[
+		'readInt64AsBigInt',
+		'bigint',
+		data => readIsoBoxes(data, defaultReaderConfig({ int64: readInt64AsBigInt })),
+	],
+]
 
 // Writers that return the source bytes of a box.
 const sourceWriters = Object.fromEntries(
-	Object.keys(writers).map(type => [type, ({ view }: ParsedIsoBox) => view]),
+	Object.keys(writers).map(type => [type, ({ view }: ParsedIsoBox<IsoInt64>) => view]),
 )
 
 function counts(config: object): Record<string, number> {
@@ -137,105 +152,118 @@ function values(value: unknown): unknown {
 }
 
 // `traverseIsoBoxes` does not yield the entries of the dref and stsd boxes.
-function* walk(boxes: ParsedIsoBox[]): Generator<ParsedIsoBox> {
+function* walk(boxes: ParsedIsoBox<IsoInt64>[]): Generator<ParsedIsoBox<IsoInt64>> {
 	for (const box of boxes) {
 		yield box
 
 		if ('boxes' in box) {
-			yield* walk(box.boxes as ParsedIsoBox[])
+			yield* walk(box.boxes as ParsedIsoBox<IsoInt64>[])
 		} else if (box.type === 'dref' || box.type === 'stsd') {
-			yield* walk(box.entries as ParsedIsoBox[])
+			yield* walk(box.entries as ParsedIsoBox<IsoInt64>[])
 		}
 	}
 }
 
 // The samples of a WebVTT track are boxes inside the mdat box.
-function* walkSamples(boxes: ParsedIsoBox[]): Generator<ParsedIsoBox> {
+function* walkSamples(
+	boxes: ParsedIsoBox<IsoInt64>[],
+	read: Read,
+): Generator<ParsedIsoBox<IsoInt64>> {
 	for (const box of boxes) {
 		if (
 			box.type === 'mdat' &&
 			['vttc', 'vtte'].includes(String.fromCharCode(...box.data.subarray(4, 8)))
 		) {
-			yield* walk(readIsoBoxes(box.data, readerConfig))
+			yield* walk(read(box.data))
 		}
 	}
 }
 
 describe('fixture round trip', function () {
-	it('should read, write, and read every fixture with the default configs', function () {
-		const failed: Record<string, number> = {}
-		const read = counts(readers)
-		const written = counts(writers)
+	for (const [name, kind, read] of MODES) {
+		it(`should read, write, and read every fixture with ${name}`, function () {
+			const failed: Record<string, number> = {}
+			const parsed = counts(readers)
+			const written = counts(writers)
+			const fields = new Set<string>()
 
-		for (const file of fixtureFiles()) {
-			const source = new Uint8Array(load(file))
-			const boxes = readIsoBoxes(source, readerConfig)
-			const tree = [...walk(boxes)]
-			const fail = (type: string, check: string): void => {
-				const key = `${file}/${type}/${check}`
-				failed[key] = (failed[key] ?? 0) + 1
-			}
-			let changed = false
+			for (const file of fixtureFiles()) {
+				const source = new Uint8Array(load(file))
+				const boxes = read(source)
+				const tree = [...walk(boxes)]
+				const fail = (type: string, check: string): void => {
+					const key = `${file}/${type}/${check}`
+					failed[key] = (failed[key] ?? 0) + 1
+				}
+				let changed = false
 
-			for (const box of [...tree, ...walkSamples(tree)]) {
-				const { type, view } = box
-				const writer = writers[type]
+				for (const box of [...tree, ...walkSamples(tree, read)]) {
+					const { type, view } = box
+					const writer = writers[type]
 
-				if (type in readers) {
-					read[type]++
+					if (box.type === 'tfdt') {
+						fields.add(typeof box.baseMediaDecodeTime)
+					}
 
-					if (view.bytesRemaining !== 0) {
-						fail(type, 'remaining')
+					if (type in readers) {
+						parsed[type]++
+
+						if (view.bytesRemaining !== 0) {
+							fail(type, 'remaining')
+						}
+					}
+
+					if (!writer) {
+						continue
+					}
+
+					// Only the writer of this box runs. The child boxes keep their source bytes.
+					const output = writeIsoBox(box, { writers: { ...sourceWriters, [type]: writer } })
+
+					written[type]++
+
+					if (!same(output, bytes(view))) {
+						fail(type, 'bytes')
+						changed ||= tree.includes(box)
+					}
+
+					if (!isDeepStrictEqual(values(read(output)), values([box]))) {
+						fail(type, 'values')
 					}
 				}
 
-				if (!writer) {
-					continue
+				const output = reduceUint8Arrays(writeIsoBoxes(boxes, { writers }))
+				const end = boxes.reduce((size, box) => size + box.view.byteLength, 0)
+
+				if (end !== source.length) {
+					fail('file', 'remaining')
 				}
 
-				// Only the writer of this box runs. The child boxes keep their source bytes.
-				const output = writeIsoBox(box, { writers: { ...sourceWriters, [type]: writer } })
-
-				written[type]++
-
-				if (!same(output, bytes(view))) {
-					fail(type, 'bytes')
-					changed ||= tree.includes(box)
+				// A box that fails the bytes check changes the file. The line of that box covers the file.
+				if (!changed && !same(output, source.subarray(0, end))) {
+					fail('file', 'bytes')
 				}
 
-				if (!isDeepStrictEqual(values(readIsoBoxes(output, readerConfig)), values([box]))) {
-					fail(type, 'values')
-				}
-			}
+				for (const box of tree) {
+					const offsets =
+						box.type === 'stco'
+							? box.chunkOffset
+							: box.type === 'tfra'
+								? box.entries.map(entry => Number(entry.moofOffset))
+								: []
 
-			const output = reduceUint8Arrays(writeIsoBoxes(boxes, { writers }))
-			const end = boxes.reduce((size, box) => size + box.view.byteLength, 0)
-
-			if (end !== source.length) {
-				fail('file', 'remaining')
-			}
-
-			// A box that fails the bytes check changes the file. The line of that box covers the file.
-			if (!changed && !same(output, source.subarray(0, end))) {
-				fail('file', 'bytes')
-			}
-
-			for (const box of tree) {
-				const offsets =
-					box.type === 'stco'
-						? box.chunkOffset
-						: box.type === 'tfra'
-							? box.entries.map(entry => entry.moofOffset)
-							: []
-
-				for (const offset of offsets) {
-					if (!same(output.subarray(offset, offset + 16), source.subarray(offset, offset + 16))) {
-						fail(box.type, 'offsets')
+					for (const offset of offsets) {
+						if (!same(output.subarray(offset, offset + 16), source.subarray(offset, offset + 16))) {
+							fail(box.type, 'offsets')
+						}
 					}
 				}
 			}
-		}
 
-		deepStrictEqual({ failed, read, written }, { failed: EXCEPTIONS, read: BOXES, written: BOXES })
-	})
+			deepStrictEqual(
+				{ failed, read: parsed, written, fields: [...fields] },
+				{ failed: EXCEPTIONS, read: BOXES, written: BOXES, fields: [kind] },
+			)
+		})
+	}
 })
