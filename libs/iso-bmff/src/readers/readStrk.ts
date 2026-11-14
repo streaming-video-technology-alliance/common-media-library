@@ -14,9 +14,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readStrk(view: IsoBoxReadView<IsoInt64>): SubTrackBox {
+export function readStrk<V extends IsoInt64>(view: IsoBoxReadView<V>): SubTrackBox<V> {
 	return {
 		type: 'strk',
-		boxes: view.readBoxes<SubTrackBoxChild>(),
+		boxes: view.readBoxes<SubTrackBoxChild<V>>(),
 	}
 }

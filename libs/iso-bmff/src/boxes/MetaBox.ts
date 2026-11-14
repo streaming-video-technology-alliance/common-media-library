@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { DataInformationBox } from './DataInformationBox.ts'
 import type { FullBox } from './FullBox.ts'
 import type { GroupsListBox } from './GroupsListBox.ts'
@@ -13,7 +14,7 @@ import type { PrimaryItemBox } from './PrimaryItemBox.ts'
  *
  * @public
  */
-export type MetaBoxChild =
+export type MetaBoxChild<V extends IsoInt64 = number> =
 	| HandlerReferenceBox
 	| PrimaryItemBox
 	| DataInformationBox
@@ -21,14 +22,14 @@ export type MetaBoxChild =
 	| ItemProtectionBox
 	| ItemInfoBox
 	| ItemReferenceBox
-	| GroupsListBox
+	| GroupsListBox<V>
 
 /**
  * ISO/IEC 14496-12:202x - 8.11.1 Meta box
  *
  * @public
  */
-export type MetaBox = FullBox & {
+export type MetaBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'meta'
-	boxes: MetaBoxChild[]
+	boxes: MetaBoxChild<V>[]
 }

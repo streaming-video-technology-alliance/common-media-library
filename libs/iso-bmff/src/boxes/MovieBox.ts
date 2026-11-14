@@ -13,7 +13,7 @@ export type MovieBoxChild<V extends IsoInt64 = number> =
 	| MovieHeaderBox<V>
 	| TrackBox<V>
 	| MovieExtendsBox<V>
-	| UserDataBox
+	| UserDataBox<V>
 
 /**
  * Movie Box - 'moov' - Container

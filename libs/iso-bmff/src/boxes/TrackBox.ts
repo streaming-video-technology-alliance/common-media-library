@@ -15,7 +15,7 @@ export type TrackBoxChild<V extends IsoInt64 = number> =
 	| TrackReferenceBox
 	| EditBox<V>
 	| MediaBox<V>
-	| UserDataBox
+	| UserDataBox<V>
 
 /**
  * Track Box - 'trak' - Container

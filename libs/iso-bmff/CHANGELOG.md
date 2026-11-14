@@ -39,6 +39,11 @@ and this project adheres to
 - `Required<IsoBoxReadViewConfig>` now has a required `int64` key. A value of that type with no `int64` function is a compile error. Use `Required<Pick<IsoBoxReadViewConfig, 'readers'>>` for a configuration with required readers ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - A subclass override of `IsoBoxReadView.readUint` or `IsoBoxReadView.readInt` no longer runs for a 64-bit integer field of a built-in reader. The constructor assigns the methods of the base class to `readWideUint` and `readWideInt`. To run the override, pass an `int64` function that calls `view.readUint` and `view.readInt` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - The reading guide has a section on a function that forwards the `int64` option. The guide also states that `JSON.stringify` throws a `TypeError` for a `bigint` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `UserDataBox`, `GroupsListBox`, `SubTrackBox`, `AdditionalMetadataContainerBox`, and `MetaBox` now have the type parameter for the type of the 64-bit integer fields. The default is `number`, so existing references do not change ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- `readMeta` is now a generic function, so `ReturnType<typeof readMeta>` is `MetaBox<number | bigint>`. Use the type `MetaBox` in place of that utility type ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- `writeMeta` now takes a `MetaBox` with `number` fields or `bigint` fields ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- The type of a `udta`, `grpl`, `strk`, or `meco` child no longer has the `view` and `size` fields. Cast the child: `(child as ParsedIsoBox).view` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- A `udta`, `grpl`, `strk`, or `meco` box no longer accepts a child of another type, such as a `Uint8Array`. Cast that child: `bytes as unknown as IsoBox` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 
 ### Fixed
 
@@ -75,6 +80,8 @@ and this project adheres to
 - `IsoBoxReadView.readBox` now throws an `Error` for a box with a size below the size of the box header. The message is `Truncated box`. Earlier releases return that box, and the next read starts inside the header of that box ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
 - `readPssh` and `writePssh` now read and write 16 bytes for each key ID of a version 1 `pssh` box. The `kid` field has 16 numbers for each key ID. Earlier releases use one byte for each key ID, so `readPssh` returns a wrong `dataSize` and `data` or throws a `RangeError` ([#649](https://github.com/streaming-video-technology-alliance/common-media-library/issues/649)).
 - `writeTenc` now writes the constant IV of a `tenc` box that has `defaultConstantIvSize` or `defaultConstantIv`. A read and then a write of the box returns the source bytes. Earlier releases write 32 bytes and drop the constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- The children of the `udta`, `grpl`, `strk`, and `meco` boxes now have the type `IsoBox`. Earlier releases give each child the type `any`, so TypeScript checks no field of a child. Test `child.type` before you read a field of a child ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- After `isContainer(box)`, each element of `box.boxes` now has a box type. A 64-bit integer field of a child has the type of the `int64` option ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 
 ### Changed
 

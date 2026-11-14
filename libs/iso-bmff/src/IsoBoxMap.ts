@@ -116,7 +116,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	free: FreeSpaceBox<'free'>
 	frma: OriginalFormatBox
 	ftyp: FileTypeBox
-	grpl: GroupsListBox
+	grpl: GroupsListBox<V>
 	hdlr: HandlerReferenceBox
 	hev1: VisualSampleEntryBox<'hev1'>
 	hmhd: HintMediaHeaderBox
@@ -134,9 +134,9 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	mdat: MediaDataBox
 	mdhd: MediaHeaderBox<V>
 	mdia: MediaBox<V>
-	meco: AdditionalMetadataContainerBox
+	meco: AdditionalMetadataContainerBox<V>
 	mehd: MovieExtendsHeaderBox<V>
-	meta: MetaBox
+	meta: MetaBox<V>
 	mfhd: MovieFragmentHeaderBox
 	mfra: MovieFragmentRandomAccessBox<V>
 	mfro: MovieFragmentRandomAccessOffsetBox
@@ -169,7 +169,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	stco: ChunkOffsetBox
 	stdp: DegradationPriorityBox
 	sthd: SubtitleMediaHeaderBox
-	strk: SubTrackBox
+	strk: SubTrackBox<V>
 	stsc: SampleToChunkBox
 	stsd: SampleDescriptionBox
 	stsh: ShadowSyncSampleBox
@@ -190,7 +190,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	tref: TrackReferenceBox
 	trex: TrackExtendsBox
 	trun: TrackRunBox
-	udta: UserDataBox
+	udta: UserDataBox<V>
 	'url ': DataEntryUrlBox
 	'urn ': DataEntryUrnBox
 	vlab: WebVttSourceLabelBox

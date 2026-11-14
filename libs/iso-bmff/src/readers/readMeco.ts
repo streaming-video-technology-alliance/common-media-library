@@ -17,9 +17,11 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readMeco(view: IsoBoxReadView<IsoInt64>): AdditionalMetadataContainerBox {
+export function readMeco<V extends IsoInt64>(
+	view: IsoBoxReadView<V>,
+): AdditionalMetadataContainerBox<V> {
 	return {
 		type: 'meco',
-		boxes: view.readBoxes<AdditionalMetadataContainerBoxChild>(),
+		boxes: view.readBoxes<AdditionalMetadataContainerBoxChild<V>>(),
 	}
 }
