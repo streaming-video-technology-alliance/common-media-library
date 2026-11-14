@@ -21,6 +21,10 @@ and this project adheres to
 - `IsoInt64Reader` is the type of a function for the `int64` option. `IsoInt64` is the type `number | bigint` of a 64-bit integer field ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - Each container box type in `CONTAINERS` now has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result. `readVttc` reads the `vttc` box, and `readVttC` reads the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
 - Each container box type in `CONTAINERS` now has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes. `writeVttc` writes the `vttc` box, and `writeVttC` writes the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
+- `TrackEncryptionBox` has the new optional fields `defaultConstantIvSize` and `defaultConstantIv`. `readTenc` sets the fields for a `tenc` box with a constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `TrackEncryptionBox` has the new optional field `defaultIsProtected`. `readTenc` sets the field to the protection state, which is the lowest byte of `defaultIsEncrypted`. `writeTenc` does not write the field ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `TrackEncryptionBox` has the new optional fields `defaultCryptByteBlock` and `defaultSkipByteBlock`. `readTenc` sets the fields for a `tenc` box of version 1 or above. The value of `defaultIsEncrypted` does not change ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `writeTenc` now writes `defaultCryptByteBlock` and `defaultSkipByteBlock` to a `tenc` box of version 1 or above. With no pattern field, the writer writes the pattern bits of `defaultIsEncrypted`. To change the pattern of a box from `readTenc`, change the pattern fields ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 
 ### Changed
 
@@ -70,6 +74,7 @@ and this project adheres to
 - `readIsoBoxes` now returns for a box with a `size` of 1 and a `largesize` of 0. Earlier releases read that box again without end, and the memory use grows ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
 - `IsoBoxReadView.readBox` now throws an `Error` for a box with a size below the size of the box header. The message is `Truncated box`. Earlier releases return that box, and the next read starts inside the header of that box ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
 - `readPssh` and `writePssh` now read and write 16 bytes for each key ID of a version 1 `pssh` box. The `kid` field has 16 numbers for each key ID. Earlier releases use one byte for each key ID, so `readPssh` returns a wrong `dataSize` and `data` or throws a `RangeError` ([#649](https://github.com/streaming-video-technology-alliance/common-media-library/issues/649)).
+- `writeTenc` now writes the constant IV of a `tenc` box that has `defaultConstantIvSize` or `defaultConstantIv`. A read and then a write of the box returns the source bytes. Earlier releases write 32 bytes and drop the constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 
 ### Changed
 
