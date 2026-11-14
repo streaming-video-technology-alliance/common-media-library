@@ -57,7 +57,8 @@ export function writePrsl(
 	}
 
 	if (preselectionTagBytes) {
-		writer.writeUtf8TerminatedString(box.preselectionTag ?? '')
+		writer.writeBytes(preselectionTagBytes)
+		writer.writeUint(0, 1)
 	}
 
 	if (box.flags & 0x2000) {
@@ -65,7 +66,8 @@ export function writePrsl(
 	}
 
 	if (interleavingTagBytes) {
-		writer.writeUtf8TerminatedString(box.interleavingTag ?? '')
+		writer.writeBytes(interleavingTagBytes)
+		writer.writeUint(0, 1)
 	}
 
 	writer.writeBytes(bytes)
