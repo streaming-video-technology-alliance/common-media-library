@@ -10,6 +10,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @returns A parsed `ProtectionSystemSpecificHeaderBox`
  *
+ * @example
+ * {@includeCode ../../test/readers/readPssh.test.ts#example}
+ *
  * @public
  */
 export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecificHeaderBox {
@@ -23,7 +26,7 @@ export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecif
 
 	if (version > 0) {
 		kidCount = readUint(4)
-		kid = readArray(UINT, 1, kidCount)
+		kid = readArray(UINT, 1, kidCount * 16)
 	}
 
 	const dataSize = readUint(4)

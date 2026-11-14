@@ -6,18 +6,41 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 /**
  * Parse a `TrackEncryptionBox` from an `IsoBoxReadView`.
  *
+ * ISO/IEC 23001-7:2016 - 8.2 Track Encryption Box
+ *
  * @param view - The `IsoBoxReadView` to read data from
  *
  * @returns A parsed `TrackEncryptionBox`
  *
+ * @example
+ * {@includeCode ../../test/readers/readTenc.test.ts#example}
+ *
  * @public
  */
 export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox {
-	return {
+	const { version, flags } = view.readFullBox()
+	const defaultIsEncrypted = view.readUint(3)
+	const defaultIvSize = view.readUint(1)
+	const defaultIsProtected = defaultIsEncrypted & 0xff
+	const box: TrackEncryptionBox = {
 		type: 'tenc',
-		...view.readFullBox(),
-		defaultIsEncrypted: view.readUint(3),
-		defaultIvSize: view.readUint(1),
+		version,
+		flags,
+		defaultIsEncrypted,
+		defaultIvSize,
 		defaultKid: view.readArray(UINT, 1, 16),
+		defaultIsProtected,
 	}
+
+	if (version > 0) {
+		box.defaultCryptByteBlock = (defaultIsEncrypted >> 12) & 0xf
+		box.defaultSkipByteBlock = (defaultIsEncrypted >> 8) & 0xf
+	}
+
+	if (defaultIsProtected === 1 && defaultIvSize === 0 && !view.done) {
+		box.defaultConstantIvSize = view.readUint(1)
+		box.defaultConstantIv = view.readArray(UINT, 1, box.defaultConstantIvSize)
+	}
+
+	return box
 }
