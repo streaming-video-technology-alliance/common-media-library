@@ -121,7 +121,7 @@ The view finds a reader by the exact type and by the trimmed type. A reader unde
 
 A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw.
 
-The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). A `size` of 0 is valid and means that the box extends to the end of the data.
+The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
 
 The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes. The `size` field of the parsed box is the size of the source box.
 
