@@ -69,6 +69,7 @@ and this project adheres to
 - `readIsoBoxes` now stops before a box with a size below the size of the box header. The function returns the boxes before that box. Earlier releases return boxes with wrong types, omit the next box, or throw a `RangeError` ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
 - `readIsoBoxes` now returns for a box with a `size` of 1 and a `largesize` of 0. Earlier releases read that box again without end, and the memory use grows ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
 - `IsoBoxReadView.readBox` now throws an `Error` for a box with a size below the size of the box header. The message is `Truncated box`. Earlier releases return that box, and the next read starts inside the header of that box ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
+- `readPssh` and `writePssh` now read and write 16 bytes for each key ID of a version 1 `pssh` box. The `kid` field has 16 numbers for each key ID. Earlier releases use one byte for each key ID, so `readPssh` returns a wrong `dataSize` and `data` or throws a `RangeError` ([#649](https://github.com/streaming-video-technology-alliance/common-media-library/issues/649)).
 
 ### Changed
 
