@@ -13,6 +13,7 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  * With `readInt64AsBigInt`, the built-in readers return those fields as a `bigint`.
  *
  * The function stops before a box if the data ends inside the header or the body of that box.
+ * The function also stops before a box with a size below the size of its header.
  * The function then returns the boxes before that box and does not throw.
  *
  * @param raw - The raw ISO data

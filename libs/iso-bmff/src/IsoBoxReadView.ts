@@ -353,9 +353,12 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	/**
 	 * Reads a raw box from the data view.
 	 *
+	 * A box header has 8 bytes, or 16 bytes when `size` is 1 and `largesize` follows (ISO/IEC 14496-12, clause 4.2).
+	 *
 	 * @returns The box.
 	 *
 	 * @throws Error with the message `Truncated box` if the view ends inside the header or the body of the box.
+	 * @throws Error with the message `Truncated box` if the size of the box is below the size of its header.
 	 */
 	readBox = (): ParsedBox<Box, V> => {
 		const { dataView, offset, bytesRemaining } = this
@@ -383,7 +386,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 			}
 		}
 
-		if (!box || actualSize > bytesRemaining) {
+		if (!box || actualSize < cursor || actualSize > bytesRemaining) {
 			this.truncated = true
 			throw new Error('Truncated box')
 		}
@@ -402,6 +405,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	/**
 	 * Reads a number of boxes from the data view.
 	 * The method stops before a box if the view ends inside the header or the body of that box.
+	 * The method also stops before a box with a size below the size of its header.
 	 *
 	 * @param length - The number of boxes to read.
 	 * @returns The boxes.
@@ -440,6 +444,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	/**
 	 * Iterates over the boxes in the data view.
 	 * The iteration stops before a box if the view ends inside the header or the body of that box.
+	 * The iteration also stops before a box with a size below the size of its header.
 	 *
 	 * @returns A generator of boxes.
 	 */
