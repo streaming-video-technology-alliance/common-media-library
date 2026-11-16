@@ -17,10 +17,12 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export function readMdhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MediaHeaderBox<V> {
 	const { version, flags } = view.readFullBox()
 
-	const creationTime = view.readWideUint(version == 1 ? 8 : 4)
-	const modificationTime = view.readWideUint(version == 1 ? 8 : 4)
+	const size = version == 1 ? 8 : 4
+
+	const creationTime = view.readWideUint(size)
+	const modificationTime = view.readWideUint(size)
 	const timescale = view.readUint(4)
-	const duration = view.readWideUint(version == 1 ? 8 : 4)
+	const duration = view.readWideUint(size)
 	const lang = view.readUint(2)
 	const language = String.fromCharCode(
 		((lang >> 10) & 0x1f) + 0x60,

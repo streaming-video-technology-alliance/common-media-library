@@ -62,11 +62,5 @@ export function readIsoBoxes<V extends IsoInt64 = number>(
  */
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[]
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[] {
-	const boxes = []
-
-	for (const box of new IsoBoxReadView(raw, config)) {
-		boxes.push(box)
-	}
-
-	return boxes
+	return new IsoBoxReadView(raw, config).readBoxes<ParsedIsoBox>()
 }

@@ -27,10 +27,11 @@ export function readTfra<V extends IsoInt64>(
 	const lengthSizeOfSampleNum = reserved & 0x00000003
 
 	const numberOfEntry = view.readUint(4)
+	const size = version === 1 ? 8 : 4
 
 	const entries = view.readEntries<TrackFragmentRandomAccessEntry<V>>(numberOfEntry, () => ({
-		time: view.readWideUint(version === 1 ? 8 : 4),
-		moofOffset: view.readWideUint(version === 1 ? 8 : 4),
+		time: view.readWideUint(size),
+		moofOffset: view.readWideUint(size),
 		trafNumber: view.readUint(lengthSizeOfTrafNum + 1),
 		trunNumber: view.readUint(lengthSizeOfTrunNum + 1),
 		sampleNumber: view.readUint(lengthSizeOfSampleNum + 1),

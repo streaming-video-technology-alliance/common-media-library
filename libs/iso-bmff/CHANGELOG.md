@@ -120,6 +120,9 @@ and this project adheres to
 - `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
 - `IsoBoxWriteView.writeUint64`, `writeWideUint`, and `writeWideInt` are now methods of the class prototype, so a writer allocates less memory for each box. Call each method on the writer, as in `writer.writeUint64(value)`.
 - `IsoBoxReadView` now has one rule for the size limit of `readData` and `readUtf8`. The results of both methods do not change.
+- `readIsoBoxes` now calls `IsoBoxReadView.readBoxes`. The result does not change.
+- `readMdhd` and `readTfra` now compute the size of the 64-bit integer fields one time for each box.
+- `writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change.
 
 ## [1.0.7] - 2026-10-18
 
