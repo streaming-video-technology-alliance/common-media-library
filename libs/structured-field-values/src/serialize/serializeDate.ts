@@ -1,3 +1,5 @@
+import { DATE } from '../utils/DATE.ts'
+import { serializeError } from './serializeError.ts'
 import { serializeInteger } from './serializeInteger.ts'
 
 // 4.1.10.  Serializing a Date
@@ -12,5 +14,11 @@ import { serializeInteger } from './serializeInteger.ts'
  * @internal
  */
 export function serializeDate(value: Date) {
-	return `@${serializeInteger(value.getTime() / 1000)}`
+	const time = value.getTime()
+
+	if (Number.isNaN(time)) {
+		throw serializeError(String(value), DATE)
+	}
+
+	return `@${serializeInteger(time / 1000)}`
 }

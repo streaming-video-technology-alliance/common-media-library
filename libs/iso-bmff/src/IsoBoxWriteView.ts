@@ -52,8 +52,16 @@ export class IsoBoxWriteView {
 	/**
 	 * Writes a uint to the data view.
 	 *
+	 * The method does not check the value.
+	 * With a size of 8, the method writes all bits set for a value of 2^64 or more.
+	 * The default reader returns 2^64 for a 64-bit field with all bits set,
+	 * so a read and then a write keep that field.
+	 *
 	 * @param value - The value to write.
 	 * @param size - The size, in bytes, of the value.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeUint.test.ts#example}
 	 */
 	writeUint = (value: number, size: number): void => {
 		const { dataView, cursor } = this
@@ -82,8 +90,11 @@ export class IsoBoxWriteView {
 			case 8: {
 				// A number loses precision for integers >= 2^53.
 				// writeUint64 writes the exact value from a bigint.
-				const s1 = Math.floor(value / Math.pow(2, 32))
-				const s2 = value - s1 * Math.pow(2, 32)
+				let s1 = Math.floor(value / Math.pow(2, 32))
+				let s2 = value - s1 * Math.pow(2, 32)
+				if (s1 > 0xffffffff) {
+					s1 = s2 = 0xffffffff
+				}
 				dataView.setUint32(cursor, s1)
 				dataView.setUint32(cursor + 4, s2)
 				break
