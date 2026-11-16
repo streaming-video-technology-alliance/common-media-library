@@ -24,6 +24,6 @@ export function readPrft<V extends IsoInt64>(view: IsoBoxReadView<V>): ProducerR
 		referenceTrackId: view.readUint(4),
 		ntpTimestampSec: view.readUint(4),
 		ntpTimestampFrac: view.readUint(4),
-		mediaTime: view.readWideUint(version === 1 ? 8 : 4),
+		mediaTime: view.readWideUint(version === 0 ? 4 : 8),
 	}
 }

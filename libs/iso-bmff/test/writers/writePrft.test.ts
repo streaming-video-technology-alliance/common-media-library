@@ -1,0 +1,28 @@
+import { assert, describe, it, readIsoBoxes, readPrft, writePrft } from '../util/box.ts'
+import { prftBox } from '../util/versionBoxes.ts'
+
+describe('writePrft', function () {
+	for (const version of [0, 1, 2]) {
+		it(`should write the source bytes after a read of a version ${version} box`, function () {
+			const source = prftBox(version)
+			const [box] = readIsoBoxes(source, { readers: { prft: readPrft } })
+
+			assert.strictEqual(box.type, 'prft')
+			assert.deepStrictEqual(new Uint8Array(writePrft(box).buffer), source)
+		})
+	}
+
+	it('should write a 64-bit media_time for a version 2 box', function () {
+		const writer = writePrft({
+			type: 'prft',
+			version: 2,
+			flags: 0,
+			referenceTrackId: 1,
+			ntpTimestampSec: 2,
+			ntpTimestampFrac: 3,
+			mediaTime: 4,
+		})
+
+		assert.deepStrictEqual(new Uint8Array(writer.buffer), prftBox(2))
+	})
+})
