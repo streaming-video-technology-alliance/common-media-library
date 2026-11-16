@@ -118,6 +118,7 @@ and this project adheres to
 - `writePrsl` now encodes each tag one time. The written bytes do not change.
 - The reading guide and the documentation of `IsoBoxReadView.readBox` now state that the header of a `uuid` box has 16 more bytes for the `usertype` field.
 - `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
+- `IsoBoxWriteView.writeUint64`, `writeWideUint`, and `writeWideInt` are now methods of the class prototype, so a writer allocates less memory for each box. Call each method on the writer, as in `writer.writeUint64(value)`.
 
 ## [1.0.7] - 2026-10-18
 
