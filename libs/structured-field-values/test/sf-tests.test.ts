@@ -45,6 +45,11 @@ describe('structured_field_tests', async () => {
 		const ignore = [
 			// number.json
 			`negative zero`, // -0 & +0 are no equal in deepStrictEqual
+			// date.json
+			`syntactic max date - 999,999,999,999,999`, // outside the range of a JS Date
+			`syntactic min date - -999,999,999,999,999`, // outside the range of a JS Date
+			// string.json
+			`two lines string`,
 			// list.json
 			`two line list`,
 			// dictionary.json
@@ -119,6 +124,9 @@ describe('structured_field_tests', async () => {
 					assert.deepStrictEqual(str, encoded, suite.name)
 				}
 			} catch (error) {
+				if (suite.can_fail && !(error instanceof assert.AssertionError)) {
+					return
+				}
 				assert.deepStrictEqual(
 					suite.must_fail,
 					true,

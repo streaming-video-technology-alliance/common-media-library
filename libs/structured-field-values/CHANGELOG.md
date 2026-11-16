@@ -14,6 +14,10 @@ and this project adheres to
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/structured-field-values](https://cml.svta.org/packages/structured-field-values/).
 
+### Fixed
+
+- The encoders now round every Decimal tie to the even digit, as RFC 9651 section 4.1.5 requires. `encodeSfItem(2.0005)` returns `2.0` instead of `2.001`. The fix is in `roundToEven` of `@svta/cml-utils`, so install the next release of `@svta/cml-utils` ([#665](https://github.com/streaming-video-technology-alliance/common-media-library/issues/665))
+
 ## [1.1.7] - 2026-10-18
 
 ### Changed

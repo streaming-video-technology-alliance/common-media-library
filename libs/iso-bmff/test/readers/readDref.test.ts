@@ -1,4 +1,17 @@
-import { assert, describe, filterBoxes, it, readDref, readUrl } from '../util/box.ts'
+import {
+	assert,
+	defaultReaderConfig,
+	defaultWriterConfig,
+	describe,
+	filterBoxes,
+	it,
+	readDref,
+	readIsoBoxes,
+	readUrl,
+	writeIsoBox,
+	type DataReferenceBox,
+} from '../util/box.ts'
+import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('readDref', function () {
 	it('should correctly parse the box from sample data', function () {
@@ -16,5 +29,25 @@ describe('readDref', function () {
 		assert.strictEqual(entry.version, 0)
 		assert.strictEqual(entry.flags, 1)
 		assert.strictEqual(entry.location, '')
+	})
+
+	it('should read no entries for an entry_count of 0', function () {
+		const url = boxBytes('url ', [0, 1], [1, 3])
+		const bytes = boxBytes('dref', [0, 4], [0, 4], url)
+
+		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as DataReferenceBox[]
+
+		assert.strictEqual(box.entryCount, 0)
+		assert.deepStrictEqual(box.entries, [])
+	})
+
+	it('should write an entry_count of 0 after a read', function () {
+		const url = boxBytes('url ', [0, 1], [1, 3])
+		const bytes = boxBytes('dref', [0, 4], [0, 4], url)
+
+		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as DataReferenceBox[]
+		const written = writeIsoBox(box, defaultWriterConfig())
+
+		assert.deepStrictEqual(written, boxBytes('dref', [0, 4], [0, 4]))
 	})
 })
