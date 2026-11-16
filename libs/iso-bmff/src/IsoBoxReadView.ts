@@ -410,11 +410,15 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	 * The method stops before a box if the view ends inside the header or the body of that box.
 	 * The method also stops before a box with a size below the size of its header.
 	 *
-	 * @param length - The number of boxes to read.
+	 * @param length - The maximum number of boxes to read. A length of 0 reads no boxes. A negative length reads every box.
 	 * @returns The boxes.
 	 */
 	readBoxes = <T = IsoBox<V>>(length: number = -1): T[] => {
 		const result: T[] = []
+
+		if (length === 0) {
+			return result
+		}
 
 		for (const box of this) {
 			result.push(box as T)
