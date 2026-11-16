@@ -93,6 +93,7 @@ and this project adheres to
 - `writeIsoBox` and `writeIsoBoxes` now write the source bytes of a parsed box with a `boxes` field and no writer. The rule applies to every type outside `CONTAINERS`, such as `meta`, `prsl`, and the sample entries. Earlier releases write only the header and the child boxes of such a box, so its other fields are lost ([#651](https://github.com/streaming-video-technology-alliance/common-media-library/issues/651)).
 - `readEmsg` now returns the source version for an `emsg` box of version 2 or above. `messageData` has all bytes after the full box fields, and the other fields are empty strings or 0. Earlier releases read the fields of version 0 and return `version: 0` ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 - `writeEmsg` now writes only the full box fields and `messageData` for a `version` other than 0 or 1. A read and then a write of such a box return the source bytes. Earlier releases write the fields of version 1 ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
+- `IsoBoxWriteView.writeUint(value, 8)` and the built-in writers now write all bits set for a `number` of 2^64 or more. Earlier releases write 0. A read and then a write with the default configs now keep a 64-bit field with all bits set, such as `duration` in `mvhd` ([#653](https://github.com/streaming-video-technology-alliance/common-media-library/issues/653)).
 
 ### Changed
 

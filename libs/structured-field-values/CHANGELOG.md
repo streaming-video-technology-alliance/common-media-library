@@ -17,6 +17,8 @@ and this project adheres to
 ### Fixed
 
 - The encoders now round every Decimal tie to the even digit, as RFC 9651 section 4.1.5 requires. `encodeSfItem(2.0005)` returns `2.0` instead of `2.001`. The fix is in `roundToEven` of `@svta/cml-utils`, so install the next release of `@svta/cml-utils` ([#665](https://github.com/streaming-video-technology-alliance/common-media-library/issues/665))
+- The decoders now throw a parse error for a Date outside the range of a JS `Date`. `decodeSfItem('@999999999999999')` throws instead of returning an item with an Invalid Date. A JS `Date` holds at most 8,640,000,000,000 seconds before or after 1970-01-01.
+- The encoders now throw a serialize error for an Invalid Date. `encodeSfItem(new Date(NaN))` throws instead of returning `@NaN`.
 
 ## [1.1.7] - 2026-10-18
 
