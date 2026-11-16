@@ -199,7 +199,7 @@ export type Entity = {
 };
 
 // @public
-export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V>;
+export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V> | EventMessageBoxUnrecognizedVersion;
 
 // @public
 export type EventMessageBoxBase = FullBox & {
@@ -211,6 +211,16 @@ export type EventMessageBoxBase = FullBox & {
     id: number;
     messageData: Uint8Array;
 };
+
+// @public
+export type EventMessageBoxUnrecognizedVersion = EventMessageBoxBase & {
+    version: EventMessageBoxUnrecognizedVersionNumber;
+    presentationTimeDelta: number;
+    presentationTime: number;
+};
+
+// @public
+export type EventMessageBoxUnrecognizedVersionNumber<A extends number[] = [0, 1]> = A["length"] extends 256 ? Exclude<A[number], 0 | 1> : EventMessageBoxUnrecognizedVersionNumber<[...A, A["length"]]>;
 
 // @public
 export type EventMessageBoxV0 = EventMessageBoxBase & {

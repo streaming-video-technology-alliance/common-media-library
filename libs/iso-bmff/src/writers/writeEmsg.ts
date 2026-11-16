@@ -11,6 +11,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * For a version other than 0 or 1, the writer writes the full box fields and `messageData` only.
+ *
  * @param box - The `EventMessageBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
@@ -26,14 +28,14 @@ export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView {
 	const schemeIdUriSize = schemeIdUriBytes.length + 1 // null-terminated
 	const valueSize = valueBytes.length + 1 // null-terminated
 
-	let contentSize: number
+	let contentSize = box.messageData.length
 
 	if (box.version === 0) {
 		// version 0: scheme_id_uri, value, timescale, presentation_time_delta, event_duration, id, message_data
-		contentSize = schemeIdUriSize + valueSize + 4 + 4 + 4 + 4 + box.messageData.length
-	} else {
+		contentSize += schemeIdUriSize + valueSize + 4 + 4 + 4 + 4
+	} else if (box.version === 1) {
 		// version 1: timescale, presentation_time, event_duration, id, scheme_id_uri, value, message_data
-		contentSize = 4 + 8 + 4 + 4 + schemeIdUriSize + valueSize + box.messageData.length
+		contentSize += 4 + 8 + 4 + 4 + schemeIdUriSize + valueSize
 	}
 
 	const totalSize = headerSize + fullBoxSize + contentSize
@@ -50,7 +52,7 @@ export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView {
 		writer.writeUint(box.presentationTimeDelta ?? 0, 4)
 		writer.writeUint(box.eventDuration, 4)
 		writer.writeUint(box.id, 4)
-	} else {
+	} else if (box.version === 1) {
 		writer.writeUint(box.timescale, 4)
 		writer.writeWideUint(box.presentationTime ?? 0, 8)
 		writer.writeUint(box.eventDuration, 4)
