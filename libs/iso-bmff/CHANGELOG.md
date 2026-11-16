@@ -44,6 +44,7 @@ and this project adheres to
 - `writeMeta` now takes a `MetaBox` with `number` fields or `bigint` fields ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - The type of a `udta`, `grpl`, `strk`, or `meco` child no longer has the `view` and `size` fields. Cast the child: `(child as ParsedIsoBox).view` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - A `udta`, `grpl`, `strk`, or `meco` box no longer accepts a child of another type, such as a `Uint8Array`. Cast that child: `bytes as unknown as IsoBox` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- `writeIsoBox` and `writeIsoBoxes` now throw `No writer found for box type` for a box that has no writer and no `view`. The rule applies to a box with a `boxes` field and a type outside `CONTAINERS`, such as a `meta` box that code builds. Add the writer for the type, such as `writeMeta`, to the `writers` map ([#651](https://github.com/streaming-video-technology-alliance/common-media-library/issues/651)).
 
 ### Fixed
 
@@ -84,6 +85,7 @@ and this project adheres to
 - `writeTenc` now writes the constant IV of a `tenc` box that has `defaultConstantIvSize` or `defaultConstantIv`. A read and then a write of the box returns the source bytes. Earlier releases write 32 bytes and drop the constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - The children of the `udta`, `grpl`, `strk`, and `meco` boxes now have the type `IsoBox`. Earlier releases give each child the type `any`, so TypeScript checks no field of a child. Test `child.type` before you read a field of a child ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - After `isContainer(box)`, each element of `box.boxes` now has a box type. A 64-bit integer field of a child has the type of the `int64` option ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- `writeIsoBox` and `writeIsoBoxes` now write the source bytes of a parsed box with a `boxes` field and no writer. The rule applies to every type outside `CONTAINERS`, such as `meta`, `prsl`, and the sample entries. Earlier releases write only the header and the child boxes of such a box, so its other fields are lost ([#651](https://github.com/streaming-video-technology-alliance/common-media-library/issues/651)).
 
 ### Changed
 

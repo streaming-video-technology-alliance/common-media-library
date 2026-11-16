@@ -393,6 +393,8 @@ If you provide raw box objects, also provide a configuration object that names t
 
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
+>
+> The function does not write a box of another type as a container, even if the box has a `boxes` field. Examples are `meta` and the sample entries. If the `writers` map has no writer for such a type, the function writes the `view` bytes of a parsed box. For a box with no `view`, the function throws `No writer found for box type`.
 
 A write omits the bytes of a source box that the reader stops before. See [Incomplete boxes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#incomplete-boxes).
 
