@@ -11,6 +11,10 @@ test('serializeDecimal', () => {
 	assert.deepStrictEqual(serializeDecimal(1.0025), '1.002')
 	assert.deepStrictEqual(serializeDecimal(1.0035), '1.004')
 	assert.deepStrictEqual(serializeDecimal(-1.0035), '-1.004')
+	assert.deepStrictEqual(serializeDecimal(2.0005), '2.0')
+	assert.deepStrictEqual(serializeDecimal(0.5015), '0.502')
+	assert.deepStrictEqual(serializeDecimal(-0.5015), '-0.502')
+	assert.deepStrictEqual(serializeDecimal(0.5035), '0.504')
 	assert.deepStrictEqual(serializeDecimal(999_999_999_999.999), '999999999999.999')
 	assert.deepStrictEqual(serializeDecimal(-999_999_999_999.999), '-999999999999.999')
 	assert.throws(

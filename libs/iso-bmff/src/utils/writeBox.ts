@@ -1,7 +1,8 @@
 import type { IsoBoxStreamable } from '../IsoBoxStreamable.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
-import { isContainer } from '../utils/isContainer.ts'
+import type { IsoBoxContainer } from '../IsoBoxContainer.ts'
+import { CONTAINERS } from './CONTAINERS.ts'
 import { writeContainerBox } from './writeContainerBox.ts'
 
 /**
@@ -26,8 +27,8 @@ export function writeBox(
 		if (writer) {
 			// TODO: Find a better way to do this without casting to any
 			view = writer(box as any, config)
-		} else if (isContainer(box)) {
-			view = writeContainerBox(box, config)
+		} else if (CONTAINERS.includes(type)) {
+			view = writeContainerBox(box as IsoBoxContainer<IsoInt64>, config)
 		} else if ('view' in box) {
 			view = box.view
 		}

@@ -12,6 +12,11 @@ and this project adheres to
 
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/utils](https://cml.svta.org/packages/utils/).
 
+### Fixed
+
+- `roundToEven` now rounds every decimal tie to the even value. `roundToEven(2.0005, 3)` returns `2` instead of `2.001` ([#665](https://github.com/streaming-video-technology-alliance/common-media-library/issues/665))
+- `roundToEven` now rounds a value next to a decimal tie to the nearest value. `roundToEven(0.07050000000000001, 3)` returns `0.071` instead of `0.07` ([#665](https://github.com/streaming-video-technology-alliance/common-media-library/issues/665))
+
 ## [1.7.0] - 2026-10-26
 
 ### Added
