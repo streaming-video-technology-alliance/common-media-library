@@ -18,8 +18,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIndexBox<V> {
 	const { readUint, readWideUint } = view
 	const { version, flags } = view.readFullBox()
-	const v1 = version === 1
-	const size = v1 ? 8 : 4
+	const size = version === 0 ? 4 : 8
 
 	const referenceId = readUint(4)
 	const timescale = readUint(4)
