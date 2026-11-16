@@ -13,6 +13,7 @@ import {
 	type IsoInt64,
 	type ParsedIsoBox,
 } from './util/box.ts'
+import { bytes } from './util/bytes.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
@@ -125,10 +126,6 @@ const sourceWriters = Object.fromEntries(
 
 function counts(config: object): Record<string, number> {
 	return Object.fromEntries(Object.keys(config).map(type => [type, 0]))
-}
-
-function bytes(view: ArrayBufferView): Uint8Array {
-	return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 }
 
 function same(a: Uint8Array, b: Uint8Array): boolean {

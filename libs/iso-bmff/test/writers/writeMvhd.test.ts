@@ -1,7 +1,5 @@
 import { assert, describe, it, writeMvhd, type MovieHeaderBox } from '../util/box.ts'
-
-// The stored integers of a rotation of 90 degrees with a horizontal translation of 1080.
-const ROTATION = [0, 0x10000, 0, -0x10000, 0, 0, 1080 * 0x10000, 0, 0x40000000]
+import { ROTATION } from '../util/matrices.ts'
 
 function createBox(matrix: number[]): MovieHeaderBox {
 	return {

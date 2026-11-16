@@ -6,6 +6,7 @@ import {
 	type IsoInt64,
 	type TrackFragmentBaseMediaDecodeTimeBox,
 } from './util/box.ts'
+import { body } from './util/bytes.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
 // #region example
@@ -23,12 +24,6 @@ const writeTfdtWide = (box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>) => {
 const EXACT = BigInt('9007199254740993')
 const MIN = -(BigInt(2) ** BigInt(63))
 const MAX = BigInt(2) ** BigInt(63) - BigInt(1)
-
-function body(write: (writer: IsoBoxWriteView) => void, size: number): number[] {
-	const writer = new IsoBoxWriteView('test', 8 + size)
-	write(writer)
-	return Array.from(new Uint8Array(writer.buffer).subarray(8))
-}
 
 describe('IsoBoxWriteView.writeWideUint', function () {
 	it('should write a box with a bigint field or a number field', function () {
