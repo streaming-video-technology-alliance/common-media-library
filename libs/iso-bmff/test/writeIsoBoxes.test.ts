@@ -1,13 +1,15 @@
-import { deepEqual, doesNotThrow, equal, ok } from 'node:assert'
+import { deepEqual, doesNotThrow, equal, ok, throws } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	describe,
 	it,
+	createVisualSampleEntryReader,
 	defaultReaderConfig,
 	defaultWriterConfig,
 	filterIsoBoxes,
 	readFtyp,
 	readIsoBoxes,
+	readStsd,
 	writeFtyp,
 	writeIsoBoxes,
 	writeMdat,
@@ -229,5 +231,76 @@ describe('writeIsoBoxes', function () {
 		const [result] = writeIsoBoxes([plain], defaultWriterConfig())
 
 		equal(result.buffer, plain.buffer)
+	})
+
+	describe('a box with a boxes field and no writer', function () {
+		const FREE = [0x00, 0x00, 0x00, 0x09, 0x66, 0x72, 0x65, 0x65, 0x01]
+		const META = [0x00, 0x00, 0x00, 0x15, 0x6d, 0x65, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00, ...FREE]
+		const TRAF = [0x00, 0x00, 0x00, 0x11, 0x74, 0x72, 0x61, 0x66, ...FREE]
+
+		function sampleEntry(type: string): Uint8Array {
+			const [stsd] = filterIsoBoxes(
+				parseFile('hvc1_init.mp4', { readers: { stsd: readStsd } }),
+				box => box.type === 'stsd',
+			)
+			ok(stsd?.type === 'stsd')
+			const { view } = stsd.entries[0] as ParsedIsoBox
+			const bytes = new Uint8Array(
+				view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength),
+			)
+			bytes.set(
+				[...type].map(char => char.charCodeAt(0)),
+				4,
+			)
+			return bytes
+		}
+
+		it('should write the source bytes of a parsed meta box', function () {
+			const boxes = readIsoBoxes(new Uint8Array(META), defaultReaderConfig())
+
+			const [bytes] = writeIsoBoxes(boxes, { writers: {} })
+
+			deepEqual([...bytes], META)
+		})
+
+		it('should write the source bytes of a sample entry with no writer', function () {
+			const source = sampleEntry('av01')
+			const readers = {
+				...defaultReaderConfig().readers,
+				av01: createVisualSampleEntryReader('av01'),
+			}
+			const boxes = readIsoBoxes(source, { readers })
+
+			const [bytes] = writeIsoBoxes(boxes, defaultWriterConfig())
+
+			equal(bytes.length, 137)
+			deepEqual(bytes, source)
+		})
+
+		it('should write a parsed container as a container', function () {
+			const [traf] = readIsoBoxes(new Uint8Array(TRAF), defaultReaderConfig())
+			ok(traf.type === 'traf')
+			traf.boxes.push(new Uint8Array(FREE) as never)
+
+			const [bytes] = writeIsoBoxes([traf], { writers: {} })
+
+			deepEqual([...bytes], [0x00, 0x00, 0x00, 0x1a, 0x74, 0x72, 0x61, 0x66, ...FREE, ...FREE])
+		})
+
+		it('should write a container that code builds as a container', function () {
+			const box = { type: 'udta', boxes: [new Uint8Array(FREE)] } as IsoBoxStreamable
+
+			const [bytes] = writeIsoBoxes([box], { writers: {} })
+
+			deepEqual([...bytes], [0x00, 0x00, 0x00, 0x11, 0x75, 0x64, 0x74, 0x61, ...FREE])
+		})
+
+		it('should throw for a box that code builds with no view and no writer', function () {
+			const box: IsoBoxStreamable = { type: 'meta', version: 0, flags: 0, boxes: [] }
+
+			throws(() => writeIsoBoxes([box], { writers: {} }), {
+				message: 'No writer found for box type: meta',
+			})
+		})
 	})
 })
