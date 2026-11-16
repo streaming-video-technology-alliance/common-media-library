@@ -1,4 +1,5 @@
-import { assert, describe, findBox, it, readTrun } from '../util/box.ts'
+import { assert, describe, findBox, it, readIsoBoxes, readTrun } from '../util/box.ts'
+import { trunBox } from '../util/versionBoxes.ts'
 
 describe('readTrun', function () {
 	it('should correctly parse the box from sample data', function () {
@@ -14,4 +15,23 @@ describe('readTrun', function () {
 		assert.strictEqual(sample.sampleFlags, undefined)
 		assert.strictEqual(sample.sampleCompositionTimeOffset, undefined)
 	})
+})
+
+describe('readTrun versions', function () {
+	const offsets = [
+		[0, 0xfffffffe],
+		[1, -2],
+		[2, -2],
+	]
+
+	for (const [version, offset] of offsets) {
+		it(`should read the composition time offset of a version ${version} box`, function () {
+			const [box] = readIsoBoxes(trunBox(version), { readers: { trun: readTrun } })
+
+			assert.strictEqual(box.type, 'trun')
+			assert.strictEqual(box.version, version)
+			assert.strictEqual(box.sampleCount, 1)
+			assert.strictEqual(box.samples[0].sampleCompositionTimeOffset, offset)
+		})
+	}
 })
