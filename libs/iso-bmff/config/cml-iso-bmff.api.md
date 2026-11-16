@@ -213,10 +213,14 @@ export type EventMessageBoxBase = FullBox & {
 };
 
 // @public
-export type EventMessageBoxUnrecognizedVersion = FullBox & {
-    type: "emsg";
-    messageData: Uint8Array;
+export type EventMessageBoxUnrecognizedVersion = EventMessageBoxBase & {
+    version: EventMessageBoxUnrecognizedVersionNumber;
+    presentationTimeDelta: number;
+    presentationTime: number;
 };
+
+// @public
+export type EventMessageBoxUnrecognizedVersionNumber<A extends number[] = [0, 1]> = A["length"] extends 256 ? Exclude<A[number], 0 | 1> : EventMessageBoxUnrecognizedVersionNumber<[...A, A["length"]]>;
 
 // @public
 export type EventMessageBoxV0 = EventMessageBoxBase & {

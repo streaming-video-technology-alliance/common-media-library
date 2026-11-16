@@ -1,4 +1,7 @@
-import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
+import type {
+	EventMessageBox,
+	EventMessageBoxUnrecognizedVersionNumber,
+} from '../boxes/EventMessageBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
@@ -10,8 +13,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * ISO/IEC 23009-1 - 5.10.3.3 Event Message Box
  *
- * For a version other than 0 or 1, the result has the full box fields and `messageData` only.
- * `messageData` holds all bytes after the full box fields.
+ * For a version other than 0 or 1, `messageData` holds all bytes after the full box fields.
+ * The strings of the result are empty and the numbers are 0.
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
@@ -58,8 +61,15 @@ export function readEmsg<V extends IsoInt64>(view: IsoBoxReadView<V>): EventMess
 
 	return {
 		type: 'emsg',
-		version,
+		version: version as EventMessageBoxUnrecognizedVersionNumber,
 		flags,
+		schemeIdUri: '',
+		value: '',
+		timescale: 0,
+		presentationTimeDelta: 0,
+		presentationTime: 0,
+		eventDuration: 0,
+		id: 0,
 		messageData: readData(-1),
 	}
 }

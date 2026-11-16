@@ -18,6 +18,7 @@ import {
 	writeIsoBoxes,
 	writeTfdt,
 	type Box,
+	type EventMessageBoxUnrecognizedVersionNumber,
 	type IsoBox,
 	type IsoBoxData,
 	type IsoBoxReaderMap,
@@ -242,10 +243,10 @@ describe('int64 option types', function () {
 				expectType<Equal<typeof box.mediaTime, bigint>>(true)
 				expectType<Equal<typeof box.ntpTimestampSec, number>>(true)
 			}
-			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 1) {
+			if (box.type === 'emsg' && box.version === 1) {
 				expectType<Equal<typeof box.presentationTime, bigint>>(true)
 			}
-			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 0) {
+			if (box.type === 'emsg' && box.version === 0) {
 				expectType<Equal<typeof box.presentationTimeDelta, number>>(true)
 			}
 		}
@@ -817,21 +818,39 @@ describe('int64 option types', function () {
 		const stored = { emsg: readEmsg }
 
 		for (const box of readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: stored })) {
-			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 1) {
+			if (box.type === 'emsg' && box.version === 1) {
 				expectType<Equal<typeof box.presentationTime, bigint>>(true)
 			}
-			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 0) {
+			if (box.type === 'emsg' && box.version === 0) {
 				expectType<Equal<typeof box.presentationTimeDelta, number>>(true)
+			}
+			if (box.type === 'emsg' && box.version !== 0 && box.version !== 1) {
+				expectType<Equal<typeof box.presentationTime, number>>(true)
+			}
+			if (box.type === 'emsg' && box.version !== 0) {
+				expectType<Equal<typeof box.presentationTime, bigint | number>>(true)
 			}
 		}
 
 		for (const box of readIsoBoxes(buffer, { readers: stored })) {
-			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 1) {
+			if (box.type === 'emsg' && box.version === 1) {
 				expectType<Equal<typeof box.presentationTime, number>>(true)
 			}
 		}
 
 		assert.strictEqual(readIsoBoxes(buffer, { readers: stored }).length, 3)
+	})
+
+	it('20c. gives an emsg box of a version other than 0 or 1 the versions 2 to 255', function () {
+		expectType<
+			Equal<Extract<EventMessageBoxUnrecognizedVersionNumber, 0 | 1 | 2 | 255 | 256>, 2 | 255>
+		>(true)
+
+		const version: EventMessageBoxUnrecognizedVersionNumber = 2
+		// @ts-expect-error 1 is the version of EventMessageBoxV1
+		const versionOne: EventMessageBoxUnrecognizedVersionNumber = 1
+
+		assert.strictEqual(version + versionOne, 3)
 	})
 
 	it('20c. keeps the any of a reader that returns any', function () {

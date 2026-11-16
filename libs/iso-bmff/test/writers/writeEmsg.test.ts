@@ -141,7 +141,6 @@ describe('writeEmsg', function () {
 		const [box] = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(box.type, 'emsg')
-		assert.ok('schemeIdUri' in box)
 		assert.strictEqual(box.value, 'AĀB')
 		assert.strictEqual(box.timescale, 1000)
 		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array([0xff]))
@@ -166,7 +165,6 @@ describe('writeEmsg', function () {
 
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].type, 'emsg')
-		assert.ok('schemeIdUri' in boxes[0])
 		assert.strictEqual(boxes[0].version, 1)
 		assert.strictEqual(boxes[0].schemeIdUri, 'urn:test:scheme')
 		assert.strictEqual(boxes[0].value, '1')
@@ -258,7 +256,6 @@ describe('writeEmsg', function () {
 
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].type, 'emsg')
-		assert.ok('schemeIdUri' in boxes[0])
 		assert.strictEqual(boxes[0].value, '')
 		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
@@ -283,7 +280,6 @@ describe('writeEmsg', function () {
 
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].type, 'emsg')
-		assert.ok('schemeIdUri' in boxes[0])
 		assert.strictEqual(boxes[0].schemeIdUri, '')
 		assert.strictEqual(boxes[0].value, '1')
 		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
@@ -309,7 +305,6 @@ describe('writeEmsg', function () {
 
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].type, 'emsg')
-		assert.ok('schemeIdUri' in boxes[0])
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].schemeIdUri, '')
 		assert.strictEqual(boxes[0].value, '')
@@ -319,26 +314,14 @@ describe('writeEmsg', function () {
 		assert.strictEqual(boxes[0].id, 7)
 		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
-	it('should write the full box fields and messageData for a version 2 box', function () {
-		const writer = writeEmsg({
-			type: 'emsg',
-			version: 2,
-			flags: 1,
-			messageData: new Uint8Array([0xaa, 0xbb]),
-		})
 
-		assert.deepStrictEqual(
-			new Uint8Array(writer.buffer),
-			new Uint8Array([0, 0, 0, 14, 0x65, 0x6d, 0x73, 0x67, 2, 0, 0, 1, 0xaa, 0xbb]),
-		)
-	})
-
-	it('should not write the version 1 fields of a version 2 box', function () {
+	it('should write only the full box fields and messageData for a version 2 box', function () {
 		const box = {
 			type: 'emsg' as const,
-			version: 2,
-			flags: 0,
+			version: 2 as const,
+			flags: 1,
 			timescale: 1,
+			presentationTimeDelta: 4,
 			presentationTime: 5,
 			eventDuration: 2,
 			id: 3,
@@ -351,7 +334,7 @@ describe('writeEmsg', function () {
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
-			new Uint8Array([0, 0, 0, 13, 0x65, 0x6d, 0x73, 0x67, 2, 0, 0, 0, 1]),
+			new Uint8Array([0, 0, 0, 13, 0x65, 0x6d, 0x73, 0x67, 2, 0, 0, 1, 1]),
 		)
 	})
 

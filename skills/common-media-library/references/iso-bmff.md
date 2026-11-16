@@ -92,7 +92,7 @@ import {
 const readEmsgWithId3 = (view: IsoBoxReadView) => {
 	const emsg = readEmsg(view);
 	const frames: Id3Frame[] =
-		"schemeIdUri" in emsg && emsg.schemeIdUri === ID3_SCHEME_ID_URI
+		emsg.schemeIdUri === ID3_SCHEME_ID_URI
 			? getId3Frames(emsg.messageData)
 			: [];
 	return { ...emsg, frames };
@@ -839,10 +839,14 @@ export type EventMessageBoxBase = FullBox & {
 };
 
 // @public
-export type EventMessageBoxUnrecognizedVersion = FullBox & {
-    type: "emsg";
-    messageData: Uint8Array;
+export type EventMessageBoxUnrecognizedVersion = EventMessageBoxBase & {
+    version: EventMessageBoxUnrecognizedVersionNumber;
+    presentationTimeDelta: number;
+    presentationTime: number;
 };
+
+// @public
+export type EventMessageBoxUnrecognizedVersionNumber<A extends number[] = [0, 1]> = A["length"] extends 256 ? Exclude<A[number], 0 | 1> : EventMessageBoxUnrecognizedVersionNumber<[...A, A["length"]]>;
 
 // @public
 export type EventMessageBoxV0 = EventMessageBoxBase & {

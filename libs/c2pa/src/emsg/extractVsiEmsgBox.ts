@@ -20,7 +20,7 @@ export function extractVsiEmsgBox(segmentBytes: Uint8Array): EventMessageBox | n
 	for (const box of readIsoBoxes(segmentBytes, EMSG_READER_CONFIG)) {
 		if (box.type !== EMSG_BOX_TYPE) continue
 		const emsg = box as EventMessageBox
-		if ('schemeIdUri' in emsg && emsg.schemeIdUri === VSI_SCHEME_URI) return emsg
+		if (emsg.schemeIdUri === VSI_SCHEME_URI) return emsg
 	}
 	return null
 }

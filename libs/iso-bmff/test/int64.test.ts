@@ -296,7 +296,6 @@ describe('int64 option', function () {
 
 		assert.ok(parsed)
 		assert.strictEqual(parsed.type, 'emsg')
-		assert.ok('schemeIdUri' in parsed)
 		assert.strictEqual(parsed.version, 0)
 		assert.strictEqual(parsed.presentationTimeDelta, 5)
 		assert.deepStrictEqual(bigintFields(parsed), {})
