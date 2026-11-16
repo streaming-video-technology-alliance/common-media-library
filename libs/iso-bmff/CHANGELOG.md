@@ -84,6 +84,7 @@ and this project adheres to
 - `writeTenc` now writes the constant IV of a `tenc` box that has `defaultConstantIvSize` or `defaultConstantIv`. A read and then a write of the box returns the source bytes. Earlier releases write 32 bytes and drop the constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - The children of the `udta`, `grpl`, `strk`, and `meco` boxes now have the type `IsoBox`. Earlier releases give each child the type `any`, so TypeScript checks no field of a child. Test `child.type` before you read a field of a child ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - After `isContainer(box)`, each element of `box.boxes` now has a box type. A 64-bit integer field of a child has the type of the `int64` option ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- `IsoBoxWriteView.writeUint(value, 8)` and the built-in writers now write all bits set for a `number` of 2^64 or more. Earlier releases write 0. A read and then a write with the default configs now keep a 64-bit field with all bits set, such as `duration` in `mvhd` ([#653](https://github.com/streaming-video-technology-alliance/common-media-library/issues/653)).
 
 ### Changed
 
