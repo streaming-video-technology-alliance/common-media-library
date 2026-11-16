@@ -354,6 +354,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	 * Reads a raw box from the data view.
 	 *
 	 * A box header has 8 bytes, or 16 bytes when `size` is 1 and `largesize` follows (ISO/IEC 14496-12, clause 4.2).
+	 * The header of a `uuid` box has 16 more bytes for the `usertype` field.
 	 *
 	 * @returns The box.
 	 *
@@ -386,7 +387,9 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 			}
 		}
 
-		if (!box || actualSize < cursor || actualSize > bytesRemaining) {
+		const headerSize = box?.type === 'uuid' ? cursor + 16 : cursor
+
+		if (!box || actualSize < headerSize || actualSize > bytesRemaining) {
 			this.truncated = true
 			throw new Error('Truncated box')
 		}

@@ -225,6 +225,61 @@ describe('box size below the header size', function () {
 		assert.deepStrictEqual(types(read(bytes)), ['ftyp', 'free'])
 	})
 
+	for (const size of [8, 23]) {
+		it(`should stop before a last uuid box with the size ${size}`, function () {
+			const bytes = reduceUint8Arrays([FTYP, header(size, 'uuid'), new Uint8Array(size - 8)])
+
+			assert.deepStrictEqual(types(read(bytes)), ['ftyp'])
+		})
+	}
+
+	it('should stop before a uuid box with the size 8 after a complete box', function () {
+		const bytes = reduceUint8Arrays([FTYP, header(8, 'uuid'), FREE, FREE])
+
+		assert.deepStrictEqual(types(read(bytes)), ['ftyp'])
+	})
+
+	it('should stop before a last child uuid box with the size 8 and read the boxes after the container', function () {
+		const bytes = reduceUint8Arrays([boxBytes('moov', FREE, header(8, 'uuid')), FTYP])
+
+		const boxes = read(bytes)
+
+		assert.deepStrictEqual(types(boxes), ['moov', 'ftyp'])
+		assert.deepStrictEqual(types(boxes[0]?.boxes), ['free'])
+	})
+
+	it('should stop before a uuid box with the size 1 and the largesize 31', function () {
+		const bytes = reduceUint8Arrays([FTYP, largeHeader(31, 'uuid'), new Uint8Array(15)])
+
+		assert.deepStrictEqual(types(read(bytes)), ['ftyp'])
+	})
+
+	it('should read a uuid box with the size 24 and the box after it', function () {
+		const usertype = Uint8Array.from({ length: 16 }, (_, i) => i + 1)
+		const bytes = reduceUint8Arrays([header(24, 'uuid'), usertype, FREE])
+
+		const boxes = readIsoBoxes(bytes, defaultReaderConfig())
+
+		assert.deepStrictEqual(
+			boxes.map(box => box.type),
+			['uuid', 'free'],
+		)
+		assert.deepStrictEqual(boxes[0]?.usertype, Array.from(usertype))
+	})
+
+	it('should read a uuid box with the size 1 and the largesize 32 and the box after it', function () {
+		const usertype = Uint8Array.from({ length: 16 }, (_, i) => i + 1)
+		const bytes = reduceUint8Arrays([largeHeader(32, 'uuid'), usertype, FREE])
+
+		const boxes = readIsoBoxes(bytes, defaultReaderConfig())
+
+		assert.deepStrictEqual(
+			boxes.map(box => box.type),
+			['uuid', 'free'],
+		)
+		assert.deepStrictEqual(boxes[0]?.usertype, Array.from(usertype))
+	})
+
 	it('should throw the same error from readBox as for a cut box', function () {
 		const expected = { name: 'Error', message: 'Truncated box' }
 
@@ -233,6 +288,9 @@ describe('box size below the header size', function () {
 			reduceUint8Arrays([header(7, 'free'), FREE]),
 			largeHeader(0, 'free'),
 			reduceUint8Arrays([largeHeader(15, 'free'), FREE]),
+			header(8, 'uuid'),
+			reduceUint8Arrays([header(23, 'uuid'), FREE, FREE]),
+			reduceUint8Arrays([largeHeader(31, 'uuid'), FREE, FREE]),
 		]) {
 			const view = new IsoBoxReadView(bytes)
 
