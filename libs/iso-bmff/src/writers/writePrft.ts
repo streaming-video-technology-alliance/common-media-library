@@ -17,8 +17,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writePrft(box: ProducerReferenceTimeBox<IsoInt64>): IsoBoxWriteView {
-	const v1 = box.version === 1
-	const mediaTimeSize = v1 ? 8 : 4
+	const mediaTimeSize = box.version === 0 ? 4 : 8
 	const headerSize = 8
 	const fullBoxSize = 4
 	const referenceTrackIdSize = 4

@@ -1,4 +1,5 @@
-import { assert, describe, filterBoxes, it, readCtts } from '../util/box.ts'
+import { assert, describe, filterBoxes, it, readCtts, readIsoBoxes } from '../util/box.ts'
+import { cttsBox } from '../util/versionBoxes.ts'
 
 describe('readCtts', function () {
 	it('should correctly parse the box', function () {
@@ -23,5 +24,34 @@ describe('readCtts', function () {
 		assert.strictEqual(entries[3].sampleOffset, 0)
 		assert.strictEqual(entries[4].sampleCount, 1)
 		assert.strictEqual(entries[4].sampleOffset, 512)
+	})
+})
+
+describe('readCtts versions', function () {
+	it('should read an unsigned sample offset for a version 0 box', function () {
+		const [box] = readIsoBoxes(cttsBox(0), { readers: { ctts: readCtts } })
+
+		assert.strictEqual(box.type, 'ctts')
+		assert.strictEqual(box.version, 0)
+		assert.strictEqual(box.entryCount, 1)
+		assert.deepStrictEqual(box.entries, [{ sampleCount: 1, sampleOffset: 4294967294 }])
+	})
+
+	it('should read a signed sample offset for a version 1 box', function () {
+		const [box] = readIsoBoxes(cttsBox(1), { readers: { ctts: readCtts } })
+
+		assert.strictEqual(box.type, 'ctts')
+		assert.strictEqual(box.version, 1)
+		assert.strictEqual(box.entryCount, 1)
+		assert.deepStrictEqual(box.entries, [{ sampleCount: 1, sampleOffset: -2 }])
+	})
+
+	it('should read entry_count and no entries for a version 2 box', function () {
+		const [box] = readIsoBoxes(cttsBox(2), { readers: { ctts: readCtts } })
+
+		assert.strictEqual(box.type, 'ctts')
+		assert.strictEqual(box.version, 2)
+		assert.strictEqual(box.entryCount, 1)
+		assert.deepStrictEqual(box.entries, [])
 	})
 })
