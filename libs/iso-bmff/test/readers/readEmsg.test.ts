@@ -44,6 +44,7 @@ describe('readEmsg', function () {
 		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(box.type, 'emsg')
+		assert.ok('schemeIdUri' in box)
 		assert.strictEqual(box.version, 0)
 		assert.strictEqual(box.schemeIdUri, 'urn:é')
 		assert.strictEqual(box.value, '日本')
@@ -98,6 +99,7 @@ describe('readEmsg', function () {
 		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(box.type, 'emsg')
+		assert.ok('schemeIdUri' in box)
 		assert.strictEqual(box.version, 1)
 		assert.strictEqual(box.schemeIdUri, 'urn:é')
 		assert.strictEqual(box.value, '日本')
@@ -112,6 +114,7 @@ describe('readEmsg', function () {
 		const box = findBox('emsg.m4s', 'emsg', { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(box.type, 'emsg')
+		assert.ok('schemeIdUri' in box)
 		assert.strictEqual(box.size, 74)
 		assert.strictEqual(box.version, 0)
 		assert.strictEqual(box.schemeIdUri, 'urn:mpeg:dash:event:2012')
@@ -129,11 +132,44 @@ describe('readEmsg', function () {
 	it('should expose version-specific fields via discriminated union', function () {
 		const box = findBox('emsg.m4s', 'emsg', { readers: { emsg: readEmsg } })
 
-		if (box.version === 0) {
-			assert.strictEqual(typeof box.presentationTimeDelta, 'number')
-		} else {
-			assert.strictEqual(box.version, 1)
-			assert.strictEqual(typeof box.presentationTime, 'number')
+		// #region example
+		if ('schemeIdUri' in box) {
+			if (box.version === 0) {
+				assert.strictEqual(typeof box.presentationTimeDelta, 'number')
+			} else {
+				assert.strictEqual(typeof box.presentationTime, 'number')
+			}
 		}
+		// #endregion example
+
+		assert.strictEqual(box.version, 0)
+	})
+
+	it('should read a version 2 box as the full box fields and messageData', function () {
+		const fields = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 3, 0x61, 0, 0x62, 0, 1]
+		const bytes = new Uint8Array([
+			0,
+			0,
+			0,
+			12 + fields.length,
+			0x65,
+			0x6d,
+			0x73,
+			0x67,
+			2,
+			0,
+			0,
+			1,
+			...fields,
+		])
+
+		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
+
+		assert.strictEqual(box.type, 'emsg')
+		assert.strictEqual(box.version, 2)
+		assert.strictEqual(box.flags, 1)
+		assert.strictEqual('schemeIdUri' in box, false)
+		assert.strictEqual('timescale' in box, false)
+		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array(fields))
 	})
 })

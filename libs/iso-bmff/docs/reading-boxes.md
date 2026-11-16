@@ -59,7 +59,7 @@ import {
 const readEmsgWithId3 = (view: IsoBoxReadView) => {
 	const emsg = readEmsg(view);
 	const frames: Id3Frame[] =
-		emsg.schemeIdUri === ID3_SCHEME_ID_URI
+		"schemeIdUri" in emsg && emsg.schemeIdUri === ID3_SCHEME_ID_URI
 			? getId3Frames(emsg.messageData)
 			: [];
 	return { ...emsg, frames };

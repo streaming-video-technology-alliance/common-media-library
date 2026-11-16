@@ -25,6 +25,7 @@ and this project adheres to
 - `TrackEncryptionBox` has the new optional field `defaultIsProtected`. `readTenc` sets the field to the protection state, which is the lowest byte of `defaultIsEncrypted`. `writeTenc` does not write the field ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - `TrackEncryptionBox` has the new optional fields `defaultCryptByteBlock` and `defaultSkipByteBlock`. `readTenc` sets the fields for a `tenc` box of version 1 or above. The value of `defaultIsEncrypted` does not change ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - `writeTenc` now writes `defaultCryptByteBlock` and `defaultSkipByteBlock` to a `tenc` box of version 1 or above. With no pattern field, the writer writes the pattern bits of `defaultIsEncrypted`. To change the pattern of a box from `readTenc`, change the pattern fields ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `EventMessageBoxUnrecognizedVersion` is the new type of an `emsg` box of a version other than 0 or 1. The type has the full box fields and `messageData` ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 
 ### Changed
 
@@ -45,6 +46,7 @@ and this project adheres to
 - The type of a `udta`, `grpl`, `strk`, or `meco` child no longer has the `view` and `size` fields. Cast the child: `(child as ParsedIsoBox).view` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - A `udta`, `grpl`, `strk`, or `meco` box no longer accepts a child of another type, such as a `Uint8Array`. Cast that child: `bytes as unknown as IsoBox` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - `writeIsoBox` and `writeIsoBoxes` now throw `No writer found for box type` for a box that has no writer and no `view`. The rule applies to a box with a `boxes` field and a type outside `CONTAINERS`, such as a `meta` box that code builds. Add the writer for the type, such as `writeMeta`, to the `writers` map ([#651](https://github.com/streaming-video-technology-alliance/common-media-library/issues/651)).
+- `EventMessageBox` now includes `EventMessageBoxUnrecognizedVersion`. A check of `version` alone no longer narrows the type to `EventMessageBoxV0` or `EventMessageBoxV1`. Before a read of `schemeIdUri` or a check of `version`, check `'schemeIdUri' in box` ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 
 ### Fixed
 
@@ -88,6 +90,8 @@ and this project adheres to
 - The children of the `udta`, `grpl`, `strk`, and `meco` boxes now have the type `IsoBox`. Earlier releases give each child the type `any`, so TypeScript checks no field of a child. Test `child.type` before you read a field of a child ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - After `isContainer(box)`, each element of `box.boxes` now has a box type. A 64-bit integer field of a child has the type of the `int64` option ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - `writeIsoBox` and `writeIsoBoxes` now write the source bytes of a parsed box with a `boxes` field and no writer. The rule applies to every type outside `CONTAINERS`, such as `meta`, `prsl`, and the sample entries. Earlier releases write only the header and the child boxes of such a box, so its other fields are lost ([#651](https://github.com/streaming-video-technology-alliance/common-media-library/issues/651)).
+- `readEmsg` now returns the source version for an `emsg` box of version 2 or above. The result has only `type`, `version`, `flags`, and `messageData`, as the syntax of ISO/IEC 23009-1 defines. Earlier releases read the fields of version 0 and return `version: 0` ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
+- `writeEmsg` now writes only the full box fields and `messageData` for a `version` other than 0 or 1. A read and then a write of such a box return the source bytes. Earlier releases write the fields of version 1 ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 
 ### Changed
 

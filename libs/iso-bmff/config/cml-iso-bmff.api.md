@@ -199,7 +199,7 @@ export type Entity = {
 };
 
 // @public
-export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V>;
+export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V> | EventMessageBoxUnrecognizedVersion;
 
 // @public
 export type EventMessageBoxBase = FullBox & {
@@ -209,6 +209,12 @@ export type EventMessageBoxBase = FullBox & {
     timescale: number;
     eventDuration: number;
     id: number;
+    messageData: Uint8Array;
+};
+
+// @public
+export type EventMessageBoxUnrecognizedVersion = FullBox & {
+    type: "emsg";
     messageData: Uint8Array;
 };
 

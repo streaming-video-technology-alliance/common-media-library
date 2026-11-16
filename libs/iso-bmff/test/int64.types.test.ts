@@ -242,10 +242,10 @@ describe('int64 option types', function () {
 				expectType<Equal<typeof box.mediaTime, bigint>>(true)
 				expectType<Equal<typeof box.ntpTimestampSec, number>>(true)
 			}
-			if (box.type === 'emsg' && box.version === 1) {
+			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 1) {
 				expectType<Equal<typeof box.presentationTime, bigint>>(true)
 			}
-			if (box.type === 'emsg' && box.version === 0) {
+			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 0) {
 				expectType<Equal<typeof box.presentationTimeDelta, number>>(true)
 			}
 		}
@@ -817,16 +817,16 @@ describe('int64 option types', function () {
 		const stored = { emsg: readEmsg }
 
 		for (const box of readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: stored })) {
-			if (box.type === 'emsg' && box.version === 1) {
+			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 1) {
 				expectType<Equal<typeof box.presentationTime, bigint>>(true)
 			}
-			if (box.type === 'emsg' && box.version === 0) {
+			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 0) {
 				expectType<Equal<typeof box.presentationTimeDelta, number>>(true)
 			}
 		}
 
 		for (const box of readIsoBoxes(buffer, { readers: stored })) {
-			if (box.type === 'emsg' && box.version === 1) {
+			if (box.type === 'emsg' && 'schemeIdUri' in box && box.version === 1) {
 				expectType<Equal<typeof box.presentationTime, number>>(true)
 			}
 		}

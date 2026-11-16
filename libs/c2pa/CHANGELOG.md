@@ -13,6 +13,7 @@ and this project adheres to
 - Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/c2pa](https://cml.svta.org/packages/c2pa/).
+- `validateC2paSegment` now skips an `emsg` box of a version other than 0 or 1 in the search for the VSI box ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 
 ## [1.7.0] - 2026-10-22
 
