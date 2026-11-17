@@ -44,3 +44,13 @@ export function prftBox(version: number): Uint8Array<ArrayBuffer> {
 export function cttsBox(version: number): Uint8Array<ArrayBuffer> {
 	return boxBytes('ctts', [version, 1], [0, 3], [1, 4], [1, 4], [-2, 4])
 }
+
+/**
+ * Builds a trun box with the flag 0x000800 and one sample, with a `sample_composition_time_offset` of the bytes `ff ff ff fe`.
+ *
+ * @param version - The version of the box. Version 0 has an unsigned offset, every other version has a signed offset.
+ * @returns The bytes of the box.
+ */
+export function trunBox(version: number): Uint8Array<ArrayBuffer> {
+	return boxBytes('trun', [version, 1], [0x800, 3], [1, 4], [-2, 4])
+}

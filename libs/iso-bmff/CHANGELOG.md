@@ -98,6 +98,7 @@ and this project adheres to
 - `readPrft` and `writePrft` now read and write `mediaTime` as a 64-bit field for a `prft` box of version 2 or above. Earlier releases use a 32-bit field for every version other than 1 ([#670](https://github.com/streaming-video-technology-alliance/common-media-library/issues/670)).
 - `readCtts` now returns `entryCount` and an empty `entries` list for a `ctts` box of version 2 or above. The syntax defines no entries for those versions. Earlier releases read the entries with the layout of version 0 ([#670](https://github.com/streaming-video-technology-alliance/common-media-library/issues/670)).
 - `writeCtts` now writes `entryCount` and no entries for a `ctts` box of version 2 or above. Earlier releases write every element of `entries` for every version ([#670](https://github.com/streaming-video-technology-alliance/common-media-library/issues/670)).
+- `readTrun` now reads `sampleCompositionTimeOffset` as a signed integer for a `trun` box of version 2 or above. Earlier releases read a signed integer only for version 1 ([#678](https://github.com/streaming-video-technology-alliance/common-media-library/issues/678)).
 
 ### Changed
 
