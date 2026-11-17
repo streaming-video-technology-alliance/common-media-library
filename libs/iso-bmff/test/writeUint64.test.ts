@@ -32,18 +32,4 @@ describe('IsoBoxWriteView.writeUint64', function () {
 		assert.throws(() => writer.writeUint64(BigInt(-1)), RangeError)
 		assert.throws(() => writer.writeUint64(BigInt('0x10000000000000000')), RangeError)
 	})
-
-	it('should be a compile error to call a method that is detached from the writer', function () {
-		const writer = new IsoBoxWriteView('test', 24)
-		/* oxlint-disable typescript/unbound-method */
-		const { writeUint64, writeWideUint, writeWideInt } = writer
-		/* oxlint-enable typescript/unbound-method */
-
-		// @ts-expect-error the method needs the writer as `this`
-		assert.throws(() => writeUint64(BigInt(1)), TypeError)
-		// @ts-expect-error the method needs the writer as `this`
-		assert.throws(() => writeWideUint(1, 4), TypeError)
-		// @ts-expect-error the method needs the writer as `this`
-		assert.throws(() => writeWideInt(1, 4), TypeError)
-	})
 })

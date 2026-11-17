@@ -116,7 +116,7 @@ export class IsoBoxWriteView {
 	 * @example
 	 * {@includeCode ../test/writeUint64.test.ts#example}
 	 */
-	writeUint64(this: IsoBoxWriteView, value: bigint): void {
+	writeUint64 = (value: bigint): void => {
 		if (BigInt.asUintN(64, value) !== value) {
 			throw new RangeError(
 				`writeUint64: value must be in the range 0 to 2^64 - 1, received ${value}`,
@@ -175,7 +175,7 @@ export class IsoBoxWriteView {
 	 * @example
 	 * {@includeCode ../test/writeWideUint.test.ts#example}
 	 */
-	writeWideUint(this: IsoBoxWriteView, value: number | bigint, size: 4 | 8): void {
+	writeWideUint = (value: number | bigint, size: 4 | 8): void => {
 		if (typeof value !== 'bigint') {
 			this.writeUint(value, size)
 		} else if (size === 8) {
@@ -201,7 +201,7 @@ export class IsoBoxWriteView {
 	 * @param size - The size, in bytes, of the value.
 	 * @throws RangeError if `value` is a `bigint` that does not fit in `size` bytes.
 	 */
-	writeWideInt(this: IsoBoxWriteView, value: number | bigint, size: 4 | 8): void {
+	writeWideInt = (value: number | bigint, size: 4 | 8): void => {
 		if (typeof value !== 'bigint') {
 			this.writeInt(value, size)
 		} else {
