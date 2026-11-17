@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- `decodeUtf8` converts UTF-8 bytes in a `DataView` or a `Uint8Array` to a string. Its bundle is smaller than the bundle of `decodeText`.
+
+### Fixed
+
+- Without `TextDecoder`, `decodeText` replaces each invalid UTF-8 byte sequence with U+FFFD, like `TextDecoder`. Before, some sequences gave other characters, and a code point above U+10FFFF threw a `RangeError`.
+- The TSDoc of `encodeText` states that the function needs `TextEncoder`.
+
 ## [1.7.1] - 2026-11-16
 
 ### Changed
