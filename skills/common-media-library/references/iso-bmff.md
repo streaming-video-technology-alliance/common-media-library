@@ -10,9 +10,10 @@ Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/is
 - Parse the boxes of an init or media segment, with full content for the box types that you need: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`
 - Read the track timescale, codec, or default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTfhd`, `readTrun`
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
+- Read 64-bit fields, such as a tfdt time at a 10 MHz timescale, with the exact value: `readInt64AsBigInt`, `createInt64OverflowReader`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
-- Write boxes to a ReadableStream: `createIsoBoxReadableStream`, `IsoBoxReadableStream`
-- Write or patch boxes, such as inserting emsg or rewriting tfdt: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`
+- Write or patch boxes, such as inserting emsg or rewriting tfdt, to byte arrays or a ReadableStream: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`, `createIsoBoxReadableStream`, `IsoBoxReadableStream`
+- Read or write a container box, such as moov or moof, with an optional named function: `readMoov`, `writeMoov`
 - Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
 
 Do not write your own box parser, box walker, or box writer. Open an issue for a box that is missing.
@@ -40,11 +41,11 @@ description: Parse ISO BMFF boxes from a buffer
 The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To parse the content of a box, provide a reader function for that box type.
 
 > [!NOTE]
-> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types.
+> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultReaderConfig()`. It returns a configuration with every available reader:
+If tree shaking is not a concern, use `defaultReaderConfig()`. It returns a configuration with every available reader except the container readers:
 
 ```typescript
 import { defaultReaderConfig, readIsoBoxes } from "@svta/cml-iso-bmff";
@@ -116,11 +117,185 @@ for (const box of boxes) {
 
 The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
 
+## Incomplete boxes
+
+A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw.
+
+The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
+
+The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes. The `size` field of the parsed box is the size of the source box.
+
+A writer builds a container or a sample entry from the child boxes of the parsed box. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes.
+
 ## Reading 64-bit fields
 
-The built-in readers return every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
+The built-in readers return every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit, and the reader then returns a rounded value. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
 
-If your code needs the exact value, write a custom reader that calls `readUint64`. The method returns a `bigint`:
+The `int64` option of the configuration takes a function that reads every 64-bit field of the built-in readers. The package exports two functions for the option. `readInt64AsBigInt` returns the exact value as a `bigint`. `createInt64OverflowReader` keeps the `number` and reports a rounded value.
+
+The option applies to these fields:
+
+| Box                    | Fields                                          |
+| ---------------------- | ----------------------------------------------- |
+| `tfdt`                 | `baseMediaDecodeTime`                           |
+| `sidx`                 | `earliestPresentationTime`, `firstOffset`       |
+| `tfra`                 | `time` and `moofOffset` of each entry           |
+| `prft`                 | `mediaTime`                                     |
+| `emsg`                 | `presentationTime` of a version 1 box           |
+| `mehd`                 | `fragmentDuration`                              |
+| `mvhd`, `mdhd`, `tkhd` | `creationTime`, `modificationTime`, `duration`  |
+| `elst`                 | `segmentDuration` and `mediaTime` of each entry |
+| `tfhd`                 | `baseDataOffset`                                |
+
+### Exact values as `bigint`
+
+Pass `readInt64AsBigInt` as the `int64` option. The built-in readers then return each field of the table as a `bigint`. The result type of `readIsoBoxes` follows the option:
+
+```typescript
+import {
+	defaultReaderConfig,
+	readInt64AsBigInt,
+	readIsoBoxes,
+} from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(
+	buffer,
+	defaultReaderConfig({ int64: readInt64AsBigInt }),
+);
+
+for (const box of boxes) {
+	if (box.type === "sidx") {
+		// earliestPresentationTime is a bigint.
+		const seconds = box.earliestPresentationTime / BigInt(box.timescale);
+		console.log(seconds);
+	}
+}
+```
+
+Pass the option as the argument of `defaultReaderConfig`. The readers of the returned configuration have the types of that option. If you add `readInt64AsBigInt` to the result of `defaultReaderConfig()` afterward, the code does not compile.
+
+The option works the same way with specific readers:
+
+```typescript
+import { readInt64AsBigInt, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: {
+		tfdt: readTfdt,
+	},
+});
+
+for (const box of boxes) {
+	if (box.type === "tfdt") {
+		// baseMediaDecodeTime is a bigint.
+		console.log(box.baseMediaDecodeTime);
+	}
+}
+```
+
+Each field has one type for every version of its box. A version 0 `tfdt` box stores `baseMediaDecodeTime` in 32 bits. The reader returns that field as a `bigint` too, so your code does not test `version`. The option also applies to the child boxes of a container.
+
+`readInt64AsBigInt` needs `BigInt` and does not test for it. On a runtime without `BigInt`, the read of a 64-bit field fails with the error of the runtime. If your code supports such a runtime, test `typeof BigInt === "function"` before you pass the function.
+
+`JSON.stringify` throws a `TypeError` for a `bigint`. To serialize a box with `bigint` fields, pass a replacer function that converts each `bigint` to a string.
+
+### Reporting a rounded value
+
+If your code keeps `number` fields, use `createInt64OverflowReader`. The function takes a callback and returns a function for the `int64` option. When a 64-bit value is outside the safe integer range, the callback receives a `RangeError`. If the callback returns, the read continues with the rounded value. If the callback throws, the read stops with that error.
+
+```typescript
+import {
+	createInt64OverflowReader,
+	readIsoBoxes,
+	readTfdt,
+} from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, {
+	int64: createInt64OverflowReader((error) => console.warn(error.message)),
+	readers: {
+		tfdt: readTfdt,
+	},
+});
+```
+
+The types of the result do not change, and the function does not need `BigInt`. The function checks the fields of the table above. The function does not check a call of `readUint(8)` in a custom reader. A configuration takes one function for the option. The configuration selects `bigint` fields or the report, not both.
+
+### Custom readers and the option
+
+A custom reader of the type `(view: IsoBoxReadView) => ...` works with no option and with `createInt64OverflowReader`. With `readInt64AsBigInt`, that reader is a compile error, because the view then has `bigint` fields. Use one of two forms:
+
+- A reader that reads no 64-bit field takes `IsoBoxReadView<IsoInt64>`. That type accepts the view of every configuration.
+- A reader that follows the option is generic. That reader reads each 64-bit field with `readWideUint` or `readWideInt`.
+
+`readWideUint` and `readWideInt` take the size of the field in bytes, 4 or 8. With no option, they return a `number`, as `readUint` and `readInt` do. With the option, they return the result of the `int64` function:
+
+```typescript
+import {
+	readInt64AsBigInt,
+	readIsoBoxes,
+	type IsoBoxReadView,
+	type IsoInt64,
+} from "@svta/cml-iso-bmff";
+
+const readTfdtWide = <V extends IsoInt64>(view: IsoBoxReadView<V>) => {
+	const { version, flags } = view.readFullBox();
+	const baseMediaDecodeTime = view.readWideUint(version === 1 ? 8 : 4);
+	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+};
+
+// baseMediaDecodeTime is a bigint in this result.
+const boxes = readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: {
+		tfdt: readTfdtWide,
+	},
+});
+
+// A readers map in a variable needs a type argument for a generic custom reader.
+const readers = { tfdt: readTfdtWide<bigint> };
+const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
+```
+
+A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`.
+
+### A function that forwards the option
+
+Your code can have a function that takes a configuration and passes that configuration to `readIsoBoxes`. Give the function a type parameter for the type of the 64-bit fields. The result type then follows the configuration of each call:
+
+```typescript
+import {
+	defaultReaderConfig,
+	readInt64AsBigInt,
+	readIsoBoxes,
+	type IsoBoxData,
+	type IsoBoxReadViewConfig,
+	type IsoInt64,
+	type ParsedIsoBox,
+} from "@svta/cml-iso-bmff";
+
+function readSegment<V extends IsoInt64 = number>(
+	data: IsoBoxData,
+	config: IsoBoxReadViewConfig<V>,
+): ParsedIsoBox<V>[] {
+	return readIsoBoxes(data, config);
+}
+
+// The 64-bit fields are numbers in this result.
+const plain = readSegment(buffer, defaultReaderConfig());
+
+// The 64-bit fields are bigints in this result.
+const exact = readSegment(
+	buffer,
+	defaultReaderConfig({ int64: readInt64AsBigInt }),
+);
+```
+
+Do not type the parameter as `IsoBoxReadViewConfig<IsoInt64>`. That type does not accept the result of `defaultReaderConfig({ int64: readInt64AsBigInt })`.
+
+### A custom reader for one field
+
+If your code needs the exact value of one field only, a custom reader can call `readUint64`. The method returns a `bigint` and needs no option:
 
 ```typescript
 import { readIsoBoxes, type IsoBoxReadView } from "@svta/cml-iso-bmff";
@@ -132,10 +307,6 @@ const readTfdt64 = (view: IsoBoxReadView) => {
 	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
 };
 
-const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
-	r.arrayBuffer(),
-);
-
 const boxes = readIsoBoxes(buffer, {
 	readers: {
 		tfdt: readTfdt64,
@@ -143,7 +314,7 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
-`IsoBoxWriteView.writeUint64` is the matching method for writing a `bigint`.
+The built-in writers write a `bigint` field with the exact value. See [Writing 64-bit fields](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md#writing-64-bit-fields).
 
 <!-- libs/iso-bmff/docs/utilities.md -->
 ---
@@ -180,6 +351,22 @@ const box: IsoBox = { type: "meta", version: 0, flags: 0, boxes: [] };
 const container = isContainer(box);
 ```
 
+After `isContainer` returns `true`, each element of `box.boxes` has a box type. Test the `type` of a child before you read a field of that child.
+
+```typescript
+import { defaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bmff";
+
+for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+	if (isContainer(box)) {
+		for (const child of box.boxes) {
+			if (child.type === "tfdt") {
+				console.log(child.baseMediaDecodeTime);
+			}
+		}
+	}
+}
+```
+
 `isFullBox` checks whether a box is a full box.
 
 ```typescript
@@ -205,11 +392,15 @@ The `writeIsoBoxes` function writes boxes. It takes an array of streamable items
 If you provide raw box objects, also provide a configuration object that names the writers for those box types.
 
 > [!NOTE]
-> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types.
+> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
+>
+> The function does not write a box of another type as a container, even if the box has a `boxes` field. Examples are `meta` and the sample entries. If the `writers` map has no writer for such a type, the function writes the `view` bytes of a parsed box. For a box with no `view`, the function throws `No writer found for box type`.
+
+A write omits the bytes of a source box that the reader stops before. See [Incomplete boxes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#incomplete-boxes).
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer:
+If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer except the container writers:
 
 ```typescript
 import { defaultWriterConfig, writeIsoBoxes, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
@@ -313,9 +504,72 @@ readableStream.pipeTo(stream.writable);
 
 ## Writing 64-bit fields
 
-The built-in writers take every integer field as a `number`. A `number` holds integers up to 2^53 - 1 exactly. A 64-bit field can exceed that limit. One example is `baseMediaDecodeTime` in a version 1 `tfdt` box with a 10 MHz timescale and a wall-clock origin.
+The built-in writers take each 64-bit field as a `number` or as a `bigint`. A `number` holds integers up to 2^53 - 1 exactly, and a `bigint` holds the exact value. The guide [Reading 64-bit fields](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#reading-64-bit-fields) lists the fields.
 
-If your code has the exact value as a `bigint`, write the box with `IsoBoxWriteView` and call `writeUint64`:
+A box that `readIsoBoxes` reads with `readInt64AsBigInt` has `bigint` fields. The writers write that box with no conversion, and the writer configuration needs no option:
+
+```typescript
+import {
+	readInt64AsBigInt,
+	readIsoBoxes,
+	readTfdt,
+	writeIsoBox,
+	writeTfdt,
+} from "@svta/cml-iso-bmff";
+
+const [tfdt] = readIsoBoxes(buffer, {
+	int64: readInt64AsBigInt,
+	readers: {
+		tfdt: readTfdt,
+	},
+});
+
+if (tfdt?.type === "tfdt") {
+	tfdt.baseMediaDecodeTime += BigInt(90000);
+
+	const bytes = writeIsoBox(tfdt, { writers: { tfdt: writeTfdt } });
+}
+```
+
+A raw box object can hold a `bigint` too:
+
+```typescript
+import { writeIsoBox, writeTfdt } from "@svta/cml-iso-bmff";
+
+const bytes = writeIsoBox(
+	{
+		type: "tfdt",
+		version: 1,
+		flags: 0,
+		baseMediaDecodeTime: BigInt("17900000000000000"),
+	},
+	{ writers: { tfdt: writeTfdt } },
+);
+```
+
+A writer throws a `RangeError` for a `bigint` that does not fit the field. One example is a value above 2^32 - 1 in a version 0 box.
+
+A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined.
+
+A custom writer calls `writeWideUint` or `writeWideInt` on `IsoBoxWriteView`. Both methods take a `number` or a `bigint`, and the size of the field in bytes, 4 or 8:
+
+```typescript
+import {
+	IsoBoxWriteView,
+	type IsoInt64,
+	type TrackFragmentBaseMediaDecodeTimeBox,
+} from "@svta/cml-iso-bmff";
+
+const writeTfdtWide = (box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>) => {
+	const size = box.version === 1 ? 8 : 4;
+	const writer = new IsoBoxWriteView("tfdt", 12 + size);
+	writer.writeFullBox(box.version, box.flags);
+	writer.writeWideUint(box.baseMediaDecodeTime, size);
+	return writer;
+};
+```
+
+`writeUint64` writes a 64-bit field from a `bigint` only:
 
 ```typescript
 import { IsoBoxWriteView } from "@svta/cml-iso-bmff";
@@ -330,7 +584,7 @@ const writeTfdt64 = (baseMediaDecodeTime: bigint) => {
 const tfdt = writeTfdt64(BigInt("17900000000000000"));
 ```
 
-The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects. `IsoBoxReadView.readUint64` is the matching method for reading a `bigint`.
+The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects.
 
 ## Type safety
 
@@ -381,13 +635,13 @@ const box: IsoBoxMap["ftyp"] = {
 import { ValueOf } from '@svta/cml-utils';
 
 // @public
-export type AdditionalMetadataContainerBox = {
+export type AdditionalMetadataContainerBox<V extends IsoInt64 = number> = {
     type: "meco";
-    boxes: AdditionalMetadataContainerBoxChild[];
+    boxes: AdditionalMetadataContainerBoxChild<V>[];
 };
 
 // @public
-export type AdditionalMetadataContainerBoxChild = any;
+export type AdditionalMetadataContainerBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export type AudioRenderingIndicationBox = FullBox & {
@@ -460,13 +714,16 @@ export type CompositionTimeToSampleEntry = {
 export const CONTAINERS: string[];
 
 // @public
-export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView) => AudioSampleEntryBox<T>;
+export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => AudioSampleEntryBox<T>;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
+export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader;
 
 // @public
-export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView) => VisualSampleEntryBox<T>;
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
+
+// @public
+export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntryBox<T>;
 
 // @public
 export const DATA: "data";
@@ -514,7 +771,16 @@ export type DecodingTimeToSampleBox = FullBox & {
 };
 
 // @public
-export function defaultReaderConfig(): IsoBoxReadViewConfig;
+export function defaultReaderConfig<V extends IsoInt64 = number>(...options: [V] extends [bigint] ? [options: {
+    int64: IsoInt64Reader<V>;
+}] : [options?: {
+    int64?: IsoInt64Reader<V>;
+}]): IsoBoxReadViewConfig<V>;
+
+// @public
+export function defaultReaderConfig(options?: {
+    int64?: IsoInt64Reader;
+}): IsoBoxReadViewConfig;
 
 // @public
 export function defaultWriterConfig(): IsoBoxWriteViewConfig;
@@ -526,25 +792,25 @@ export type DegradationPriorityBox = FullBox & {
 };
 
 // @public
-export type EditBox = {
+export type EditBox<V extends IsoInt64 = number> = {
     type: "edts";
-    boxes: EditBoxChild[];
+    boxes: EditBoxChild<V>[];
 };
 
 // @public
-export type EditBoxChild = EditListBox;
+export type EditBoxChild<V extends IsoInt64 = number> = EditListBox<V>;
 
 // @public
-export type EditListBox = FullBox & {
+export type EditListBox<V extends IsoInt64 = number> = FullBox & {
     type: "elst";
     entryCount: number;
-    entries: EditListEntry[];
+    entries: EditListEntry<V>[];
 };
 
 // @public
-export type EditListEntry = {
-    segmentDuration: number;
-    mediaTime: number;
+export type EditListEntry<V extends IsoInt64 = number> = {
+    segmentDuration: V;
+    mediaTime: V;
     mediaRateInteger: number;
     mediaRateFraction: number;
 };
@@ -561,7 +827,7 @@ export type Entity = {
 };
 
 // @public
-export type EventMessageBox = EventMessageBoxV0 | EventMessageBoxV1;
+export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V> | EventMessageBoxUnrecognizedVersion;
 
 // @public
 export type EventMessageBoxBase = FullBox & {
@@ -575,15 +841,25 @@ export type EventMessageBoxBase = FullBox & {
 };
 
 // @public
+export type EventMessageBoxUnrecognizedVersion = EventMessageBoxBase & {
+    version: EventMessageBoxUnrecognizedVersionNumber;
+    presentationTimeDelta: number;
+    presentationTime: number;
+};
+
+// @public
+export type EventMessageBoxUnrecognizedVersionNumber<A extends number[] = [0, 1]> = A["length"] extends 256 ? Exclude<A[number], 0 | 1> : EventMessageBoxUnrecognizedVersionNumber<[...A, A["length"]]>;
+
+// @public
 export type EventMessageBoxV0 = EventMessageBoxBase & {
     version: 0;
     presentationTimeDelta: number;
 };
 
 // @public
-export type EventMessageBoxV1 = EventMessageBoxBase & {
+export type EventMessageBoxV1<V extends IsoInt64 = number> = EventMessageBoxBase & {
     version: 1;
-    presentationTime: number;
+    presentationTime: V;
 };
 
 // @public
@@ -623,13 +899,13 @@ export type FullBox = {
 };
 
 // @public
-export type GroupsListBox = {
+export type GroupsListBox<V extends IsoInt64 = number> = {
     type: "grpl";
-    boxes: GroupsListBoxChild[];
+    boxes: GroupsListBoxChild<V>[];
 };
 
 // @public
-export type GroupsListBoxChild = any;
+export type GroupsListBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export type HandlerReferenceBox = FullBox & {
@@ -666,40 +942,45 @@ export type IpmpInfoBox = FullBox & {
 };
 
 // @public
-export function isContainer<T extends IsoBox | Box<IsoBox["type"]>>(box: T): box is T & IsoBoxContainer;
+export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]>>(box: T): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never] ? T & IsoBoxContainer<IsoInt64> : Extract<T, IsoBoxContainer<IsoInt64>>;
 
 // @public
 export function isFullBox(box: any): box is FullBox;
 
 // @public
+export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
+    view: IsoBoxReadView<V>;
+} | null | undefined): box is IsoBoxMap<V>[T];
+
+// @public
 export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T];
 
 // @public
-export type IsoBox = IsoBoxMap[keyof IsoBoxMap];
+export type IsoBox<V extends IsoInt64 = number> = IsoBoxMap<V>[keyof IsoBoxMap<V>];
 
 // @public
-export type IsoBoxContainer = IsoBoxContainerMap[keyof IsoBoxContainerMap];
+export type IsoBoxContainer<V extends IsoInt64 = number> = IsoBoxContainerMap<V>[keyof IsoBoxContainerMap<V>];
 
 // @public
-export type IsoBoxContainerMap = {
+export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
     dinf: DataInformationBox;
-    edts: EditBox;
-    grpl: GroupsListBox;
-    mdia: MediaBox;
-    meco: AdditionalMetadataContainerBox;
-    mfra: MovieFragmentRandomAccessBox;
+    edts: EditBox<V>;
+    grpl: GroupsListBox<V>;
+    mdia: MediaBox<V>;
+    meco: AdditionalMetadataContainerBox<V>;
+    mfra: MovieFragmentRandomAccessBox<V>;
     minf: MediaInformationBox;
-    moof: MovieFragmentBox;
-    moov: MovieBox;
-    mvex: MovieExtendsBox;
+    moof: MovieFragmentBox<V>;
+    moov: MovieBox<V>;
+    mvex: MovieExtendsBox<V>;
     schi: SchemeInformationBox;
     sinf: ProtectionSchemeInformationBox;
     stbl: SampleTableBox;
-    strk: SubTrackBox;
-    traf: TrackFragmentBox;
-    trak: TrackBox;
+    strk: SubTrackBox<V>;
+    traf: TrackFragmentBox<V>;
+    trak: TrackBox<V>;
     tref: TrackReferenceBox;
-    udta: UserDataBox;
+    udta: UserDataBox<V>;
     vttc: WebVttCueBox;
 };
 
@@ -720,7 +1001,7 @@ export const IsoBoxFields: {
 export type IsoBoxFields = ValueOf<typeof IsoBoxFields>;
 
 // @public
-export type IsoBoxMap = {
+export type IsoBoxMap<V extends IsoInt64 = number> = {
     ardi: AudioRenderingIndicationBox;
     avc1: VisualSampleEntryBox<"avc1">;
     avc2: VisualSampleEntryBox<"avc2">;
@@ -730,16 +1011,16 @@ export type IsoBoxMap = {
     ctts: CompositionTimeToSampleBox;
     dinf: DataInformationBox;
     dref: DataReferenceBox;
-    edts: EditBox;
+    edts: EditBox<V>;
     elng: ExtendedLanguageBox;
-    elst: EditListBox;
-    emsg: EventMessageBox;
+    elst: EditListBox<V>;
+    emsg: EventMessageBox<V>;
     enca: AudioSampleEntryBox<"enca">;
     encv: VisualSampleEntryBox<"encv">;
     free: FreeSpaceBox<"free">;
     frma: OriginalFormatBox;
     ftyp: FileTypeBox;
-    grpl: GroupsListBox;
+    grpl: GroupsListBox<V>;
     hdlr: HandlerReferenceBox;
     hev1: VisualSampleEntryBox<"hev1">;
     hmhd: HintMediaHeaderBox;
@@ -755,24 +1036,24 @@ export type IsoBoxMap = {
     kind: TrackKindBox;
     labl: LabelBox;
     mdat: MediaDataBox;
-    mdhd: MediaHeaderBox;
-    mdia: MediaBox;
-    meco: AdditionalMetadataContainerBox;
-    mehd: MovieExtendsHeaderBox;
-    meta: MetaBox;
+    mdhd: MediaHeaderBox<V>;
+    mdia: MediaBox<V>;
+    meco: AdditionalMetadataContainerBox<V>;
+    mehd: MovieExtendsHeaderBox<V>;
+    meta: MetaBox<V>;
     mfhd: MovieFragmentHeaderBox;
-    mfra: MovieFragmentRandomAccessBox;
+    mfra: MovieFragmentRandomAccessBox<V>;
     mfro: MovieFragmentRandomAccessOffsetBox;
     minf: MediaInformationBox;
-    moof: MovieFragmentBox;
-    moov: MovieBox;
+    moof: MovieFragmentBox<V>;
+    moov: MovieBox<V>;
     mp4a: AudioSampleEntryBox<"mp4a">;
-    mvex: MovieExtendsBox;
-    mvhd: MovieHeaderBox;
+    mvex: MovieExtendsBox<V>;
+    mvhd: MovieHeaderBox<V>;
     nmhd: NullMediaHeaderBox;
     payl: WebVttCuePayloadBox;
     pitm: PrimaryItemBox;
-    prft: ProducerReferenceTimeBox;
+    prft: ProducerReferenceTimeBox<V>;
     prsl: PreselectionGroupBox;
     pssh: ProtectionSystemSpecificHeaderBox;
     saio: SampleAuxiliaryInformationOffsetsBox;
@@ -783,7 +1064,7 @@ export type IsoBoxMap = {
     sdtp: SampleDependencyTypeBox;
     senc: SampleEncryptionBox;
     sgpd: SampleGroupDescriptionBox;
-    sidx: SegmentIndexBox;
+    sidx: SegmentIndexBox<V>;
     sinf: ProtectionSchemeInformationBox;
     skip: FreeSpaceBox<"skip">;
     smhd: SoundMediaHeaderBox;
@@ -792,7 +1073,7 @@ export type IsoBoxMap = {
     stco: ChunkOffsetBox;
     stdp: DegradationPriorityBox;
     sthd: SubtitleMediaHeaderBox;
-    strk: SubTrackBox;
+    strk: SubTrackBox<V>;
     stsc: SampleToChunkBox;
     stsd: SampleDescriptionBox;
     stsh: ShadowSyncSampleBox;
@@ -804,16 +1085,16 @@ export type IsoBoxMap = {
     subs: SubsampleInformationBox;
     stz2: CompactSampleSizeBox;
     tenc: TrackEncryptionBox;
-    tfdt: TrackFragmentBaseMediaDecodeTimeBox;
-    tfhd: TrackFragmentHeaderBox;
-    tfra: TrackFragmentRandomAccessBox;
-    tkhd: TrackHeaderBox;
-    traf: TrackFragmentBox;
-    trak: TrackBox;
+    tfdt: TrackFragmentBaseMediaDecodeTimeBox<V>;
+    tfhd: TrackFragmentHeaderBox<V>;
+    tfra: TrackFragmentRandomAccessBox<V>;
+    tkhd: TrackHeaderBox<V>;
+    traf: TrackFragmentBox<V>;
+    trak: TrackBox<V>;
     tref: TrackReferenceBox;
     trex: TrackExtendsBox;
     trun: TrackRunBox;
-    udta: UserDataBox;
+    udta: UserDataBox<V>;
     "url ": DataEntryUrlBox;
     "urn ": DataEntryUrnBox;
     vlab: WebVttSourceLabelBox;
@@ -827,24 +1108,26 @@ export type IsoBoxMap = {
 //
 // @public
 export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
-    constructor(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig);
+    constructor(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig);
 }
 
 // @public
-export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType> = (view: IsoBoxReadView, type: T) => B;
+export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = number> = (view: IsoBoxReadView<V>, type: T) => B;
 
 // @public
-export type IsoBoxReaderMap = Record<IsoBoxType, IsoBoxReader>;
+export type IsoBoxReaderMap<V extends IsoInt64 = number> = Record<IsoBoxType, IsoBoxReader<unknown, IsoBoxType, V>>;
 
 // @public
-export type IsoBoxReaderReturn<T> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? ParsedBox<B> : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? ParsedBox<([string] extends [R] ? IsoBox : Exclude<IsoBox, {
+export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? ParsedBox<0 extends 1 & B ? B : [B] extends [{
+        type: infer N extends keyof IsoBoxMap;
+    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : B, V> : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? ParsedBox<([string] extends [R] ? IsoBox<V> : Exclude<IsoBox<V>, {
     type: R;
-}>) | Box> : never);
+}>) | Box, V> : never);
 
 // @public
-export class IsoBoxReadView {
-    [Symbol.iterator](): Generator<ParsedIsoBox>;
-    constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig);
+export class IsoBoxReadView<V extends IsoInt64 = number> {
+    [Symbol.iterator](): Generator<ParsedIsoBox<V>>;
+    constructor(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadViewConfig<V>] : [config?: IsoBoxReadViewConfig<V>]);
     get buffer(): ArrayBufferLike;
     get byteLength(): number;
     get byteOffset(): number;
@@ -853,8 +1136,8 @@ export class IsoBoxReadView {
     get done(): boolean;
     jump: (size: number) => void;
     readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
-    readBox: () => ParsedBox;
-    readBoxes: <T = IsoBox>(length?: number) => T[];
+    readBox: () => ParsedBox<Box, V>;
+    readBoxes: <T = IsoBox<V>>(length?: number) => T[];
     readData: (size: number) => Uint8Array;
     readEntries: <T>(length: number, map: () => T) => T[];
     readFullBox: () => FullBox;
@@ -864,16 +1147,22 @@ export class IsoBoxReadView {
     readUint: (size: number) => number;
     readUint64: () => bigint;
     readUtf8: (size?: number) => string;
-    slice: (offset: number, size: number) => IsoBoxReadView;
+    readWideInt: (size: 4 | 8) => V;
+    readWideUint: (size: 4 | 8) => V;
+    slice: (offset: number, size: number) => IsoBoxReadView<V>;
 }
 
 // @public
-export type IsoBoxReadViewConfig = {
-    readers?: IsoBoxReaderMap;
-};
+export type IsoBoxReadViewConfig<V extends IsoInt64 = number> = {
+    readers?: NoInfer<IsoBoxReaderMap<V>>;
+} & ([V] extends [bigint] ? {
+    int64: IsoInt64Reader<V>;
+} : {
+    int64?: IsoInt64Reader<V>;
+});
 
 // @public
-export type IsoBoxStreamable = IsoBox | ParsedIsoBox | ParsedBox<unknown> | ArrayBufferView;
+export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | ParsedBox<unknown, V> | ArrayBufferView;
 
 // @public
 export type IsoBoxType = `${string}${string}${string}${string}`;
@@ -901,6 +1190,8 @@ export class IsoBoxWriteView {
     writeUint: (value: number, size: number) => void;
     writeUint64: (value: bigint) => void;
     writeUtf8TerminatedString: (value: string) => void;
+    writeWideInt: (value: number | bigint, size: 4 | 8) => void;
+    writeWideUint: (value: number | bigint, size: 4 | 8) => void;
 }
 
 // @public
@@ -919,7 +1210,13 @@ export type IsoFieldTypeMap = {
 };
 
 // @public
-export type IsoTypedParsedBox<T extends keyof IsoBoxMap> = ParsedBox<IsoBoxMap[T]>;
+export type IsoInt64 = number | bigint;
+
+// @public
+export type IsoInt64Reader<V extends IsoInt64 = number> = (view: IsoBoxReadView<IsoInt64>, size: 4 | 8, signed: boolean) => V;
+
+// @public
+export type IsoTypedParsedBox<T extends keyof IsoBoxMap, V extends IsoInt64 = number> = ParsedBox<IsoBoxMap<V>[T], V>;
 
 // @public
 export type ItemExtent = {
@@ -998,13 +1295,13 @@ export type LabelBox = FullBox & {
 };
 
 // @public
-export type MediaBox = {
+export type MediaBox<V extends IsoInt64 = number> = {
     type: "mdia";
-    boxes: MediaBoxChild[];
+    boxes: MediaBoxChild<V>[];
 };
 
 // @public
-export type MediaBoxChild = MediaHeaderBox | HandlerReferenceBox | MediaInformationBox;
+export type MediaBoxChild<V extends IsoInt64 = number> = MediaHeaderBox<V> | HandlerReferenceBox | MediaInformationBox;
 
 // @public
 export type MediaDataBox = {
@@ -1013,12 +1310,12 @@ export type MediaDataBox = {
 };
 
 // @public
-export type MediaHeaderBox = FullBox & {
+export type MediaHeaderBox<V extends IsoInt64 = number> = FullBox & {
     type: "mdhd";
-    creationTime: number;
-    modificationTime: number;
+    creationTime: V;
+    modificationTime: V;
     timescale: number;
-    duration: number;
+    duration: V;
     language: string;
     preDefined: number;
 };
@@ -1033,46 +1330,46 @@ export type MediaInformationBox = {
 export type MediaInformationBoxChild = VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox | SubtitleMediaHeaderBox;
 
 // @public
-export type MetaBox = FullBox & {
+export type MetaBox<V extends IsoInt64 = number> = FullBox & {
     type: "meta";
-    boxes: MetaBoxChild[];
+    boxes: MetaBoxChild<V>[];
 };
 
 // @public
-export type MetaBoxChild = HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox | GroupsListBox;
+export type MetaBoxChild<V extends IsoInt64 = number> = HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox | GroupsListBox<V>;
 
 // @public
-export type MovieBox = {
+export type MovieBox<V extends IsoInt64 = number> = {
     type: "moov";
-    boxes: MovieBoxChild[];
+    boxes: MovieBoxChild<V>[];
 };
 
 // @public
-export type MovieBoxChild = MovieHeaderBox | TrackBox | MovieExtendsBox | UserDataBox;
+export type MovieBoxChild<V extends IsoInt64 = number> = MovieHeaderBox<V> | TrackBox<V> | MovieExtendsBox<V> | UserDataBox<V>;
 
 // @public
-export type MovieExtendsBox = {
+export type MovieExtendsBox<V extends IsoInt64 = number> = {
     type: "mvex";
-    boxes: MovieExtendsBoxChild[];
+    boxes: MovieExtendsBoxChild<V>[];
 };
 
 // @public
-export type MovieExtendsBoxChild = MovieExtendsHeaderBox | TrackExtendsBox;
+export type MovieExtendsBoxChild<V extends IsoInt64 = number> = MovieExtendsHeaderBox<V> | TrackExtendsBox;
 
 // @public
-export type MovieExtendsHeaderBox = FullBox & {
+export type MovieExtendsHeaderBox<V extends IsoInt64 = number> = FullBox & {
     type: "mehd";
-    fragmentDuration: number;
+    fragmentDuration: V;
 };
 
 // @public
-export type MovieFragmentBox = {
+export type MovieFragmentBox<V extends IsoInt64 = number> = {
     type: "moof";
-    boxes: MovieFragmentBoxChild[];
+    boxes: MovieFragmentBoxChild<V>[];
 };
 
 // @public
-export type MovieFragmentBoxChild = MovieFragmentHeaderBox | TrackFragmentBox;
+export type MovieFragmentBoxChild<V extends IsoInt64 = number> = MovieFragmentHeaderBox | TrackFragmentBox<V>;
 
 // @public
 export type MovieFragmentHeaderBox = FullBox & {
@@ -1081,13 +1378,13 @@ export type MovieFragmentHeaderBox = FullBox & {
 };
 
 // @public
-export type MovieFragmentRandomAccessBox = {
+export type MovieFragmentRandomAccessBox<V extends IsoInt64 = number> = {
     type: "mfra";
-    boxes: MovieFragmentRandomAccessBoxChild[];
+    boxes: MovieFragmentRandomAccessBoxChild<V>[];
 };
 
 // @public
-export type MovieFragmentRandomAccessBoxChild = TrackFragmentRandomAccessBox | MovieFragmentRandomAccessOffsetBox;
+export type MovieFragmentRandomAccessBoxChild<V extends IsoInt64 = number> = TrackFragmentRandomAccessBox<V> | MovieFragmentRandomAccessOffsetBox;
 
 // @public
 export type MovieFragmentRandomAccessOffsetBox = FullBox & {
@@ -1096,12 +1393,12 @@ export type MovieFragmentRandomAccessOffsetBox = FullBox & {
 };
 
 // @public
-export type MovieHeaderBox = FullBox & {
+export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
     type: "mvhd";
-    creationTime: number;
-    modificationTime: number;
+    creationTime: V;
+    modificationTime: V;
     timescale: number;
-    duration: number;
+    duration: V;
     rate: number;
     volume: number;
     reserved1: number;
@@ -1123,15 +1420,15 @@ export type OriginalFormatBox = {
 };
 
 // @public
-export type ParsedBox<T = Box> = (T extends IsoBox ? T & Omit<Box, "type"> : T) & {
-    view: IsoBoxReadView;
+export type ParsedBox<T = Box, V extends IsoInt64 = number> = (T extends IsoBox<V> ? T & Omit<Box, "type"> : T) & {
+    view: IsoBoxReadView<V>;
     size: number;
     largesize?: number;
     usertype?: number[];
 };
 
 // @public
-export type ParsedIsoBox = ParsedBox<IsoBox | Box>;
+export type ParsedIsoBox<V extends IsoInt64 = number> = ParsedBox<IsoBox<V> | Box, V>;
 
 // @public
 export type PreselectionGroupBox = FullBox & {
@@ -1155,12 +1452,12 @@ export type PrimaryItemBox = FullBox & {
 };
 
 // @public
-export type ProducerReferenceTimeBox = FullBox & {
+export type ProducerReferenceTimeBox<V extends IsoInt64 = number> = FullBox & {
     type: "prft";
     referenceTrackId: number;
     ntpTimestampSec: number;
     ntpTimestampFrac: number;
-    mediaTime: number;
+    mediaTime: V;
 };
 
 // @public
@@ -1183,198 +1480,270 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 };
 
 // @public
-export function readArdi(view: IsoBoxReadView): AudioRenderingIndicationBox;
+export function readArdi(view: IsoBoxReadView<IsoInt64>): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView): AudioSampleEntryBox<T>;
+export function readAudioSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView<IsoInt64>): AudioSampleEntryBox<T>;
 
 // @public
-export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<"avc1">;
+export function readAvc1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"avc1">;
 
 // @public
-export function readAvc2(view: IsoBoxReadView): VisualSampleEntryBox<"avc2">;
+export function readAvc2(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"avc2">;
 
 // @public
-export function readAvc3(view: IsoBoxReadView): VisualSampleEntryBox<"avc3">;
+export function readAvc3(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"avc3">;
 
 // @public
-export function readAvc4(view: IsoBoxReadView): VisualSampleEntryBox<"avc4">;
+export function readAvc4(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"avc4">;
 
 // @public
-export function readCtts(view: IsoBoxReadView): CompositionTimeToSampleBox;
+export function readCtts(view: IsoBoxReadView<IsoInt64>): CompositionTimeToSampleBox;
 
 // @public
-export function readDref(view: IsoBoxReadView): DataReferenceBox;
+export function readDinf(view: IsoBoxReadView<IsoInt64>): DataInformationBox;
 
 // @public
-export function readElng(view: IsoBoxReadView): ExtendedLanguageBox;
+export function readDref(view: IsoBoxReadView<IsoInt64>): DataReferenceBox;
 
 // @public
-export function readElst(view: IsoBoxReadView): EditListBox;
+export function readEdts<V extends IsoInt64>(view: IsoBoxReadView<V>): EditBox<V>;
 
 // @public
-export function readEmsg(view: IsoBoxReadView): EventMessageBox;
+export function readElng(view: IsoBoxReadView<IsoInt64>): ExtendedLanguageBox;
 
 // @public
-export function readEnca(view: IsoBoxReadView): AudioSampleEntryBox<"enca">;
+export function readElst<V extends IsoInt64>(view: IsoBoxReadView<V>): EditListBox<V>;
 
 // @public
-export function readEncv(view: IsoBoxReadView): VisualSampleEntryBox<"encv">;
+export function readEmsg<V extends IsoInt64>(view: IsoBoxReadView<V>): EventMessageBox<V>;
 
 // @public
-export function readFree(view: IsoBoxReadView): FreeSpaceBox;
+export function readEnca(view: IsoBoxReadView<IsoInt64>): AudioSampleEntryBox<"enca">;
 
 // @public
-export function readFrma(view: IsoBoxReadView): OriginalFormatBox;
+export function readEncv(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"encv">;
 
 // @public
-export function readFtyp(view: IsoBoxReadView): FileTypeBox;
+export function readFree(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox;
 
 // @public
-export function readHdlr(view: IsoBoxReadView): HandlerReferenceBox;
+export function readFrma(view: IsoBoxReadView<IsoInt64>): OriginalFormatBox;
 
 // @public
-export function readHev1(view: IsoBoxReadView): VisualSampleEntryBox<"hev1">;
+export function readFtyp(view: IsoBoxReadView<IsoInt64>): FileTypeBox;
 
 // @public
-export function readHvc1(view: IsoBoxReadView): VisualSampleEntryBox<"hvc1">;
+export function readGrpl<V extends IsoInt64>(view: IsoBoxReadView<V>): GroupsListBox<V>;
 
 // @public
-export function readIden(view: IsoBoxReadView): WebVttCueIdBox;
+export function readHdlr(view: IsoBoxReadView<IsoInt64>): HandlerReferenceBox;
 
 // @public
-export function readImda(view: IsoBoxReadView): IdentifiedMediaDataBox;
+export function readHev1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"hev1">;
 
 // @public
-export function readIsoBoxes<const R extends IsoBoxReaderMap>(raw: IsoBoxData, config: IsoBoxReadViewConfig & {
+export function readHvc1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<"hvc1">;
+
+// @public
+export function readIden(view: IsoBoxReadView<IsoInt64>): WebVttCueIdBox;
+
+// @public
+export function readImda(view: IsoBoxReadView<IsoInt64>): IdentifiedMediaDataBox;
+
+// @public
+export function readInt64AsBigInt(view: IsoBoxReadView<IsoInt64>, size: 4 | 8, signed: boolean): bigint;
+
+// @public
+export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoInt64 = number>(raw: IsoBoxData, config: IsoBoxReadViewConfig<V> & {
     readers: R;
-}): IsoBoxReaderReturn<R>[];
+}): IsoBoxReaderReturn<R, V>[];
 
-// @public (undocumented)
+// @public
+export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadViewConfig<V>] : [config?: IsoBoxReadViewConfig<V>]): ParsedIsoBox<V>[];
+
+// @public
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[];
 
 // @public
-export function readKind(view: IsoBoxReadView): TrackKindBox;
+export function readKind(view: IsoBoxReadView<IsoInt64>): TrackKindBox;
 
 // @public
-export function readLabl(view: IsoBoxReadView): LabelBox;
+export function readLabl(view: IsoBoxReadView<IsoInt64>): LabelBox;
 
 // @public
-export function readMdat(view: IsoBoxReadView): MediaDataBox;
+export function readMdat(view: IsoBoxReadView<IsoInt64>): MediaDataBox;
 
 // @public
-export function readMdhd(view: IsoBoxReadView): MediaHeaderBox;
+export function readMdhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MediaHeaderBox<V>;
 
 // @public
-export function readMehd(view: IsoBoxReadView): MovieExtendsHeaderBox;
+export function readMdia<V extends IsoInt64>(view: IsoBoxReadView<V>): MediaBox<V>;
 
 // @public
-export function readMeta(view: IsoBoxReadView): MetaBox;
+export function readMeco<V extends IsoInt64>(view: IsoBoxReadView<V>): AdditionalMetadataContainerBox<V>;
 
 // @public
-export function readMfhd(view: IsoBoxReadView): MovieFragmentHeaderBox;
+export function readMehd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieExtendsHeaderBox<V>;
 
 // @public
-export function readMfro(view: IsoBoxReadView): MovieFragmentRandomAccessOffsetBox;
+export function readMeta<V extends IsoInt64>(view: IsoBoxReadView<V>): MetaBox<V>;
 
 // @public
-export function readMp4a(view: IsoBoxReadView): AudioSampleEntryBox<"mp4a">;
+export function readMfhd(view: IsoBoxReadView<IsoInt64>): MovieFragmentHeaderBox;
 
 // @public
-export function readMvhd(view: IsoBoxReadView): MovieHeaderBox;
+export function readMfra<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieFragmentRandomAccessBox<V>;
 
 // @public
-export function readPayl(view: IsoBoxReadView): WebVttCuePayloadBox;
+export function readMfro(view: IsoBoxReadView<IsoInt64>): MovieFragmentRandomAccessOffsetBox;
 
 // @public
-export function readPrft(view: IsoBoxReadView): ProducerReferenceTimeBox;
+export function readMinf(view: IsoBoxReadView<IsoInt64>): MediaInformationBox;
 
 // @public
-export function readPrsl(view: IsoBoxReadView): PreselectionGroupBox;
+export function readMoof<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieFragmentBox<V>;
 
 // @public
-export function readPssh(view: IsoBoxReadView): ProtectionSystemSpecificHeaderBox;
+export function readMoov<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieBox<V>;
 
 // @public
-export function readSchm(view: IsoBoxReadView): SchemeTypeBox;
+export function readMp4a(view: IsoBoxReadView<IsoInt64>): AudioSampleEntryBox<"mp4a">;
 
 // @public
-export function readSdtp(view: IsoBoxReadView): SampleDependencyTypeBox;
+export function readMvex<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieExtendsBox<V>;
 
 // @public
-export function readSidx(view: IsoBoxReadView): SegmentIndexBox;
+export function readMvhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieHeaderBox<V>;
 
 // @public
-export function readSkip(view: IsoBoxReadView): FreeSpaceBox<"skip">;
+export function readPayl(view: IsoBoxReadView<IsoInt64>): WebVttCuePayloadBox;
 
 // @public
-export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox;
+export function readPrft<V extends IsoInt64>(view: IsoBoxReadView<V>): ProducerReferenceTimeBox<V>;
 
 // @public
-export function readSsix(view: IsoBoxReadView): SubsegmentIndexBox;
+export function readPrsl(view: IsoBoxReadView<IsoInt64>): PreselectionGroupBox;
 
 // @public
-export function readSthd(view: IsoBoxReadView): SubtitleMediaHeaderBox;
+export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecificHeaderBox;
 
 // @public
-export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox>(view: IsoBoxReadView): SampleDescriptionBox<E>;
+export function readSchi(view: IsoBoxReadView<IsoInt64>): SchemeInformationBox;
 
 // @public
-export function readStss(view: IsoBoxReadView): SyncSampleBox;
+export function readSchm(view: IsoBoxReadView<IsoInt64>): SchemeTypeBox;
 
 // @public
-export function readSttg(view: IsoBoxReadView): WebVttSettingsBox;
+export function readSdtp(view: IsoBoxReadView<IsoInt64>): SampleDependencyTypeBox;
 
 // @public
-export function readStts(view: IsoBoxReadView): DecodingTimeToSampleBox;
+export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIndexBox<V>;
 
 // @public
-export function readStyp(view: IsoBoxReadView): SegmentTypeBox;
+export function readSinf(view: IsoBoxReadView<IsoInt64>): ProtectionSchemeInformationBox;
 
 // @public
-export function readSubs(view: IsoBoxReadView): SubsampleInformationBox;
+export function readSkip(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox<"skip">;
 
 // @public
-export function readTenc(view: IsoBoxReadView): TrackEncryptionBox;
+export function readSmhd(view: IsoBoxReadView<IsoInt64>): SoundMediaHeaderBox;
 
 // @public
-export function readTfdt(view: IsoBoxReadView): TrackFragmentBaseMediaDecodeTimeBox;
+export function readSsix(view: IsoBoxReadView<IsoInt64>): SubsegmentIndexBox;
 
 // @public
-export function readTfhd(view: IsoBoxReadView): TrackFragmentHeaderBox;
+export function readStbl(view: IsoBoxReadView<IsoInt64>): SampleTableBox;
 
 // @public
-export function readTfra(view: IsoBoxReadView): TrackFragmentRandomAccessBox;
+export function readStco(view: IsoBoxReadView<IsoInt64>): ChunkOffsetBox;
 
 // @public
-export function readTkhd(view: IsoBoxReadView): TrackHeaderBox;
+export function readSthd(view: IsoBoxReadView<IsoInt64>): SubtitleMediaHeaderBox;
 
 // @public
-export function readTrex(view: IsoBoxReadView): TrackExtendsBox;
+export function readStrk<V extends IsoInt64>(view: IsoBoxReadView<V>): SubTrackBox<V>;
 
 // @public
-export function readTrun(view: IsoBoxReadView): TrackRunBox;
+export function readStsc(view: IsoBoxReadView<IsoInt64>): SampleToChunkBox;
 
 // @public
-export function readUrl(view: IsoBoxReadView): DataEntryUrlBox;
+export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox>(view: IsoBoxReadView<IsoInt64>): SampleDescriptionBox<E>;
 
 // @public
-export function readUrn(view: IsoBoxReadView): DataEntryUrnBox;
+export function readStss(view: IsoBoxReadView<IsoInt64>): SyncSampleBox;
 
 // @public
-export function readVisualSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView): VisualSampleEntryBox<T>;
+export function readStsz(view: IsoBoxReadView<IsoInt64>): SampleSizeBox;
 
 // @public
-export function readVlab(view: IsoBoxReadView): WebVttSourceLabelBox;
+export function readSttg(view: IsoBoxReadView<IsoInt64>): WebVttSettingsBox;
 
 // @public
-export function readVmhd(view: IsoBoxReadView): VideoMediaHeaderBox;
+export function readStts(view: IsoBoxReadView<IsoInt64>): DecodingTimeToSampleBox;
 
 // @public
-export function readVttC(view: IsoBoxReadView): WebVttConfigurationBox;
+export function readStyp(view: IsoBoxReadView<IsoInt64>): SegmentTypeBox;
 
 // @public
-export function readVtte(_: IsoBoxReadView): WebVttEmptySampleBox;
+export function readSubs(view: IsoBoxReadView<IsoInt64>): SubsampleInformationBox;
+
+// @public
+export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox;
+
+// @public
+export function readTfdt<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentBaseMediaDecodeTimeBox<V>;
+
+// @public
+export function readTfhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentHeaderBox<V>;
+
+// @public
+export function readTfra<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentRandomAccessBox<V>;
+
+// @public
+export function readTkhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackHeaderBox<V>;
+
+// @public
+export function readTraf<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentBox<V>;
+
+// @public
+export function readTrak<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackBox<V>;
+
+// @public
+export function readTref(view: IsoBoxReadView<IsoInt64>): TrackReferenceBox;
+
+// @public
+export function readTrex(view: IsoBoxReadView<IsoInt64>): TrackExtendsBox;
+
+// @public
+export function readTrun(view: IsoBoxReadView<IsoInt64>): TrackRunBox;
+
+// @public
+export function readUdta<V extends IsoInt64>(view: IsoBoxReadView<V>): UserDataBox<V>;
+
+// @public
+export function readUrl(view: IsoBoxReadView<IsoInt64>): DataEntryUrlBox;
+
+// @public
+export function readUrn(view: IsoBoxReadView<IsoInt64>): DataEntryUrnBox;
+
+// @public
+export function readVisualSampleEntryBox<T extends IsoBoxType>(type: T, view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<T>;
+
+// @public
+export function readVlab(view: IsoBoxReadView<IsoInt64>): WebVttSourceLabelBox;
+
+// @public
+export function readVmhd(view: IsoBoxReadView<IsoInt64>): VideoMediaHeaderBox;
+
+// @public
+export function readVttC(view: IsoBoxReadView<IsoInt64>): WebVttConfigurationBox;
+
+// @public
+export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox;
+
+// @public
+export function readVtte(_: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
 
 // @public
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
@@ -1496,12 +1865,12 @@ export type SchemeTypeBox = FullBox & {
 };
 
 // @public
-export type SegmentIndexBox = FullBox & {
+export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
     type: "sidx";
     referenceId: number;
     timescale: number;
-    earliestPresentationTime: number;
-    firstOffset: number;
+    earliestPresentationTime: V;
+    firstOffset: V;
     reserved: number;
     references: SegmentIndexReference[];
 };
@@ -1607,13 +1976,13 @@ export type SubtitleMediaHeaderBox = FullBox & {
 };
 
 // @public
-export type SubTrackBox = {
+export type SubTrackBox<V extends IsoInt64 = number> = {
     type: "strk";
-    boxes: SubTrackBoxChild[];
+    boxes: SubTrackBoxChild<V>[];
 };
 
 // @public
-export type SubTrackBoxChild = any;
+export type SubTrackBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export type SyncSample = {
@@ -1631,13 +2000,13 @@ export type SyncSampleBox = FullBox & {
 export const TEMPLATE: "template";
 
 // @public
-export type TrackBox = {
+export type TrackBox<V extends IsoInt64 = number> = {
     type: "trak";
-    boxes: TrackBoxChild[];
+    boxes: TrackBoxChild<V>[];
 };
 
 // @public
-export type TrackBoxChild = TrackHeaderBox | TrackReferenceBox | EditBox | MediaBox | UserDataBox;
+export type TrackBoxChild<V extends IsoInt64 = number> = TrackHeaderBox<V> | TrackReferenceBox | EditBox<V> | MediaBox<V> | UserDataBox<V>;
 
 // @public
 export type TrackEncryptionBox = FullBox & {
@@ -1645,6 +2014,11 @@ export type TrackEncryptionBox = FullBox & {
     defaultIsEncrypted: number;
     defaultIvSize: number;
     defaultKid: number[];
+    defaultIsProtected?: number;
+    defaultCryptByteBlock?: number;
+    defaultSkipByteBlock?: number;
+    defaultConstantIvSize?: number;
+    defaultConstantIv?: number[];
 };
 
 // @public
@@ -1658,25 +2032,25 @@ export type TrackExtendsBox = FullBox & {
 };
 
 // @public
-export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
+export type TrackFragmentBaseMediaDecodeTimeBox<V extends IsoInt64 = number> = FullBox & {
     type: "tfdt";
-    baseMediaDecodeTime: number;
+    baseMediaDecodeTime: V;
 };
 
 // @public
-export type TrackFragmentBox = {
+export type TrackFragmentBox<V extends IsoInt64 = number> = {
     type: "traf";
-    boxes: TrackFragmentBoxChild[];
+    boxes: TrackFragmentBoxChild<V>[];
 };
 
 // @public
-export type TrackFragmentBoxChild = TrackFragmentHeaderBox | TrackFragmentBaseMediaDecodeTimeBox | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox | SubsampleInformationBox;
+export type TrackFragmentBoxChild<V extends IsoInt64 = number> = TrackFragmentHeaderBox<V> | TrackFragmentBaseMediaDecodeTimeBox<V> | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox | SubsampleInformationBox;
 
 // @public
-export type TrackFragmentHeaderBox = FullBox & {
+export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
     type: "tfhd";
     trackId: number;
-    baseDataOffset?: number;
+    baseDataOffset?: V;
     sampleDescriptionIndex?: number;
     defaultSampleDuration?: number;
     defaultSampleSize?: number;
@@ -1684,7 +2058,7 @@ export type TrackFragmentHeaderBox = FullBox & {
 };
 
 // @public
-export type TrackFragmentRandomAccessBox = FullBox & {
+export type TrackFragmentRandomAccessBox<V extends IsoInt64 = number> = FullBox & {
     type: "tfra";
     trackId: number;
     reserved: number;
@@ -1692,26 +2066,26 @@ export type TrackFragmentRandomAccessBox = FullBox & {
     lengthSizeOfTrafNum: number;
     lengthSizeOfTrunNum: number;
     lengthSizeOfSampleNum: number;
-    entries: TrackFragmentRandomAccessEntry[];
+    entries: TrackFragmentRandomAccessEntry<V>[];
 };
 
 // @public
-export type TrackFragmentRandomAccessEntry = {
-    time: number;
-    moofOffset: number;
+export type TrackFragmentRandomAccessEntry<V extends IsoInt64 = number> = {
+    time: V;
+    moofOffset: V;
     trafNumber: number;
     trunNumber: number;
     sampleNumber: number;
 };
 
 // @public
-export type TrackHeaderBox = FullBox & {
+export type TrackHeaderBox<V extends IsoInt64 = number> = FullBox & {
     type: "tkhd";
-    creationTime: number;
-    modificationTime: number;
+    creationTime: V;
+    modificationTime: V;
     trackId: number;
     reserved1: number;
-    duration: number;
+    duration: V;
     reserved2: number[];
     layer: number;
     alternateGroup: number;
@@ -1788,13 +2162,13 @@ export type url = DataEntryUrlBox;
 export type urn = DataEntryUrnBox;
 
 // @public
-export type UserDataBox = {
+export type UserDataBox<V extends IsoInt64 = number> = {
     type: "udta";
-    boxes: UserDataBoxChild[];
+    boxes: UserDataBoxChild<V>[];
 };
 
 // @public
-export type UserDataBoxChild = any;
+export type UserDataBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export const UTF8: "utf8";
@@ -1896,16 +2270,22 @@ export function writeAvc4(box: VisualSampleEntryBox<"avc4">, config: IsoBoxWrite
 export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView;
 
 // @public
+export function writeDinf(box: DataInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeDref(box: DataReferenceBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeEdts(box: EditBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView;
 
 // @public
-export function writeElst(box: EditListBox): IsoBoxWriteView;
+export function writeElst(box: EditListBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeEmsg(box: EventMessageBox): IsoBoxWriteView;
+export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writeEnca(box: AudioSampleEntryBox<"enca">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
@@ -1923,6 +2303,9 @@ export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView;
 export function writeFtyp(box: FileTypeBox): IsoBoxWriteView;
 
 // @public
+export function writeGrpl(box: GroupsListBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView;
 
 // @public
@@ -1938,10 +2321,10 @@ export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
 export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 
 // @public
-export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBox(box: IsoBoxStreamable<IsoInt64>, config?: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>[];
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>[];
 
 // @public
 export function writeKind(box: TrackKindBox): IsoBoxWriteView;
@@ -1953,31 +2336,52 @@ export function writeLabl(box: LabelBox): IsoBoxWriteView;
 export function writeMdat(box: MediaDataBox): IsoBoxWriteView;
 
 // @public
-export function writeMdhd(box: MediaHeaderBox): IsoBoxWriteView;
+export function writeMdhd(box: MediaHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeMehd(box: MovieExtendsHeaderBox): IsoBoxWriteView;
+export function writeMdia(box: MediaBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeMeta(box: MetaBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+export function writeMeco(box: AdditionalMetadataContainerBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMehd(box: MovieExtendsHeaderBox<IsoInt64>): IsoBoxWriteView;
+
+// @public
+export function writeMeta(box: MetaBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeMfra(box: MovieFragmentRandomAccessBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView;
+
+// @public
+export function writeMinf(box: MediaInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMoof(box: MovieFragmentBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMoov(box: MovieBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeMp4a(box: AudioSampleEntryBox<"mp4a">, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeMvhd(box: MovieHeaderBox): IsoBoxWriteView;
+export function writeMvex(box: MovieExtendsBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView;
 
 // @public
-export function writePrft(box: ProducerReferenceTimeBox): IsoBoxWriteView;
+export function writePrft(box: ProducerReferenceTimeBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
 export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
@@ -1986,13 +2390,19 @@ export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteViewConf
 export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView;
 
 // @public
+export function writeSchi(box: SchemeInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView;
 
 // @public
 export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView;
 
 // @public
-export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView;
+export function writeSidx(box: SegmentIndexBox<IsoInt64>): IsoBoxWriteView;
+
+// @public
+export function writeSinf(box: ProtectionSchemeInformationBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeSkip(box: FreeSpaceBox<"skip">): IsoBoxWriteView;
@@ -2004,10 +2414,16 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView;
 export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView;
 
 // @public
+export function writeStbl(box: SampleTableBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
 export function writeStco(box: ChunkOffsetBox): IsoBoxWriteView;
 
 // @public
 export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView;
+
+// @public
+export function writeStrk(box: SubTrackBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeStsc(box: SampleToChunkBox): IsoBoxWriteView;
@@ -2037,22 +2453,34 @@ export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView;
 export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView;
 
 // @public
-export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWriteView;
+export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView;
+export function writeTfhd(box: TrackFragmentHeaderBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeTfra(box: TrackFragmentRandomAccessBox): IsoBoxWriteView;
+export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWriteView;
 
 // @public
-export function writeTkhd(box: TrackHeaderBox): IsoBoxWriteView;
+export function writeTkhd(box: TrackHeaderBox<IsoInt64>): IsoBoxWriteView;
+
+// @public
+export function writeTraf(box: TrackFragmentBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeTrak(box: TrackBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
+
+// @public
+export function writeTref(box: TrackReferenceBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView;
 
 // @public
 export function writeTrun(box: TrackRunBox): IsoBoxWriteView;
+
+// @public
+export function writeUdta(box: UserDataBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
@@ -2071,6 +2499,9 @@ export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView;
 
 // @public
 export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
+
+// @public
+export function writeVttc(box: WebVttCueBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
 export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;

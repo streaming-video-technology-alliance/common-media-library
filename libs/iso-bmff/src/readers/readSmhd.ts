@@ -1,5 +1,6 @@
 import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `SoundMediaHeaderBox` from an `IsoBoxReadView`.
@@ -10,11 +11,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSmhd(view: IsoBoxReadView): SoundMediaHeaderBox {
+export function readSmhd(view: IsoBoxReadView<IsoInt64>): SoundMediaHeaderBox {
 	return {
 		type: 'smhd',
 		...view.readFullBox(),
-		balance: view.readUint(2),
+		balance: view.readInt(2) / 256,
 		reserved: view.readUint(2),
 	}
 }

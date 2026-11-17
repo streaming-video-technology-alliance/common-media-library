@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { MovieExtendsHeaderBox } from './MovieExtendsHeaderBox.ts'
 import type { TrackExtendsBox } from './TrackExtendsBox.ts'
 
@@ -6,14 +7,16 @@ import type { TrackExtendsBox } from './TrackExtendsBox.ts'
  *
  * @public
  */
-export type MovieExtendsBoxChild = MovieExtendsHeaderBox | TrackExtendsBox
+export type MovieExtendsBoxChild<V extends IsoInt64 = number> =
+	| MovieExtendsHeaderBox<V>
+	| TrackExtendsBox
 
 /**
  * Movie Extends Box - 'mvex' - Container
  *
  * @public
  */
-export type MovieExtendsBox = {
+export type MovieExtendsBox<V extends IsoInt64 = number> = {
 	type: 'mvex'
-	boxes: MovieExtendsBoxChild[]
+	boxes: MovieExtendsBoxChild<V>[]
 }

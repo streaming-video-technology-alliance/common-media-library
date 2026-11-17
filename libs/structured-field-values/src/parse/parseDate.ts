@@ -35,5 +35,11 @@ export function parseDate(src: string): ParsedValue<Date> {
 		throw parseError(src, DATE)
 	}
 
-	return parsedValue(new Date(date.value * 1000), date.src)
+	const value = new Date(date.value * 1000)
+
+	if (Number.isNaN(value.getTime())) {
+		throw parseError(src, DATE)
+	}
+
+	return parsedValue(value, date.src)
 }

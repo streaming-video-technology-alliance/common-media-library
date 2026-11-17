@@ -4,6 +4,7 @@ import type {
 	PreselectionGroupBoxChild,
 } from '../boxes/PreselectionGroupBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `PreselectionGroupBox` from an `IsoBoxReadView`.
@@ -14,7 +15,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readPrsl(view: IsoBoxReadView): PreselectionGroupBox {
+export function readPrsl(view: IsoBoxReadView<IsoInt64>): PreselectionGroupBox {
 	const { version, flags } = view.readFullBox()
 	const groupId = view.readUint(4)
 	const numEntitiesInGroup = view.readUint(4)

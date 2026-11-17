@@ -1,4 +1,5 @@
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import { readFree } from './readFree.ts'
 
@@ -11,7 +12,7 @@ import { readFree } from './readFree.ts'
  *
  * @public
  */
-export function readSkip(view: IsoBoxReadView): FreeSpaceBox<'skip'> {
+export function readSkip(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox<'skip'> {
 	return {
 		...readFree(view),
 		type: 'skip',

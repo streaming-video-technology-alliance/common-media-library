@@ -1,5 +1,6 @@
 import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `TrackKindBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readKind(view: IsoBoxReadView): TrackKindBox {
+export function readKind(view: IsoBoxReadView<IsoInt64>): TrackKindBox {
 	return {
 		type: 'kind',
 		...view.readFullBox(),

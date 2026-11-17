@@ -13,9 +13,16 @@ and this project adheres to
 - `fetchRequester` sends an `HttpRequest` with `fetch` and resolves with an `HttpResponse`. The response has the response text as `data` and every response header in `headers`
 - `HttpRequester`, the type of a function that sends an `HttpRequest` and resolves with an `HttpResponse`
 
+## [1.7.1] - 2026-11-16
+
 ### Changed
 
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/utils](https://cml.svta.org/packages/utils/).
+
+### Fixed
+
+- `roundToEven` now rounds every decimal tie to the even value. `roundToEven(2.0005, 3)` returns `2` instead of `2.001` ([#665](https://github.com/streaming-video-technology-alliance/common-media-library/issues/665))
+- `roundToEven` now rounds a value next to a decimal tie to the nearest value. `roundToEven(0.07050000000000001, 3)` returns `0.071` instead of `0.07` ([#665](https://github.com/streaming-video-technology-alliance/common-media-library/issues/665))
 
 ## [1.7.0] - 2026-10-26
 
@@ -124,7 +131,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.1...HEAD
+[1.7.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...utils-v1.7.1
 [1.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.2...utils-v1.7.0
 [1.6.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...utils-v1.6.2
 [1.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.6.1

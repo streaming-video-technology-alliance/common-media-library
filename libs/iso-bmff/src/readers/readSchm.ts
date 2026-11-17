@@ -1,5 +1,6 @@
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `SchemeTypeBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readSchm(view: IsoBoxReadView): SchemeTypeBox {
+export function readSchm(view: IsoBoxReadView<IsoInt64>): SchemeTypeBox {
 	const { version, flags } = view.readFullBox()
 
 	return {
@@ -19,6 +20,6 @@ export function readSchm(view: IsoBoxReadView): SchemeTypeBox {
 		flags,
 		schemeType: view.readUint(4),
 		schemeVersion: view.readUint(4),
-		schemeUri: flags & 0x000001 ? view.readString(-1) : undefined,
+		schemeUri: flags & 0x000001 ? view.readUtf8(-1) : undefined,
 	}
 }

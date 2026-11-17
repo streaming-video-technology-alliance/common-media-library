@@ -1,5 +1,6 @@
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `FreeSpaceBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readFree(view: IsoBoxReadView): FreeSpaceBox {
+export function readFree(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox {
 	return {
 		type: 'free',
 		data: view.readData(-1),

@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -5,10 +6,10 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type TrackFragmentHeaderBox = FullBox & {
+export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'tfhd'
 	trackId: number
-	baseDataOffset?: number
+	baseDataOffset?: V
 	sampleDescriptionIndex?: number
 	defaultSampleDuration?: number
 	defaultSampleSize?: number

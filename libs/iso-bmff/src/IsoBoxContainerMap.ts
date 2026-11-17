@@ -17,30 +17,31 @@ import type { TrackFragmentBox } from './boxes/TrackFragmentBox.ts'
 import type { TrackReferenceBox } from './boxes/TrackReferenceBox.ts'
 import type { UserDataBox } from './boxes/UserDataBox.ts'
 import type { WebVttCueBox } from './boxes/WebVttCueBox.ts'
+import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
  * Map of container box types to their allowed child box types
  *
  * @public
  */
-export type IsoBoxContainerMap = {
+export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
 	dinf: DataInformationBox
-	edts: EditBox
-	grpl: GroupsListBox
-	mdia: MediaBox
-	meco: AdditionalMetadataContainerBox
-	mfra: MovieFragmentRandomAccessBox
+	edts: EditBox<V>
+	grpl: GroupsListBox<V>
+	mdia: MediaBox<V>
+	meco: AdditionalMetadataContainerBox<V>
+	mfra: MovieFragmentRandomAccessBox<V>
 	minf: MediaInformationBox
-	moof: MovieFragmentBox
-	moov: MovieBox
-	mvex: MovieExtendsBox
+	moof: MovieFragmentBox<V>
+	moov: MovieBox<V>
+	mvex: MovieExtendsBox<V>
 	schi: SchemeInformationBox
 	sinf: ProtectionSchemeInformationBox
 	stbl: SampleTableBox
-	strk: SubTrackBox
-	traf: TrackFragmentBox
-	trak: TrackBox
+	strk: SubTrackBox<V>
+	traf: TrackFragmentBox<V>
+	trak: TrackBox<V>
 	tref: TrackReferenceBox
-	udta: UserDataBox
+	udta: UserDataBox<V>
 	vttc: WebVttCueBox
 }

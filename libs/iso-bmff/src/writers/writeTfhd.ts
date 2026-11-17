@@ -1,4 +1,5 @@
 import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -6,13 +7,16 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2012 - 8.8.7 Track Fragment Header Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `TrackFragmentHeaderBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
-export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
+export function writeTfhd(box: TrackFragmentHeaderBox<IsoInt64>): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
@@ -37,7 +41,7 @@ export function writeTfhd(box: TrackFragmentHeaderBox): IsoBoxWriteView {
 	writer.writeUint(box.trackId, 4)
 
 	if (box.flags & 0x01) {
-		writer.writeUint(box.baseDataOffset ?? 0, 8)
+		writer.writeWideUint(box.baseDataOffset ?? 0, 8)
 	}
 
 	if (box.flags & 0x02) {

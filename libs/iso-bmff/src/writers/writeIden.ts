@@ -15,11 +15,11 @@ export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView {
 	const cueIdBytes = encodeText(box.cueId)
 
 	const headerSize = 8
-	const cueIdSize = cueIdBytes.length + 1 // null-terminated
+	const cueIdSize = cueIdBytes.length
 	const totalSize = headerSize + cueIdSize
 
 	const writer = new IsoBoxWriteView('iden', totalSize)
-	writer.writeUtf8TerminatedString(box.cueId)
+	writer.writeBytes(cueIdBytes)
 
 	return writer
 }

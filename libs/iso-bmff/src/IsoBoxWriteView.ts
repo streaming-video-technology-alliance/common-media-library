@@ -52,8 +52,16 @@ export class IsoBoxWriteView {
 	/**
 	 * Writes a uint to the data view.
 	 *
+	 * The method does not check the value.
+	 * With a size of 8, the method writes all bits set for a value of 2^64 or more.
+	 * The default reader returns 2^64 for a 64-bit field with all bits set,
+	 * so a read and then a write keep that field.
+	 *
 	 * @param value - The value to write.
 	 * @param size - The size, in bytes, of the value.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeUint.test.ts#example}
 	 */
 	writeUint = (value: number, size: number): void => {
 		const { dataView, cursor } = this
@@ -82,8 +90,11 @@ export class IsoBoxWriteView {
 			case 8: {
 				// A number loses precision for integers >= 2^53.
 				// writeUint64 writes the exact value from a bigint.
-				const s1 = Math.floor(value / Math.pow(2, 32))
-				const s2 = value - s1 * Math.pow(2, 32)
+				let s1 = Math.floor(value / Math.pow(2, 32))
+				let s2 = value - s1 * Math.pow(2, 32)
+				if (s1 > 0xffffffff) {
+					s1 = s2 = 0xffffffff
+				}
 				dataView.setUint32(cursor, s1)
 				dataView.setUint32(cursor + 4, s2)
 				break
@@ -151,6 +162,63 @@ export class IsoBoxWriteView {
 	}
 
 	/**
+	 * Writes an unsigned integer field of 4 or 8 bytes from a `number` or a `bigint`.
+	 *
+	 * Use this method for a field that is 64 bits in one version of its box.
+	 * A box that `readIsoBoxes` reads with `readInt64AsBigInt` holds such a field as a `bigint`.
+	 * The method writes a `number` as `writeUint` does, and a `bigint` with the exact value.
+	 *
+	 * @param value - The value to write.
+	 * @param size - The size, in bytes, of the value.
+	 * @throws RangeError if `value` is a `bigint` that is negative or does not fit in `size` bytes.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeWideUint.test.ts#example}
+	 */
+	writeWideUint = (value: number | bigint, size: 4 | 8): void => {
+		if (typeof value !== 'bigint') {
+			this.writeUint(value, size)
+		} else if (size === 8) {
+			this.writeUint64(value)
+		} else {
+			if (BigInt.asUintN(32, value) !== value) {
+				throw new RangeError(
+					`writeWideUint: value must be in the range 0 to 2^32 - 1, received ${value}`,
+				)
+			}
+
+			this.writeUint(Number(value), 4)
+		}
+	}
+
+	/**
+	 * Writes a signed integer field of 4 or 8 bytes from a `number` or a `bigint`.
+	 *
+	 * Use this method for a field that is 64 bits in one version of its box.
+	 * The method writes a `number` as `writeInt` does, and a `bigint` with the exact value.
+	 *
+	 * @param value - The value to write.
+	 * @param size - The size, in bytes, of the value.
+	 * @throws RangeError if `value` is a `bigint` that does not fit in `size` bytes.
+	 */
+	writeWideInt = (value: number | bigint, size: 4 | 8): void => {
+		if (typeof value !== 'bigint') {
+			this.writeInt(value, size)
+		} else {
+			if (BigInt.asIntN(size * 8, value) !== value) {
+				throw new RangeError(`writeWideInt: value must fit in ${size} bytes, received ${value}`)
+			}
+
+			if (size === 8) {
+				this.dataView.setBigInt64(this.cursor, value)
+				this.cursor += 8
+			} else {
+				this.writeInt(Number(value), 4)
+			}
+		}
+	}
+
+	/**
 	 * Writes a string to the data view.
 	 *
 	 * @param value - The value to write.
@@ -163,8 +231,13 @@ export class IsoBoxWriteView {
 
 	/**
 	 * Writes a null terminated string to the data view.
+	 * The method writes one byte for each character.
+	 * For text that is not ASCII, use `writeUtf8TerminatedString`.
 	 *
 	 * @param value - The value to write.
+	 *
+	 * @example
+	 * {@includeCode ../test/writeTerminatedString.test.ts#example}
 	 */
 	writeTerminatedString = (value: string): void => {
 		for (let c = 0, len = value.length; c < len; c++) {
@@ -227,10 +300,12 @@ export class IsoBoxWriteView {
 	}
 
 	/**
-	 * Writes a template to the data view.
+	 * Writes a fixed-point value to the data view. Half of the bytes hold the integer part,
+	 * and half hold the fraction. The method stores a negative value as a two's complement
+	 * number.
 	 *
 	 * @param value - The value to write.
-	 * @param size - The size, in bytes, of the template.
+	 * @param size - The size, in bytes, of the value: 2 or 4.
 	 */
 	writeTemplate = (value: number, size: number): void => {
 		const shift = size === 4 ? 16 : 8

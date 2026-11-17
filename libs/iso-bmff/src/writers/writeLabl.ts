@@ -26,8 +26,10 @@ export function writeLabl(box: LabelBox): IsoBoxWriteView {
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeUint(box.labelId, 2)
-	writer.writeUtf8TerminatedString(box.language)
-	writer.writeUtf8TerminatedString(box.label)
+	writer.writeBytes(languageBytes)
+	writer.writeUint(0, 1)
+	writer.writeBytes(labelBytes)
+	writer.writeUint(0, 1)
 
 	return writer
 }

@@ -8,11 +8,19 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.8] - 2026-11-16
+
 ### Changed
 
 - `parseByteSequence` throws a parse error instead of a `TypeError` when the byte sequence contains a line break. Every other input reports the same error as before.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/structured-field-values](https://cml.svta.org/packages/structured-field-values/).
+
+### Fixed
+
+- The encoders now round every Decimal tie to the even digit, as RFC 9651 section 4.1.5 requires. `encodeSfItem(2.0005)` returns `2.0` instead of `2.001`. The fix is in `roundToEven` of `@svta/cml-utils`, so install `@svta/cml-utils` 1.7.1 or later ([#665](https://github.com/streaming-video-technology-alliance/common-media-library/issues/665))
+- The decoders now throw a parse error for a Date outside the range of a JS `Date`. `decodeSfItem('@999999999999999')` throws instead of returning an item with an Invalid Date. A JS `Date` holds at most 8,640,000,000,000 seconds before or after 1970-01-01.
+- The encoders now throw a serialize error for an Invalid Date. `encodeSfItem(new Date(NaN))` throws instead of returning `@NaN`.
 
 ## [1.1.7] - 2026-10-18
 
@@ -94,7 +102,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.7...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.8...HEAD
+[1.1.8]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.7...structured-field-values-v1.1.8
 [1.1.7]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.6...structured-field-values-v1.1.7
 [1.1.6]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.5...structured-field-values-v1.1.6
 [1.1.5]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/structured-field-values-v1.1.4...structured-field-values-v1.1.5

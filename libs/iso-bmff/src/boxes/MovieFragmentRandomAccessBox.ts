@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { MovieFragmentRandomAccessOffsetBox } from './MovieFragmentRandomAccessOffsetBox.ts'
 import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBox.ts'
 
@@ -6,8 +7,8 @@ import type { TrackFragmentRandomAccessBox } from './TrackFragmentRandomAccessBo
  *
  * @public
  */
-export type MovieFragmentRandomAccessBoxChild =
-	| TrackFragmentRandomAccessBox
+export type MovieFragmentRandomAccessBoxChild<V extends IsoInt64 = number> =
+	| TrackFragmentRandomAccessBox<V>
 	| MovieFragmentRandomAccessOffsetBox
 
 /**
@@ -15,7 +16,7 @@ export type MovieFragmentRandomAccessBoxChild =
  *
  * @public
  */
-export type MovieFragmentRandomAccessBox = {
+export type MovieFragmentRandomAccessBox<V extends IsoInt64 = number> = {
 	type: 'mfra'
-	boxes: MovieFragmentRandomAccessBoxChild[]
+	boxes: MovieFragmentRandomAccessBoxChild<V>[]
 }
