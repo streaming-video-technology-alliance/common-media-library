@@ -84,99 +84,126 @@ describe('parsePsshList', () => {
 			...uint32(0),
 		]
 
-		it('returns one entry for one valid pssh box of 32 bytes', () => {
-			const data = new Uint8Array(psshBox(SYSTEM_ID_A))
-			const result = parsePsshList(data)
+		const PADDING = new Array<number>(16).fill(0xff)
 
-			deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
-			deepStrictEqual(result[SYSTEM_ID_A], data)
-		})
+		// Each form returns the entries as `Uint8Array` values. The padded view has bytes before and after the data.
+		const FORMS: [string, (data: Uint8Array) => Record<string, Uint8Array>][] = [
+			['Uint8Array', data => parsePsshList(data)],
+			[
+				'ArrayBuffer',
+				data => {
+					const result = parsePsshList(data.slice().buffer)
+					return Object.fromEntries(
+						Object.entries(result).map(([id, box]) => [id, new Uint8Array(box)]),
+					)
+				},
+			],
+			[
+				'Uint8Array view with padding',
+				data => {
+					const padded = new Uint8Array([...PADDING, ...data, ...PADDING])
+					return parsePsshList(padded.subarray(PADDING.length, PADDING.length + data.length))
+				},
+			],
+		]
 
-		it('returns no entry for a free box with a size of 0', () => {
-			const data = new Uint8Array([...uint32(0), ...FREE, 1, 2, 3, 4])
+		for (const [form, parse] of FORMS) {
+			describe(form, () => {
+				it('returns one entry for one valid pssh box of 32 bytes', () => {
+					const data = new Uint8Array(psshBox(SYSTEM_ID_A))
+					const result = parse(data)
 
-			deepStrictEqual(parsePsshList(data), {})
-		})
+					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
+					deepStrictEqual(result[SYSTEM_ID_A], data)
+				})
 
-		it('reads a pssh box with a size of 0 to the end of the data', () => {
-			const data = new Uint8Array(psshBox(SYSTEM_ID_A, 0))
-			const result = parsePsshList(data)
+				it('returns no entry for a free box with a size of 0', () => {
+					const data = new Uint8Array([...uint32(0), ...FREE, 1, 2, 3, 4])
 
-			deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
-			deepStrictEqual(result[SYSTEM_ID_A], data)
-		})
+					deepStrictEqual(parse(data), {})
+				})
 
-		it('reads a pssh box with a size of 0 after a valid pssh box', () => {
-			const first = psshBox(SYSTEM_ID_A)
-			const last = psshBox(SYSTEM_ID_B, 0)
-			const result = parsePsshList(new Uint8Array([...first, ...last]))
+				it('reads a pssh box with a size of 0 to the end of the data', () => {
+					const data = new Uint8Array(psshBox(SYSTEM_ID_A, 0))
+					const result = parse(data)
 
-			deepStrictEqual(Object.keys(result), [SYSTEM_ID_A, SYSTEM_ID_B])
-			deepStrictEqual(result[SYSTEM_ID_A], new Uint8Array(first))
-			deepStrictEqual(result[SYSTEM_ID_B], new Uint8Array(last))
-		})
+					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
+					deepStrictEqual(result[SYSTEM_ID_A], data)
+				})
 
-		it('stops if fewer than 8 bytes remain', () => {
-			const data = new Uint8Array([...uint32(8), ...FREE, 1, 2])
+				it('reads a pssh box with a size of 0 after a valid pssh box', () => {
+					const first = psshBox(SYSTEM_ID_A)
+					const last = psshBox(SYSTEM_ID_B, 0)
+					const result = parse(new Uint8Array([...first, ...last]))
 
-			deepStrictEqual(parsePsshList(data), {})
-		})
+					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A, SYSTEM_ID_B])
+					deepStrictEqual(result[SYSTEM_ID_A], new Uint8Array(first))
+					deepStrictEqual(result[SYSTEM_ID_B], new Uint8Array(last))
+				})
 
-		it('skips a pssh box with a size of 12 at the end of the data', () => {
-			const data = new Uint8Array([...uint32(12), ...PSSH, 0, 0, 0, 0])
+				it('stops if fewer than 8 bytes remain', () => {
+					const data = new Uint8Array([...uint32(8), ...FREE, 1, 2])
 
-			deepStrictEqual(parsePsshList(data), {})
-		})
+					deepStrictEqual(parse(data), {})
+				})
 
-		it('skips a pssh box with a size of 12 before a free box', () => {
-			const free = [...uint32(28), ...FREE, ...new Array<number>(20).fill(0xaa)]
-			const data = new Uint8Array([...uint32(12), ...PSSH, 0, 0, 0, 0, ...free])
+				it('skips a pssh box with a size of 12 at the end of the data', () => {
+					const data = new Uint8Array([...uint32(12), ...PSSH, 0, 0, 0, 0])
 
-			deepStrictEqual(parsePsshList(data), {})
-		})
+					deepStrictEqual(parse(data), {})
+				})
 
-		it('reads the largesize field of a box with a size of 1', () => {
-			const free = [...uint32(1), ...FREE, ...uint32(0), ...uint32(16)]
-			const pssh = psshBox(SYSTEM_ID_A)
-			const result = parsePsshList(new Uint8Array([...free, ...pssh]))
+				it('skips a pssh box with a size of 12 before a free box', () => {
+					const free = [...uint32(28), ...FREE, ...new Array<number>(20).fill(0xaa)]
+					const data = new Uint8Array([...uint32(12), ...PSSH, 0, 0, 0, 0, ...free])
 
-			deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
-			deepStrictEqual(result[SYSTEM_ID_A], new Uint8Array(pssh))
-		})
+					deepStrictEqual(parse(data), {})
+				})
 
-		it('reads the system ID after the largesize field of a pssh box', () => {
-			const box = psshBox(SYSTEM_ID_A)
-			const data = new Uint8Array([
-				...uint32(1),
-				...PSSH,
-				...uint32(0),
-				...uint32(40),
-				...box.slice(8),
-			])
-			const result = parsePsshList(data)
+				it('reads the largesize field of a box with a size of 1', () => {
+					const free = [...uint32(1), ...FREE, ...uint32(0), ...uint32(16)]
+					const pssh = psshBox(SYSTEM_ID_A)
+					const result = parse(new Uint8Array([...free, ...pssh]))
 
-			deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
-			deepStrictEqual(result[SYSTEM_ID_A], data)
-		})
+					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
+					deepStrictEqual(result[SYSTEM_ID_A], new Uint8Array(pssh))
+				})
 
-		it('stops before a box that ends after the data', () => {
-			const first = psshBox(SYSTEM_ID_A)
-			const data = new Uint8Array([...first, ...psshBox(SYSTEM_ID_B, 40)])
-			const result = parsePsshList(data)
+				it('reads the system ID after the largesize field of a pssh box', () => {
+					const box = psshBox(SYSTEM_ID_A)
+					const data = new Uint8Array([
+						...uint32(1),
+						...PSSH,
+						...uint32(0),
+						...uint32(40),
+						...box.slice(8),
+					])
+					const result = parse(data)
 
-			deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
-		})
+					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
+					deepStrictEqual(result[SYSTEM_ID_A], data)
+				})
 
-		it('stops before a box with a size below 8', () => {
-			const data = new Uint8Array([...uint32(4), ...FREE, ...psshBox(SYSTEM_ID_A)])
+				it('stops before a box that ends after the data', () => {
+					const first = psshBox(SYSTEM_ID_A)
+					const data = new Uint8Array([...first, ...psshBox(SYSTEM_ID_B, 40)])
+					const result = parse(data)
 
-			deepStrictEqual(parsePsshList(data), {})
-		})
+					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
+				})
 
-		it('stops before a box with a size of 1 and fewer than 16 bytes', () => {
-			const data = new Uint8Array([...uint32(1), ...FREE, 0, 0, 0])
+				it('stops before a box with a size below 8', () => {
+					const data = new Uint8Array([...uint32(4), ...FREE, ...psshBox(SYSTEM_ID_A)])
 
-			deepStrictEqual(parsePsshList(data), {})
-		})
+					deepStrictEqual(parse(data), {})
+				})
+
+				it('stops before a box with a size of 1 and fewer than 16 bytes', () => {
+					const data = new Uint8Array([...uint32(1), ...FREE, 0, 0, 0])
+
+					deepStrictEqual(parse(data), {})
+				})
+			})
+		}
 	})
 })
