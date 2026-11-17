@@ -362,6 +362,7 @@ Limits of the numbers:
 10. **A box with a `boxes` field and a type outside `CONTAINERS`.** With no writer for such a box, version 1 writes the bytes of the `view` field. A parsed box has no `view` field in version 2.0.0. Should `writeIsoBoxes` throw for that box?
 11. **Members of `IsoBoxReadView` with no replacement.** This RFC states no replacement for `slice`, `jump`, `readBox`, and `bytesRemaining`. The readers of `ftyp` and `sdtp` use `bytesRemaining`. Should a reader use `cursor.pos` and `cursor.end`, or should the package export a function for each member?
 12. **The box type argument of a reader.** In version 1, a reader takes the box type as a second argument. The `IsoBoxReader` type of this RFC has no such argument. Should the read cursor have the box type, or should a reader keep the second argument?
+13. **The start of a box.** A cursor from `seekIsoBox` and the cursor of a reader have their position after the box header. The header has 8 or 16 bytes, so the caller cannot compute the first byte of the box. `parsePsshList` of `@svta/cml-drm` returns the complete bytes of each `pssh` box, so it needs that first byte. Should the read cursor have a `start` field? A custom reader could then also return the bytes of its box.
 
 ## Future possibilities
 
