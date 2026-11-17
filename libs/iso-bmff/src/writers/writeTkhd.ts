@@ -4,16 +4,19 @@ import { INT, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `TrackHeaderBox` to an `IsoBoxWriteView`.
+ * Write the `tkhd` box (`TrackHeaderBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.3.2 Track Header Box
+ * ISO/IEC 14496-12:2015 - 8.3.2
  *
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
  * @param box - The `TrackHeaderBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
+ *
+ * @example
+ * {@includeCode ../../test/writers/writeTkhd.test.ts#example}
  *
  * @public
  */

@@ -1,5 +1,7 @@
 /**
- * ISO/IEC 14496-30:2014 - WebVTT Empty Sample Box
+ * WebVTT Empty Sample Box (`vtte`).
+ *
+ * ISO/IEC 14496-30:2014
  *
  * @public
  */

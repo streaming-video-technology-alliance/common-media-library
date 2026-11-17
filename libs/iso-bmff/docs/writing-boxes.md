@@ -5,12 +5,15 @@ description: Write boxes to byte arrays or streams
 
 # Writing Boxes
 
-The `writeIsoBoxes` function writes boxes. It takes an array of streamable items and returns an array of `Uint8Array`s. Streamable items include:
+The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable items and returns an array of `Uint8Array`s. Streamable items include:
 
 - Raw box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
-- ArrayBufferViews such as `Uint8Array` and `DataView`, and the box structures that `readIsoBoxes` returns. Those structures implement the `ArrayBufferView` interface.
+- `ArrayBufferView`s such as `Uint8Array` and `DataView`.
+- Boxes that `readIsoBoxes` returns. If the `writers` map has a writer for the type, the function writes the fields of the box. If the map has no writer and the type is not a container, the function writes the source bytes of the box. A changed field then has no effect.
 
-If you provide raw box objects, also provide a configuration object that names the writers for those box types.
+If you provide raw box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space.
+
+A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.
 
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
@@ -46,9 +49,13 @@ const byteArrays = writeIsoBoxes(boxes, defaultWriterConfig());
 
 for (const byteArray of byteArrays) {
 	sourceBuffer.appendBuffer(byteArray);
-	// wait for updateend event
+	await new Promise((resolve) =>
+		sourceBuffer.addEventListener("updateend", resolve, { once: true }),
+	);
 }
 ```
+
+Each call of `defaultWriterConfig()` returns a new configuration object. A player can create the configuration once and pass it to every write.
 
 ## Using specific writers
 
@@ -86,13 +93,15 @@ const byteArrays = writeIsoBoxes(boxes, {
 
 for (const byteArray of byteArrays) {
 	sourceBuffer.appendBuffer(byteArray);
-	// wait for updateend event
+	await new Promise((resolve) =>
+		sourceBuffer.addEventListener("updateend", resolve, { once: true }),
+	);
 }
 ```
 
 ## Streaming boxes
 
-The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers:
+The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers. The function needs `ReadableStream`. On a runtime without `ReadableStream`, the function throws an error.
 
 ```typescript
 import {
@@ -131,24 +140,29 @@ A box that `readIsoBoxes` reads with `readInt64AsBigInt` has `bigint` fields. Th
 
 ```typescript
 import {
+	findIsoBox,
 	readInt64AsBigInt,
 	readIsoBoxes,
 	readTfdt,
-	writeIsoBox,
+	writeIsoBoxes,
 	writeTfdt,
 } from "@svta/cml-iso-bmff";
 
-const [tfdt] = readIsoBoxes(buffer, {
+const boxes = readIsoBoxes(buffer, {
 	int64: readInt64AsBigInt,
 	readers: {
 		tfdt: readTfdt,
 	},
 });
 
-if (tfdt?.type === "tfdt") {
+// A tfdt box is inside a traf box, inside a moof box.
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+
+if (tfdt) {
 	tfdt.baseMediaDecodeTime += BigInt(90000);
 
-	const bytes = writeIsoBox(tfdt, { writers: { tfdt: writeTfdt } });
+	// Write the whole segment. A player cannot append a lone tfdt box.
+	const byteArrays = writeIsoBoxes(boxes, { writers: { tfdt: writeTfdt } });
 }
 ```
 
@@ -170,7 +184,7 @@ const bytes = writeIsoBox(
 
 A writer throws a `RangeError` for a `bigint` that does not fit the field. One example is a value above 2^32 - 1 in a version 0 box.
 
-A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined.
+A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. See [Reporting a rounded value](reading-boxes.md#reporting-a-rounded-value) for the read of that value.
 
 A custom writer calls `writeWideUint` or `writeWideInt` on `IsoBoxWriteView`. Both methods take a `number` or a `bigint`, and the size of the field in bytes, 4 or 8:
 
@@ -207,9 +221,13 @@ const tfdt = writeTfdt64(BigInt("17900000000000000"));
 
 The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects.
 
+## Writing a changed `mfra` box
+
+The `mfraSize` field of an `mfro` box is the size in bytes of the enclosing `mfra` box. `writeMfro` writes the stored value, and `writeMfra` does not change it. After a change to the children of an `mfra` box, set `mfraSize` to the new size of the `mfra` box.
+
 ## Type safety
 
-In TypeScript, cast raw box objects to a box type for type safety. There are two ways. The first way uses a box type from the library:
+In TypeScript, give a raw box object a box type. Annotate the object with a box type from the package:
 
 ```typescript
 import type { FileTypeBox } from "@svta/cml-iso-bmff";
@@ -222,18 +240,7 @@ const box: FileTypeBox = {
 };
 ```
 
-The second way uses the `as const` operator on the `type` property:
-
-```typescript
-const box = {
-	type: "ftyp" as const,
-	majorBrand: "isom",
-	minorVersion: 1,
-	compatibleBrands: ["isom"],
-};
-```
-
-You can also get a box type from `IsoBoxMap` with the box's FourCC:
+Or get the same type from `IsoBoxMap` with the four-character type of the box:
 
 ```typescript
 import type { IsoBoxMap } from "@svta/cml-iso-bmff";
@@ -244,4 +251,17 @@ const box: IsoBoxMap["ftyp"] = {
 	minorVersion: 1,
 	compatibleBrands: ["isom"],
 };
+```
+
+The `satisfies` operator checks the object against the box type and keeps the literal types of the object:
+
+```typescript
+import type { FileTypeBox } from "@svta/cml-iso-bmff";
+
+const box = {
+	type: "ftyp",
+	majorBrand: "isom",
+	minorVersion: 1,
+	compatibleBrands: ["isom"],
+} satisfies FileTypeBox;
 ```

@@ -1,8 +1,8 @@
-import { assert, describe, it, parseBox, readSsix } from '../util/box.ts'
+import { assert, describe, findBox, it, readSsix } from '../util/box.ts'
 
 describe('readSsix', function () {
 	it('should correctly parse the box', function () {
-		const box = parseBox('spliced_10000.m4v', readSsix, 4)
+		const box = findBox('spliced_10000.m4v', 'ssix', { readers: { ssix: readSsix } })
 
 		assert.strictEqual(box.type, 'ssix')
 		assert.strictEqual(box.size, 8124)

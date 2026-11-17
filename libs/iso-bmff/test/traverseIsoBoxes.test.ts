@@ -1,5 +1,4 @@
 import { readIsoBoxes, traverseIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
-import { equal } from 'assert'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
@@ -16,14 +15,21 @@ describe('traverseIsoBoxes', function () {
 
 	it('should provide an example', async function () {
 		// #region example
-		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
-		const boxes = readIsoBoxes(new Uint8Array(isoFile))
+		const isoFile = await readFile(new URL('./fixtures/mss_moof_tfdt.mp4', import.meta.url))
+		const boxes = readIsoBoxes(isoFile)
 
-		for (const box of traverseIsoBoxes(boxes)) {
-			equal(box.type, 'ftyp')
-			break
-		}
+		// Depth-first: each box, then its children.
+		const types = Array.from(traverseIsoBoxes(boxes), box => box.type)
+
+		// Breadth-first, with the root boxes and their children only.
+		const levels = Array.from(
+			traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 }),
+			box => box.type,
+		)
 		// #endregion example
+
+		assert.deepStrictEqual(types.slice(0, 4), ['moof', 'mfhd', 'traf', 'tfhd'])
+		assert.deepStrictEqual(levels, ['moof', 'mdat', 'mfhd', 'traf'])
 	})
 
 	it('should traverse empty boxes', function () {
@@ -66,19 +72,14 @@ describe('traverseIsoBoxes', function () {
 	})
 
 	it('should traverse nested boxes breadth-first when specified', function () {
-		const child1 = createBox('child1')
-		const child2 = createBox('child2')
-		const container = createContainer('meta', [child1, child2])
-		const root = createBox('root')
-		const result = Array.from(traverseIsoBoxes([root, container], { depthFirst: false }))
+		const meta = createContainer('meta', [createBox('child1')])
+		const trak = createContainer('trak', [createBox('child2')])
+		const result = Array.from(traverseIsoBoxes([meta, trak], { depthFirst: false }))
 
-		// Breadth-first: root -> container -> child1 -> child2
-		// Note: In this simple case, the order is the same, but let's verify
-		assert.strictEqual(result.length, 4)
-		assert.strictEqual(result[0].type, 'root')
-		assert.strictEqual(result[1].type, 'meta')
-		assert.strictEqual(result[2].type, 'child1')
-		assert.strictEqual(result[3].type, 'child2')
+		assert.deepStrictEqual(
+			result.map(box => box.type),
+			['meta', 'trak', 'child1', 'child2'],
+		)
 	})
 
 	it('should traverse deeply nested boxes depth-first', function () {
@@ -201,5 +202,75 @@ describe('traverseIsoBoxes', function () {
 		assert.strictEqual(result[0].type, 'moov')
 		assert.strictEqual(result[1].type, 'trak')
 		assert.strictEqual(result[2].type, 'trak')
+	})
+})
+
+describe('traverseIsoBoxes order', function () {
+	type Orders = Record<string, Record<'depthFirst' | 'breadthFirst', Record<string, string>>>
+
+	it('gives the same order as before on every fixture', async function () {
+		const orders = JSON.parse(
+			await readFile(new URL('./traverseIsoBoxesOrder.json', import.meta.url), 'utf8'),
+		) as Orders
+		const maxDepths = [0, 1, 1.5, 2, 3, Infinity, -1, NaN]
+
+		for (const [fixture, expected] of Object.entries(orders)) {
+			const isoFile = await readFile(new URL(`./fixtures/${fixture}`, import.meta.url))
+			const boxes = readIsoBoxes(new Uint8Array(isoFile))
+
+			for (const depthFirst of [true, false]) {
+				const order = depthFirst ? 'depthFirst' : 'breadthFirst'
+
+				for (const maxDepth of maxDepths) {
+					const types = Array.from(
+						traverseIsoBoxes(boxes, { depthFirst, maxDepth }),
+						box => box.type,
+					)
+					assert.strictEqual(
+						types.join(','),
+						expected[order][String(maxDepth)],
+						`${fixture} ${order} ${maxDepth}`,
+					)
+				}
+			}
+		}
+	})
+
+	it('closes every open iterator on break', function () {
+		type TestBox = { type: string; boxes?: Iterable<TestBox> }
+
+		for (const depthFirst of [true, false]) {
+			const closed: string[] = []
+
+			function* children(name: string, boxes: TestBox[]): Generator<TestBox> {
+				try {
+					yield* boxes
+				} finally {
+					closed.push(name)
+				}
+			}
+
+			const leaf = { type: 'leaf' }
+			const tree = children('root', [
+				{
+					type: 'moov',
+					boxes: children('moov', [
+						{ type: 'trak', boxes: children('trak', [leaf, { type: 'free' }]) },
+					]),
+				},
+				{ type: 'mdat' },
+			])
+
+			for (const box of traverseIsoBoxes(tree, { depthFirst })) {
+				if (box === leaf) {
+					break
+				}
+			}
+
+			assert.deepStrictEqual(
+				closed,
+				depthFirst ? ['trak', 'moov', 'root'] : ['root', 'moov', 'trak'],
+			)
+		}
 	})
 })

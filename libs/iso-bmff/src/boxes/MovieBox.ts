@@ -16,7 +16,9 @@ export type MovieBoxChild<V extends IsoInt64 = number> =
 	| UserDataBox<V>
 
 /**
- * Movie Box - 'moov' - Container
+ * Movie Box (`moov`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.2.1
  *
  * @public
  */

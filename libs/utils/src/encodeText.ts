@@ -1,6 +1,6 @@
 /**
- * Converts a string to a Uint8Array. The function works like
- * `TextEncoder.encode` and also supports environments without `TextEncoder`.
+ * Converts a string to UTF-8 bytes in a Uint8Array. The function calls
+ * `TextEncoder.encode`. The environment must have `TextEncoder`.
  *
  * @param data - The string to encode.
  * @returns The Uint8Array representation of the string.

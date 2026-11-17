@@ -4,7 +4,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `SampleDependencyTypeBox` from an `IsoBoxReadView`.
+ * Read the `sdtp` box (`SampleDependencyTypeBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

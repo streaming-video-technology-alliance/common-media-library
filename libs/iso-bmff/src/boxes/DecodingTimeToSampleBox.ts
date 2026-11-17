@@ -2,7 +2,9 @@ import type { DecodingTimeSample } from './DecodingTimeSample.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.6.1.2 Decoding Time To Sample Box
+ * Decoding Time To Sample Box (`stts`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.6.1.2
  *
  * @public
  */

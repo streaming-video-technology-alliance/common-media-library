@@ -19,7 +19,7 @@ import {
 describe('API', function () {
 	it('should handle advanced use cases', async () => {
 		const isoFile = await readFile(new URL('./fixtures/hvc1_init.mp4', import.meta.url))
-		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
+		const boxes = readIsoBoxes(isoFile, {
 			readers: {
 				stsd: readStsd,
 				test: (view: IsoBoxReadView) => ({ type: 'test' as const, value: view.readUint(4) }),

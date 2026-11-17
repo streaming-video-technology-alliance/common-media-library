@@ -3,6 +3,7 @@ import {
 	createInt64OverflowReader,
 	defaultReaderConfig,
 	describe,
+	findIsoBox,
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
@@ -16,18 +17,54 @@ const TFDT_V1 = boxBytes('tfdt', [1, 1], [0, 3], [BigInt('9007199254740993'), 8]
 describe('defaultReaderConfig', function () {
 	it('should read 64-bit fields as bigint with the int64 option', function () {
 		// #region example
-		const boxes = readIsoBoxes(TFDT_V1, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		// A moof box that holds a traf box with a version 1 tfdt box.
+		// baseMediaDecodeTime is 2^53 + 1, which a number cannot hold.
+		const bytes = new Uint8Array([
+			0,
+			0,
+			0,
+			36,
+			0x6d,
+			0x6f,
+			0x6f,
+			0x66, // moof
+			0,
+			0,
+			0,
+			28,
+			0x74,
+			0x72,
+			0x61,
+			0x66, // traf
+			0,
+			0,
+			0,
+			20,
+			0x74,
+			0x66,
+			0x64,
+			0x74,
+			1,
+			0,
+			0,
+			0, // tfdt, version 1
+			0,
+			0x20,
+			0,
+			0,
+			0,
+			0,
+			0,
+			1, // baseMediaDecodeTime
+		])
+		const boxes = readIsoBoxes(bytes, defaultReaderConfig({ int64: readInt64AsBigInt }))
 
-		for (const box of boxes) {
-			if (box.type === 'tfdt') {
-				// The field is a bigint with the exact value.
-				assert.strictEqual(box.baseMediaDecodeTime, BigInt('9007199254740993'))
-			}
-		}
+		// The field is a bigint with the exact value.
+		const tfdt = findIsoBox(boxes, box => box.type === 'tfdt')
 		// #endregion example
 
-		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'tfdt')
+		assert.ok(tfdt)
+		assert.strictEqual(tfdt.baseMediaDecodeTime, BigInt('9007199254740993'))
 	})
 
 	it('should read 64-bit fields as numbers with no argument', function () {

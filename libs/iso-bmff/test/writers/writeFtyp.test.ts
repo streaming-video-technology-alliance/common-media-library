@@ -12,6 +12,7 @@ describe('writeFtyp', function () {
 
 		const writer = writeFtyp(box)
 		const buffer = new Uint8Array(writer.buffer)
+		// #endregion example
 
 		assert.strictEqual(
 			Buffer.compare(
@@ -41,7 +42,6 @@ describe('writeFtyp', function () {
 			),
 			0,
 		)
-		// #endregion example
 	})
 
 	it('should write FileTypeBox with multiple compatible brands', function () {

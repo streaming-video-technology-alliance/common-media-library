@@ -69,6 +69,9 @@ import { writeVtte } from './writeVtte.ts'
  *
  * @returns An `IsoBoxWriteViewConfig` with all available writers pre-configured, except the container writers
  *
+ * @example
+ * {@includeCode ../../test/writers/defaultWriterConfig.test.ts#example}
+ *
  * @public
  */
 export function defaultWriterConfig(): IsoBoxWriteViewConfig {

@@ -2,13 +2,16 @@ import type { ChunkOffsetBox } from '../boxes/ChunkOffsetBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `ChunkOffsetBox` to an `IsoBoxWriteView`.
+ * Write the `stco` box (`ChunkOffsetBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.5 Chunk Offset Box
+ * ISO/IEC 14496-12:2015 - 8.7.5
  *
  * @param box - The `ChunkOffsetBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
+ *
+ * @example
+ * {@includeCode ../../test/writers/writeStco.test.ts#example}
  *
  * @public
  */

@@ -32,8 +32,52 @@ const MOOV = [0x00, 0x00, 0x00, 0x24, 0x6d, 0x6f, 0x6f, 0x76, ...UDTA]
 const buffer = new Uint8Array([...TRAF, ...MOOV]).buffer
 
 describe('isContainer', function () {
-	it('reads a field of a child of a container', function () {
+	it('reads a field of a child of a moof box', function () {
 		// #region example
+		// A moof box that holds an mfhd box with the sequence number 7.
+		const bytes = new Uint8Array([
+			0,
+			0,
+			0,
+			24,
+			0x6d,
+			0x6f,
+			0x6f,
+			0x66, // moof
+			0,
+			0,
+			0,
+			16,
+			0x6d,
+			0x66,
+			0x68,
+			0x64,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			7, // mfhd
+		])
+
+		const sequenceNumbers: number[] = []
+		for (const box of readIsoBoxes(bytes, defaultReaderConfig())) {
+			if (isContainer(box)) {
+				for (const child of box.boxes) {
+					if (child.type === 'mfhd') {
+						sequenceNumbers.push(child.sequenceNumber)
+					}
+				}
+			}
+		}
+		// #endregion example
+
+		assert.deepStrictEqual(sequenceNumbers, [7])
+	})
+
+	it('reads a field of a child of a container', function () {
 		const times: number[] = []
 
 		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
@@ -45,7 +89,6 @@ describe('isContainer', function () {
 				}
 			}
 		}
-		// #endregion example
 
 		assert.deepStrictEqual(times, [ROUNDED])
 	})

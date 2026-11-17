@@ -7,7 +7,7 @@ Documentation: [cml.svta.org/packages/utils](https://cml.svta.org/packages/utils
 ## When to use
 
 - Convert between hex, base64, UUID strings, and byte arrays: `hexToArrayBuffer`, `arrayBufferToHex`, `arrayBufferToUuid`, `uuidToArrayBuffer`, `decodeBase64`, `encodeBase64`
-- Encode or decode UTF-8 and UTF-16 text: `encodeText`, `decodeText`, `Encoding`
+- Encode or decode UTF-8 and UTF-16 text: `encodeText`, `decodeUtf8`, `decodeText`, `Encoding`
 - Resolve a base URL or make a URL relative to another URL: `getBaseUrl`, `urlToRelativePath`
 - Compute the time to first byte, the transfer duration, and the bandwidth in bits per second of a `ResourceTiming` sample: `getTimeToFirstByte`, `getTransferDuration`, `getBandwidthBps`
 - Unescape HTML entities in a manifest or a caption string: `unescapeHtml`

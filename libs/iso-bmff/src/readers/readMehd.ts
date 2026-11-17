@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `MovieExtendsHeaderBox` from an `IsoBoxReadView`.
+ * Read the `mehd` box (`MovieExtendsHeaderBox`).
  *
  * The 64-bit integer fields of the result have the type that the `int64` option of the view returns.
  * With no option, they are numbers.

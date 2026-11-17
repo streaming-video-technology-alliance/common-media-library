@@ -2,7 +2,9 @@ import type { FullBox } from './FullBox.ts'
 import type { SampleToGroupEntry } from './SampleToGroupEntry.ts'
 
 /**
- * Sample to Group Box - 'sbgp'
+ * Sample To Group Box (`sbgp`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.9.2
  *
  * @public
  */

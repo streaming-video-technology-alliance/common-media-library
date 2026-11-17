@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `WebVttCuePayloadBox` from an `IsoBoxReadView`.
+ * Read the `payl` box (`WebVttCuePayloadBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

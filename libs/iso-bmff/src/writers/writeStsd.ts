@@ -4,12 +4,15 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a `SampleDescriptionBox` to an `IsoBoxWriteView`.
+ * Write the `stsd` box (`SampleDescriptionBox`).
  *
  * @param box - The `SampleDescriptionBox` fields to write
- * @param config - The IsoBoxWriteViewConfig to use
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
+ *
+ * @example
+ * {@includeCode ../../test/writers/writeStsd.test.ts#example}
  *
  * @public
  */

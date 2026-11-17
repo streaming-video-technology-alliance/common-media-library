@@ -1,7 +1,7 @@
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
- * Base Box Type
+ * The base of every box: the four-character `type`.
  *
  * @public
  */

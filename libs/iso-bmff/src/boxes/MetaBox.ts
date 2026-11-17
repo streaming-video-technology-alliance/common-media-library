@@ -25,7 +25,9 @@ export type MetaBoxChild<V extends IsoInt64 = number> =
 	| GroupsListBox<V>
 
 /**
- * ISO/IEC 14496-12:202x - 8.11.1 Meta box
+ * Meta Box (`meta`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.11.1
  *
  * @public
  */

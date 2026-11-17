@@ -31,7 +31,9 @@ export type SampleTableBoxChild =
 	| SampleGroupDescriptionBox
 
 /**
- * Sample Table Box - 'stbl' - Container
+ * Sample Table Box (`stbl`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.5.1
  *
  * @public
  */

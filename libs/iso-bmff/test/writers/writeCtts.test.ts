@@ -34,4 +34,35 @@ describe('writeCtts', function () {
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), boxBytes('ctts', [2, 1], [0, 3], [1, 4]))
 	})
+
+	it('should write a negative sample offset of a version 1 box as a signed field', function () {
+		const writer = writeCtts({
+			type: 'ctts',
+			version: 1,
+			flags: 0,
+			entryCount: 1,
+			entries: [{ sampleCount: 1, sampleOffset: -1 }],
+		})
+		const bytes = new Uint8Array(writer.buffer)
+		const [box] = readIsoBoxes(bytes, { readers: { ctts: readCtts } })
+
+		assert.deepStrictEqual(bytes, boxBytes('ctts', [1, 1], [0, 3], [1, 4], [1, 4], [0xffffffff, 4]))
+		assert.strictEqual(box.type, 'ctts')
+		assert.strictEqual(box.entries[0].sampleOffset, -1)
+	})
+
+	it('should keep the bytes of a version 0 sample offset above 2^31', function () {
+		const writer = writeCtts({
+			type: 'ctts',
+			version: 0,
+			flags: 0,
+			entryCount: 1,
+			entries: [{ sampleCount: 1, sampleOffset: 3_000_000_000 }],
+		})
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			boxBytes('ctts', [0, 1], [0, 3], [1, 4], [1, 4], [0xb2d05e00, 4]),
+		)
+	})
 })

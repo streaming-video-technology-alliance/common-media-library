@@ -4,9 +4,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `CompositionTimeToSampleBox` from an `IsoBoxReadView`.
+ * Read the `ctts` box (`CompositionTimeToSampleBox`).
  *
- * ISO/IEC 14496-12:2015 - 8.6.1.3 Composition Time to Sample Box
+ * ISO/IEC 14496-12:2015 - 8.6.1.3
  *
  * A box of version 2 or above has no entries in the syntax. The result then has an empty `entries` list.
  *

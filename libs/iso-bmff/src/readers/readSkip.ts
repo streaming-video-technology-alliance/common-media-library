@@ -4,7 +4,7 @@ import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import { readFree } from './readFree.ts'
 
 /**
- * Parse a `FreeSpaceBox` from an `IsoBoxReadView`.
+ * Read the `skip` box (`FreeSpaceBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
