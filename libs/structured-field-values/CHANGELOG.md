@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The published package includes `NOTICE.md`.
+
 ## [1.1.8] - 2026-11-16
 
 ### Changed
