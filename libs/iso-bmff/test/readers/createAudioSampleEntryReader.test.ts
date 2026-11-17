@@ -3,6 +3,7 @@ import {
 	findIsoBox,
 	readIsoBoxes,
 	readStsd,
+	type AudioSampleEntryBox,
 } from '@svta/cml-iso-bmff'
 import assert from 'node:assert'
 import { readFile } from 'node:fs/promises'
@@ -20,7 +21,9 @@ describe('createAudioSampleEntryReader', function () {
 		})
 
 		const stsd = findIsoBox(boxes, box => box.type === 'stsd')
-		const entry = stsd?.entries[0]
+
+		// The type of `entries` lists the built-in sample entries, so give the entry its type.
+		const entry = stsd?.entries[0] as AudioSampleEntryBox<'ac-4'> | undefined
 		// #endregion example
 
 		assert.ok(entry)

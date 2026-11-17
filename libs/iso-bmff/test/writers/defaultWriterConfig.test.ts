@@ -22,9 +22,9 @@ describe('defaultWriterConfig', function () {
 	})
 
 	it('should have a writer for each box type of defaultReaderConfig', function () {
-		const readerTypes = Object.keys(defaultReaderConfig().readers).sort()
-		const writerTypes = Object.keys(defaultWriterConfig().writers).sort()
+		const { readers } = defaultReaderConfig()
+		const { writers } = defaultWriterConfig()
 
-		assert.deepStrictEqual(writerTypes, readerTypes)
+		assert.deepStrictEqual(Object.keys(writers).sort(), Object.keys(readers ?? {}).sort())
 	})
 })
