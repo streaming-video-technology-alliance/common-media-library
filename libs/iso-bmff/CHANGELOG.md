@@ -48,6 +48,28 @@ and this project adheres to
 - A `udta`, `grpl`, `strk`, or `meco` box no longer accepts a child of another type, such as a `Uint8Array`. Cast that child: `bytes as unknown as IsoBox` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - `writeIsoBox` and `writeIsoBoxes` now throw `No writer found for box type` for a box that has no writer and no `view`. The rule applies to a box with a `boxes` field and a type outside `CONTAINERS`, such as a `meta` box that code builds. Add the writer for the type, such as `writeMeta`, to the `writers` map ([#651](https://github.com/streaming-video-technology-alliance/common-media-library/issues/651)).
 - `EventMessageBox` now includes `EventMessageBoxUnrecognizedVersion`. After a check of `version === 0`, the other branch is no longer `EventMessageBoxV1`. To narrow to `EventMessageBoxV1`, check `version === 1` ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
+- The documentation of `IsoBoxReadView.readTemplate` now states that the method reads an unsigned fixed-point value.
+- The documentation of `IsoBoxWriteView.writeTemplate` and of the `TEMPLATE` field type now describes a fixed-point value. The `writeTemplate` documentation states the sizes 2 and 4 and the storage of a negative value.
+- The documentation of the `matrix` field of `MovieHeaderBox` and `TrackHeaderBox` now states the entry order and the identity matrix. The documentation also states the stored formats.
+- The documentation of the `balance` field of `SoundMediaHeaderBox` now states the values for full left, center, and full right.
+- The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
+- `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
+- `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.
+- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
+- The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
+- Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
+- The reading guide has a section on incomplete boxes, and the writing guide links to that section. The documentation of `readIsoBoxes`, `IsoBoxReadView.readBox`, and `IsoBoxReadView.readBoxes` now states where the read stops ([#650](https://github.com/streaming-video-technology-alliance/common-media-library/issues/650)).
+- The reading guide now states that a box with a size below the size of the box header is incomplete. The documentation of `readIsoBoxes`, `IsoBoxReadView.readBox`, and `IsoBoxReadView.readBoxes` states the same rule ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
+- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/).
+- `writeElng`, `writeIden`, `writeKind`, `writeLabl`, `writePayl`, `writeSttg`, and `writeVlab` now encode each string one time. The written bytes of `writeElng`, `writeKind`, and `writeLabl` do not change ([#632](https://github.com/streaming-video-technology-alliance/common-media-library/issues/632)).
+- `writePrsl` now encodes each tag one time. The written bytes do not change.
+- The reading guide and the documentation of `IsoBoxReadView.readBox` now state that the header of a `uuid` box has 16 more bytes for the `usertype` field.
+- `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
+- `IsoBoxReadView` now has one rule for the size limit of `readData` and `readUtf8`. The results of both methods do not change.
+- `readIsoBoxes` now calls `IsoBoxReadView.readBoxes`. The result does not change.
+- `readTfra` now computes the size of the 64-bit integer fields one time for each box.
+- `writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change.
+- The examples of `readIsoBoxes`, `writeIsoBoxes`, `traverseIsoBoxes`, and `createIsoBoxReadableStream` now use `strictEqual` and `deepStrictEqual`. The `writeIsoBoxes` example compares the written bytes with a `Uint8Array` of the file.
 
 ### Fixed
 
@@ -100,31 +122,6 @@ and this project adheres to
 - `readCtts` now returns `entryCount` and an empty `entries` list for a `ctts` box of version 2 or above. The syntax defines no entries for those versions. Earlier releases read the entries with the layout of version 0 ([#670](https://github.com/streaming-video-technology-alliance/common-media-library/issues/670)).
 - `writeCtts` now writes `entryCount` and no entries for a `ctts` box of version 2 or above. Earlier releases write every element of `entries` for every version ([#670](https://github.com/streaming-video-technology-alliance/common-media-library/issues/670)).
 - `readTrun` now reads `sampleCompositionTimeOffset` as a signed integer for a `trun` box of version 2 or above. Earlier releases read a signed integer only for version 1 ([#678](https://github.com/streaming-video-technology-alliance/common-media-library/issues/678)).
-
-### Changed
-
-- The documentation of `IsoBoxReadView.readTemplate` now states that the method reads an unsigned fixed-point value.
-- The documentation of `IsoBoxWriteView.writeTemplate` and of the `TEMPLATE` field type now describes a fixed-point value. The `writeTemplate` documentation states the sizes 2 and 4 and the storage of a negative value.
-- The documentation of the `matrix` field of `MovieHeaderBox` and `TrackHeaderBox` now states the entry order and the identity matrix. The documentation also states the stored formats.
-- The documentation of the `balance` field of `SoundMediaHeaderBox` now states the values for full left, center, and full right.
-- The reading guide has a section on extending a built-in reader. The example decodes the ID3 frames of an `emsg` box.
-- `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
-- `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.
-- The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
-- The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
-- Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
-- The reading guide has a section on incomplete boxes, and the writing guide links to that section. The documentation of `readIsoBoxes`, `IsoBoxReadView.readBox`, and `IsoBoxReadView.readBoxes` now states where the read stops ([#650](https://github.com/streaming-video-technology-alliance/common-media-library/issues/650)).
-- The reading guide now states that a box with a size below the size of the box header is incomplete. The documentation of `readIsoBoxes`, `IsoBoxReadView.readBox`, and `IsoBoxReadView.readBoxes` states the same rule ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
-- The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/).
-- `writeElng`, `writeIden`, `writeKind`, `writeLabl`, `writePayl`, `writeSttg`, and `writeVlab` now encode each string one time. The written bytes of `writeElng`, `writeKind`, and `writeLabl` do not change ([#632](https://github.com/streaming-video-technology-alliance/common-media-library/issues/632)).
-- `writePrsl` now encodes each tag one time. The written bytes do not change.
-- The reading guide and the documentation of `IsoBoxReadView.readBox` now state that the header of a `uuid` box has 16 more bytes for the `usertype` field.
-- `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
-- `IsoBoxReadView` now has one rule for the size limit of `readData` and `readUtf8`. The results of both methods do not change.
-- `readIsoBoxes` now calls `IsoBoxReadView.readBoxes`. The result does not change.
-- `readTfra` now computes the size of the 64-bit integer fields one time for each box.
-- `writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change.
-- The examples of `readIsoBoxes`, `writeIsoBoxes`, `traverseIsoBoxes`, and `createIsoBoxReadableStream` now use `strictEqual` and `deepStrictEqual`. The `writeIsoBoxes` example compares the written bytes with a `Uint8Array` of the file.
 
 ## [1.0.7] - 2026-10-18
 
@@ -216,7 +213,7 @@ Official stable release. No changes since 1.0.0-beta.2.
 
 ## [1.0.0-alpha.7] - 2026-01-12
 
-### Fix
+### Fixed
 
 - Bad publish
 
@@ -258,7 +255,7 @@ Official stable release. No changes since 1.0.0-beta.2.
 - Changed `traverseIsoBoxes` to accept a config object instead of positional arguments for `depthFirst` and `maxDepth`
 - Expanded `AudioSampleEntryBox` and `VisualSampleEntryBox` type parameters to accept any `IsoBoxType`
 
-## [1.0.0-alpha.3] - 2025-01-07
+## [1.0.0-alpha.3] - 2026-01-07
 
 ### Changed
 
@@ -268,7 +265,7 @@ Official stable release. No changes since 1.0.0-beta.2.
 
 - Incorrect FourCC for Additional Metadata Container Box (`meco`) box
 
-## [1.0.0-alpha.2] - 2025-01-05
+## [1.0.0-alpha.2] - 2026-01-05
 
 ### Added
 
