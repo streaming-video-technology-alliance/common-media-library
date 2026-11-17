@@ -3,6 +3,11 @@ import { isArrayBufferLike } from '@svta/cml-utils'
 /**
  * Parses a list of PSSH boxes into keysystem-specific PSSH data.
  *
+ * The function stops before a box if the data ends inside the header or the body of that box.
+ * The function also stops before a box with a size below the size of its header.
+ * The function then returns the entries before that box and does not throw.
+ * The function skips a `pssh` box that ends before its data size field.
+ *
  * @param data - The concatenated list of PSSH boxes as provided by
  * the CDM as initialization data when CommonEncryption content is detected
  * @returns An object that has a property named according to each of
@@ -17,6 +22,11 @@ import { isArrayBufferLike } from '@svta/cml-utils'
 export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>
 /**
  * Parses a list of PSSH boxes into keysystem-specific PSSH data.
+ *
+ * The function stops before a box if the data ends inside the header or the body of that box.
+ * The function also stops before a box with a size below the size of its header.
+ * The function then returns the entries before that box and does not throw.
+ * The function skips a `pssh` box that ends before its data size field.
  *
  * @param data - The concatenated list of PSSH boxes as a `Uint8Array`.
  * @returns An object that has a property named according to each of
@@ -37,85 +47,56 @@ export function parsePsshList(
 	const dv = isArrayBufferLike(data)
 		? new DataView(data)
 		: new DataView(data.buffer, data.byteOffset, data.byteLength)
+	const length = dv.byteLength
 	const pssh: Record<string, ArrayBufferLike | Uint8Array> = {}
-	let byteCursor = 0
+	let offset = 0
 
-	while (true) {
-		if (byteCursor >= dv.byteLength) {
+	// Box header rules of ISO/IEC 14496-12, clause 4.2
+	while (length - offset >= 8) {
+		const remaining = length - offset
+		let size = dv.getUint32(offset)
+		let headerSize = 8
+
+		if (size === 1) {
+			headerSize = 16
+
+			if (remaining < headerSize) {
+				break
+			}
+
+			size = dv.getUint32(offset + 8) * 0x100000000 + dv.getUint32(offset + 12)
+		} else if (size === 0) {
+			size = remaining
+		}
+
+		if (size < headerSize || size > remaining) {
 			break
 		}
 
-		const boxStart = byteCursor
+		const end = offset + size
 
-		// Box size
-		const size = dv.getUint32(byteCursor)
-		const nextBox = byteCursor + size
-		byteCursor += 4
+		// The full box header, the system ID, and the data size field of ISO/IEC 23001-7, clause 8.1
+		if (dv.getUint32(offset + 4) === 0x70737368 && size - headerSize >= 24) {
+			const fields = offset + headerSize
+			const version = dv.getUint8(fields)
 
-		// Verify PSSH
-		if (dv.getUint32(byteCursor) !== 0x70737368) {
-			byteCursor = nextBox
-			continue
+			if (version === 0 || version === 1) {
+				let systemID = ''
+
+				for (let i = 0; i < 16; i++) {
+					if (i === 4 || i === 6 || i === 8 || i === 10) {
+						systemID += '-'
+					}
+
+					const val = dv.getUint8(fields + 4 + i).toString(16)
+					systemID += val.length === 1 ? '0' + val : val
+				}
+
+				pssh[systemID] = data.slice(offset, end)
+			}
 		}
-		byteCursor += 4
 
-		// Version must be 0 or 1
-		const version = dv.getUint8(byteCursor)
-		if (version !== 0 && version !== 1) {
-			byteCursor = nextBox
-			continue
-		}
-
-		byteCursor += 1 // Move past version
-		byteCursor += 3 // Skip flags
-
-		// 16-byte UUID/SystemID
-		let systemID = ''
-		let val: string
-
-		for (let i = 0; i < 4; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16)
-			systemID += val.length === 1 ? '0' + val : val
-		}
-		byteCursor += 4
-		systemID += '-'
-
-		for (let i = 0; i < 2; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16)
-			systemID += val.length === 1 ? '0' + val : val
-		}
-		byteCursor += 2
-		systemID += '-'
-
-		for (let i = 0; i < 2; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16)
-			systemID += val.length === 1 ? '0' + val : val
-		}
-		byteCursor += 2
-		systemID += '-'
-
-		for (let i = 0; i < 2; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16)
-			systemID += val.length === 1 ? '0' + val : val
-		}
-		byteCursor += 2
-		systemID += '-'
-
-		for (let i = 0; i < 6; i++) {
-			val = dv.getUint8(byteCursor + i).toString(16)
-			systemID += val.length === 1 ? '0' + val : val
-		}
-		byteCursor += 6
-
-		systemID = systemID.toLowerCase()
-
-		// PSSH Data Size
-		byteCursor += 4
-
-		// PSSH boxdata
-		pssh[systemID] = data.slice(boxStart, nextBox)
-
-		byteCursor = nextBox
+		offset = end
 	}
 
 	return pssh
