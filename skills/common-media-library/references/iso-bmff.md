@@ -71,15 +71,15 @@ Some exports need a runtime API:
 <!-- libs/iso-bmff/docs/reading-boxes.md -->
 ---
 title: Reading Boxes
-description: Parse ISO BMFF boxes from a buffer
+description: Read ISO BMFF boxes from a buffer
 ---
 
 # Reading Boxes
 
-The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To parse the content of a box, provide a reader function for that box type.
+The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To read the content of a box, provide a reader function for that box type.
 
 > [!NOTE]
-> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
+> The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
 
 ## Using default config
 
@@ -94,6 +94,10 @@ const buffer = await fetch("https://example.com/bbb.mp4").then((r) =>
 
 const boxes = readIsoBoxes(buffer, defaultReaderConfig());
 ```
+
+Each call of `defaultReaderConfig()` returns a new configuration object. A player can create the configuration once and pass it to every read.
+
+`readIsoBoxes` accepts an `ArrayBuffer` and any view, such as a `Uint8Array`, a `DataView`, or a Node.js `Buffer`. The function does not copy the data. Pass the view itself. Do not pass the `buffer` property of a view, because that buffer can contain other data.
 
 ## Using specific readers
 
@@ -153,17 +157,21 @@ for (const box of boxes) {
 }
 ```
 
+A byte field such as `messageData` is a view over the input data. The field shares memory with that data and is not a copy. To keep the bytes after your code releases or changes the input, call `slice()` on the field.
+
 The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
 
 ## Incomplete boxes
 
-A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw.
+A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw for an incomplete box.
+
+A box with a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
 
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
 
-The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes. The `size` field of the parsed box is the size of the source box.
+The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes. The `size` field of the parsed box is the `size` field of the source box header, so it counts those bytes. The field is 1 when the box has a `largesize` field, and the parsed box then has `largesize`. The field is 0 when the box extends to the end of the data.
 
-A writer builds a container or a sample entry from the child boxes of the parsed box. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes.
+A writer builds a container or a sample entry from the child boxes of the parsed box. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes. The `mfraSize` field of an `mfro` box has the same limit. See [Writing a changed `mfra` box](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md#writing-a-changed-mfra-box).
 
 ## Reading 64-bit fields
 
@@ -203,8 +211,12 @@ const boxes = readIsoBoxes(
 
 for (const box of boxes) {
 	if (box.type === "sidx") {
-		// earliestPresentationTime is a bigint.
-		const seconds = box.earliestPresentationTime / BigInt(box.timescale);
+		// earliestPresentationTime is a bigint. The division of two bigints
+		// drops the fraction, so add the remainder as a number.
+		const scale = BigInt(box.timescale);
+		const seconds =
+			Number(box.earliestPresentationTime / scale) +
+			Number(box.earliestPresentationTime % scale) / box.timescale;
 		console.log(seconds);
 	}
 }
@@ -215,7 +227,12 @@ Pass the option as the argument of `defaultReaderConfig`. The readers of the ret
 The option works the same way with specific readers:
 
 ```typescript
-import { readInt64AsBigInt, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+import {
+	findIsoBox,
+	readInt64AsBigInt,
+	readIsoBoxes,
+	readTfdt,
+} from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(buffer, {
 	int64: readInt64AsBigInt,
@@ -224,12 +241,11 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 
-for (const box of boxes) {
-	if (box.type === "tfdt") {
-		// baseMediaDecodeTime is a bigint.
-		console.log(box.baseMediaDecodeTime);
-	}
-}
+// A tfdt box is inside a traf box, inside a moof box.
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+
+// baseMediaDecodeTime is a bigint.
+console.log(tfdt?.baseMediaDecodeTime);
 ```
 
 Each field has one type for every version of its box. A version 0 `tfdt` box stores `baseMediaDecodeTime` in 32 bits. The reader returns that field as a `bigint` too, so your code does not test `version`. The option also applies to the child boxes of a container.
@@ -241,6 +257,8 @@ Each field has one type for every version of its box. A version 0 `tfdt` box sto
 ### Reporting a rounded value
 
 If your code keeps `number` fields, use `createInt64OverflowReader`. The function takes a callback and returns a function for the `int64` option. When a 64-bit value is outside the safe integer range, the callback receives a `RangeError`. If the callback returns, the read continues with the rounded value. If the callback throws, the read stops with that error.
+
+A version 1 `mvhd`, `tkhd`, or `mdhd` box can have a `duration` with all bits set. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. The callback receives a `RangeError` for that value too, and the field reads as `2 ** 64`. That report does not mean that the file is damaged. If your code reads such boxes, do not throw from the callback.
 
 ```typescript
 import {
@@ -279,7 +297,13 @@ import {
 const readTfdtWide = <V extends IsoInt64>(view: IsoBoxReadView<V>) => {
 	const { version, flags } = view.readFullBox();
 	const baseMediaDecodeTime = view.readWideUint(version === 1 ? 8 : 4);
-	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+	return {
+		type: "tfdt" as const,
+		version,
+		flags,
+		baseMediaDecodeTime,
+		source: "custom",
+	};
 };
 
 // baseMediaDecodeTime is a bigint in this result.
@@ -295,7 +319,7 @@ const readers = { tfdt: readTfdtWide<bigint> };
 const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
 ```
 
-A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`.
+A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`. A custom reader whose result equals the built-in box type gets the fields of the configuration without a type argument.
 
 ### A function that forwards the option
 
@@ -362,9 +386,11 @@ description: Traversing boxes and type guards
 
 # Utilities
 
+In the examples, `buffer` holds the bytes of a segment.
+
 ## Traversing boxes
 
-The `traverseIsoBoxes` function traverses box iterators and returns a generator of boxes. It takes an iterable of boxes and two optional arguments: depth-first traversal and maximum depth. By default, the function traverses depth-first with a maximum depth of infinity. A maximum depth of 0 traverses only the root boxes.
+The `traverseIsoBoxes` function traverses box iterators and returns a generator of boxes. It takes an iterable of boxes and one optional configuration with two options. `depthFirst` selects a depth-first or a breadth-first traversal, and the default is `true`. `maxDepth` is the maximum depth, and the default is `Infinity`. A maximum depth of 0 traverses only the root boxes.
 
 ```typescript
 import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
@@ -376,16 +402,69 @@ for (const box of traverseIsoBoxes(boxes)) {
 }
 ```
 
+This example traverses breadth-first, and stops at the children of the root boxes:
+
+```typescript
+import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer);
+
+for (const box of traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 })) {
+	console.log(box.type);
+}
+```
+
+## Finding boxes
+
+`findIsoBox` returns the first box that matches a callback, or `null`. `filterIsoBoxes` returns every box that matches. Both functions traverse the boxes as `traverseIsoBoxes` does and take the same configuration. A callback that tests `box.type` narrows the result to that box type.
+
+```typescript
+import {
+	defaultReaderConfig,
+	filterIsoBoxes,
+	findIsoBox,
+	readIsoBoxes,
+} from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, defaultReaderConfig());
+
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+const trafs = filterIsoBoxes(boxes, (box) => box.type === "traf");
+
+console.log(tfdt?.baseMediaDecodeTime, trafs.length);
+```
+
+The traversal follows only the `boxes` field. The search therefore does not reach the `entries` of an `stsd` or a `dref` box.
+
+`isIsoBoxType` checks the type of one box and narrows the box to that type:
+
+```typescript
+import {
+	isIsoBoxType,
+	readIsoBoxes,
+	readTfdt,
+	traverseIsoBoxes,
+} from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
+
+for (const box of traverseIsoBoxes(boxes)) {
+	if (isIsoBoxType("tfdt", box)) {
+		console.log(box.baseMediaDecodeTime);
+	}
+}
+```
+
 ## Type guards
 
-The library provides type guards that check whether a box is a container box or a full box. These guards narrow the type of a box in TypeScript.
+The package provides type guards that check whether a box is a container box or a full box. These guards narrow the type of a box in TypeScript.
 
 `isContainer` checks whether a box is a container box.
 
 ```typescript
 import { isContainer, type IsoBox } from "@svta/cml-iso-bmff";
 
-const box: IsoBox = { type: "meta", version: 0, flags: 0, boxes: [] };
+const box: IsoBox = { type: "moov", boxes: [] };
 const container = isContainer(box);
 ```
 
@@ -397,8 +476,8 @@ import { defaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bm
 for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
 	if (isContainer(box)) {
 		for (const child of box.boxes) {
-			if (child.type === "tfdt") {
-				console.log(child.baseMediaDecodeTime);
+			if (child.type === "mfhd") {
+				console.log(child.sequenceNumber);
 			}
 		}
 	}
@@ -410,7 +489,7 @@ for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
 ```typescript
 import { isFullBox } from "@svta/cml-iso-bmff";
 
-const box = { type: "meta", version: 1, flags: 0 };
+const box = { type: "mfhd", version: 0, flags: 0, sequenceNumber: 1 };
 const fullBox = isFullBox(box);
 ```
 
@@ -422,12 +501,15 @@ description: Write boxes to byte arrays or streams
 
 # Writing Boxes
 
-The `writeIsoBoxes` function writes boxes. It takes an array of streamable items and returns an array of `Uint8Array`s. Streamable items include:
+The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable items and returns an array of `Uint8Array`s. Streamable items include:
 
 - Raw box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
-- ArrayBufferViews such as `Uint8Array` and `DataView`, and the box structures that `readIsoBoxes` returns. Those structures implement the `ArrayBufferView` interface.
+- `ArrayBufferView`s such as `Uint8Array` and `DataView`.
+- Boxes that `readIsoBoxes` returns. If the `writers` map has a writer for the type, the function writes the fields of the box. If the map has no writer and the type is not a container, the function writes the source bytes of the box, and a changed field has no effect.
 
-If you provide raw box objects, also provide a configuration object that names the writers for those box types.
+If you provide raw box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space.
+
+A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing field.
 
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
@@ -463,9 +545,13 @@ const byteArrays = writeIsoBoxes(boxes, defaultWriterConfig());
 
 for (const byteArray of byteArrays) {
 	sourceBuffer.appendBuffer(byteArray);
-	// wait for updateend event
+	await new Promise((resolve) =>
+		sourceBuffer.addEventListener("updateend", resolve, { once: true }),
+	);
 }
 ```
+
+Each call of `defaultWriterConfig()` returns a new configuration object. A player can create the configuration once and pass it to every write.
 
 ## Using specific writers
 
@@ -503,13 +589,15 @@ const byteArrays = writeIsoBoxes(boxes, {
 
 for (const byteArray of byteArrays) {
 	sourceBuffer.appendBuffer(byteArray);
-	// wait for updateend event
+	await new Promise((resolve) =>
+		sourceBuffer.addEventListener("updateend", resolve, { once: true }),
+	);
 }
 ```
 
 ## Streaming boxes
 
-The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers:
+The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers. The function needs `ReadableStream`. On a runtime without `ReadableStream`, the function throws an error.
 
 ```typescript
 import {
@@ -548,24 +636,29 @@ A box that `readIsoBoxes` reads with `readInt64AsBigInt` has `bigint` fields. Th
 
 ```typescript
 import {
+	findIsoBox,
 	readInt64AsBigInt,
 	readIsoBoxes,
 	readTfdt,
-	writeIsoBox,
+	writeIsoBoxes,
 	writeTfdt,
 } from "@svta/cml-iso-bmff";
 
-const [tfdt] = readIsoBoxes(buffer, {
+const boxes = readIsoBoxes(buffer, {
 	int64: readInt64AsBigInt,
 	readers: {
 		tfdt: readTfdt,
 	},
 });
 
-if (tfdt?.type === "tfdt") {
+// A tfdt box is inside a traf box, inside a moof box.
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+
+if (tfdt) {
 	tfdt.baseMediaDecodeTime += BigInt(90000);
 
-	const bytes = writeIsoBox(tfdt, { writers: { tfdt: writeTfdt } });
+	// Write the whole segment. A player cannot append a lone tfdt box.
+	const byteArrays = writeIsoBoxes(boxes, { writers: { tfdt: writeTfdt } });
 }
 ```
 
@@ -587,7 +680,7 @@ const bytes = writeIsoBox(
 
 A writer throws a `RangeError` for a `bigint` that does not fit the field. One example is a value above 2^32 - 1 in a version 0 box.
 
-A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined.
+A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. See [Reporting a rounded value](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#reporting-a-rounded-value) for the read of that value.
 
 A custom writer calls `writeWideUint` or `writeWideInt` on `IsoBoxWriteView`. Both methods take a `number` or a `bigint`, and the size of the field in bytes, 4 or 8:
 
@@ -624,9 +717,13 @@ const tfdt = writeTfdt64(BigInt("17900000000000000"));
 
 The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects.
 
+## Writing a changed `mfra` box
+
+The `mfraSize` field of an `mfro` box is the size in bytes of the enclosing `mfra` box. `writeMfro` writes the stored value, and `writeMfra` does not change it. After a change to the children of an `mfra` box, set `mfraSize` to the new size of the `mfra` box.
+
 ## Type safety
 
-In TypeScript, cast raw box objects to a box type for type safety. There are two ways. The first way uses a box type from the library:
+In TypeScript, give a raw box object a box type. Annotate the object with a box type from the package:
 
 ```typescript
 import type { FileTypeBox } from "@svta/cml-iso-bmff";
@@ -639,18 +736,7 @@ const box: FileTypeBox = {
 };
 ```
 
-The second way uses the `as const` operator on the `type` property:
-
-```typescript
-const box = {
-	type: "ftyp" as const,
-	majorBrand: "isom",
-	minorVersion: 1,
-	compatibleBrands: ["isom"],
-};
-```
-
-You can also get a box type from `IsoBoxMap` with the box's FourCC:
+Or get the same type from `IsoBoxMap` with the four-character type of the box:
 
 ```typescript
 import type { IsoBoxMap } from "@svta/cml-iso-bmff";
@@ -661,6 +747,19 @@ const box: IsoBoxMap["ftyp"] = {
 	minorVersion: 1,
 	compatibleBrands: ["isom"],
 };
+```
+
+The `satisfies` operator checks the object against the box type and keeps the literal types of the object:
+
+```typescript
+import type { FileTypeBox } from "@svta/cml-iso-bmff";
+
+const box = {
+	type: "ftyp",
+	majorBrand: "isom",
+	minorVersion: 1,
+	compatibleBrands: ["isom"],
+} satisfies FileTypeBox;
 ```
 
 <!-- libs/iso-bmff/config/cml-iso-bmff.api.md -->
