@@ -82,6 +82,13 @@ and this project adheres to
 - 25 readers and writers and 7 other exports now link a test example. Each linked example declares its input, except the examples of `IsoBoxWriteView.writeUint` and `writeIsoBoxes`.
 - `traverseIsoBoxes` is faster. The largest gain is in breadth-first order over many sibling containers. The order of the boxes does not change ([#706](https://github.com/streaming-video-technology-alliance/common-media-library/pull/706)).
 - `IsoBoxReadView.readBox` now reads the four characters of the box type in one call. `readIsoBoxes` is about 3% faster ([#706](https://github.com/streaming-video-technology-alliance/common-media-library/pull/706)).
+- `writeCtts` and `writeTrun` now write the signed offset fields as signed integers, as `readCtts` and `readTrun` read them. The written bytes do not change.
+- `isFullBox` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
+- `IsoBoxType` is now declared as `string`. The type accepts the same values as before. The documentation states that TypeScript does not check the length of a box type.
+- `readVtte` and `writeVtte` now name their parameters `_view` and `_box`, and the documentation describes the parameters.
+- The documentation of `readInt64AsBigInt` and the reading guide now test for `DataView.prototype.getBigUint64`. A runtime can have `BigInt` and no `getBigUint64` method. The documentation of `readUint64`, `writeUint64`, `writeWideUint`, and `writeWideInt` names the `DataView` method that each one needs.
+- The runtime requirements table of the README now lists the `DataView` methods that the `bigint` reads and writes need.
+- The description of the package now states that the package reads and writes boxes.
 
 ### Fixed
 
@@ -134,6 +141,8 @@ and this project adheres to
 - `readCtts` now returns `entryCount` and an empty `entries` list for a `ctts` box of version 2 or above. The syntax defines no entries for those versions. Earlier releases read the entries with the layout of version 0 ([#670](https://github.com/streaming-video-technology-alliance/common-media-library/issues/670)).
 - `writeCtts` now writes `entryCount` and no entries for a `ctts` box of version 2 or above. Earlier releases write every element of `entries` for every version ([#670](https://github.com/streaming-video-technology-alliance/common-media-library/issues/670)).
 - `readTrun` now reads `sampleCompositionTimeOffset` as a signed integer for a `trun` box of version 2 or above. Earlier releases read a signed integer only for version 1 ([#678](https://github.com/streaming-video-technology-alliance/common-media-library/issues/678)).
+- `readIsoBoxes` and `IsoBoxReadView` now read an `ArrayBuffer` from another realm, such as a `node:vm` context or an iframe. Earlier releases throw a `TypeError` for that `ArrayBuffer`.
+- `IsoBoxReadableStream` and `createIsoBoxReadableStream` now close the source iterator when the stream is canceled. The `finally` block of a generator source now runs. Earlier releases leave the iterator open.
 
 ## [1.0.7] - 2026-10-18
 

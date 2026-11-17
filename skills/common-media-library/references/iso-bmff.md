@@ -60,6 +60,7 @@ Some exports need a runtime API:
 | --- | --- | --- |
 | `TextEncoder` | Every writer of a UTF-8 string field, such as `writeHdlr` and `writeEmsg` | None |
 | `BigInt` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, and the boxes with `bigint` fields | None, and no check |
+| `DataView` methods `getBigUint64`, `setBigUint64`, and `setBigInt64` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, `IsoBoxWriteView.writeWideUint`, and `IsoBoxWriteView.writeWideInt` with a `bigint` of 8 bytes | None, and no check |
 | `ReadableStream` | `createIsoBoxReadableStream`, `IsoBoxReadableStream` | None. The constructor throws an error with a clear message |
 
 ## Usage
@@ -250,7 +251,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 
 Each field has one type for every version of its box. A version 0 `tfdt` box stores `baseMediaDecodeTime` in 32 bits. The reader returns that field as a `bigint` too, so your code does not test `version`. The option also applies to the child boxes of a container.
 
-`readInt64AsBigInt` needs `BigInt` and does not test for it. On a runtime without `BigInt`, the read of a 64-bit field fails with the error of the runtime. If your code supports such a runtime, test `typeof BigInt === "function"` before you pass the function.
+`readInt64AsBigInt` needs `BigInt` and the `getBigUint64` method of `DataView`, and does not test for them. On a runtime without them, a read fails with the error of the runtime. If your code supports such a runtime, test `typeof DataView.prototype.getBigUint64 === "function"` before you pass the function. The test is `false` on a runtime without `BigInt` too.
 
 `JSON.stringify` throws a `TypeError` for a `bigint`. To serialize a box with `bigint` fields, pass a replacer function that converts each `bigint` to a string.
 
@@ -1082,7 +1083,7 @@ export type IpmpInfoBox = FullBox & {
 export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]>>(box: T): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never] ? T & IsoBoxContainer<IsoInt64> : Extract<T, IsoBoxContainer<IsoInt64>>;
 
 // @public
-export function isFullBox(box: any): box is FullBox;
+export function isFullBox(box: unknown): box is FullBox;
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
@@ -1302,7 +1303,7 @@ export type IsoBoxReadViewConfig<V extends IsoInt64 = number> = {
 export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | ParsedBox<unknown, V> | ArrayBufferView;
 
 // @public
-export type IsoBoxType = `${string}${string}${string}${string}`;
+export type IsoBoxType = string;
 
 // @public
 export type IsoBoxWriter<B> = (box: B, config: IsoBoxWriteViewConfig) => ArrayBufferView;
@@ -1880,7 +1881,7 @@ export function readVttC(view: IsoBoxReadView<IsoInt64>): WebVttConfigurationBox
 export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox;
 
 // @public
-export function readVtte(_: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
+export function readVtte(_view: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
 
 // @public
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
@@ -2641,7 +2642,7 @@ export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
 export function writeVttc(box: WebVttCueBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;
+export function writeVtte(_box: WebVttEmptySampleBox): IsoBoxWriteView;
 
 // (No @packageDocumentation comment for this package)
 

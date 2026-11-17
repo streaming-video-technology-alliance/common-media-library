@@ -179,7 +179,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 
 Each field has one type for every version of its box. A version 0 `tfdt` box stores `baseMediaDecodeTime` in 32 bits. The reader returns that field as a `bigint` too, so your code does not test `version`. The option also applies to the child boxes of a container.
 
-`readInt64AsBigInt` needs `BigInt` and does not test for it. On a runtime without `BigInt`, the read of a 64-bit field fails with the error of the runtime. If your code supports such a runtime, test `typeof BigInt === "function"` before you pass the function.
+`readInt64AsBigInt` needs `BigInt` and the `getBigUint64` method of `DataView`, and does not test for them. On a runtime without them, a read fails with the error of the runtime. If your code supports such a runtime, test `typeof DataView.prototype.getBigUint64 === "function"` before you pass the function. The test is `false` on a runtime without `BigInt` too.
 
 `JSON.stringify` throws a `TypeError` for a `bigint`. To serialize a box with `bigint` fields, pass a replacer function that converts each `bigint` to a string.
 

@@ -111,6 +111,8 @@ export class IsoBoxWriteView {
 	 * `writeUint(value, 8)` takes a `number` and loses precision above 2^53 - 1.
 	 * Use this method for a 64-bit field whose value can exceed that limit.
 	 *
+	 * The method needs the `setBigUint64` method of `DataView`.
+	 *
 	 * @param value - The value to write, from 0 to 2^64 - 1.
 	 * @throws RangeError if `value` is negative or greater than 2^64 - 1.
 	 *
@@ -168,6 +170,7 @@ export class IsoBoxWriteView {
 	 * Use this method for a field that is 64 bits in one version of its box.
 	 * A box that `readIsoBoxes` reads with `readInt64AsBigInt` holds such a field as a `bigint`.
 	 * The method writes a `number` as `writeUint` does, and a `bigint` with the exact value.
+	 * For a `bigint` of 8 bytes, the method needs the `setBigUint64` method of `DataView`.
 	 *
 	 * @param value - The value to write.
 	 * @param size - The size, in bytes, of the value.
@@ -197,6 +200,7 @@ export class IsoBoxWriteView {
 	 *
 	 * Use this method for a field that is 64 bits in one version of its box.
 	 * The method writes a `number` as `writeInt` does, and a `bigint` with the exact value.
+	 * For a `bigint` of 8 bytes, the method needs the `setBigInt64` method of `DataView`.
 	 *
 	 * @param value - The value to write.
 	 * @param size - The size, in bytes, of the value.

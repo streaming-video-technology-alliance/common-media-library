@@ -4,12 +4,16 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `vtte` box (`WebVttEmptySampleBox`).
  *
+ * The box has no fields, so the function writes only the box header.
+ *
+ * @param _box - The `WebVttEmptySampleBox` fields to write
+ *
  * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-// eslint-disable-next-line
-export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView {
+// oxlint-disable-next-line no-unused-vars
+export function writeVtte(_box: WebVttEmptySampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const totalSize = headerSize
 

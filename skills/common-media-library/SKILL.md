@@ -210,7 +210,7 @@ Reference: references/iso-8601.md
 
 ### @svta/cml-iso-bmff
 
-ISO Base Media File Format (ISOBMFF) parsing functionality
+Read and write ISO Base Media File Format (ISO BMFF) boxes
 
 - Read the boxes of an init or media segment, with full content for the box types that you need: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`
 - Read the track timescale, codec, or default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTrex`, `readTfhd`, `readTrun`

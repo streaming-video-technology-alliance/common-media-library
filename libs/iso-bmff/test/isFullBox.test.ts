@@ -15,4 +15,11 @@ describe('isFullBox', function () {
 	it('should return false for a box with no version', function () {
 		assert.strictEqual(isFullBox({ type: 'moov', boxes: [] }), false)
 	})
+
+	it('should return false for null and for a value that is not an object', function () {
+		assert.strictEqual(isFullBox(null), false)
+		assert.strictEqual(isFullBox(undefined), false)
+		assert.strictEqual(isFullBox(5), false)
+		assert.strictEqual(isFullBox('tfdt'), false)
+	})
 })

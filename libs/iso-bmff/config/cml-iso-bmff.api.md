@@ -317,7 +317,7 @@ export type IpmpInfoBox = FullBox & {
 export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]>>(box: T): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never] ? T & IsoBoxContainer<IsoInt64> : Extract<T, IsoBoxContainer<IsoInt64>>;
 
 // @public
-export function isFullBox(box: any): box is FullBox;
+export function isFullBox(box: unknown): box is FullBox;
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
@@ -537,7 +537,7 @@ export type IsoBoxReadViewConfig<V extends IsoInt64 = number> = {
 export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | ParsedBox<unknown, V> | ArrayBufferView;
 
 // @public
-export type IsoBoxType = `${string}${string}${string}${string}`;
+export type IsoBoxType = string;
 
 // @public
 export type IsoBoxWriter<B> = (box: B, config: IsoBoxWriteViewConfig) => ArrayBufferView;
@@ -1115,7 +1115,7 @@ export function readVttC(view: IsoBoxReadView<IsoInt64>): WebVttConfigurationBox
 export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox;
 
 // @public
-export function readVtte(_: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
+export function readVtte(_view: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
 
 // @public
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
@@ -1876,7 +1876,7 @@ export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
 export function writeVttc(box: WebVttCueBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;
+export function writeVtte(_box: WebVttEmptySampleBox): IsoBoxWriteView;
 
 // (No @packageDocumentation comment for this package)
 
