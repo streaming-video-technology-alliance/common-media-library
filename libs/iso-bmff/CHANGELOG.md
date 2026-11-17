@@ -124,6 +124,7 @@ and this project adheres to
 - `readIsoBoxes` now calls `IsoBoxReadView.readBoxes`. The result does not change.
 - `readTfra` now computes the size of the 64-bit integer fields one time for each box.
 - `writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change.
+- The examples of `readIsoBoxes`, `writeIsoBoxes`, `traverseIsoBoxes`, and `createIsoBoxReadableStream` now use `strictEqual` and `deepStrictEqual`. The `writeIsoBoxes` example compares the written bytes with a `Uint8Array` of the file.
 
 ## [1.0.7] - 2026-10-18
 

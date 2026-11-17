@@ -1,4 +1,4 @@
-import { equal } from 'node:assert'
+import { strictEqual } from 'node:assert'
 import { createWriteStream } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -42,7 +42,7 @@ describe('createIsoBoxReadableStream', function () {
 		const copy = join(tmpdir(), 'captions-copy.mp4')
 		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
 
-		equal(Buffer.compare(isoFile, await readFile(copy)), 0)
+		strictEqual(Buffer.compare(isoFile, await readFile(copy)), 0)
 		// #endregion example
 	})
 
@@ -152,7 +152,7 @@ describe('createIsoBoxReadableStream', function () {
 		const copy = join(tmpdir(), 'subsample.mp4')
 		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
 
-		equal(Buffer.compare(isoFile, await readFile(copy)), 0)
+		strictEqual(Buffer.compare(isoFile, await readFile(copy)), 0)
 	})
 
 	it('should exit if boxes are empty', async function () {
@@ -163,6 +163,6 @@ describe('createIsoBoxReadableStream', function () {
 			buffers.push(data)
 		}
 
-		equal(buffers.length, 0)
+		strictEqual(buffers.length, 0)
 	})
 })

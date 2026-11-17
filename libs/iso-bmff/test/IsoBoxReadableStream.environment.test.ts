@@ -1,4 +1,4 @@
-import { equal, throws } from 'node:assert'
+import { strictEqual, throws } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
 // This file must not import @svta/cml-iso-bmff statically: the module has to be
@@ -15,14 +15,14 @@ describe('IsoBoxReadableStream in a runtime without ReadableStream', () => {
 		try {
 			const { fourCcToUint32, IsoBoxReadableStream } = await import('@svta/cml-iso-bmff')
 
-			equal(typeof IsoBoxReadableStream, 'function')
+			strictEqual(typeof IsoBoxReadableStream, 'function')
 			throws(
 				() => new IsoBoxReadableStream([], { writers: {} }),
 				/ReadableStream is not available in this environment/,
 			)
 
 			// Non-stream exports remain fully usable
-			equal(fourCcToUint32('ftyp'), 0x66747970)
+			strictEqual(fourCcToUint32('ftyp'), 0x66747970)
 		} finally {
 			globalThis.ReadableStream = NativeReadableStream
 		}

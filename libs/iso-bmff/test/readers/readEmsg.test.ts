@@ -120,7 +120,7 @@ describe('readEmsg', function () {
 		assert.strictEqual(box.id, 1)
 		assert.strictEqual(box.timescale, 1)
 		assert.strictEqual(box.presentationTimeDelta, 1)
-		assert.deepEqual(
+		assert.deepStrictEqual(
 			box.messageData,
 			new Uint8Array([50, 48, 49, 52, 45, 48, 54, 45, 49, 49, 84, 49, 51, 58, 48, 54, 58, 50, 52]),
 		)
