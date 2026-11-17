@@ -19,6 +19,8 @@ If you provide raw box objects, also provide a configuration object that names t
 
 A write omits the bytes of a source box that the reader stops before. See [Incomplete boxes](reading-boxes.md#incomplete-boxes).
 
+The writers of string fields, such as `writeHdlr` and `writeEmsg`, need the `TextEncoder` API. The package has no fallback for a runtime without `TextEncoder`.
+
 ## Using default config
 
 If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer except the container writers:
@@ -169,6 +171,8 @@ const bytes = writeIsoBox(
 ```
 
 A writer throws a `RangeError` for a `bigint` that does not fit the field. One example is a value above 2^32 - 1 in a version 0 box.
+
+The write of a `bigint` to an 8-byte field needs the `setBigUint64` and `setBigInt64` methods of `DataView`.
 
 A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined.
 

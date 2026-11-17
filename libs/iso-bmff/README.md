@@ -1,6 +1,6 @@
 # @svta/cml-iso-bmff
 
-ISO Base Media File Format (ISO BMFF) parsing.
+Read and write ISO Base Media File Format (ISO BMFF) boxes.
 
 Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/)
 

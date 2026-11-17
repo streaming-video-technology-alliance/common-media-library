@@ -28,10 +28,11 @@ export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView {
 	writer.writeUint(box.entryCount, 4)
 
 	if (hasEntries) {
+		const writeOffset = box.version ? writer.writeInt : writer.writeUint
+
 		for (const entry of box.entries) {
 			writer.writeUint(entry.sampleCount, 4)
-			// For version 1, sampleOffset is signed, but we store as unsigned
-			writer.writeUint(entry.sampleOffset, 4)
+			writeOffset(entry.sampleOffset, 4)
 		}
 	}
 

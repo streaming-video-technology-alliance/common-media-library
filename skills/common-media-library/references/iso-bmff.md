@@ -1,7 +1,7 @@
 <!-- libs/iso-bmff/README.md -->
 # @svta/cml-iso-bmff
 
-ISO Base Media File Format (ISO BMFF) parsing.
+Read and write ISO Base Media File Format (ISO BMFF) boxes.
 
 Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/iso-bmff/)
 
@@ -196,7 +196,7 @@ for (const box of boxes) {
 
 Each field has one type for every version of its box. A version 0 `tfdt` box stores `baseMediaDecodeTime` in 32 bits. The reader returns that field as a `bigint` too, so your code does not test `version`. The option also applies to the child boxes of a container.
 
-`readInt64AsBigInt` needs `BigInt` and does not test for it. On a runtime without `BigInt`, the read of a 64-bit field fails with the error of the runtime. If your code supports such a runtime, test `typeof BigInt === "function"` before you pass the function.
+`readInt64AsBigInt` needs `BigInt` and the `getBigUint64` method of `DataView`, and does not test for them. On a runtime without them, a read fails with the error of the runtime. If your code supports such a runtime, test `typeof DataView.prototype.getBigUint64 === "function"` before you pass the function. The test is `false` on a runtime without `BigInt` too.
 
 `JSON.stringify` throws a `TypeError` for a `bigint`. To serialize a box with `bigint` fields, pass a replacer function that converts each `bigint` to a string.
 
@@ -398,6 +398,8 @@ If you provide raw box objects, also provide a configuration object that names t
 
 A write omits the bytes of a source box that the reader stops before. See [Incomplete boxes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#incomplete-boxes).
 
+The writers of string fields, such as `writeHdlr` and `writeEmsg`, need the `TextEncoder` API. The package has no fallback for a runtime without `TextEncoder`.
+
 ## Using default config
 
 If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer except the container writers:
@@ -548,6 +550,8 @@ const bytes = writeIsoBox(
 ```
 
 A writer throws a `RangeError` for a `bigint` that does not fit the field. One example is a value above 2^32 - 1 in a version 0 box.
+
+The write of a `bigint` to an 8-byte field needs the `setBigUint64` and `setBigInt64` methods of `DataView`.
 
 A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined.
 
@@ -945,7 +949,7 @@ export type IpmpInfoBox = FullBox & {
 export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]>>(box: T): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never] ? T & IsoBoxContainer<IsoInt64> : Extract<T, IsoBoxContainer<IsoInt64>>;
 
 // @public
-export function isFullBox(box: any): box is FullBox;
+export function isFullBox(box: unknown): box is FullBox;
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
@@ -1165,7 +1169,7 @@ export type IsoBoxReadViewConfig<V extends IsoInt64 = number> = {
 export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | ParsedBox<unknown, V> | ArrayBufferView;
 
 // @public
-export type IsoBoxType = `${string}${string}${string}${string}`;
+export type IsoBoxType = string;
 
 // @public
 export type IsoBoxWriter<B> = (box: B, config: IsoBoxWriteViewConfig) => ArrayBufferView;
@@ -1743,7 +1747,7 @@ export function readVttC(view: IsoBoxReadView<IsoInt64>): WebVttConfigurationBox
 export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox;
 
 // @public
-export function readVtte(_: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
+export function readVtte(_view: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
 
 // @public
 export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
@@ -2504,7 +2508,7 @@ export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView;
 export function writeVttc(box: WebVttCueBox, config: IsoBoxWriteViewConfig): IsoBoxWriteView;
 
 // @public
-export function writeVtte(_: WebVttEmptySampleBox): IsoBoxWriteView;
+export function writeVtte(_box: WebVttEmptySampleBox): IsoBoxWriteView;
 
 // (No @packageDocumentation comment for this package)
 

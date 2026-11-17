@@ -1,3 +1,4 @@
+import { runInNewContext } from 'node:vm'
 import {
 	assert,
 	createAudioSampleEntryReader,
@@ -154,5 +155,25 @@ describe('readIsoBoxes', function () {
 		} else {
 			assert.fail('expected a url box')
 		}
+	})
+
+	it('should read an ArrayBuffer from another realm', function () {
+		const buffer = runInNewContext(
+			'new Uint8Array([0, 0, 0, 8, 102, 114, 101, 101]).buffer',
+		) as ArrayBuffer
+		const boxes = readIsoBoxes(buffer)
+
+		assert.strictEqual(boxes.length, 1)
+		assert.strictEqual(boxes[0].type, 'free')
+		assert.strictEqual(boxes[0].size, 8)
+	})
+
+	it('should read a DataView that starts at a byte offset', function () {
+		const bytes = new Uint8Array([0xff, 0xff, 0xff, 0xff, 0, 0, 0, 8, 102, 114, 101, 101])
+		const boxes = readIsoBoxes(new DataView(bytes.buffer, 4, 8))
+
+		assert.strictEqual(boxes.length, 1)
+		assert.strictEqual(boxes[0].type, 'free')
+		assert.strictEqual(boxes[0].size, 8)
 	})
 })

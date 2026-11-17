@@ -35,12 +35,14 @@ export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
 	writer.writeUint(box.sampleCount, 4)
 
 	if (box.flags & 0x1) {
-		writer.writeUint(box.dataOffset ?? 0, 4)
+		writer.writeInt(box.dataOffset ?? 0, 4)
 	}
 
 	if (box.flags & 0x4) {
 		writer.writeUint(box.firstSampleFlags ?? 0, 4)
 	}
+
+	const writeCompositionTimeOffset = box.version ? writer.writeInt : writer.writeUint
 
 	for (const sample of box.samples) {
 		if (box.flags & 0x100) {
@@ -53,7 +55,7 @@ export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
 			writer.writeUint(sample.sampleFlags ?? 0, 4)
 		}
 		if (box.flags & 0x800) {
-			writer.writeUint(sample.sampleCompositionTimeOffset ?? 0, 4)
+			writeCompositionTimeOffset(sample.sampleCompositionTimeOffset ?? 0, 4)
 		}
 	}
 

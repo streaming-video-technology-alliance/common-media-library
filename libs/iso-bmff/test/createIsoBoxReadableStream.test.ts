@@ -1,4 +1,4 @@
-import { equal } from 'node:assert'
+import { deepStrictEqual, equal, strictEqual } from 'node:assert'
 import { createWriteStream } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -11,6 +11,7 @@ import {
 	it,
 	readFtyp,
 	readIsoBoxes,
+	writeFree,
 	writeFtyp,
 	writeMdat,
 	writeMfhd,
@@ -164,5 +165,46 @@ describe('createIsoBoxReadableStream', function () {
 		}
 
 		equal(buffers.length, 0)
+	})
+
+	it('should close the source iterator once on cancel', async function () {
+		let closeCount = 0
+
+		function* source(): Generator<IsoBoxStreamable> {
+			try {
+				for (let i = 0; i < 3; i++) {
+					yield { type: 'free', data: new Uint8Array([i]) }
+				}
+			} finally {
+				closeCount++
+			}
+		}
+
+		const stream = createIsoBoxReadableStream(source(), { writers: { free: writeFree } })
+		const reader = stream.getReader()
+		const first = await reader.read()
+
+		deepStrictEqual(first.value, new Uint8Array([0, 0, 0, 9, 102, 114, 101, 101, 0]))
+
+		await reader.cancel()
+
+		strictEqual(closeCount, 1)
+		deepStrictEqual(await reader.read(), { done: true, value: undefined })
+		strictEqual(closeCount, 1)
+	})
+
+	it('should write every box of the source in order', async function () {
+		const boxes: IsoBoxStreamable[] = [0, 1, 2].map(i => ({
+			type: 'free',
+			data: new Uint8Array([i]),
+		}))
+		const stream = createIsoBoxReadableStream(boxes, { writers: { free: writeFree } })
+		const chunks: number[] = []
+
+		for await (const data of stream) {
+			chunks.push(data[8])
+		}
+
+		deepStrictEqual(chunks, [0, 1, 2])
 	})
 })

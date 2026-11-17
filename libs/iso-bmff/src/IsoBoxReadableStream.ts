@@ -37,19 +37,19 @@ export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
 		const cfg = createWriterConfig(config)
 
 		function pull(controller: ReadableStreamDefaultController<Uint8Array>) {
-			const desiredSize = controller.desiredSize ?? 0
+			const next = iterator.next()
 
-			for (let i = 0; i < desiredSize; i++) {
-				const next = iterator.next()
-
-				if (next.done) {
-					controller.close()
-				} else {
-					controller.enqueue(writeIsoBox(next.value, cfg))
-				}
+			if (next.done) {
+				controller.close()
+			} else {
+				controller.enqueue(writeIsoBox(next.value, cfg))
 			}
 		}
 
-		super({ start: pull, pull })
+		function cancel() {
+			iterator.return?.()
+		}
+
+		super({ start: pull, pull, cancel })
 	}
 }

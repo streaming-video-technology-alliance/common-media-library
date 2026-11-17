@@ -1,4 +1,3 @@
-import { isArrayBufferLike } from '@svta/cml-utils'
 import type { Box } from './boxes/Box.ts'
 import type { FullBox } from './boxes/FullBox.ts'
 import type { IsoBox } from './IsoBox.ts'
@@ -82,11 +81,9 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 			: [config?: IsoBoxReadViewConfig<V>]
 	)
 	constructor(raw: IsoBoxData, config?: IsoBoxReadView<V>['config']) {
-		this.dataView = isArrayBufferLike(raw)
-			? new DataView(raw)
-			: raw instanceof DataView
-				? raw
-				: new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+		this.dataView = ArrayBuffer.isView(raw)
+			? new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+			: new DataView(raw)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
 
@@ -231,6 +228,8 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	 * `readUint(8)` returns a `number` and loses precision above 2^53 - 1.
 	 * Use this method for a 64-bit field whose value can exceed that limit,
 	 * such as `baseMediaDecodeTime` in a version 1 `tfdt` box.
+	 *
+	 * The method needs the `getBigUint64` method of `DataView`.
 	 *
 	 * @returns The unsigned integer as a `bigint`.
 	 *
