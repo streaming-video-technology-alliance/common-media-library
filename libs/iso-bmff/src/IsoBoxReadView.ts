@@ -199,10 +199,12 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 				break
 			}
 
-			case DATA:
-				cursor = limitSize(size, this.bytesRemaining)
-				result = new Uint8Array(dataView.buffer, offset, cursor)
+			case DATA: {
+				const data = new Uint8Array(dataView.buffer, offset, limitSize(size, this.bytesRemaining))
+				result = data
+				cursor = data.length
 				break
+			}
 
 			default:
 				result = -1

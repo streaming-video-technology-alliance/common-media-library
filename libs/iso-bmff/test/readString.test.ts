@@ -90,4 +90,11 @@ describe('IsoBoxReadView.readString', function () {
 		assert.strictEqual(url.location, '')
 		assert.strictEqual(bytesRemaining, 0)
 	})
+
+	it('should throw a RangeError when a positive size exceeds the bytes that remain', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		assert.throws(() => view.readString(8), RangeError)
+		assert.strictEqual(view.cursor, 0)
+	})
 })

@@ -89,4 +89,14 @@ describe('IsoBoxReadView.readData', function () {
 		assert.strictEqual(data.byteOffset, 3)
 		assert.strictEqual(data.length, 2)
 	})
+
+	it('should move the view by the length of the result when the size is not an integer', function () {
+		const view = new IsoBoxReadView(new Uint8Array(MAIN))
+
+		assert.strictEqual(view.readData(0.5).length, 0)
+		assert.strictEqual(view.cursor, 0)
+		assert.strictEqual(view.readData(2.5).length, 2)
+		assert.strictEqual(view.cursor, 2)
+		assert.strictEqual(view.readUint(1), 0x69)
+	})
 })

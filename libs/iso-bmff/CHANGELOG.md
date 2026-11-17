@@ -18,6 +18,7 @@ and this project adheres to
 - `IsoBoxReadView.readWideUint` and `IsoBoxReadView.readWideInt` read a field of 4 or 8 bytes with the function of the `int64` option. A custom reader that follows the option calls the two methods ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `defaultReaderConfig` takes an optional argument with the `int64` option. The readers of the returned configuration have the types of that option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxWriteView.writeWideUint` and `IsoBoxWriteView.writeWideInt` write a field of 4 or 8 bytes from a `number` or a `bigint`. The methods throw a `RangeError` for a `bigint` that does not fit the size ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `IsoBoxWriteView.writeUint64`, `writeWideUint`, and `writeWideInt` are methods of the class prototype. Call each method on the writer, as in `writer.writeUint64(value)`. A call of a detached method is a compile error.
 - `IsoInt64Reader` is the type of a function for the `int64` option. `IsoInt64` is the type `number | bigint` of a 64-bit integer field ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - Each container box type in `CONTAINERS` now has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result. `readVttc` reads the `vttc` box, and `readVttC` reads the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
 - Each container box type in `CONTAINERS` now has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes. `writeVttc` writes the `vttc` box, and `writeVttC` writes the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
@@ -119,10 +120,9 @@ and this project adheres to
 - `writePrsl` now encodes each tag one time. The written bytes do not change.
 - The reading guide and the documentation of `IsoBoxReadView.readBox` now state that the header of a `uuid` box has 16 more bytes for the `usertype` field.
 - `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
-- `IsoBoxWriteView.writeUint64`, `writeWideUint`, and `writeWideInt` are now methods of the class prototype, so a writer allocates less memory for each box. Call each method on the writer, as in `writer.writeUint64(value)`.
 - `IsoBoxReadView` now has one rule for the size limit of `readData` and `readUtf8`. The results of both methods do not change.
 - `readIsoBoxes` now calls `IsoBoxReadView.readBoxes`. The result does not change.
-- `readMdhd` and `readTfra` now compute the size of the 64-bit integer fields one time for each box.
+- `readTfra` now computes the size of the 64-bit integer fields one time for each box.
 - `writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change.
 
 ## [1.0.7] - 2026-10-18

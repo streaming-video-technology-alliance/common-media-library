@@ -1188,10 +1188,10 @@ export class IsoBoxWriteView {
     writeTemplate: (value: number, size: number) => void;
     writeTerminatedString: (value: string) => void;
     writeUint: (value: number, size: number) => void;
-    writeUint64(value: bigint): void;
+    writeUint64(this: IsoBoxWriteView, value: bigint): void;
     writeUtf8TerminatedString: (value: string) => void;
-    writeWideInt(value: number | bigint, size: 4 | 8): void;
-    writeWideUint(value: number | bigint, size: 4 | 8): void;
+    writeWideInt(this: IsoBoxWriteView, value: number | bigint, size: 4 | 8): void;
+    writeWideUint(this: IsoBoxWriteView, value: number | bigint, size: 4 | 8): void;
 }
 
 // @public
