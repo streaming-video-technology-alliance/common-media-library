@@ -70,6 +70,16 @@ and this project adheres to
 - `readTfra` now computes the size of the 64-bit integer fields one time for each box.
 - `writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change.
 - The examples of `readIsoBoxes`, `writeIsoBoxes`, `traverseIsoBoxes`, and `createIsoBoxReadableStream` now use `strictEqual` and `deepStrictEqual`. The `writeIsoBoxes` example compares the written bytes with a `Uint8Array` of the file.
+- The README has a quick start with one read example and one write example. A new section lists the runtime APIs that some exports need.
+- The reading guide states that `readIsoBoxes` throws a `RangeError` for a complete box with a body shorter than its fields. The guide also states the rules for the `size` field, the input types, and shared byte fields.
+- The reading and writing guide examples find a `tfdt` box with `findIsoBox`. The earlier examples looked for the box at the top level, where a segment does not have it.
+- The `bigint` example of the reading guide keeps the fraction of the seconds. The guide also states that an all-ones `duration` reports an overflow to `createInt64OverflowReader`.
+- The writing guide states the exact keys of the `writers` map and the rule for flags and missing fields. The `appendBuffer` examples wait for the `updateend` event.
+- The utilities guide describes the configuration of `traverseIsoBoxes` and has a section on `findIsoBox`, `filterIsoBoxes`, and `isIsoBoxType`.
+- The documentation of `readIsoBoxes`, `writeIsoBox`, `writeIsoBoxes`, `createIsoBoxReadableStream`, and `IsoBoxReadableStream` now has `@throws` tags.
+- The summary of each reader and writer names the four-character type of its box. The summary of each box type uses one form and cites ISO/IEC 14496-12:2015 where that edition defines the box.
+- The documentation of the `mvhd`, `tkhd`, `mdhd`, `mehd`, `elst`, `mfro`, `tfhd`, and `tfra` fields states the units, the 1904 epoch, and the flags. Byte fields state that they are a view over the input.
+- 25 readers and writers and 7 other exports now link a test example. Each linked example declares its input.
 
 ### Fixed
 
