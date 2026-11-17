@@ -1,5 +1,7 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-iso-bmff@1.1.0
+implementation-pr: https://github.com/streaming-video-technology-alliance/common-media-library/pull/645
 ---
 
 # RFC: `int64` reader option for exact 64-bit fields
@@ -444,7 +446,7 @@ No open questions remain. The Final Decision section records the decisions.
 
 ## Final Decision
 
-Accepted on 2026-11-11. The second pull request adds the option.
+Accepted on 2026-11-11. The second pull request adds the option. The first release is `@svta/cml-iso-bmff@1.1.0`.
 
 The working files of this RFC, in `plans/uint64-reader-config/`, are not on `main`. Commit 0718985e1 of #613 contains them.
 

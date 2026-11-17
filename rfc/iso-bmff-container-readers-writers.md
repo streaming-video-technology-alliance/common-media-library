@@ -1,5 +1,7 @@
 ---
-status: accepted
+status: implemented
+implemented-in: @svta/cml-iso-bmff@1.1.0
+implementation-pr: https://github.com/streaming-video-technology-alliance/common-media-library/pull/654
 ---
 
 # RFC: Named readers and writers for container boxes
@@ -223,4 +225,4 @@ None.
 
 ## Final Decision
 
-Accepted on 2026-11-12. The RFC PR #622 carries the functions and the contract above. The implementation PR #654 follows the signatures in [Functions](#functions).
+Accepted on 2026-11-12. The RFC PR #622 carries the functions and the contract above. The implementation PR #654 follows the signatures in [Functions](#functions). The first release is `@svta/cml-iso-bmff@1.1.0`.
