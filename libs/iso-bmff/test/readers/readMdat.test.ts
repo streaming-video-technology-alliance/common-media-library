@@ -1,8 +1,8 @@
-import { assert, describe, it, parseBox, readMdat } from '../util/box.ts'
+import { assert, describe, findBox, it, readMdat } from '../util/box.ts'
 
 describe('readMdat', function () {
 	it('should correctly parse the readMdat box', function () {
-		const box = parseBox('captions.mp4', readMdat, 2)
+		const box = findBox('captions.mp4', 'mdat', { readers: { mdat: readMdat } })
 
 		assert.strictEqual(box.type, 'mdat')
 		assert.strictEqual(box.size, 21530)
