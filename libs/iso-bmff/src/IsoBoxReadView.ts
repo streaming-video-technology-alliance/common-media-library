@@ -369,7 +369,13 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 
 		if (bytesRemaining >= cursor) {
 			const size = readUint(dataView, offset, 4)
-			const type = readString(dataView, offset + 4, 4)
+			const index = offset - dataView.byteOffset + 4
+			const type = String.fromCharCode(
+				dataView.getUint8(index),
+				dataView.getUint8(index + 1),
+				dataView.getUint8(index + 2),
+				dataView.getUint8(index + 3),
+			)
 
 			box = { size, type } as ParsedBox<Box, V>
 			actualSize = size
