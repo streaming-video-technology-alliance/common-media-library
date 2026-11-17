@@ -9,6 +9,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @returns A parsed `DataEntryUrnBox`
  *
+ * @example
+ * {@includeCode ../../test/readers/readUrn.test.ts#example}
+ *
  * @public
  */
 export function readUrn(view: IsoBoxReadView<IsoInt64>): DataEntryUrnBox {

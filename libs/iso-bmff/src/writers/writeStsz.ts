@@ -10,6 +10,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeStsz.test.ts#example}
+ *
  * @public
  */
 export function writeStsz(box: SampleSizeBox): IsoBoxWriteView {

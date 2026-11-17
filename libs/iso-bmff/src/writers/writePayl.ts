@@ -9,6 +9,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writePayl.test.ts#example}
+ *
  * @public
  */
 export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView {

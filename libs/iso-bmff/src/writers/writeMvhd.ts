@@ -15,6 +15,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeMvhd.test.ts#example}
+ *
  * @public
  */
 export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView {

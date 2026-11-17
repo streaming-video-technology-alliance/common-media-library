@@ -9,6 +9,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeVlab.test.ts#example}
+ *
  * @public
  */
 export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView {

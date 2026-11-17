@@ -45,7 +45,7 @@ describe('writeIsoBoxes', function () {
 		// #region example
 		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 
-		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
+		const boxes = readIsoBoxes(isoFile, {
 			readers: {
 				ftyp: readFtyp,
 			},

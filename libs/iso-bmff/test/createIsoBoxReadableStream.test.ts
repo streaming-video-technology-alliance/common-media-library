@@ -1,9 +1,5 @@
 import { strictEqual } from 'node:assert'
-import { createWriteStream } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
-import { Writable } from 'node:stream'
 import {
 	createIsoBoxReadableStream,
 	defaultWriterConfig,
@@ -27,7 +23,7 @@ describe('createIsoBoxReadableStream', function () {
 		// #region example
 		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 
-		const boxes = readIsoBoxes(new Uint8Array(isoFile), {
+		const boxes = readIsoBoxes(isoFile, {
 			readers: {
 				ftyp: readFtyp,
 			},
@@ -39,11 +35,17 @@ describe('createIsoBoxReadableStream', function () {
 			},
 		})
 
-		const copy = join(tmpdir(), 'captions-copy.mp4')
-		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
-
-		strictEqual(Buffer.compare(isoFile, await readFile(copy)), 0)
+		const chunks: Uint8Array[] = []
+		await stream.pipeTo(
+			new WritableStream({
+				write(chunk) {
+					chunks.push(chunk)
+				},
+			}),
+		)
 		// #endregion example
+
+		strictEqual(Buffer.compare(isoFile, Buffer.concat(chunks)), 0)
 	})
 
 	it('should write from raw boxes', async function () {
@@ -149,10 +151,9 @@ describe('createIsoBoxReadableStream', function () {
 		})
 
 		const isoFile = await readFile(new URL('./fixtures/subsample.m4s', import.meta.url))
-		const copy = join(tmpdir(), 'subsample.mp4')
-		await stream.pipeTo(Writable.toWeb(createWriteStream(copy)))
+		const written = new Uint8Array(await new Response(stream).arrayBuffer())
 
-		strictEqual(Buffer.compare(isoFile, await readFile(copy)), 0)
+		strictEqual(Buffer.compare(isoFile, written), 0)
 	})
 
 	it('should exit if boxes are empty', async function () {

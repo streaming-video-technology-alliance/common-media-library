@@ -15,6 +15,9 @@ import { writeBox } from './utils/writeBox.ts'
  * @throws Error if a box has no writer, no `boxes` field of a container, and no `view`. The message starts with "No writer found for box type".
  * @throws RangeError if a `bigint` field does not fit its size.
  *
+ * @example
+ * {@includeCode ../test/writeIsoBox.test.ts#example}
+ *
  * @public
  */
 export function writeIsoBox(

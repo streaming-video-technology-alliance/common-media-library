@@ -11,6 +11,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeElng.test.ts#example}
+ *
  * @public
  */
 export function writeElng(box: ExtendedLanguageBox): IsoBoxWriteView {

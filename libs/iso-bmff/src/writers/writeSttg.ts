@@ -9,6 +9,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeSttg.test.ts#example}
+ *
  * @public
  */
 export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView {

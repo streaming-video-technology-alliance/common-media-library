@@ -9,6 +9,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeLabl.test.ts#example}
+ *
  * @public
  */
 export function writeLabl(box: LabelBox): IsoBoxWriteView {

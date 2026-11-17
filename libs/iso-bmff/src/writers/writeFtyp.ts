@@ -10,6 +10,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeFtyp.test.ts#example}
+ *
  * @public
  */
 export function writeFtyp(box: FileTypeBox): IsoBoxWriteView {

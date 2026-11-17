@@ -10,6 +10,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeSmhd.test.ts#example}
+ *
  * @public
  */
 export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView {

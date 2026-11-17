@@ -15,6 +15,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeTkhd.test.ts#example}
+ *
  * @public
  */
 export function writeTkhd(box: TrackHeaderBox<IsoInt64>): IsoBoxWriteView {

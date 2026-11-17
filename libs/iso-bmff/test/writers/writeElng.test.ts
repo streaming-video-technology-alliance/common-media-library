@@ -11,13 +11,13 @@ describe('writeElng', function () {
 		}
 
 		const writer = writeElng(box)
+		// #endregion example
 
 		// size (18), type (elng), version and flags, extendedLanguage, null terminator
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
 			new Uint8Array([0, 0, 0, 18, 101, 108, 110, 103, 0, 0, 0, 0, 101, 110, 45, 85, 83, 0]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of an extendedLanguage that is not ASCII', function () {

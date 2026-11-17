@@ -12,14 +12,7 @@ import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
  * @returns A reader function that can be passed to `readIsoBoxes`
  *
  * @example
- * ```ts
- * const boxes = readIsoBoxes(data, {
- *   readers: {
- *     'ac-3': createAudioSampleEntryReader('ac-3'),
- *     'ec-3': createAudioSampleEntryReader('ec-3'),
- *   }
- * })
- * ```
+ * {@includeCode ../../test/readers/createAudioSampleEntryReader.test.ts#example}
  *
  * @public
  */

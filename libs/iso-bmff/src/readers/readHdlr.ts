@@ -10,6 +10,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @returns A parsed `HandlerReferenceBox`
  *
+ * @example
+ * {@includeCode ../../test/readers/readHdlr.test.ts#example}
+ *
  * @public
  */
 export function readHdlr(view: IsoBoxReadView<IsoInt64>): HandlerReferenceBox {

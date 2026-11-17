@@ -12,14 +12,7 @@ import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
  * @returns A reader function that can be passed to `readIsoBoxes`
  *
  * @example
- * ```ts
- * const boxes = readIsoBoxes(data, {
- *   readers: {
- *     'vp09': createVisualSampleEntryReader('vp09'),
- *     'av01': createVisualSampleEntryReader('av01'),
- *   }
- * })
- * ```
+ * {@includeCode ../../test/readers/createVisualSampleEntryReader.test.ts#example}
  *
  * @public
  */

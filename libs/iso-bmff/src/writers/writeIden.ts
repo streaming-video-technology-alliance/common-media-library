@@ -9,6 +9,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writeIden.test.ts#example}
+ *
  * @public
  */
 export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView {

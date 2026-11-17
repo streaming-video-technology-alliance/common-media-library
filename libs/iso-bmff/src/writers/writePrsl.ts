@@ -16,6 +16,9 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
+ * @example
+ * {@includeCode ../../test/writers/writePrsl.test.ts#example}
+ *
  * @public
  */
 export function writePrsl(

@@ -9,6 +9,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @returns A parsed `SchemeTypeBox`
  *
+ * @example
+ * {@includeCode ../../test/readers/readSchm.test.ts#example}
+ *
  * @public
  */
 export function readSchm(view: IsoBoxReadView<IsoInt64>): SchemeTypeBox {

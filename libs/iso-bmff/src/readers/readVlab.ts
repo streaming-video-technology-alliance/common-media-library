@@ -9,6 +9,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @returns A parsed `WebVttSourceLabelBox`
  *
+ * @example
+ * {@includeCode ../../test/readers/readVlab.test.ts#example}
+ *
  * @public
  */
 export function readVlab(view: IsoBoxReadView<IsoInt64>): WebVttSourceLabelBox {
