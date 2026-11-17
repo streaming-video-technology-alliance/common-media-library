@@ -9,11 +9,11 @@ The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable it
 
 - Raw box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
-- Boxes that `readIsoBoxes` returns. If the `writers` map has a writer for the type, the function writes the fields of the box. If the map has no writer and the type is not a container, the function writes the source bytes of the box, and a changed field has no effect.
+- Boxes that `readIsoBoxes` returns. If the `writers` map has a writer for the type, the function writes the fields of the box. If the map has no writer and the type is not a container, the function writes the source bytes of the box. A changed field then has no effect.
 
 If you provide raw box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space.
 
-A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing field.
+A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.
 
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.

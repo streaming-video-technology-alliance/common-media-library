@@ -94,7 +94,7 @@ The view finds a reader by the exact type and by the trimmed type. A reader unde
 
 A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw for an incomplete box.
 
-A box with a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
+A box with a reader in the configuration and a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
 
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
 

@@ -79,7 +79,7 @@ and this project adheres to
 - The documentation of `readIsoBoxes`, `writeIsoBox`, `writeIsoBoxes`, `createIsoBoxReadableStream`, and `IsoBoxReadableStream` now has `@throws` tags.
 - The summary of each reader and writer names the four-character type of its box. The summary of each box type uses one form and cites ISO/IEC 14496-12:2015 where that edition defines the box.
 - The documentation of the `mvhd`, `tkhd`, `mdhd`, `mehd`, `elst`, `mfro`, `tfhd`, and `tfra` fields states the units, the 1904 epoch, and the flags. Byte fields state that they are a view over the input.
-- 25 readers and writers and 7 other exports now link a test example. Each linked example declares its input.
+- 25 readers and writers and 7 other exports now link a test example. Each linked example declares its input, except the examples of `IsoBoxWriteView.writeUint` and `writeIsoBoxes`.
 
 ### Fixed
 

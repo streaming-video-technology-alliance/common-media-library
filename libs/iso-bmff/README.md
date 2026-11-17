@@ -28,13 +28,13 @@ npm i @svta/cml-iso-bmff
 Read the boxes of a media segment, and find the `tfdt` box inside `moof` and `traf`:
 
 ```typescript
-import { defaultReaderConfig, findIsoBox, readIsoBoxes } from "@svta/cml-iso-bmff";
+import { findIsoBox, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
 
 const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
 	r.arrayBuffer(),
 );
 
-const boxes = readIsoBoxes(buffer, defaultReaderConfig());
+const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
 const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
 
 console.log(tfdt?.baseMediaDecodeTime);
@@ -43,11 +43,11 @@ console.log(tfdt?.baseMediaDecodeTime);
 Write boxes to byte arrays:
 
 ```typescript
-import { defaultWriterConfig, writeIsoBoxes } from "@svta/cml-iso-bmff";
+import { writeFtyp, writeIsoBoxes } from "@svta/cml-iso-bmff";
 
 const byteArrays = writeIsoBoxes(
 	[{ type: "ftyp", majorBrand: "isom", minorVersion: 1, compatibleBrands: ["isom"] }],
-	defaultWriterConfig(),
+	{ writers: { ftyp: writeFtyp } },
 );
 ```
 
@@ -57,8 +57,8 @@ Some exports need a runtime API:
 
 | API | Exports | Fallback |
 | --- | --- | --- |
-| `TextEncoder` | Every writer of a string field | None |
-| `BigInt` | `readInt64AsBigInt`, and the boxes with `bigint` fields | None, and no check |
+| `TextEncoder` | Every writer of a UTF-8 string field, such as `writeHdlr` and `writeEmsg` | None |
+| `BigInt` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, and the boxes with `bigint` fields | None, and no check |
 | `ReadableStream` | `createIsoBoxReadableStream`, `IsoBoxReadableStream` | None. The constructor throws an error with a clear message |
 
 ## Usage
