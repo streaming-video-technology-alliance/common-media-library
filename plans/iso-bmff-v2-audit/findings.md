@@ -4,7 +4,7 @@ This file lists the findings. The maintainer decides each group. The "Result" co
 
 ## Status on 2026-11-17
 
-Briefs 1 and 2 of `briefs.md` are complete. Their PRs merged into `main`: 702, 703, 704, 705, 706, 708, 713, and 714. Brief 3 and brief 4 have not started.
+Briefs 1 and 2 of `briefs.md` are complete. Their PRs merged into `main`: 702, 703, 704, 705, 706, 708, 713, and 714. Brief 3 is complete: PR 682 has the amended cursor RFC at 8435c2ae0. Brief 4 has not started.
 
 | Result for the 73 rows that break nothing | Rows |
 | --- | --- |
@@ -84,7 +84,7 @@ One row of the last group is urgent. **G466**: `parsePsshList` in `@svta/cml-drm
 | Step | Work | Rows | Needs | Status |
 | --- | --- | --- | --- | --- |
 | 1 | Fix G466 in drm (issue 683) | 1 | No decision. A patch release of drm | Done. PR 685, drm 1.1.13 |
-| 2 | Amend the cursor RFC | 30 | No code. One revision of the draft | Not started (brief 3) |
+| 2 | Amend the cursor RFC | 30 | No code. One revision of the draft | Done (brief 3). PR 682 at 8435c2ae0 |
 | 3 | Fix the rows that break nothing | 73 | No decision. 37 rows are documentation | Done (briefs 1 and 2). See "Status on 2026-11-17" |
 | 4 | Decide the twelve themes | 92 | RFC text, because each theme changes the public API | Not started (brief 4) |
 | 5 | Implement the themes on the 2.0.0 branch | 92 | Step 4. One PR for each theme | Waits for step 4 |
@@ -98,36 +98,36 @@ Each row names a defect or a gap in `rfc/iso-bmff-cursor-api.md`. Fix these rows
 
 | ID | Severity | Category | When | Finding | Result |
 | --- | --- | --- | --- | --- | --- |
-| G462 | high | api-surface | any time | The raw box of the RFC has no header size, so the four c2pa call sites that read the body of a box with no reader must parse the header by hand. |  |
-| F240 | high | behavior | any time | The RFC contract writes any box with a `boxes` field and no writer as a container, which reverses the tested rule of version 1 and would write a `meta` box or a sample entry with no fields. |  |
-| G480 | high | type-design | any time | The RFC cursor type is invariant in `V`, so a reader of either mode accepts no cursor and the accepted `int64` rule fails to compile. |  |
-| G482 | high | type-design | major | A write cursor replaces `view` and `bytes` when the buffer grows, and a read cursor is shared by all boxes, but every cursor field is public and mutable and the contract does not warn about either case. |  |
-| F273 | medium | api-surface | major | The RFC states that isIsoBoxType does not change, but its first overload takes `{ view: IsoBoxReadView<V> }`, a class that the RFC removes. |  |
-| G463 (G495) | medium | api-surface | any time | A container box never becomes a raw box under the RFC, so the migration text "omit the reader and use the raw box" is false for the 19 container types. |  |
-| G470 | medium | api-surface | major | Under the RFC the user type of a uuid box moves into a reader, but the package has no uuid reader and no uuid box type, so c2pa keeps a local type and a double cast. |  |
-| G483 | medium | api-surface | any time | The RFC states that each method of the two view classes becomes a field function, but the table has no row and no stated fate for 11 members of the read view and 9 members of the write view. |  |
-| G493 | medium | api-surface | major | The RFC drops two documented inputs of `writeIsoBoxes` without a line in Drawbacks: a bare `Uint8Array` in the list, and the result of a direct writer call. |  |
-| G500 | medium | api-surface | any time | The RFC lists four functions that do not change and gives no fate for the other public exports outside the two view classes, among them the stream API and the sample entry helpers that take a view. |  |
-| G509 | medium | api-surface | any time | Version 1 uses two position systems in public members (`cursor` is relative to the view, `slice(offset, size)` takes an offset from the start of the buffer and documents only `size`), and the RFC cursor type does not state which system `pos` and `end` use. |  |
-| G485 | medium | behavior | major | The RFC keeps a `size` parameter for `readString`, `readUtf8` and `readBytes` with no rule for -1, 0 or no size, and its new rule for a read past the end contradicts the limit that version 1 applies. |  |
-| G491 (G469) | medium | behavior | major | The RFC removes the `type` argument of a reader and does not say who sets `type` on the box, what happens when a reader reads fewer bytes than the box has, or whether a reader may keep the cursor. |  |
-| G492 | medium | behavior | any time | The RFC does not say what a writer that never calls `endIsoBox` produces, and a size of 0 is a legal size that means the box extends to the end of the file. |  |
-| G487 | medium | consistency | optional | `seekIsoBox` returns `null`, and the first example of the RFC converts that `null` to `undefined`. |  |
-| G489 | medium | consistency | major | The RFC has three rules for an optional configuration, and its writer signature brings back an alternative that the accepted container RFC rejected. |  |
-| G496 | medium | docs | any time | The RFC states twice that `readIsoBoxes` keeps its signature and that only the return type of `writeIsoBoxes` changes, but the source shows that the return type, both configuration types and both map value types change. |  |
-| G497 | medium | docs | any time | The Summary states that the trial build is faster in every scenario, but the second table of the RFC shows a slower row, and the only faster row for a large payload uses a behavior that the contract excludes. |  |
-| G499 | medium | docs | any time | The RFC states that the names and the rules of the two accepted RFCs do not change, but it reverses one recorded decision and makes about 75 lines of those RFCs wrong, with no plan to amend them. |  |
-| G502 | medium | docs | any time | The RFC has no migration guide, no deprecation release, no list of the dependent packages in this repository, and no decision on the two open items that the accepted RFCs left for a major version. |  |
-| G484 | medium | naming | major | The RFC has no field function that reads or writes an 8-byte field as a `number`, and `readUint64` returns a `bigint` in a family of functions that return a `number`. |  |
-| G486 | medium | naming | any time | The RFC adds 32 exports with generic names and no `Iso` token, next to 6 new functions that have the token. |  |
-| G490 | medium | naming | any time | The cursor field names `pos` and `end` are abbreviations with no stated origin, and the RFC gives the words `view`, `bytes` and `cursor` meanings that differ from version 1. |  |
-| G471 | medium | package-config | major | The RFC does not list the two CML packages that depend on iso-bmff, and the release script gives them a patch version whose peer range moves to a new major. |  |
-| G494 | medium | spec-compliance | major | The `uuid` contract contradicts the reader contract of the same RFC, and the RFC states no rule for the `usertype` of a `uuid` box with no reader or for a `uuid` writer. |  |
-| G481 | medium | type-design | major | The RFC cursor makes `int64` optional for `bigint` fields, which drops the accepted rule that a type with `bigint` fields always has the function. |  |
-| F433 | low | api-surface | any time | Gap: a parsed box will have no byte position after the RFC, and all three players need the position and the size of a box. |  |
-| G476 | low | docs | any time | The RFC has no migration text for a direct call of a built-in writer, and the only in-repo direct call depends on the `buffer` of the write view. |  |
-| G498 | low | docs | any time | The RFC counts 87 readers and 85 writers, but the package has 84 reader functions and 84 writer functions, and two other statements in Motivation do not match the source. |  |
-| G501 | low | reader-writer-asymmetry | any time | The RFC gives the writer a helper for the full box header and the box type, and gives the reader neither, so 41 readers repeat two bit operations. |  |
+| G462 | high | api-surface | any time | The raw box of the RFC has no header size, so the four c2pa call sites that read the body of a box with no reader must parse the header by hand. | Question 16 of the RFC in PR 682 (8435c2ae0): `headerSize` on the raw box, default yes |
+| F240 | high | behavior | any time | The RFC contract writes any box with a `boxes` field and no writer as a container, which reverses the tested rule of version 1 and would write a `meta` box or a sample entry with no fields. | Done in PR 682 (8435c2ae0). The contract states the rule of PR 673. Question 10 covers a parsed box |
+| G480 | high | type-design | any time | The RFC cursor type is invariant in `V`, so a reader of either mode accepts no cursor and the accepted `int64` rule fails to compile. | Confirmed with a TypeScript 6.0.3 model (8 errors). PR 682 (8435c2ae0) adds a variance paragraph and question 14, default: a method signature for the readers map |
+| G482 | high | type-design | major | A write cursor replaces `view` and `bytes` when the buffer grows, and a read cursor is shared by all boxes, but every cursor field is public and mutable and the contract does not warn about either case. | Contract lines done in PR 682 (8435c2ae0). Question 15 asks for `readonly` fields, default yes |
+| F273 | medium | api-surface | major | The RFC states that isIsoBoxType does not change, but its first overload takes `{ view: IsoBoxReadView<V> }`, a class that the RFC removes. | Done in PR 682 (8435c2ae0), section "Result type" |
+| G463 (G495) | medium | api-surface | any time | A container box never becomes a raw box under the RFC, so the migration text "omit the reader and use the raw box" is false for the 19 container types. | Done in PR 682 (8435c2ae0). The Drawbacks limit the raw box advice to types outside `CONTAINERS` and name question 13 |
+| G470 | medium | api-surface | major | Under the RFC the user type of a uuid box moves into a reader, but the package has no uuid reader and no uuid box type, so c2pa keeps a local type and a double cast. | Question 17 of the RFC in PR 682 (8435c2ae0). Issue 694 tracks a helper after 2.0.0 |
+| G483 | medium | api-surface | any time | The RFC states that each method of the two view classes becomes a field function, but the table has no row and no stated fate for 11 members of the read view and 9 members of the write view. | Not done. Question 11 of the RFC covers four members |
+| G493 | medium | api-surface | major | The RFC drops two documented inputs of `writeIsoBoxes` without a line in Drawbacks: a bare `Uint8Array` in the list, and the result of a direct writer call. | Not done. Open for the RFC review |
+| G500 | medium | api-surface | any time | The RFC lists four functions that do not change and gives no fate for the other public exports outside the two view classes, among them the stream API and the sample entry helpers that take a view. | Not done. Open for the RFC review |
+| G509 | medium | api-surface | any time | Version 1 uses two position systems in public members (`cursor` is relative to the view, `slice(offset, size)` takes an offset from the start of the buffer and documents only `size`), and the RFC cursor type does not state which system `pos` and `end` use. | Done in PR 682 (8435c2ae0). The contract states the origin of `pos` and `end` |
+| G485 | medium | behavior | major | The RFC keeps a `size` parameter for `readString`, `readUtf8` and `readBytes` with no rule for -1, 0 or no size, and its new rule for a read past the end contradicts the limit that version 1 applies. | Not done. Open for the RFC review |
+| G491 (G469) | medium | behavior | major | The RFC removes the `type` argument of a reader and does not say who sets `type` on the box, what happens when a reader reads fewer bytes than the box has, or whether a reader may keep the cursor. | Position and lifetime done in PR 682 (8435c2ae0). Question 18 asks who sets `type` |
+| G492 | medium | behavior | any time | The RFC does not say what a writer that never calls `endIsoBox` produces, and a size of 0 is a legal size that means the box extends to the end of the file. | The `largesize` part is question 23 in PR 682 (8435c2ae0). The check for a missing `endIsoBox` call is not done |
+| G487 | medium | consistency | optional | `seekIsoBox` returns `null`, and the first example of the RFC converts that `null` to `undefined`. | Done in PR 682 (8435c2ae0). The examples return `null` |
+| G489 | medium | consistency | major | The RFC has three rules for an optional configuration, and its writer signature brings back an alternative that the accepted container RFC rejected. | Not done. Open for the RFC review |
+| G496 | medium | docs | any time | The RFC states twice that `readIsoBoxes` keeps its signature and that only the return type of `writeIsoBoxes` changes, but the source shows that the return type, both configuration types and both map value types change. | Done in PR 682 (8435c2ae0) |
+| G497 | medium | docs | any time | The Summary states that the trial build is faster in every scenario, but the second table of the RFC shows a slower row, and the only faster row for a large payload uses a behavior that the contract excludes. | Done in PR 682 (8435c2ae0). Question 2 asks for the copy rule and `capacity` |
+| G499 | medium | docs | any time | The RFC states that the names and the rules of the two accepted RFCs do not change, but it reverses one recorded decision and makes about 75 lines of those RFCs wrong, with no plan to amend them. | Done in PR 682 (8435c2ae0), section "Changes to accepted RFCs" |
+| G502 | medium | docs | any time | The RFC has no migration guide, no deprecation release, no list of the dependent packages in this repository, and no decision on the two open items that the accepted RFCs left for a major version. | Done in PR 682 (8435c2ae0): Migration section, a drawback, numbers in question 1, names in question 5 |
+| G484 | medium | naming | major | The RFC has no field function that reads or writes an 8-byte field as a `number`, and `readUint64` returns a `bigint` in a family of functions that return a `number`. | Not done. Open for the RFC review |
+| G486 | medium | naming | any time | The RFC adds 32 exports with generic names and no `Iso` token, next to 6 new functions that have the token. | Done in PR 682 (8435c2ae0). Question 5 asks for the `Iso` token |
+| G490 | medium | naming | any time | The cursor field names `pos` and `end` are abbreviations with no stated origin, and the RFC gives the words `view`, `bytes` and `cursor` meanings that differ from version 1. | Not done. Open for the RFC review |
+| G471 | medium | package-config | major | The RFC does not list the two CML packages that depend on iso-bmff, and the release script gives them a patch version whose peer range moves to a new major. | Done in PR 682 (8435c2ae0): a drawback and question 24 |
+| G494 | medium | spec-compliance | major | The `uuid` contract contradicts the reader contract of the same RFC, and the RFC states no rule for the `usertype` of a `uuid` box with no reader or for a `uuid` writer. | Done in PR 682 (8435c2ae0). The contract points to question 17 |
+| G481 | medium | type-design | major | The RFC cursor makes `int64` optional for `bigint` fields, which drops the accepted rule that a type with `bigint` fields always has the function. | Done in PR 682 (8435c2ae0). A `bigint` cursor requires `int64` |
+| F433 | low | api-surface | any time | Gap: a parsed box will have no byte position after the RFC, and all three players need the position and the size of a box. | Partly done by question 13 of the RFC (the `start` field) |
+| G476 | low | docs | any time | The RFC has no migration text for a direct call of a built-in writer, and the only in-repo direct call depends on the `buffer` of the write view. | Done in PR 682 (8435c2ae0). A drawback shows two forms |
+| G498 | low | docs | any time | The RFC counts 87 readers and 85 writers, but the package has 84 reader functions and 84 writer functions, and two other statements in Motivation do not match the source. | Done in PR 682 (8435c2ae0) |
+| G501 | low | reader-writer-asymmetry | any time | The RFC gives the writer a helper for the full box header and the box type, and gives the reader neither, so 41 readers repeat two bit operations. | Done in PR 682 (8435c2ae0). The example reads `readUint8` and `readUint24` |
 
 ## Breaking changes for 2.0.0
 
@@ -136,11 +136,11 @@ Each row changes a public type, a name, or a result. The major version is the on
 | ID | Severity | Category | When | Finding | Result |
 | --- | --- | --- | --- | --- | --- |
 | F152 | high | behavior | major | `findIsoBox`, `filterIsoBoxes`, and `traverseIsoBoxes` never visit the child boxes of `stsd` and `dref`, because those two types store child boxes in `entries` and every other type uses `boxes`. |  |
-| F237 | high | behavior | major | A writer in the map wins over the source bytes of a box that was read with no reader, so the writer writes zeros or throws. |  |
+| F237 | high | behavior | major | A writer in the map wins over the source bytes of a box that was read with no reader, so the writer writes zeros or throws. | Theme 4 is in PR 682 (8435c2ae0): section "Raw boxes in writeIsoBoxes" and question 20 |
 | F190 | high | reader-writer-asymmetry | major | Twenty-four box types have a required count field that duplicates an array length, and the writers use three different rules for it. |  |
-| F188 | high | type-design | major | The return type of readIsoBoxes has parsed fields for every built-in box type, but a box with no reader in the map has only the header fields at run time. |  |
-| F189 | high | type-design | major | The child types of 12 container boxes are closed lists that omit children the specification allows, so a test for a legal child is a compile error. |  |
-| F270 | high | type-design | major | isIsoBoxType narrows a box that has no decoded fields to the complete box type, so typed fields are `undefined` at run time. |  |
+| F188 | high | type-design | major | The return type of readIsoBoxes has parsed fields for every built-in box type, but a box with no reader in the map has only the header fields at run time. | Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19 |
+| F189 | high | type-design | major | The child types of 12 container boxes are closed lists that omit children the specification allows, so a test for a legal child is a compile error. | Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19 |
+| F270 | high | type-design | major | isIsoBoxType narrows a box that has no decoded fields to the complete box type, so typed fields are `undefined` at run time. | Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19 |
 | F94 | high | type-design | major | `TrackReferenceTypeBox` declares `type: 'tref'` and `trackIds`, and no reader or writer produces or accepts that shape. |  |
 | F204 | medium | api-surface | major | IsoBoxMap contains 18 box types that no reader produces and no writer accepts, and several of those types differ from the specification. |  |
 | F198 | medium | behavior | major | The readers map has no key check, and a reader under the wrong key silently changes the `type` of the box. |  |
@@ -186,21 +186,21 @@ Each row changes a public type, a name, or a result. The major version is the on
 | F9 | medium | spec-compliance | major | The package cannot express `AudioSampleEntryV1`: `entry_version` is hidden in the high half of `reserved2[0]`, there is no `srat` box, and a sample rate above 65535 writes a wrong value without an error. |  |
 | G473 (G514, G523) | medium | spec-compliance | major | The `kid` field of the pssh box is one flat `number[]` with 16 numbers for each key ID, and the specification defines a list of 16-byte key IDs. |  |
 | F120 | medium | type-design | major | `location` is a required string in `DataEntryUrlBox` and `DataEntryUrnBox`, and the spec forbids it in one case and makes it optional in the other. |  |
-| F173 | medium | type-design | major | Three exported child aliases and five other public positions are `any`, while four containers with the same open content use `IsoBox<V>`. |  |
+| F173 | medium | type-design | major | Three exported child aliases and five other public positions are `any`, while four containers with the same open content use `IsoBox<V>`. | Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19 |
 | F193 | medium | type-design | major | isContainer returns true for 14 box types that its type predicate excludes, and the package has three different definitions of a container. |  |
-| F194 | medium | type-design | major | The default `never` of `Box<T>` makes an unknown box impossible to write as a value and makes a test for an unknown type a compile error. |  |
+| F194 | medium | type-design | major | The default `never` of `Box<T>` makes an unknown box impossible to write as a value and makes a test for an unknown type a compile error. | Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19 |
 | F197 | medium | type-design | major | IsoBoxWriterMap is `Record<string, IsoBoxWriter<any>>`, so a writer under the wrong key compiles and writeBox needs an `any` cast. |  |
 | F200 | medium | type-design | major | Ten box types have required reserved and pre_defined fields, and the writers write whatever value the box has. |  |
 | F253 | medium | type-design | major | A container cannot hold a child given as bytes without a cast, although the writer accepts such a child. |  |
 | F26 | medium | type-design | major | Boxes that share one shape use three different type patterns, and TypeBox is an unconstrained generic with a vague name |  |
 | F282 | medium | type-design | major | The generic `T` of traverseIsoBoxes, findIsoBox and filterIsoBoxes has no constraint, and the yielded type is wrong when `T` is narrower than the tree. |  |
 | F4 | medium | type-design | major | `compressorName` is a `number[]` of 32 raw bytes, but the spec defines a counted string. |  |
-| F53 | medium | type-design | major | The child types of the container readers claim a fully read box for a child that no reader read. |  |
+| F53 | medium | type-design | major | The child types of the container readers claim a fully read box for a child that no reader read. | Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19 |
 | F72 | medium | type-design | major | SampleDependencyTypeBox returns the packed bytes as number[] under a name that is not in the spec, with no documentation of the bits. |  |
-| F85 | medium | type-design | major | The default entry type of `SampleDescriptionBox` claims fields that many entries do not have, `readStsd` has a type parameter that only casts, and `writeStsd` rejects the type that `readStsd` returns. |  |
-| G468 | medium | type-design | any time | A readers map with the exported type IsoBoxReaderMap makes every box of the readIsoBoxes result lose `type`, so drm builds its map through a second variable. |  |
+| F85 | medium | type-design | major | The default entry type of `SampleDescriptionBox` claims fields that many entries do not have, `readStsd` has a type parameter that only casts, and `writeStsd` rejects the type that `readStsd` returns. | Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19 |
+| G468 | medium | type-design | any time | A readers map with the exported type IsoBoxReaderMap makes every box of the readIsoBoxes result lose `type`, so drm builds its map through a second variable. | Theme 3 is in PR 682 (8435c2ae0): rule 3 of "Result type" and question 19 |
 | G512 | medium | type-design | optional | No field with a closed set of values has a literal type, and `writeSidx` masks a value outside the set without an error. |  |
-| G522 | medium | type-design | major | A custom reader that returns only fields, with no `type`, works at run time but removes `type` from the whole result type, so `box.type` is a compile error for every box. |  |
+| G522 | medium | type-design | major | A custom reader that returns only fields, with no `type`, works at run time but removes `type` from the whole result type, so `box.type` is a compile error for every box. | Theme 3 is in PR 682 (8435c2ae0): question 18 |
 | F232 | low | api-surface | major | Several exports have no purpose after the cursor RFC, and six of them are generic constant names. |  |
 | F268 | low | api-surface | major | `writeBytes` takes one array or a list of arrays, and `writeArray` accepts field types that it cannot write. |  |
 | F333 | low | api-surface | major | createIsoBoxReadableStream and IsoBoxReadableStream are two exports for one feature, and the chunk type is not Uint8Array<ArrayBuffer> |  |
@@ -250,19 +250,19 @@ Each row can ship in any release. Details: `details-non-breaking.md`.
 | F111 | low | consistency | optional | Readers and writers of this scope use different local forms for the same concept. | Not done. The cursor rewrite replaces the code |
 | F258 | low | consistency | any time | Three writers write a signed field with the unsigned function and depend on wrap for a negative value. | Done in PR 702 |
 | F311 | low | consistency | optional | The matrix code is copied into four files with a closure and an extra array, and signed fixed-point reads are written by hand while writes use `writeTemplate` | Skipped. PR 620 measured the inline form and chose it |
-| F338 | low | consistency | any time | The docs and TSDoc use several words for one thing: parse and read, encoded and written, raw box, library and package | Partly done in PR 708. The rename of "box object" goes to the cursor RFC |
+| F338 | low | consistency | any time | The docs and TSDoc use several words for one thing: parse and read, encoded and written, raw box, library and package | Partly done in PR 708. The rename of "box object" goes to the cursor RFC. The two terms are in the Migration section of PR 682 (8435c2ae0) |
 | F366 | low | consistency | any time | The summaries of the box types follow three patterns, and the sample entry writers follow two. | Done in PR 708 |
 | F417 | low | consistency | any time | The readers get `version` and `flags` in two ways and compare the version with two operators. | Not done. The cursor rewrite replaces the code |
-| F110 | low | docs | any time | The box types of this scope have almost no field documentation, and only `tenc` has TSDoc examples. | Partly done in PR 708. New `readTfhd` and `readTfdt` example files go to the cursor RFC |
+| F110 | low | docs | any time | The box types of this scope have almost no field documentation, and only `tenc` has TSDoc examples. | Partly done in PR 708. New `readTfhd` and `readTfdt` example files go to the cursor RFC. The example files belong to the pull requests that implement the cursor RFC |
 | F184 | low | docs | any time | Three exports appear as "(undocumented)" in the API report beside the four lowercase aliases. | Done in PR 708 |
 | F187 | low | docs | any time | The README has no quick-start example, and the README and `package.json` describe the package as parsing only. | Done in PRs 708 and 702 |
-| F262 | low | docs | any time | The writing guide states that parsed boxes implement `ArrayBufferView`, calls a type annotation a cast, and uses the term raw box for a meaning that differs from the RFC. | Partly done in PR 708. Part 2 goes to the cursor RFC |
-| F292 | low | docs | any time | The utilities guide describes a signature that was removed, omits five public utilities, and uses `meta` in two examples where it does not fit. | Partly done in PR 708. Part 2 goes to the cursor RFC |
+| F262 | low | docs | any time | The writing guide states that parsed boxes implement `ArrayBufferView`, calls a type annotation a cast, and uses the term raw box for a meaning that differs from the RFC. | Partly done in PR 708. Part 2 goes to the cursor RFC. Part 2 is in the Migration section of PR 682 (8435c2ae0) |
+| F292 | low | docs | any time | The utilities guide describes a signature that was removed, omits five public utilities, and uses `meta` in two examples where it does not fit. | Partly done in PR 708. Part 2 goes to the cursor RFC. Part 2 is in the Migration section of PR 682 (8435c2ae0) |
 | F316 | low | docs | optional | `defaultReaderConfig` and `defaultWriterConfig` build an object with 62 entries on each call, and the guides call them inside the read call | Done in PR 708 |
 | F334 | low | docs | any time | TSDoc statements in the top-level files do not match the code | Done in PR 708 |
-| F335 | low | docs | any time | Many public types have a TSDoc summary that only repeats the type name | Partly done in PR 708. `ParsedBox`, `ParsedIsoBox`, and `IsoTypedParsedBox` wait for the RFC decision on those types |
+| F335 | low | docs | any time | Many public types have a TSDoc summary that only repeats the type name | Partly done in PR 708. `ParsedBox`, `ParsedIsoBox`, and `IsoTypedParsedBox` wait for the RFC decision on those types. Rule 6 of "Result type" in PR 682 (8435c2ae0) states the fate of the three types |
 | F336 | low | docs | any time | Entry points have no @throws tags, and some have no @example | Done in PR 708 |
-| F34 | low | docs | any time | The types of messageData (emsg) and data (free, skip) do not say that the bytes share memory with the input buffer | Done in PR 708. The `readBytes` sentence goes to the cursor RFC |
+| F34 | low | docs | any time | The types of messageData (emsg) and data (free, skip) do not say that the bytes share memory with the input buffer | Done in PR 708. The `readBytes` sentence goes to the cursor RFC. The `readBytes` sentence is in the contract of PR 682 (8435c2ae0) |
 | F340 | low | docs | any time | The Unreleased section has two '### Changed' headings, and two older sections have the wrong year | Done in PR 708 |
 | F341 | low | docs | any time | Two bullets of the README 'When to use' section do not match the functions that they name | Done in PR 708 |
 | F342 | low | docs | any time | The writing guide has wording errors and an example that fails at runtime | Done in PR 708 |
@@ -286,9 +286,9 @@ Each row can ship in any release. Details: `details-non-breaking.md`.
 | G525 | low | docs | any time | The reading guide states that a generic custom reader in a stored map needs a type argument, but the guide's own example has `bigint` fields without the type argument. | Done in PR 708 |
 | G526 | low | docs | any time | The `bigint` example of the reading guide names a value `seconds`, but the `bigint` division drops the fraction. | Done in PR 708 |
 | G527 | low | docs | any time | The guide states that the `size` field of a parsed box is the size of the source box, but the field is 1 for a box with `largesize` and 0 for a box that extends to the end. | Done in PR 708 |
-| G528 | low | docs | any time | Ten of the 28 TSDoc examples use a name that the example does not define, so the published example cannot run and the reader cannot see the input. | Partly done in PR 708. The `writeUint` and `writeIsoBoxes` regions go to the cursor RFC |
+| G528 | low | docs | any time | Ten of the 28 TSDoc examples use a name that the example does not define, so the published example cannot run and the reader cannot see the input. | Partly done in PR 708. The `writeUint` and `writeIsoBoxes` regions go to the cursor RFC. The regions belong to the pull requests that implement the cursor RFC |
 | G529 | low | docs | any time | Eight TSDoc examples copy the complete file with `new Uint8Array(isoFile)` before the read, although `readIsoBoxes` accepts the `Buffer`. | Done in PR 708 |
-| F265 | low | errors | any time | `writeBoxHeader` can write a 16-byte header with `largesize`, but every built-in writer computes its size with an 8-byte header, so a box above 4 GiB fails with an unclear `RangeError`. | Not done. The header size of a box above 4 GiB goes to the cursor RFC, because a 1.x check is a range check |
+| F265 | low | errors | any time | `writeBoxHeader` can write a 16-byte header with `largesize`, but every built-in writer computes its size with an 8-byte header, so a box above 4 GiB fails with an unclear `RangeError`. | Not done. The header size of a box above 4 GiB goes to the cursor RFC, because a 1.x check is a range check. Question 23 of the RFC in PR 682 (8435c2ae0) |
 | F291 | low | errors | optional | The default container writing throws an opaque TypeError for a container box with no `boxes` field, which differs from the rule that a writer does not throw for a missing field. | Skipped. Only JavaScript or a cast reaches the error, as in issue 668 |
 | G508 | low | errors | any time | The input handling uses `instanceof` tests, so an `ArrayBuffer` from another realm throws an unclear `TypeError`, a wrong input type gives an engine error with no parameter name, and a `SharedArrayBuffer` from another realm passes the copy step of `writeIsoBox`. | Done in PR 702 |
 | F180 | low | naming | major | Seven type names follow the clause title and not the syntax class of the spec, and the package does not state which rule it uses. | Not done. Brief 4 covers the row in theme 5, names |

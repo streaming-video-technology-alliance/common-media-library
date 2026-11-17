@@ -341,7 +341,7 @@ Severity low. Category consistency. Breaking: no. Fact check: confirmed. Value c
 - "package" for "library" at docs/utilities.md:24 and docs/writing-boxes.md:212. README.md lines 3, 9, 28 and the front matter of reading-boxes.md say "Parse" and "parsing": change them to "read" and regenerate skills/common-media-library, because the README section feeds it.
 
 
-**Result.** Partly done in PR 708. The rename of "box object" goes to the cursor RFC.
+**Result.** Partly done in PR 708. The rename of "box object" goes to the cursor RFC. The two terms are in the Migration section of PR 682 (8435c2ae0).
 
 ## F366: The summaries of the box types follow three patterns, and the sample entry writers follow two.
 
@@ -394,7 +394,7 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Prior decision.** None found that makes the current state intentional. The comment rule of the project allows spec references on fields, and src/boxes/TrackEncryptionBox.ts:11-57 (PR 658) already documents each field with its spec name. The TSDoc pass of issue 435 covers the remaining packages and is not finished.
 
-**Result.** Partly done in PR 708. New `readTfhd` and `readTfdt` example files go to the cursor RFC.
+**Result.** Partly done in PR 708. New `readTfhd` and `readTfdt` example files go to the cursor RFC. The example files belong to the pull requests that implement the cursor RFC.
 
 ## F184: Three exports appear as "(undocumented)" in the API report beside the four lowercase aliases.
 
@@ -449,7 +449,7 @@ Part 1, now, in a docs-only PR against the current 1.x guide (no API change):
 Part 2, with the implementation of the cursor RFC (2.0.0): the guide rewrite that the RFC already requires uses "box object" for an object with fields and "raw box" for `{ type, bytes }`, and repeats the precedence sentence for the raw box. Do not rename the term in the 1.x guide before the RFC is accepted. Add a count rule or a range rule to the guide only if the findings that define those rules are accepted. Do not list them as part of this finding.
 
 
-**Result.** Partly done in PR 708. Part 2 goes to the cursor RFC.
+**Result.** Partly done in PR 708. Part 2 goes to the cursor RFC. Part 2 is in the Migration section of PR 682 (8435c2ae0).
 
 ## F292: The utilities guide describes a signature that was removed, omits five public utilities, and uses `meta` in two examples where it does not fit.
 
@@ -476,7 +476,7 @@ Part 2, with the 2.0.0 guide rewrite, because the write API and the custom reade
 Drop the proposed line for `CONTAINERS`. reading-boxes.md:11 and writing-boxes.md:16 already document the constant. A guide line for `fourCcToUint32` is optional, because its TSDoc has an example. First decide whether the function stays a public export.
 
 
-**Result.** Partly done in PR 708. Part 2 goes to the cursor RFC.
+**Result.** Partly done in PR 708. Part 2 goes to the cursor RFC. Part 2 is in the Migration section of PR 682 (8435c2ae0).
 
 ## F316: `defaultReaderConfig` and `defaultWriterConfig` build an object with 62 entries on each call, and the guides call them inside the read call
 
@@ -534,7 +534,7 @@ Corrected sentences:
 - `ParsedBox`, `ParsedIsoBox`, `IsoTypedParsedBox`: write these after the RFC implementation decides whether the three types still differ from `IsoBox` once the four fields are removed. If a type becomes an alias of another, remove the type instead of documenting it (that removal is a separate, breaking item).
 
 
-**Result.** Partly done in PR 708. `ParsedBox`, `ParsedIsoBox`, and `IsoTypedParsedBox` wait for the RFC decision on those types.
+**Result.** Partly done in PR 708. `ParsedBox`, `ParsedIsoBox`, and `IsoTypedParsedBox` wait for the RFC decision on those types. Rule 6 of "Result type" in PR 682 (8435c2ae0) states the fate of the three types.
 
 ## F336: Entry points have no @throws tags, and some have no @example
 
@@ -573,7 +573,7 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Prior decision.** PR 644 (commit af0e23eb0, "fix(iso-bmff): limit readData to the view and read no bytes for 0") chose the no-copy behavior on purpose. Its test plan lists "a form that returns a copy" as a wrong form that must fail a test, and test/readData.test.ts:88 asserts `data.buffer === buffer.buffer`. The same PR added the shared memory sentence to the TSDoc of `readData`. AGENTS.md (PR 583) sets the type rule: a function that returns a view over its input returns `Uint8Array`, an allocating function returns `Uint8Array<ArrayBuffer>`. No prior decision says that the fields or the guides must stay silent about it, so the documentation gap is not intentional.
 
-**Result.** Done in PR 708. The `readBytes` sentence goes to the cursor RFC.
+**Result.** Done in PR 708. The `readBytes` sentence goes to the cursor RFC. The `readBytes` sentence is in the contract of PR 682 (8435c2ae0).
 
 ## F340: The Unreleased section has two '### Changed' headings, and two older sections have the wrong year
 
@@ -1020,7 +1020,7 @@ Drop the `assert.strictEqual` style change. Imports are outside every region tod
 
 **Prior decision.** AGENTS.md:82 and PR 573 (e7db0e39e, "docs: make every README and guide example block typecheck"): TSDoc `{@includeCode}` regions compile with the test file, so the README example rule (import every name, no pseudocode) does not apply to them. The exemption from the check is intentional. The undefined input names are not covered by any decision.
 
-**Result.** Partly done in PR 708. The `writeUint` and `writeIsoBoxes` regions go to the cursor RFC.
+**Result.** Partly done in PR 708. The `writeUint` and `writeIsoBoxes` regions go to the cursor RFC. The regions belong to the pull requests that implement the cursor RFC.
 
 ## G529: Eight TSDoc examples copy the complete file with `new Uint8Array(isoFile)` before the read, although `readIsoBoxes` accepts the `Buffer`.
 
@@ -1050,7 +1050,7 @@ Severity low. Category errors. Breaking: no. Fact check: confirmed. Value check:
 **Proposal of the finder.** 2.0.0 defines the case in the contract of `endIsoBox`: the function throws a `RangeError` with the box type and the size when the size is above 2^32 - 1. Support for `largesize` can come later with the stream writer that the RFC lists under Future possibilities.
 
 
-**Result.** Not done. The header size of a box above 4 GiB goes to the cursor RFC, because a 1.x check is a range check.
+**Result.** Not done. The header size of a box above 4 GiB goes to the cursor RFC, because a 1.x check is a range check. Question 23 of the RFC in PR 682 (8435c2ae0).
 
 ## F291: The default container writing throws an opaque TypeError for a container box with no `boxes` field, which differs from the rule that a writer does not throw for a missing field.
 

@@ -80,6 +80,8 @@ Rules:
 
 Done: commits on the PR branch, an updated PR description, and a table with the result for each finding ID.
 
+Status: complete on 2026-11-17. PR 682 has the amended RFC at 8435c2ae0 and a result table in its description. Of the 30 rows, 16 are done in the RFC text. Seven rows have an unresolved question or a part done. Seven rows are not done and stay open for the RFC review: G483, G484, G485, G489, G490, G493, and G500. Each API change is an unresolved question with a default answer: questions 14 to 24 and the corrected questions 2, 5, and 10. The maintainer decides those questions in the review. The "Result" column of `findings.md` states the result of each row.
+
 ## 4. Second RFC: the other breaking changes of 2.0.0
 
 Draft a second RFC for `@svta/cml-iso-bmff` 2.0.0. It covers the breaking changes that are not part of the cursor API. Branch from `origin/feat/iso-bmff-v2`, save the file as `rfc/<name>.md` per `rfc/README.md`, and open a draft PR against `feat/iso-bmff-v2`.

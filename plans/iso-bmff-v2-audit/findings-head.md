@@ -4,7 +4,7 @@ This file lists the findings. The maintainer decides each group. The "Result" co
 
 ## Status on 2026-11-17
 
-Briefs 1 and 2 of `briefs.md` are complete. Their PRs merged into `main`: 702, 703, 704, 705, 706, 708, 713, and 714. Brief 3 and brief 4 have not started.
+Briefs 1 and 2 of `briefs.md` are complete. Their PRs merged into `main`: 702, 703, 704, 705, 706, 708, 713, and 714. Brief 3 is complete: PR 682 has the amended cursor RFC at 8435c2ae0. Brief 4 has not started.
 
 | Result for the 73 rows that break nothing | Rows |
 | --- | --- |
@@ -84,7 +84,7 @@ One row of the last group is urgent. **G466**: `parsePsshList` in `@svta/cml-drm
 | Step | Work | Rows | Needs | Status |
 | --- | --- | --- | --- | --- |
 | 1 | Fix G466 in drm (issue 683) | 1 | No decision. A patch release of drm | Done. PR 685, drm 1.1.13 |
-| 2 | Amend the cursor RFC | 30 | No code. One revision of the draft | Not started (brief 3) |
+| 2 | Amend the cursor RFC | 30 | No code. One revision of the draft | Done (brief 3). PR 682 at 8435c2ae0 |
 | 3 | Fix the rows that break nothing | 73 | No decision. 37 rows are documentation | Done (briefs 1 and 2). See "Status on 2026-11-17" |
 | 4 | Decide the twelve themes | 92 | RFC text, because each theme changes the public API | Not started (brief 4) |
 | 5 | Implement the themes on the 2.0.0 branch | 92 | Step 4. One PR for each theme | Waits for step 4 |

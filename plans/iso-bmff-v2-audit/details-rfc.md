@@ -16,6 +16,8 @@ Severity high. Category api-surface. Breaking: no. Fact check: partly. Value che
 
 **Prior decision.** No decision about the raw box. Related and binding for the definition of the header: PR 664 (commit 9103e4548, issue 660, closed) states in IsoBoxReadView.ts:355 and CHANGELOG.md:120 that the header of a `uuid` box has 16 more bytes for the `usertype` field. That matches ISO/IEC 14496-12:2015 clause 4.2.
 
+**Result.** Question 16 of the RFC in PR 682 (8435c2ae0): `headerSize` on the raw box, default yes.
+
 ## F240: The RFC contract writes any box with a `boxes` field and no writer as a container, which reverses the tested rule of version 1 and would write a `meta` box or a sample entry with no fields.
 
 Severity high. Category behavior. Breaking: no. Fact check: partly. Value check: partly.
@@ -29,6 +31,8 @@ Severity high. Category behavior. Breaking: no. Fact check: partly. Value check:
 **Proposal after verification.** Replace RFC lines 200 and 201 with three rules. (1) Automatic container handling does not change: `readIsoBoxes` and `writeIsoBoxes` read and write a box as a container with no map entry only when its type is in `CONTAINERS`. (2) `writeIsoBoxes` throws `No writer found for box type` for every other box that has no writer and no `bytes` field, even if the box has a `boxes` field. Examples are `meta`, `prsl`, and the sample entries. (3) State the one change from version 1 in the costs section: a parsed box of a type outside `CONTAINERS` that has a reader and no writer wrote its `view` bytes in version 1. In version 2 the box has no source bytes, so the write throws. The adopter adds the writer, or removes the reader so the box stays a raw box. Keep the existing test at writeIsoBoxes.test.ts:298 and add a test for rule 3.
 
 **Prior decision.** Issue 651 (closed) and PR 673, commit d395df3ce "fix(iso-bmff): write a box with a boxes field and no writer from its view", merged 2026-11-16. The maintainer chose the first option of issue 651: the container form only for a type in `CONTAINERS`, and `No writer found for box type` for a box that code builds with a `boxes` field and no writer. The prior decision supports the finding and contradicts the RFC text at lines 200 and 201.
+
+**Result.** Done in PR 682 (8435c2ae0). The contract states the rule of PR 673. Question 10 covers a parsed box.
 
 ## G480: The RFC cursor type is invariant in `V`, so a reader of either mode accepts no cursor and the accepted `int64` rule fails to compile.
 
@@ -49,6 +53,8 @@ Better options, in order of preference:
 In both cases, add a "Variance of the cursor" paragraph to the RFC that carries over line 370 of uint64-reader-config.md. Add these type tests for the cursor: both either-mode assignments, both mode-mix `@ts-expect-error` lines, an either-mode reader in a map of each mode, a custom reader of each mode, and the generic `int64` call. Test 15 of test/int64.types.test.ts is the model.
 
 **Prior decision.** The accepted RFC rfc/uint64-reader-config.md line 370, "Variance of the view" (PR 613, commit 9bc54be04, implemented in PR 645, commit 2aca3e3e9) requires a read handle that is covariant in `V`. That decision supports the finding. No decision supports the invariant cursor: the cursor RFC exists only in the unpushed commit 8ce63c212.
+
+**Result.** Confirmed with a TypeScript 6.0.3 model (8 errors). PR 682 (8435c2ae0) adds a variance paragraph and question 14, default: a method signature for the readers map.
 
 ## G482: A write cursor replaces `view` and `bytes` when the buffer grows, and a read cursor is shared by all boxes, but every cursor field is public and mutable and the contract does not warn about either case.
 
@@ -78,6 +84,8 @@ Severity: medium. The hazard needs a custom writer that bypasses the field funct
 
 **Prior decision.** None for the missing contract text. The mechanisms are intentional design choices of the draft RFC: rfc/iso-bmff-cursor-api.md:249 (one shared read cursor, one allocation) and lines 203 and 240 (buffer doubles, each growth copies). The RFC status is draft, "Pending review" (line 285).
 
+**Result.** Contract lines done in PR 682 (8435c2ae0). Question 15 asks for `readonly` fields, default yes.
+
 ## F273: The RFC states that isIsoBoxType does not change, but its first overload takes `{ view: IsoBoxReadView<V> }`, a class that the RFC removes.
 
 Severity medium. Category api-surface. Breaking: yes. Fact check: partly. Value check: partly.
@@ -94,6 +102,8 @@ Severity medium. Category api-surface. Breaking: yes. Fact check: partly. Value 
 
 **Prior decision.** rfc/uint64-reader-config.md:231-240 and PR 645 (2aca3e3e9), with CHANGELOG.md:37, added the first overload with `{ view: IsoBoxReadView<V> }` on purpose for version 1. The decision is the rule that the guard keeps the field type of the box. It does not require the `view` member, so it does not block the change.
 
+**Result.** Done in PR 682 (8435c2ae0), section "Result type".
+
 ## G463: A container box never becomes a raw box under the RFC, so the migration text "omit the reader and use the raw box" is false for the 19 container types.
 
 Severity medium. Category api-surface. Breaking: no. Fact check: confirmed. Value check: partly. Merged duplicates: G495.
@@ -108,6 +118,8 @@ Severity medium. Category api-surface. Breaking: no. Fact check: confirmed. Valu
 
 **Prior decision.** None for the conflict itself: the RFC text is a single draft commit (8ce63c212). The container half is intentional: rfc/iso-bmff-container-readers-writers.md lines 42 and 148 keep automatic container handling (RFC PR 622, implementation PR 654), so a container with no map entry stays `{ type, boxes }`.
 
+**Result.** Done in PR 682 (8435c2ae0). The Drawbacks limit the raw box advice to types outside `CONTAINERS` and name question 13.
+
 ## G470: Under the RFC the user type of a uuid box moves into a reader, but the package has no uuid reader and no uuid box type, so c2pa keeps a local type and a double cast.
 
 Severity medium. Category api-surface. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -120,6 +132,8 @@ Severity medium. Category api-surface. Breaking: no. Fact check: confirmed. Valu
 
 **Proposal after verification.** Ship the pair in 2.0, not the reader alone: `readUuid` and `writeUuid`, plus `UuidBox = { type: 'uuid'; usertype: <16 bytes>; data: Uint8Array }` in `IsoBoxMap`. `data` is a view of the input (return type `Uint8Array`, per the AGENTS.md rule for views). Give `usertype` the same type that 2.0 uses for the other 16-byte identifiers (`systemId` of pssh, `defaultKid` of tenc). Those are `number[]` today. If another finding moves them to `Uint8Array`, use `Uint8Array` here too. Do not mix the two types. Without `writeUuid`, `writeIsoBoxes` throws for a parsed `UuidBox` under RFC line 201. State in the RFC contract that the cursor position for a `uuid` reader is before the 16 bytes of the user type, and name `readUuid` and `writeUuid` there. In c2pa, `matchesUuid` takes `readonly number[]` (utils.ts:79), so its parameter type changes to `ArrayLike<number>` if `usertype` becomes a `Uint8Array`. Use the c2pa change as the migration example in the RFC.
 
+
+**Result.** Question 17 of the RFC in PR 682 (8435c2ae0). Issue 694 tracks a helper after 2.0.0.
 
 ## G483: The RFC states that each method of the two view classes becomes a field function, but the table has no row and no stated fate for 11 members of the read view and 9 members of the write view.
 
@@ -146,6 +160,8 @@ Severity medium. Category api-surface. Breaking: yes. Fact check: partly. Value 
 5. Do not mark the fix as breaking. If the decisions in item 3 remove a member with no replacement, add that member to Drawbacks.
 
 
+**Result.** Not done. Question 11 of the RFC covers four members.
+
 ## G493: The RFC drops two documented inputs of `writeIsoBoxes` without a line in Drawbacks: a bare `Uint8Array` in the list, and the result of a direct writer call.
 
 Severity medium. Category api-surface. Breaking: yes. Fact check: partly. Value check: partly.
@@ -170,6 +186,8 @@ Severity medium. Category api-surface. Breaking: yes. Fact check: partly. Value 
 
 **Prior decision.** None that chose to remove either input. The current state of version 1 is intentional: commit d615e5bf0 ("feat: add iso box writers", issue 269) created `IsoBoxStreamable = IsoBox | Box | ArrayBufferView`, PR 583 added the SharedArrayBuffer copy rule for a view in the list (CHANGELOG.md:111, tests at test/writeIsoBoxes.test.ts:217 and :229), and the accepted RFC rfc/iso-bmff-container-readers-writers.md:80 to 91 (PR 622, PR 654) documents the direct writer call. The cursor RFC is a draft in commit 8ce63c212 and is not pushed. `gh issue list` for "IsoBoxStreamable iso-bmff" and "writeIsoBoxes ArrayBufferView iso-bmff" returned no issue.
 
+**Result.** Not done. Open for the RFC review.
+
 ## G500: The RFC lists four functions that do not change and gives no fate for the other public exports outside the two view classes, among them the stream API and the sample entry helpers that take a view.
 
 Severity medium. Category api-surface. Breaking: yes. Fact check: partly. Value check: partly.
@@ -192,6 +210,8 @@ Severity medium. Category api-surface. Breaking: yes. Fact check: partly. Value 
 6. `CONTAINERS`, `isContainer`, `isFullBox`, `fourCcToUint32`, `IsoBoxData`, `TraverseIsoBoxesConfig`: one row each with "no change", plus one sentence for `isContainer` on a hand-built raw box of a container type. Drop the question about a number in the `seekIsoBox` path. Line 276 already states the path form.
 
 **Prior decision.** rfc/iso-bmff-cursor-api.md:241 ("The names and the rules of both RFCs do not change. The signatures take a cursor.") together with rfc/uint64-reader-config.md:227 and :246 implicitly keeps the names `defaultReaderConfig`, `createAudioSampleEntryReader` and `createVisualSampleEntryReader`. rfc/iso-bmff-container-readers-writers.md:162 keeps `defaultReaderConfig()` and `defaultWriterConfig()` without the container functions. No prior decision covers the stream, the utils exports or the three types.
+
+**Result.** Not done. Open for the RFC review.
 
 ## G509: Version 1 uses two position systems in public members (`cursor` is relative to the view, `slice(offset, size)` takes an offset from the start of the buffer and documents only `size`), and the RFC cursor type does not state which system `pos` and `end` use.
 
@@ -216,6 +236,8 @@ Severity medium. Category api-surface. Breaking: no. Fact check: confirmed. Valu
 No change to version 1 is needed. If a 1.x release ships before 2.0.0, the only cheap fix is the missing `@param offset` line in the TSDoc of `slice` (IsoBoxReadView.ts:146-151), with the statement that the offset counts from the start of the buffer.
 
 
+**Result.** Done in PR 682 (8435c2ae0). The contract states the origin of `pos` and `end`.
+
 ## G485: The RFC keeps a `size` parameter for `readString`, `readUtf8` and `readBytes` with no rule for -1, 0 or no size, and its new rule for a read past the end contradicts the limit that version 1 applies.
 
 Severity medium. Category behavior. Breaking: yes. Fact check: confirmed. Value check: partly.
@@ -238,6 +260,8 @@ Severity medium. Category behavior. Breaking: yes. Fact check: confirmed. Value 
 Also correct RFC line 176 and the rows at lines 185 and 186 with the migration: `readUtf8(-1)` becomes `readTerminatedUtf8`, `readUtf8()` and `readData(-1)` become the to-end form, and a positive size keeps `readUtf8` or `readBytes` with the throw. State in the Drawbacks section that a custom reader that relied on the limit of `readData(size)` or `readUtf8(size)` now gets a `RangeError`.
 
 **Prior decision.** Version 1 rules were chosen on purpose: PR 639 (issue 635) set "-1 reads to the null byte or to the end of the view". PR 642 set the limit and the 0 rule for `readUtf8` and states that `readString(size)` still throws a `RangeError`. PR 644 set the same limit for `readData`. Issue 636 keeps the tolerant read of a null byte in `iden`, `payl`, `sttg` and `vlab`. Issue 668 was closed as not planned: a `RangeError` from a custom reader with bad input goes to the caller. None of these decides the version 2 field functions. The null-or-end rule is the one decision that version 2 must keep.
+
+**Result.** Not done. Open for the RFC review.
 
 ## G491: The RFC removes the `type` argument of a reader and does not say who sets `type` on the box, what happens when a reader reads fewer bytes than the box has, or whether a reader may keep the cursor.
 
@@ -263,6 +287,8 @@ Severity medium. Category behavior. Breaking: yes. Fact check: partly. Value che
 
 **Prior decision.** PR 290 (commit d429da2d2, version 1.0.0-alpha.8, CHANGELOG.md line 213: "Updated box reader functions to allow a type parameter to be passed in") added the second argument `type` on purpose. The RFC removes it without a note, so the Drawbacks section must name the removal. The factory replacement already exists since 1.0.0-alpha.4 (`createAudioSampleEntryReader`, `createVisualSampleEntryReader`, CHANGELOG.md line 248). rfc/iso-bmff-container-readers-writers.md:144 and docs/reading-boxes.md:275 already show a reader that returns `type`. Issue 668 (closed as not planned, 2026-11-16) is the precedent against a runtime check for a custom reader. No prior decision covers the three missing contract lines. The gh search for "IsoBoxReader type argument" and "custom reader" found no other issue.
 
+**Result.** Position and lifetime done in PR 682 (8435c2ae0). Question 18 asks who sets `type`.
+
 ## G492: The RFC does not say what a writer that never calls `endIsoBox` produces, and a size of 0 is a legal size that means the box extends to the end of the file.
 
 Severity medium. Category behavior. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -280,6 +306,8 @@ Severity medium. Category behavior. Breaking: no. Fact check: confirmed. Value c
 2. Contract, box above 2^32 - 1 bytes. State that `endIsoBox` throws a `RangeError` with the box type and the size. Do not move the body and do not write `largesize`. Record a `largesize` writer under "Future possibilities", next to the `ReadableStream` writer for a large `mdat`. Also correct the comparison with version 1 in any migration note: version 1 has the `isLarge` branch at IsoBoxWriteView.ts:323, but no writer reserves the 8 extra bytes, so version 1 also fails with a `RangeError`.
 
 
+**Result.** The `largesize` part is question 23 in PR 682 (8435c2ae0). The check for a missing `endIsoBox` call is not done.
+
 ## G487: `seekIsoBox` returns `null`, and the first example of the RFC converts that `null` to `undefined`.
 
 Severity medium. Category consistency. Breaking: no. Fact check: partly. Value check: partly.
@@ -296,6 +324,8 @@ Severity medium. Category consistency. Breaking: no. Fact check: partly. Value c
 
 **Prior decision.** For the truncated-box half: PR 661 (7d67e217a) and PR 662 (6c788e430), issues 650 and 663, documented in libs/iso-bmff/docs/reading-boxes.md:89 and kept by rfc/iso-bmff-cursor-api.md:198. The read stops before an incomplete box and does not throw. For null against undefined: none found.
 
+**Result.** Done in PR 682 (8435c2ae0). The examples return `null`.
+
 ## G489: The RFC has three rules for an optional configuration, and its writer signature brings back an alternative that the accepted container RFC rejected.
 
 Severity medium. Category consistency. Breaking: no. Fact check: partly. Value check: partly.
@@ -309,6 +339,8 @@ Severity medium. Category consistency. Breaking: no. Fact check: partly. Value c
 **Proposal after verification.** State one rule in rfc/iso-bmff-cursor-api.md: the `writers` map is required wherever a write function takes a configuration. Concretely: `writeIsoBoxes(boxes, config)`, `writeIsoBox(box, config)`, and `createIsoBoxWriteCursor(config)` take a required `config` with a required `writers: IsoBoxWriterMap` and an optional `capacity`. `IsoBoxWriteCursor.writers` is required, as `IsoBoxWriteViewConfig.writers` is in version 1. An adopter who writes only raw boxes or one leaf box passes `{ writers: {} }`, as issue 298 proposes. Then `writeMoov(createIsoBoxWriteCursor(), moov)` does not compile, and lines 145 and 217 of the container RFC stay valid with "cursor" in place of "config". The only change against version 1 is that `writeIsoBox(box)` with one argument no longer compiles. Add that change to the Drawbacks section. Add `IsoBoxWriterMap` and `IsoBoxReaderMap<V>` to the Types block with the new function types. Do not add a default to `IsoBoxWriter<B>`. If the author prefers an optional `config` for `createIsoBoxWriteCursor` because a leaf writer needs no map, the RFC must state that exception and its reason as an unresolved question, and must not change the two tree functions.
 
 **Prior decision.** Issue 298 ("Optional configuration footgun?") and PR 301 (commit a31419299, CHANGELOG 1.0.0-beta.1: "Made `IsoBoxWriteViewConfig` required in `writeIsoBoxes` function") made the writer configuration and the `writers` map required on purpose. The accepted RFC rfc/iso-bmff-container-readers-writers.md (PR 622, lines 145 and 217) repeats the decision for the container writers and rejects an optional `config`. The optional `config` of `writeIsoBox` is not covered by either decision. PR 301 did not change that function.
+
+**Result.** Not done. Open for the RFC review.
 
 ## G496: The RFC states twice that `readIsoBoxes` keeps its signature and that only the return type of `writeIsoBoxes` changes, but the source shows that the return type, both configuration types and both map value types change.
 
@@ -330,6 +362,8 @@ Drop the `raw` to `data` point. Do not add the three overloads yet. First add on
 
 **Prior decision.** None for the current wording. Related: PR 682 (open, head f40e351ec) already reworded line 68. rfc/uint64-reader-config.md lines 202-209 and 387 (PR 645, merged) keep `Parameters<typeof readIsoBoxes>` and `ReturnType<typeof readIsoBoxes>` stable on purpose, which shows that the maintainers treat the exact signature as public contract.
 
+**Result.** Done in PR 682 (8435c2ae0).
+
 ## G497: The Summary states that the trial build is faster in every scenario, but the second table of the RFC shows a slower row, and the only faster row for a large payload uses a behavior that the contract excludes.
 
 Severity medium. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -348,6 +382,8 @@ Severity medium. Category docs. Breaking: no. Fact check: partly. Value check: p
 4. State in the function table whether the `config` of `writeIsoBoxes` and `writeIsoBox` takes `capacity`. Line 240 and Unresolved question 2 assume that the option exists there.
 5. Decide the copy rule in the contract at line 203. The cheapest rule: `writeIsoBoxes` returns the buffer itself when `pos` equals the buffer length, and a copy with the exact size otherwise. A `capacity` of the full size then gives the 48 µs path through `writeIsoBoxes` with no new option. If the author rejects that rule, add the question to Unresolved question 2 and do not add a "skip the copy" option without review.
 
+
+**Result.** Done in PR 682 (8435c2ae0). Question 2 asks for the copy rule and `capacity`.
 
 ## G499: The RFC states that the names and the rules of the two accepted RFCs do not change, but it reverses one recorded decision and makes about 75 lines of those RFCs wrong, with no plan to amend them.
 
@@ -372,6 +408,8 @@ Severity medium. Category docs. Breaking: no. Fact check: partly. Value check: p
 5. Optional: add one sentence to rfc/README.md under Status Lifecycle that a later RFC records a partial change of an accepted RFC with a dated line in its Final Decision section.
 
 
+**Result.** Done in PR 682 (8435c2ae0), section "Changes to accepted RFCs".
+
 ## G502: The RFC has no migration guide, no deprecation release, no list of the dependent packages in this repository, and no decision on the two open items that the accepted RFCs left for a major version.
 
 Severity medium. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -393,6 +431,8 @@ Drop three items. Drop the `@deprecated` 1.x release, or defer it to a 1.x patch
 
 **Prior decision.** No decision makes the gaps intentional. Three related records: (1) RFC question 1 and the open PR 681 (release prep of iso-bmff 1.1.0, created 2026-11-17 UTC) already handle the release order. PR 616, an earlier 1.1.0 release prep, closed without a merge on 2026-11-10. (2) rfc/uint64-reader-config.md, accepted 2026-11-11 (PR 613), keeps `number` as the default of the `int64` option and lists a `bigint` default only under Future possibilities. (3) rfc/iso-bmff-container-readers-writers.md, accepted 2026-11-12 (PR 622, implementation PR 654), kept `readVttc` and `readVttC` and recorded the one-letter difference as a drawback.
 
+**Result.** Done in PR 682 (8435c2ae0): Migration section, a drawback, numbers in question 1, names in question 5.
+
 ## G484: The RFC has no field function that reads or writes an 8-byte field as a `number`, and `readUint64` returns a `bigint` in a family of functions that return a `number`.
 
 Severity medium. Category naming. Breaking: yes. Fact check: partly. Value check: partly.
@@ -409,6 +449,8 @@ Severity medium. Category naming. Breaking: yes. Fact check: partly. Value check
 
 **Prior decision.** Issue 611 and PR 612 (cf6add83e) chose `readUint64(): bigint` and `writeUint64(value: bigint)` on purpose, and the accepted RFC rfc/uint64-reader-config.md (lines 263 and 443) keeps the name and plans `readInt64` as the signed `bigint` partner. The decision covers the class API, where `readUint(8)` is the `number` form. The methods are unreleased, and the draft cursor RFC lists its sized names as open (unresolved question 5). No prior decision covers the missing 8-byte `number` field functions.
 
+**Result.** Not done. Open for the RFC review.
+
 ## G486: The RFC adds 32 exports with generic names and no `Iso` token, next to 6 new functions that have the token.
 
 Severity medium. Category naming. Breaking: no. Fact check: partly. Value check: partly.
@@ -422,6 +464,8 @@ Severity medium. Category naming. Breaking: no. Fact check: partly. Value check:
 **Proposal after verification.** Do not rename all 32 names in the audit. Extend Unresolved question 5 of rfc/iso-bmff-cursor-api.md so that the maintainer decides the token before version 2.0.0 is published (after that, a rename breaks adopters). The question must state three facts: (a) the collision with player helpers, with hls.js mp4-tools.ts as the example and the error-codes RFC as the precedent, (b) the settled names `readInt64AsBigInt`, `createInt64OverflowReader`, `readWideUint`, and `readWideInt` have no token, so a token on the other names needs either an exception for those names or a change to the accepted int64 RFC, (c) the about 170 box functions (`readTfdt`) have no token. Options to list: keep the short names and document the alias or `import * as iso` form in the README, or add the token to all field functions including the wide functions (`readIsoUint32`, `readIsoWideUint`) and keep `readInt64AsBigInt` as a named exception. My recommendation is the short names: the cursor argument already ties each function to the package, the collision fails at compile time, and custom readers stay short. Record the reason in the RFC in both cases.
 
 **Prior decision.** Partial only. rfc/uint64-reader-config.md:458 (accepted RFC, PR 613, implemented in PR 645) settles `readWideUint`, `readWideInt`, `writeWideUint`, `writeWideInt`, `readInt64AsBigInt`, and `createInt64OverflowReader` without the `Iso` token. rfc/iso-bmff-cursor-api.md:241 states that those names do not change. No decision covers the other 28 field function names. rfc/error-codes.md:140 is a precedent in the other direction (prefix to avoid collisions with player identifiers).
+
+**Result.** Done in PR 682 (8435c2ae0). Question 5 asks for the `Iso` token.
 
 ## G490: The cursor field names `pos` and `end` are abbreviations with no stated origin, and the RFC gives the words `view`, `bytes` and `cursor` meanings that differ from version 1.
 
@@ -443,6 +487,8 @@ Severity medium. Category naming. Breaking: no. Fact check: partly. Value check:
 If the maintainers still want longer names, `position` is better than `offset`, and the size cost of the longer property name in every field function needs a measurement first.
 
 
+**Result.** Not done. Open for the RFC review.
+
 ## G471: The RFC does not list the two CML packages that depend on iso-bmff, and the release script gives them a patch version whose peer range moves to a new major.
 
 Severity medium. Category package-config. Breaking: yes. Fact check: partly. Value check: partly.
@@ -458,6 +504,8 @@ Severity medium. Category package-config. Breaking: yes. Fact check: partly. Val
 **Proposal after verification.** Do not add a call-site section to the RFC. Add one bullet to Drawbacks in rfc/iso-bmff-cursor-api.md: "Two packages in this repository change with the release: `@svta/cml-drm` and `@svta/cml-c2pa`. Their next release requires `@svta/cml-iso-bmff` 2 and rejects version 1. Their public API does not change." Add one item to Unresolved questions: which version level drm and c2pa get. Option A is the automatic patch of `prepare-release` (PR 531). An adopter with `^1` ranges for drm or c2pa and for iso-bmff then gets a peer conflict on the next update. Option B is a major version of drm and c2pa, set with `npm run ver` before `npm run prepare-release` (prepareRelease.ts:115 then skips them), with a changelog entry that names the new peer major. Option B also gives cmaf-ham a cascade patch for the drm peer. A minor version is not an option, because a `^1` range accepts it. Recommendation: option B. Put the call sites (c2pa: four `view.readData` uses, two `usertype` uses, one `writeEmsg` test call. drm: ensureEncryptedInit.ts:183-192) in the plan files and the description of the 2.0 pull request.
 
 **Prior decision.** PR 531 (commit 673e33b3a, "chore(release): publish caret peer ranges instead of exact pins"): "A dependent gets a cascade bump only when the published range rejects the new peer version, such as a major bump." AGENTS.md:34 documents the same rule. Precedent: c2pa 1.4.1 released a peer range change as a patch (libs/c2pa/CHANGELOG.md:82). These show that the patch cascade is intentional. None of them decides the version level for a dependent whose own code must change with the peer major.
+
+**Result.** Done in PR 682 (8435c2ae0): a drawback and question 24.
 
 ## G494: The `uuid` contract contradicts the reader contract of the same RFC, and the RFC states no rule for the `usertype` of a `uuid` box with no reader or for a `uuid` writer.
 
@@ -475,6 +523,8 @@ Severity medium. Category spec-compliance. Breaking: yes. Fact check: partly. Va
 
 **Prior decision.** PR 664 (commit 9103e4548, issue 660, closed as completed 2026-11-16) is a decision for version 1: the header of a `uuid` box includes the 16 bytes of `usertype`, and `readIsoBoxes` stops before a `uuid` box with a size below 24, or below 32 with `largesize`. That decision supports the finding: the RFC must keep the rule or state the change. No decision covers the RFC text. rfc/iso-bmff-cursor-api.md has `status: draft`, and its line 230 says the trial build has no `uuid` user type.
 
+**Result.** Done in PR 682 (8435c2ae0). The contract points to question 17.
+
 ## G481: The RFC cursor makes `int64` optional for `bigint` fields, which drops the accepted rule that a type with `bigint` fields always has the function.
 
 Severity medium. Category type-design. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -485,6 +535,8 @@ Severity medium. Category type-design. Breaking: no. Fact check: confirmed. Valu
 
 **Proposal of the finder.** Use the same conditional in the cursor type: `& ([V] extends [bigint] ? { int64: IsoInt64Reader<V> } : { int64?: IsoInt64Reader<V> })`. State the same rule for the `config` argument of `seekIsoBox` and `createIsoBoxReadCursor`.
 
+
+**Result.** Done in PR 682 (8435c2ae0). A `bigint` cursor requires `int64`.
 
 ## F433: Gap: a parsed box will have no byte position after the RFC, and all three players need the position and the size of a box.
 
@@ -510,6 +562,8 @@ The change is additive to the RFC design, so it breaks no adopter beyond the rem
 
 **Prior decision.** None found that makes the missing position intentional. The RFC at rfc/iso-bmff-cursor-api.md:238 records the removal of `view` and `size` as a known drawback and names the raw box as the path for the bytes of a box. The RFC is a draft (commit 8ce63c212), not accepted.
 
+**Result.** Partly done by question 13 of the RFC (the `start` field).
+
 ## G476: The RFC has no migration text for a direct call of a built-in writer, and the only in-repo direct call depends on the `buffer` of the write view.
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -522,6 +576,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 
 **Proposal after verification.** Add one bullet to the Drawbacks section of rfc/iso-bmff-cursor-api.md: "A direct call of a built-in writer changes. In version 1 the call returns an `IsoBoxWriteView`. In version 2.0.0 the writer takes a cursor and returns nothing." Show the two supported forms next to the bullet, and do not call the direct call unsupported. Simple form: `writeIsoBox(box, { writers: { emsg: writeEmsg } })`, which also compiles in version 1. Cursor form for callers that want no final copy: `const cursor = createIsoBoxWriteCursor({ capacity })`, `writeEmsg(cursor, box)`, `cursor.bytes.subarray(0, cursor.pos)`. In the 2.0 rewrite of libs/iso-bmff/docs/writing-boxes.md, replace the section at lines 193-208 (a writer result passed to `writeIsoBoxes`) with the same two forms. Change libs/c2pa/test/vsi/vsiTestUtils.ts:316-330 to `writeIsoBox({ type: 'emsg', ... }, { writers: { emsg: writeEmsg } })` now. That change is test-only and gives the same bytes.
 
+
+**Result.** Done in PR 682 (8435c2ae0). A drawback shows two forms.
 
 ## G498: The RFC counts 87 readers and 85 writers, but the package has 84 reader functions and 84 writer functions, and two other statements in Motivation do not match the source.
 
@@ -541,6 +597,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 4. Motivation item 4: replace "`readIsoBoxes` is the only entry point, and it creates a view for every box that it passes" with "Every entry point (`readIsoBoxes`, `IsoBoxReadView.readBoxes`, the iterator, and `readBox`) creates a view for every box that it passes." Also review the heading "A read decodes by default": with no `readers` in the configuration, a read decodes no leaf box. A heading such as "A read visits every box" matches the source.
 
 
+**Result.** Done in PR 682 (8435c2ae0).
+
 ## G501: The RFC gives the writer a helper for the full box header and the box type, and gives the reader neither, so 41 readers repeat two bit operations.
 
 Severity low. Category reader-writer-asymmetry. Breaking: no. Fact check: partly. Value check: partly.
@@ -557,3 +615,5 @@ Severity low. Category reader-writer-asymmetry. Breaking: no. Fact check: partly
 3. Optional: state in one sentence that a built-in reader may read the two fields as one `readUint32` when a measurement shows a gain. That form stays internal and the round-trip fixture test covers it.
 4. Optional: add one sentence to "Write a custom writer" that explains why the writer writes the header and the reader does not (the tree reader needs the type to select a reader).
 
+
+**Result.** Done in PR 682 (8435c2ae0). The example reads `readUint8` and `readUint24`.
