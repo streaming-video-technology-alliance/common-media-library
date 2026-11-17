@@ -428,6 +428,32 @@ The rule changes the bytes of one test fixture. The `hdlr` box below `moov/udta/
 
 **Alternatives.** A required configuration everywhere. The cursor RFC moves the writers into the write cursor, and a container writer finds a missing writer at run time. The compile check of issue 298 therefore no longer exists, and a required argument has no gain.
 
+### Build order
+
+The work for both RFCs lands on `feat/iso-bmff-v2` in three phases. Each pull request has one kind of change. The round-trip test of the fixtures and the diff of the API report then show one change at a time.
+
+**Phase 1, before the cursor rewrite.** Themes 1, 5, 6, 9, and 10 change version 1 code. These themes rename or remove public names, or change a few fields. They need no function of the cursor RFC, and the rewrite keeps their result. The rewrite then changes only the cursor code. Theme 9 also removes the reserved fields of about ten readers, so the rewrite has fewer fields to change.
+
+**Phase 2, the cursor rewrite.** The rewrite also builds the parts of this RFC that define the field functions or the contract of the cursor:
+
+- The map types of theme 4, because the variance model of the cursor RFC decides them.
+- `readFourCc` and `writeFourCc`, with the write rule of theme 4.
+- The string functions of theme 8, rules 1 to 3.
+- The rules of theme 7 for the tree reader: the size check before a reader, no catch around a reader, and the nesting limit.
+
+A later change to these parts would change the field functions a second time.
+
+**Phase 3, one box at a time.** These rules change one reader or one writer each. They go into the pull request that moves that box to the cursor:
+
+- Theme 3, because the byte fields use the views of `readBytes`. In version 1 code, the `pssh`, `tenc`, and sample entry code would change twice.
+- Rule 1 of theme 4: the string fields of four-character codes.
+- Rules 3 and 5 of theme 7: the count check of `stsd` and `dref`, and the stream.
+- Rules 4 to 6 of theme 8: `vttC`, the `mdhd` language, and `location`.
+
+Each pull request of every phase also changes `@svta/cml-drm` and `@svta/cml-c2pa` (issue 698). Each pull request also sets the size budget of the package.
+
+Question 1 of the cursor RFC changes this order. If a version 1.1.0 is released first, phase 1 starts after that release, because phase 1 breaks the API of version 1. Question 22 asks about the alternative order.
+
 ### Changes to the cursor RFC
 
 | Section of the cursor RFC | Change |
@@ -526,6 +552,10 @@ Each question has a default answer. The default answer is the rule in the theme.
 **Theme 10: configuration**
 
 21. **Optional configuration.** Should every entry point take an optional configuration with optional maps? The default answer is yes.
+
+**Build order**
+
+22. **Phase 1 first, or the cursor first.** Phase 1 puts five pull requests before the cursor rewrite, which has the highest risk. An alternative order starts with themes 6 and 10, because they only remove names and change types. Themes 1, 5, and 9 then go into the rewrite. That order tests the cursor code earlier, and the review of the rewrite is harder. The default answer is the three phases of [Build order](#build-order).
 
 ## Future possibilities
 
