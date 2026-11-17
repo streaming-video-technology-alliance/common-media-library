@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-11-17
+
 ### Added
 
 - `decodeUtf8` converts UTF-8 bytes in a `DataView` or a `Uint8Array` to a string. Its bundle is smaller than the bundle of `decodeText`.
@@ -135,7 +137,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.1...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.8.0...HEAD
+[1.8.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.1...utils-v1.8.0
 [1.7.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...utils-v1.7.1
 [1.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.2...utils-v1.7.0
 [1.6.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...utils-v1.6.2
