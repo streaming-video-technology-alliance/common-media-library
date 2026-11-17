@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.4.5.2 Video Media Header Box
+ * Video Media Header Box (`vmhd`).
+ *
+ * ISO/IEC 14496-12:2015 - 12.1.2
  *
  * @public
  */

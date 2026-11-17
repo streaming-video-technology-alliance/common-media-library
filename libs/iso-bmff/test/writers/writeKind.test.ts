@@ -12,6 +12,7 @@ describe('writeKind', function () {
 		}
 
 		const writer = writeKind(box)
+		// #endregion example
 
 		// size (41), type (kind), version and flags, then each string and a null terminator
 		assert.deepStrictEqual(
@@ -21,7 +22,6 @@ describe('writeKind', function () {
 				97, 115, 104, 58, 114, 111, 108, 101, 58, 50, 48, 49, 49, 0, 109, 97, 105, 110, 0,
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of strings that are not ASCII', function () {

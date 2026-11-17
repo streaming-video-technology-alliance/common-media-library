@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
+ * Handler Reference Box (`hdlr`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.4.3
  *
  * @public
  */

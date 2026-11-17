@@ -1,6 +1,7 @@
 import {
 	assert,
 	describe,
+	findIsoBox,
 	it,
 	IsoBoxReadView,
 	readInt64AsBigInt,
@@ -9,21 +10,60 @@ import {
 } from './util/box.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
-// A version 1 tfdt box. baseMediaDecodeTime is 2^53 + 1, which a number cannot hold.
-const TFDT_V1 = boxBytes('tfdt', [1, 1], [0, 3], [BigInt('9007199254740993'), 8])
-
 describe('readInt64AsBigInt', function () {
 	it('should give the built-in readers bigint fields', function () {
 		// #region example
-		const [box] = readIsoBoxes(TFDT_V1, {
+		// A moof box that holds a traf box with a version 1 tfdt box.
+		// baseMediaDecodeTime is 2^53 + 1, which a number cannot hold.
+		const bytes = new Uint8Array([
+			0,
+			0,
+			0,
+			36,
+			0x6d,
+			0x6f,
+			0x6f,
+			0x66, // moof
+			0,
+			0,
+			0,
+			28,
+			0x74,
+			0x72,
+			0x61,
+			0x66, // traf
+			0,
+			0,
+			0,
+			20,
+			0x74,
+			0x66,
+			0x64,
+			0x74,
+			1,
+			0,
+			0,
+			0, // tfdt, version 1
+			0,
+			0x20,
+			0,
+			0,
+			0,
+			0,
+			0,
+			1, // baseMediaDecodeTime
+		])
+		const boxes = readIsoBoxes(bytes, {
 			int64: readInt64AsBigInt,
 			readers: { tfdt: readTfdt },
 		})
 
-		assert.strictEqual(box.type, 'tfdt')
 		// The field is a bigint with the exact value.
-		assert.strictEqual(box.baseMediaDecodeTime, BigInt('9007199254740993'))
+		const tfdt = findIsoBox(boxes, box => box.type === 'tfdt')
 		// #endregion example
+
+		assert.ok(tfdt)
+		assert.strictEqual(tfdt.baseMediaDecodeTime, BigInt('9007199254740993'))
 	})
 
 	it('should read an unsigned 8-byte field', function () {

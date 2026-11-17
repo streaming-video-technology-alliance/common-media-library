@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * Primary Item Box - 'pitm'
+ * Primary Item Box (`pitm`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.11.4
  *
  * @public
  */

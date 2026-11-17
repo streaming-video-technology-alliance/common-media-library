@@ -9,6 +9,9 @@ import type { IsoInt64Reader } from './IsoInt64Reader.ts'
  * When `onOverflow` returns, the read continues with the rounded value.
  * When `onOverflow` throws, the read stops with that error.
  *
+ * A version 1 `mvhd`, `tkhd`, or `mdhd` box can have a `duration` with all bits set.
+ * ISO/IEC 14496-12 uses that value for a duration that cannot be determined, and the function reports it too.
+ *
  * The function does not need `BigInt`. To read the exact value, use `readInt64AsBigInt`.
  *
  * @param onOverflow - The callback for a value outside the safe integer range.

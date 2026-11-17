@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `MovieBox` from an `IsoBoxReadView`.
+ * Read the `moov` box (`MovieBox`).
  *
  * The `readers` map does not need an entry for the `moov` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.

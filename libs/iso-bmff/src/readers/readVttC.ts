@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `WebVttConfigurationBox` from an `IsoBoxReadView`.
+ * Read the `vttC` box (`WebVttConfigurationBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

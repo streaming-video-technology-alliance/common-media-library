@@ -3,11 +3,11 @@ import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `WebVttConfigurationBox` to an `IsoBoxWriteView`.
+ * Write the `vttC` box (`WebVttConfigurationBox`).
  *
  * @param box - The `WebVttConfigurationBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

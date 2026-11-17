@@ -2,7 +2,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.16.5 Producer Reference Time
+ * Producer Reference Time Box (`prft`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.16.5
  *
  * @public
  */

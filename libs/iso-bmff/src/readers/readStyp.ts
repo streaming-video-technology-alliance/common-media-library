@@ -4,7 +4,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { readFtyp } from './readFtyp.ts'
 
 /**
- * Parse a `SegmentTypeBox` from an `IsoBoxReadView`.
+ * Read the `styp` box (`SegmentTypeBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

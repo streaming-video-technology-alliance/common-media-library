@@ -9,13 +9,13 @@ describe('writeVlab', function () {
 		}
 
 		const writer = writeVlab(box)
+		// #endregion example
 
 		// size (14), type (vlab), sourceLabel
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
 			new Uint8Array([0, 0, 0, 14, 118, 108, 97, 98, 115, 111, 117, 114, 99, 101]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of a sourceLabel that is not ASCII', function () {

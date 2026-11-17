@@ -1,7 +1,9 @@
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
- * ISO/IEC 14496-12:2015 - 8.5.2.2 Sample Entry
+ * Sample Entry, the base of every sample entry box.
+ *
+ * ISO/IEC 14496-12:2015 - 8.5.2
  *
  * @public
  */

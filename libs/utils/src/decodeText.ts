@@ -1,6 +1,6 @@
 import type { DecodeTextOptions } from './DecodeTextOptions.ts'
+import { decodeUtf8Bytes } from './decodeUtf8Bytes.ts'
 import { isArrayBufferLike } from './isArrayBufferLike.ts'
-import { UTF_16 } from './UTF_16.ts'
 import { UTF_16_BE } from './UTF_16_BE.ts'
 import { UTF_16_LE } from './UTF_16_LE.ts'
 import { UTF_8 } from './UTF_8.ts'
@@ -8,6 +8,8 @@ import { UTF_8 } from './UTF_8.ts'
 /**
  * Converts an ArrayBuffer or ArrayBufferView to a string. The function works like
  * `TextDecoder.decode` and also supports environments without `TextDecoder`.
+ *
+ * If the data is always UTF-8, use {@link decodeUtf8}. Its bundle is smaller.
  *
  * @param data - The data to decode.
  * @param options - The options for the decoding.
@@ -61,97 +63,20 @@ export function decodeText(
 		return new TextDecoder(encoding).decode(view)
 	}
 
-	const { byteLength } = view
+	const { buffer, byteLength } = view
+
+	if (encoding === UTF_8) {
+		return decodeUtf8Bytes(
+			new Uint8Array(buffer, view.byteOffset + byteOffset, byteLength - byteOffset),
+		)
+	}
+
 	const endian = encoding !== UTF_16_BE
 	let str = ''
-	let char!: number
 
 	while (byteOffset < byteLength) {
-		switch (encoding) {
-			case UTF_8:
-				char = view.getUint8(byteOffset)
-
-				// Single byte (ASCII)
-				if (char < 128) {
-					byteOffset++
-				}
-				// 2-byte sequence
-				else if (char >= 194 && char <= 223) {
-					if (byteOffset + 1 < byteLength) {
-						const byte2 = view.getUint8(byteOffset + 1)
-						if (byte2 >= 128 && byte2 <= 191) {
-							char = ((char & 0x1f) << 6) | (byte2 & 0x3f)
-							byteOffset += 2
-						} else {
-							// Invalid sequence, skip
-							byteOffset++
-						}
-					} else {
-						// Incomplete sequence, skip
-						byteOffset++
-					}
-				}
-				// 3-byte sequence
-				else if (char >= 224 && char <= 239) {
-					if (byteOffset + 2 <= byteLength - 1) {
-						const byte2 = view.getUint8(byteOffset + 1)
-						const byte3 = view.getUint8(byteOffset + 2)
-						if (byte2 >= 128 && byte2 <= 191 && byte3 >= 128 && byte3 <= 191) {
-							char = ((char & 0x0f) << 12) | ((byte2 & 0x3f) << 6) | (byte3 & 0x3f)
-							byteOffset += 3
-						} else {
-							// Invalid sequence, skip
-							byteOffset++
-						}
-					} else {
-						// Incomplete sequence, skip
-						byteOffset++
-					}
-				}
-				// 4-byte sequence
-				else if (char >= 240 && char <= 244) {
-					if (byteOffset + 3 <= byteLength - 1) {
-						const byte2 = view.getUint8(byteOffset + 1)
-						const byte3 = view.getUint8(byteOffset + 2)
-						const byte4 = view.getUint8(byteOffset + 3)
-						if (
-							byte2 >= 128 &&
-							byte2 <= 191 &&
-							byte3 >= 128 &&
-							byte3 <= 191 &&
-							byte4 >= 128 &&
-							byte4 <= 191
-						) {
-							char =
-								((char & 0x07) << 18) |
-								((byte2 & 0x3f) << 12) |
-								((byte3 & 0x3f) << 6) |
-								(byte4 & 0x3f)
-							byteOffset += 4
-						} else {
-							// Invalid sequence, skip
-							byteOffset++
-						}
-					} else {
-						// Incomplete sequence, skip
-						byteOffset++
-					}
-				}
-				// Invalid byte, skip
-				else {
-					byteOffset++
-				}
-				break
-
-			case UTF_16_BE:
-			case UTF_16:
-			case UTF_16_LE:
-				char = view.getUint16(byteOffset, endian)
-				byteOffset += 2
-				break
-		}
-
-		str += String.fromCodePoint(char)
+		str += String.fromCharCode(view.getUint16(byteOffset, endian))
+		byteOffset += 2
 	}
 
 	return str

@@ -11,14 +11,13 @@ import { traverseIsoBoxes } from './traverseIsoBoxes.ts'
  * @param callback - A function that accepts a box and returns true if it matches
  * @param config - Configuration options for traversal
  *
- * @returns An array of boxes that satisfy the callback
+ * @returns An array of boxes that satisfy the callback, narrowed to the type `S` of the type guard
  *
  * @example
  * {@includeCode ../test/filterIsoBoxes.test.ts#example}
  *
  * @public
  */
-
 export function filterIsoBoxes<T, S extends T>(
 	boxes: Iterable<T>,
 	callback: (box: T) => box is S,
@@ -26,6 +25,16 @@ export function filterIsoBoxes<T, S extends T>(
 ): S[]
 
 /**
+ * Filters boxes in the tree for which a `boolean` callback returns true.
+ *
+ * Use the other overload with a type guard callback to narrow the result.
+ *
+ * @param boxes - The boxes to search through
+ * @param callback - A function that accepts a box and returns true if it matches
+ * @param config - Configuration options for traversal
+ *
+ * @returns An array of boxes that satisfy the callback, with the input type `T`
+ *
  * @public
  */
 export function filterIsoBoxes<T>(

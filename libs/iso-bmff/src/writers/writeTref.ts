@@ -4,7 +4,7 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
- * Write a `TrackReferenceBox` to an `IsoBoxWriteView`.
+ * Write the `tref` box (`TrackReferenceBox`).
  *
  * The `writers` map does not need an entry for the `tref` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.
@@ -12,7 +12,7 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  * @param box - The `TrackReferenceBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

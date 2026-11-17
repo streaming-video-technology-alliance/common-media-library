@@ -1,4 +1,3 @@
-import { isArrayBufferLike } from '@svta/cml-utils'
 import type { Box } from './boxes/Box.ts'
 import type { FullBox } from './boxes/FullBox.ts'
 import type { IsoBox } from './IsoBox.ts'
@@ -68,12 +67,12 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	readWideInt: (size: 4 | 8) => V
 
 	/**
-	 * Creates a new IsoView instance. Similar to DataView, but with additional
+	 * Creates a new `IsoBoxReadView`. Similar to DataView, but with additional
 	 * methods for reading ISO BMFF data. It implements the iterator protocol,
 	 * so it can be used in a for...of loop.
 	 *
 	 * @param raw - The raw data to view.
-	 * @param config - The configuration for the IsoView. The configuration is required when `V` is `bigint`.
+	 * @param config - The readers map and the `int64` option. The configuration is required when `V` is `bigint`.
 	 */
 	constructor(
 		raw: IsoBoxData,
@@ -82,11 +81,9 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 			: [config?: IsoBoxReadViewConfig<V>]
 	)
 	constructor(raw: IsoBoxData, config?: IsoBoxReadView<V>['config']) {
-		this.dataView = isArrayBufferLike(raw)
-			? new DataView(raw)
-			: raw instanceof DataView
-				? raw
-				: new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+		this.dataView = ArrayBuffer.isView(raw)
+			? new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
+			: new DataView(raw)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
 
@@ -123,7 +120,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	}
 
 	/**
-	 * The current byteoffset in the data view.
+	 * The current byte offset in the data view.
 	 */
 	get cursor(): number {
 		return this.offset - this.dataView.byteOffset
@@ -144,10 +141,11 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	}
 
 	/**
-	 * Creates a new IsoView instance with a slice of the current data view.
+	 * Creates a new `IsoBoxReadView` with a slice of the current data view.
 	 *
+	 * @param offset - The byte offset of the slice in the buffer.
 	 * @param size - The size of the slice.
-	 * @returns A new IsoView instance.
+	 * @returns A new `IsoBoxReadView`.
 	 */
 	slice = (offset: number, size: number): IsoBoxReadView<V> => {
 		const dataView = new DataView(this.dataView.buffer, offset, size)
@@ -165,7 +163,6 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	}
 
 	private read = <T extends IsoBoxFields>(type: T, size: number = 0): IsoFieldTypeMap[T] => {
-		// TODO: Change all sizes from bits to bytes
 		const { dataView, offset } = this
 
 		let result: unknown
@@ -216,7 +213,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	}
 
 	/**
-	 * Reads a unsigned integer from the data view.
+	 * Reads an unsigned integer from the data view.
 	 *
 	 * @param size - The size of the integer in bytes.
 	 * @returns The unsigned integer.
@@ -231,6 +228,8 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	 * `readUint(8)` returns a `number` and loses precision above 2^53 - 1.
 	 * Use this method for a 64-bit field whose value can exceed that limit,
 	 * such as `baseMediaDecodeTime` in a version 1 `tfdt` box.
+	 *
+	 * The method needs the `getBigUint64` method of `DataView`.
 	 *
 	 * @returns The unsigned integer as a `bigint`.
 	 *
@@ -294,6 +293,9 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 
 	/**
 	 * Reads a UTF-8 string from the data view.
+	 *
+	 * The function expects valid UTF-8. The result for bytes that are not valid UTF-8 depends on the environment,
+	 * and a write of that string does not return the source bytes.
 	 *
 	 * @param size - The size of the string in bytes. With `-1`, the method reads to the first null byte or to the end of the view. With no size, the method reads to the end of the view. With a size that exceeds the bytes that remain, the method reads to the end of the view.
 	 * @returns The UTF-8 string.
@@ -369,7 +371,13 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 
 		if (bytesRemaining >= cursor) {
 			const size = readUint(dataView, offset, 4)
-			const type = readString(dataView, offset + 4, 4)
+			const index = offset - dataView.byteOffset + 4
+			const type = String.fromCharCode(
+				dataView.getUint8(index),
+				dataView.getUint8(index + 1),
+				dataView.getUint8(index + 2),
+				dataView.getUint8(index + 3),
+			)
 
 			box = { size, type } as ParsedBox<Box, V>
 			actualSize = size

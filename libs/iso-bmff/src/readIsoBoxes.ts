@@ -14,12 +14,14 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  *
  * The function stops before a box if the data ends inside the header or the body of that box.
  * The function also stops before a box with a size below the size of its header.
- * The function then returns the boxes before that box and does not throw.
+ * The function then returns the boxes before that box and does not throw for that box.
  *
  * @param raw - The raw ISO data
- * @param config - The configuration for the IsoView
+ * @param config - The readers map and the `int64` option.
  *
  * @returns The parsed boxes
+ *
+ * @throws RangeError if a box is complete and a reader reads past the end of that box.
  *
  * @example
  * {@includeCode ../test/readIsoBoxes.test.ts#example}
@@ -35,9 +37,11 @@ export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoIn
  * Reads ISO boxes from a data source with no readers map in the type of the configuration.
  *
  * @param raw - The raw ISO data
- * @param config - The configuration for the IsoView. The configuration is required when `V` is `bigint`.
+ * @param config - The readers map and the `int64` option. The configuration is required when `V` is `bigint`.
  *
  * @returns The parsed boxes
+ *
+ * @throws RangeError if a box is complete and a reader reads past the end of that box.
  *
  * @public
  */
@@ -54,9 +58,11 @@ export function readIsoBoxes<V extends IsoInt64 = number>(
  * `Parameters<typeof readIsoBoxes>` and `ReturnType<typeof readIsoBoxes>` resolve to this signature.
  *
  * @param raw - The raw ISO data
- * @param config - The configuration for the IsoView
+ * @param config - The readers map and the `int64` option.
  *
  * @returns The parsed boxes
+ *
+ * @throws RangeError if a box is complete and a reader reads past the end of that box.
  *
  * @public
  */

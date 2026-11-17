@@ -23,6 +23,8 @@ const ReadableStreamBase: typeof ReadableStream = /* @__PURE__ */ (() =>
 /**
  * A readable stream of ISO BMFF boxes as Uint8Arrays.
  *
+ * The class needs `ReadableStream`. For an example, see {@link createIsoBoxReadableStream}.
+ *
  * @public
  */
 export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
@@ -31,25 +33,29 @@ export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
 	 *
 	 * @param boxes - The boxes to stream.
 	 * @param config - The configuration for the stream.
+	 *
+	 * @throws Error if `ReadableStream` is not available in this environment.
+	 * @throws Error if a box has no writer, no `boxes` field of a container, and no `view`. The message starts with "No writer found for box type".
+	 * @throws RangeError if a `bigint` field does not fit its size.
 	 */
 	constructor(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig) {
 		const iterator = boxes[Symbol.iterator]()
 		const cfg = createWriterConfig(config)
 
 		function pull(controller: ReadableStreamDefaultController<Uint8Array>) {
-			const desiredSize = controller.desiredSize ?? 0
+			const next = iterator.next()
 
-			for (let i = 0; i < desiredSize; i++) {
-				const next = iterator.next()
-
-				if (next.done) {
-					controller.close()
-				} else {
-					controller.enqueue(writeIsoBox(next.value, cfg))
-				}
+			if (next.done) {
+				controller.close()
+			} else {
+				controller.enqueue(writeIsoBox(next.value, cfg))
 			}
 		}
 
-		super({ start: pull, pull })
+		function cancel() {
+			iterator.return?.()
+		}
+
+		super({ start: pull, pull, cancel })
 	}
 }

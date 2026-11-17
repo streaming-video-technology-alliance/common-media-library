@@ -1,5 +1,7 @@
 /**
- * ISO/IEC 14496-30:2014 - WebVTT Cue Id Box.
+ * WebVTT Cue Id Box (`iden`).
+ *
+ * ISO/IEC 14496-30:2014
  *
  * @public
  */

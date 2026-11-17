@@ -12,7 +12,9 @@ export type MovieFragmentRandomAccessBoxChild<V extends IsoInt64 = number> =
 	| MovieFragmentRandomAccessOffsetBox
 
 /**
- * Movie Fragment Random Access Box - 'mfra' - Container
+ * Movie Fragment Random Access Box (`mfra`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.9
  *
  * @public
  */

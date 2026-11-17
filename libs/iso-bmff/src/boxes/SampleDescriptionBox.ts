@@ -4,7 +4,9 @@ import type { SampleEntryBox } from './SampleEntryBox.ts'
 import type { VisualSampleEntryBox } from './VisualSampleEntryBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.5.2 Sample Description Box
+ * Sample Description Box (`stsd`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.5.2
  *
  * @public
  */

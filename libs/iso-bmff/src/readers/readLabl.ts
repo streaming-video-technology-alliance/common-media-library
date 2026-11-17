@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `LabelBox` from an `IsoBoxReadView`.
+ * Read the `labl` box (`LabelBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

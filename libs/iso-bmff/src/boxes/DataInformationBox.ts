@@ -8,7 +8,9 @@ import type { DataReferenceBox } from './DataReferenceBox.ts'
 export type DataInformationBoxChild = DataReferenceBox
 
 /**
- * Data Information Box - 'dinf' - Container
+ * Data Information Box (`dinf`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.7.1
  *
  * @public
  */

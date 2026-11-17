@@ -93,7 +93,7 @@ import type { WebVttSourceLabelBox } from './boxes/WebVttSourceLabelBox.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
- * Comprehensive mapping from box type strings to their corresponding TypeScript interfaces
+ * Map of each box type that the package names to the type of that box.
  *
  * @public
  */
