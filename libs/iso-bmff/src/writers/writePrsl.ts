@@ -12,7 +12,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  * The writer writes an empty string for a missing tag.
  *
  * @param box - The `PreselectionGroupBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` to use
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *

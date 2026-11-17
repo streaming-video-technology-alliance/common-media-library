@@ -1,7 +1,7 @@
 import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
 
 /**
- * ISO box writer.
+ * A function that writes one box to an `IsoBoxWriteView`. `writeIsoBoxes` calls the function for each box of its type.
  *
  * @public
  */

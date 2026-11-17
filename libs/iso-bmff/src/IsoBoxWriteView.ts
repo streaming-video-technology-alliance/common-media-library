@@ -14,7 +14,8 @@ export class IsoBoxWriteView {
 	/**
 	 * Constructs a new IsoBoxWriteView.
 	 *
-	 * @param size - The size of the data view.
+	 * @param type - The type of the box.
+	 * @param size - The size of the box in bytes, with its header.
 	 */
 	constructor(type: string, size: number) {
 		this.dataView = new DataView(new ArrayBuffer(size))
@@ -283,7 +284,7 @@ export class IsoBoxWriteView {
 	 * @param data - The data to write.
 	 * @param type - The type of the data.
 	 * @param size - The size, in bytes, of each data value.
-	 * @param length - The number of values to write. (optional)
+	 * @param length - The number of values to write.
 	 */
 	writeArray = <T extends keyof IsoFieldTypeMap>(
 		data: number[],

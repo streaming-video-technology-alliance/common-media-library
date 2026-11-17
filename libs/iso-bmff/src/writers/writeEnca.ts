@@ -7,7 +7,7 @@ import { writeAudioSampleEntryBox } from './writeAudioSampleEntryBox.ts'
  * Write an `AudioSampleEntryBox` (enca) to an `IsoBoxWriteView`.
  *
  * @param box - The `AudioSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` to use
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *

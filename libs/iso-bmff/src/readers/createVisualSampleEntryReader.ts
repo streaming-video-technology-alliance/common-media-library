@@ -5,10 +5,7 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
 import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
 
 /**
- * Creates a reader function for `VisualSampleEntryBox` with a custom type.
- *
- * This utility allows reading visual sample entry boxes with types that
- * aren't in the standard `VisualSampleEntryType` union (e.g., `'avc1'`, `'hvc1'`).
+ * Create a reader for a visual sample entry box of a type that `VisualSampleEntryType` does not list, such as `av01` or `vp09`.
  *
  * @param type - The 4-character box type
  *

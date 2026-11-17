@@ -9,6 +9,7 @@ import { writeAudioSampleEntryBox } from './writeAudioSampleEntryBox.ts'
  * ISO/IEC 14496-12:2012 - 12.2.3 Audio Sample Entry
  *
  * @param box - The `AudioSampleEntryBox` fields to write
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *

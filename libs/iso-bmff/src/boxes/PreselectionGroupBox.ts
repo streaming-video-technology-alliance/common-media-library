@@ -1,12 +1,12 @@
 import type { Entity } from './Entity.ts'
 import type { FullBox } from './FullBox.ts'
 
+// TODO: Find documentation on what children are allowed
 /**
  * Child boxes of Preselection Group Box
  *
  * @public
  */
-// TODO: Find documentation on what children are allowed
 export type PreselectionGroupBoxChild = any
 
 /**

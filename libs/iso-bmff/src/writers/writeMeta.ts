@@ -12,7 +12,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *
  * @param box - The `MetaBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` to use
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *

@@ -7,7 +7,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  * Write a `DataReferenceBox` to an `IsoBoxWriteView`.
  *
  * @param box - The `DataReferenceBox` fields to write
- * @param config - The IsoBoxWriteViewConfig to use
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *

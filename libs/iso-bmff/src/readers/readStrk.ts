@@ -8,6 +8,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * The `readers` map does not need an entry for the `strk` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
  *
+ * The 64-bit integer fields of the child boxes have the type that the `int64` option of the view returns.
+ * With no option, they are numbers.
+ *
  * @param view - The `IsoBoxReadView` to read data from
  *
  * @returns A parsed `SubTrackBox`
