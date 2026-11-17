@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `mdat` box (`MediaDataBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.1.1 Media Data Box
+ * ISO/IEC 14496-12:2015 - 8.1.1
  *
  * @param box - The `MediaDataBox` fields to write
  *

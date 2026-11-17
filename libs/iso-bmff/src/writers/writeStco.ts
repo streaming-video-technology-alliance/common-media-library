@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `stco` box (`ChunkOffsetBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.5 Chunk Offset Box
+ * ISO/IEC 14496-12:2015 - 8.7.5
  *
  * @param box - The `ChunkOffsetBox` fields to write
  *

@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `subs` box (`SubsampleInformationBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.7 Sub-Sample Information Box
+ * ISO/IEC 14496-12:2015 - 8.7.7
  *
  * @param box - The `SubsampleInformationBox` fields to write
  *

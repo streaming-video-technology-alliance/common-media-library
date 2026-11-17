@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `styp` box (`SegmentTypeBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
+ * ISO/IEC 14496-12:2015 - 8.16.2
  *
  * @param box - The `SegmentTypeBox` fields to write
  *

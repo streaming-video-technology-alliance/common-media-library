@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * Sample Auxiliary Information Offsets Box - 'saio'
+ * Sample Auxiliary Information Offsets Box (`saio`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.7.9
  *
  * @public
  */

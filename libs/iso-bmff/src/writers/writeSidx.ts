@@ -5,7 +5,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `sidx` box (`SegmentIndexBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
+ * ISO/IEC 14496-12:2015 - 8.16.3
  *
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.

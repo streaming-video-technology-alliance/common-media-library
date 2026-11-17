@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `frma` box (`OriginalFormatBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.12.2 Original Format Box
+ * ISO/IEC 14496-12:2015 - 8.12.2
  *
  * @param box - The `OriginalFormatBox` fields to write
  *

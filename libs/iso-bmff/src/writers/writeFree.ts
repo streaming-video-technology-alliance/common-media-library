@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `free` box (`FreeSpaceBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.1.2 Free Space Box
+ * ISO/IEC 14496-12:2015 - 8.1.2
  *
  * @param box - The `FreeSpaceBox` fields to write
  *

@@ -5,7 +5,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `tfdt` box (`TrackFragmentBaseMediaDecodeTimeBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Base Media Decode Time Box
+ * ISO/IEC 14496-12:2015 - 8.8.12
  *
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.

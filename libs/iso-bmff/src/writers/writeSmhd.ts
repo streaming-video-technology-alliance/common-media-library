@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `smhd` box (`SoundMediaHeaderBox`).
  *
- * ISO/IEC 14496-12:2012 - 12.2.2 Sound Media Header Box
+ * ISO/IEC 14496-12:2015 - 12.2.2
  *
  * @param box - The `SoundMediaHeaderBox` fields to write
  *

@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `trex` box (`TrackExtendsBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
+ * ISO/IEC 14496-12:2015 - 8.8.3
  *
  * @param box - The `TrackExtendsBox` fields to write
  *

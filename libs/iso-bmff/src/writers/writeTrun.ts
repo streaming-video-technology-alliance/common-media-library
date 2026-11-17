@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `trun` box (`TrackRunBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.8.8 Track Run Box
+ * ISO/IEC 14496-12:2015 - 8.8.8
  *
  * @param box - The `TrackRunBox` fields to write
  *

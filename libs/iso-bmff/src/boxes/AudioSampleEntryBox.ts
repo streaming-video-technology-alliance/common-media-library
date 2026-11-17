@@ -3,14 +3,16 @@ import type { AudioSampleEntryType } from './AudioSampleEntryType.ts'
 import type { SampleEntryBox } from './SampleEntryBox.ts'
 
 /**
- * Child boxes of AudioSampleEntryBox
+ * Child boxes of Audio Sample Entry Box
  *
  * @public
  */
 export type AudioSampleEntryBoxChild = any
 
 /**
- * ISO/IEC 14496-12:2012 - 8.5.2.2 mp4a box (use AudioSampleEntry definition and naming)
+ * Audio Sample Entry Box, such as `mp4a` or `enca`.
+ *
+ * ISO/IEC 14496-12:2015 - 12.2.3
  *
  * @public
  */

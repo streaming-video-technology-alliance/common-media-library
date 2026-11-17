@@ -7,7 +7,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 /**
  * Write the `meta` box (`MetaBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.11.1 Meta Box
+ * ISO/IEC 14496-12:2015 - 8.11.1
  *
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *

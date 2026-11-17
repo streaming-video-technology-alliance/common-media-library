@@ -5,7 +5,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `elng` box (`ExtendedLanguageBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.4.6 Extended Language Tag
+ * ISO/IEC 14496-12:2015 - 8.4.6
  *
  * @param box - The `ExtendedLanguageBox` fields to write
  *

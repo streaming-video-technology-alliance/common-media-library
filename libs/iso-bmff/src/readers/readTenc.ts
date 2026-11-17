@@ -6,7 +6,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 /**
  * Read the `tenc` box (`TrackEncryptionBox`).
  *
- * ISO/IEC 23001-7:2016 - 8.2 Track Encryption Box
+ * ISO/IEC 23001-7:2016 - 8.2
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

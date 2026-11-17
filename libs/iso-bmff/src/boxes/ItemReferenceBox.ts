@@ -8,7 +8,9 @@ import type { SingleItemTypeReferenceBox } from './SingleItemTypeReferenceBox.ts
 export type ItemReferenceBoxChild = SingleItemTypeReferenceBox
 
 /**
- * Item Reference Box - 'iref' - Container
+ * Item Reference Box (`iref`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.11.12
  *
  * @public
  */

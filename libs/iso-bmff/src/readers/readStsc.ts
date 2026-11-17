@@ -6,7 +6,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 /**
  * Read the `stsc` box (`SampleToChunkBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.4 Sample to Chunk Box
+ * ISO/IEC 14496-12:2015 - 8.7.4
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

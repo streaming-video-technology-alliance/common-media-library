@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `stss` box (`SyncSampleBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.6.2 Sync Sample Box
+ * ISO/IEC 14496-12:2015 - 8.6.2
  *
  * @param box - The `SyncSampleBox` fields to write
  *

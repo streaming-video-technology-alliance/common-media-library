@@ -10,7 +10,9 @@ import type { FullBox } from './FullBox.ts'
 export type PreselectionGroupBoxChild = any
 
 /**
- * ISO/IEC 14496-12:202x - 8.18.4.1 Preselection group box
+ * Preselection Group Box (`prsl`).
+ *
+ * ISO/IEC 14496-12
  *
  * @public
  */

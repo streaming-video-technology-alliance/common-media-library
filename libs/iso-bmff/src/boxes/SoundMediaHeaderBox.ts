@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.4.5.3 Sound Media Header Box
+ * Sound Media Header Box (`smhd`).
+ *
+ * ISO/IEC 14496-12:2015 - 12.2.2
  *
  * @public
  */

@@ -3,7 +3,9 @@ import type { DataEntryUrnBox } from './DataEntryUrnBox.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
+ * Data Reference Box (`dref`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.7.2
  *
  * @public
  */

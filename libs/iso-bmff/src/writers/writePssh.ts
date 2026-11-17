@@ -5,7 +5,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `pssh` box (`ProtectionSystemSpecificHeaderBox`).
  *
- * ISO/IEC 23001-7 - 8.1 Protection System Specific Header Box
+ * ISO/IEC 23001-7:2016 - 8.1
  *
  * @param box - The `ProtectionSystemSpecificHeaderBox` fields to write
  *

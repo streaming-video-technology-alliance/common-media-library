@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `ftyp` box (`FileTypeBox`).
  *
- * ISO/IEC 14496-12:2012 - 4.3 File Type Box
+ * ISO/IEC 14496-12:2015 - 4.3
  *
  * @param box - The `FileTypeBox` fields to write
  *

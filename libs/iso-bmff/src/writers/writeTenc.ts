@@ -5,7 +5,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `tenc` box (`TrackEncryptionBox`).
  *
- * ISO/IEC 23001-7:2016 - 8.2 Track Encryption Box
+ * ISO/IEC 23001-7:2016 - 8.2
  *
  * @param box - The `TrackEncryptionBox` fields to write
  *

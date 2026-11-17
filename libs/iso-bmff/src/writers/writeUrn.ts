@@ -5,7 +5,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `urn ` box (`DataEntryUrnBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
+ * ISO/IEC 14496-12:2015 - 8.7.2
  *
  * @param box - The `DataEntryUrnBox` fields to write
  *

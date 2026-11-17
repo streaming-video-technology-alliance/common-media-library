@@ -12,6 +12,8 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *
+ * The writer does not change the `mfraSize` field of the `mfro` child. Set `mfraSize` after a change to the children.
+ *
  * @param box - The `MovieFragmentRandomAccessBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *

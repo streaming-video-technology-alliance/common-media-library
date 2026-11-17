@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `sthd` box (`SubtitleMediaHeaderBox`).
  *
- * ISO/IEC 14496-12:2012 - 12.6.2 Subtitle Media Header Box
+ * ISO/IEC 14496-12:2015 - 12.6.2
  *
  * @param box - The `SubtitleMediaHeaderBox` fields to write
  *

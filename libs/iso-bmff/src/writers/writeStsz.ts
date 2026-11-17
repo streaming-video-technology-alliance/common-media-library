@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `stsz` box (`SampleSizeBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.3 Sample Size Box
+ * ISO/IEC 14496-12:2015 - 8.7.3
  *
  * @param box - The `SampleSizeBox` fields to write
  *

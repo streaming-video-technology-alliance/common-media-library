@@ -7,7 +7,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * The writer omits `location` when flag `0x000001` is set.
  *
- * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
+ * ISO/IEC 14496-12:2015 - 8.7.2
  *
  * @param box - The `DataEntryUrlBox` fields to write
  *

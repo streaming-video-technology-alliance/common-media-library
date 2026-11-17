@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `ssix` box (`SubsegmentIndexBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
+ * ISO/IEC 14496-12:2015 - 8.16.4
  *
  * @param box - The `SubsegmentIndexBox` fields to write
  *

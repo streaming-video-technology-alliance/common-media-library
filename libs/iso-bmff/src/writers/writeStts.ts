@@ -4,7 +4,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `stts` box (`DecodingTimeToSampleBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.6.1.2 Decoding Time to Sample Box
+ * ISO/IEC 14496-12:2015 - 8.6.1.2
  *
  * @param box - The `DecodingTimeToSampleBox` fields to write
  *

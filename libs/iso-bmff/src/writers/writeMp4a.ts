@@ -6,7 +6,7 @@ import { writeAudioSampleEntryBox } from './writeAudioSampleEntryBox.ts'
 /**
  * Write the `mp4a` box (`AudioSampleEntryBox`).
  *
- * ISO/IEC 14496-12:2012 - 12.2.3 Audio Sample Entry
+ * ISO/IEC 14496-12:2015 - 12.2.3
  *
  * @param box - The `AudioSampleEntryBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
