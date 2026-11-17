@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- `parsePsshList` handles zero and extended box sizes and validates box boundaries. Malformed input no longer hangs or reads outside a box. Fixes #683.
+
 ### Changed
 
 - `concatInitDataIdAndCertificate` and `decodeFairPlayLicense` now return `Uint8Array<ArrayBuffer>`. The result passes to Web APIs such as `MediaKeySession.update` without a cast under TypeScript 6 and later. The type declarations now need TypeScript 5.7 or later.

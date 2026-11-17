@@ -20,3 +20,4 @@ Please add entries to the bottom of the list in the following format:
 - @valentinamgiusti [Valentina Giusti, Qualabs]
 - @tobbee [Torbjörn Einarsson, Eyevinn]
 - @mrappard [Matthew Rappard, Cognitive Proof]
+- @snehaapratap [Sneha P Pratap]

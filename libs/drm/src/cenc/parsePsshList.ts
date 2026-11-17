@@ -2,6 +2,7 @@ import { isArrayBufferLike } from '@svta/cml-utils'
 
 /**
  * Parses a list of PSSH boxes into keysystem-specific PSSH data.
+ * Supports zero and extended box sizes. Stops at invalid box boundaries and skips short PSSH boxes.
  *
  * @param data - The concatenated list of PSSH boxes as provided by
  * the CDM as initialization data when CommonEncryption content is detected
@@ -17,6 +18,7 @@ import { isArrayBufferLike } from '@svta/cml-utils'
 export function parsePsshList(data: ArrayBufferLike): Record<string, ArrayBufferLike>
 /**
  * Parses a list of PSSH boxes into keysystem-specific PSSH data.
+ * Supports zero and extended box sizes. Stops at invalid box boundaries and skips short PSSH boxes.
  *
  * @param data - The concatenated list of PSSH boxes as a `Uint8Array`.
  * @returns An object that has a property named according to each of
@@ -40,24 +42,36 @@ export function parsePsshList(
 	const pssh: Record<string, ArrayBufferLike | Uint8Array> = {}
 	let byteCursor = 0
 
-	while (true) {
-		if (byteCursor >= dv.byteLength) {
+	while (byteCursor < dv.byteLength) {
+		const boxStart = byteCursor
+		const remaining = dv.byteLength - boxStart
+		if (remaining < 8) {
 			break
 		}
 
-		const boxStart = byteCursor
+		let size = dv.getUint32(boxStart)
+		let headerSize = 8
+		if (size === 1) {
+			if (remaining < 16) {
+				break
+			}
+			size = dv.getUint32(boxStart + 8) * 0x100000000 + dv.getUint32(boxStart + 12)
+			headerSize = 16
+		} else if (size === 0) {
+			size = remaining
+		}
 
-		// Box size
-		const size = dv.getUint32(byteCursor)
-		const nextBox = byteCursor + size
-		byteCursor += 4
+		if (size < headerSize || size > remaining) {
+			break
+		}
+		const nextBox = boxStart + size
 
-		// Verify PSSH
-		if (dv.getUint32(byteCursor) !== 0x70737368) {
+		// A PSSH box needs version, flags, SystemID, and data size after its header.
+		if (dv.getUint32(boxStart + 4) !== 0x70737368 || size < headerSize + 24) {
 			byteCursor = nextBox
 			continue
 		}
-		byteCursor += 4
+		byteCursor = boxStart + headerSize
 
 		// Version must be 0 or 1
 		const version = dv.getUint8(byteCursor)
