@@ -34,6 +34,7 @@ describe('writeSchm', function () {
 			schemeVersion: 0x00010000,
 			schemeUri: '',
 		})
+		// #endregion example
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -61,7 +62,6 @@ describe('writeSchm', function () {
 				0, // schemeUri (empty) and the null terminator
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write an empty schemeUri when flag 0x000001 is set and the box has no schemeUri', function () {

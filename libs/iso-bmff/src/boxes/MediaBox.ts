@@ -14,7 +14,9 @@ export type MediaBoxChild<V extends IsoInt64 = number> =
 	| MediaInformationBox
 
 /**
- * Media Box - 'mdia' - Container
+ * Media Box (`mdia`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.4.1
  *
  * @public
  */

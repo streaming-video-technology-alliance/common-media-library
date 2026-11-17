@@ -7,7 +7,9 @@ import type { ProtectionSchemeInformationBox } from './ProtectionSchemeInformati
  */
 export type ItemProtectionBoxChild = ProtectionSchemeInformationBox
 /**
- * Item Protection Box - 'ipro' - Container
+ * Item Protection Box (`ipro`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.11.5
  *
  * @public
  */

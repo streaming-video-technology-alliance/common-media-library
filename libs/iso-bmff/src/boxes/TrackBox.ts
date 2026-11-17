@@ -18,7 +18,9 @@ export type TrackBoxChild<V extends IsoInt64 = number> =
 	| UserDataBox<V>
 
 /**
- * Track Box - 'trak' - Container
+ * Track Box (`trak`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.3.1
  *
  * @public
  */

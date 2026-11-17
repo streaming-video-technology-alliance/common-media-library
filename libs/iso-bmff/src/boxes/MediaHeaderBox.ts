@@ -2,28 +2,30 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
+ * Media Header Box (`mdhd`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.4.2
  *
  * @public
  */
 export type MediaHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'mdhd'
 
-	/** A 32-bit integer that specifies the creation time of the media in this track. */
+	/** The creation time of the media in this track, in seconds since midnight, 1904-01-01, UTC. The field has 32 bits in version 0 and 64 bits in version 1. */
 	creationTime: V
 
-	/** A 32-bit integer that specifies the most recent time the media in this track was modified. */
+	/** The most recent time the media in this track was modified, in seconds since midnight, 1904-01-01, UTC. */
 	modificationTime: V
 
-	/** A time value that indicates the time-scale for this media; this is the number of time units that pass in one second. */
+	/** The number of time units that pass in one second for this media. */
 	timescale: number
 
-	/** A time value that indicates the duration of this media. */
+	/** The duration of this media in units of `timescale`. All bits set means that the duration cannot be determined. */
 	duration: V
 
-	/** A 16-bit integer that specifies the language code for this media. */
+	/** The ISO 639-2/T language code, three lower-case letters. */
 	language: string
 
-	/** A 16-bit value that is reserved for use in other specifications. */
+	/** The `pre_defined` field. The default value is 0. */
 	preDefined: number
 }

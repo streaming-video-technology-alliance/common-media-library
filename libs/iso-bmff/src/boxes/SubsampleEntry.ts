@@ -1,7 +1,7 @@
 import type { Subsample } from './Subsample.ts'
 
 /**
- * Sub sample entry
+ * Sub-sample entry
  *
  * @public
  */

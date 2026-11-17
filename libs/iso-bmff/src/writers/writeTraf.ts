@@ -5,7 +5,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
- * Write a `TrackFragmentBox` to an `IsoBoxWriteView`.
+ * Write the `traf` box (`TrackFragmentBox`).
  *
  * The `writers` map does not need an entry for the `traf` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.
@@ -15,7 +15,7 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  * @param box - The `TrackFragmentBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

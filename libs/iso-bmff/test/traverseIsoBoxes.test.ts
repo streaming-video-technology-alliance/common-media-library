@@ -1,5 +1,4 @@
 import { readIsoBoxes, traverseIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
-import { equal } from 'assert'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
@@ -16,14 +15,21 @@ describe('traverseIsoBoxes', function () {
 
 	it('should provide an example', async function () {
 		// #region example
-		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
-		const boxes = readIsoBoxes(new Uint8Array(isoFile))
+		const isoFile = await readFile(new URL('./fixtures/mss_moof_tfdt.mp4', import.meta.url))
+		const boxes = readIsoBoxes(isoFile)
 
-		for (const box of traverseIsoBoxes(boxes)) {
-			equal(box.type, 'ftyp')
-			break
-		}
+		// Depth-first: each box, then its children.
+		const types = Array.from(traverseIsoBoxes(boxes), box => box.type)
+
+		// Breadth-first, with the root boxes and their children only.
+		const levels = Array.from(
+			traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 }),
+			box => box.type,
+		)
 		// #endregion example
+
+		assert.deepStrictEqual(types.slice(0, 4), ['moof', 'mfhd', 'traf', 'tfhd'])
+		assert.deepStrictEqual(levels, ['moof', 'mdat', 'mfhd', 'traf'])
 	})
 
 	it('should traverse empty boxes', function () {
@@ -66,19 +72,14 @@ describe('traverseIsoBoxes', function () {
 	})
 
 	it('should traverse nested boxes breadth-first when specified', function () {
-		const child1 = createBox('child1')
-		const child2 = createBox('child2')
-		const container = createContainer('meta', [child1, child2])
-		const root = createBox('root')
-		const result = Array.from(traverseIsoBoxes([root, container], { depthFirst: false }))
+		const meta = createContainer('meta', [createBox('child1')])
+		const trak = createContainer('trak', [createBox('child2')])
+		const result = Array.from(traverseIsoBoxes([meta, trak], { depthFirst: false }))
 
-		// Breadth-first: root -> container -> child1 -> child2
-		// Note: In this simple case, the order is the same, but let's verify
-		assert.strictEqual(result.length, 4)
-		assert.strictEqual(result[0].type, 'root')
-		assert.strictEqual(result[1].type, 'meta')
-		assert.strictEqual(result[2].type, 'child1')
-		assert.strictEqual(result[3].type, 'child2')
+		assert.deepStrictEqual(
+			result.map(box => box.type),
+			['meta', 'trak', 'child1', 'child2'],
+		)
 	})
 
 	it('should traverse deeply nested boxes depth-first', function () {

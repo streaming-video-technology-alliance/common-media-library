@@ -7,14 +7,14 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a `VisualSampleEntryBox` to an `IsoBoxWriteView`.
+ * Write a visual sample entry box (`VisualSampleEntryBox`) of the type in its `type` field.
  *
- * ISO/IEC 14496-12:2012 - 12.1.3 Visual Sample Entry
+ * ISO/IEC 14496-12:2015 - 12.1.3
  *
  * @param box - The `VisualSampleEntryBox` fields to write
- * @param config - The configuration for the writer
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

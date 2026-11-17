@@ -9,7 +9,9 @@ import type { EditListBox } from './EditListBox.ts'
 export type EditBoxChild<V extends IsoInt64 = number> = EditListBox<V>
 
 /**
- * Edit Box - 'edts' - Container
+ * Edit Box (`edts`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.6.5
  *
  * @public
  */

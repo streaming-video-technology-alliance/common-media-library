@@ -11,7 +11,7 @@ import { traverseIsoBoxes } from './traverseIsoBoxes.ts'
  * @param callback - A function that accepts a box and returns true if it matches
  * @param config - Configuration options for traversal
  *
- * @returns The first box that satisfies the callback, or null if none is found
+ * @returns The first box that satisfies the callback, narrowed to the type `S` of the type guard, or null if none is found
  *
  * @example
  * {@includeCode ../test/findIsoBox.test.ts#example}
@@ -25,6 +25,16 @@ export function findIsoBox<T, S extends T>(
 ): S | null
 
 /**
+ * Finds the first box in the tree for which a `boolean` callback returns true.
+ *
+ * Use the other overload with a type guard callback to narrow the result.
+ *
+ * @param boxes - The boxes to search through
+ * @param callback - A function that accepts a box and returns true if it matches
+ * @param config - Configuration options for traversal
+ *
+ * @returns The first box that satisfies the callback, with the input type `T`, or null if none is found
+ *
  * @public
  */
 export function findIsoBox<T>(

@@ -3,11 +3,14 @@ import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `WebVttCuePayloadBox` to an `IsoBoxWriteView`.
+ * Write the `payl` box (`WebVttCuePayloadBox`).
  *
  * @param box - The `WebVttCuePayloadBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
+ *
+ * @example
+ * {@includeCode ../../test/writers/writePayl.test.ts#example}
  *
  * @public
  */

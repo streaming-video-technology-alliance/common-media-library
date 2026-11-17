@@ -22,7 +22,9 @@ export type TrackFragmentBoxChild<V extends IsoInt64 = number> =
 	| SubsampleInformationBox
 
 /**
- * Track Fragment Box - 'traf' - Container
+ * Track Fragment Box (`traf`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.6
  *
  * @public
  */

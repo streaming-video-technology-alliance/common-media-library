@@ -2,7 +2,9 @@ import type { CompositionTimeToSampleEntry } from './CompositionTimeToSampleEntr
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.6.1.3 Composition Time To Sample Box
+ * Composition Time To Sample Box (`ctts`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.6.1.3
  *
  * @public
  */

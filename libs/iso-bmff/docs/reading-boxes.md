@@ -1,14 +1,14 @@
 ---
 title: Reading Boxes
-description: Parse ISO BMFF boxes from a buffer
+description: Read ISO BMFF boxes from a buffer
 ---
 
 # Reading Boxes
 
-The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To parse the content of a box, provide a reader function for that box type.
+The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To read the content of a box, provide a reader function for that box type.
 
 > [!NOTE]
-> The function parses container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
+> The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
 
 ## Using default config
 
@@ -23,6 +23,10 @@ const buffer = await fetch("https://example.com/bbb.mp4").then((r) =>
 
 const boxes = readIsoBoxes(buffer, defaultReaderConfig());
 ```
+
+Each call of `defaultReaderConfig()` returns a new configuration object. A player can create the configuration once and pass it to every read.
+
+`readIsoBoxes` accepts an `ArrayBuffer` and any view, such as a `Uint8Array`, a `DataView`, or a Node.js `Buffer`. The function does not copy the data. Pass the view itself. Do not pass the `buffer` property of a view, because that buffer can contain other data.
 
 ## Using specific readers
 
@@ -82,17 +86,21 @@ for (const box of boxes) {
 }
 ```
 
+A byte field such as `messageData` is a view over the input data. The field shares memory with that data and is not a copy. To keep the bytes after your code releases or changes the input, call `slice()` on the field.
+
 The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
 
 ## Incomplete boxes
 
-A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw.
+A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw for an incomplete box.
+
+A box with a reader in the configuration and a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
 
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
 
-The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes. The `size` field of the parsed box is the size of the source box.
+The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes. The `size` field of the parsed box is the `size` field of the source box header, so it counts those bytes. The field is 1 when the box has a `largesize` field, and the parsed box then has `largesize`. The field is 0 when the box extends to the end of the data.
 
-A writer builds a container or a sample entry from the child boxes of the parsed box. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes.
+A writer builds a container or a sample entry from the child boxes of the parsed box. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes. The `mfraSize` field of an `mfro` box has the same limit. See [Writing a changed `mfra` box](writing-boxes.md#writing-a-changed-mfra-box).
 
 ## Reading 64-bit fields
 
@@ -132,8 +140,12 @@ const boxes = readIsoBoxes(
 
 for (const box of boxes) {
 	if (box.type === "sidx") {
-		// earliestPresentationTime is a bigint.
-		const seconds = box.earliestPresentationTime / BigInt(box.timescale);
+		// earliestPresentationTime is a bigint. The division of two bigints
+		// drops the fraction, so add the remainder as a number.
+		const scale = BigInt(box.timescale);
+		const seconds =
+			Number(box.earliestPresentationTime / scale) +
+			Number(box.earliestPresentationTime % scale) / box.timescale;
 		console.log(seconds);
 	}
 }
@@ -144,7 +156,12 @@ Pass the option as the argument of `defaultReaderConfig`. The readers of the ret
 The option works the same way with specific readers:
 
 ```typescript
-import { readInt64AsBigInt, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+import {
+	findIsoBox,
+	readInt64AsBigInt,
+	readIsoBoxes,
+	readTfdt,
+} from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(buffer, {
 	int64: readInt64AsBigInt,
@@ -153,12 +170,11 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 
-for (const box of boxes) {
-	if (box.type === "tfdt") {
-		// baseMediaDecodeTime is a bigint.
-		console.log(box.baseMediaDecodeTime);
-	}
-}
+// A tfdt box is inside a traf box, inside a moof box.
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+
+// baseMediaDecodeTime is a bigint.
+console.log(tfdt?.baseMediaDecodeTime);
 ```
 
 Each field has one type for every version of its box. A version 0 `tfdt` box stores `baseMediaDecodeTime` in 32 bits. The reader returns that field as a `bigint` too, so your code does not test `version`. The option also applies to the child boxes of a container.
@@ -170,6 +186,8 @@ Each field has one type for every version of its box. A version 0 `tfdt` box sto
 ### Reporting a rounded value
 
 If your code keeps `number` fields, use `createInt64OverflowReader`. The function takes a callback and returns a function for the `int64` option. When a 64-bit value is outside the safe integer range, the callback receives a `RangeError`. If the callback returns, the read continues with the rounded value. If the callback throws, the read stops with that error.
+
+A version 1 `mvhd`, `tkhd`, or `mdhd` box can have a `duration` with all bits set. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. The callback receives a `RangeError` for that value too, and the field reads as `2 ** 64`. That report does not mean that the file is damaged. If your code reads such boxes, do not throw from the callback.
 
 ```typescript
 import {
@@ -208,7 +226,13 @@ import {
 const readTfdtWide = <V extends IsoInt64>(view: IsoBoxReadView<V>) => {
 	const { version, flags } = view.readFullBox();
 	const baseMediaDecodeTime = view.readWideUint(version === 1 ? 8 : 4);
-	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+	return {
+		type: "tfdt" as const,
+		version,
+		flags,
+		baseMediaDecodeTime,
+		source: "custom",
+	};
 };
 
 // baseMediaDecodeTime is a bigint in this result.
@@ -224,7 +248,7 @@ const readers = { tfdt: readTfdtWide<bigint> };
 const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
 ```
 
-A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`.
+A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`. A custom reader whose result equals the built-in box type gets the fields of the configuration without a type argument.
 
 ### A function that forwards the option
 

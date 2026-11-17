@@ -1,5 +1,5 @@
 /**
- * Iso Box Type
+ * The four-character type of a box, such as `moov`.
  *
  * @public
  */

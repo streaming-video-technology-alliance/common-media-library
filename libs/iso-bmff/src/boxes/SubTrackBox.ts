@@ -9,7 +9,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export type SubTrackBoxChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
- * Sub track box - 'strk'
+ * Sub Track Box (`strk`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.14.3
  *
  * @public
  */

@@ -12,6 +12,9 @@ import { writeBoxes } from './utils/writeBoxes.ts'
  *
  * @returns The written boxes. A box given as a view over a `SharedArrayBuffer` is copied, so each result is backed by an `ArrayBuffer`.
  *
+ * @throws Error if a box has no writer, no `boxes` field of a container, and no `view`. The message starts with "No writer found for box type".
+ * @throws RangeError if a `bigint` field does not fit its size.
+ *
  * @example
  * {@includeCode ../test/writeIsoBoxes.test.ts#example}
  *

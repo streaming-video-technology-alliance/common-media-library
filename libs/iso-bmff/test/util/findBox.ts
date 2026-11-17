@@ -14,7 +14,6 @@ export function findBox<T extends keyof IsoBoxMap>(
 	config?: IsoBoxReadViewConfig,
 ): IsoTypedParsedBox<T> {
 	const boxes = readIsoBoxes(load(file), config)
-	let found: IsoTypedParsedBox<T> | undefined
 
 	for (const box of traverseIsoBoxes(boxes)) {
 		if (box.type === type) {
@@ -24,7 +23,5 @@ export function findBox<T extends keyof IsoBoxMap>(
 		}
 	}
 
-	assert.ok(found, `Box of type ${type} not found in file ${file}`)
-
-	return found
+	assert.fail(`Box of type ${type} not found in file ${file}`)
 }

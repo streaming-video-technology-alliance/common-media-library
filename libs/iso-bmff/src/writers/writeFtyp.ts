@@ -2,13 +2,16 @@ import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `FileTypeBox` to an `IsoBoxWriteView`.
+ * Write the `ftyp` box (`FileTypeBox`).
  *
- * ISO/IEC 14496-12:2012 - 4.3 File Type Box
+ * ISO/IEC 14496-12:2015 - 4.3
  *
  * @param box - The `FileTypeBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
+ *
+ * @example
+ * {@includeCode ../../test/writers/writeFtyp.test.ts#example}
  *
  * @public
  */
