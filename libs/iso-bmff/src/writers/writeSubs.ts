@@ -2,13 +2,13 @@ import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.t
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `SubsampleInformationBox` to an `IsoBoxWriteView`.
+ * Write the `subs` box (`SubsampleInformationBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.7.7 Sub-Sample Information Box
  *
  * @param box - The `SubsampleInformationBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

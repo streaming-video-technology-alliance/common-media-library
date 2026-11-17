@@ -3,13 +3,13 @@ import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `VideoMediaHeaderBox` to an `IsoBoxWriteView`.
+ * Write the `vmhd` box (`VideoMediaHeaderBox`).
  *
  * ISO/IEC 14496-12:2012 - 12.1.2 Video Media Header Box
  *
  * @param box - The `VideoMediaHeaderBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

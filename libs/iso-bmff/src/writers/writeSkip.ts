@@ -2,13 +2,13 @@ import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `FreeSpaceBox` (skip variant) to an `IsoBoxWriteView`.
+ * Write the `skip` box (`FreeSpaceBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.1.2 Free Space Box
  *
  * @param box - The `FreeSpaceBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

@@ -3,7 +3,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write an `EditListBox` to an `IsoBoxWriteView`.
+ * Write the `elst` box (`EditListBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.6.6 Edit List Box
  *
@@ -12,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `EditListBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

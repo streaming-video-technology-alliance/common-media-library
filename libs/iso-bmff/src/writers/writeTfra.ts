@@ -3,7 +3,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `TrackFragmentRandomAccessBox` to an `IsoBoxWriteView`.
+ * Write the `tfra` box (`TrackFragmentRandomAccessBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
  *
@@ -12,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `TrackFragmentRandomAccessBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

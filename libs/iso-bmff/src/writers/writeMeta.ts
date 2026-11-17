@@ -5,7 +5,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a `MetaBox` to an `IsoBoxWriteView`.
+ * Write the `meta` box (`MetaBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.11.1 Meta Box
  *
@@ -14,7 +14,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  * @param box - The `MetaBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

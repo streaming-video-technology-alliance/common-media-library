@@ -3,13 +3,13 @@ import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `TrackEncryptionBox` to an `IsoBoxWriteView`.
+ * Write the `tenc` box (`TrackEncryptionBox`).
  *
  * ISO/IEC 23001-7:2016 - 8.2 Track Encryption Box
  *
  * @param box - The `TrackEncryptionBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeTenc.test.ts#example}

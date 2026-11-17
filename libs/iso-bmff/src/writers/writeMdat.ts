@@ -2,13 +2,13 @@ import type { MediaDataBox } from '../boxes/MediaDataBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `MediaDataBox` to an `IsoBoxWriteView`.
+ * Write the `mdat` box (`MediaDataBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.1.1 Media Data Box
  *
  * @param box - The `MediaDataBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

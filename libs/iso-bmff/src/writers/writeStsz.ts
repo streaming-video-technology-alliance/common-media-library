@@ -2,13 +2,13 @@ import type { SampleSizeBox } from '../boxes/SampleSizeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `SampleSizeBox` to an `IsoBoxWriteView`.
+ * Write the `stsz` box (`SampleSizeBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.7.3 Sample Size Box
  *
  * @param box - The `SampleSizeBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

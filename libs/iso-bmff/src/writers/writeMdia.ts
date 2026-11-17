@@ -5,7 +5,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
- * Write a `MediaBox` to an `IsoBoxWriteView`.
+ * Write the `mdia` box (`MediaBox`).
  *
  * The `writers` map does not need an entry for the `mdia` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.
@@ -15,7 +15,7 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  * @param box - The `MediaBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

@@ -4,7 +4,7 @@ import { INT, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `MovieHeaderBox` to an `IsoBoxWriteView`.
+ * Write the `mvhd` box (`MovieHeaderBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.2.2 Movie Header Box
  *
@@ -13,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `MovieHeaderBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

@@ -4,7 +4,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `SampleToChunkBox` from an `IsoBoxReadView`.
+ * Read the `stsc` box (`SampleToChunkBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.7.4 Sample to Chunk Box
  *

@@ -2,7 +2,7 @@ import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampl
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `CompositionTimeToSampleBox` to an `IsoBoxWriteView`.
+ * Write the `ctts` box (`CompositionTimeToSampleBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.6.1.3 Composition Time to Sample Box
  *
@@ -10,7 +10,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `CompositionTimeToSampleBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

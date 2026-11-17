@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `TrackFragmentBox` from an `IsoBoxReadView`.
+ * Read the `traf` box (`TrackFragmentBox`).
  *
  * The `readers` map does not need an entry for the `traf` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.

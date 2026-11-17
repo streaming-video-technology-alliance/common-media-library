@@ -4,13 +4,13 @@ import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `HandlerReferenceBox` to an `IsoBoxWriteView`.
+ * Write the `hdlr` box (`HandlerReferenceBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.4.3 Handler Reference Box
  *
  * @param box - The `HandlerReferenceBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

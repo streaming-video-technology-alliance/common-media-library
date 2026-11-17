@@ -3,11 +3,11 @@ import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `WebVttCueIdBox` to an `IsoBoxWriteView`.
+ * Write the `iden` box (`WebVttCueIdBox`).
  *
  * @param box - The `WebVttCueIdBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

@@ -4,7 +4,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `SampleSizeBox` from an `IsoBoxReadView`.
+ * Read the `stsz` box (`SampleSizeBox`).
  *
  * When `sampleSize` is not 0, `entrySize` is `undefined`.
  *

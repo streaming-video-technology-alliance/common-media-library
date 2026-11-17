@@ -3,7 +3,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `MediaHeaderBox` to an `IsoBoxWriteView`.
+ * Write the `mdhd` box (`MediaHeaderBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.4.2 Media Header Box
  *
@@ -12,7 +12,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `MediaHeaderBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

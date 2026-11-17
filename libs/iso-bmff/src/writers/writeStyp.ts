@@ -2,13 +2,13 @@ import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `SegmentTypeBox` to an `IsoBoxWriteView`.
+ * Write the `styp` box (`SegmentTypeBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
  *
  * @param box - The `SegmentTypeBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

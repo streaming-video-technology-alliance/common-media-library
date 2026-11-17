@@ -2,13 +2,13 @@ import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `SyncSampleBox` to an `IsoBoxWriteView`.
+ * Write the `stss` box (`SyncSampleBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.6.2 Sync Sample Box
  *
  * @param box - The `SyncSampleBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

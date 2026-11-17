@@ -2,13 +2,13 @@ import type { SampleToChunkBox } from '../boxes/SampleToChunkBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `SampleToChunkBox` to an `IsoBoxWriteView`.
+ * Write the `stsc` box (`SampleToChunkBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.7.4 Sample to Chunk Box
  *
  * @param box - The `SampleToChunkBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

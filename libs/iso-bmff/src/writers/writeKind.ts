@@ -3,11 +3,11 @@ import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `TrackKindBox` to an `IsoBoxWriteView`.
+ * Write the `kind` box (`TrackKindBox`).
  *
  * @param box - The `TrackKindBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

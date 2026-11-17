@@ -3,13 +3,13 @@ import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write an `ExtendedLanguageBox` to an `IsoBoxWriteView`.
+ * Write the `elng` box (`ExtendedLanguageBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.4.6 Extended Language Tag
  *
  * @param box - The `ExtendedLanguageBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

@@ -3,7 +3,7 @@ import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `DataEntryUrlBox` to an `IsoBoxWriteView`.
+ * Write the `url ` box (`DataEntryUrlBox`).
  *
  * The writer omits `location` when flag `0x000001` is set.
  *
@@ -11,7 +11,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `DataEntryUrlBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

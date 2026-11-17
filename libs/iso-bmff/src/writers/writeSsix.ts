@@ -2,13 +2,13 @@ import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `SubsegmentIndexBox` to an `IsoBoxWriteView`.
+ * Write the `ssix` box (`SubsegmentIndexBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
  *
  * @param box - The `SubsegmentIndexBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

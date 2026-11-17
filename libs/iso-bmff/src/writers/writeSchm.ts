@@ -3,7 +3,7 @@ import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `SchemeTypeBox` to an `IsoBoxWriteView`.
+ * Write the `schm` box (`SchemeTypeBox`).
  *
  * When flag `0x000001` is set, the writer writes `schemeUri`, or an empty string for a missing `schemeUri`.
  *
@@ -11,7 +11,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `SchemeTypeBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

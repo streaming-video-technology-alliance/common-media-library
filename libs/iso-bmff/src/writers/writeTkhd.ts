@@ -4,7 +4,7 @@ import { INT, UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `TrackHeaderBox` to an `IsoBoxWriteView`.
+ * Write the `tkhd` box (`TrackHeaderBox`).
  *
  * ISO/IEC 14496-12:2012 - 8.3.2 Track Header Box
  *
@@ -13,7 +13,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @param box - The `TrackHeaderBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
