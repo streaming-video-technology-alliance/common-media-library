@@ -7,18 +7,7 @@ import {
 	writePssh,
 	type ProtectionSystemSpecificHeaderBox,
 } from '../util/box.ts'
-
-const TYPE = [112, 115, 115, 104] // 'pssh'
-const SYSTEM_ID = new Array<number>(16).fill(0xaa)
-const KID_A = new Array<number>(16).fill(0x11)
-const KID_B = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-
-// The bytes of a pssh box: size, type, version, flags, SystemID, then the fields after SystemID.
-function psshBox(version: number, fields: number[]): Uint8Array {
-	const size = 28 + fields.length
-
-	return new Uint8Array([0, 0, 0, size, ...TYPE, version, 0, 0, 0, ...SYSTEM_ID, ...fields])
-}
+import { KID_A, KID_B, psshBox, SYSTEM_ID } from '../util/psshBoxes.ts'
 
 function pssh(version: number, kidCount: number, kid: number[]): ProtectionSystemSpecificHeaderBox {
 	return {

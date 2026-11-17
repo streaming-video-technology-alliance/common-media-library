@@ -119,6 +119,10 @@ and this project adheres to
 - `writePrsl` now encodes each tag one time. The written bytes do not change.
 - The reading guide and the documentation of `IsoBoxReadView.readBox` now state that the header of a `uuid` box has 16 more bytes for the `usertype` field.
 - `writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do. Earlier releases write these boxes with no `TextEncoder` ([#643](https://github.com/streaming-video-technology-alliance/common-media-library/pull/643)).
+- `IsoBoxReadView` now has one rule for the size limit of `readData` and `readUtf8`. The results of both methods do not change.
+- `readIsoBoxes` now calls `IsoBoxReadView.readBoxes`. The result does not change.
+- `readTfra` now computes the size of the 64-bit integer fields one time for each box.
+- `writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change.
 
 ## [1.0.7] - 2026-10-18
 

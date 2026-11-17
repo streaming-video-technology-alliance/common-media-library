@@ -13,12 +13,17 @@ import type { ParsedBox } from './ParsedBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 import { getTerminatedStringLength } from './utils/getTerminatedStringLength.ts'
 import { isContainer } from './utils/isContainer.ts'
-import { readData } from './utils/readData.ts'
 import { readInt } from './utils/readInt.ts'
 import { readString } from './utils/readString.ts'
 import { readTemplate } from './utils/readTemplate.ts'
 import { readUint } from './utils/readUint.ts'
 import { readUtf8String } from './utils/readUtf8String.ts'
+
+function limitSize(size: number, remaining: number): number {
+	const limit = Math.max(remaining, 0)
+
+	return size >= 0 && size < limit ? size : limit
+}
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
@@ -180,33 +185,26 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 				break
 
 			case STRING:
+			case UTF8: {
+				let length = size
+
 				if (size === -1) {
-					const length = getTerminatedStringLength(dataView, offset)
-					result = readString(dataView, offset, length)
+					length = getTerminatedStringLength(dataView, offset)
 					cursor = length < this.bytesRemaining ? length + 1 : length
-				} else {
-					result = readString(dataView, offset, size)
+				} else if (type === UTF8) {
+					cursor = length = limitSize(size, this.bytesRemaining)
 				}
+
+				result = (type === UTF8 ? readUtf8String : readString)(dataView, offset, length)
 				break
+			}
 
 			case DATA: {
-				const data = readData(dataView, offset, size)
+				const data = new Uint8Array(dataView.buffer, offset, limitSize(size, this.bytesRemaining))
 				result = data
 				cursor = data.length
 				break
 			}
-
-			case UTF8:
-				if (size === -1) {
-					const length = getTerminatedStringLength(dataView, offset)
-					result = readUtf8String(dataView, offset, length)
-					cursor = length < this.bytesRemaining ? length + 1 : length
-				} else {
-					const remaining = Math.max(this.bytesRemaining, 0)
-					cursor = size >= 0 && size < remaining ? size : remaining
-					result = readUtf8String(dataView, offset, cursor)
-				}
-				break
 
 			default:
 				result = -1

@@ -58,8 +58,8 @@ export function writeTkhd(box: TrackHeaderBox<IsoInt64>): IsoBoxWriteView {
 	writer.writeUint(box.reserved1, 4)
 	writer.writeWideUint(box.duration, size)
 	writer.writeArray(box.reserved2, UINT, 4, 2)
-	writer.writeUint(box.layer, 2)
-	writer.writeUint(box.alternateGroup, 2)
+	writer.writeInt(box.layer, 2)
+	writer.writeInt(box.alternateGroup, 2)
 	writer.writeTemplate(box.volume, 2)
 	writer.writeUint(box.reserved3, 2)
 	// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.

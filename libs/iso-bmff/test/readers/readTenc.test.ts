@@ -6,14 +6,7 @@ import {
 	readTenc,
 	type TrackEncryptionBox,
 } from '../util/box.ts'
-
-const KID = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-const IV = [161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176]
-
-// The bytes of a tenc box: size, type, then the body.
-function tencBox(...body: number[]): Uint8Array {
-	return new Uint8Array([0, 0, 0, 8 + body.length, 116, 101, 110, 99, ...body])
-}
+import { IV, KID, tencBox } from '../util/tencBoxes.ts'
 
 function read(bytes: Uint8Array): TrackEncryptionBox {
 	const [tenc] = readIsoBoxes(bytes, { readers: { tenc: readTenc } })

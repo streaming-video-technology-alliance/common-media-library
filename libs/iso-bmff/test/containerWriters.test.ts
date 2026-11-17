@@ -40,6 +40,7 @@ import {
 	type TrackFragmentBaseMediaDecodeTimeBox,
 	type TrackFragmentBox,
 } from './util/box.ts'
+import { bytes } from './util/bytes.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
@@ -94,10 +95,6 @@ function write<K extends ContainerType>(
 	config: IsoBoxWriteViewConfig,
 ): IsoBoxWriteView {
 	return WRITERS[type](containerBox(type, boxes), config)
-}
-
-function bytes(view: ArrayBufferView): Uint8Array {
-	return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 }
 
 describe('container writers', function () {

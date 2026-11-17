@@ -9,15 +9,10 @@ import {
 	writeIsoBox,
 	type MovieHeaderBox,
 } from './util/box.ts'
+import { body } from './util/bytes.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
 const ALL_BITS_SET = new Uint8Array(8).fill(0xff)
-
-function body(write: (writer: IsoBoxWriteView) => void, size: number): number[] {
-	const writer = new IsoBoxWriteView('test', 8 + size)
-	write(writer)
-	return Array.from(new Uint8Array(writer.buffer).subarray(8))
-}
 
 function roundTrip(source: Uint8Array): Uint8Array {
 	const [box] = readIsoBoxes(source, defaultReaderConfig())
