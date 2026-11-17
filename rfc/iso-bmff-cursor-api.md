@@ -65,7 +65,7 @@ export function getExactDecodeTime(segment: Uint8Array): bigint | undefined {
 
 ### Read and write a tree
 
-The two calls have the same arguments as in version 1. Only the return type of `writeIsoBoxes` changes.
+The two calls have the same arguments as in version 1. The return type of `writeIsoBoxes` changes. The box types also change. [Contract](#contract) and [Count fields](#count-fields) list the removed fields.
 
 ```ts
 import {
@@ -199,8 +199,61 @@ The write cursor has the same field functions with the `write` prefix. `findIsoB
 - A parsed box has only `type` and its fields. The fields `view`, `size`, `largesize`, and `usertype` do not exist. A reader for a `uuid` box reads the 16 bytes of the user type.
 - Automatic container handling does not change. A container box with no map entry is read and written through its `boxes` field.
 - `writeIsoBoxes` throws for a box that has no writer, no `boxes` field, and no `bytes` field.
-- A writer follows the same rules as in version 1. The flags and the version decide which fields the writer writes.
+- A writer follows the same rules as in version 1, except for count fields. The flags and the version decide which fields the writer writes. [Count fields](#count-fields) states the exception.
 - The write cursor doubles its buffer when a field does not fit. `writeIsoBoxes` returns a copy with the exact size.
+
+### Count fields
+
+Many box types have a count next to an array, such as `sampleCount` and `samples` in `trun`. Version 1 has both fields. The two fields can disagree. Version 2.0.0 has one source for each count.
+
+**Rule 1.** If the syntax has a table for the count, the box type has no count field. The writer writes the length of the array. Code that needs the count reads the length of the array.
+
+| Box | Removed field | Array |
+|---|---|---|
+| `trun` | `sampleCount` | `samples` |
+| `stco`, `co64` | `entryCount` | `chunkOffset` |
+| `stz2` | `sampleCount` | `entrySize` |
+| `stts`, `stsc`, `stss`, `stsh`, `elst`, `sbgp`, `sgpd`, `dref`, `stsd`, `subs` | `entryCount` | `entries` |
+| `ctts`, version 0 or 1 | `entryCount` | `entries` |
+| `stsz`, `sampleSize` is 0 | `sampleCount` | `entrySize` |
+| `saiz`, `defaultSampleInfoSize` is 0 | `sampleCount` | `sampleInfoSize` |
+| `saio` | `entryCount` | `offset` |
+| `tfra` | `numberOfEntry` | `entries` |
+| `ssix` | `subsegmentCount` | `subsegments` |
+| `prsl` | `numEntitiesInGroup` | `entities` |
+| `senc` | `sampleCount` | `samples` |
+| `pssh` | `kidCount`, `dataSize` | `kid`, `data` |
+| `tenc` | `defaultConstantIvSize` | `defaultConstantIv` |
+| `iinf`, `ipro` | `entryCount`, `protectionCount` | `boxes` |
+| `iloc`, version 0 to 2 | `itemCount` | `items` |
+| `iref` child | `referenceCount` | `toItemId` |
+| `subs` entry | `subsampleCount` | `subsamples` |
+| `ssix` subsegment | `rangesCount` | `ranges` |
+
+- `trun` follows rule 1 in every form. The flags 0x100 to 0x800 add the fields of a row. If the box sets none of those flags, a row has 0 bytes. The reader then returns one empty object for each sample.
+- `senc` follows rule 1 in every form. A row of `senc` can also have 0 bytes. The IV size is not a field of `senc`, so a custom reader needs that size to split the rows.
+- The `kid` field of `pssh` is a list of bytes, with 16 bytes for each key ID. For version 1 or above, the writer writes the length of `kid` divided by 16. A box of version 0 has no count and no key IDs.
+- `defaultConstantIv` of `tenc` is optional. With no array, the writer writes no size and no bytes, as in version 1.
+- `entrySize` of `stsz` and `sampleInfoSize` of `saiz` are optional. With no array, the writer writes a count of 0.
+- `sidx` already has no count field. `writeSidx` writes the length of `references`.
+
+**Rule 2.** If the syntax has a count and no table, the count is an optional field. The reader sets the field only in that form. In that form, the writer writes the value of the field, or 0 for a missing field.
+
+| Box | Form with no table | Optional field |
+|---|---|---|
+| `stsz` | `sampleSize` is not 0 | `sampleCount` |
+| `saiz` | `defaultSampleInfoSize` is not 0 | `sampleCount` |
+| `ctts` | Version 2 or above | `entryCount` |
+
+The package has a type and no reader or writer for 12 of these boxes. The boxes are `co64`, `stz2`, `stsh`, `sbgp`, `sgpd`, `saio`, `saiz`, `senc`, `iinf`, `ipro`, `iloc`, and `iref`. For those boxes, the two rules change only the type.
+
+A field that is not the length of an array does not change. Examples are `channelcount`, `frameCount`, `samplesPerChunk`, and the `sampleCount` of an entry in `stts`.
+
+Migration:
+
+- `box.sampleCount` becomes `box.samples.length`. The compiler reports each read of a removed field.
+- The compiler does not report a count that a variable passes to a writer. The writer ignores that count.
+- A rule 2 field is optional. For `stsz`, the sample count is the length of `entrySize` if `sampleSize` is 0. In the other form, the sample count is `sampleCount`.
 
 ### Results of a trial build
 
@@ -228,6 +281,7 @@ Method: Node 24.22 on Apple silicon, one process for each row, the median of thr
 Limits of the numbers:
 
 - The trial build has no `uuid` user type, no `int64` option, and no string fields. The real code will be larger.
+- The trial build keeps the `sampleCount` field of `trun`. The trial build does not follow the rules of [Count fields](#count-fields).
 - The size difference is mostly fixed code: two classes against two plain objects. The difference for each added reader is smaller.
 - The heap column does not count the bytes of an `ArrayBuffer`. V8 stores those bytes outside the heap.
 - The row "Read `tfdt` from a segment" for version 1 uses `readIsoBoxes` with three readers, then `findIsoBox`.
@@ -240,7 +294,8 @@ Limits of the numbers:
 - **A large payload without a `capacity` value is slower.** The second table shows the cost. The buffer grows several times, and each growth copies the bytes.
 - **Two accepted RFCs change before a release.** The `int64` option and the container functions are not published yet. The names and the rules of both RFCs do not change. The signatures take a cursor.
 - **The package has more exports.** One method with a `size` parameter becomes up to four functions.
-- **The work is large.** The change touches 87 readers. The change also touches 85 writers. The test fixtures and the round-trip test already cover them.
+- **Code that reads or sets a count field changes.** [Count fields](#count-fields) lists the removed fields. A caller who builds a `trun` box with rows of 0 bytes passes one empty object for each sample.
+- **The work is large.** The change touches 87 readers. The change also touches 85 writers. The round-trip test covers the boxes that the test fixtures contain. The fixtures do not contain every box type.
 
 ## Rationale and alternatives
 
@@ -251,6 +306,33 @@ A bundler removes an unused function and shortens every function name. A plain o
 ### Why one buffer for writes
 
 The writer of a box no longer states its size, so the size cannot be wrong. A container box writes its child boxes into the same buffer. No child bytes are copied.
+
+### Why counts are not getters
+
+A getter that returns the length of the array keeps the count field. A test built a `subs` box with 120 entries. The box and each entry have a count. The table shows three getter variants and two variants with no getter.
+
+| Variant | Time per box | Heap per box | Plain object |
+|---|---|---|---|
+| No count field | 2526 ns | 42742 B | Yes |
+| Count as a data field | 2584 ns | 43707 B | Yes |
+| Getter in the object literal | 23390 ns | 84576 B | Yes |
+| Getter through `Object.defineProperty`, not enumerable | 13530 ns | 42742 B | Yes |
+| Getter on a shared prototype (a class) | 2600 ns | 43149 B | No |
+
+- V8 stores an object literal with a getter in dictionary mode. Dictionary mode is slower than the default mode.
+- `Object.defineProperty` adds one call for each object.
+- An object with a shared prototype is not a plain object. A class and `Object.create` both produce such an object.
+- `JSON.stringify`, a spread copy, and `structuredClone` copy only the enumerable fields of the object itself. The copy has no count for the last two variants.
+- For a getter in the object literal, the copy contains the count as a number. That number does not change when the array changes.
+- Each getter variant needs two types for a box: the read output and the write input. With one type, a hand-built box must state the count.
+- A data field has a low cost. The field can disagree with the array after an edit.
+
+Limits of the numbers:
+
+- The test ran on Node 24.22 and on no other engine.
+- The test reader is not the trial build, and it has no cursor functions.
+- Each value is the median of three runs. The time difference between the first two rows and the last row is inside the spread of the runs.
+- The heap value of the last row includes an effect of the forced garbage collection in the test. With more calls after that collection, the last row equals the first row.
 
 ### Rejected alternatives
 
@@ -274,6 +356,9 @@ The writer of a box no longer states its size, so the size cannot be wrong. A co
 4. **Migration help.** Should version 2.0.0 export a function that adapts a version 1 custom reader? The default answer is no.
 5. **Names.** `seekIsoBox`, `beginIsoBox`, `endIsoBox`, and the field functions with a size in the name are proposals.
 6. **Path syntax.** `seekIsoBox` takes an array of box types. hls.js uses the same form.
+7. **A count above the field width.** Some counts are 8 or 16 bits wide. The reference count of `sidx` is a 16-bit field. That field cannot state 65536 entries. `writeSidx` writes 0 for that array today, and still writes every reference. Should the writer throw a `RangeError`?
+8. **A count for rows of 0 bytes.** A `trun` box of 16 bytes can state any sample count. The reader creates one object for each sample, as in version 1. Should the reader limit that count?
+9. **A `kid` length that is not a multiple of 16.** Should `writePssh` throw a `RangeError`, or write only the complete key IDs?
 
 ## Future possibilities
 
