@@ -20,5 +20,4 @@ Each row maps findings of `findings.md` to a GitHub issue. The rows cover the gr
 | G472, G478 | 698 | drm and c2pa: update the code that uses iso-bmff |
 | G477 | 699 | Delete or rewrite `dev/isobmff.html` |
 | G475 | 700 | The skill describes `main` and not the npm version |
-
-G467 has no issue. The finding is about a validation check of c2pa, and the maintainer decides how to report it.
+| G467 | 701 | c2pa: the `mdat` check and the hash read different boxes |
