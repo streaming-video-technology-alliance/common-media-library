@@ -1,4 +1,4 @@
-import { decodeText, UTF_8 } from '@svta/cml-utils'
+import { decodeUtf8 } from '@svta/cml-utils'
 
 /**
  * Reads a UTF-8 string from a data view.
@@ -14,7 +14,5 @@ import { decodeText, UTF_8 } from '@svta/cml-utils'
  * @internal
  */
 export function readUtf8String(dataView: DataView, offset: number, length: number): string {
-	return length > 0
-		? decodeText(new DataView(dataView.buffer, offset, length), { encoding: UTF_8 })
-		: ''
+	return length > 0 ? decodeUtf8(new Uint8Array(dataView.buffer, offset, length)) : ''
 }

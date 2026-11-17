@@ -89,6 +89,7 @@ and this project adheres to
 - The documentation of `readInt64AsBigInt` and the reading guide now test for `DataView.prototype.getBigUint64`. A runtime can have `BigInt` and no `getBigUint64` method. The documentation of `readUint64`, `writeUint64`, `writeWideUint`, and `writeWideInt` names the `DataView` method that each one needs.
 - The runtime requirements table of the README now lists the `DataView` methods that the `bigint` reads and writes need.
 - The description of the package now states that the package reads and writes boxes.
+- The UTF-8 string reads now call `decodeUtf8` of `@svta/cml-utils`. A bundle with `readIsoBoxes` is about 200 bytes smaller after gzip. The results do not change. The package now needs `@svta/cml-utils` 1.8.0 or later.
 
 ### Fixed
 
