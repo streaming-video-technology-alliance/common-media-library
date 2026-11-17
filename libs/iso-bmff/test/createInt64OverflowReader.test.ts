@@ -2,6 +2,7 @@ import {
 	assert,
 	createInt64OverflowReader,
 	describe,
+	findIsoBox,
 	it,
 	IsoBoxReadView,
 	readIsoBoxes,
@@ -30,20 +31,62 @@ function read(value: number | bigint, size: 4 | 8, signed: boolean): [number, Ra
 describe('createInt64OverflowReader', function () {
 	it('should report a value that a number cannot hold', function () {
 		// #region example
+		// A moof box that holds a traf box with a version 1 tfdt box.
+		// baseMediaDecodeTime is 2^53 + 1, which a number cannot hold.
+		const bytes = new Uint8Array([
+			0,
+			0,
+			0,
+			36,
+			0x6d,
+			0x6f,
+			0x6f,
+			0x66, // moof
+			0,
+			0,
+			0,
+			28,
+			0x74,
+			0x72,
+			0x61,
+			0x66, // traf
+			0,
+			0,
+			0,
+			20,
+			0x74,
+			0x66,
+			0x64,
+			0x74,
+			1,
+			0,
+			0,
+			0, // tfdt, version 1
+			0,
+			0x20,
+			0,
+			0,
+			0,
+			0,
+			0,
+			1, // baseMediaDecodeTime
+		])
 		const errors: RangeError[] = []
-		const [box] = readIsoBoxes(TFDT_V1, {
+		const boxes = readIsoBoxes(bytes, {
 			int64: createInt64OverflowReader(error => {
 				errors.push(error)
 			}),
 			readers: { tfdt: readTfdt },
 		})
 
-		assert.strictEqual(box.type, 'tfdt')
-		// The field is a number. The value in the box is 2^53 + 1, so the number is rounded.
-		assert.strictEqual(box.baseMediaDecodeTime, 2 ** 53)
+		// The field is a number, rounded to 2^53, and errors holds one RangeError.
+		const tfdt = findIsoBox(boxes, box => box.type === 'tfdt')
+		// #endregion example
+
+		assert.ok(tfdt)
+		assert.strictEqual(tfdt.baseMediaDecodeTime, 2 ** 53)
 		assert.strictEqual(errors.length, 1)
 		assert.strictEqual(errors[0].message, '64-bit value is outside the safe integer range')
-		// #endregion example
 
 		assert.ok(errors[0] instanceof RangeError)
 	})

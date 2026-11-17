@@ -2,7 +2,7 @@ import type { EncryptedSample } from './EncryptedSample.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
- * Sample Encryption Box - 'senc'
+ * Sample Encryption Box (`senc`).
  *
  * @public
  */

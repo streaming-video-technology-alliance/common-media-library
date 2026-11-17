@@ -1,7 +1,9 @@
 import type { TypeBox } from './TypeBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.16.2 Segment Type Box
+ * Segment Type Box (`styp`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.16.2
  *
  * @public
  */

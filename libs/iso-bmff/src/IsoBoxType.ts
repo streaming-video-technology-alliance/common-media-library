@@ -1,5 +1,5 @@
 /**
- * A four-character box type, such as `'moov'`.
+ * The four-character type of a box, such as `moov`.
  *
  * TypeScript does not check the length of the value.
  *

@@ -3,7 +3,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 
 /**
- * Parse a `SubsegmentIndexBox` from an `IsoBoxReadView`.
+ * Read the `ssix` box (`SubsegmentIndexBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

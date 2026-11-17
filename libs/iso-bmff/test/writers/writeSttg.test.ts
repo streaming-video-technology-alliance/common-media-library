@@ -21,6 +21,7 @@ describe('writeSttg', function () {
 		}
 
 		const writer = writeSttg(box)
+		// #endregion example
 
 		// size (19), type (sttg), settings
 		assert.deepStrictEqual(
@@ -29,7 +30,6 @@ describe('writeSttg', function () {
 				0, 0, 0, 19, 115, 116, 116, 103, 97, 108, 105, 103, 110, 58, 115, 116, 97, 114, 116,
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of settings that are not ASCII', function () {

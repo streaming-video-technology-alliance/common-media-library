@@ -3,11 +3,14 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `SchemeTypeBox` from an `IsoBoxReadView`.
+ * Read the `schm` box (`SchemeTypeBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
  * @returns A parsed `SchemeTypeBox`
+ *
+ * @example
+ * {@includeCode ../../test/readers/readSchm.test.ts#example}
  *
  * @public
  */

@@ -1,7 +1,7 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * IPMP Info Box - 'imif'
+ * IPMP Info Box (`imif`).
  *
  * @public
  */

@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.12.5 Scheme Type Box
+ * Scheme Type Box (`schm`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.12.5
  *
  * @public
  */

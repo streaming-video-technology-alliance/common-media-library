@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `DecodingTimeToSampleBox` from an `IsoBoxReadView`.
+ * Read the `stts` box (`DecodingTimeToSampleBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

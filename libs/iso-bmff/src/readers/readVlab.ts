@@ -3,11 +3,14 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `WebVttSourceLabelBox` from an `IsoBoxReadView`.
+ * Read the `vlab` box (`WebVttSourceLabelBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
  * @returns A parsed `WebVttSourceLabelBox`
+ *
+ * @example
+ * {@includeCode ../../test/readers/readVlab.test.ts#example}
  *
  * @public
  */

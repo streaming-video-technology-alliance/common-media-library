@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `IdentifiedMediaDataBox` from an `IsoBoxReadView`.
+ * Read the `imda` box (`IdentifiedMediaDataBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

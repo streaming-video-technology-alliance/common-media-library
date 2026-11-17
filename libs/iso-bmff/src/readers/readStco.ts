@@ -4,9 +4,9 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `ChunkOffsetBox` from an `IsoBoxReadView`.
+ * Read the `stco` box (`ChunkOffsetBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.5 Chunk Offset Box
+ * ISO/IEC 14496-12:2015 - 8.7.5
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

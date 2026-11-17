@@ -7,14 +7,14 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write an `AudioSampleEntryBox` to an `IsoBoxWriteView`.
+ * Write an audio sample entry box (`AudioSampleEntryBox`) of the type in its `type` field.
  *
- * ISO/IEC 14496-12:2012 - 12.2.3 Audio Sample Entry
+ * ISO/IEC 14496-12:2015 - 12.2.3
  *
  * @param box - The `AudioSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` to use
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

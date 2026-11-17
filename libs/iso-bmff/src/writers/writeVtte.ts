@@ -2,13 +2,13 @@ import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `WebVttEmptySampleBox` to an `IsoBoxWriteView`.
+ * Write the `vtte` box (`WebVttEmptySampleBox`).
  *
  * The box has no fields, so the function writes only the box header.
  *
  * @param _box - The `WebVttEmptySampleBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

@@ -1,4 +1,5 @@
-import { assert, describe, findBox, it, readEmsg, readIsoBoxes } from '../util/box.ts'
+import { readFile } from 'node:fs/promises'
+import { assert, describe, findBox, findIsoBox, it, readEmsg, readIsoBoxes } from '../util/box.ts'
 
 const SCHEME = [0x75, 0x72, 0x6e, 0x3a, 0xc3, 0xa9] // 'urn:é'
 const VALUE = [0xe6, 0x97, 0xa5, 0xe6, 0x9c, 0xac] // '日本'
@@ -126,20 +127,20 @@ describe('readEmsg', function () {
 		)
 	})
 
-	it('should expose version-specific fields via discriminated union', function () {
-		const box = findBox('emsg.m4s', 'emsg', { readers: { emsg: readEmsg } })
-
+	it('should expose version-specific fields via discriminated union', async function () {
 		// #region example
-		assert.strictEqual(box.schemeIdUri, 'urn:mpeg:dash:event:2012')
+		const isoFile = await readFile(new URL('../fixtures/emsg.m4s', import.meta.url))
+		const boxes = readIsoBoxes(isoFile, { readers: { emsg: readEmsg } })
+		const box = findIsoBox(boxes, box => box.type === 'emsg')
 
-		if (box.version === 0) {
-			assert.strictEqual(typeof box.presentationTimeDelta, 'number')
-		} else {
-			assert.strictEqual(typeof box.presentationTime, 'number')
-		}
+		// A version 0 box has a presentation time delta, and a version 1 box has a presentation time.
+		const time = box?.version === 0 ? box.presentationTimeDelta : box?.presentationTime
 		// #endregion example
 
+		assert.ok(box)
+		assert.strictEqual(box.schemeIdUri, 'urn:mpeg:dash:event:2012')
 		assert.strictEqual(box.version, 0)
+		assert.strictEqual(time, 1)
 	})
 
 	it('should read a version 2 box as empty fields and messageData', function () {

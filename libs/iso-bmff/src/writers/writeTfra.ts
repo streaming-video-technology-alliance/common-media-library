@@ -3,16 +3,16 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `TrackFragmentRandomAccessBox` to an `IsoBoxWriteView`.
+ * Write the `tfra` box (`TrackFragmentRandomAccessBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.8.10 Track Fragment Random Access Box
+ * ISO/IEC 14496-12:2015 - 8.8.10
  *
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
  * @param box - The `TrackFragmentRandomAccessBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

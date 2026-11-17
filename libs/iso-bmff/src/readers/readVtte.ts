@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `WebVttEmptySampleBox` from an `IsoBoxReadView`.
+ * Read the `vtte` box (`WebVttEmptySampleBox`).
  *
  * The box has no fields, so the function reads no bytes from the view.
  *

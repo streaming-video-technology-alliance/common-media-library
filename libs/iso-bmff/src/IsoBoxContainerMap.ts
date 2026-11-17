@@ -20,7 +20,7 @@ import type { WebVttCueBox } from './boxes/WebVttCueBox.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
- * Map of container box types to their allowed child box types
+ * Map of each container box type to the type of that container box.
  *
  * @public
  */

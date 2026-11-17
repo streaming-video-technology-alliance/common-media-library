@@ -4,12 +4,12 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
 
 /**
- * Write a `VisualSampleEntryBox` (hev1) to an `IsoBoxWriteView`.
+ * Write the `hev1` box (`VisualSampleEntryBox`).
  *
  * @param box - The `VisualSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` to use
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

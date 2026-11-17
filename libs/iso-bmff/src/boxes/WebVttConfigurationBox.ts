@@ -1,5 +1,7 @@
 /**
- * ISO/IEC 14496-30:2014 - WebVTT Configuration Box
+ * WebVTT Configuration Box (`vttC`).
+ *
+ * ISO/IEC 14496-30:2014
  *
  * @public
  */

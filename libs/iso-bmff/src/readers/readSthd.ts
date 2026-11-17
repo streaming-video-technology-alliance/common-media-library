@@ -3,7 +3,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `SubtitleMediaHeaderBox` from an `IsoBoxReadView`.
+ * Read the `sthd` box (`SubtitleMediaHeaderBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

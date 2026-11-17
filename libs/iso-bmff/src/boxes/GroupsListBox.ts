@@ -9,7 +9,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export type GroupsListBoxChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
- * Groups List Box - 'grpl' - Container
+ * Groups List Box (`grpl`).
+ *
+ * ISO/IEC 14496-12
  *
  * @public
  */
