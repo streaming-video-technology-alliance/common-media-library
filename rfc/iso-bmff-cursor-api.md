@@ -278,6 +278,8 @@ A second test writes a `moof` box and an `mdat` box of 1 MB.
 
 Method: Node 24.22 on Apple silicon, one process for each row, the median of three runs. The bundle entries keep `@svta/cml-utils` external.
 
+The version 1 rows describe `main` at commit c8346ca6b. PRs 702 to 714 changed version 1 after that commit. A second test compared `main` before and after those PRs, with one test program for both. The read of `tfdt` was 10% faster after the PRs. Each other time, heap value, and bundle size changed by less than 3%. The comparison in the first table therefore still applies to version 1 at commit e9eadc2b8.
+
 Limits of the numbers:
 
 - The trial build has no `uuid` user type, no `int64` option, and no string fields. The real code will be larger.
