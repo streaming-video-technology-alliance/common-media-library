@@ -98,19 +98,18 @@ describe('findIsoBox', function () {
 	})
 
 	it('should respect depthFirst config', function () {
-		const child1 = createBox('mdia')
-		const child2 = createBox('mdia')
-		const container1 = createContainer('meta', [child1])
-		const container2 = createContainer('trak', [child2])
-		const boxes = [container1, container2]
+		const deep = createBox('mdia')
+		const shallow = createBox('mdia')
+		const boxes = [
+			createContainer('meta', [createContainer('trak', [deep])]),
+			createContainer('moov', [shallow]),
+		]
 
-		// Depth-first should find the first nested target
 		const depthFirstResult = findIsoBox(boxes, box => box.type === 'mdia', { depthFirst: true })
-		assert.strictEqual(depthFirstResult, child1)
+		assert.strictEqual(depthFirstResult, deep)
 
-		// Breadth-first should also find child1 first in this case (containers visited before children)
 		const breadthFirstResult = findIsoBox(boxes, box => box.type === 'mdia', { depthFirst: false })
-		assert.strictEqual(breadthFirstResult, child1)
+		assert.strictEqual(breadthFirstResult, shallow)
 	})
 
 	it('should work with complex callback conditions', function () {
