@@ -1,4 +1,4 @@
-import { deepEqual, doesNotThrow, equal, ok, throws } from 'node:assert'
+import { deepStrictEqual, doesNotThrow, strictEqual, ok, throws } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	describe,
@@ -57,7 +57,7 @@ describe('writeIsoBoxes', function () {
 			},
 		})
 
-		deepEqual(isoFile, reduceUint8Arrays(bytes))
+		deepStrictEqual(new Uint8Array(isoFile), reduceUint8Arrays(bytes))
 		// #endregion example
 	})
 
@@ -164,7 +164,7 @@ describe('writeIsoBoxes', function () {
 		})
 
 		const isoFile = await readFile(new URL('./fixtures/subsample.m4s', import.meta.url))
-		deepEqual(isoFile, reduceUint8Arrays(bytes))
+		deepStrictEqual(new Uint8Array(isoFile), reduceUint8Arrays(bytes))
 	})
 
 	it('should write every fixture that the default readers parse', function () {
@@ -187,7 +187,7 @@ describe('writeIsoBoxes', function () {
 			const original = sampleTableBytes(boxes)
 			const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
 
-			deepEqual(sampleTableBytes(readIsoBoxes(written)), original, file)
+			deepStrictEqual(sampleTableBytes(readIsoBoxes(written)), original, file)
 			count += original.length
 		}
 
@@ -202,7 +202,7 @@ describe('writeIsoBoxes', function () {
 			const original = headerBytes(boxes)
 			const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
 
-			deepEqual(headerBytes(readIsoBoxes(written)), original, file)
+			deepStrictEqual(headerBytes(readIsoBoxes(written)), original, file)
 			count += original.length
 		}
 
@@ -211,7 +211,7 @@ describe('writeIsoBoxes', function () {
 
 	it('should exit if boxes are empty', function () {
 		const bytes = writeIsoBoxes([], defaultWriterConfig())
-		equal(bytes.length, 0)
+		strictEqual(bytes.length, 0)
 	})
 
 	it('should copy a box given as a view over a SharedArrayBuffer', function () {
@@ -222,7 +222,7 @@ describe('writeIsoBoxes', function () {
 		const [result] = writeIsoBoxes([shared], defaultWriterConfig())
 
 		ok(result.buffer instanceof ArrayBuffer)
-		deepEqual([...result], bytes)
+		deepStrictEqual([...result], bytes)
 	})
 
 	it('should not copy a box given as a view over an ArrayBuffer', function () {
@@ -230,7 +230,7 @@ describe('writeIsoBoxes', function () {
 
 		const [result] = writeIsoBoxes([plain], defaultWriterConfig())
 
-		equal(result.buffer, plain.buffer)
+		strictEqual(result.buffer, plain.buffer)
 	})
 
 	describe('a box with a boxes field and no writer', function () {
@@ -260,7 +260,7 @@ describe('writeIsoBoxes', function () {
 
 			const [bytes] = writeIsoBoxes(boxes, { writers: {} })
 
-			deepEqual([...bytes], META)
+			deepStrictEqual([...bytes], META)
 		})
 
 		it('should write the source bytes of a sample entry with no writer', function () {
@@ -273,8 +273,8 @@ describe('writeIsoBoxes', function () {
 
 			const [bytes] = writeIsoBoxes(boxes, defaultWriterConfig())
 
-			equal(bytes.length, 137)
-			deepEqual(bytes, source)
+			strictEqual(bytes.length, 137)
+			deepStrictEqual(bytes, source)
 		})
 
 		it('should write a parsed container as a container', function () {
@@ -284,7 +284,10 @@ describe('writeIsoBoxes', function () {
 
 			const [bytes] = writeIsoBoxes([traf], { writers: {} })
 
-			deepEqual([...bytes], [0x00, 0x00, 0x00, 0x1a, 0x74, 0x72, 0x61, 0x66, ...FREE, ...FREE])
+			deepStrictEqual(
+				[...bytes],
+				[0x00, 0x00, 0x00, 0x1a, 0x74, 0x72, 0x61, 0x66, ...FREE, ...FREE],
+			)
 		})
 
 		it('should write a container that code builds as a container', function () {
@@ -292,7 +295,7 @@ describe('writeIsoBoxes', function () {
 
 			const [bytes] = writeIsoBoxes([box], { writers: {} })
 
-			deepEqual([...bytes], [0x00, 0x00, 0x00, 0x11, 0x75, 0x64, 0x74, 0x61, ...FREE])
+			deepStrictEqual([...bytes], [0x00, 0x00, 0x00, 0x11, 0x75, 0x64, 0x74, 0x61, ...FREE])
 		})
 
 		it('should throw for a box that code builds with no view and no writer', function () {

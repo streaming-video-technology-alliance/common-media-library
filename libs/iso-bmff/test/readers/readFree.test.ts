@@ -1,8 +1,8 @@
-import { assert, describe, readFree, it, parseBox } from '../util/box.ts'
+import { assert, describe, findBox, readFree, it } from '../util/box.ts'
 
 describe('readFree', () => {
 	it('should correctly parse the box', () => {
-		const box = parseBox('captions.mp4', readFree, 3)
+		const box = findBox('captions.mp4', 'free', { readers: { free: readFree } })
 
 		assert.strictEqual(box.type, 'free')
 		assert.strictEqual(box.size, 59)
