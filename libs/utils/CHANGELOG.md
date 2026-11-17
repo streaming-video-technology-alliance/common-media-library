@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-11-16
+
 ### Changed
 
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/utils](https://cml.svta.org/packages/utils/).
@@ -124,7 +126,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.1...HEAD
+[1.7.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.7.0...utils-v1.7.1
 [1.7.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.2...utils-v1.7.0
 [1.6.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.1...utils-v1.6.2
 [1.6.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/utils-v1.6.0...utils-v1.6.1
