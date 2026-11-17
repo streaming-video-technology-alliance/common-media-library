@@ -204,3 +204,73 @@ describe('traverseIsoBoxes', function () {
 		assert.strictEqual(result[2].type, 'trak')
 	})
 })
+
+describe('traverseIsoBoxes order', function () {
+	type Orders = Record<string, Record<'depthFirst' | 'breadthFirst', Record<string, string>>>
+
+	it('gives the same order as before on every fixture', async function () {
+		const orders = JSON.parse(
+			await readFile(new URL('./traverseIsoBoxesOrder.json', import.meta.url), 'utf8'),
+		) as Orders
+		const maxDepths = [0, 1, 1.5, 2, 3, Infinity, -1, NaN]
+
+		for (const [fixture, expected] of Object.entries(orders)) {
+			const isoFile = await readFile(new URL(`./fixtures/${fixture}`, import.meta.url))
+			const boxes = readIsoBoxes(new Uint8Array(isoFile))
+
+			for (const depthFirst of [true, false]) {
+				const order = depthFirst ? 'depthFirst' : 'breadthFirst'
+
+				for (const maxDepth of maxDepths) {
+					const types = Array.from(
+						traverseIsoBoxes(boxes, { depthFirst, maxDepth }),
+						box => box.type,
+					)
+					assert.strictEqual(
+						types.join(','),
+						expected[order][String(maxDepth)],
+						`${fixture} ${order} ${maxDepth}`,
+					)
+				}
+			}
+		}
+	})
+
+	it('closes every open iterator on break', function () {
+		type TestBox = { type: string; boxes?: Iterable<TestBox> }
+
+		for (const depthFirst of [true, false]) {
+			const closed: string[] = []
+
+			function* children(name: string, boxes: TestBox[]): Generator<TestBox> {
+				try {
+					yield* boxes
+				} finally {
+					closed.push(name)
+				}
+			}
+
+			const leaf = { type: 'leaf' }
+			const tree = children('root', [
+				{
+					type: 'moov',
+					boxes: children('moov', [
+						{ type: 'trak', boxes: children('trak', [leaf, { type: 'free' }]) },
+					]),
+				},
+				{ type: 'mdat' },
+			])
+
+			for (const box of traverseIsoBoxes(tree, { depthFirst })) {
+				if (box === leaf) {
+					break
+				}
+			}
+
+			assert.deepStrictEqual(
+				closed,
+				depthFirst ? ['trak', 'moov', 'root'] : ['root', 'moov', 'trak'],
+			)
+		}
+	})
+})

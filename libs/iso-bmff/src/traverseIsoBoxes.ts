@@ -1,6 +1,4 @@
-import type { Box } from './boxes/Box.ts'
 import type { TraverseIsoBoxesConfig } from './TraverseIsoBoxesConfig.ts'
-import { isContainer } from './utils/isContainer.ts'
 
 /**
  * Traverse ISO boxes
@@ -26,32 +24,39 @@ export function* traverseIsoBoxes<T>(
 		return
 	}
 
-	const queue: [Iterable<T>, number][] = [[boxes, 0]]
+	const limit = depthFirst ? Math.floor(maxDepth) : maxDepth
+	const iterators: [Iterator<T>, number][] = [[boxes[Symbol.iterator](), 0]]
+	let head = 0
 
-	while (queue.length > 0) {
-		const item = queue.shift()
-		if (!item) {
-			continue
-		}
-		const [children, depth] = item
+	try {
+		while (head < iterators.length) {
+			const index = depthFirst ? iterators.length - 1 : head
+			const [iterator, depth] = iterators[index]
+			const result = iterator.next()
 
-		for (const child of children) {
-			yield child
-
-			if (depth >= maxDepth) {
+			if (result.done) {
+				if (depthFirst) {
+					iterators.pop()
+				} else {
+					head++
+				}
 				continue
 			}
 
-			const box = child as Box
-			if (isContainer(box) && box.boxes) {
-				const next = box.boxes as T[]
+			const child = result.value
+			yield child
 
-				if (depthFirst) {
-					yield* traverseIsoBoxes(next, { depthFirst, maxDepth: maxDepth - 1 })
-				} else {
-					queue.push([next, depth + 1])
+			if (depth < limit) {
+				const children = (child as { boxes?: Iterable<T> }).boxes
+
+				if (children) {
+					iterators.push([children[Symbol.iterator](), depth + 1])
 				}
 			}
+		}
+	} finally {
+		for (let i = iterators.length - 1; i >= head; i--) {
+			iterators[i][0].return?.()
 		}
 	}
 }
