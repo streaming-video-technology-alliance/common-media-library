@@ -90,13 +90,14 @@ import type { WebVttCuePayloadBox } from './boxes/WebVttCuePayloadBox.ts'
 import type { WebVttEmptySampleBox } from './boxes/WebVttEmptySampleBox.ts'
 import type { WebVttSettingsBox } from './boxes/WebVttSettingsBox.ts'
 import type { WebVttSourceLabelBox } from './boxes/WebVttSourceLabelBox.ts'
+import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
  * Comprehensive mapping from box type strings to their corresponding TypeScript interfaces
  *
  * @public
  */
-export type IsoBoxMap = {
+export type IsoBoxMap<V extends IsoInt64 = number> = {
 	ardi: AudioRenderingIndicationBox
 	avc1: VisualSampleEntryBox<'avc1'>
 	avc2: VisualSampleEntryBox<'avc2'>
@@ -106,16 +107,16 @@ export type IsoBoxMap = {
 	ctts: CompositionTimeToSampleBox
 	dinf: DataInformationBox
 	dref: DataReferenceBox
-	edts: EditBox
+	edts: EditBox<V>
 	elng: ExtendedLanguageBox
-	elst: EditListBox
-	emsg: EventMessageBox
+	elst: EditListBox<V>
+	emsg: EventMessageBox<V>
 	enca: AudioSampleEntryBox<'enca'>
 	encv: VisualSampleEntryBox<'encv'>
 	free: FreeSpaceBox<'free'>
 	frma: OriginalFormatBox
 	ftyp: FileTypeBox
-	grpl: GroupsListBox
+	grpl: GroupsListBox<V>
 	hdlr: HandlerReferenceBox
 	hev1: VisualSampleEntryBox<'hev1'>
 	hmhd: HintMediaHeaderBox
@@ -131,24 +132,24 @@ export type IsoBoxMap = {
 	kind: TrackKindBox
 	labl: LabelBox
 	mdat: MediaDataBox
-	mdhd: MediaHeaderBox
-	mdia: MediaBox
-	meco: AdditionalMetadataContainerBox
-	mehd: MovieExtendsHeaderBox
-	meta: MetaBox
+	mdhd: MediaHeaderBox<V>
+	mdia: MediaBox<V>
+	meco: AdditionalMetadataContainerBox<V>
+	mehd: MovieExtendsHeaderBox<V>
+	meta: MetaBox<V>
 	mfhd: MovieFragmentHeaderBox
-	mfra: MovieFragmentRandomAccessBox
+	mfra: MovieFragmentRandomAccessBox<V>
 	mfro: MovieFragmentRandomAccessOffsetBox
 	minf: MediaInformationBox
-	moof: MovieFragmentBox
-	moov: MovieBox
+	moof: MovieFragmentBox<V>
+	moov: MovieBox<V>
 	mp4a: AudioSampleEntryBox<'mp4a'>
-	mvex: MovieExtendsBox
-	mvhd: MovieHeaderBox
+	mvex: MovieExtendsBox<V>
+	mvhd: MovieHeaderBox<V>
 	nmhd: NullMediaHeaderBox
 	payl: WebVttCuePayloadBox
 	pitm: PrimaryItemBox
-	prft: ProducerReferenceTimeBox
+	prft: ProducerReferenceTimeBox<V>
 	prsl: PreselectionGroupBox
 	pssh: ProtectionSystemSpecificHeaderBox
 	saio: SampleAuxiliaryInformationOffsetsBox
@@ -159,7 +160,7 @@ export type IsoBoxMap = {
 	sdtp: SampleDependencyTypeBox
 	senc: SampleEncryptionBox
 	sgpd: SampleGroupDescriptionBox
-	sidx: SegmentIndexBox
+	sidx: SegmentIndexBox<V>
 	sinf: ProtectionSchemeInformationBox
 	skip: FreeSpaceBox<'skip'>
 	smhd: SoundMediaHeaderBox
@@ -168,7 +169,7 @@ export type IsoBoxMap = {
 	stco: ChunkOffsetBox
 	stdp: DegradationPriorityBox
 	sthd: SubtitleMediaHeaderBox
-	strk: SubTrackBox
+	strk: SubTrackBox<V>
 	stsc: SampleToChunkBox
 	stsd: SampleDescriptionBox
 	stsh: ShadowSyncSampleBox
@@ -180,16 +181,16 @@ export type IsoBoxMap = {
 	subs: SubsampleInformationBox
 	stz2: CompactSampleSizeBox
 	tenc: TrackEncryptionBox
-	tfdt: TrackFragmentBaseMediaDecodeTimeBox
-	tfhd: TrackFragmentHeaderBox
-	tfra: TrackFragmentRandomAccessBox
-	tkhd: TrackHeaderBox
-	traf: TrackFragmentBox
-	trak: TrackBox
+	tfdt: TrackFragmentBaseMediaDecodeTimeBox<V>
+	tfhd: TrackFragmentHeaderBox<V>
+	tfra: TrackFragmentRandomAccessBox<V>
+	tkhd: TrackHeaderBox<V>
+	traf: TrackFragmentBox<V>
+	trak: TrackBox<V>
 	tref: TrackReferenceBox
 	trex: TrackExtendsBox
 	trun: TrackRunBox
-	udta: UserDataBox
+	udta: UserDataBox<V>
 	'url ': DataEntryUrlBox
 	'urn ': DataEntryUrnBox
 	vlab: WebVttSourceLabelBox

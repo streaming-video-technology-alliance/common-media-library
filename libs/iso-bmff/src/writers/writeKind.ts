@@ -24,8 +24,10 @@ export function writeKind(box: TrackKindBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('kind', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
-	writer.writeUtf8TerminatedString(box.schemeUri)
-	writer.writeUtf8TerminatedString(box.value)
+	writer.writeBytes(schemeUriBytes)
+	writer.writeUint(0, 1)
+	writer.writeBytes(valueBytes)
+	writer.writeUint(0, 1)
 
 	return writer
 }

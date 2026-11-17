@@ -1,4 +1,5 @@
 import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragmentBaseMediaDecodeTimeBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -6,13 +7,16 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2012 - 8.8.12 Track Fragment Base Media Decode Time Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `TrackFragmentBaseMediaDecodeTimeBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
-export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWriteView {
+export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>): IsoBoxWriteView {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -21,7 +25,7 @@ export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox): IsoBoxWrite
 
 	const writer = new IsoBoxWriteView('tfdt', totalSize)
 	writer.writeFullBox(box.version, box.flags)
-	writer.writeUint(box.baseMediaDecodeTime, size)
+	writer.writeWideUint(box.baseMediaDecodeTime, size)
 
 	return writer
 }

@@ -15,11 +15,11 @@ export function writeVlab(box: WebVttSourceLabelBox): IsoBoxWriteView {
 	const sourceLabelBytes = encodeText(box.sourceLabel)
 
 	const headerSize = 8
-	const sourceLabelSize = sourceLabelBytes.length + 1 // null-terminated
+	const sourceLabelSize = sourceLabelBytes.length
 	const totalSize = headerSize + sourceLabelSize
 
 	const writer = new IsoBoxWriteView('vlab', totalSize)
-	writer.writeUtf8TerminatedString(box.sourceLabel)
+	writer.writeBytes(sourceLabelBytes)
 
 	return writer
 }

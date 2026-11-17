@@ -1,4 +1,6 @@
 import type { IsoBoxReadViewConfig } from '../IsoBoxReadViewConfig.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { IsoInt64Reader } from '../IsoInt64Reader.ts'
 import { readArdi } from './readArdi.ts'
 import { readAvc1 } from './readAvc1.ts'
 import { readAvc2 } from './readAvc2.ts'
@@ -39,9 +41,12 @@ import { readSidx } from './readSidx.ts'
 import { readSkip } from './readSkip.ts'
 import { readSmhd } from './readSmhd.ts'
 import { readSsix } from './readSsix.ts'
+import { readStco } from './readStco.ts'
 import { readSthd } from './readSthd.ts'
+import { readStsc } from './readStsc.ts'
 import { readStsd } from './readStsd.ts'
 import { readStss } from './readStss.ts'
+import { readStsz } from './readStsz.ts'
 import { readSttg } from './readSttg.ts'
 import { readStts } from './readStts.ts'
 import { readStyp } from './readStyp.ts'
@@ -61,14 +66,60 @@ import { readVttC } from './readVttC.ts'
 import { readVtte } from './readVtte.ts'
 
 /**
- * Create a default reader configuration with all available readers pre-configured.
+ * Create a default reader configuration with every reader except the container readers, such as `readMoov`.
+ * `readIsoBoxes` reads a container box that has no reader.
  *
- * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured
+ * The `int64` option selects the type of every 64-bit integer field.
+ * The readers of the configuration have the types of that option.
+ * Pass the option here and do not add it to the configuration afterward.
+ *
+ * @param options - The options for the configuration. The `int64` option is required when `V` is `bigint`.
+ * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured, except the container readers
+ *
+ * @example
+ * {@includeCode ../../test/readers/defaultReaderConfig.test.ts#example}
  *
  * @public
  */
-export function defaultReaderConfig(): IsoBoxReadViewConfig {
+export function defaultReaderConfig<V extends IsoInt64 = number>(
+	...options: [V] extends [bigint]
+		? [
+				options: {
+					/**
+					 * The function that reads every 64-bit integer field of the built-in readers.
+					 */
+					int64: IsoInt64Reader<V>
+				},
+			]
+		: [
+				options?: {
+					/**
+					 * The function that reads every 64-bit integer field of the built-in readers.
+					 */
+					int64?: IsoInt64Reader<V>
+				},
+			]
+): IsoBoxReadViewConfig<V>
+
+/**
+ * Create a default reader configuration with `number` fields.
+ *
+ * `Parameters<typeof defaultReaderConfig>` and `ReturnType<typeof defaultReaderConfig>` resolve to this signature.
+ *
+ * @param options - The options for the configuration
+ * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured, except the container readers
+ *
+ * @public
+ */
+export function defaultReaderConfig(options?: {
+	/**
+	 * The function that reads every 64-bit integer field of the built-in readers.
+	 */
+	int64?: IsoInt64Reader
+}): IsoBoxReadViewConfig
+export function defaultReaderConfig(options?: { int64?: IsoInt64Reader }): IsoBoxReadViewConfig {
 	return {
+		...options,
 		readers: {
 			ardi: readArdi,
 			avc1: readAvc1,
@@ -110,9 +161,12 @@ export function defaultReaderConfig(): IsoBoxReadViewConfig {
 			skip: readSkip,
 			smhd: readSmhd,
 			ssix: readSsix,
+			stco: readStco,
 			sthd: readSthd,
+			stsc: readStsc,
 			stsd: readStsd,
 			stss: readStss,
+			stsz: readStsz,
 			sttg: readSttg,
 			stts: readStts,
 			styp: readStyp,

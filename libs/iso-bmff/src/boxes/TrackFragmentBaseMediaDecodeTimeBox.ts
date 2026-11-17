@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -5,7 +6,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type TrackFragmentBaseMediaDecodeTimeBox = FullBox & {
+export type TrackFragmentBaseMediaDecodeTimeBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'tfdt'
-	baseMediaDecodeTime: number
+	baseMediaDecodeTime: V
 }

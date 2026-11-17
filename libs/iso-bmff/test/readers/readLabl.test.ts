@@ -19,9 +19,9 @@ describe('readLabl', function () {
 		const grpl = meta.boxes.find(child => child.type === 'grpl')
 		assert.ok(grpl)
 
-		const prsl = grpl.boxes.find((child: PreselectionGroupBox) => child.groupId === 234) as
-			| PreselectionGroupBox
-			| undefined
+		const prsl = grpl.boxes.find(
+			(child): child is PreselectionGroupBox => child.type === 'prsl' && child.groupId === 234,
+		)
 		assert.ok(prsl)
 
 		const boxes = prsl.boxes.filter((child: LabelBox) => child.type === 'labl') as LabelBox[]

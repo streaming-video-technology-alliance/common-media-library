@@ -1,5 +1,6 @@
 import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
 
 /**
@@ -11,6 +12,6 @@ import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
  *
  * @public
  */
-export function readAvc1(view: IsoBoxReadView): VisualSampleEntryBox<'avc1'> {
+export function readAvc1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<'avc1'> {
 	return readVisualSampleEntryBox('avc1', view)
 }

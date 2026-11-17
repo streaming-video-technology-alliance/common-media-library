@@ -32,6 +32,22 @@ const box: IsoBox = { type: "meta", version: 0, flags: 0, boxes: [] };
 const container = isContainer(box);
 ```
 
+After `isContainer` returns `true`, each element of `box.boxes` has a box type. Test the `type` of a child before you read a field of that child.
+
+```typescript
+import { defaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bmff";
+
+for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+	if (isContainer(box)) {
+		for (const child of box.boxes) {
+			if (child.type === "tfdt") {
+				console.log(child.baseMediaDecodeTime);
+			}
+		}
+	}
+}
+```
+
 `isFullBox` checks whether a box is a full box.
 
 ```typescript

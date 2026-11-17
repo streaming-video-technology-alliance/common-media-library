@@ -1,4 +1,5 @@
 import { IsoBoxReadableStream } from './IsoBoxReadableStream.ts'
+import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
 
@@ -16,7 +17,7 @@ import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
  * @public
  */
 export function createIsoBoxReadableStream(
-	boxes: Iterable<IsoBoxStreamable>,
+	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
 	config: IsoBoxWriteViewConfig,
 ): ReadableStream<Uint8Array> {
 	return new IsoBoxReadableStream(boxes, config)

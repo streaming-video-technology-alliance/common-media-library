@@ -1,9 +1,13 @@
 import type { EditListBox } from '../boxes/EditListBox.ts'
 import type { EditListEntry } from '../boxes/EditListEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `EditListBox` from an `IsoBoxReadView`.
+ *
+ * The 64-bit integer fields of the result have the type that the `int64` option of the view returns.
+ * With no option, they are numbers.
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
@@ -11,15 +15,15 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readElst(view: IsoBoxReadView): EditListBox {
+export function readElst<V extends IsoInt64>(view: IsoBoxReadView<V>): EditListBox<V> {
 	const { version, flags } = view.readFullBox()
 	const v1 = version === 1
 	const size = v1 ? 8 : 4
 
 	const entryCount = view.readUint(4)
-	const entries = view.readEntries<EditListEntry>(entryCount, () => ({
-		segmentDuration: view.readUint(size),
-		mediaTime: view.readInt(size),
+	const entries = view.readEntries<EditListEntry<V>>(entryCount, () => ({
+		segmentDuration: view.readWideUint(size),
+		mediaTime: view.readWideInt(size),
 		mediaRateInteger: view.readInt(2),
 		mediaRateFraction: view.readInt(2),
 	}))

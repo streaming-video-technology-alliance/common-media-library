@@ -1,4 +1,5 @@
 import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
@@ -6,15 +7,17 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2012 - 8.16.3 Segment Index Box
  *
+ * Each 64-bit integer field of the box is a `number` or a `bigint`.
+ * The writer throws a `RangeError` for a `bigint` that does not fit the field.
+ *
  * @param box - The `SegmentIndexBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *
  * @public
  */
-export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
-	const v1 = box.version === 1
-	const size = v1 ? 8 : 4
+export function writeSidx(box: SegmentIndexBox<IsoInt64>): IsoBoxWriteView {
+	const size = box.version === 0 ? 4 : 8
 	const headerSize = 8
 	const fullBoxSize = 4
 	const referenceIdSize = 4
@@ -40,8 +43,8 @@ export function writeSidx(box: SegmentIndexBox): IsoBoxWriteView {
 
 	writer.writeUint(box.referenceId, 4)
 	writer.writeUint(box.timescale, 4)
-	writer.writeUint(box.earliestPresentationTime, size)
-	writer.writeUint(box.firstOffset, size)
+	writer.writeWideUint(box.earliestPresentationTime, size)
+	writer.writeWideUint(box.firstOffset, size)
 	writer.writeUint(box.reserved ?? 0, 2)
 	writer.writeUint(box.references.length, 2)
 

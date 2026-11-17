@@ -1,5 +1,6 @@
 import type { LabelBox } from '../boxes/LabelBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `LabelBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readLabl(view: IsoBoxReadView): LabelBox {
+export function readLabl(view: IsoBoxReadView<IsoInt64>): LabelBox {
 	const { version, flags } = view.readFullBox()
 
 	return {

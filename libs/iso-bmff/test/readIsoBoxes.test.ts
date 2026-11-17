@@ -9,15 +9,7 @@ import {
 	readUrl,
 	type IsoBoxReadView,
 } from './util/box.ts'
-
-/** `true` when `A` and `B` are the same type, otherwise `false`. */
-type Equal<A, B> =
-	(<X>() => X extends A ? 1 : 2) extends <X>() => X extends B ? 1 : 2 ? true : false
-
-/** Compile-time assertion. `expectType<Equal<A, B>>(true)` compiles only when `A` and `B` are the same type. */
-function expectType<T>(value: T): T {
-	return value
-}
+import { expectType, type Equal } from './util/expectType.ts'
 
 /** A tfdt reader that keeps the 64-bit field exact. */
 const readTfdt64 = (view: IsoBoxReadView) => {

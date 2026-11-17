@@ -1,33 +1,71 @@
 import { isArrayBufferLike } from '@svta/cml-utils'
+import type { Box } from './boxes/Box.ts'
 import type { FullBox } from './boxes/FullBox.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import { DATA, INT, STRING, TEMPLATE, UINT, UTF8, type IsoBoxFields } from './IsoBoxFields.ts'
+import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
 import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
+import type { IsoInt64 } from './IsoInt64.ts'
+import type { IsoInt64Reader } from './IsoInt64Reader.ts'
 import type { ParsedBox } from './ParsedBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
+import { getTerminatedStringLength } from './utils/getTerminatedStringLength.ts'
 import { isContainer } from './utils/isContainer.ts'
-import { readData } from './utils/readData.ts'
 import { readInt } from './utils/readInt.ts'
 import { readString } from './utils/readString.ts'
 import { readTemplate } from './utils/readTemplate.ts'
-import { readTerminatedString } from './utils/readTerminatedString.ts'
 import { readUint } from './utils/readUint.ts'
 import { readUtf8String } from './utils/readUtf8String.ts'
-import { readUtf8TerminatedString } from './utils/readUtf8TerminatedString.ts'
+
+function limitSize(size: number, remaining: number): number {
+	const limit = Math.max(remaining, 0)
+
+	return size >= 0 && size < limit ? size : limit
+}
 
 /**
  * ISO BMFF data view. Similar to DataView, but with additional methods for reading ISO BMFF data.
  * It implements the iterator protocol, so it can be used in a for...of loop.
  *
+ * The type parameter `V` is the type of every 64-bit integer field that the built-in readers return.
+ * TypeScript infers `V` from the `int64` option of the configuration.
+ *
  * @public
  */
-export class IsoBoxReadView {
+export class IsoBoxReadView<V extends IsoInt64 = number> {
 	private dataView: DataView
 	private offset: number
-	private config: IsoBoxReadViewConfig
+	private config: { readers?: IsoBoxReaderMap; int64?: IsoInt64Reader<V> }
 	private truncated: boolean = false
+
+	/**
+	 * Reads an unsigned integer field of 4 or 8 bytes.
+	 * The field is 64 bits in one version of its box.
+	 *
+	 * With no `int64` option, this method is the same function as `readUint`.
+	 * With the option, this method returns the result of the `int64` function.
+	 *
+	 * @param size - The size of the field in bytes.
+	 * @returns The value of the field.
+	 *
+	 * @example
+	 * {@includeCode ../test/readWideUint.test.ts#example}
+	 */
+	readWideUint: (size: 4 | 8) => V
+
+	/**
+	 * Reads a signed integer field of 4 or 8 bytes.
+	 * The field is 64 bits in one version of its box.
+	 *
+	 * With no `int64` option, this method is the same function as `readInt`.
+	 * With the option, this method returns the result of the `int64` function.
+	 *
+	 * @param size - The size of the field in bytes.
+	 * @returns The value of the field.
+	 */
+	readWideInt: (size: 4 | 8) => V
 
 	/**
 	 * Creates a new IsoView instance. Similar to DataView, but with additional
@@ -35,9 +73,15 @@ export class IsoBoxReadView {
 	 * so it can be used in a for...of loop.
 	 *
 	 * @param raw - The raw data to view.
-	 * @param config - The configuration for the IsoView.
+	 * @param config - The configuration for the IsoView. The configuration is required when `V` is `bigint`.
 	 */
-	constructor(raw: IsoBoxData, config?: IsoBoxReadViewConfig) {
+	constructor(
+		raw: IsoBoxData,
+		...config: [V] extends [bigint]
+			? [config: IsoBoxReadViewConfig<V>]
+			: [config?: IsoBoxReadViewConfig<V>]
+	)
+	constructor(raw: IsoBoxData, config?: IsoBoxReadView<V>['config']) {
 		this.dataView = isArrayBufferLike(raw)
 			? new DataView(raw)
 			: raw instanceof DataView
@@ -45,6 +89,16 @@ export class IsoBoxReadView {
 				: new DataView(raw.buffer, raw.byteOffset, raw.byteLength)
 		this.offset = this.dataView.byteOffset
 		this.config = config || {}
+
+		const { int64 } = this.config
+
+		if (int64) {
+			this.readWideUint = size => int64(this, size, false)
+			this.readWideInt = size => int64(this, size, true)
+		} else {
+			this.readWideUint = this.readUint as IsoBoxReadView<V>['readWideUint']
+			this.readWideInt = this.readInt as IsoBoxReadView<V>['readWideInt']
+		}
 	}
 
 	/**
@@ -95,9 +149,12 @@ export class IsoBoxReadView {
 	 * @param size - The size of the slice.
 	 * @returns A new IsoView instance.
 	 */
-	slice = (offset: number, size: number): IsoBoxReadView => {
+	slice = (offset: number, size: number): IsoBoxReadView<V> => {
 		const dataView = new DataView(this.dataView.buffer, offset, size)
-		const isoView = new IsoBoxReadView(dataView, this.config)
+		const isoView = new IsoBoxReadView(
+			dataView,
+			this.config as IsoBoxReadViewConfig<IsoInt64>,
+		) as IsoBoxReadView<V>
 		const headerSize = this.offset - offset
 		const bodySize = size - headerSize
 
@@ -128,31 +185,26 @@ export class IsoBoxReadView {
 				break
 
 			case STRING:
+			case UTF8: {
+				let length = size
+
 				if (size === -1) {
-					const text = readTerminatedString(dataView, offset)
-					result = text
-					cursor = text.length + 1
-				} else {
-					result = readString(dataView, offset, size)
+					length = getTerminatedStringLength(dataView, offset)
+					cursor = length < this.bytesRemaining ? length + 1 : length
+				} else if (type === UTF8) {
+					cursor = length = limitSize(size, this.bytesRemaining)
 				}
+
+				result = (type === UTF8 ? readUtf8String : readString)(dataView, offset, length)
 				break
+			}
 
 			case DATA: {
-				const data = readData(dataView, offset, size)
+				const data = new Uint8Array(dataView.buffer, offset, limitSize(size, this.bytesRemaining))
 				result = data
 				cursor = data.length
 				break
 			}
-
-			case UTF8:
-				if (size === -1) {
-					const text = readUtf8TerminatedString(dataView, offset)
-					result = text
-					cursor = text.length + 1
-				} else {
-					result = readUtf8String(dataView, offset)
-				}
-				break
 
 			default:
 				result = -1
@@ -203,19 +255,25 @@ export class IsoBoxReadView {
 
 	/**
 	 * Reads a string from the data view.
+	 * The method reads one character for each byte.
+	 * For UTF-8 text, use `readUtf8`.
 	 *
-	 * @param size - The size of the string in bytes.
+	 * @param size - The size of the string in bytes. With `-1`, the method reads to the first null byte or to the end of the view.
 	 * @returns The string.
+	 *
+	 * @example
+	 * {@includeCode ../test/readString.test.ts#example}
 	 */
 	readString = (size: number): string => {
 		return this.read(STRING, size)
 	}
 
 	/**
-	 * Reads a template from the data view.
+	 * Reads an unsigned fixed-point value from the data view.
+	 * Half of the bytes hold the integer part, and half hold the fraction.
 	 *
-	 * @param size - The size of the template in bytes.
-	 * @returns The template.
+	 * @param size - The size of the value in bytes.
+	 * @returns The value.
 	 */
 	readTemplate = (size: number): number => {
 		return this.read(TEMPLATE, size)
@@ -224,8 +282,11 @@ export class IsoBoxReadView {
 	/**
 	 * Reads a byte array from the data view.
 	 *
-	 * @param size - The size of the data in bytes.
-	 * @returns The data.
+	 * @param size - The size of the data in bytes. With `-1` or a size that exceeds the bytes that remain, the method reads to the end of the view. With `0`, the method reads no bytes.
+	 * @returns The data. The array shares memory with the buffer of the view.
+	 *
+	 * @example
+	 * {@includeCode ../test/readData.test.ts#example}
 	 */
 	readData = (size: number): Uint8Array => {
 		return this.read(DATA, size)
@@ -234,10 +295,13 @@ export class IsoBoxReadView {
 	/**
 	 * Reads a UTF-8 string from the data view.
 	 *
-	 * @param size - The size of the string in bytes.
+	 * @param size - The size of the string in bytes. With `-1`, the method reads to the first null byte or to the end of the view. With no size, the method reads to the end of the view. With a size that exceeds the bytes that remain, the method reads to the end of the view.
 	 * @returns The UTF-8 string.
+	 *
+	 * @example
+	 * {@includeCode ../test/readUtf8.test.ts#example}
 	 */
-	readUtf8 = (size?: number): string => {
+	readUtf8 = (size: number = Infinity): string => {
 		return this.read(UTF8, size)
 	}
 
@@ -287,33 +351,50 @@ export class IsoBoxReadView {
 	/**
 	 * Reads a raw box from the data view.
 	 *
+	 * A box header has 8 bytes, or 16 bytes when `size` is 1 and `largesize` follows (ISO/IEC 14496-12, clause 4.2).
+	 * The header of a `uuid` box has 16 more bytes for the `usertype` field.
+	 *
 	 * @returns The box.
+	 *
+	 * @throws Error with the message `Truncated box` if the view ends inside the header or the body of the box.
+	 * @throws Error with the message `Truncated box` if the size of the box is below the size of its header.
 	 */
-	readBox = (): ParsedBox => {
-		const { dataView, offset } = this
+	readBox = (): ParsedBox<Box, V> => {
+		const { dataView, offset, bytesRemaining } = this
 
 		// read box size and type without advancing the cursor in case the box is truncated
-		let cursor = 0
-		const size = readUint(dataView, offset, 4)
-		const type = readString(dataView, offset + 4, 4)
-		const box = { size, type } as ParsedBox
+		let cursor = 8
+		let actualSize = 0
+		let box: ParsedBox<Box, V> | undefined
 
-		cursor += 8
+		if (bytesRemaining >= cursor) {
+			const size = readUint(dataView, offset, 4)
+			const type = readString(dataView, offset + 4, 4)
 
-		if (box.size === 1) {
-			box.largesize = readUint(dataView, offset + cursor, 8)
-			cursor += 8
+			box = { size, type } as ParsedBox<Box, V>
+			actualSize = size
+
+			if (size === 1) {
+				cursor = actualSize = 16
+
+				if (bytesRemaining >= cursor) {
+					box.largesize = actualSize = readUint(dataView, offset + 8, 8)
+				}
+			} else if (size === 0) {
+				actualSize = bytesRemaining
+			}
 		}
 
-		const actualSize = box.size === 0 ? this.bytesRemaining : (box.largesize ?? box.size)
-		if (this.cursor + actualSize > dataView.byteLength) {
+		const headerSize = box?.type === 'uuid' ? cursor + 16 : cursor
+
+		if (!box || actualSize < headerSize || actualSize > bytesRemaining) {
 			this.truncated = true
 			throw new Error('Truncated box')
 		}
 
 		this.jump(cursor)
 
-		if (type === 'uuid') {
+		if (box.type === 'uuid') {
 			box.usertype = this.readArray('uint', 1, 16)
 		}
 
@@ -324,12 +405,18 @@ export class IsoBoxReadView {
 
 	/**
 	 * Reads a number of boxes from the data view.
+	 * The method stops before a box if the view ends inside the header or the body of that box.
+	 * The method also stops before a box with a size below the size of its header.
 	 *
-	 * @param length - The number of boxes to read.
+	 * @param length - The maximum number of boxes to read. A length of 0 reads no boxes. A negative length reads every box.
 	 * @returns The boxes.
 	 */
-	readBoxes = <T = IsoBox>(length: number = -1): T[] => {
+	readBoxes = <T = IsoBox<V>>(length: number = -1): T[] => {
 		const result: T[] = []
+
+		if (length === 0) {
+			return result
+		}
 
 		for (const box of this) {
 			result.push(box as T)
@@ -361,31 +448,27 @@ export class IsoBoxReadView {
 
 	/**
 	 * Iterates over the boxes in the data view.
+	 * The iteration stops before a box if the view ends inside the header or the body of that box.
+	 * The iteration also stops before a box with a size below the size of its header.
 	 *
 	 * @returns A generator of boxes.
 	 */
-	*[Symbol.iterator](): Generator<ParsedIsoBox> {
+	*[Symbol.iterator](): Generator<ParsedIsoBox<V>> {
 		const { readers = {} } = this.config
 
 		while (!this.done) {
 			try {
-				const box = this.readBox() as ParsedIsoBox
+				const box = this.readBox() as ParsedIsoBox<V>
 				const { type, view } = box
 				const parser = readers[type] || readers[type.trim()] // url and urn boxes have a trailing space in their type field
 
 				if (parser) {
-					Object.assign(box, parser(view, type))
+					Object.assign(box, parser(view as IsoBoxReadView, type))
 				}
 
 				// Some boxes, like meta, parse their child boxes themselves.
 				if (isContainer(box) && !box.boxes) {
-					const boxes = []
-
-					for (const child of view) {
-						boxes.push(child)
-					}
-
-					box.boxes = boxes
+					;(box as { boxes: unknown }).boxes = view.readBoxes()
 				}
 
 				yield box

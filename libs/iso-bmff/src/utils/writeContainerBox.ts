@@ -1,4 +1,5 @@
 import type { IsoBox } from '../IsoBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxContainer } from '../IsoBoxContainer.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
@@ -16,13 +17,13 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @internal
  */
-export function writeContainerBox<T extends IsoBoxContainer>(
+export function writeContainerBox<T extends IsoBoxContainer<IsoInt64>>(
 	box: T,
 	config: IsoBoxWriteViewConfig,
 ): IsoBoxWriteView {
 	const headerSize = 8
 	// TODO: Is there a way to avoid creating the intermediate Uint8Arrays?
-	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox[], config)
+	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox<IsoInt64>[], config)
 
 	const totalSize = headerSize + size
 

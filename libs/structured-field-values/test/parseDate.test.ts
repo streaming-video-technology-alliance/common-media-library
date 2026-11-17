@@ -10,3 +10,21 @@ test('parseDate', () => {
 	})
 	assert.throws(() => parseDate(``), /failed to parse "" as Date/)
 })
+
+test('parseDate reads the first and the last second of a JS Date', () => {
+	assert.deepStrictEqual(parseDate(`@8640000000000`), {
+		value: new Date(8_640_000_000_000_000),
+		src: ``,
+	})
+	assert.deepStrictEqual(parseDate(`@-8640000000000`), {
+		value: new Date(-8_640_000_000_000_000),
+		src: ``,
+	})
+})
+
+test('parseDate throws for a Date outside the range of a JS Date', () => {
+	assert.throws(() => parseDate(`@8640000000001`), /failed to parse "@8640000000001" as Date/)
+	assert.throws(() => parseDate(`@-8640000000001`), /failed to parse "@-8640000000001" as Date/)
+	assert.throws(() => parseDate(`@999999999999999`), /failed to parse "@999999999999999" as Date/)
+	assert.throws(() => parseDate(`@-999999999999999`), /failed to parse "@-999999999999999" as Date/)
+})

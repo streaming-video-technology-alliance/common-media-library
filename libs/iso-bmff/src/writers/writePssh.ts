@@ -11,6 +11,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @returns An `IsoBoxWriteView` containing the encoded box
  *
+ * @example
+ * {@includeCode ../../test/writers/writePssh.test.ts#example}
+ *
  * @public
  */
 export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView {
@@ -31,7 +34,7 @@ export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteVi
 
 	if (box.version > 0) {
 		writer.writeUint(box.kidCount, 4)
-		writer.writeArray(box.kid, UINT, 1, box.kidCount)
+		writer.writeArray(box.kid, UINT, 1, kidSize)
 	}
 
 	writer.writeUint(box.dataSize, 4)

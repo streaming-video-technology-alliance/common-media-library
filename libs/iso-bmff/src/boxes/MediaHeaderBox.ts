@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -5,20 +6,20 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type MediaHeaderBox = FullBox & {
+export type MediaHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'mdhd'
 
 	/** A 32-bit integer that specifies the creation time of the media in this track. */
-	creationTime: number
+	creationTime: V
 
 	/** A 32-bit integer that specifies the most recent time the media in this track was modified. */
-	modificationTime: number
+	modificationTime: V
 
 	/** A time value that indicates the time-scale for this media; this is the number of time units that pass in one second. */
 	timescale: number
 
 	/** A time value that indicates the duration of this media. */
-	duration: number
+	duration: V
 
 	/** A 16-bit integer that specifies the language code for this media. */
 	language: string

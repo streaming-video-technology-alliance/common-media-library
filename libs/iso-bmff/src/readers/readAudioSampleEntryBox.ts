@@ -1,6 +1,7 @@
 import type { AudioSampleEntryBox, AudioSampleEntryBoxChild } from '../boxes/AudioSampleEntryBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
@@ -15,7 +16,7 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  */
 export function readAudioSampleEntryBox<T extends IsoBoxType>(
 	type: T,
-	view: IsoBoxReadView,
+	view: IsoBoxReadView<IsoInt64>,
 ): AudioSampleEntryBox<T> {
 	const { readArray, readUint, readTemplate, readBoxes } = view
 

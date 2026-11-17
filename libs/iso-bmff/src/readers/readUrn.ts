@@ -1,5 +1,6 @@
 import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `DataEntryUrnBox` from an `IsoBoxReadView`.
@@ -10,11 +11,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readUrn(view: IsoBoxReadView): DataEntryUrnBox {
+export function readUrn(view: IsoBoxReadView<IsoInt64>): DataEntryUrnBox {
 	return {
 		type: 'urn ',
 		...view.readFullBox(),
-		name: view.readString(-1),
-		location: view.readString(-1),
+		name: view.readUtf8(-1),
+		location: view.readUtf8(-1),
 	}
 }

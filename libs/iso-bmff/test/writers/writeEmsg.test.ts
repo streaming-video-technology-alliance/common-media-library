@@ -1,6 +1,151 @@
-import { assert, describe, it, readEmsg, readIsoBoxes, writeEmsg } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	isIsoBoxType,
+	it,
+	readEmsg,
+	readIsoBoxes,
+	writeEmsg,
+} from '../util/box.ts'
+
+const SCHEME = [0x75, 0x72, 0x6e, 0x3a, 0xc3, 0xa9] // 'urn:é'
+const VALUE = [0xe6, 0x97, 0xa5, 0xe6, 0x9c, 0xac] // '日本'
 
 describe('writeEmsg', function () {
+	it('should write UTF-8 strings in a version 0 box', function () {
+		const writer = writeEmsg({
+			type: 'emsg',
+			version: 0,
+			flags: 0,
+			schemeIdUri: 'urn:é',
+			value: '日本',
+			timescale: 1000,
+			presentationTimeDelta: 5,
+			eventDuration: 10,
+			id: 7,
+			messageData: new Uint8Array([0xff]),
+		})
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([
+				0x00,
+				0x00,
+				0x00,
+				0x2b, // size
+				0x65,
+				0x6d,
+				0x73,
+				0x67, // type
+				0x00,
+				0x00,
+				0x00,
+				0x00, // version + flags
+				...SCHEME,
+				0x00, // schemeIdUri + terminator
+				...VALUE,
+				0x00, // value + terminator
+				0x00,
+				0x00,
+				0x03,
+				0xe8, // timescale
+				0x00,
+				0x00,
+				0x00,
+				0x05, // presentationTimeDelta
+				0x00,
+				0x00,
+				0x00,
+				0x0a, // eventDuration
+				0x00,
+				0x00,
+				0x00,
+				0x07, // id
+				0xff, // messageData
+			]),
+		)
+	})
+
+	it('should write UTF-8 strings in a version 1 box', function () {
+		const writer = writeEmsg({
+			type: 'emsg',
+			version: 1,
+			flags: 0,
+			timescale: 1000,
+			presentationTime: 5,
+			eventDuration: 10,
+			id: 7,
+			schemeIdUri: 'urn:é',
+			value: '日本',
+			messageData: new Uint8Array([0xff]),
+		})
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([
+				0x00,
+				0x00,
+				0x00,
+				0x2f, // size
+				0x65,
+				0x6d,
+				0x73,
+				0x67, // type
+				0x01,
+				0x00,
+				0x00,
+				0x00, // version + flags
+				0x00,
+				0x00,
+				0x03,
+				0xe8, // timescale
+				0x00,
+				0x00,
+				0x00,
+				0x00, // presentationTime (hi)
+				0x00,
+				0x00,
+				0x00,
+				0x05, // presentationTime (lo)
+				0x00,
+				0x00,
+				0x00,
+				0x0a, // eventDuration
+				0x00,
+				0x00,
+				0x00,
+				0x07, // id
+				...SCHEME,
+				0x00, // schemeIdUri + terminator
+				...VALUE,
+				0x00, // value + terminator
+				0xff, // messageData
+			]),
+		)
+	})
+
+	it('should read back a version 0 box whose value has the character U+0100', function () {
+		const writer = writeEmsg({
+			type: 'emsg',
+			version: 0,
+			flags: 0,
+			schemeIdUri: 'urn:a',
+			value: 'AĀB',
+			timescale: 1000,
+			presentationTimeDelta: 5,
+			eventDuration: 10,
+			id: 7,
+			messageData: new Uint8Array([0xff]),
+		})
+
+		const [box] = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
+
+		assert.strictEqual(box.type, 'emsg')
+		assert.strictEqual(box.value, 'AĀB')
+		assert.strictEqual(box.timescale, 1000)
+		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array([0xff]))
+	})
+
 	it('should write a version 1 EventMessageBox that can be read back correctly', function () {
 		const box = {
 			type: 'emsg' as const,
@@ -169,4 +314,58 @@ describe('writeEmsg', function () {
 		assert.strictEqual(boxes[0].id, 7)
 		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
+
+	it('should write only the full box fields and messageData for a version 2 box', function () {
+		const box = {
+			type: 'emsg' as const,
+			version: 2 as const,
+			flags: 1,
+			timescale: 1,
+			presentationTimeDelta: 4,
+			presentationTime: 5,
+			eventDuration: 2,
+			id: 3,
+			schemeIdUri: 'a',
+			value: 'b',
+			messageData: new Uint8Array([1]),
+		}
+
+		const writer = writeEmsg(box)
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			new Uint8Array([0, 0, 0, 13, 0x65, 0x6d, 0x73, 0x67, 2, 0, 0, 1, 1]),
+		)
+	})
+
+	for (const [version, fields] of [
+		[0, [0x61, 0, 0x62, 0, 0, 0, 0, 1, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 3, 1]],
+		[1, [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 3, 0x61, 0, 0x62, 0, 1]],
+		[2, [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 3, 0x61, 0, 0x62, 0, 1]],
+	] as const) {
+		it(`should write the source bytes after a read of a version ${version} box`, function () {
+			const source = new Uint8Array([
+				0,
+				0,
+				0,
+				12 + fields.length,
+				0x65,
+				0x6d,
+				0x73,
+				0x67,
+				version,
+				0,
+				0,
+				0,
+				...fields,
+			])
+
+			const [box] = readIsoBoxes(source, { readers: { emsg: readEmsg } })
+			assert.ok(isIsoBoxType('emsg', box))
+			const writer = writeEmsg(box)
+
+			assert.strictEqual(box.version, version)
+			assert.deepStrictEqual(new Uint8Array(writer.buffer), source)
+		})
+	}
 })

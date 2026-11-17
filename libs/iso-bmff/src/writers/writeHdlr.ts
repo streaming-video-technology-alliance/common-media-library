@@ -1,3 +1,4 @@
+import { encodeText } from '@svta/cml-utils'
 import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -14,12 +15,14 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
+	const nameBytes = encodeText(box.name)
+
 	const headerSize = 8
 	const fullBoxSize = 4
 	const preDefinedSize = 4
 	const handlerTypeSize = 4
 	const reservedSize = 12 // 3 x 4 bytes
-	const nameSize = box.name.length + 1 // null-terminated string
+	const nameSize = nameBytes.length + 1 // null-terminated string
 	const totalSize =
 		headerSize + fullBoxSize + preDefinedSize + handlerTypeSize + reservedSize + nameSize
 
@@ -29,7 +32,8 @@ export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
 	writer.writeUint(box.preDefined, 4)
 	writer.writeString(box.handlerType)
 	writer.writeArray(box.reserved, UINT, 4, 3)
-	writer.writeTerminatedString(box.name)
+	writer.writeBytes(nameBytes)
+	writer.writeUint(0, 1)
 
 	return writer
 }

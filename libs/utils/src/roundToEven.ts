@@ -2,6 +2,9 @@
  * Rounds a value with the procedure from step 2 of the "Serializing a Decimal" specification.
  * The style is known as "even rounding", "banker's rounding", or "commercial rounding".
  *
+ * @example
+ * {@includeCode ../test/roundToEven.test.ts#example}
+ *
  * @param value - The value to round
  * @param precision - The number of decimal places to round to
  * @returns The rounded value
@@ -14,14 +17,13 @@ export function roundToEven(value: number, precision: number): number {
 	}
 
 	const decimalShift = Math.pow(10, precision)
-	const isEquidistant = Math.abs(((value * decimalShift) % 1) - 0.5) < Number.EPSILON
+	const flooredValue = Math.floor(value * decimalShift)
+	const midpoint = (flooredValue + 0.5) / decimalShift
 
-	if (isEquidistant) {
+	if (value === midpoint) {
 		// If the tail of the decimal place is 'equidistant' we round to the nearest even value
-		const flooredValue = Math.floor(value * decimalShift)
 		return (flooredValue % 2 === 0 ? flooredValue : flooredValue + 1) / decimalShift
-	} else {
-		// Otherwise, proceed as normal
-		return Math.round(value * decimalShift) / decimalShift
 	}
+
+	return (value > midpoint ? flooredValue + 1 : flooredValue) / decimalShift
 }

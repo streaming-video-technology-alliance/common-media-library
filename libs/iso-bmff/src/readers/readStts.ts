@@ -1,5 +1,6 @@
 import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Parse a `DecodingTimeToSampleBox` from an `IsoBoxReadView`.
@@ -10,7 +11,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
  *
  * @public
  */
-export function readStts(view: IsoBoxReadView): DecodingTimeToSampleBox {
+export function readStts(view: IsoBoxReadView<IsoInt64>): DecodingTimeToSampleBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 	const entries = view.readEntries(entryCount, () => ({
