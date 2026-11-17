@@ -14,6 +14,13 @@ and this project adheres to
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/drm](https://cml.svta.org/packages/drm/).
 
+### Fixed
+
+- `parsePsshList` now returns for a box with a size of 0. The function reads that box to the end of the data.
+- `parsePsshList` now reads the `largesize` field of a box with a size of 1.
+- `parsePsshList` now stops before a box that ends after the data, or before a box with a size below the size of its header. The function returns the entries before that box and does not throw.
+- `parsePsshList` now skips a `pssh` box that ends before its data size field. Before, the function read the system ID from the bytes after that box.
+
 ## [1.1.12] - 2026-10-18
 
 ### Changed
