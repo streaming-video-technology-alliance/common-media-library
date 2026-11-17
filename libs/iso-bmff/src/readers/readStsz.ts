@@ -4,11 +4,11 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `SampleSizeBox` from an `IsoBoxReadView`.
+ * Read the `stsz` box (`SampleSizeBox`).
  *
  * When `sampleSize` is not 0, `entrySize` is `undefined`.
  *
- * ISO/IEC 14496-12:2012 - 8.7.3 Sample Size Box
+ * ISO/IEC 14496-12:2015 - 8.7.3
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

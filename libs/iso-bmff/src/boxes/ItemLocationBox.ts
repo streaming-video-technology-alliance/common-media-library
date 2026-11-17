@@ -2,7 +2,9 @@ import type { FullBox } from './FullBox.ts'
 import type { ItemLocation } from './ItemLocation.ts'
 
 /**
- * Item Location Box - 'iloc'
+ * Item Location Box (`iloc`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.11.3
  *
  * @public
  */

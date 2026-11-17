@@ -6,14 +6,12 @@ import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a ContainerBox to an IsoBmffWriter.
+ * Writes a container box from the child boxes in its `boxes` field.
  *
- * This function writes a container box with its child boxes. Child boxes are
- * extracted from the container box's `boxes` array and encoded using their `view` property.
+ * @param box - The container box to write
+ * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @param box - The ContainerBox to write
- *
- * @returns An IsoBmffWriter containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @internal
  */

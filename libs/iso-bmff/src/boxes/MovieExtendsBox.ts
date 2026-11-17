@@ -12,7 +12,9 @@ export type MovieExtendsBoxChild<V extends IsoInt64 = number> =
 	| TrackExtendsBox
 
 /**
- * Movie Extends Box - 'mvex' - Container
+ * Movie Extends Box (`mvex`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.1
  *
  * @public
  */

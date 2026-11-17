@@ -42,6 +42,7 @@ describe('writeHdlr', function () {
 			reserved: [0, 0, 0],
 			name: 'Video',
 		})
+		// #endregion example
 
 		// size (38), type (hdlr), version and flags, pre_defined, handler_type (vide),
 		// reserved, then the name (Video) and a null terminator
@@ -52,7 +53,6 @@ describe('writeHdlr', function () {
 				0, 0, 0, 0, 0, 0, 0, 86, 105, 100, 101, 111, 0,
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of a name that is not ASCII', function () {

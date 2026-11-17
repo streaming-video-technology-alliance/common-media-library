@@ -24,6 +24,7 @@ describe('writeStsc', function () {
 
 		const writer = writeStsc(box)
 		const buffer = new Uint8Array(writer.buffer)
+		// #endregion example
 
 		assert.strictEqual(
 			Buffer.compare(
@@ -75,6 +76,5 @@ describe('writeStsc', function () {
 			),
 			0,
 		)
-		// #endregion example
 	})
 })

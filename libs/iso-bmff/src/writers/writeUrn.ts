@@ -3,13 +3,16 @@ import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `DataEntryUrnBox` to an `IsoBoxWriteView`.
+ * Write the `urn ` box (`DataEntryUrnBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.7.2 Data Reference Box
+ * ISO/IEC 14496-12:2015 - 8.7.2
  *
  * @param box - The `DataEntryUrnBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
+ *
+ * @example
+ * {@includeCode ../../test/writers/writeUrn.test.ts#example}
  *
  * @public
  */

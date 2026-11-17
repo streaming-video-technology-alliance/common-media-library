@@ -1,7 +1,9 @@
 import type { TypeBox } from './TypeBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 4.3 File Type Box
+ * File Type Box (`ftyp`).
+ *
+ * ISO/IEC 14496-12:2015 - 4.3
  *
  * @public
  */

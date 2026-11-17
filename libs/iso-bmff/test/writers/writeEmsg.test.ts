@@ -170,7 +170,7 @@ describe('writeEmsg', function () {
 		assert.strictEqual(boxes[0].value, '1')
 		assert.strictEqual(boxes[0].timescale, 90000)
 		assert.strictEqual(boxes[0].presentationTime, 900000)
-		assert.deepEqual(new Uint8Array(boxes[0].messageData), box.messageData)
+		assert.deepStrictEqual(new Uint8Array(boxes[0].messageData), box.messageData)
 	})
 
 	it('should encode an empty value as a lone null terminator', function () {
@@ -257,7 +257,7 @@ describe('writeEmsg', function () {
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].type, 'emsg')
 		assert.strictEqual(boxes[0].value, '')
-		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
+		assert.deepStrictEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
 
 	it('should preserve a non-empty value through a version 1 round trip when schemeIdUri is empty', function () {
@@ -282,7 +282,7 @@ describe('writeEmsg', function () {
 		assert.strictEqual(boxes[0].type, 'emsg')
 		assert.strictEqual(boxes[0].schemeIdUri, '')
 		assert.strictEqual(boxes[0].value, '1')
-		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
+		assert.deepStrictEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
 
 	it('should preserve the fixed fields through a version 0 round trip when the strings are empty', function () {
@@ -312,7 +312,7 @@ describe('writeEmsg', function () {
 		assert.strictEqual(boxes[0].presentationTimeDelta, 96000)
 		assert.strictEqual(boxes[0].eventDuration, 5)
 		assert.strictEqual(boxes[0].id, 7)
-		assert.deepEqual(new Uint8Array(boxes[0].messageData), messageData)
+		assert.deepStrictEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
 
 	it('should write only the full box fields and messageData for a version 2 box', function () {

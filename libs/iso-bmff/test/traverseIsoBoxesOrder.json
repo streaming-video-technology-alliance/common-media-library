@@ -1,0 +1,112 @@
+{
+	"captions.mp4": {
+		"depthFirst": {
+			"0": "ftyp,moov,mdat,free",
+			"1": "ftyp,moov,mvhd,trak,mdat,free",
+			"2": "ftyp,moov,mvhd,trak,tkhd,mdia,mdat,free",
+			"3": "ftyp,moov,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf,mdat,free",
+			"1.5": "ftyp,moov,mvhd,trak,mdat,free",
+			"Infinity": "ftyp,moov,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf,sthd,dinf,dref,stbl,stsd,stts,stsc,stsz,stco,mdat,free",
+			"-1": "",
+			"NaN": ""
+		},
+		"breadthFirst": {
+			"0": "ftyp,moov,mdat,free",
+			"1": "ftyp,moov,mdat,free,mvhd,trak",
+			"2": "ftyp,moov,mdat,free,mvhd,trak,tkhd,mdia",
+			"3": "ftyp,moov,mdat,free,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf",
+			"1.5": "ftyp,moov,mdat,free,mvhd,trak,tkhd,mdia",
+			"Infinity": "ftyp,moov,mdat,free,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf,sthd,dinf,stbl,dref,stsd,stts,stsc,stsz,stco",
+			"-1": "",
+			"NaN": ""
+		}
+	},
+	"editlist.mp4": {
+		"depthFirst": {
+			"0": "ftyp,free,moov,mdat",
+			"1": "ftyp,free,moov,mvhd,trak,udta,mdat",
+			"2": "ftyp,free,moov,mvhd,trak,tkhd,edts,mdia,udta,mdat",
+			"3": "ftyp,free,moov,mvhd,trak,tkhd,edts,elst,mdia,mdhd,hdlr,minf,udta,mdat",
+			"1.5": "ftyp,free,moov,mvhd,trak,udta,mdat",
+			"Infinity": "ftyp,free,moov,mvhd,trak,tkhd,edts,elst,mdia,mdhd,hdlr,minf,smhd,dinf,dref,stbl,stsd,stts,stsc,stsz,stco,udta,mdat",
+			"-1": "",
+			"NaN": ""
+		},
+		"breadthFirst": {
+			"0": "ftyp,free,moov,mdat",
+			"1": "ftyp,free,moov,mdat,mvhd,trak,udta",
+			"2": "ftyp,free,moov,mdat,mvhd,trak,udta,tkhd,edts,mdia",
+			"3": "ftyp,free,moov,mdat,mvhd,trak,udta,tkhd,edts,mdia,elst,mdhd,hdlr,minf",
+			"1.5": "ftyp,free,moov,mdat,mvhd,trak,udta,tkhd,edts,mdia",
+			"Infinity": "ftyp,free,moov,mdat,mvhd,trak,udta,tkhd,edts,mdia,elst,mdhd,hdlr,minf,smhd,dinf,stbl,dref,stsd,stts,stsc,stsz,stco",
+			"-1": "",
+			"NaN": ""
+		}
+	},
+	"hvc1_init.mp4": {
+		"depthFirst": {
+			"0": "ftyp,moov",
+			"1": "ftyp,moov,mvhd,iods,trak,mvex",
+			"2": "ftyp,moov,mvhd,iods,trak,tkhd,mdia,mvex,trex",
+			"3": "ftyp,moov,mvhd,iods,trak,tkhd,mdia,mdhd,hdlr,minf,mvex,trex",
+			"1.5": "ftyp,moov,mvhd,iods,trak,mvex",
+			"Infinity": "ftyp,moov,mvhd,iods,trak,tkhd,mdia,mdhd,hdlr,minf,vmhd,dinf,dref,stbl,stsd,stts,stsc,stsz,stco,mvex,trex",
+			"-1": "",
+			"NaN": ""
+		},
+		"breadthFirst": {
+			"0": "ftyp,moov",
+			"1": "ftyp,moov,mvhd,iods,trak,mvex",
+			"2": "ftyp,moov,mvhd,iods,trak,mvex,tkhd,mdia,trex",
+			"3": "ftyp,moov,mvhd,iods,trak,mvex,tkhd,mdia,trex,mdhd,hdlr,minf",
+			"1.5": "ftyp,moov,mvhd,iods,trak,mvex,tkhd,mdia,trex",
+			"Infinity": "ftyp,moov,mvhd,iods,trak,mvex,tkhd,mdia,trex,mdhd,hdlr,minf,vmhd,dinf,stbl,dref,stsd,stts,stsc,stsz,stco",
+			"-1": "",
+			"NaN": ""
+		}
+	},
+	"SRMP_AC4.mp4": {
+		"depthFirst": {
+			"0": "ftyp,moov,meta",
+			"1": "ftyp,moov,mvhd,trak,mvex,meta",
+			"2": "ftyp,moov,mvhd,trak,tkhd,mdia,mvex,mehd,trex,meta",
+			"3": "ftyp,moov,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf,mvex,mehd,trex,meta",
+			"1.5": "ftyp,moov,mvhd,trak,mvex,meta",
+			"Infinity": "ftyp,moov,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf,smhd,dinf,dref,stbl,stsd,stts,stsc,stsz,stco,mvex,mehd,trex,meta",
+			"-1": "",
+			"NaN": ""
+		},
+		"breadthFirst": {
+			"0": "ftyp,moov,meta",
+			"1": "ftyp,moov,meta,mvhd,trak,mvex",
+			"2": "ftyp,moov,meta,mvhd,trak,mvex,tkhd,mdia,mehd,trex",
+			"3": "ftyp,moov,meta,mvhd,trak,mvex,tkhd,mdia,mehd,trex,mdhd,hdlr,minf",
+			"1.5": "ftyp,moov,meta,mvhd,trak,mvex,tkhd,mdia,mehd,trex",
+			"Infinity": "ftyp,moov,meta,mvhd,trak,mvex,tkhd,mdia,mehd,trex,mdhd,hdlr,minf,smhd,dinf,stbl,dref,stsd,stts,stsc,stsz,stco",
+			"-1": "",
+			"NaN": ""
+		}
+	},
+	"test_frag.mp4": {
+		"depthFirst": {
+			"0": "ftyp,moov,moof,mdat,moof,mdat,moof,mdat,mfra",
+			"1": "ftyp,moov,mvhd,trak,trak,mvex,moof,mfhd,traf,mdat,moof,mfhd,traf,mdat,moof,mfhd,traf,mdat,mfra,tfra,tfra,mfro",
+			"2": "ftyp,moov,mvhd,trak,tkhd,mdia,trak,tkhd,mdia,mvex,mehd,trex,trex,moof,mfhd,traf,tfhd,tfdt,trun,mdat,moof,mfhd,traf,tfhd,tfdt,trun,mdat,moof,mfhd,traf,tfhd,tfdt,trun,mdat,mfra,tfra,tfra,mfro",
+			"3": "ftyp,moov,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf,trak,tkhd,mdia,mdhd,hdlr,minf,mvex,mehd,trex,trex,moof,mfhd,traf,tfhd,tfdt,trun,mdat,moof,mfhd,traf,tfhd,tfdt,trun,mdat,moof,mfhd,traf,tfhd,tfdt,trun,mdat,mfra,tfra,tfra,mfro",
+			"1.5": "ftyp,moov,mvhd,trak,trak,mvex,moof,mfhd,traf,mdat,moof,mfhd,traf,mdat,moof,mfhd,traf,mdat,mfra,tfra,tfra,mfro",
+			"Infinity": "ftyp,moov,mvhd,trak,tkhd,mdia,mdhd,hdlr,minf,vmhd,dinf,dref,stbl,stsd,stsz,stsc,stts,stco,trak,tkhd,mdia,mdhd,hdlr,minf,smhd,dinf,dref,stbl,stsd,stsz,stsc,stts,stco,mvex,mehd,trex,trex,moof,mfhd,traf,tfhd,tfdt,trun,mdat,moof,mfhd,traf,tfhd,tfdt,trun,mdat,moof,mfhd,traf,tfhd,tfdt,trun,mdat,mfra,tfra,tfra,mfro",
+			"-1": "",
+			"NaN": ""
+		},
+		"breadthFirst": {
+			"0": "ftyp,moov,moof,mdat,moof,mdat,moof,mdat,mfra",
+			"1": "ftyp,moov,moof,mdat,moof,mdat,moof,mdat,mfra,mvhd,trak,trak,mvex,mfhd,traf,mfhd,traf,mfhd,traf,tfra,tfra,mfro",
+			"2": "ftyp,moov,moof,mdat,moof,mdat,moof,mdat,mfra,mvhd,trak,trak,mvex,mfhd,traf,mfhd,traf,mfhd,traf,tfra,tfra,mfro,tkhd,mdia,tkhd,mdia,mehd,trex,trex,tfhd,tfdt,trun,tfhd,tfdt,trun,tfhd,tfdt,trun",
+			"3": "ftyp,moov,moof,mdat,moof,mdat,moof,mdat,mfra,mvhd,trak,trak,mvex,mfhd,traf,mfhd,traf,mfhd,traf,tfra,tfra,mfro,tkhd,mdia,tkhd,mdia,mehd,trex,trex,tfhd,tfdt,trun,tfhd,tfdt,trun,tfhd,tfdt,trun,mdhd,hdlr,minf,mdhd,hdlr,minf",
+			"1.5": "ftyp,moov,moof,mdat,moof,mdat,moof,mdat,mfra,mvhd,trak,trak,mvex,mfhd,traf,mfhd,traf,mfhd,traf,tfra,tfra,mfro,tkhd,mdia,tkhd,mdia,mehd,trex,trex,tfhd,tfdt,trun,tfhd,tfdt,trun,tfhd,tfdt,trun",
+			"Infinity": "ftyp,moov,moof,mdat,moof,mdat,moof,mdat,mfra,mvhd,trak,trak,mvex,mfhd,traf,mfhd,traf,mfhd,traf,tfra,tfra,mfro,tkhd,mdia,tkhd,mdia,mehd,trex,trex,tfhd,tfdt,trun,tfhd,tfdt,trun,tfhd,tfdt,trun,mdhd,hdlr,minf,mdhd,hdlr,minf,vmhd,dinf,stbl,smhd,dinf,stbl,dref,stsd,stsz,stsc,stts,stco,dref,stsd,stsz,stsc,stts,stco",
+			"-1": "",
+			"NaN": ""
+		}
+	}
+}

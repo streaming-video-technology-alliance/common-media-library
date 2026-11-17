@@ -8,9 +8,10 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * The built-in readers then return every 64-bit integer field as a `bigint`, with the exact value.
  * A field that is 32 bits in version 0 of its box is a `bigint` too.
  *
- * This function needs `BigInt` and does not test for it.
- * On a runtime without `BigInt`, the first read of a field fails with the error of the runtime.
- * If your code supports such a runtime, test `typeof BigInt === 'function'` before you pass this function.
+ * This function needs `BigInt` and the `getBigUint64` method of `DataView`, and does not test for them.
+ * On a runtime without them, a read fails with the error of the runtime.
+ * If your code supports such a runtime, test `typeof DataView.prototype.getBigUint64 === 'function'` before you pass this function.
+ * The test is `false` on a runtime without `BigInt` too.
  *
  * @param view - The view to read the field from.
  * @param size - The size of the field in bytes.

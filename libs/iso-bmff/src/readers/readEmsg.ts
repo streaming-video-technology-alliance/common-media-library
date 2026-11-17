@@ -6,12 +6,12 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `EventMessageBox` from an `IsoBoxReadView`.
+ * Read the `emsg` box (`EventMessageBox`).
  *
  * The 64-bit integer fields of the result have the type that the `int64` option of the view returns.
  * With no option, they are numbers.
  *
- * ISO/IEC 23009-1 - 5.10.3.3 Event Message Box
+ * ISO/IEC 23009-1:2022 - 5.10.3.3
  *
  * For a version other than 0 or 1, `messageData` holds all bytes after the full box fields.
  * The strings of the result are empty and the numbers are 0.

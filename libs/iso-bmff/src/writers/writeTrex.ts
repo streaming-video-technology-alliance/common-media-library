@@ -2,13 +2,13 @@ import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `TrackExtendsBox` to an `IsoBoxWriteView`.
+ * Write the `trex` box (`TrackExtendsBox`).
  *
- * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
+ * ISO/IEC 14496-12:2015 - 8.8.3
  *
  * @param box - The `TrackExtendsBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

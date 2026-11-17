@@ -38,6 +38,7 @@ describe('writeStsd', function () {
 			},
 		})
 		const buffer = new Uint8Array(writer.buffer)
+		// #endregion example
 
 		assert.strictEqual(
 			Buffer.compare(
@@ -151,6 +152,5 @@ describe('writeStsd', function () {
 			),
 			0,
 		)
-		// #endregion example
 	})
 })

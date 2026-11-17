@@ -3,7 +3,7 @@ import type { IsoBoxType } from './IsoBoxType.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
- * ISO BMFF box reader
+ * A function that reads the fields of one box from an `IsoBoxReadView` and returns the box.
  *
  * The type parameter `V` is the type of the 64-bit integer fields of the view that the reader accepts.
  *

@@ -4,7 +4,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `SyncSampleBox` from an `IsoBoxReadView`.
+ * Read the `stss` box (`SyncSampleBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

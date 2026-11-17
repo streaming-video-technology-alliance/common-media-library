@@ -21,7 +21,9 @@ export type MediaInformationBoxChild =
 	| SubtitleMediaHeaderBox
 
 /**
- * Media Information Box - 'minf' - Container
+ * Media Information Box (`minf`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.4.4
  *
  * @public
  */

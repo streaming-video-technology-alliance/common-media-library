@@ -2,7 +2,9 @@ import type { FullBox } from './FullBox.ts'
 import type { Subsegment } from './Subsegment.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.16.4 Subsegment Index Box
+ * Subsegment Index Box (`ssix`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.16.4
  *
  * @public
  */

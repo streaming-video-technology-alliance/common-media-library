@@ -4,11 +4,14 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `HandlerReferenceBox` from an `IsoBoxReadView`.
+ * Read the `hdlr` box (`HandlerReferenceBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
  * @returns A parsed `HandlerReferenceBox`
+ *
+ * @example
+ * {@includeCode ../../test/readers/readHdlr.test.ts#example}
  *
  * @public
  */

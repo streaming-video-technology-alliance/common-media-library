@@ -21,6 +21,7 @@ describe('writePayl', function () {
 		}
 
 		const writer = writePayl(box)
+		// #endregion example
 
 		// size (19), type (payl), cueText
 		assert.deepStrictEqual(
@@ -29,7 +30,6 @@ describe('writePayl', function () {
 				0, 0, 0, 19, 112, 97, 121, 108, 72, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100,
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of a cueText that is not ASCII', function () {

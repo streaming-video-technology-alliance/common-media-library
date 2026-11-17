@@ -32,6 +32,7 @@ describe('writeUrn', function () {
 			name: 'urn:a',
 			location: 'a.mp4',
 		})
+		// #endregion example
 
 		// size (24), type (urn ), version and flags, then the name (urn:a) and
 		// the location (a.mp4), each with a null terminator
@@ -42,7 +43,6 @@ describe('writeUrn', function () {
 				0,
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of a name that is not ASCII before an ASCII location', function () {

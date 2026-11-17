@@ -21,13 +21,13 @@ describe('writeIden', function () {
 		}
 
 		const writer = writeIden(box)
+		// #endregion example
 
 		// size (13), type (iden), cueId
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
 			new Uint8Array([0, 0, 0, 13, 105, 100, 101, 110, 99, 117, 101, 45, 49]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of a cueId that is not ASCII', function () {

@@ -15,7 +15,9 @@ export type ProtectionSchemeInformationBoxChild =
 	| SchemeInformationBox
 
 /**
- * Protection Scheme Information Box - 'sinf' - Container
+ * Protection Scheme Information Box (`sinf`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.12.1
  *
  * @public
  */

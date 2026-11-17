@@ -2,7 +2,7 @@ import type { IsoBoxContainerMap } from './IsoBoxContainerMap.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
- * Iso Box Container Type
+ * The union of the container boxes in `IsoBoxContainerMap`.
  *
  * @public
  */

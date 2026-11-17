@@ -3,13 +3,13 @@ import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write a `ProtectionSystemSpecificHeaderBox` to an `IsoBoxWriteView`.
+ * Write the `pssh` box (`ProtectionSystemSpecificHeaderBox`).
  *
- * ISO/IEC 23001-7 - 8.1 Protection System Specific Header Box
+ * ISO/IEC 23001-7:2016 - 8.1
  *
  * @param box - The `ProtectionSystemSpecificHeaderBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writePssh.test.ts#example}

@@ -4,7 +4,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
 
 /**
- * Parse a `VisualSampleEntryBox` from an `IsoBoxReadView`.
+ * Read the `hvc1` box (`VisualSampleEntryBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

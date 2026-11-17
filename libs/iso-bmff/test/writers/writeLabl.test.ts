@@ -14,6 +14,7 @@ describe('writeLabl', function () {
 		}
 
 		const writer = writeLabl(box)
+		// #endregion example
 
 		// size (25), type (labl), version and flags, labelId, then each string and a null terminator
 		assert.deepStrictEqual(
@@ -23,7 +24,6 @@ describe('writeLabl', function () {
 				104, 0,
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the UTF-8 bytes of strings that are not ASCII', function () {

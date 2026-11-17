@@ -19,6 +19,7 @@ describe('writeUrl', function () {
 	it('should write no location string when flag 0x000001 is set', function () {
 		// #region example
 		const writer = writeUrl({ type: 'url ', version: 0, flags: 1, location: '' })
+		// #endregion example
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -37,7 +38,6 @@ describe('writeUrl', function () {
 				1, // flags
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the location string when flag 0x000001 is not set', function () {

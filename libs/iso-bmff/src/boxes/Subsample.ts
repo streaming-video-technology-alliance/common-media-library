@@ -1,5 +1,5 @@
 /**
- * Sub sample
+ * Sub-sample
  *
  * @public
  */

@@ -8,11 +8,20 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.13] - 2026-11-17
+
 ### Changed
 
 - `concatInitDataIdAndCertificate` and `decodeFairPlayLicense` now return `Uint8Array<ArrayBuffer>`. The result passes to Web APIs such as `MediaKeySession.update` without a cast under TypeScript 6 and later. The type declarations now need TypeScript 5.7 or later.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/drm](https://cml.svta.org/packages/drm/).
+
+### Fixed
+
+- `parsePsshList` now returns for a box with a size of 0. The function reads that box to the end of the data.
+- `parsePsshList` now reads the `largesize` field of a box with a size of 1.
+- `parsePsshList` now stops before a box that ends after the data, or before a box with a size below the size of its header. The function returns the entries before that box and does not throw.
+- `parsePsshList` now skips a `pssh` box that ends before its data size field. Before, the function read the system ID from the bytes after that box.
 
 ## [1.1.12] - 2026-10-18
 
@@ -128,7 +137,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.12...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.13...HEAD
+[1.1.13]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.12...drm-v1.1.13
 [1.1.12]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.11...drm-v1.1.12
 [1.1.11]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.10...drm-v1.1.11
 [1.1.10]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/drm-v1.1.9...drm-v1.1.10

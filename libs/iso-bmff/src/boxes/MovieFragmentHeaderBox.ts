@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.8.5 Movie Fragment Header Box
+ * Movie Fragment Header Box (`mfhd`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.5
  *
  * @public
  */

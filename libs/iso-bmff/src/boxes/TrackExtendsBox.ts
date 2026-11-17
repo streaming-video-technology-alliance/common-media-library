@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:2012 - 8.8.3 Track Extends Box
+ * Track Extends Box (`trex`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.3
  *
  * @public
  */
