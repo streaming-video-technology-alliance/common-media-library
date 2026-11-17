@@ -1,6 +1,20 @@
 # Audit of `@svta/cml-iso-bmff` before version 2.0.0
 
-This file lists findings only. No fix is applied. The maintainer decides each group.
+This file lists the findings. The maintainer decides each group. The "Result" column of each table states what happened to a row. `results.json` holds that column.
+
+## Status on 2026-11-17
+
+Briefs 1 and 2 of `briefs.md` are complete. Their PRs merged into `main`: 702, 703, 704, 705, 706, 708, 713, and 714. Brief 3 and brief 4 have not started.
+
+| Result for the 73 rows that break nothing | Rows |
+| --- | --- |
+| Done | 45 |
+| Partly done. The rest waits for the cursor RFC, the second RFC, or the 2.0.0 release prep | 15 |
+| Not done. The cursor work, brief 4, or issue 652 covers the row | 8 |
+| Filed as an issue (710, 711) | 2 |
+| Skipped, with the reason in the row | 3 |
+
+The section "Carried to briefs 3 and 4" of `briefs.md` lists each part that waits.
 
 ## Method
 
@@ -63,17 +77,17 @@ The RFC rows with the highest value:
 - **G497, G498.** The Summary states that the trial build is faster in every scenario, and one table row is slower. The reader count and the writer count are wrong.
 - **G499, G502.** The RFC makes text of the two accepted RFCs wrong and has no migration guide.
 
-One row of the last group is urgent. **G466**: `parsePsshList` in `@svta/cml-drm` does not return for a box with a size of 0. The author of this file reproduced the defect. The input comes from the media. Issue 683 records the defect and the proposed fix.
+One row of the last group is urgent. **G466**: `parsePsshList` in `@svta/cml-drm` does not return for a box with a size of 0. The author of this file reproduced the defect. The input comes from the media. Issue 683 records the defect and the proposed fix. PR 685 fixed the defect, and drm 1.1.13 is published.
 
 ## Proposed order
 
-| Step | Work | Rows | Needs |
-| --- | --- | --- | --- |
-| 1 | Fix G466 in drm (issue 683) | 1 | No decision. A patch release of drm |
-| 2 | Amend the cursor RFC | 30 | No code. One revision of the draft |
-| 3 | Fix the rows that break nothing | 73 | No decision. 37 rows are documentation |
-| 4 | Decide the twelve themes | 92 | RFC text, because each theme changes the public API |
-| 5 | Implement the themes on the 2.0.0 branch | 92 | Step 4. One PR for each theme |
-| 6 | Record the other rows as issues | 18 | The maintainer selects the rows |
+| Step | Work | Rows | Needs | Status |
+| --- | --- | --- | --- | --- |
+| 1 | Fix G466 in drm (issue 683) | 1 | No decision. A patch release of drm | Done. PR 685, drm 1.1.13 |
+| 2 | Amend the cursor RFC | 30 | No code. One revision of the draft | Not started (brief 3) |
+| 3 | Fix the rows that break nothing | 73 | No decision. 37 rows are documentation | Done (briefs 1 and 2). See "Status on 2026-11-17" |
+| 4 | Decide the twelve themes | 92 | RFC text, because each theme changes the public API | Not started (brief 4) |
+| 5 | Implement the themes on the 2.0.0 branch | 92 | Step 4. One PR for each theme | Waits for step 4 |
+| 6 | Record the other rows as issues | 18 | The maintainer selects the rows | Done. Issues 683 and 686 to 701 |
 
 The size of each step in hours is not estimated.

@@ -1,6 +1,6 @@
 # Issues filed from the audit
 
-Each row maps findings of `findings.md` to a GitHub issue. The rows cover the group "New functions and new box types" and the group "Other packages and repository files".
+Each row maps findings of `findings.md` to a GitHub issue. Most rows cover the group "New functions and new box types" and the group "Other packages and repository files". Briefs 1 and 2 filed the last three rows.
 
 | Findings | Issue | Subject |
 | --- | --- | --- |
@@ -21,3 +21,6 @@ Each row maps findings of `findings.md` to a GitHub issue. The rows cover the gr
 | G477 | 699 | Delete or rewrite `dev/isobmff.html` |
 | G475 | 700 | The skill describes `main` and not the npm version |
 | G467 | 701 | c2pa: the `mdat` check and the hash read different boxes |
+| F121 | 710 | iso-bmff: `readTrun` allocates one object for each sample with no limit on `sample_count` |
+| F317 | 711 | Measure `sideEffects: false` with webpack for the published packages |
+| F387 (part B) | 712 | `package.json`: `authors` is not an npm field, and `publishConfig.scope` has no effect |

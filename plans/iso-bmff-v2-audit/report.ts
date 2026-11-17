@@ -1,4 +1,4 @@
-// Builds findings.md and the details-*.md files from audit.json and findings-head.md.
+// Builds findings.md and the details-*.md files from audit.json, results.json, and findings-head.md.
 // Usage, from the repository root: node plans/iso-bmff-v2-audit/report.ts
 import { readFileSync, writeFileSync } from 'node:fs'
 
@@ -22,6 +22,7 @@ type Audit = { confirmed: Finding[]; rejected: Finding[] }
 
 const dir = import.meta.dirname
 const audit = JSON.parse(readFileSync(`${dir}/audit.json`, 'utf8')) as Audit
+const results = JSON.parse(readFileSync(`${dir}/results.json`, 'utf8')) as Record<string, string>
 
 const RFC =
 	'G462 F240 G480 G482 F273 G469 G483 G493 G495 G500 G485 G491 G494 G463 G470 G509 G492 G487 G489 G496 G497 G499 G502 G486 G490 G481 G476 G498 G501 G484 G471 F433'.split(
@@ -106,7 +107,7 @@ for (const [key, title, intro] of GROUPS) {
 				a.id.localeCompare(b.id),
 		)
 
-	tables += `\n## ${title}\n\n${intro} Details: \`details-${key}.md\`.\n\n| ID | Severity | Category | When | Finding |\n| --- | --- | --- | --- | --- |\n`
+	tables += `\n## ${title}\n\n${intro} Details: \`details-${key}.md\`.\n\n| ID | Severity | Category | When | Finding | Result |\n| --- | --- | --- | --- | --- | --- |\n`
 	let detail = `# ${title}: details\n\nThe audit agents wrote this text. The index is in \`findings.md\`.\n`
 
 	for (const finding of rows) {
@@ -116,7 +117,9 @@ for (const [key, title, intro] of GROUPS) {
 		const prior = (finding.value?.priorDecision || finding.fact?.priorDecision || '').trim()
 		const files = (finding.files ?? []).map(file => `\`${file}\``).join(', ')
 
-		tables += `| ${finding.id}${also ? ` (${also})` : ''} | ${finding.severity} | ${finding.category} | ${WHEN[worth] ?? worth} | ${oneLine(finding.title).replace(/\|/g, '\\|')} |\n`
+		const result = results[finding.id] ?? ''
+
+		tables += `| ${finding.id}${also ? ` (${also})` : ''} | ${finding.severity} | ${finding.category} | ${WHEN[worth] ?? worth} | ${oneLine(finding.title).replace(/\|/g, '\\|')} | ${result} |\n`
 
 		detail += `\n## ${finding.id}: ${oneLine(finding.title)}\n\n`
 		detail += `Severity ${finding.severity}. Category ${finding.category}. Breaking: ${finding.breaking ? 'yes' : 'no'}. Fact check: ${finding.fact?.verdict}. Value check: ${finding.value?.verdict}.${also ? ` Merged duplicates: ${also}.` : ''}\n\n`
@@ -128,6 +131,7 @@ for (const [key, title, intro] of GROUPS) {
 		detail += `**Proposal of the finder.** ${finding.proposal.trim()}\n\n`
 		if (correction) detail += `**Proposal after verification.** ${correction}\n\n`
 		if (prior) detail += `**Prior decision.** ${prior}\n`
+		if (result) detail += `\n**Result.** ${result}.\n`
 	}
 
 	writeFileSync(`${dir}/details-${key}.md`, detail)

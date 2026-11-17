@@ -21,6 +21,8 @@ No behavior, type, or written byte changes, so the fix does not need the major v
 
 **Prior decision.** PR 612 (cf6add83e) chose `DataView.getBigUint64` and `setBigUint64` on purpose. RFC rfc/uint64-reader-config.md (PR 613, accepted) lines 166, 426 and 461 decide that `readInt64AsBigInt`, `readUint64` and `writeUint64` have no runtime check and that the read fails with the error of the runtime. These decisions make the native methods and the missing check intentional. They do not cover the documented feature test: the RFC does not consider a runtime with `BigInt` and without the DataView BigInt methods.
 
+**Result.** Done in PR 702.
+
 ## F279: The config argument is optional for writeIsoBox and required for writeIsoBoxes, createIsoBoxReadableStream and the stream constructor, and `writers` is required while `readers` is optional.
 
 Severity medium. Category consistency. Breaking: no. Fact check: partly. Value check: partly.
@@ -42,6 +44,8 @@ Step 1 is the only breaking part. Steps 2 and 3 fit any release.
 
 **Prior decision.** Issue 298 "Optional configuration footgun?" (closed as completed) and PR 301 (commit a31419299, merged 2026-01-29) made the config and `writers` required on purpose. libs/iso-bmff/CHANGELOG.md:194 records the change in 1.0.0-beta.1. rfc/iso-bmff-container-readers-writers.md:217 (accepted) rejects an optional `config` argument for the writers for the same reason.
 
+**Result.** Not done. Brief 4 covers the row in theme 10, rules for an optional configuration.
+
 ## F330: The unreleased changes that alter results have no migration guide in the docs, and the changelog does not mark them as breaking
 
 Severity medium. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -55,6 +59,8 @@ Severity medium. Category docs. Breaking: no. Fact check: partly. Value check: p
 **Proposal after verification.** Do this at 2.0.0 release prep, after the cursor RFC settles question 1 (release order). Add `libs/iso-bmff/docs/migrating-to-v2.md` with a `title` frontmatter and link it from README.md next to the three guides. Write the guide as the delta from 1.0.7 to 2.0.0: one table for changed values (matrix u, v, w as 2.30 with w = 1, `balance` as signed 8.8, signed `rate`, `volume`, `layer`, `alternateGroup`, the `readTemplate` fraction, `pssh` `kid` with 16 bytes for each key ID, `entry_count` 0 in `dref` and `stsd`, UTF-8 strings, `emsg`, `sidx`, `prft`, and `ctts` for version 2 or above), one table for changed types (`EventMessageBox` narrowing, `IsoBox` children of `udta`, `grpl`, `strk`, `meco`, generic readers and `ReturnType`), one table for changed errors (`Truncated box`, `No writer found for box type`), and one section for the cursor API. Do not add rows for `IsoBoxReadView` methods or the `view` cast if 2.0.0 removes them before any release. Rewrite or remove those changelog entries instead. In the changelog, keep the Keep a Changelog headings. Add one line under the `## [2.0.0]` heading that links the guide, and prefix each entry that changes a value, a type, or an error with `**Breaking:**`. Do not add a `### Breaking` heading. Merge the two `### Changed` headings of the `[Unreleased]` section (lines 31 and 103) now, since that part does not depend on the release.
 
 **Prior decision.** No decision against a guide. PR 620 (a13db9ace) and closed release PR 616 show the maintainers classed the value changes as fixes for a minor release (1.1.0), with the migration sentence inside each changelog entry. rfc/uint64-reader-config.md:12 records "Breaking change: No" with named exceptions. AGENTS.md:67 requires guidance in the changelog and the docs.
+
+**Result.** Partly done in PR 708. The migration guide and the breaking-change prefixes go to the 2.0.0 release prep.
 
 ## G520: Seven examples look for `tfdt` at a position where no ISO BMFF file has it, so they do nothing on every fixture.
 
@@ -81,6 +87,8 @@ The same pattern is in four TSDoc examples. isContainer.test.ts L24-L33 builds `
 If the cursor RFC lands in 2.0.0, the guides are rewritten anyway. Then write the new examples with the real path (`['moof', 'traf', 'tfdt']`) from the start. Consider a run of each guide block against one fixture in the example check, because a compile-only check did not find this defect.
 
 
+**Result.** Done in PR 708.
+
 ## F327: The published package does not contain NOTICE.md with the codem-isoboxer license text
 
 Severity medium. Category package-config. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -94,6 +102,8 @@ Severity medium. Category package-config. Breaking: no. Fact check: confirmed. V
 **Proposal after verification.** Change `"NOTICE"` to `"NOTICE.md"` in `libs/iso-bmff/package.json` now. Do not wait for 2.0.0: the fix is not breaking, and every published 1.x tarball lacks the MIT notice. Apply the same one-line fix in one PR to the seven other packages that have a NOTICE.md file and the wrong entry: 608, dash, id3, mse, structured-field-values, webvtt, xml. Packages with no NOTICE.md file (cmcd, utils, and the others) need no change, or the unused entry can go. Add a changelog entry per affected package. After the cursor rewrite, review whether NOTICE.md still describes the code.
 
 **Prior decision.** No decision keeps the current state. Two precedents support the fix: commit e1e43230f (PR 344, c2pa pre-publish review) renamed `libs/c2pa/NOTICE` to `NOTICE.md` and changed the `files` entry to match, and `rfc/error-codes.md:128` specifies `files: ["dist/**/*", "NOTICE.md"]` for new packages. PR 105 (5d22395fd, "include full license text in notice file") shows that the maintainers intend to ship the license text. The `"NOTICE"` entry is a leftover of the pre-v1 single package (`lib/NOTICE`, removed in 8ac3ef9b9, PR 265).
+
+**Result.** Done in PR 703, for eight packages.
 
 ## F121: `readTrun` creates one empty object for each sample of a box with no per-sample flag, and the count has no limit.
 
@@ -110,6 +120,8 @@ Severity medium. Category performance. Breaking: no. Fact check: confirmed. Valu
 If the maintainers want protection against the 16-byte box, add one guard in `readTrun` for the zero-byte row case only (no bit of 0xF00 set). The guard throws a `RangeError` that names `sample_count`, the limit, and the received value. Rows with at least one field need no guard, because the read already throws a `RangeError` at the end of the box view. This guard changes behavior only for input above the limit, so it is not a break for adopters and does not need the major version. The limit is a number that the spec does not define, so it needs a maintainer decision and a documentation line. Without agreement on a number, leave the reader unchanged and document that `readTrun` allocates `sample_count` rows. Correct the finding text: the allocation cost for valid fragments is about 80 bytes per row and is not a performance reason for a change.
 
 **Prior decision.** None found. Issue 668 (closed as not planned) does not cover this case: its reasons were that only a custom reader reaches the position and that the error goes to the caller. Neither reason applies here. `gh issue list` searches for `trun sample_count memory` and `readEntries` returned no matching issue.
+
+**Result.** Issue 710. The limit needs a number from the maintainer.
 
 ## G456: traverseIsoBoxes takes quadratic time in two shapes: breadth-first over many sibling containers, and depth-first over deep nesting.
 
@@ -140,6 +152,8 @@ The known finding lists `Array.shift` and the generator for each container as av
 Also measure the bundle bytes of `traverseIsoBoxes` before and after. The variant with one index loop and one stack loop adds a few lines. The entry `if (!item) { continue }` at :33 becomes dead code and leaves with `shift`.
 
 
+**Result.** Done in PR 706.
+
 ## G503: String writers need `TextEncoder` and have no fallback, while string readers work without `TextDecoder`, and the TSDoc of `encodeText` claims a fallback that does not exist.
 
 Severity medium. Category reader-writer-asymmetry. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -159,6 +173,8 @@ Severity medium. Category reader-writer-asymmetry. Breaking: no. Fact check: con
 Move the `encodeInto` idea to the open questions of rfc/iso-bmff-cursor-api.md as a measurement item for the `writeUtf8` field function. It is not an audit fix, and PR 637 already dropped a similar fast path after a measurement.
 
 **Prior decision.** PR 643 (merged 2026-11-11, commit 6b2a23c36) and libs/iso-bmff/CHANGELOG.md:121 accept and record that the UTF-8 writers need `TextEncoder` and that `encodeText` has no fallback. The same PR and PR 637 record that an ASCII fast path in the writers was measured and dropped. rfc/uint64-reader-config.md:166 is the pattern for a platform need: state the need, add no check. No decision covers the false TSDoc sentence of `encodeText` (present since PR 280, commit b242334af).
+
+**Result.** Done in PRs 705 and 708.
 
 ## F384: Ten readers and eleven writers have no test of any kind, and the cursor RFC says the fixtures and the round-trip test cover all of them.
 
@@ -182,6 +198,8 @@ The readSthd, readStss, and readStyp point (fixture coverage only, no field asse
 
 **Prior decision.** None that makes the current state intentional. PR 641 (commit 2406305cd, "test(iso-bmff): add a read, write, read test for every fixture") recorded the gap as a known limit: "16 types have the count 0, so no fixture covers them."
 
+**Result.** Done in PR 704.
+
 ## G505: Every read bundle contains the complete `decodeText` of cml-utils, with its UTF-16 branches and its byte order mark detection, although iso-bmff only decodes UTF-8 and the RFC size table does not count that code.
 
 Severity medium. Category tree-shaking. Breaking: no. Fact check: partly. Value check: partly.
@@ -202,6 +220,8 @@ Severity medium. Category tree-shaking. Breaking: no. Fact check: partly. Value 
 
 **Prior decision.** Issue 244 and PR 246 (commit 80c272e64, "feat: consolidate text decode utils into decodeText"): the maintainer chose one `decodeText` in cml-utils with a `TextDecoder` default and a fallback. The single decoder is intentional. Its cost inside every iso-bmff read bundle is a side effect of the view class, not a decision. PR 643 measured bundles with cml-utils external and recorded that a shared decoder saves about 40 ns for each string.
 
+**Result.** Done in PRs 705 and 714. utils 1.8.0 is published (PR 713).
+
 ## F196: IsoBoxType is identical to `string`: it accepts the empty string and any length, and gives no completion for the known box types.
 
 Severity medium. Category type-design. Breaking: no. Fact check: partly. Value check: partly.
@@ -220,6 +240,8 @@ Step 2 (optional, not breaking in my probe): if key completion is wanted, add it
 
 **Prior decision.** None for the template form of the alias (introduced without rationale in PR 289, commit 3102f626e). One related constraint: the accepted RFC rfc/uint64-reader-config.md:335 (PR 613) relies on `IsoBoxReaderMap<V>` as `Record<IsoBoxType, IsoBoxReader<unknown, IsoBoxType, V>>` with one call signature per value. Any change to the map must keep that property.
 
+**Result.** Partly done in PR 702 (step 1). Step 2, keys in the reader map, goes to the second RFC.
+
 ## F126: `readVtte` and `writeVtte` publish a parameter named `_`, disable every lint rule for the line, and have no `@param` tag.
 
 Severity low. Category api-surface. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -233,6 +255,8 @@ Severity low. Category api-surface. Breaking: no. Fact check: confirmed. Value c
 **Proposal after verification.** Keep the parameters so every reader and writer has the same call form. Name them as the other functions do (`view` and `box` today, `cursor` and `box` after the cursor RFC). Add the `@param` tags and one TSDoc sentence: the box has no fields. Delete the comment `Nothing should happen here.`. Replace each bare directive with a directive that names the rule: `// oxlint-disable-next-line no-unused-vars`. The directive cannot simply be removed: oxlint 1.88 with the repo options reports every unused parameter, including `_` and `_view`. After the cursor RFC the reader still needs the directive for `cursor`, and the writer needs it for `box`. Alternative with no directive: add `argsIgnorePattern: '^_'` to the `no-unused-vars` options in vite.config.ts and name the parameters `_view` and `_box`. Do not remove the parameters: a direct call `readVtte(view)` would stop compiling, for no gain.
 
 
+**Result.** Done in PR 702.
+
 ## F289: The stream `pull` loop continues after `controller.close()`, and the stream has no `cancel` handler for the source iterator.
 
 Severity low. Category behavior. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -243,6 +267,8 @@ Severity low. Category behavior. Breaking: no. Fact check: confirmed. Value chec
 
 **Proposal of the finder.** Write one box for each `pull` call with no loop: `const next = iterator.next(); if (next.done) controller.close(); else controller.enqueue(...)`. Add `cancel() { iterator.return?.() }`. Add a test that cancels the stream over a generator source.
 
+
+**Result.** Done in PR 702.
 
 ## F111: Readers and writers of this scope use different local forms for the same concept.
 
@@ -261,6 +287,8 @@ Severity low. Category consistency. Breaking: no. Fact check: partly. Value chec
 2. Local names and field order (optional, taste): do not add a written template to the RFC. The cursor rewrite already removes `readFullBox()` (rfc/iso-bmff-cursor-api.md:188) and the size code of the writers, so the spread form and most of the differing locals disappear. For the locals that remain, one line in the implementation PR is enough: a width that depends on the version has the name `size` when the box has one such width, and a name with the field prefix (`timeSize`, `mediaTimeSize`) when the box has more than one. The reader and the writer of one box use the same name. Drop the `v1` local where it has one use.
 
 
+**Result.** Not done. The cursor rewrite replaces the code.
+
 ## F258: Three writers write a signed field with the unsigned function and depend on wrap for a negative value.
 
 Severity low. Category consistency. Breaking: no. Fact check: partly. Value check: confirmed.
@@ -274,6 +302,8 @@ Severity low. Category consistency. Breaking: no. Fact check: partly. Value chec
 **Proposal after verification.** Two writers write three signed fields with the unsigned method and depend on the `DataView.setUint32` wrap: `writeCtts` (`sampleOffset`, version 1) and `writeTrun` (`dataOffset`, and `sampleCompositionTimeOffset` for version above 0). `writeVisualSampleEntryBox.ts:74` also pairs `writeUint` with a `readInt` field, but it masks with `& 0xffff` and does not depend on the wrap. Proposal: the cursor RFC must add signed write functions (`writeInt8`, `writeInt16`, `writeInt32`), which it does not list today. Then `writeTrun` uses `writeInt32` for `dataOffset` and `version === 0 ? writeUint32 : writeInt32` for the composition offset. `writeCtts` uses `version === 1 ? writeInt32 : writeUint32`, the same condition as `readCtts`. Delete the comment at writeCtts.ts:33.
 
 **Prior decision.** No decision keeps the current state. A precedent supports the fix: PR 677 (commit 2c8b7fa9d), changelog entry "`writeTkhd` now writes `layer` and `alternateGroup` as signed integers, as `readTkhd` reads them. The written bytes do not change." PR 679 (issue 678) fixed the signed read of the trun composition offset and left the writer unchanged.
+
+**Result.** Done in PR 702.
 
 ## F311: The matrix code is copied into four files with a closure and an extra array, and signed fixed-point reads are written by hand while writes use `writeTemplate`
 
@@ -290,6 +320,8 @@ Severity low. Category consistency. Breaking: no. Fact check: partly. Value chec
 Do not add `readSignedTemplate16`/`readSignedTemplate32`. Fix the asymmetry in the RFC text instead: state in the field function table that `writeTemplate16`/`writeTemplate32` accept a negative value (two's complement), and that a reader of a signed fixed-point field uses `readInt16`/`readInt32` and a division, as PR 620 decided. If the major version renames the `Template` functions to a fixed-point name (the spec keyword `template` means a field with a default value, not a fixed-point format), decide a signed read form as part of that rename, not as a separate addition.
 
 **Prior decision.** PR 620 (commit a13db9ace, "fix(iso-bmff): read and write fixed-point fields correctly"), Design section: the matrix expression stays inline in the four functions because shared read and write helpers measured 1331 B against 1314 B inline; `readTemplate` stays unsigned, and the readers of signed fixed-point fields call `readInt` and divide.
+
+**Result.** Skipped. PR 620 measured the inline form and chose it.
 
 ## F338: The docs and TSDoc use several words for one thing: parse and read, encoded and written, raw box, library and package
 
@@ -309,6 +341,8 @@ Severity low. Category consistency. Breaking: no. Fact check: confirmed. Value c
 - "package" for "library" at docs/utilities.md:24 and docs/writing-boxes.md:212. README.md lines 3, 9, 28 and the front matter of reading-boxes.md say "Parse" and "parsing": change them to "read" and regenerate skills/common-media-library, because the README section feeds it.
 
 
+**Result.** Partly done in PR 708. The rename of "box object" goes to the cursor RFC.
+
 ## F366: The summaries of the box types follow three patterns, and the sample entry writers follow two.
 
 Severity low. Category consistency. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -321,6 +355,8 @@ Severity low. Category consistency. Breaking: no. Fact check: confirmed. Value c
 
 **Proposal after verification.** Keep the proposal with three changes. (1) Define the title source: use the box name of the exported type in title case, then the four-character code, for example `Track Run Box (`trun`).`. Put the edition and the clause on the reference line. A clause title differs between editions (2012 `Track Run Box`, 2015 `Track Fragment Run Box`), so the clause title is not a stable summary. (2) Cite one edition per reference line, and fix the `202x` placeholder in the six files when the edition question is decided. (3) Do the work once: either in the cursor change, which already rewrites the 168 function summaries that name `IsoBoxReadView` and `IsoBoxWriteView`, or in the iso-bmff PR of issue 435. Reference issue 435 from the change so the package is not rewritten twice. Also correct the evidence: 8 of 84 reader files contain a spec reference, not 6. The container marker in a second sentence is optional, because the `boxes` field already shows it.
 
+
+**Result.** Done in PR 708.
 
 ## F417: The readers get `version` and `flags` in two ways and compare the version with two operators.
 
@@ -337,6 +373,8 @@ Severity low. Category consistency. Breaking: no. Fact check: partly. Value chec
 3. In the cursor rewrite, use the RFC form (`header >>> 24`, `header & 0xffffff`) in every full box reader. This is already the RFC example, so add one sentence to the RFC that makes the form the rule.
 4. The read side of ftyp/styp and free/skip already delegates. The defect there is the spread: `{ ...readFtyp(view), type: 'styp' }` allocates a second object per box. Replace it with one internal, non-exported helper that takes the type (`readTypeBox(cursor, 'styp')`, `readFreeSpaceBox(cursor, 'skip')`), and keep the four public reader names. On the write side, the cursor rewrite removes the size code, so each body shrinks to about four lines. A shared internal helper there is optional. Keep the public names `writeFtyp`, `writeStyp`, `writeFree`, `writeSkip`.
 
+
+**Result.** Not done. The cursor rewrite replaces the code.
 
 ## F110: The box types of this scope have almost no field documentation, and only `tenc` has TSDoc examples.
 
@@ -356,6 +394,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Prior decision.** None found that makes the current state intentional. The comment rule of the project allows spec references on fields, and src/boxes/TrackEncryptionBox.ts:11-57 (PR 658) already documents each field with its spec name. The TSDoc pass of issue 435 covers the remaining packages and is not finished.
 
+**Result.** Partly done in PR 708. New `readTfhd` and `readTfdt` example files go to the cursor RFC.
+
 ## F184: Three exports appear as "(undocumented)" in the API report beside the four lowercase aliases.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -370,6 +410,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Prior decision.** No decision keeps the current state. PR 540 (c7edf435f, "chore: resolve api-extractor warnings") shows the opposite practice: second overloads get a doc comment. The bare tag on the IsoBoxFields type follows the repo-wide const enum pattern (cmcd CmcdObjectType, CmcdStreamType).
 
+**Result.** Done in PR 708.
+
 ## F187: The README has no quick-start example, and the README and `package.json` describe the package as parsing only.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -383,6 +425,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: c
 **Proposal after verification.** No factual correction. Two notes on the proposal. First, keep the quick-start short (one read example, one write example) and keep the three guide links, because PR 301 moved the long examples into the guides on purpose. Second, the description change and a quick-start with the current API can land in any release. Only the example that uses the 2.0.0 API must wait for 2.0.0. After the package.json description changes, run the root build and commit the regenerated skills/common-media-library/SKILL.md. The `authors` key is the same in every package, so it belongs in a repo-wide follow-up, as F328 says.
 
 **Prior decision.** Commit a31419299 (PR 301, 2026-01-29) states "Refactor README documentation into separate doc files". That commit removed about 180 lines of examples from the README and created docs/reading-boxes.md, docs/writing-boxes.md, and docs/utilities.md. The links-only Usage section is therefore a deliberate move of the examples into guides, not an omission. The AGENTS.md rule at line 75 still asks for a quick-start example in the README, so the finding stands. The "parsing" description has no recorded decision; it predates the writers.
+
+**Result.** Done in PRs 708 and 702.
 
 ## F262: The writing guide states that parsed boxes implement `ArrayBufferView`, calls a type annotation a cast, and uses the term raw box for a meaning that differs from the RFC.
 
@@ -404,6 +448,8 @@ Part 1, now, in a docs-only PR against the current 1.x guide (no API change):
 
 Part 2, with the implementation of the cursor RFC (2.0.0): the guide rewrite that the RFC already requires uses "box object" for an object with fields and "raw box" for `{ type, bytes }`, and repeats the precedence sentence for the raw box. Do not rename the term in the 1.x guide before the RFC is accepted. Add a count rule or a range rule to the guide only if the findings that define those rules are accepted. Do not list them as part of this finding.
 
+
+**Result.** Partly done in PR 708. Part 2 goes to the cursor RFC.
 
 ## F292: The utilities guide describes a signature that was removed, omits five public utilities, and uses `meta` in two examples where it does not fit.
 
@@ -430,6 +476,8 @@ Part 2, with the 2.0.0 guide rewrite, because the write API and the custom reade
 Drop the proposed line for `CONTAINERS`. reading-boxes.md:11 and writing-boxes.md:16 already document the constant. A guide line for `fourCcToUint32` is optional, because its TSDoc has an example. First decide whether the function stays a public export.
 
 
+**Result.** Partly done in PR 708. Part 2 goes to the cursor RFC.
+
 ## F316: `defaultReaderConfig` and `defaultWriterConfig` build an object with 62 entries on each call, and the guides call them inside the read call
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -444,6 +492,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 
 **Prior decision.** PR 301 (commit a31419299, closes issue 298) added `defaultReaderConfig` and `defaultWriterConfig` as functions on purpose. RFC rfc/uint64-reader-config.md (PR 613, implemented in PR 645) gives `defaultReaderConfig` the `int64` argument (lines 95, 202-209) and rejects an option on the writer configuration (lines 136, 265, 422), so the difference between the two functions is intentional. rfc/iso-bmff-container-readers-writers.md:162 also names both functions and keeps them without the container entries.
 
+**Result.** Done in PR 708.
+
 ## F334: TSDoc statements in the top-level files do not match the code
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: confirmed.
@@ -456,6 +506,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: conf
 
 **Proposal after verification.** Three corrections. (a) The exact phrase "Creates a new IsoView instance" is at IsoBoxReadView.ts:71 and :147 only. Line 150 reads "@returns A new IsoView instance." and line 76 reads "The configuration for the IsoView", so the class has four `IsoView` mentions (71, 76, 147, 150). (b) "Items 3 to 9 are in the view classes that the cursor RFC removes" is wrong for the first half of item 3. readIsoBoxes.ts is not a view class, and the RFC keeps `readIsoBoxes` with an unchanged signature (rfc/iso-bmff-cursor-api.md:168). The three `@param config` lines there need an explicit fix. Items 1, 2 and the readIsoBoxes part of 3 are the only items on public API that survives 2.0.0. (c) Item 10: the sentence about the `view` property is misleading, not fully false. utils/writeBox.ts:25-33 uses the writers map first, then the container handling, then `box.view` as the last fallback. Also `writeContainerBox` is tagged `@internal` (writeContainerBox.ts:18) and src/index.ts does not export it, so item 10 does not reach the generated docs.
 
+
+**Result.** Done in PR 708.
 
 ## F335: Many public types have a TSDoc summary that only repeats the type name
 
@@ -482,6 +534,8 @@ Corrected sentences:
 - `ParsedBox`, `ParsedIsoBox`, `IsoTypedParsedBox`: write these after the RFC implementation decides whether the three types still differ from `IsoBox` once the four fields are removed. If a type becomes an alias of another, remove the type instead of documenting it (that removal is a separate, breaking item).
 
 
+**Result.** Partly done in PR 708. `ParsedBox`, `ParsedIsoBox`, and `IsoTypedParsedBox` wait for the RFC decision on those types.
+
 ## F336: Entry points have no @throws tags, and some have no @example
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -503,6 +557,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 The overload part of the proposal stands as written.
 
 
+**Result.** Done in PR 708.
+
 ## F34: The types of messageData (emsg) and data (free, skip) do not say that the bytes share memory with the input buffer
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -517,6 +573,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Prior decision.** PR 644 (commit af0e23eb0, "fix(iso-bmff): limit readData to the view and read no bytes for 0") chose the no-copy behavior on purpose. Its test plan lists "a form that returns a copy" as a wrong form that must fail a test, and test/readData.test.ts:88 asserts `data.buffer === buffer.buffer`. The same PR added the shared memory sentence to the TSDoc of `readData`. AGENTS.md (PR 583) sets the type rule: a function that returns a view over its input returns `Uint8Array`, an allocating function returns `Uint8Array<ArrayBuffer>`. No prior decision says that the fields or the guides must stay silent about it, so the documentation gap is not intentional.
 
+**Result.** Done in PR 708. The `readBytes` sentence goes to the cursor RFC.
+
 ## F340: The Unreleased section has two '### Changed' headings, and two older sections have the wrong year
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -530,6 +588,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: c
 **Proposal after verification.** No correction to the finding. One more defect of the same kind is in the same file: line 217 has the heading `### Fix` under `## [1.0.0-alpha.7]`, and Keep a Changelog names that heading `### Fixed`.
 
 
+**Result.** Done in PR 708.
+
 ## F341: Two bullets of the README 'When to use' section do not match the functions that they name
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -542,6 +602,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 
 **Proposal after verification.** Keep 8 bullets (scripts/agentDocs.ts maxBullets = 8) and keep each bullet under 20 words. Line 12: "Read a 64-bit field, such as a tfdt time at a 10 MHz timescale, exactly or with an overflow report: `readInt64AsBigInt`, `createInt64OverflowReader`". Line 10: keep the text and add `readTrex` to the list (`readMdhd`, `readStsd`, `readTrex`, `readTfhd`, `readTrun`). Describe line 10 as a missing fallback reader, not as a wrong bullet: `readTfhd` does return `defaultSampleDuration`, and `trex` holds the default when the tfhd flag is absent. Then run the root build so that skills/common-media-library/SKILL.md and references/iso-bmff.md regenerate, and commit the result. No changelog version impact beyond a docs entry under Unreleased.
 
+
+**Result.** Done in PR 708.
 
 ## F342: The writing guide has wording errors and an example that fails at runtime
 
@@ -564,6 +626,8 @@ Item (2): the awaited `updateend` listener with `{ once: true }` is correct, bec
 Item (3) as proposed: "It takes an iterable of streamable items".
 
 
+**Result.** Done in PR 708.
+
 ## F343: The docs of createInt64OverflowReader do not state that the all-ones duration of ISO/IEC 14496-12 reports an overflow
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -577,6 +641,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 **Proposal after verification.** Keep the behavior. Add one short paragraph to the section "Reporting a rounded value" of docs/reading-boxes.md, and one sentence to the TSDoc of createInt64OverflowReader. Suggested guide text: "A version 1 `mvhd`, `tkhd`, or `mdhd` box can have a `duration` with all bits set. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. The callback receives a `RangeError` for that value too, and the field reads as `2 ** 64`. That report does not mean that the file is damaged. If your code reads such boxes, do not throw from the callback." Link the sentence in docs/writing-boxes.md:173 to that paragraph instead of a second explanation. Do not add a special case to the function: an exception for all ones costs bytes on every adopter of the function, and the stored value 2^64 - 1 is in fact rounded. Carry the note into the guide text that the cursor API RFC rewrites.
 
 **Prior decision.** The reporting behavior is intentional: rfc/uint64-reader-config.md (PR 613, section "Overflow detection", line 274, and decision "Overflow check" at line 467) defines the check as `Number.isSafeInteger` with no exception, and PR 645 added the test "should report the largest unsigned value" (test/createInt64OverflowReader.test.ts:63). No prior decision covers the missing documentation note. Issue 653 and PR 669 documented the all-ones value on the write side only.
+
+**Result.** Done in PR 708.
 
 ## F346: The guide context files give the name `buffer` two types, and the guides never say what `buffer` holds
 
@@ -592,6 +658,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 
 **Prior decision.** PR 573 (commit e7db0e39e, "docs: make every README and guide example block typecheck") added the context files, and AGENTS.md:80 records the rule: a block may use a value from the reader's code, declared in `<guide>.context.d.ts`. That decision makes the undeclared names intentional. It does not decide the type mismatch or forbid an explanatory sentence.
 
+**Result.** Done in PR 708.
+
 ## F359: Spec references use four year formats, and the type and the writer of the same box cite different editions or clauses.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -604,6 +672,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Proposal after verification.** "One edition for the whole package" cannot be the 2015 edition: `imda`, `labl`, `prsl` and `ardi` are not in that text. Use this rule instead. Cite ISO/IEC 14496-12:2015 for every box that the 2015 text contains, with the 2015 clause number (smhd 12.2.2, vmhd 12.1.2, sthd 12.6.2, AudioSampleEntry 12.2.3, VisualSampleEntry 12.1.3 of 14496-12 and not 14496-15, elng 8.4.6, kind 8.4.10 is wrong, use 8.10.4, meta 8.11.1). That also fixes the writers, whose 12.x numbers already are 2015 numbers under a 2012 label. For `imda`, `labl`, `prsl` and `ardi`, cite the edition or amendment that defines the box, and only after a read of that text. Until then, remove the clause number and keep the box name, because a wrong clause is worse than none. Cite 23001-7:2016 for pssh (clause 8.1 confirmed) and check the 23009-1 edition for emsg version 1 before a year is written (the 2014 year on the version 1 type is doubtful, the text was not available). Do not use the clause title as the name without a check: the 2015 title of 8.8.12 is `Track fragment decode time` and of 12.2.2 is `Sound media header`. Use the clause number plus the box class name of the syntax (`TrackFragmentBaseMediaDecodeTimeBox`, `SampleDependencyTypeBox`). One citation on the box type and a `{@link}` from the reader and the writer is a good rule. Apply it in the cursor change, which edits every reader and writer file, or in the iso-bmff PR of issue 435. A major version is not needed.
 
+
+**Result.** Done in PR 708.
 
 ## F360: The field comments of MediaHeaderBox contradict the field types.
 
@@ -625,6 +695,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 Add one entry under `## [Unreleased]` in the changelog. The fix can ship in any release and can merge with the same correction for `MovieHeaderBox` and `TrackHeaderBox`, which have no comments on these fields (MovieHeaderBox.ts:11-14).
 
 
+**Result.** Done in PR 708.
+
 ## F365: The @param config lines of the writers use four wordings, and writeMp4a has none.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -637,6 +709,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Proposal after verification.** Do not edit the 34 `@param config` lines as a separate task for 2.0.0. The cursor RFC removes the `config` parameter from every writer (`(cursor: IsoBoxWriteCursor, box: B) => void`), so the lines disappear. Apply the rule to the rewrite instead: every writer gets the same two lines, in signature order, for example `@param cursor - The `IsoBoxWriteCursor` to write to` and `@param box - The `<BoxType>` fields to write`, and no writer (writeMp4a included) omits a parameter. Add the same rule for the readers (`@param cursor`). If the RFC is rejected or delayed and version 1 stays, then the original proposal is fine as a docs-only change under issue 435: one wording for all 34 writers, with the missing line added to writeMp4a.
 
+
+**Result.** Done in PR 708.
 
 ## F368: The TSDoc of the two sample entry reader factories gives misleading examples and does not follow the documentation rules.
 
@@ -657,6 +731,8 @@ Order the work in two parts. The sentence fix can go now, in the iso-bmff PR of 
 The duplicate report F50 adds a separate item (the TSDoc of `readHev1` and `readHvc1` does not name the box type, and no guide mentions the factories). Track that item on its own. It is also documentation only.
 
 
+**Result.** Done in PR 708.
+
 ## F369: Twenty-five test files have an example region that no TSDoc includes.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -670,6 +746,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 **Proposal after verification.** Keep the region markers. Do not offer removal as an option, and do not ask for a new rule: .claude/rules/code-quality.md:40-41 already requires an `@example` with `{@includeCode}` for public functions and a region in every test file. Apply that rule in the same change that rewrites each reader and writer for the cursor API, because the writer regions read `writer.buffer` and will change then. In that pass: (1) add `@example` followed by `{@includeCode ../../test/<readers|writers>/<name>.test.ts#example}` to the 25 functions, with the path form that src already uses, (2) cut each region to the call and its input, and move the `assert` calls and expected byte arrays below `// #endregion example` (18 of the 25 regions contain an assert, and writeStsd is 148 lines), (3) treat the 25 as the first step only: 88 files in src/readers and 86 in src/writers exist, and 9 have an example, so the remaining readers and writers need a region and a tag as well if the rule is enforced for 2.0.
 
 
+**Result.** Done in PR 708. Regions for the other readers and writers belong to issue 435.
+
 ## F370: Five container readers with a type parameter for 64-bit fields do not document the int64 option, and their writers do.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -681,6 +759,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: c
 **Proposal of the finder.** Add the int64 paragraph to the five readers. No generic function has a `@typeParam V` line, so add one line to each or state the rule once in the guide.
 
 **Prior decision.** None that makes the omission intentional. rfc/iso-bmff-container-readers-writers.md:146 states the rule the five readers now fall under: "A reader with the type parameter returns the 64-bit integer fields of the child boxes with that type. With no option, those fields are numbers." That RFC text predates PR 659 and still counts 8 box types with `V` (lines 99 and 147), so the RFC is stale in the same way.
+
+**Result.** Done in PR 708.
 
 ## F371: A TODO line comment sits between the TSDoc and the declaration of a public type.
 
@@ -700,6 +780,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 
 **Prior decision.** PR 659 (commit 1337aaed4, fixes issue 646) kept the prsl child type as `any` on purpose: "The child types of the audio sample entry, the visual sample entry, and the prsl box stay any. The writeStsd example passes raw bytes as a child, and IsoBox rejects that child." The decision avoided a wider compile break in a minor version. It does not forbid the change in a major version. Issue 584 (open) tracks no-explicit-any.
 
+**Result.** Partly done in PR 708. Typed `prsl` children are breaking and go to the second RFC.
+
 ## F392: Two documentation examples in the tests do not show the use of the function well.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -717,6 +799,8 @@ Stream example: `new Response(stream).arrayBuffer()` works, but it buffers the w
 Traverse example: the proposal is good. Use a small literal tree, or the fixture, and assert the order of the types, for example `const types = Array.from(traverseIsoBoxes(boxes), box => box.type)` with a `moof` that has `mfhd` and `traf` children. A second line with `{ maxDepth: 0 }` or `{ depthFirst: false }` would show the config, which the current example and the guide (docs/utilities.md:17) do not show.
 
 
+**Result.** Done in PR 708.
+
 ## F57: writeMfra and writeMfro do not keep `mfraSize` correct, and no TSDoc or guide tells the adopter to set it.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -730,6 +814,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 **Proposal after verification.** Keep the documentation-only scope, the name `mfraSize`, and no automatic patch. Change three details. (1) Add TSDoc to `mfraSize`: the value is the size in bytes of the enclosing `mfra` box, the spec name of the field is `size` (ISO/IEC 14496-12, 8.8.11.3), and the writer writes the stored value. Add one sentence to the TSDoc of `writeMfra` and `writeMfro`: the caller sets `mfraSize` after a change to the children of the `mfra` box. (2) Put the guide sentence in libs/iso-bmff/docs/writing-boxes.md, not next to reading-boxes.md:95. That paragraph describes dropped trailing bytes of a parsed box. A short cross-reference from reading-boxes.md:95 is enough. (3) Fix the clause title in libs/iso-bmff/src/boxes/MovieFragmentRandomAccessOffsetBox.ts:4 from "8.8.11 Movie Fragment Random Access Box" to "8.8.11 Movie Fragment Random Access Offset Box", and add the same spec reference to readMfro.ts.
 
 
+**Result.** Done in PR 708.
+
 ## F58: The TSDoc of MovieFragmentRandomAccessOffsetBox names the wrong box.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -740,6 +826,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: c
 
 **Proposal of the finder.** Change the type TSDoc to `8.8.11 Movie Fragment Random Access Offset Box`.
 
+
+**Result.** Done in PR 708.
 
 ## F60: The fields of MovieHeaderBox, MovieExtendsHeaderBox, MovieFragmentHeaderBox, and MovieFragmentRandomAccessOffsetBox have no TSDoc, except `matrix`.
 
@@ -755,6 +843,8 @@ Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: p
 
 **Prior decision.** None found against field TSDoc. CHANGELOG.md:107 shows the `matrix` field documentation of MovieHeaderBox and TrackHeaderBox was added on purpose (PR 620), which is why `matrix` is the only documented field. No entry states that the other fields stay undocumented.
 
+**Result.** Done in PR 708.
+
 ## G452: A string field with bytes that are not valid UTF-8 is read with U+FFFD and no signal, so a read and a write change the bytes and the size of the box.
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: partly. Merged duplicates: G459.
@@ -768,6 +858,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 **Proposal after verification.** Keep the read behavior. If the cursor RFC adds a TSDoc sentence to the UTF-8 read function, do not promise U+FFFD. Write the contract as the maintainer stated it: "The function expects valid UTF-8. The result for bytes that are not valid UTF-8 depends on the environment, and a write of that string does not return the source bytes." The reason is the path of decodeText with no TextDecoder (libs/utils/src/decodeText.ts:141-154), which returns the byte value as a code point (a9 41 reads as U+00A9 U+0041), not U+FFFD. Do not add tests or changelog text for invalid UTF-8 (PR 643). One sentence in the TSDoc is enough, and docs/reading-boxes.md does not need it. A separate question for @svta/cml-utils, outside this audit: whether the fallback path of decodeText should return U+FFFD to match TextDecoder.
 
 **Prior decision.** Merged PR 643 (fix(iso-bmff): read and write the emsg strings as UTF-8), description, section "Not changed, by earlier decisions of the maintainer": "No changelog text and no tests for input that is not valid UTF-8. The library expects UTF-8 in a field that the spec defines as UTF-8." The decision covers changelog text and tests. It does not name TSDoc, so it limits the proposal and does not refute it. PR 637 and PR 643 also record a related known effect with no follow-up issue: decodeText removes a leading byte order mark.
+
+**Result.** Done in PR 708.
 
 ## G461: The reading guide says that `readIsoBoxes` does not throw for damaged input, but 1,995 of 367,642 single-byte changes to the fixtures make the function throw.
 
@@ -798,6 +890,8 @@ Not now:
 
 **Prior decision.** Issue 668 (closed as not planned, 2026-11-16): an error from a reader that reads past its data goes to the caller, so the throw for a damaged box is intentional. PR 661 (7d67e217a, issue 650) and PR 662 (issue 663) added the "does not throw" sentence, scoped to incomplete boxes only. rfc/iso-bmff-cursor-api.md:195 and :198 keep both rules for version 2. No prior decision states that the documentation should omit the throw.
 
+**Result.** Done in PR 708.
+
 ## G510: No document states the runtime APIs that the package needs, and the website says the packages need no polyfills.
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -818,6 +912,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 
 **Prior decision.** No decision covers the missing section. Three decisions make the runtime needs themselves intentional. (1) PR 643, libs/iso-bmff/CHANGELOG.md:121: "`writeEmsg`, `writeHdlr`, `writeUrl`, `writeUrn`, and `writeSchm` now need `TextEncoder`, as the other UTF-8 writers do." (2) rfc/uint64-reader-config.md:166, 426, 461 (accepted, PR 613 and PR 645): the package targets ES2019, `readInt64AsBigInt` needs `BigInt` and has no check, and a `BigInt` check was a rejected alternative. (3) PR 383 for issue 382, libs/iso-bmff/CHANGELOG.md:157: `IsoBoxReadableStream` guards the `ReadableStream` global and throws a descriptive error on construction.
 
+**Result.** Partly done in PR 708. The ES baseline waits for the open target decision.
+
 ## G518: No time field states the 1904 epoch or its unit, and no ID field states that it holds a UUID or a key ID, except `kid` of pssh.
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: partly.
@@ -837,6 +933,8 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 7. If 2.0.0 changes the type of `systemId`, `kid`, or `defaultKid` (another finding may propose `Uint8Array`), write these sentences in the same change, so the "16 bytes" wording matches the final type.
 
 
+**Result.** Done in PR 708.
+
 ## G525: The reading guide states that a generic custom reader in a stored map needs a type argument, but the guide's own example has `bigint` fields without the type argument.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -854,6 +952,8 @@ The statement is true only for a reader with another shape. The same reader with
 **Proposal after verification.** Prefer the example change over the reword alone, and match test 21. A custom reader that returns exactly the built-in shape is not a real use case, so give `readTfdtWide` one more field (for example `extra: 'x'`, as `readTfdtAware` has in test/int64.types.test.ts L79-L88). The comment at L222 and the sentence at L227 are then true as written. Add one short sentence that states the exemption, taken from the RFC: "A custom reader whose result equals the built-in box type gets the fields of the configuration without a type argument." If the 2.0.0 guide rewrite for the cursor API happens first, apply the same correction there and do not patch the old text separately.
 
 
+**Result.** Done in PR 708.
+
 ## G526: The `bigint` example of the reading guide names a value `seconds`, but the `bigint` division drops the fraction.
 
 Severity low. Category docs. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -866,6 +966,8 @@ Run of the block and of examples/a/sidx.ts on the fixtures: `vttc.mp4 EPT 150150
 
 **Proposal of the finder.** Show a conversion that keeps the fraction and states the limit: `const whole = time / scale; const rest = time % scale; const seconds = Number(whole) + Number(rest) / box.timescale`. Or keep the division, rename the variable to `wholeSeconds`, and add the comment `// The division of two bigints drops the fraction.`
 
+
+**Result.** Done in PR 708.
 
 ## G527: The guide states that the `size` field of a parsed box is the size of the source box, but the field is 1 for a box with `largesize` and 0 for a box that extends to the end.
 
@@ -884,6 +986,8 @@ Script examples/a/claims2.ts: `d: largesize box => [{"size":1,"type":"free","lar
 **Proposal after verification.** Docs only, no break. If a 1.x release ships before 2.0, replace the sentence at reading-boxes.md:93 with: "The `size` field of the parsed box is the `size` field of the source box header, so it counts those bytes. The field is 1 when the box has a `largesize` field, and the parsed box then has `largesize`. The field is 0 when the box extends to the end of the data." In 2.0, delete the sentence in the implementation PR of the cursor RFC, together with the field. Drop the second part of the proposal: a byte position or a byte length on a parsed box is a new feature. If the maintainers want it, add it as an open question to rfc/iso-bmff-cursor-api.md, with the rule that the length is the complete byte length for `largesize` and for a `size` of 0.
 
 **Prior decision.** PR 661 (7d67e217a, fixes issue 650) added the sentence on purpose for the QuickTime trailing bytes case. It records no decision about the wording for `largesize` or a `size` of 0. rfc/iso-bmff-cursor-api.md:199 already removes the `size` and `largesize` fields in 2.0.
+
+**Result.** Done in PR 708.
 
 ## G528: Ten of the 28 TSDoc examples use a name that the example does not define, so the published example cannot run and the reader cannot see the input.
 
@@ -916,6 +1020,8 @@ Drop the `assert.strictEqual` style change. Imports are outside every region tod
 
 **Prior decision.** AGENTS.md:82 and PR 573 (e7db0e39e, "docs: make every README and guide example block typecheck"): TSDoc `{@includeCode}` regions compile with the test file, so the README example rule (import every name, no pseudocode) does not apply to them. The exemption from the check is intentional. The undefined input names are not covered by any decision.
 
+**Result.** Partly done in PR 708. The `writeUint` and `writeIsoBoxes` regions go to the cursor RFC.
+
 ## G529: Eight TSDoc examples copy the complete file with `new Uint8Array(isoFile)` before the read, although `readIsoBoxes` accepts the `Buffer`.
 
 Severity low. Category docs. Breaking: no. Fact check: partly. Value check: confirmed.
@@ -931,6 +1037,8 @@ Script examples/b/inputs.ts passes a `Buffer` with no copy and compiles with tsc
 **Proposal after verification.** The proposal is right. Two small additions. (1) Also change test/api.test.ts:22 for consistency, although it is not a TSDoc example. (2) Extend the guide sentence with the trap that the finder measured: "Pass the view itself. Do not pass the `buffer` property of a view, because that buffer can contain other data." Keep test/util/load.ts as is: that helper must return a standalone `ArrayBuffer`, so its copy is needed.
 
 
+**Result.** Done in PR 708.
+
 ## F265: `writeBoxHeader` can write a 16-byte header with `largesize`, but every built-in writer computes its size with an 8-byte header, so a box above 4 GiB fails with an unclear `RangeError`.
 
 Severity low. Category errors. Breaking: no. Fact check: confirmed. Value check: confirmed.
@@ -941,6 +1049,8 @@ Severity low. Category errors. Breaking: no. Fact check: confirmed. Value check:
 
 **Proposal of the finder.** 2.0.0 defines the case in the contract of `endIsoBox`: the function throws a `RangeError` with the box type and the size when the size is above 2^32 - 1. Support for `largesize` can come later with the stream writer that the RFC lists under Future possibilities.
 
+
+**Result.** Not done. The header size of a box above 4 GiB goes to the cursor RFC, because a 1.x check is a range check.
 
 ## F291: The default container writing throws an opaque TypeError for a container box with no `boxes` field, which differs from the rule that a writer does not throw for a missing field.
 
@@ -956,6 +1066,8 @@ Severity low. Category errors. Breaking: no. Fact check: partly. Value check: pa
 
 **Prior decision.** No direct decision for a missing `boxes` field. Related: issue 668 closed as not planned (an error for input outside the contract already goes to the caller). PRs 626, 627 and 640 applied the "no throw for a missing field" rule to optional fields that the flags govern, not to required list fields.
 
+**Result.** Skipped. Only JavaScript or a cast reaches the error, as in issue 668.
+
 ## G508: The input handling uses `instanceof` tests, so an `ArrayBuffer` from another realm throws an unclear `TypeError`, a wrong input type gives an engine error with no parameter name, and a `SharedArrayBuffer` from another realm passes the copy step of `writeIsoBox`.
 
 Severity low. Category errors. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -969,6 +1081,8 @@ Severity low. Category errors. Breaking: no. Fact check: confirmed. Value check:
 **Proposal after verification.** Keep only the branch change. In `createIsoBoxReadCursor` of 2.0.0, build the view with `ArrayBuffer.isView(data) ? new DataView(data.buffer, data.byteOffset, data.byteLength) : new DataView(data)` and drop the `isArrayBufferLike` import. This form accepts buffers and views of any realm, and every wrong input gives one engine `TypeError` that names the expected type. Add one test with a `vm.runInNewContext` `ArrayBuffer`. Do not add the hand-written `TypeError` wrapper: the compiler already rejects the wrong types, no package in the repo has such a check, and the wrapper costs bundle bytes. Do not add the `Object.prototype.toString` test or a TSDoc note to `writeBox`: the cursor writer of the RFC copies all bytes into its own `ArrayBuffer`, so that code path is removed. The same `isArrayBufferLike` branch exists in libs/drm/src/cenc/parsePsshList.ts:37 and libs/id3/src/util/toArrayBuffer.ts:21 and utf8.ts:37. Those files are outside this package and are a possible follow-up.
 
 **Prior decision.** No prior decision covers realms. Related decisions: (1) Issue 668, closed as not planned on 2026-11-16: bad input whose error already reaches the caller gets no extra guard. This decision speaks against the `TypeError` wrapper. (2) PR 583 (27316b9b4) added the `SharedArrayBuffer` copy step of `writeBox` on purpose for the `Uint8Array<ArrayBuffer>` return type (CHANGELOG.md:111). (3) rfc/iso-bmff-cursor-api.md lines 87 and 203: `writeIsoBoxes` copies every raw box into the cursor buffer, so the copy step of `writeBox` does not exist in 2.0.0.
+
+**Result.** Done in PR 702.
 
 ## F180: Seven type names follow the clause title and not the syntax class of the spec, and the package does not state which rule it uses.
 
@@ -987,6 +1101,8 @@ Preferred fix in 2.0.0: rename six types so that the rule has no exception list.
 Fallback without a break: keep the names and document the true rule in the README with the seven exceptions in a table (package name, spec class, box type). This fallback is weaker, because the adopter must read the table to find the type.
 
 
+**Result.** Not done. Brief 4 covers the row in theme 5, names.
+
 ## F317: `package.json` has no `sideEffects` field
 
 Severity low. Category package-config. Breaking: no. Fact check: partly. Value check: partly.
@@ -1000,6 +1116,8 @@ Severity low. Category package-config. Breaking: no. Fact check: partly. Value c
 **Proposal after verification.** Remove this item from the 2.0.0 list. It is a non-breaking, repo-wide packaging change. File it as a separate issue: add `"sideEffects": false` to every published `libs/*/package.json` in one PR, after a bare-import probe per package (Rollup, tsdown, webpack) confirms that the statement is true for each package. State the real gain: a bundler that reads the field drops the whole module when no export is used. Because each package ships one bundled dist/index.js, the field does not improve partial imports. PURE annotations and the bare-import probe stay the primary control. Do not add a default export or subpath exports.
 
 **Prior decision.** No decision about the `sideEffects` field exists. Related decisions: PR 383 (5b1f124c0, issue 382) and PR 514 (2086dad8d) chose pure module-scope statements verified by a bare-import probe, and .claude/rules/code-quality.md:12 forbids module-scope side effects. The field is consistent with those decisions and does not replace them.
+
+**Result.** Issue 711. Rolldown already drops a bare import, and webpack is not measured.
 
 ## F387: package.json has fields with no effect and a description that names only parsing.
 
@@ -1020,6 +1138,8 @@ Part B, repo-wide chore in one separate PR, not part of the iso-bmff major versi
 Drop the two other items, or treat them as optional repo-wide questions. Keep `--passWithNoTests` identical in every package as PR 582 chose. If the guard matters, remove the flag from every package that has tests in one change, not from iso-bmff alone. Add `"./package.json": "./package.json"` only if an adopter tool needs it, and then in every package.
 
 **Prior decision.** PR 582 (051864d5d, "chore: run the tests with Vitest through vp test") chose the identical `--passWithNoTests` test script for every package and validated that a package with no tests exits 0. No prior decision covers `authors`, `publishConfig.scope`, the description text, or the missing `./package.json` export. They all date from PR 265 (8ac3ef9b9, CML Version 1).
+
+**Result.** Partly done in PR 702 (part A). Part B is issue 712.
 
 ## F236: Each string read allocates two DataViews and a TextDecoder, and readUtf8 removes a byte order mark without notice.
 
@@ -1043,6 +1163,8 @@ Expected gain for item 1 plus item 2 on my machine: about 255 ns to about 112 ns
 
 **Prior decision.** PR 643 (merged, commit 6b2a23c36, "fix(iso-bmff): read and write the emsg strings as UTF-8"). The description records three points. (1) Measured: a shared `TextEncoder` does not recover the write time, and a shared `TextDecoder` saves about 40 ns for each string. (2) Maintainer decision: no changelog text and no tests for input that is not valid UTF-8. (3) The byte order mark removal is a "Known effect for a follow-up". Points 1 and 3 do not make the current state intentional. Point 2 argues against the U+FFFD sentence. PR 637 (aecfdfa19) follows the same rule.
 
+**Result.** Partly done in PR 702 (documentation). The speed change goes to the cursor rewrite.
+
 ## F286: The traversal does avoidable work for each box: a linear scan of CONTAINERS, a new generator and config object for each container, and `Array.shift`.
 
 Severity low. Category performance. Breaking: no. Fact check: partly. Value check: partly.
@@ -1057,6 +1179,8 @@ Severity low. Category performance. Breaking: no. Fact check: partly. Value chec
 
 **Prior decision.** rfc/iso-bmff-cursor-api.md:191 states that `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`, and `isIsoBoxType` do not change. That statement covers the API, not the implementation, so it does not block an internal rewrite with the same signatures and order. No prior decision makes the current implementation intentional (git log for the file shows only type-inference and formatting changes).
 
+**Result.** Done in PR 706.
+
 ## F310: The box type and every other four-character string are decoded one byte at a time with a `switch` call and a string concatenation for each byte
 
 Severity low. Category performance. Breaking: no. Fact check: partly. Value check: partly.
@@ -1069,6 +1193,8 @@ Severity low. Category performance. Breaking: no. Fact check: partly. Value chec
 
 **Proposal after verification.** Keep the item, with three changes. (1) Scope: fold it into the cursor implementation of RFC iso-bmff-cursor-api, not a separate rule. The header read of `readIsoBoxes` and `readChildBoxes` uses four `getUint8` calls and one `String.fromCharCode(a, b, c, d)` call. `readFtyp` (and `readStyp` through it) and `readHdlr` use the same internal function. Measured gain: about 14 ns for each box (29 ns to 15 ns). (2) Remove `readFrma` and `readSchm` from the list. Both return a number today (`dataFormat: view.readUint(4)`, `schemeType: view.readUint(4)`). A change to a string is a breaking type change and needs its own finding and decision. (3) `seekIsoBox` should not create a type string at all. Convert each path element one time with the existing public `fourCcToUint32` (libs/iso-bmff/src/utils/fourCcToUint32.ts:14) and compare it with `getUint32` of the header. On the write side, `beginIsoBox` writes the type with one `setUint32(pos, fourCcToUint32(type))` call, which reuses the same export and adds no new helper. The generic `readString` and `writeString` field functions stay for other lengths. Measure the bundle bytes of the six-box trial build before and after, because the new internal function adds bytes to every bundle that reads a tree.
 
+
+**Result.** Done in PR 706.
 
 ## F313: Values that do not change inside a loop are computed for every entry in readSubs, readTfra, writeTfra, and readMdhd, and three readers compare the version with `==`
 
@@ -1089,6 +1215,8 @@ Severity low. Category performance. Breaking: no. Fact check: partly. Value chec
 3. RFC gap (the part with real value): add one sentence or one open question to rfc/iso-bmff-cursor-api.md near line 176. The sentence states how a reader and a writer handle a field whose size is known only at run time. `tfra` (1 to 4 bytes, 14496-12:2015 clause 8.8.10.2) and `subs` (2 or 4 bytes) are the only boxes with such a field. Two options: readTfra and writeTfra select the field function for each of the three fields before the loop (for example from a local array `[readUint8, readUint16, readUint24, readUint32]`), or the package keeps one field function with a size parameter. The first option needs no new public export and keeps the other readers free of the generic function.
 
 
+**Result.** Not done. The cursor rewrite replaces the code. No speed gain.
+
 ## F294: Two traversal tests cannot fail for a wrong order, and the breadth-first test of traverseIsoBoxes states that its two orders are the same.
 
 Severity low. Category tests. Breaking: no. Fact check: partly. Value check: confirmed.
@@ -1101,6 +1229,8 @@ Severity low. Category tests. Breaking: no. Fact check: partly. Value check: con
 
 **Proposal after verification.** The core problem holds for both tests. Correct the last sentence of the evidence: the test at traverseIsoBoxes.test.ts:97-112 is the only test that asserts a breadth-first order different from the depth-first order. The test at lines 136-149 also separates the two orders, from the depth-first side. So the suite as a whole does detect an implementation that ignores `depthFirst` in `traverseIsoBoxes`. The gap that remains is in findIsoBox.test.ts, where no test separates the orders, plus one redundant test at traverseIsoBoxes.test.ts:68-82 with a misleading comment.
 
+
+**Result.** Done in PR 704.
 
 ## F388: Test files are in inconsistent locations and some names do not match a source file.
 
@@ -1118,6 +1248,8 @@ Severity low. Category tests. Breaking: no. Fact check: partly. Value check: par
 3. Optional: use the rule "a test file has the name of the export under test", which is the convention of cmcd, id3, and utils. That rule keeps readVttc.test.ts. If the major version renames readVttc, name the test after the new export. Move isContainer.test.ts and fourCcToUint32.test.ts only together with the two `{@includeCode ../../test/...}` paths in src/utils. Rename test/util to test/helpers only if those two tests move to test/utils. Add test/writers/defaultWriterConfig.test.ts only if the TSDoc of defaultWriterConfig needs an example region.
 
 **Prior decision.** No decision on the test layout. One related decision: rfc/iso-bmff-container-readers-writers.md:158 (RFC of PR 622, implemented in PR 654, 75f5d7b64) placed readVttc in readVttCue.ts on purpose because of file systems that ignore case. The mismatch between readVttc.test.ts and readVttCue.ts follows from that decision.
+
+**Result.** Partly done in PR 704 (part 1). The file moves wait for the cursor work.
 
 ## F389: Test helpers have names close to the public functions, one helper has dead code, and one helper name has two meanings.
 
@@ -1138,6 +1270,8 @@ Severity low. Category tests. Breaking: no. Fact check: confirmed. Value check: 
 Drop the rename to findFixtureBox and filterFixtureBoxes, or treat it as optional. It is a matter of taste with 45 call sites of churn. None of this needs the major version.
 
 
+**Result.** Partly done in PR 704 (parts 1 and 2). The `boxBytes` names wait for the cursor work.
+
 ## F390: Nine test files use the loose assertions `equal` and `deepEqual`, two of them inside a documentation example.
 
 Severity low. Category tests. Breaking: no. Fact check: partly. Value check: confirmed.
@@ -1151,6 +1285,8 @@ Severity low. Category tests. Breaking: no. Fact check: partly. Value check: con
 **Proposal after verification.** Nine test files contain 30 loose `equal` or `deepEqual` calls. Four of the calls (not two) are inside `#region example` blocks that TSDoc publishes: writeIsoBoxes.test.ts:60, readIsoBoxes.test.ts:38, traverseIsoBoxes.test.ts:23, createIsoBoxReadableStream.test.ts:45. The loose calls in the emsg tests are at writers/writeEmsg.test.ts:173, 260, 285, 315 and readers/readEmsg.test.ts:123, not line 1. Proposal stays: replace all 30 with `strictEqual` and `deepStrictEqual`, and compare `new Uint8Array(isoFile)` in the writeIsoBoxes example because deepStrictEqual of a Buffer and a Uint8Array fails. Check writeIsoBoxes.test.ts:277 (`deepEqual(bytes, source)`) and the emsg `messageData` lines for the same Buffer or prototype mismatch when converting. Optional: change `from 'assert'` to `from 'node:assert'` at traverseIsoBoxes.test.ts:2. Tests only, no adopter impact, not tied to the major version.
 
 
+**Result.** Done in PR 704.
+
 ## F16: One reader and three writers in scope import a view class as a value where every other file uses `import type`.
 
 Severity low. Category tree-shaking. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -1163,6 +1299,8 @@ Severity low. Category tree-shaking. Breaking: no. Fact check: confirmed. Value 
 
 **Proposal after verification.** Reclassify the finding as internal consistency with no effect on bundle size. Do not edit the four files as part of the major version: the cursor RFC deletes both view classes and rewrites every reader and writer, so the imports disappear. The lasting fix is a separate chore PR that enables `typescript/consistent-type-imports` in vite.config.ts for the whole repo and applies the autofix. Run the rule first to count the findings in the other packages. That PR needs no changelog entry for adopters, because the output of the build does not change.
 
+
+**Result.** Skipped. The bundle size does not change, and the cursor rewrite removes the imports.
 
 ## F29: writeSkip and writeStyp copy the bodies of writeFree and writeFtyp, while the readers delegate with an object spread
 
@@ -1178,6 +1316,8 @@ Severity low. Category tree-shaking. Breaking: no. Fact check: confirmed. Value 
 
 **Prior decision.** No decision on styp or skip. For the alias part of the proposal: rfc/iso-bmff-container-readers-writers.md (accepted, PR 622, implemented in PR 654) rejects "One shared function under 19 names" (line 213) and requires "One box type per function" as a function declaration (lines 151-152).
 
+**Result.** Not done. The cursor rewrite replaces the code.
+
 ## F287: isFullBox takes `any`, throws for null and primitives, has no test and is not used by the package.
 
 Severity low. Category type-design. Breaking: no. Fact check: partly. Value check: partly.
@@ -1191,6 +1331,8 @@ Severity low. Category type-design. Breaking: no. Fact check: partly. Value chec
 **Proposal after verification.** Split the finding in two. Part A, do anytime, not breaking: `export function isFullBox(box: unknown): box is FullBox { return typeof box === 'object' && box !== null && 'version' in box && 'flags' in box }`, plus test/isFullBox.test.ts (a full box, a plain box, null, a primitive) and a changelog entry in the same form as the isIsoBoxType entry. This also closes one of the public `any` sites of issue 584. Part B, a 2.0.0 decision only: either remove the export (no caller in the package and no known adopter use), or keep it. If the guards get the `Iso` token, rename `isFullBox` and `isContainer` together (`isIsoFullBox`, `isIsoContainer`) in one change. Do not rename `isFullBox` alone. The generic form `isFullBox<T>(box: T): box is T & FullBox` from the duplicate F195 depends on the separate `FullBox extends Box` type change and should be judged with that finding.
 
 **Prior decision.** No decision for the current state. PR 585 (facd7ba42) deferred public `any` parameters to issue 584 (open), whose plan is to replace each public `any` with `unknown`. The same PR already made that change for isIsoBoxType (CHANGELOG.md:110).
+
+**Result.** Partly done in PR 702 (part A). Part B, remove or rename the export, goes to the second RFC.
 
 ## G519: The 64-bit fields of `co64`, `saio`, and `iloc` have the type `number` with no `IsoInt64` parameter, so a custom reader cannot return them as `bigint` under the documented rule.
 
@@ -1211,6 +1353,8 @@ Fold the co64 part into issue 652 and do not file a separate issue for it.
 
 **Prior decision.** rfc/uint64-reader-config.md (accepted, PR 613, implemented in PR 645): line 17 scopes the option to the 64-bit fields of the built-in readers, line 221 lists the eleven affected box types, line 425 rejects type parameters that add no type information. Issue 652 (open) has a maintainer comment that already assigns the `V[]` change for `co64` to the change that adds the `co64` reader and writer.
 
+**Result.** Not done. The `co64` part belongs to issue 652. `saio` and `iloc` keep `number`.
+
 ## F31: Reader summaries use the wrong article before a vowel, and the readSkip and readEncv summaries do not name their box type
 
 Severity low. Category typo. Breaking: no. Fact check: confirmed. Value check: partly.
@@ -1223,3 +1367,5 @@ Severity low. Category typo. Breaking: no. Fact check: confirmed. Value check: p
 
 **Proposal after verification.** Use a template with the definite article, so no article depends on the pronunciation of a code: "Reads the `elng` box (`ExtendedLanguageBox`)." and "Writes the `elng` box (`ExtendedLanguageBox`)." Apply it to every reader and writer when the cursor API rewrites the summary lines, in one mood (third person matches readIsoBoxes and readInt64AsBigInt). Name the four-character code in all 13 readers that share a class name (avc1 to avc4, hev1, hvc1, encv, enca, mp4a, free, skip, and the two shared sample entry readers), not only readSkip and readEncv. Keep "parsed box" as the noun for the result while the type `ParsedIsoBox` keeps its name. If the cursor rewrite is far away, the six "a" to "an" fixes can go in the TSDoc pass of issue 435 now, with a docs note in the changelog.
 
+
+**Result.** Done in PR 708.

@@ -21,6 +21,8 @@ Rules:
 
 Done: one PR against `main`. The description has a table with the result for each finding ID.
 
+Status: complete. PR 708 merged as 693717ac4 on 2026-11-17. All 40 findings held. PR 708 did 30 in full and 10 in part. PR 702 finished F187. The "Result" column of `findings.md` states the part that waits.
+
 ## 2. Code, test, and configuration fixes (base `main`)
 
 Fix the code findings of the iso-bmff audit that break nothing. Branch from `origin/main`, target `main`.
@@ -44,6 +46,8 @@ Rules:
 - Follow AGENTS.md: a test for each behavior fix, a changelog entry for each change, the root `npm test`.
 
 Done: PRs against `main`, each with a table of finding IDs and results.
+
+Status: complete. PRs 702, 703, 704, 705, 706, 713, and 714 merged on 2026-11-17. utils 1.8.0 is published. Issues 710, 711, and 712 record the rows that need a number or a value from the maintainer. The "Result" column of `findings.md` states the result of each row.
 
 ## 3. Amendments to the cursor RFC (PR 682)
 
@@ -107,3 +111,37 @@ Rules:
 - Text only. No package code. Follow the Writing Style of AGENTS.md.
 
 Done: a draft RFC PR against `feat/iso-bmff-v2`, and a table that maps every breaking finding ID to a theme or to "not in this RFC".
+
+## Carried to briefs 3 and 4
+
+Briefs 1 and 2 left these parts open. Each part belongs to a later brief or to the 2.0.0 release prep.
+
+Brief 3, text of the cursor RFC:
+
+- F265: the header size of a box above 4 GiB. The write cursor writes the size after the body, so the cursor must choose the header size before the body. Add an unresolved question.
+- F34: the sentence about `readBytes` and shared memory.
+- F262 part 2 and F292 part 2: the guide text that describes version 1 functions.
+- F338: the rename of "box object".
+- F110 and G528: the examples for `readTfhd`, `readTfdt`, `writeUint`, and `writeIsoBoxes`.
+- F335: the summaries of `ParsedBox`, `ParsedIsoBox`, and `IsoTypedParsedBox`, after the RFC decides those types.
+
+Brief 4, the second RFC:
+
+- F196 step 2: completion for the keys of the reader map. The change alters the declared type of `IsoBoxReaderMap`.
+- F287 part B: remove `isFullBox`, or rename it with `isContainer`.
+- F371: typed children of `prsl`.
+- F180 (theme 5) and F279 (theme 10) are already in the theme list.
+
+The cursor implementation, after brief 3:
+
+- F236 (the speed of the string read), F417, F29, F111, and F313. The rewrite replaces the code of these rows.
+- F389 part 3 and F388 part 2: the `boxBytes` names and the test file moves.
+
+The 2.0.0 release prep:
+
+- F330: the migration guide and the breaking-change prefixes of the changelog.
+
+Other:
+
+- G519: the `V` parameter of `co64` belongs to issue 652.
+- G510: the ES baseline waits for the open target decision.
