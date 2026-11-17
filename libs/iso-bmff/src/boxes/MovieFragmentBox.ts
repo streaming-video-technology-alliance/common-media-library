@@ -12,7 +12,9 @@ export type MovieFragmentBoxChild<V extends IsoInt64 = number> =
 	| TrackFragmentBox<V>
 
 /**
- * Movie Fragment Box - 'moof' - Container
+ * Movie Fragment Box (`moof`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.4
  *
  * @public
  */

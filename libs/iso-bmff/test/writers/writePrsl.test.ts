@@ -27,6 +27,7 @@ describe('writePrsl', function () {
 		}
 
 		const writer = writePrsl(box, { writers: {} })
+		// #endregion example
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -58,7 +59,6 @@ describe('writePrsl', function () {
 				0, // interleavingTag (empty) and the null terminator
 			]),
 		)
-		// #endregion example
 	})
 
 	it('should write the null terminator of an empty preselectionTag when flag 0x1000 is set', function () {

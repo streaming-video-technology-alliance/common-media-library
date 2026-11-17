@@ -5,7 +5,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
- * Parse a `AudioSampleEntryBox` from an `IsoBoxReadView`.
+ * Read an audio sample entry box (`AudioSampleEntryBox`) of the given type.
  *
  * @param type - The type of `AudioSampleEntryBox` to read
  * @param view - The `IsoBoxReadView` to read data from

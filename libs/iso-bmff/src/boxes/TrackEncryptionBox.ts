@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 23001-7:2016 - 8.2 Track Encryption Box
+ * Track Encryption Box (`tenc`).
+ *
+ * ISO/IEC 23001-7:2016 - 8.2
  *
  * @public
  */
@@ -18,7 +20,7 @@ export type TrackEncryptionBox = FullBox & {
 	/** `default_Per_Sample_IV_Size` */
 	defaultIvSize: number
 
-	/** `default_KID` */
+	/** `default_KID`: the default key ID, 16 bytes. */
 	defaultKid: number[]
 
 	/**

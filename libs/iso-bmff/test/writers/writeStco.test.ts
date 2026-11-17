@@ -13,6 +13,7 @@ describe('writeStco', function () {
 
 		const writer = writeStco(box)
 		const buffer = new Uint8Array(writer.buffer)
+		// #endregion example
 
 		assert.strictEqual(
 			Buffer.compare(
@@ -50,6 +51,5 @@ describe('writeStco', function () {
 			),
 			0,
 		)
-		// #endregion example
 	})
 })

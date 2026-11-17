@@ -3,11 +3,14 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `DataEntryUrnBox` from an `IsoBoxReadView`.
+ * Read the `urn ` box (`DataEntryUrnBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
  * @returns A parsed `DataEntryUrnBox`
+ *
+ * @example
+ * {@includeCode ../../test/readers/readUrn.test.ts#example}
  *
  * @public
  */

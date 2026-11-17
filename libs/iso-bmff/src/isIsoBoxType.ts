@@ -14,6 +14,9 @@ import type { IsoInt64 } from './IsoInt64.ts'
  *
  * @returns `true` if the box is of the specified type, `false` otherwise
  *
+ * @example
+ * {@includeCode ../test/isIsoBoxType.test.ts#example}
+ *
  * @public
  */
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(

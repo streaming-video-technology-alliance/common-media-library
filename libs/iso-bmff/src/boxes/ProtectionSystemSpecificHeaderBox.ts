@@ -1,12 +1,15 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 23001-7:2011 - 8.1 Protection System Specific Header Box
+ * Protection System Specific Header Box (`pssh`).
+ *
+ * ISO/IEC 23001-7:2016 - 8.1
  *
  * @public
  */
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
 	type: 'pssh'
+	/** The UUID of the protection system, 16 bytes. */
 	systemId: number[]
 
 	/** The number of key IDs in `kid`. The value is 0 for a version 0 box. */

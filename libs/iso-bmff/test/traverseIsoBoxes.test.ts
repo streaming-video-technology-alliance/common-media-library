@@ -1,5 +1,4 @@
 import { readIsoBoxes, traverseIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
-import { strictEqual } from 'node:assert'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
@@ -16,14 +15,21 @@ describe('traverseIsoBoxes', function () {
 
 	it('should provide an example', async function () {
 		// #region example
-		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
-		const boxes = readIsoBoxes(new Uint8Array(isoFile))
+		const isoFile = await readFile(new URL('./fixtures/mss_moof_tfdt.mp4', import.meta.url))
+		const boxes = readIsoBoxes(isoFile)
 
-		for (const box of traverseIsoBoxes(boxes)) {
-			strictEqual(box.type, 'ftyp')
-			break
-		}
+		// Depth-first: each box, then its children.
+		const types = Array.from(traverseIsoBoxes(boxes), box => box.type)
+
+		// Breadth-first, with the root boxes and their children only.
+		const levels = Array.from(
+			traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 }),
+			box => box.type,
+		)
 		// #endregion example
+
+		assert.deepStrictEqual(types.slice(0, 4), ['moof', 'mfhd', 'traf', 'tfhd'])
+		assert.deepStrictEqual(levels, ['moof', 'mdat', 'mfhd', 'traf'])
 	})
 
 	it('should traverse empty boxes', function () {

@@ -1,7 +1,7 @@
 import type { IsoBoxWriter } from './IsoBoxWriter.ts'
 
 /**
- * A map of box writers to their box types
+ * Map of each box type to the writer of that box.
  *
  * @public
  */

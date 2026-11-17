@@ -9,7 +9,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export type AdditionalMetadataContainerBoxChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
- * Additional Metadata Container Box - 'meco' - Container - 8.11.7.1
+ * Additional Metadata Container Box (`meco`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.11.7
  *
  * @public
  */

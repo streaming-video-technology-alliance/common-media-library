@@ -5,17 +5,19 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
- * Write a `MovieFragmentRandomAccessBox` to an `IsoBoxWriteView`.
+ * Write the `mfra` box (`MovieFragmentRandomAccessBox`).
  *
  * The `writers` map does not need an entry for the `mfra` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.
  *
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *
+ * The writer does not change the `mfraSize` field of the `mfro` child. Set `mfraSize` after a change to the children.
+ *
  * @param box - The `MovieFragmentRandomAccessBox` fields to write
  * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the encoded box
+ * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */

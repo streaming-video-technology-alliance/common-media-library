@@ -5,7 +5,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `DataReferenceBox` from an `IsoBoxReadView`.
+ * Read the `dref` box (`DataReferenceBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

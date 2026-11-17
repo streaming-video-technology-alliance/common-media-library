@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * ISO/IEC 14496-12:202x - 8.10.4 Track kind box
+ * Track Kind Box (`kind`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.10.4
  *
  * @public
  */

@@ -4,7 +4,7 @@ import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Parse a `ProtectionSystemSpecificHeaderBox` from an `IsoBoxReadView`.
+ * Read the `pssh` box (`ProtectionSystemSpecificHeaderBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *

@@ -3,7 +3,7 @@ import type { IsoBoxType } from './IsoBoxType.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
- * A map of box parsers to their box types
+ * Map of each box type to the reader of that box.
  *
  * @public
  */

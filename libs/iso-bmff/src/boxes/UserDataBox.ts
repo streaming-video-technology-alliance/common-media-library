@@ -9,7 +9,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export type UserDataBoxChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
- * User Data Box - 'udta' - Container
+ * User Data Box (`udta`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.10.1
  *
  * @public
  */

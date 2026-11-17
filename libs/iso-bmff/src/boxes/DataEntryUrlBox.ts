@@ -1,7 +1,9 @@
 import type { FullBox } from './FullBox.ts'
 
 /**
- * Data Entry Url Box - 'url '
+ * Data Entry URL Box (`url `).
+ *
+ * ISO/IEC 14496-12:2015 - 8.7.2
  *
  * @public
  */

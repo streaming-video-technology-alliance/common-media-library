@@ -1,5 +1,7 @@
 /**
- * ISO/IEC 14496-30:2014 - WebVTT Cue Payload Box.
+ * WebVTT Cue Payload Box (`payl`).
+ *
+ * ISO/IEC 14496-30:2014
  *
  * @public
  */

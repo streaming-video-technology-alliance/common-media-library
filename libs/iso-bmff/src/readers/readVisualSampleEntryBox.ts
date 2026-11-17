@@ -8,7 +8,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
- * Parse a `VisualSampleEntryBox` from an `IsoBoxReadView`.
+ * Read a visual sample entry box (`VisualSampleEntryBox`) of the given type.
  *
  * @param type - The type of `VisualSampleEntryBox` to read
  * @param view - The `IsoBoxReadView` to read data from

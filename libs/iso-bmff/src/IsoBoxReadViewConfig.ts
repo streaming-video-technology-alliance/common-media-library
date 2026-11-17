@@ -13,7 +13,7 @@ import type { IsoInt64Reader } from './IsoInt64Reader.ts'
  */
 export type IsoBoxReadViewConfig<V extends IsoInt64 = number> = {
 	/**
-	 * A map of box parsers to their box types
+	 * Map of each box type to the reader of that box.
 	 */
 	readers?: NoInfer<IsoBoxReaderMap<V>>
 } & ([V] extends [bigint]
