@@ -1,4 +1,4 @@
-import { deepStrictEqual, equal, ok, throws } from 'node:assert'
+import { deepStrictEqual, strictEqual, ok, throws } from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 import { boxBytes, valueAt, WIDE_BOXES, wideValues } from './util/wideBoxes.ts'
 
@@ -59,17 +59,17 @@ describe('int64 option in a runtime without BigInt', () => {
 					ok(plain && checked)
 
 					for (const [i, path] of box.paths.entries()) {
-						equal(valueAt(plain, path), input.values[i])
-						equal(valueAt(checked, path), input.values[i])
+						strictEqual(valueAt(plain, path), input.values[i])
+						strictEqual(valueAt(checked, path), input.values[i])
 					}
 
-					equal(errors, input === high ? box.paths.length : 0)
+					strictEqual(errors, input === high ? box.paths.length : 0)
 
 					// The writers take the number fields with no BigInt.
 					if (input !== high) {
 						deepStrictEqual(writeIsoBox(plain, defaultWriterConfig()), input.bytes)
 					} else {
-						equal(writeIsoBox(plain, defaultWriterConfig()).length, input.bytes.length)
+						strictEqual(writeIsoBox(plain, defaultWriterConfig()).length, input.bytes.length)
 					}
 				}
 			}
