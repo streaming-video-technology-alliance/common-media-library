@@ -51,6 +51,7 @@ and this project adheres to
 
 ### Fixed
 
+- The published package includes `NOTICE.md`.
 - `IsoBoxReadView.readUtf8(-1)` now moves the view to the byte after the null byte of a string that has multi-byte characters. `readKind`, `readLabl`, and `readPrsl` now return the correct fields after such a string. Earlier releases return an empty `value` for a `kind` box with the `schemeUri` `urn:é` ([#630](https://github.com/streaming-video-technology-alliance/common-media-library/issues/630)).
 - `IsoBoxReadView.readUtf8(-1)` and `IsoBoxReadView.readString(-1)` now stop at the end of the view when the string has no null byte. Earlier releases move the view one byte past the end, and `bytesRemaining` is -1 ([#635](https://github.com/streaming-video-technology-alliance/common-media-library/issues/635)).
 - `IsoBoxReadView.readUtf8()` with no size now moves the view to the end of the view. Earlier releases return the string and do not move the view ([#635](https://github.com/streaming-video-technology-alliance/common-media-library/issues/635)).
@@ -132,6 +133,7 @@ and this project adheres to
 - The documentation of `readInt64AsBigInt` and the reading guide now test for `DataView.prototype.getBigUint64`. A runtime can have `BigInt` and no `getBigUint64` method. The documentation of `readUint64`, `writeUint64`, `writeWideUint`, and `writeWideInt` names the `DataView` method that each one needs.
 - The writing guide now states that the writers of string fields need `TextEncoder`.
 - The description of the package now states that the package reads and writes boxes.
+- The examples of `readIsoBoxes`, `writeIsoBoxes`, `traverseIsoBoxes`, and `createIsoBoxReadableStream` now use `strictEqual` and `deepStrictEqual`. The `writeIsoBoxes` example compares the written bytes with a `Uint8Array` of the file.
 
 ## [1.0.7] - 2026-10-18
 

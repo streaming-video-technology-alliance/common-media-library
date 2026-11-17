@@ -36,7 +36,7 @@ describe('readIsoBoxes', function () {
 		assert.strictEqual(box.size, 20)
 		assert.strictEqual(box.majorBrand, 'isom')
 		assert.strictEqual(box.minorVersion, 1)
-		assert.deepEqual(box.compatibleBrands, ['isom'])
+		assert.deepStrictEqual(box.compatibleBrands, ['isom'])
 		// #endregion example
 	})
 
