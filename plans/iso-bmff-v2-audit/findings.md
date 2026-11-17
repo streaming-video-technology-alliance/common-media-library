@@ -20,6 +20,8 @@ The audit read the source at commit 8ce63c212. That commit is `main` plus the dr
 
 Limits of the audit:
 
+- The audit read the package code of `main`. The base branch of version 2.0.0, `feat/iso-bmff-v2`, has the package code of version 1.0.7. Thirty-six findings name a file that the base branch does not have. No finding was checked against the base branch.
+- The audit read the first draft of the cursor RFC. PR 682 has a later text. That text may already correct some rows of the RFC group.
 - The specification texts were ISO/IEC 14496-12:2015, 23001-7:2016, and 23000-19:2020. Later editions were not available.
 - ISO/IEC 14496-15, 14496-30, and 23009-1 were not available. The `ardi`, `imda`, `labl`, and `grpl` boxes were not compared with a specification.
 - The agents wrote the detail files. Only the eight findings above have a second check by hand.
