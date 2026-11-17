@@ -1,5 +1,4 @@
 import { readIsoBoxes, traverseIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
-import { strictEqual } from 'node:assert'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
