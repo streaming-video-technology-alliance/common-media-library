@@ -1050,7 +1050,7 @@ Severity low. Category errors. Breaking: no. Fact check: confirmed. Value check:
 **Proposal of the finder.** 2.0.0 defines the case in the contract of `endIsoBox`: the function throws a `RangeError` with the box type and the size when the size is above 2^32 - 1. Support for `largesize` can come later with the stream writer that the RFC lists under Future possibilities.
 
 
-**Result.** Not done. The header size of a box above 4 GiB goes to the cursor RFC, because a 1.x check is a range check. Question 23 of the RFC in PR 682 (8435c2ae0).
+**Result.** Not done. The header size of a box above 4 GiB goes to the cursor RFC, because a 1.x check is a range check. Decided on 2026-11-17 in PR 682 (b6b0c4296): `endIsoBox` throws a `RangeError`.
 
 ## F291: The default container writing throws an opaque TypeError for a container box with no `boxes` field, which differs from the rule that a writer does not throw for a missing field.
 

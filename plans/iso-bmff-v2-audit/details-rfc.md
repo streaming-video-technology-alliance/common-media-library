@@ -16,7 +16,7 @@ Severity high. Category api-surface. Breaking: no. Fact check: partly. Value che
 
 **Prior decision.** No decision about the raw box. Related and binding for the definition of the header: PR 664 (commit 9103e4548, issue 660, closed) states in IsoBoxReadView.ts:355 and CHANGELOG.md:120 that the header of a `uuid` box has 16 more bytes for the `usertype` field. That matches ISO/IEC 14496-12:2015 clause 4.2.
 
-**Result.** Question 16 of the RFC in PR 682 (8435c2ae0): `headerSize` on the raw box, default yes.
+**Result.** Decided on 2026-11-17 in PR 682 (b6b0c4296): a raw box has `headerSize`.
 
 ## F240: The RFC contract writes any box with a `boxes` field and no writer as a container, which reverses the tested rule of version 1 and would write a `meta` box or a sample entry with no fields.
 
@@ -54,7 +54,7 @@ In both cases, add a "Variance of the cursor" paragraph to the RFC that carries 
 
 **Prior decision.** The accepted RFC rfc/uint64-reader-config.md line 370, "Variance of the view" (PR 613, commit 9bc54be04, implemented in PR 645, commit 2aca3e3e9) requires a read handle that is covariant in `V`. That decision supports the finding. No decision supports the invariant cursor: the cursor RFC exists only in the unpushed commit 8ce63c212.
 
-**Result.** Confirmed with a TypeScript 6.0.3 model (8 errors). PR 682 (8435c2ae0) adds a variance paragraph and question 14, default: a method signature for the readers map.
+**Result.** Confirmed with a TypeScript 6.0.3 model (8 errors). Decided on 2026-11-17 in PR 682 (b6b0c4296): a method signature for the readers map. The model of the decided types passes 16 cases.
 
 ## G482: A write cursor replaces `view` and `bytes` when the buffer grows, and a read cursor is shared by all boxes, but every cursor field is public and mutable and the contract does not warn about either case.
 
@@ -84,7 +84,7 @@ Severity: medium. The hazard needs a custom writer that bypasses the field funct
 
 **Prior decision.** None for the missing contract text. The mechanisms are intentional design choices of the draft RFC: rfc/iso-bmff-cursor-api.md:249 (one shared read cursor, one allocation) and lines 203 and 240 (buffer doubles, each growth copies). The RFC status is draft, "Pending review" (line 285).
 
-**Result.** Contract lines done in PR 682 (8435c2ae0). Question 15 asks for `readonly` fields, default yes.
+**Result.** Done in PR 682 (b6b0c4296). Decided on 2026-11-17: `readonly` fields except `pos`.
 
 ## F273: The RFC states that isIsoBoxType does not change, but its first overload takes `{ view: IsoBoxReadView<V> }`, a class that the RFC removes.
 
@@ -133,7 +133,7 @@ Severity medium. Category api-surface. Breaking: no. Fact check: confirmed. Valu
 **Proposal after verification.** Ship the pair in 2.0, not the reader alone: `readUuid` and `writeUuid`, plus `UuidBox = { type: 'uuid'; usertype: <16 bytes>; data: Uint8Array }` in `IsoBoxMap`. `data` is a view of the input (return type `Uint8Array`, per the AGENTS.md rule for views). Give `usertype` the same type that 2.0 uses for the other 16-byte identifiers (`systemId` of pssh, `defaultKid` of tenc). Those are `number[]` today. If another finding moves them to `Uint8Array`, use `Uint8Array` here too. Do not mix the two types. Without `writeUuid`, `writeIsoBoxes` throws for a parsed `UuidBox` under RFC line 201. State in the RFC contract that the cursor position for a `uuid` reader is before the 16 bytes of the user type, and name `readUuid` and `writeUuid` there. In c2pa, `matchesUuid` takes `readonly number[]` (utils.ts:79), so its parameter type changes to `ArrayLike<number>` if `usertype` becomes a `Uint8Array`. Use the c2pa change as the migration example in the RFC.
 
 
-**Result.** Question 17 of the RFC in PR 682 (8435c2ae0). Issue 694 tracks a helper after 2.0.0.
+**Result.** Decided on 2026-11-17 in PR 682 (b6b0c4296): no `uuid` reader in the package. Issue 694 tracks a helper after 2.0.0.
 
 ## G483: The RFC states that each method of the two view classes becomes a field function, but the table has no row and no stated fate for 11 members of the read view and 9 members of the write view.
 
@@ -287,7 +287,7 @@ Severity medium. Category behavior. Breaking: yes. Fact check: partly. Value che
 
 **Prior decision.** PR 290 (commit d429da2d2, version 1.0.0-alpha.8, CHANGELOG.md line 213: "Updated box reader functions to allow a type parameter to be passed in") added the second argument `type` on purpose. The RFC removes it without a note, so the Drawbacks section must name the removal. The factory replacement already exists since 1.0.0-alpha.4 (`createAudioSampleEntryReader`, `createVisualSampleEntryReader`, CHANGELOG.md line 248). rfc/iso-bmff-container-readers-writers.md:144 and docs/reading-boxes.md:275 already show a reader that returns `type`. Issue 668 (closed as not planned, 2026-11-16) is the precedent against a runtime check for a custom reader. No prior decision covers the three missing contract lines. The gh search for "IsoBoxReader type argument" and "custom reader" found no other issue.
 
-**Result.** Position and lifetime done in PR 682 (8435c2ae0). Question 18 asks who sets `type`.
+**Result.** Done in PR 682 (b6b0c4296). Decided on 2026-11-17: a reader returns the complete box with `type`.
 
 ## G492: The RFC does not say what a writer that never calls `endIsoBox` produces, and a size of 0 is a legal size that means the box extends to the end of the file.
 
@@ -306,7 +306,7 @@ Severity medium. Category behavior. Breaking: no. Fact check: confirmed. Value c
 2. Contract, box above 2^32 - 1 bytes. State that `endIsoBox` throws a `RangeError` with the box type and the size. Do not move the body and do not write `largesize`. Record a `largesize` writer under "Future possibilities", next to the `ReadableStream` writer for a large `mdat`. Also correct the comparison with version 1 in any migration note: version 1 has the `isLarge` branch at IsoBoxWriteView.ts:323, but no writer reserves the 8 extra bytes, so version 1 also fails with a `RangeError`.
 
 
-**Result.** The `largesize` part is question 23 in PR 682 (8435c2ae0). The check for a missing `endIsoBox` call is not done.
+**Result.** Decided on 2026-11-17 in PR 682 (b6b0c4296): `endIsoBox` throws a `RangeError` above 4 GiB. The check for a missing `endIsoBox` call is not done.
 
 ## G487: `seekIsoBox` returns `null`, and the first example of the RFC converts that `null` to `undefined`.
 
@@ -505,7 +505,7 @@ Severity medium. Category package-config. Breaking: yes. Fact check: partly. Val
 
 **Prior decision.** PR 531 (commit 673e33b3a, "chore(release): publish caret peer ranges instead of exact pins"): "A dependent gets a cascade bump only when the published range rejects the new peer version, such as a major bump." AGENTS.md:34 documents the same rule. Precedent: c2pa 1.4.1 released a peer range change as a patch (libs/c2pa/CHANGELOG.md:82). These show that the patch cascade is intentional. None of them decides the version level for a dependent whose own code must change with the peer major.
 
-**Result.** Done in PR 682 (8435c2ae0): a drawback and question 24.
+**Result.** Done in PR 682 (b6b0c4296). Decided on 2026-11-17: a major version for drm and c2pa.
 
 ## G494: The `uuid` contract contradicts the reader contract of the same RFC, and the RFC states no rule for the `usertype` of a `uuid` box with no reader or for a `uuid` writer.
 
@@ -523,7 +523,7 @@ Severity medium. Category spec-compliance. Breaking: yes. Fact check: partly. Va
 
 **Prior decision.** PR 664 (commit 9103e4548, issue 660, closed as completed 2026-11-16) is a decision for version 1: the header of a `uuid` box includes the 16 bytes of `usertype`, and `readIsoBoxes` stops before a `uuid` box with a size below 24, or below 32 with `largesize`. That decision supports the finding: the RFC must keep the rule or state the change. No decision covers the RFC text. rfc/iso-bmff-cursor-api.md has `status: draft`, and its line 230 says the trial build has no `uuid` user type.
 
-**Result.** Done in PR 682 (8435c2ae0). The contract points to question 17.
+**Result.** Done in PR 682 (b6b0c4296). Decided on 2026-11-17: the `uuid` rules of the contract.
 
 ## G481: The RFC cursor makes `int64` optional for `bigint` fields, which drops the accepted rule that a type with `bigint` fields always has the function.
 

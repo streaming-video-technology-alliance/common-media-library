@@ -31,7 +31,7 @@ Severity high. Category behavior. Breaking: yes. Fact check: confirmed. Value ch
 
 **Prior decision.** None found. PR 673 (d395df3ce, issue 651) and CHANGELOG.md:49 define the `view` fallback only for a type with no writer. They do not state that a writer must win over the source bytes of an unparsed box. The writer-first order dates from the first writer commit (d615e5bf0) and is needed in version 1 so that a parsed and modified box is written from its fields.
 
-**Result.** Theme 4 is in PR 682 (8435c2ae0): section "Raw boxes in writeIsoBoxes" and question 20.
+**Result.** Theme 4. Decided on 2026-11-17 in PR 682 (b6b0c4296): the order of the section "Raw boxes in writeIsoBoxes".
 
 ## F190: Twenty-four box types have a required count field that duplicates an array length, and the writers use three different rules for it.
 
@@ -85,7 +85,7 @@ Severity high. Category type-design. Breaking: yes. Fact check: partly. Value ch
 
 **Prior decision.** No decision states that a box without a reader should keep its full built-in type. The accepted RFC rfc/uint64-reader-config.md:360 ("The default union", PR 614) documents the present state: `ParsedIsoBox` includes every built-in box type, PR 614 excludes only the types that a required reader key replaces, and "When a key is not a literal, every built-in type stays." The test libs/iso-bmff/test/readIsoBoxes.test.ts:87 ("should keep the built-in box types when the reader map has no literal keys") and the TSDoc at libs/iso-bmff/src/IsoBoxReaderReturn.ts:25-26 pin that fallback. These describe the inherited union and do not defend the typed fields of a box that no reader decoded.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## F189: The child types of 12 container boxes are closed lists that omit children the specification allows, so a test for a legal child is a compile error.
 
@@ -102,7 +102,7 @@ Severity high. Category type-design. Breaking: yes. Fact check: partly. Value ch
 **Proposal after verification.** Use one element type for every `boxes` array, and make that type the same type that `readIsoBoxes` returns at the top level. Do not write `IsoBox<V> | IsoRawBox` with the raw type of the RFC as it stands: `IsoRawBox.type` is `IsoBoxType`, so `child.type === 'tfdt'` no longer narrows to the typed box (TS2339 in a scratch check with tsc 6.0.3). Two forms keep the narrowing. (1) `boxes: IsoBox<V>[]`, the rule of PR 659, with the raw box found by `'bytes' in child`. (2) A raw member whose `type` is `never`, as `Box<never>` is in `ParsedIsoBox` today. The cursor RFC must decide the form once, for the top level and for children together, and document `isIsoBoxType` as the guard that works in both forms. Delete the 26 exported `*Child` aliases (not 24) in 2.0.0 with no deprecated copies, including the three `any` aliases and the name `WebVttCueChild`. Keep the `E` parameter of `SampleDescriptionBox` and `readStsd` for a caller that knows the entry type, and change only the default to the open element type. Apply the same default to the entries of `dref`. State in the changelog the three kinds of code that stop compiling: a field read on a child with no type test, an exhaustive switch over child types, and an import of an alias name.
 
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## F270: isIsoBoxType narrows a box that has no decoded fields to the complete box type, so typed fields are `undefined` at run time.
 
@@ -126,7 +126,7 @@ Severity high. Category type-design. Breaking: yes. Fact check: partly. Value ch
 
 **Prior decision.** Not a decision for the behavior itself. rfc/uint64-reader-config.md:240 (accepted, PR 613, implemented in PR 645) kept the `unknown` signature and its narrowing to `number` fields to avoid a break in a minor version. The test comment at test/int64.types.test.ts:374 ("as before") records that compatibility choice. The draft rfc/iso-bmff-cursor-api.md:191 says `isIsoBoxType` does not change, but the draft is not accepted. A major version may change both.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## F94: `TrackReferenceTypeBox` declares `type: 'tref'` and `trackIds`, and no reader or writer produces or accepts that shape.
 
@@ -1104,7 +1104,7 @@ Severity medium. Category type-design. Breaking: yes. Fact check: confirmed. Val
 
 **Prior decision.** No decision keeps `any` on purpose. PR 659 (merged as 1337aaed4, fixes issue 646) deferred the three aliases in its section "Not in this PR": their boxes are not in `IsoBoxContainer`, and the documented `writeStsd` example passes raw bytes as a child, which `IsoBox` rejects. That reason was to avoid a compile break in a minor version. Open issue 584 plans the removal of every public `any` and the `typescript/no-explicit-any` rule.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## F193: isContainer returns true for 14 box types that its type predicate excludes, and the package has three different definitions of a container.
 
@@ -1148,7 +1148,7 @@ Part 2, in version 2.0.0, breaking: add the result type of `readIsoBoxes` to rfc
 
 **Prior decision.** PR 289 (commit 3102f626e, "feat: improved type inference for reader return types") introduced `Box<T extends IsoBoxType = never>` to replace `type: ''` and the comment "TODO: This is a hack to get type discrimination to work". PR 614 (commit 8d0b4b393, issue 611, CHANGELOG.md line 64) and rfc/iso-bmff-container-readers-writers.md:150 confirm that the result of `readIsoBoxes` narrows by `box.type`. PR 659 (commit 1337aaed4) uses `Box<IsoBox['type']>` in libs/iso-bmff/src/utils/isContainer.ts:24. No decision says that a comparison with an unknown type must be a compile error.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## F197: IsoBoxWriterMap is `Record<string, IsoBoxWriter<any>>`, so a writer under the wrong key compiles and writeBox needs an `any` cast.
 
@@ -1315,7 +1315,7 @@ Cost to state in the RFC: code that reads a field after `box.type === 'xxxx'` al
 
 **Prior decision.** No decision covers the unread case. Related context only: the TSDoc of IsoBoxReaderReturn (libs/iso-bmff/src/IsoBoxReaderReturn.ts:7-13) states that the union keeps every built-in box type so that `box.type === 'xxxx'` narrows, and the changelog entry for issue 646 (libs/iso-bmff/CHANGELOG.md:91-92) gave container children a box type with the advice "Test `child.type` before you read a field of a child". Both show that narrowing on `type` to the full box type is the intended convenience. Neither states that the gap for a box with no reader is accepted.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## F72: SampleDependencyTypeBox returns the packed bytes as number[] under a name that is not in the spec, with no documentation of the bits.
 
@@ -1354,7 +1354,7 @@ Severity medium. Category type-design. Breaking: yes. Fact check: confirmed. Val
 
 **Prior decision.** None found for the type parameter or the default. The git history of readStsd.ts and SampleDescriptionBox.ts shows no decision commit (the generic dates from the writers work, d615e5bf0 and a4f84a560). Related precedent, not a decision for stsd: issue 646 (PR 659) typed the children of `udta`, `grpl`, `strk`, and `meco` as `IsoBox<V>` (CHANGELOG.md:44-48, :91). That change did not include `stsd` entries.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): section "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## G468: A readers map with the exported type IsoBoxReaderMap makes every box of the readIsoBoxes result lose `type`, so drm builds its map through a second variable.
 
@@ -1384,7 +1384,7 @@ The constraint `IsoBoxReader<B extends { type: IsoBoxType } = { type: IsoBoxType
 
 **Prior decision.** No decision states that the missing `type` is intentional. rfc/uint64-reader-config.md:246 and test/int64.types.test.ts:1089-1093 record only that an `IsoBoxReaderMap` takes a factory reader by assignment, as drm does. The alias in drm came from PR 585 (facd7ba42) as the replacement for an `as any` cast.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): rule 3 of "Result type" and question 19.
+**Result.** Theme 3. Decided on 2026-11-17 in PR 682 (b6b0c4296): the rules of the section "Result type".
 
 ## G512: No field with a closed set of values has a literal type, and `writeSidx` masks a value outside the set without an error.
 
@@ -1435,7 +1435,7 @@ The type-only half (add `type: K` when `B` has no `type`) breaks no adopter and 
 
 **Prior decision.** None found that makes the required `type` intentional. rfc/uint64-reader-config.md L105 states only that "the result type keeps whatever the reader returns". rfc/iso-bmff-cursor-api.md L89-L111 shows a custom reader that returns `type: 'mfhd'`, and its Contract says "A parsed box has only `type` and its fields", which keeps the current convention without stating a rule.
 
-**Result.** Theme 3 is in PR 682 (8435c2ae0): question 18.
+**Result.** Theme 3. Not chosen on 2026-11-17: a reader returns `type` (PR 682 (b6b0c4296)).
 
 ## F232: Several exports have no purpose after the cursor RFC, and six of them are generic constant names.
 
