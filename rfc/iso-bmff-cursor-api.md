@@ -384,6 +384,9 @@ Limits of the numbers:
 8. **A count for rows of 0 bytes.** A `trun` box of 16 bytes can state any sample count. The reader creates one object for each sample, as in version 1. Should the reader limit that count?
 9. **A `kid` length that is not a multiple of 16.** Should `writePssh` throw a `RangeError`, or write only the complete key IDs?
 10. **A box with a `boxes` field and a type outside `CONTAINERS`.** With no writer for such a box, version 1 writes only the header and the child boxes. Version 1 does not write the other fields. Should `writeIsoBoxes` throw for that box?
+11. **Members of `IsoBoxReadView` with no replacement.** This RFC states no replacement for `slice`, `jump`, `readBox`, and `bytesRemaining`. The readers of `ftyp` and `sdtp` use `bytesRemaining`. Should a reader use `cursor.pos` and `cursor.end`, or should the package export a function for each member?
+12. **The box type argument of a reader.** In version 1, a reader takes the box type as a second argument. The `IsoBoxReader` type of this RFC has no such argument. Should the read cursor have the box type, or should a reader keep the second argument?
+13. **Rules that the table in [Baseline](#baseline) omits.** [#674](https://github.com/streaming-video-technology-alliance/common-media-library/pull/674) also changes `sidx` and `prft` for a box version of 2 or above. [#658](https://github.com/streaming-video-technology-alliance/common-media-library/pull/658) also adds the fields `defaultIsProtected`, `defaultCryptByteBlock`, and `defaultSkipByteBlock` to `tenc`. Should version 2.0.0 use those rules?
 
 ## Future possibilities
 
