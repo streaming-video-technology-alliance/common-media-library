@@ -2,6 +2,22 @@
 
 The audit agents wrote this text. The index is in `findings.md`.
 
+## G466: parsePsshList in drm never returns for a box with size 0 and throws a native RangeError for trailing bytes, because it has its own box walk.
+
+Severity high. Category behavior. Breaking: yes. Fact check: confirmed. Value check: partly.
+
+**Why it breaks.** The defect is in @svta/cml-drm. A fix changes a thrown RangeError into a returned result for malformed init data.
+
+**Files.** `libs/drm/src/cenc/parsePsshList.ts:51`, `libs/drm/src/cenc/parsePsshList.ts:56`, `libs/drm/src/cenc/parsePsshList.ts:118`, `libs/drm/src/cenc/getPsshForKeySystem.ts:24`
+
+**Evidence.** `const size = dv.getUint32(byteCursor)`, `const nextBox = byteCursor + size` (lines 51-52), then `if (dv.getUint32(byteCursor) !== 0x70737368) { byteCursor = nextBox; continue }` (lines 56-59) and `byteCursor = nextBox` (line 118). With `size` 0, `nextBox` equals the start of the same box, so the loop never ends. I ran the source with the 12 bytes `00 00 00 00 66 72 65 65 01 02 03 04`: the process did not return and a 5 second alarm stopped it. An 8-byte `free` box with 2 trailing bytes, and a `pssh` box with a size of 12, both throw `RangeError: Offset is outside the bounds of the DataView`. Size 1 (`largesize`) is read as a size of 1 byte. `getPsshForKeySystem` calls the function (getPsshForKeySystem.ts:24). The input is init data from the media, so the content controls it. ISO/IEC 14496-12 clause 4.2 allows size 0 for the last box.
+
+**Proposal of the finder.** Short term, in drm: stop the loop when `size < 8` or `nextBox > dv.byteLength`, and treat size 0 as the end of the data. With 2.0: build `parsePsshList` on the flat function of iso-bmff, so the two packages share one stop rule. Record the defect as a drm issue. It is not part of the iso-bmff package.
+
+**Proposal after verification.** Fix it in @svta/cml-drm now as a patch release, independent of iso-bmff 2.0. File one drm issue (none exists). Keep the local walk and do not add an iso-bmff import to parsePsshList. Rules, matching IsoBoxReadView.readBox (iso-bmff src line 383-390): (1) stop when fewer than 8 bytes remain; (2) size 0 means the box ends at `dv.byteLength`; (3) size 1 reads the 64-bit `largesize` (header 16 bytes), or stops if the maintainers do not want largesize support in init data; (4) stop when the box size is below its header size or `nextBox > dv.byteLength`; (5) skip a `pssh` box with a size below 32 (FullBox header 12 + SystemID 16 + DataSize 4, ISO/IEC 23001-7), so the system ID never comes from bytes outside the box. Rule 5 is missing from the finding's proposal and is needed for the size-12 `pssh` cases (one throws a RangeError, one returns a system ID made from the next box). Add tests for each input. Drop the "build on the flat function of iso-bmff" part: the cursor RFC defines no such function, and the bundle cost for adopters of `getPsshForKeySystem` is not measured. Revisit only if 2.0 adds a header-only box walk and a size measurement shows no growth. Not a semver break: a hang becomes a return, and an undocumented native RangeError on malformed input becomes a result, the same class of change that PR 662 shipped as a fix.
+
+**Prior decision.** None for drm: the loop is unchanged since 8ac3ef9b9 (CML Version 1, #265), a port of dash.js. Related precedent that supports the fix, not the current state: issue 663 / PR 662 (6c788e430) made `readIsoBoxes` stop before a box with a size below its header size and shipped it as a `### Fixed` entry with no major version. Issue 668 (closed as not planned) does not apply: a built-in function reaches this state with content-controlled input, and a hang returns no error to the caller.
+
 ## G464: The package has no flat walk of sibling boxes, so the repo has three more box walkers with four different stop rules, and the skill tells adopters not to write one.
 
 Severity medium. Category api-surface. Breaking: no. Fact check: partly. Value check: partly.
@@ -22,7 +38,7 @@ Severity medium. Category api-surface. Breaking: no. Fact check: partly. Value c
 
 4. Treat the three replacements as separate changes, not as part of the export.
    - c2pa: `readBoxes` feeds the BMFF hash. A different stop rule changes which boxes the hash covers for malformed input, such as a `uuid` box of 8 to 23 bytes. c2pa also needs the offset in the root bytes, the header size, and the index for each type (readRootBoxes.ts:11-22). The offset comes from `bytes.byteOffset`, and the caller counts the index. Do it in its own PR with the hand-built hash tests of PR 569.
-   - drm: `parsePsshList` already has iso-bmff as a peer dependency. The switch also fixes the defect of G466. That fix changes the result for malformed input, so it needs a changelog entry in drm.
+   - drm: `parsePsshList` already has iso-bmff as a peer dependency. The switch also fixes its size 0 loop. That fix changes the result for malformed input, so it needs a changelog entry in drm.
    - 608: `findBox` is a test helper in a package with no iso-bmff dependency. Leave it, or treat it as optional.
 
 **Prior decision.** No decision against a flat walk exists. Related: PR 569 (1c271202e, fixes issue 566) added the internal c2pa walker `readRootBoxes` on purpose with "No public API change", so that `computeBmffHash` and `hashIncludesMoov` see the same root boxes (libs/c2pa/src/init/validateC2paInitSegment.ts:81). PR 570 (ee916b7c8) added `readBoxes` for child levels. rfc/iso-bmff-cursor-api.md:280 lists "A function that returns every box at a path" under Future possibilities.
@@ -125,7 +141,7 @@ Severity low. Category docs. Breaking: no. Fact check: partly. Value check: part
 
 **Proposal of the finder.** After the 2.0 pssh type has byte views, build the drm functions on `readPssh` and the flat function. Change the iso-bmff bullet to state its purpose: "Read the fields of one pssh box". Keep the task "find the pssh box for a key system" only in the drm section.
 
-**Proposal after verification.** Keep only the documentation change, and make it in the source. Edit libs/iso-bmff/README.md:13 to state the purpose and point to drm, for example: "Read the fields of a pssh, tenc, or schm box: `readPssh`, `readTenc`, `readSchm`. To find the pssh box for a key system, use `@svta/cml-drm`." Then run the root build so that skills/common-media-library regenerates, and commit the result. Do this edit in the 2.0 README rewrite, because line 16 of the same section names `IsoBoxReadView` and `IsoBoxWriteView`, which the cursor RFC removes. Do not put the drm rebuild in the iso-bmff 2.0 scope. If the maintainers want it, file a drm issue that requires a bundle measurement for an adopter who imports only `parsePsshList`, keeps the version 0 or 1 filter, and covers the defect of G466.ts.
+**Proposal after verification.** Keep only the documentation change, and make it in the source. Edit libs/iso-bmff/README.md:13 to state the purpose and point to drm, for example: "Read the fields of a pssh, tenc, or schm box: `readPssh`, `readTenc`, `readSchm`. To find the pssh box for a key system, use `@svta/cml-drm`." Then run the root build so that skills/common-media-library regenerates, and commit the result. Do this edit in the 2.0 README rewrite, because line 16 of the same section names `IsoBoxReadView` and `IsoBoxWriteView`, which the cursor RFC removes. Do not put the drm rebuild in the iso-bmff 2.0 scope. If the maintainers want it, file a drm issue that requires a bundle measurement for an adopter who imports only `parsePsshList`, keeps the version 0 or 1 filter, and covers the possible size 0 loop in parsePsshList.ts.
 
 
 ## G479: The 608 package asks the caller for the position and the size of each sample, and its tests parse moof, traf and trun by hand to get them.

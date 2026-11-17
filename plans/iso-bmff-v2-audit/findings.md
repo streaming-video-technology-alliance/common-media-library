@@ -61,13 +61,13 @@ The RFC rows with the highest value:
 - **G497, G498.** The Summary states that the trial build is faster in every scenario, and one table row is slower. The reader count and the writer count are wrong.
 - **G499, G502.** The RFC makes text of the two accepted RFCs wrong and has no migration guide.
 
-One row of the last group is urgent. **G466** is a defect in the box walk of `parsePsshList` in `@svta/cml-drm`. The author of this file reproduced the defect. The input comes from the media. Recommendation: fix the defect in a patch release of drm now.
+One row of the last group is urgent. **G466**: `parsePsshList` in `@svta/cml-drm` does not return for a box with a size of 0. The author of this file reproduced the defect. The input comes from the media. Issue 683 records the defect and the proposed fix.
 
 ## Proposed order
 
 | Step | Work | Rows | Needs |
 | --- | --- | --- | --- |
-| 1 | Fix G466 in drm | 1 | A decision on how to report the defect |
+| 1 | Fix G466 in drm (issue 683) | 1 | No decision. A patch release of drm |
 | 2 | Amend the cursor RFC | 30 | No code. One revision of the draft |
 | 3 | Fix the rows that break nothing | 73 | No decision. 37 rows are documentation |
 | 4 | Decide the twelve themes | 92 | RFC text, because each theme changes the public API |
@@ -326,7 +326,7 @@ Each row is outside `libs/iso-bmff`. Record each row as an issue for its own pac
 
 | ID | Severity | Category | When | Finding |
 | --- | --- | --- | --- | --- |
-| G466 | high | behavior | any time | The box walk of `parsePsshList` in drm has stop rules that differ from `readIsoBoxes`. The details are not in this file until the maintainer decides how to report the defect. |
+| G466 | high | behavior | any time | parsePsshList in drm never returns for a box with size 0 and throws a native RangeError for trailing bytes, because it has its own box walk. |
 | G464 | medium | api-surface | any time | The package has no flat walk of sibling boxes, so the repo has three more box walkers with four different stop rules, and the skill tells adopters not to write one. |
 | G465 | medium | behavior | any time | c2pa reads JUMBF boxes with readIsoBoxes, which applies three ISO BMFF rules that JUMBF content does not need. |
 | G467 | medium | behavior | any time | validateC2paInitSegment checks for mdat with readIsoBoxes and computes the hash with a second walker, and the two walkers stop at different boxes. |
