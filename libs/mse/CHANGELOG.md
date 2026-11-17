@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - README: the Usage section states that the package has no public exports yet.
 
 
+### Fixed
+
+- The published package includes `NOTICE.md`.
+
 ## [0.0.1] - 2026-01-12
 
 ### Added
