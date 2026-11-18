@@ -354,7 +354,7 @@ The `int64` option does not change. The [box types RFC](https://github.com/strea
 
 ### Migration
 
-Version 2.0.0 ships the guide `docs/migrating-to-v2.md`. The guide has one row for each removed class member and for each removed box field. The package has no function that adapts a version 1 reader. The changelog links to the guide. The pull requests that implement this RFC also rewrite the reading guide, the writing guide, and the utilities guide. The guides use "box object" for an object with fields, and "raw box" for `{ type, bytes }`.
+Version 2.0.0 ships the guide `docs/migrating-to-v2.md`. The guide has one row for each removed class member and for each removed box field. The package has no function that adapts a version 1 reader. The changelog links to the guide. Some `[Unreleased]` entries of the changelog name members of `IsoBoxReadView` and `IsoBoxWriteView`. Each pull request that replaces a member also amends or removes the entries for that member. The pull requests that implement this RFC also rewrite the reading guide, the writing guide, and the utilities guide. The guides use "box object" for an object with fields, and "raw box" for `{ type, bytes }`.
 
 ### Results of a trial build
 
