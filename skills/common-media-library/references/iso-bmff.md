@@ -853,7 +853,7 @@ export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (vi
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteViewConfig): ReadableStream<Uint8Array>;
 
 // @public
 export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntryBox<T>;
@@ -913,7 +913,7 @@ export function defaultReaderConfig(options?: {
 }): IsoBoxReadViewConfig;
 
 // @public
-export function defaultWriterConfig(): IsoBoxWriteViewConfig;
+export function defaultWriterConfig(): Required<IsoBoxWriteViewConfig>;
 
 // @public
 export type EditBox<V extends IsoInt64 = number> = {
@@ -1260,7 +1260,7 @@ export class IsoBoxWriteView {
 
 // @public
 export type IsoBoxWriteViewConfig = {
-    writers: IsoBoxWriterMap;
+    writers?: IsoBoxWriterMap;
 };
 
 // @public
@@ -2213,7 +2213,7 @@ export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
 export function writeIsoBox(box: IsoBoxStreamable<IsoInt64>, config?: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>[];
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteViewConfig): Uint8Array<ArrayBuffer>[];
 
 // @public
 export function writeKind(box: TrackKindBox): IsoBoxWriteView;

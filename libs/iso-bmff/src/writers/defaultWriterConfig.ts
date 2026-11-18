@@ -74,7 +74,7 @@ import { writeVtte } from './writeVtte.ts'
  *
  * @public
  */
-export function defaultWriterConfig(): IsoBoxWriteViewConfig {
+export function defaultWriterConfig(): Required<IsoBoxWriteViewConfig> {
 	return {
 		writers: {
 			ardi: writeArdi,

@@ -214,6 +214,21 @@ describe('writeIsoBoxes', function () {
 		strictEqual(bytes.length, 0)
 	})
 
+	it('should write the boxes of a read with no configuration', async function () {
+		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
+
+		deepStrictEqual(
+			reduceUint8Arrays(writeIsoBoxes(readIsoBoxes(isoFile))),
+			new Uint8Array(isoFile),
+		)
+	})
+
+	it('should write a configuration with no writers map', function () {
+		const free = new Uint8Array([0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65])
+
+		deepStrictEqual([...writeIsoBoxes([free], {})[0]], [...free])
+	})
+
 	it('should copy a box given as a view over a SharedArrayBuffer', function () {
 		const bytes = [0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65]
 		const shared = new Uint8Array(new SharedArrayBuffer(bytes.length))
