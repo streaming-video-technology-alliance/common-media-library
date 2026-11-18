@@ -91,6 +91,14 @@ and this project adheres to
 - The description of the package now states that the package reads and writes boxes.
 - The UTF-8 string reads now call `decodeUtf8` of `@svta/cml-utils`. A bundle with `readIsoBoxes` is about 200 bytes smaller after gzip. The results do not change. The package now needs `@svta/cml-utils` 1.8.0 or later.
 
+### Removed
+
+- `IsoBoxMap` and the child box types no longer have the 16 box types with no reader and no writer. The removed box types are `hmhd`, `iinf`, `iloc`, `imif`, `infe`, `ipro`, `iref`, `nmhd`, `pitm`, `saio`, `saiz`, `sbgp`, `senc`, `sgpd`, `stdp`, and `stsh`. To read one of these boxes, declare its type and add a custom reader ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The package no longer exports the types of the 16 removed box types, such as `SampleEncryptionBox` and `ItemInfoEntry`. The entry types of those boxes, such as `EncryptedSample` and `ItemLocation`, are also removed ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The type aliases `co64`, `stz2`, `url`, and `urn` are removed. Use `ChunkLargeOffsetBox`, `CompactSampleSizeBox`, `DataEntryUrlBox`, and `DataEntryUrnBox`, or a key of `IsoBoxMap` such as `IsoBoxMap['co64']` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The constants `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, and `IsoBoxFields` are removed. Pass the string value, such as `view.readArray('uint', 4, count)` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The class `IsoBoxReadableStream` is removed. Replace `new IsoBoxReadableStream(boxes, config)` with `createIsoBoxReadableStream(boxes, config)` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+
 ### Fixed
 
 - The published package includes `NOTICE.md`.
@@ -144,6 +152,7 @@ and this project adheres to
 - `readTrun` now reads `sampleCompositionTimeOffset` as a signed integer for a `trun` box of version 2 or above. Earlier releases read a signed integer only for version 1 ([#678](https://github.com/streaming-video-technology-alliance/common-media-library/issues/678)).
 - `readIsoBoxes` and `IsoBoxReadView` now read an `ArrayBuffer` from another realm, such as a `node:vm` context or an iframe. Earlier releases throw a `TypeError` for that `ArrayBuffer`.
 - `IsoBoxReadableStream` and `createIsoBoxReadableStream` now close the source iterator when the stream is canceled. The `finally` block of a generator source now runs. Earlier releases leave the iterator open.
+- `createIsoBoxReadableStream` now reads the global `ReadableStream` when it is called. A `ReadableStream` polyfill that a player installs after the import now works ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 
 ## [1.0.7] - 2026-10-18
 

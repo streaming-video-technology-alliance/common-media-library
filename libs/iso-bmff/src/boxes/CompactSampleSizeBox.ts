@@ -13,8 +13,3 @@ export type CompactSampleSizeBox = FullBox & {
 	sampleCount: number
 	entrySize: number[]
 }
-
-/**
- * @public
- */
-export type stz2 = CompactSampleSizeBox

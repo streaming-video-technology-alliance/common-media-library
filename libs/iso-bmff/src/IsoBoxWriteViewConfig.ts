@@ -1,7 +1,7 @@
 import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
 
 /**
- * Configuration for the IsoBoxReadableStream.
+ * Configuration for `writeIsoBox`, `writeIsoBoxes`, and `createIsoBoxReadableStream`.
  *
  * @public
  */

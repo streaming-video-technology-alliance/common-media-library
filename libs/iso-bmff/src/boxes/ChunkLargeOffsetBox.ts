@@ -12,8 +12,3 @@ export type ChunkLargeOffsetBox = FullBox & {
 	entryCount: number
 	chunkOffset: number[]
 }
-
-/**
- * @public
- */
-export type co64 = ChunkLargeOffsetBox

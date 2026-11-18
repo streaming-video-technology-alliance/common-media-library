@@ -4,8 +4,6 @@
 
 ```ts
 
-import { ValueOf } from '@svta/cml-utils';
-
 // @public
 export type AdditionalMetadataContainerBox<V extends IsoInt64 = number> = {
     type: "meco";
@@ -58,9 +56,6 @@ export type ChunkOffsetBox = FullBox & {
     chunkOffset: number[];
 };
 
-// @public (undocumented)
-export type co64 = ChunkLargeOffsetBox;
-
 // @public
 export type CompactSampleSizeBox = FullBox & {
     type: "stz2";
@@ -96,9 +91,6 @@ export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoI
 
 // @public
 export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntryBox<T>;
-
-// @public
-export const DATA: "data";
 
 // @public
 export type DataEntryUrlBox = FullBox & {
@@ -158,12 +150,6 @@ export function defaultReaderConfig(options?: {
 export function defaultWriterConfig(): IsoBoxWriteViewConfig;
 
 // @public
-export type DegradationPriorityBox = FullBox & {
-    type: "stdp";
-    priority: number[];
-};
-
-// @public
 export type EditBox<V extends IsoInt64 = number> = {
     type: "edts";
     boxes: EditBoxChild<V>[];
@@ -185,12 +171,6 @@ export type EditListEntry<V extends IsoInt64 = number> = {
     mediaTime: V;
     mediaRateInteger: number;
     mediaRateFraction: number;
-};
-
-// @public
-export type EncryptedSample = {
-    initializationVector?: Uint8Array;
-    subsampleEncryption?: SubsampleEncryption[];
 };
 
 // @public
@@ -289,28 +269,10 @@ export type HandlerReferenceBox = FullBox & {
 };
 
 // @public
-export type HintMediaHeaderBox = FullBox & {
-    type: "hmhd";
-    maxPDUsize: number;
-    avgPDUsize: number;
-    maxbitrate: number;
-    avgbitrate: number;
-};
-
-// @public
 export type IdentifiedMediaDataBox = {
     type: "imda";
     imdaIdentifier: number;
     data: Uint8Array;
-};
-
-// @public
-export const INT: "int";
-
-// @public
-export type IpmpInfoBox = FullBox & {
-    type: "imif";
-    ipmpDescr: any[];
 };
 
 // @public
@@ -360,19 +322,6 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
 export type IsoBoxData = ArrayBufferLike | ArrayBufferView;
 
 // @public
-export const IsoBoxFields: {
-    DATA: typeof DATA;
-    INT: typeof INT;
-    STRING: typeof STRING;
-    TEMPLATE: typeof TEMPLATE;
-    UINT: typeof UINT;
-    UTF8: typeof UTF8;
-};
-
-// @public (undocumented)
-export type IsoBoxFields = ValueOf<typeof IsoBoxFields>;
-
-// @public
 export type IsoBoxMap<V extends IsoInt64 = number> = {
     ardi: AudioRenderingIndicationBox;
     avc1: VisualSampleEntryBox<"avc1">;
@@ -395,16 +344,9 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     grpl: GroupsListBox<V>;
     hdlr: HandlerReferenceBox;
     hev1: VisualSampleEntryBox<"hev1">;
-    hmhd: HintMediaHeaderBox;
     hvc1: VisualSampleEntryBox<"hvc1">;
     iden: WebVttCueIdBox;
-    iinf: ItemInfoBox;
-    iloc: ItemLocationBox;
     imda: IdentifiedMediaDataBox;
-    imif: IpmpInfoBox;
-    infe: ItemInfoEntry;
-    ipro: ItemProtectionBox;
-    iref: ItemReferenceBox;
     kind: TrackKindBox;
     labl: LabelBox;
     mdat: MediaDataBox;
@@ -422,20 +364,13 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     mp4a: AudioSampleEntryBox<"mp4a">;
     mvex: MovieExtendsBox<V>;
     mvhd: MovieHeaderBox<V>;
-    nmhd: NullMediaHeaderBox;
     payl: WebVttCuePayloadBox;
-    pitm: PrimaryItemBox;
     prft: ProducerReferenceTimeBox<V>;
     prsl: PreselectionGroupBox;
     pssh: ProtectionSystemSpecificHeaderBox;
-    saio: SampleAuxiliaryInformationOffsetsBox;
-    saiz: SampleAuxiliaryInformationSizesBox;
-    sbgp: SampleToGroupBox;
     schi: SchemeInformationBox;
     schm: SchemeTypeBox;
     sdtp: SampleDependencyTypeBox;
-    senc: SampleEncryptionBox;
-    sgpd: SampleGroupDescriptionBox;
     sidx: SegmentIndexBox<V>;
     sinf: ProtectionSchemeInformationBox;
     skip: FreeSpaceBox<"skip">;
@@ -443,12 +378,10 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     ssix: SubsegmentIndexBox;
     stbl: SampleTableBox;
     stco: ChunkOffsetBox;
-    stdp: DegradationPriorityBox;
     sthd: SubtitleMediaHeaderBox;
     strk: SubTrackBox<V>;
     stsc: SampleToChunkBox;
     stsd: SampleDescriptionBox;
-    stsh: ShadowSyncSampleBox;
     stss: SyncSampleBox;
     stsz: SampleSizeBox;
     sttg: WebVttSettingsBox;
@@ -475,13 +408,6 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     vttC: WebVttConfigurationBox;
     vtte: WebVttEmptySampleBox;
 };
-
-// Warning: (ae-forgotten-export) The symbol "ReadableStreamBase" needs to be exported by the entry point index.d.ts
-//
-// @public
-export class IsoBoxReadableStream extends ReadableStreamBase<Uint8Array> {
-    constructor(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config: IsoBoxWriteViewConfig);
-}
 
 // @public
 export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = number> = (view: IsoBoxReadView<V>, type: T) => B;
@@ -573,12 +499,12 @@ export type IsoBoxWriteViewConfig = {
 
 // @public
 export type IsoFieldTypeMap = {
-    [IsoBoxFields.UINT]: number;
-    [IsoBoxFields.INT]: number;
-    [IsoBoxFields.TEMPLATE]: number;
-    [IsoBoxFields.STRING]: string;
-    [IsoBoxFields.DATA]: Uint8Array;
-    [IsoBoxFields.UTF8]: string;
+    uint: number;
+    int: number;
+    template: number;
+    string: string;
+    data: Uint8Array;
+    utf8: string;
 };
 
 // @public
@@ -589,73 +515,6 @@ export type IsoInt64Reader<V extends IsoInt64 = number> = (view: IsoBoxReadView<
 
 // @public
 export type IsoTypedParsedBox<T extends keyof IsoBoxMap, V extends IsoInt64 = number> = ParsedBox<IsoBoxMap<V>[T], V>;
-
-// @public
-export type ItemExtent = {
-    extentIndex?: number;
-    extentOffset: number;
-    extentLength: number;
-};
-
-// @public
-export type ItemInfoBox = {
-    type: "iinf";
-    boxes: ItemInfoBoxChild[];
-    entryCount: number;
-};
-
-// @public
-export type ItemInfoBoxChild = ItemInfoEntry;
-
-// @public
-export type ItemInfoEntry = FullBox & {
-    type: "infe";
-    itemId: number;
-    itemProtectionIndex: number;
-    itemName: string;
-    contentType: string;
-    contentEncoding?: string;
-    extensionType?: string;
-};
-
-// @public
-export type ItemLocation = {
-    itemId: number;
-    constructionMethod?: number;
-    dataReferenceIndex: number;
-    baseOffset: number;
-    extents: ItemExtent[];
-};
-
-// @public
-export type ItemLocationBox = FullBox & {
-    type: "iloc";
-    offsetSize: number;
-    lengthSize: number;
-    baseOffsetSize: number;
-    indexSize?: number;
-    itemCount: number;
-    items: ItemLocation[];
-};
-
-// @public
-export type ItemProtectionBox = {
-    type: "ipro";
-    boxes: ItemProtectionBoxChild[];
-    protectionCount: number;
-};
-
-// @public
-export type ItemProtectionBoxChild = ProtectionSchemeInformationBox;
-
-// @public
-export type ItemReferenceBox = {
-    type: "iref";
-    boxes: ItemReferenceBoxChild[];
-};
-
-// @public
-export type ItemReferenceBoxChild = SingleItemTypeReferenceBox;
 
 // @public
 export type LabelBox = FullBox & {
@@ -699,7 +558,7 @@ export type MediaInformationBox = {
 };
 
 // @public
-export type MediaInformationBoxChild = VideoMediaHeaderBox | SoundMediaHeaderBox | HintMediaHeaderBox | NullMediaHeaderBox | DataInformationBox | SampleTableBox | SubtitleMediaHeaderBox;
+export type MediaInformationBoxChild = VideoMediaHeaderBox | SoundMediaHeaderBox | DataInformationBox | SampleTableBox | SubtitleMediaHeaderBox;
 
 // @public
 export type MetaBox<V extends IsoInt64 = number> = FullBox & {
@@ -708,7 +567,7 @@ export type MetaBox<V extends IsoInt64 = number> = FullBox & {
 };
 
 // @public
-export type MetaBoxChild<V extends IsoInt64 = number> = HandlerReferenceBox | PrimaryItemBox | DataInformationBox | ItemLocationBox | ItemProtectionBox | ItemInfoBox | ItemReferenceBox | GroupsListBox<V>;
+export type MetaBoxChild<V extends IsoInt64 = number> = HandlerReferenceBox | DataInformationBox | GroupsListBox<V>;
 
 // @public
 export type MovieBox<V extends IsoInt64 = number> = {
@@ -781,11 +640,6 @@ export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
 };
 
 // @public
-export type NullMediaHeaderBox = FullBox & {
-    type: "nmhd";
-};
-
-// @public
 export type OriginalFormatBox = {
     type: "frma";
     dataFormat: number;
@@ -818,12 +672,6 @@ export type PreselectionGroupBox = FullBox & {
 export type PreselectionGroupBoxChild = any;
 
 // @public
-export type PrimaryItemBox = FullBox & {
-    type: "pitm";
-    itemId: number;
-};
-
-// @public
 export type ProducerReferenceTimeBox<V extends IsoInt64 = number> = FullBox & {
     type: "prft";
     referenceTrackId: number;
@@ -839,7 +687,7 @@ export type ProtectionSchemeInformationBox = {
 };
 
 // @public
-export type ProtectionSchemeInformationBoxChild = OriginalFormatBox | IpmpInfoBox | SchemeTypeBox | SchemeInformationBox;
+export type ProtectionSchemeInformationBoxChild = OriginalFormatBox | SchemeTypeBox | SchemeInformationBox;
 
 // @public
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
@@ -1118,25 +966,6 @@ export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox;
 export function readVtte(_view: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
 
 // @public
-export type SampleAuxiliaryInformationOffsetsBox = FullBox & {
-    type: "saio";
-    auxInfoType?: number;
-    auxInfoTypeParameter?: number;
-    entryCount: number;
-    offset: number[];
-};
-
-// @public
-export type SampleAuxiliaryInformationSizesBox = FullBox & {
-    type: "saiz";
-    auxInfoType?: number;
-    auxInfoTypeParameter?: number;
-    defaultSampleInfoSize: number;
-    sampleCount: number;
-    sampleInfoSize?: number[];
-};
-
-// @public
 export type SampleDependencyTypeBox = FullBox & {
     type: "sdtp";
     sampleDependencyTable: number[];
@@ -1150,27 +979,11 @@ export type SampleDescriptionBox<E extends SampleEntryBox = AudioSampleEntryBox 
 };
 
 // @public
-export type SampleEncryptionBox = FullBox & {
-    type: "senc";
-    sampleCount: number;
-    samples: EncryptedSample[];
-};
-
-// @public
 export type SampleEntryBox<T extends IsoBoxType = IsoBoxType, C = any> = {
     type: T;
     reserved1: number[];
     dataReferenceIndex: number;
     boxes: C[];
-};
-
-// @public
-export type SampleGroupDescriptionBox = FullBox & {
-    type: "sgpd";
-    groupingType: number;
-    defaultLength?: number;
-    entryCount: number;
-    entries: any[];
 };
 
 // @public
@@ -1188,7 +1001,7 @@ export type SampleTableBox = {
 };
 
 // @public
-export type SampleTableBoxChild = SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | ShadowSyncSampleBox | DegradationPriorityBox | SampleDependencyTypeBox | SampleToGroupBox | SampleGroupDescriptionBox;
+export type SampleTableBoxChild = SampleDescriptionBox | DecodingTimeToSampleBox | CompositionTimeToSampleBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | SampleDependencyTypeBox;
 
 // @public
 export type SampleToChunkBox = FullBox & {
@@ -1202,21 +1015,6 @@ export type SampleToChunkEntry = {
     firstChunk: number;
     samplesPerChunk: number;
     sampleDescriptionIndex: number;
-};
-
-// @public
-export type SampleToGroupBox = FullBox & {
-    type: "sbgp";
-    groupingType: number;
-    groupingTypeParameter?: number;
-    entryCount: number;
-    entries: SampleToGroupEntry[];
-};
-
-// @public
-export type SampleToGroupEntry = {
-    sampleCount: number;
-    groupDescriptionIndex: number;
 };
 
 // @public
@@ -1263,26 +1061,6 @@ export type SegmentIndexReference = {
 export type SegmentTypeBox = TypeBox<"styp">;
 
 // @public
-export type ShadowSyncEntry = {
-    shadowedSampleNumber: number;
-    syncSampleNumber: number;
-};
-
-// @public
-export type ShadowSyncSampleBox = FullBox & {
-    type: "stsh";
-    entryCount: number;
-    entries: ShadowSyncEntry[];
-};
-
-// @public
-export type SingleItemTypeReferenceBox = {
-    fromItemId: number;
-    referenceCount: number;
-    toItemId: number[];
-};
-
-// @public
 export type SoundMediaHeaderBox = FullBox & {
     type: "smhd";
     balance: number;
@@ -1290,23 +1068,11 @@ export type SoundMediaHeaderBox = FullBox & {
 };
 
 // @public
-export const STRING: "string";
-
-// @public (undocumented)
-export type stz2 = CompactSampleSizeBox;
-
-// @public
 export type Subsample = {
     subsampleSize: number;
     subsamplePriority: number;
     discardable: number;
     codecSpecificParameters: number;
-};
-
-// @public
-export type SubsampleEncryption = {
-    bytesOfClearData: number;
-    bytesOfProtectedData: number;
 };
 
 // @public
@@ -1369,9 +1135,6 @@ export type SyncSampleBox = FullBox & {
 };
 
 // @public
-export const TEMPLATE: "template";
-
-// @public
 export type TrackBox<V extends IsoInt64 = number> = {
     type: "trak";
     boxes: TrackBoxChild<V>[];
@@ -1416,7 +1179,7 @@ export type TrackFragmentBox<V extends IsoInt64 = number> = {
 };
 
 // @public
-export type TrackFragmentBoxChild<V extends IsoInt64 = number> = TrackFragmentHeaderBox<V> | TrackFragmentBaseMediaDecodeTimeBox<V> | TrackRunBox | SampleAuxiliaryInformationSizesBox | SampleAuxiliaryInformationOffsetsBox | SampleEncryptionBox | SubsampleInformationBox;
+export type TrackFragmentBoxChild<V extends IsoInt64 = number> = TrackFragmentHeaderBox<V> | TrackFragmentBaseMediaDecodeTimeBox<V> | TrackRunBox | SubsampleInformationBox;
 
 // @public
 export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
@@ -1525,15 +1288,6 @@ export type TypeBox<T> = {
 };
 
 // @public
-export const UINT: "uint";
-
-// @public (undocumented)
-export type url = DataEntryUrlBox;
-
-// @public (undocumented)
-export type urn = DataEntryUrnBox;
-
-// @public
 export type UserDataBox<V extends IsoInt64 = number> = {
     type: "udta";
     boxes: UserDataBoxChild<V>[];
@@ -1541,9 +1295,6 @@ export type UserDataBox<V extends IsoInt64 = number> = {
 
 // @public
 export type UserDataBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
-
-// @public
-export const UTF8: "utf8";
 
 // @public
 export type VideoMediaHeaderBox = FullBox & {
