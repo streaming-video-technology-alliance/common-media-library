@@ -14,7 +14,7 @@ describe('readMp4a', function () {
 		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', {
 			readers: { stsd: readStsd, mp4a: readMp4a },
 		})
-		const box = container[1].entries[0] as IsoTypedParsedBox<'mp4a'>
+		const box = container[1].boxes[0] as IsoTypedParsedBox<'mp4a'>
 
 		assert.strictEqual(box.type, 'mp4a')
 		assert.strictEqual(box.size, 86)

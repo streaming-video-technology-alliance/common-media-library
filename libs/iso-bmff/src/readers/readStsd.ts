@@ -25,6 +25,6 @@ export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | Visual
 		version,
 		flags,
 		entryCount,
-		entries: view.readBoxes<E>(entryCount),
+		boxes: view.readBoxes<E>(entryCount),
 	}
 }

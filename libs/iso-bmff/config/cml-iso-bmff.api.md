@@ -118,7 +118,7 @@ export type DataInformationBoxChild = DataReferenceBox;
 export type DataReferenceBox = FullBox & {
     type: "dref";
     entryCount: number;
-    entries: (DataEntryUrlBox | DataEntryUrnBox)[];
+    boxes: (DataEntryUrlBox | DataEntryUrnBox)[];
 };
 
 // @public
@@ -975,7 +975,7 @@ export type SampleDependencyTypeBox = FullBox & {
 export type SampleDescriptionBox<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox> = FullBox & {
     type: "stsd";
     entryCount: number;
-    entries: E[];
+    boxes: E[];
 };
 
 // @public

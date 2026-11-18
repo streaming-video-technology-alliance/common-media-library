@@ -8,7 +8,7 @@ describe('writeStsd', function () {
 			version: 0,
 			flags: 0,
 			entryCount: 1,
-			entries: [
+			boxes: [
 				{
 					type: 'mp4a' as const,
 					channelcount: 2,

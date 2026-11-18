@@ -259,7 +259,7 @@ describe('writeIsoBoxes', function () {
 				box => box.type === 'stsd',
 			)
 			ok(stsd?.type === 'stsd')
-			const { view } = stsd.entries[0] as ParsedIsoBox
+			const { view } = stsd.boxes[0] as ParsedIsoBox
 			const bytes = new Uint8Array(
 				view.buffer.slice(view.byteOffset, view.byteOffset + view.byteLength),
 			)

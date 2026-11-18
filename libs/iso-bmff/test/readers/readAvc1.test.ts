@@ -19,7 +19,7 @@ describe('readAvc1', function () {
 
 		assert.strictEqual(container[0].type, 'stsd')
 
-		const box = container[0].entries[0] as Avc1Box
+		const box = container[0].boxes[0] as Avc1Box
 		assert.strictEqual(box.type, 'avc1')
 
 		assert.deepStrictEqual(box.reserved1, [0, 0, 0, 0, 0, 0])

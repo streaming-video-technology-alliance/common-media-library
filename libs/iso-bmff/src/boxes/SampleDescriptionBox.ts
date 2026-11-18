@@ -15,5 +15,5 @@ export type SampleDescriptionBox<
 > = FullBox & {
 	type: 'stsd'
 	entryCount: number
-	entries: E[]
+	boxes: E[]
 }

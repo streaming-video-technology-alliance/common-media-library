@@ -35,9 +35,9 @@ describe('API', function () {
 		const stsd = findIsoBox(boxes, box => box.type === 'stsd')
 		assert.ok(stsd)
 		assert.strictEqual(stsd.type, 'stsd')
-		assert.strictEqual(stsd.entries.length, 1)
+		assert.strictEqual(stsd.boxes.length, 1)
 
-		const entry = stsd.entries[0]
+		const entry = stsd.boxes[0]
 		assert.ok(entry)
 		assert.strictEqual(entry.type, 'hvc1')
 		assert.strictEqual(entry.boxes.length, 2)

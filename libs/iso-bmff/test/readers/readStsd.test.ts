@@ -20,10 +20,10 @@ describe('readStsd', function () {
 		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { readers: { stsd: readStsd } })
 
 		assert.strictEqual(boxes.length, 3)
-		assert.strictEqual((boxes[0].entries[0] as VisualSampleEntryBox<'avc1'>).type, 'avc1')
-		assert.strictEqual((boxes[1].entries[0] as AudioSampleEntryBox<'mp4a'>).type, 'mp4a')
+		assert.strictEqual((boxes[0].boxes[0] as VisualSampleEntryBox<'avc1'>).type, 'avc1')
+		assert.strictEqual((boxes[1].boxes[0] as AudioSampleEntryBox<'mp4a'>).type, 'mp4a')
 		assert.strictEqual(
-			(boxes[2].entries[0] as VisualSampleEntryBox<VisualSampleEntryType>).type,
+			(boxes[2].boxes[0] as VisualSampleEntryBox<VisualSampleEntryType>).type,
 			'fdsc',
 		)
 	})
@@ -35,7 +35,7 @@ describe('readStsd', function () {
 		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as SampleDescriptionBox[]
 
 		assert.strictEqual(box.entryCount, 0)
-		assert.deepStrictEqual(box.entries, [])
+		assert.deepStrictEqual(box.boxes, [])
 	})
 
 	it('should write an entry_count of 0 after a read', function () {

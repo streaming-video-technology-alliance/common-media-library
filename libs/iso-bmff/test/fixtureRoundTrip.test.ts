@@ -139,8 +139,6 @@ function* walk(boxes: ParsedIsoBox<IsoInt64>[]): Generator<ParsedIsoBox<IsoInt64
 
 		if ('boxes' in box) {
 			yield* walk(box.boxes as ParsedIsoBox<IsoInt64>[])
-		} else if (box.type === 'dref' || box.type === 'stsd') {
-			yield* walk(box.entries as ParsedIsoBox<IsoInt64>[])
 		}
 	}
 }
