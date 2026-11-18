@@ -1,7 +1,6 @@
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
-import { createWriterConfig } from './utils/createWriterConfig.ts'
 import { writeIsoBox } from './writeIsoBox.ts'
 
 /**
@@ -11,7 +10,7 @@ import { writeIsoBox } from './writeIsoBox.ts'
  * An error of a writer reaches the caller for the first box, and the consumer of the stream for a later box.
  *
  * @param boxes - The boxes to stream.
- * @param config - The configuration for the stream.
+ * @param config - The optional configuration with the writers. With no writers, the function writes only containers, byte arrays, and boxes with a `view`.
  *
  * @returns A new `ReadableStream` with one chunk for each box.
  *
@@ -26,14 +25,13 @@ import { writeIsoBox } from './writeIsoBox.ts'
  */
 export function createIsoBoxReadableStream(
 	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
-	config: IsoBoxWriteViewConfig,
+	config: IsoBoxWriteViewConfig = {},
 ): ReadableStream<Uint8Array> {
 	if (typeof ReadableStream === 'undefined') {
 		throw new Error('ReadableStream is not available in this environment')
 	}
 
 	const iterator = boxes[Symbol.iterator]()
-	const cfg = createWriterConfig(config)
 
 	function pull(controller: ReadableStreamDefaultController<Uint8Array>): void {
 		const next = iterator.next()
@@ -41,7 +39,7 @@ export function createIsoBoxReadableStream(
 		if (next.done) {
 			controller.close()
 		} else {
-			controller.enqueue(writeIsoBox(next.value, cfg))
+			controller.enqueue(writeIsoBox(next.value, config))
 		}
 	}
 

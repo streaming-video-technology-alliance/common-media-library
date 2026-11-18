@@ -1,14 +1,13 @@
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
-import { createWriterConfig } from './utils/createWriterConfig.ts'
 import { writeBoxes } from './utils/writeBoxes.ts'
 
 /**
  * Writes ISO boxes to an array of `Uint8Array`, one per box.
  *
  * @param boxes - The boxes to write
- * @param config - The configuration for the writer
+ * @param config - The optional configuration with the writers. With no writers, the function writes only containers, byte arrays, and boxes with a `view`.
  *
  * @returns The written boxes. A box given as a view over a `SharedArrayBuffer` is copied, so each result is backed by an `ArrayBuffer`.
  *
@@ -22,7 +21,7 @@ import { writeBoxes } from './utils/writeBoxes.ts'
  */
 export function writeIsoBoxes(
 	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
-	config: IsoBoxWriteViewConfig,
+	config: IsoBoxWriteViewConfig = {},
 ): Uint8Array<ArrayBuffer>[] {
-	return writeBoxes(boxes, createWriterConfig(config))
+	return writeBoxes(boxes, config)
 }

@@ -157,6 +157,14 @@ describe('createIsoBoxReadableStream', function () {
 		strictEqual(Buffer.compare(isoFile, written), 0)
 	})
 
+	it('should write the boxes of a read with no configuration', async function () {
+		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
+		const stream = createIsoBoxReadableStream(readIsoBoxes(isoFile))
+		const written = new Uint8Array(await new Response(stream).arrayBuffer())
+
+		strictEqual(Buffer.compare(isoFile, written), 0)
+	})
+
 	it('should exit if boxes are empty', async function () {
 		const stream = createIsoBoxReadableStream([], defaultWriterConfig())
 		const buffers = []
