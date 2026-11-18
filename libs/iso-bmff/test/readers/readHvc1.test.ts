@@ -17,7 +17,7 @@ describe('readHvc1', function () {
 		})
 
 		assert.strictEqual(container[0].type, 'stsd')
-		const box = container[0].entries[0] as Hvc1Box
+		const box = container[0].boxes[0] as Hvc1Box
 
 		assert.strictEqual(box.type, 'hvc1')
 

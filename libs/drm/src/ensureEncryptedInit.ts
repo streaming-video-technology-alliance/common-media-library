@@ -127,11 +127,11 @@ export function ensureEncryptedInit(
 	}
 
 	// If the stsd box already contains enca or encv entries, return original init
-	if (stsd.entries.find(({ type }) => type === 'enca' || type === 'encv')) {
+	if (stsd.boxes.find(({ type }) => type === 'enca' || type === 'encv')) {
 		return init
 	}
 
-	const entries = stsd.entries.filter(
+	const entries = stsd.boxes.filter(
 		({ type }) => videoTypes.includes(type) || audioTypes.includes(type),
 	)
 
@@ -143,9 +143,9 @@ export function ensureEncryptedInit(
 			| VisualSampleEntryBox
 
 		if (prepend) {
-			stsd.entries.unshift(box)
+			stsd.boxes.unshift(box)
 		} else {
-			stsd.entries.push(box)
+			stsd.boxes.push(box)
 		}
 
 		box.boxes.push({

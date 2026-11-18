@@ -16,13 +16,13 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export function readDref(view: IsoBoxReadView<IsoInt64>): DataReferenceBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
-	const entries = view.readBoxes<DataEntryUrlBox | DataEntryUrnBox>(entryCount)
+	const boxes = view.readBoxes<DataEntryUrlBox | DataEntryUrnBox>(entryCount)
 
 	return {
 		type: 'dref',
 		version,
 		flags,
 		entryCount,
-		entries,
+		boxes,
 	}
 }

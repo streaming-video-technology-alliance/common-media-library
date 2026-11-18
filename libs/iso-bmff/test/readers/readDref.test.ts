@@ -22,9 +22,9 @@ describe('readDref', function () {
 
 		const box = boxes[0]
 		assert.strictEqual(box.type, 'dref')
-		assert.strictEqual(box.entries.length, 1)
+		assert.strictEqual(box.boxes.length, 1)
 
-		const entry = box.entries[0]
+		const entry = box.boxes[0]
 		assert.strictEqual(entry.type, 'url ')
 		assert.strictEqual(entry.version, 0)
 		assert.strictEqual(entry.flags, 1)
@@ -38,7 +38,7 @@ describe('readDref', function () {
 		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as DataReferenceBox[]
 
 		assert.strictEqual(box.entryCount, 0)
-		assert.deepStrictEqual(box.entries, [])
+		assert.deepStrictEqual(box.boxes, [])
 	})
 
 	it('should write an entry_count of 0 after a read', function () {

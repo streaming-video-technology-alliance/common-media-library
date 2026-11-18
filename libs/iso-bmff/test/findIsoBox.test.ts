@@ -1,4 +1,10 @@
-import { findIsoBox, readFtyp, readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
+import {
+	defaultReaderConfig,
+	findIsoBox,
+	readFtyp,
+	readIsoBoxes,
+	type ParsedIsoBox,
+} from '@svta/cml-iso-bmff'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
@@ -129,5 +135,14 @@ describe('findIsoBox', function () {
 		const result = findIsoBox(boxSet, box => box.type === 'mdat')
 		assert.notStrictEqual(result, null)
 		assert.strictEqual(result?.type, 'mdat')
+	})
+
+	it('should find the child boxes of stsd and dref', async function () {
+		const isoFile = await readFile(new URL('./fixtures/hvc1_init.mp4', import.meta.url))
+		const boxes = readIsoBoxes(isoFile, defaultReaderConfig())
+
+		assert.strictEqual(findIsoBox(boxes, box => box.type === 'hvc1')?.type, 'hvc1')
+		assert.ok(findIsoBox(boxes, (box: { type: string }) => box.type === 'hvcC'))
+		assert.strictEqual(findIsoBox(boxes, box => box.type === 'url ')?.type, 'url ')
 	})
 })

@@ -435,7 +435,7 @@ const trafs = filterIsoBoxes(boxes, (box) => box.type === "traf");
 console.log(tfdt?.baseMediaDecodeTime, trafs.length);
 ```
 
-The traversal follows only the `boxes` field. The search therefore does not reach the `entries` of an `stsd` or a `dref` box.
+The traversal follows the `boxes` field. If the readers map has `readStsd` and `readDref`, the search also reaches the sample entries and the data entries.
 
 `isIsoBoxType` checks the type of one box and narrows the box to that type:
 
@@ -884,7 +884,7 @@ export type DataInformationBoxChild = DataReferenceBox;
 export type DataReferenceBox = FullBox & {
     type: "dref";
     entryCount: number;
-    entries: (DataEntryUrlBox | DataEntryUrnBox)[];
+    boxes: (DataEntryUrlBox | DataEntryUrnBox)[];
 };
 
 // @public
@@ -1741,7 +1741,7 @@ export type SampleDependencyTypeBox = FullBox & {
 export type SampleDescriptionBox<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox> = FullBox & {
     type: "stsd";
     entryCount: number;
-    entries: E[];
+    boxes: E[];
 };
 
 // @public

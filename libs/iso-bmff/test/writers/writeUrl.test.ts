@@ -134,7 +134,7 @@ describe('writeUrl', function () {
 		const [dref] = filterBoxes('captions.mp4', 'dref', {
 			readers: { dref: readDref, 'url ': readUrl },
 		})
-		const [entry] = dref.entries
+		const [entry] = dref.boxes
 
 		assert.strictEqual(entry.type, 'url ')
 		assert.strictEqual(entry.flags, 1)

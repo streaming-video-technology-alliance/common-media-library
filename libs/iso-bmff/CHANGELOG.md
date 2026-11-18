@@ -92,6 +92,8 @@ and this project adheres to
 - The UTF-8 string reads now call `decodeUtf8` of `@svta/cml-utils`. A bundle with `readIsoBoxes` is about 200 bytes smaller after gzip. The results do not change. The package now needs `@svta/cml-utils` 1.8.0 or later.
 - `writeIsoBoxes` and `createIsoBoxReadableStream` now take an optional configuration, as `writeIsoBox` does. With no configuration, a write takes only containers, byte arrays, and boxes with a `view` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - The `writers` field of `IsoBoxWriteViewConfig` is now optional. A call with `{ writers: {} }` still compiles. A custom writer that reads `config.writers` must handle a missing map, and `defaultWriterConfig` still returns the map ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `SampleDescriptionBox` and `DataReferenceBox` now keep their child boxes in `boxes`, not in `entries`. Replace `stsd.entries` with `stsd.boxes`, and `dref.entries` with `dref.boxes` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `findIsoBox`, `filterIsoBoxes`, and `traverseIsoBoxes` now reach the sample entries of `stsd` and the data entries of `dref`. A predicate that matches a type inside those boxes, such as `hvc1`, now finds that box ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 
 ### Removed
 
