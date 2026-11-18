@@ -567,7 +567,7 @@ The maintainer decided each question on 2026-11-17. The rules of the themes stat
 
 ## Final Decision
 
-Accepted on 2026-11-17. The work follows [Build order](#build-order). The cursor RFC ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)) is still a draft. Phase 2 and phase 3 need that RFC.
+Accepted on 2026-11-17. The work follows [Build order](#build-order). The cursor RFC ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)) was accepted on 2026-11-18. Phase 2 and phase 3 follow that RFC.
 
 Decided on 2026-11-17:
 
