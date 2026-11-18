@@ -10,8 +10,10 @@ and this project adheres to
 
 ### Changed
 
-- `ensureEncryptedInit` now reads and writes the sample entries in the `boxes` field of the `stsd` box, as `@svta/cml-iso-bmff` 2.0.0 returns them. The output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
-- `ensureEncryptedInit` now builds the `tenc` box with `defaultIsProtected`, as `@svta/cml-iso-bmff` 2.0.0 names the field. The output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `@svta/cml-drm` now needs `@svta/cml-iso-bmff` 2.0.0 or later ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now reads and writes the sample entries in the `boxes` field of the `stsd` box, as `@svta/cml-iso-bmff` 2.0.0 returns them. For a source with 0 in the reserved fields of its sample entries, the output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now writes 0 in the reserved fields of the sample entries that it copies. Earlier releases keep the bytes of the source entry, such as the revision and the vendor of a QuickTime sound description ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now builds the `tenc` box with `defaultIsProtected` and `defaultPerSampleIvSize`, as `@svta/cml-iso-bmff` 2.0.0 names the fields. The output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
 
 ## [1.1.13] - 2026-11-17
 
