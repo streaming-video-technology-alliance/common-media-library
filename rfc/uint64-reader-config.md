@@ -480,6 +480,6 @@ Amended on 2026-11-12, after the merge of [#645](https://github.com/streaming-vi
 
 The `IsoBoxReaderReturn` fix shipped on its own in #614.
 
-Amended on 2026-11-18, by theme 5 of the [box types RFC](iso-bmff-v2-box-types.md):
+Amended on 2026-11-18, by [theme 5 of the box types RFC](iso-bmff-v2-box-types.md#theme-5-names):
 
-- **Names.** `defaultReaderConfig` and `defaultWriterConfig` are now `createDefaultReaderConfig` and `createDefaultWriterConfig`. `IsoBoxReadViewConfig` is now `IsoBoxReadConfig`. The text of this RFC keeps the old names.
+- **Names.** `defaultReaderConfig` and `defaultWriterConfig` are now `createDefaultReaderConfig` and `createDefaultWriterConfig`. The text of this RFC keeps the old names.
