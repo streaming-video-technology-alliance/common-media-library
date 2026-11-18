@@ -1,4 +1,3 @@
-import type { IpmpInfoBox } from './IpmpInfoBox.ts'
 import type { OriginalFormatBox } from './OriginalFormatBox.ts'
 import type { SchemeInformationBox } from './SchemeInformationBox.ts'
 import type { SchemeTypeBox } from './SchemeTypeBox.ts'
@@ -10,7 +9,6 @@ import type { SchemeTypeBox } from './SchemeTypeBox.ts'
  */
 export type ProtectionSchemeInformationBoxChild =
 	| OriginalFormatBox
-	| IpmpInfoBox
 	| SchemeTypeBox
 	| SchemeInformationBox
 

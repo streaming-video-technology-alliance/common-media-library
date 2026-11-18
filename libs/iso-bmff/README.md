@@ -11,7 +11,7 @@ Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/is
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read a 64-bit field, such as a tfdt time at a 10 MHz timescale, exactly or with an overflow report: `readInt64AsBigInt`, `createInt64OverflowReader`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
-- Write or patch boxes, such as inserting emsg or rewriting tfdt, to byte arrays or a ReadableStream: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`, `createIsoBoxReadableStream`, `IsoBoxReadableStream`
+- Write or patch boxes, such as inserting emsg or rewriting tfdt, to byte arrays or a ReadableStream: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`, `createIsoBoxReadableStream`
 - Read or write a container box, such as moov or moof, with an optional named function: `readMoov`, `writeMoov`
 - Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
 
@@ -60,7 +60,7 @@ Some exports need a runtime API:
 | `TextEncoder` | Every writer of a UTF-8 string field, such as `writeHdlr` and `writeEmsg` | None |
 | `BigInt` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, and the boxes with `bigint` fields | None, and no check |
 | `DataView` methods `getBigUint64`, `setBigUint64`, and `setBigInt64` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, `IsoBoxWriteView.writeWideUint`, and `IsoBoxWriteView.writeWideInt` with a `bigint` of 8 bytes | None, and no check |
-| `ReadableStream` | `createIsoBoxReadableStream`, `IsoBoxReadableStream` | None. The constructor throws an error with a clear message |
+| `ReadableStream` | `createIsoBoxReadableStream` | None. The function throws an error with a clear message |
 
 ## Usage
 

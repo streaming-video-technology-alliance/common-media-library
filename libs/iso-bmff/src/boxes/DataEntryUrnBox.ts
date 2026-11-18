@@ -12,8 +12,3 @@ export type DataEntryUrnBox = FullBox & {
 	name: string
 	location: string
 }
-
-/**
- * @public
- */
-export type urn = DataEntryUrnBox
