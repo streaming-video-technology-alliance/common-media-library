@@ -24,7 +24,7 @@ The RFC has ten themes. Each theme states one rule:
 | 1. Child boxes | A field named `boxes` always holds child boxes. `stsd` and `dref` use `boxes`. |
 | 2. Count fields | The cursor RFC decides. This RFC adds nothing. |
 | 3. Byte fields | A run of opaque bytes is a `Uint8Array`. A `pssh` box has one entry for each key ID. |
-| 4. Four-character codes | A four-character code is a string, and a writer always writes 4 bytes. The map keys are exact codes. |
+| 4. Four-character codes | A four-character code is a string. A writer writes 4 bytes or throws. |
 | 5. Names | A type name is the class name of the specification. A field name is the specification name in camel case. |
 | 6. Types with no reader | A box type is in `IsoBoxMap` only if the package has its reader and its writer. |
 | 7. Errors | Built-in error types. No error for control flow. A reader error always reaches the caller. |
@@ -192,8 +192,8 @@ The view keeps the input buffer in memory while the caller keeps the box. That r
 **Rule.**
 
 1. A field whose values are four-character codes is a `string`. `dataFormat`, `schemeType`, `auxInfoType`, and `groupingType` become strings.
-2. `readFourCc(cursor)` and `writeFourCc(cursor, value)` read and write 4 bytes. `writeFourCc` writes 4 bytes for every value. It pads a short value with U+0020 and cuts a long value. It throws no error, as the number writers of PR 669 throw no error. `beginIsoBox` and `beginIsoFullBox` write the box type with the same rule.
-3. A map key is the exact box type. A reader for `url ` has the key `'url '`. The trimmed keys `url` and `urn` have no effect.
+2. `readFourCc(cursor)` and `writeFourCc(cursor, value)` read and write 4 bytes. `writeFourCc` throws a `RangeError` for a value that is not 4 characters. The message has the received value. `beginIsoBox` and `beginIsoFullBox` write the box type with the same rule. The range rule of PR 669 covers numbers, and a code is a string.
+3. A map key is the exact box type. Both maps also accept the keys `url` and `urn` for `'url '` and `'urn '`, as the readers map of version 1 does.
 4. The two maps list the known box types for completion and check the pairing of key and box:
 
 ```ts
@@ -211,15 +211,16 @@ A model with TypeScript 6.0.3 compiled these types with the read cursor of the c
 **Migration.**
 
 - `dataFormat: 0x61766331` becomes `dataFormat: 'avc1'`. The compiler reports each number.
-- A readers map with the key `url` or `urn` uses `'url '` or `'urn '`. The compiler does not report the old key. The reader is then not called, and the box is a raw box.
+- A hand-built code that is not 4 characters throws. In version 1, the writer wrote a box with wrong fields.
 - A custom reader for a known key returns the literal type of its key.
 - `@svta/cml-drm` passes `entry.type` as `dataFormat`. Its `schemeType` option accepts a string and a number, so its public type does not narrow (issue 698).
 
-**Cost.** The full bundle gets 32 bytes larger. The bundle with the readers and writers of `frma`, `schm`, `ftyp`, and `hdlr` gets 38 bytes larger. `fourCcToUint32` alone is 135 bytes. An adopter who imports it saves those bytes if the function leaves the package (question 5). The map types change no bytes.
+**Cost.** The full bundle gets 32 bytes larger. The bundle with the readers and writers of `frma`, `schm`, `ftyp`, and `hdlr` gets 38 bytes larger. `fourCcToUint32` alone is 135 bytes. An adopter who imports it saves those bytes if the function leaves the package (question 5). The map types change no bytes. The prototype padded and cut a code, and it removed the `url` alias. The throw of rule 2 and the alias of rule 3 were not measured.
 
 **Alternatives.**
 
-- `writeFourCc` throws a `RangeError` for a value that is not 4 characters. The message then names the field and the value. That rule is a range check, and the writers of PR 669 do no range check.
+- `writeFourCc` pads a short value with U+0020 and cuts a long value, as mp4box.js does. A dropped space, such as `'qt'` for `'qt  '`, then writes the intended code. A typo writes a wrong box with no error.
+- One key for each box type. A map with the key `url` then compiles, and its reader is never called.
 - Numbers for every code, as codem-isoboxer has for some fields. Every player reads codes as strings.
 
 ### Theme 5: names
@@ -244,7 +245,7 @@ A model with TypeScript 6.0.3 compiled these types with the read cursor of the c
 3. A field name is the specification name in lower camel case, split at each English word. Acronyms are words: `Id`, `Kid`, `Iv`, `Pdu`. `timescale` stays one word.
 4. A list field keeps the specification name, singular or plural as the specification writes it. A loop with no name in the specification gets the plural of its count field: `entry_count` gives `entries`. A list of single numbers is a `number[]`.
 5. `tenc` uses the names of ISO/IEC 23001-7:2016 only. Theme 9 removes `defaultIsEncrypted`. `defaultIvSize` becomes `defaultPerSampleIvSize`.
-6. The configuration types are `IsoBoxReadConfig` and `IsoBoxWriteConfig`. `defaultReaderConfig` and `defaultWriterConfig` keep their names.
+6. The configuration types are `IsoBoxReadConfig` and `IsoBoxWriteConfig`. A function that returns a new object starts with `create`, so `defaultReaderConfig` becomes `createDefaultReaderConfig`.
 7. `isFullBox` leaves the package. `isContainer` keeps its name and its run-time result. Its predicate narrows to the boxes with a `boxes` field.
 8. `TypeBox` and `FreeSpaceBox` constrain `T` to their two box types.
 
@@ -274,6 +275,7 @@ The table shows every rename. The specification texts were ISO/IEC 14496-12:2015
 | `prsl.entities: Entity[]` | `prsl.entityId: number[]` | 4 |
 | `defaultIvSize` | `defaultPerSampleIvSize` | 5 |
 | `IsoBoxReadViewConfig`, `IsoBoxWriteViewConfig` | `IsoBoxReadConfig`, `IsoBoxWriteConfig` | 6 |
+| `defaultReaderConfig`, `defaultWriterConfig` | `createDefaultReaderConfig`, `createDefaultWriterConfig` | 6 |
 | `isFullBox` | Removed | 7 |
 
 The rule keeps these names:
@@ -325,10 +327,10 @@ Theme 6 removes the types of `iloc`, `senc`, and `stsh`, so their entry types ne
 
 **Rule.**
 
-1. The package throws two error types. A `RangeError` is a read past `cursor.end` or a `bigint` that does not fit its field. A count above the number of complete child boxes and the nesting limit are also a `RangeError`. An `Error` is a box that cannot be written or a missing `ReadableStream`. The package adds no error class.
+1. The package throws two error types. A `RangeError` is a read past `cursor.end` or a `bigint` that does not fit its field. A count above the number of complete child boxes, the nesting limit, and a four-character code that is not 4 characters are also a `RangeError`. An `Error` is a box that cannot be written or a missing `ReadableStream`. The package adds no error class.
 2. No error is a signal inside the package. The tree reader checks the box size before it calls a reader, as the cursor RFC states for `nextIsoBox`. A truncated box stops the read with no error, as in version 1 (PR 662). The tree reader does not catch an error of a reader, so that error always reaches the caller.
 3. `stsd` and `dref` throw a `RangeError` when the body has fewer complete child boxes than `entry_count`. The message has the box type, the count, and the number of complete boxes. A count below the number of boxes keeps the rule of PR 672.
-4. The read throws a `RangeError` for a box that is deeper than 64 levels. The message has the box type and the limit. The write has no limit.
+4. The read throws a `RangeError` for a box that is deeper than 128 levels. The message has the box type and the limit. The write has no limit.
 5. The stream writes one box for each read, and an error of any box rejects the read. The stream writes no box before the first read.
 6. Two messages keep their text, because a pull request or an accepted RFC decided it. The messages are `No writer found for box type` (PR 673) and the overflow message of the `int64` RFC.
 
@@ -347,7 +349,7 @@ Theme 6 removes the types of `iloc`, `senc`, and `stsh`, so their entry types ne
 | Nesting limit (rule 4) | +45 B | +64 B |
 | Theme 7 | +97 B | +101 B |
 
-A prototype threw for an `stsd` box with an `entry_count` of 2 and one complete box. The prototype also threw the nesting error at 65 levels, and version 1 ended with a stack overflow at 200,000 levels. With the stream rule, no box was written before the first read, and an error of the first box rejected that read.
+A prototype threw for an `stsd` box with an `entry_count` of 2 and one complete box. A prototype with a limit of 64 levels threw the nesting error at 65 levels. Version 1 ended with a stack overflow at 200,000 levels. With the stream rule, no box was written before the first read, and an error of the first box rejected that read.
 
 **Alternatives.**
 
@@ -365,7 +367,7 @@ A prototype threw for an `stsd` box with an `entry_count` of 2 and one complete 
 1. A length is a number of bytes. A negative length throws a `RangeError`, as a length past `cursor.end` does. A length of 0 reads nothing. No length value has a special meaning. A reader reads to the end of the box with `cursor.end - cursor.pos`.
 2. Text is UTF-8. `readUtf8(cursor, length)` and `writeUtf8(cursor, value)` read and write text with no terminator. `readTerminatedUtf8(cursor)` stops at the first null byte or at `cursor.end`. It throws no error for a box with no null byte (PR 639). `writeTerminatedUtf8(cursor, value)` writes the value up to the first U+0000, then one null byte.
 3. A four-character code uses `readFourCc` and `writeFourCc` (theme 4). The one-byte `readString` and `writeString` leave the package.
-4. The five WebVTT text readers stop at the first null byte. `vttC` follows the rule of `iden`, `payl`, `sttg`, and `vlab` (PR 638).
+4. The five WebVTT text readers read to the end of the box. ISO/IEC 14496-30 clause 6.1, as the Unified Streaming validator quotes it, defines `boxstring` as UTF-8 bytes that fill the box with no null terminator. shaka-player and mp4box.js read these boxes the same way. `iden`, `payl`, `sttg`, and `vlab` no longer stop at a null byte (PR 638).
 5. `writeMdhd` writes the code of `und` (0x55C4) for a `language` that is not 3 characters, each from U+0060 to U+007F. A value that `readMdhd` returns therefore writes the same bytes.
 6. `location` of `url ` and `urn ` is optional. The readers omit the key when no bytes remain. This rule closes issue 629.
 
@@ -374,6 +376,7 @@ A prototype threw for an `stsd` box with an `entry_count` of 2 and one complete 
 - `view.readUtf8(-1)` becomes `readUtf8(cursor, cursor.end - cursor.pos)`.
 - `view.readString(4)` for a code becomes `readFourCc(cursor)`.
 - A `language` of 2 characters writes `und`, not 0. The bytes of such a box change.
+- A WebVTT box that release 1.0.7 or earlier wrote ends in a null byte. The read of `iden`, `payl`, `sttg`, or `vlab` then returns a trailing U+0000.
 
 **Cost.**
 
@@ -382,15 +385,14 @@ A prototype threw for an `stsd` box with an `entry_count` of 2 and one complete 
 | Terminated strings end at U+0000 (rule 2) | +22 B | +13 B |
 | `und` for a bad `language` (rule 5) | +33 B | +39 B |
 | Optional `location` (rule 6) | +34 B | +44 B |
-| `vttC` ends at the first null byte (rule 4) | -1 B | -1 B |
 | Theme 8 | +90 B | +94 B |
 
-Rules 1 and 3 change functions of the cursor RFC, which has no code yet. They were not measured. A prototype wrote an `emsg` box with the scheme `'a\0b'` and read back the value, the timescale, and the ID. Version 1 read three wrong values from the same box.
+Rules 1 and 3 change functions of the cursor RFC, which has no code yet. They were not measured. Rule 4 was not measured either, because the prototype measured the opposite rule. A prototype wrote an `emsg` box with the scheme `'a\0b'` and read back the value, the timescale, and the ID. Version 1 read three wrong values from the same box.
 
 **Alternatives.**
 
 - `writeMdhd` throws for a bad `language`. The writers of PR 669 throw no error for a bad value, and `und` is the code of the specification for an unknown language.
-- The literal rule for WebVTT strings: read to the end of the box. Every release up to 1.0.7 writes a null byte in those boxes, so a read would return that null byte.
+- All five WebVTT readers stop at the first null byte, the rule of PR 638. A box from release 1.0.7 or earlier then reads with no trailing U+0000. The rule differs from the specification for text with U+0000.
 
 ### Theme 9: reserved fields
 
@@ -448,7 +450,7 @@ A later change to these parts would change the field functions a second time.
 - Theme 3, because the byte fields use the views of `readBytes`. In version 1 code, the `pssh`, `tenc`, and sample entry code would change twice.
 - Rule 1 of theme 4: the string fields of four-character codes.
 - Rules 3 and 5 of theme 7: the count check of `stsd` and `dref`, and the stream.
-- Rules 4 to 6 of theme 8: `vttC`, the `mdhd` language, and `location`.
+- Rules 4 to 6 of theme 8: the WebVTT strings, the `mdhd` language, and `location`.
 
 Each pull request of every phase also changes `@svta/cml-drm` and `@svta/cml-c2pa` (issue 698). Each pull request also sets the size budget of the package.
 
@@ -464,9 +466,9 @@ Question 1 of the cursor RFC changes this order. If a version 1.1.0 is released 
 | Functions | `view.readString(size)` maps to `readFourCc` and `readUtf8`. The table adds `readTerminatedUtf8` and `writeTerminatedUtf8`. |
 | Functions | `writeIsoBoxes(boxes, config?)` takes an optional configuration. |
 | Functions | `writeBytes` takes one `ArrayLike<number>`. The table adds `readFourCc` and `writeFourCc`. |
-| Contract | The tree reader catches no error of a reader. A read deeper than 64 levels throws. |
+| Contract | The tree reader catches no error of a reader. A read deeper than 128 levels throws. |
 | Summary | The sentence on the names of the built-in readers and writers names the four sample entry functions of theme 5. |
-| Changes to accepted RFCs | The sentence "The exported names ... do not change" names the renames of theme 5. |
+| Changes to accepted RFCs | The sentence "The exported names ... do not change" names the renames of theme 5. The `int64` RFC gets a dated line for `createDefaultReaderConfig`. |
 
 ### Method of the measurements
 
@@ -483,10 +485,10 @@ Limits of the numbers:
 
 ## Drawbacks
 
-- **Many renames.** Theme 5 renames 22 exports and 14 fields, and removes 3 exports. Each rename is a line of the migration guide.
+- **Many renames.** Theme 5 renames 24 exports and 14 fields, and removes 3 exports. Each rename is a line of the migration guide.
 - **Views keep the input in memory.** A caller that keeps a key ID keeps the whole segment, unless the caller copies.
-- **Some byte changes are silent.** A writer now pads a short code, writes `und` for a bad language, and drops the text after U+0000. Version 1 wrote other bytes for the same input with no error.
-- **A map key of `url` stops working with no compile error.**
+- **Some byte changes are silent.** A writer now writes `und` for a bad language and drops the text after U+0000. Version 1 wrote other bytes for the same input with no error.
+- **Old WebVTT boxes read differently.** A box that release 1.0.7 or earlier wrote returns a trailing U+0000.
 - **`@svta/cml-drm` changes in the same pull requests.** Its options accept both the old and the new types, so its public API does not narrow.
 
 ## Prior art
@@ -506,56 +508,56 @@ The survey read hls.js (cd338d2fa), shaka-player (2ed47645f), the code of dash.j
 
 ## Unresolved questions
 
-Each question has a default answer. The default answer is the rule in the theme.
+The maintainer decided each question on 2026-11-17. The rules of the themes state the decisions.
 
 **Theme 3: byte fields**
 
-1. **A view or a copy.** Should a byte field be a view of the input or a copy? The default answer is a view, as `readBytes` of the cursor RFC returns.
-2. **Tuples.** Should `matrix` and `opColor` be labeled tuples? A caller that builds the array at run time then needs a type annotation. The default answer is yes.
-3. **`compressorName`.** The string costs 81 bytes in the full bundle, and no surveyed player reads the field. A 32-byte `Uint8Array` costs nothing and follows rule 1. Should the field be a string? The default answer is yes, because the specification defines a string.
+1. **A view or a copy.** Should a byte field be a view of the input or a copy? **Decision:** a view, as `readBytes` of the cursor RFC returns.
+2. **Tuples.** Should `matrix` and `opColor` be labeled tuples? A caller that builds the array at run time then needs a type annotation. **Decision:** yes.
+3. **`compressorName`.** The string costs 81 bytes in the full bundle, and no surveyed player reads the field. A 32-byte `Uint8Array` costs nothing and follows rule 1. Should the field be a string? **Decision:** yes, because the specification defines a string.
 
 **Theme 4: four-character codes**
 
-4. **A code that is not 4 characters.** Should `writeFourCc` pad and cut, or throw a `RangeError`? The default answer is pad and cut, as the number writers of PR 669 throw no error.
-5. **`fourCcToUint32`.** No field of version 2.0.0 is a number code. Should the function leave the package? The default answer is yes. `@svta/cml-drm` then converts a number `schemeType` with its own function.
-6. **The trimmed `url` key.** A readers map with the key `url` compiles and has no effect. Should the package accept the trimmed key as an alias? The default answer is no: one key for each box type.
+4. **A code that is not 4 characters.** Should `writeFourCc` pad and cut, or throw a `RangeError`? **Decision:** throw a `RangeError` with the received value.
+5. **`fourCcToUint32`.** No field of version 2.0.0 is a number code. Should the function leave the package? **Decision:** yes. `@svta/cml-drm` then converts a number `schemeType` with its own function.
+6. **The trimmed `url` key.** Should the maps accept the trimmed keys `url` and `urn` as an alias? With no alias, a map with the key `url` compiles and has no effect. **Decision:** keep the alias in both maps.
 
 **Theme 5: names**
 
-7. **Type names.** Should a type name be the class name with no suffix (`SampleEntry`)? The alternative adds `Box` to every class name (`ItemInfoEntryBox`). The default answer is the class name with no suffix.
-8. **Field names.** Should field names split the words of the specification name (`sampleRate`)? The default answer is yes, as hls.js and shaka-player have.
-9. **Entry type names.** The rule gives long names such as `SubSampleInformationSubsample`. Should the rule apply with no exception? The default answer is yes, because a rule with exceptions needs a list.
-10. **Default configuration functions.** Should `defaultReaderConfig` and `defaultWriterConfig` become `createDefaultReaderConfig` and `createDefaultWriterConfig`? The default answer is no. The accepted `int64` RFC uses the names.
-11. **Guards.** Should `isFullBox` leave the package, and `isContainer` keep its name and run-time result? The default answer is yes. The alternative renames both with the `Iso` token.
+7. **Type names.** Should a type name be the class name with no suffix (`SampleEntry`)? The alternative adds `Box` to every class name (`ItemInfoEntryBox`). **Decision:** the class name with no suffix.
+8. **Field names.** Should field names split the words of the specification name (`sampleRate`)? **Decision:** yes, as hls.js and shaka-player have.
+9. **Entry type names.** The rule gives long names such as `SubSampleInformationSubsample`. Should the rule apply with no exception? **Decision:** yes, because a rule with exceptions needs a list.
+10. **Default configuration functions.** Should `defaultReaderConfig` and `defaultWriterConfig` become `createDefaultReaderConfig` and `createDefaultWriterConfig`? The accepted `int64` RFC uses the current names. **Decision:** rename both functions with `create`.
+11. **Guards.** Should `isFullBox` leave the package, and `isContainer` keep its name and run-time result? **Decision:** yes. The alternative renames both with the `Iso` token.
 
 **Theme 6: types with no reader**
 
-12. **Remove or implement.** Should the 16 types with no reader and no writer leave the package in 2.0.0? Issue 652 implements `co64` and `stz2`. The default answer is yes.
+12. **Remove or implement.** Should the 16 types with no reader and no writer leave the package in 2.0.0? Issue 652 implements `co64` and `stz2`. **Decision:** yes.
 
 **Theme 7: errors**
 
-13. **Error class.** Should the package throw built-in error types or one error class with a code? The default answer is built-in types. The class costs 93 bytes in the full bundle.
-14. **Count of `stsd` and `dref`.** Should a count above the number of complete child boxes throw? The check costs 55 bytes. A shorter message is a trim. The default answer is yes, with a message that has the box type, the count, and the number of boxes.
-15. **Nesting limit.** Should the limit be 64 levels, with no option? The fixtures need 8 levels. `@svta/cml-c2pa` uses limits of 20 and 128 for its own formats. The default answer is 64.
-16. **Stream buffer.** Should the stream write no box before the first read? The alternative keeps one box in the buffer and changes only the error path. The default answer is no buffer.
+13. **Error class.** Should the package throw built-in error types or one error class with a code? **Decision:** built-in types. The class costs 93 bytes in the full bundle.
+14. **Count of `stsd` and `dref`.** Should a count above the number of complete child boxes throw? The check costs 55 bytes. A shorter message is a trim. **Decision:** yes, with a message that has the box type, the count, and the number of boxes.
+15. **Nesting limit.** Should the limit be 64 levels, with no option? The fixtures need 8 levels. `@svta/cml-c2pa` uses limits of 20 and 128 for its own formats. **Decision:** 128 levels.
+16. **Stream buffer.** Should the stream write no box before the first read? The alternative keeps one box in the buffer and changes only the error path. **Decision:** no buffer.
 
 **Theme 8: strings**
 
-17. **End of a WebVTT string.** Should `vttC` stop at the first null byte, as the other four WebVTT text boxes do? The specification text of ISO/IEC 14496-30 was not read. The default answer is yes.
-18. **Bad language code.** Should `writeMdhd` write `und` for a bad `language`, or throw? The default answer is `und`.
+17. **End of a WebVTT string.** Should the five WebVTT text readers read to the end of the box, or stop at the first null byte? The ISO text of ISO/IEC 14496-30 was not read. The Unified Streaming validator quotes clause 6.1. **Decision:** read to the end of the box.
+18. **Bad language code.** Should `writeMdhd` write `und` for a bad `language`, or throw? **Decision:** `und`.
 
 **Theme 9: reserved fields**
 
-19. **`reserved` of `hdlr`.** QuickTime files store the manufacturer code there, and one test fixture has `appl`. Should the field stay as an optional field, as `pre_defined` does? The default answer is yes. Then every fixture keeps its bytes.
-20. **`pre_defined` fields.** Should `pre_defined` fields stay as optional fields? The default answer is yes, for the same reason as question 19.
+19. **`reserved` of `hdlr`.** QuickTime files store the manufacturer code there, and one test fixture has `appl`. Should the field stay as an optional field, as `pre_defined` does? **Decision:** yes. Then every fixture keeps its bytes.
+20. **`pre_defined` fields.** Should `pre_defined` fields stay as optional fields? **Decision:** yes, for the same reason as question 19.
 
 **Theme 10: configuration**
 
-21. **Optional configuration.** Should every entry point take an optional configuration with optional maps? The default answer is yes.
+21. **Optional configuration.** Should every entry point take an optional configuration with optional maps? **Decision:** yes.
 
 **Build order**
 
-22. **Phase 1 first, or the cursor first.** Phase 1 puts five pull requests before the cursor rewrite, which has the highest risk. An alternative order starts with themes 6 and 10, because they only remove names and change types. Themes 1, 5, and 9 then go into the rewrite. That order tests the cursor code earlier, and the review of the rewrite is harder. The default answer is the three phases of [Build order](#build-order).
+22. **Phase 1 first, or the cursor first.** Phase 1 puts five pull requests before the cursor rewrite, which has the highest risk. An alternative order starts with themes 6 and 10, because they only remove names and change types. Themes 1, 5, and 9 then go into the rewrite. That order tests the cursor code earlier, and the review of the rewrite is harder. **Decision:** the three phases of [Build order](#build-order).
 
 ## Future possibilities
 
@@ -571,3 +573,4 @@ Decided on 2026-11-17:
 
 - **Key IDs of `pssh`.** `kid` is a `Uint8Array[]` with one entry for each key ID.
 - **Child boxes of `stsd` and `dref`.** The field is `boxes`.
+- **Questions 1 to 22.** [Unresolved questions](#unresolved-questions) states each decision.
