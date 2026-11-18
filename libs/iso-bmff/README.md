@@ -60,7 +60,7 @@ Some exports need a runtime API:
 | `TextEncoder` | Every writer of a UTF-8 string field, such as `writeHdlr` and `writeEmsg` | None |
 | `BigInt` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, and the boxes with `bigint` fields | None, and no check |
 | `DataView` methods `getBigUint64`, `setBigUint64`, and `setBigInt64` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, `IsoBoxWriteView.writeWideUint`, and `IsoBoxWriteView.writeWideInt` with a `bigint` of 8 bytes | None, and no check |
-| `ReadableStream` | `createIsoBoxReadableStream` | None. The function throws an error with a clear message |
+| `ReadableStream` | `createIsoBoxReadableStream` | None. The function throws an `Error` with the message "ReadableStream is not available in this environment" |
 
 ## Usage
 

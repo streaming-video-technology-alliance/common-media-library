@@ -482,4 +482,4 @@ The `IsoBoxReaderReturn` fix shipped on its own in #614.
 
 Amended on 2026-11-18, by [theme 5 of the box types RFC](iso-bmff-v2-box-types.md#theme-5-names):
 
-- **Names.** `defaultReaderConfig` and `defaultWriterConfig` are now `createDefaultReaderConfig` and `createDefaultWriterConfig`. The text of this RFC keeps the old names.
+- **Names.** `defaultReaderConfig` and `defaultWriterConfig` are now `createDefaultReaderConfig` and `createDefaultWriterConfig`. `IsoBoxReadViewConfig` and `IsoBoxWriteViewConfig` are now `IsoBoxReadConfig` and `IsoBoxWriteConfig`. The text of this RFC keeps the old names.

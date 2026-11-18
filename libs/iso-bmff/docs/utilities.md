@@ -53,7 +53,7 @@ const trafs = filterIsoBoxes(boxes, (box) => box.type === "traf");
 console.log(tfdt?.baseMediaDecodeTime, trafs.length);
 ```
 
-The traversal follows the `boxes` field. If the readers map has `readStsd` and `readDref`, the search also reaches the sample entries and the data entries.
+The traversal follows the `boxes` field. If the `readers` map has `readStsd`, the search also reaches the sample entries. If the map has `readDref`, the search also reaches the data entries.
 
 `isIsoBoxType` checks the type of one box and narrows the box to that type:
 

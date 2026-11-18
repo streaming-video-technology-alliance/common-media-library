@@ -3,7 +3,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoInt64Reader } from './IsoInt64Reader.ts'
 
 /**
- * ISO Box Read View configuration
+ * Configuration for `readIsoBoxes` and `IsoBoxReadView`.
  *
  * The type parameter `V` is the type of every 64-bit integer field that the built-in readers return.
  * TypeScript infers `V` from the return type of the `int64` function.
