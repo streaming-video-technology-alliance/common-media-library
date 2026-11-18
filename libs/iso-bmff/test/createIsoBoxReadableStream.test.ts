@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual } from 'node:assert'
+import { deepStrictEqual, rejects, strictEqual, throws } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	createIsoBoxReadableStream,
@@ -215,5 +215,25 @@ describe('createIsoBoxReadableStream', function () {
 		}
 
 		deepStrictEqual(chunks, [0, 1, 2])
+	})
+
+	it('should throw from the call for a first box with no writer', function () {
+		const box: IsoBoxStreamable = { type: 'meta', version: 0, flags: 0, boxes: [] }
+
+		throws(() => createIsoBoxReadableStream([box], { writers: {} }), {
+			message: 'No writer found for box type: meta',
+		})
+	})
+
+	it('should error the stream for a later box with no writer', async function () {
+		const boxes: IsoBoxStreamable[] = [
+			{ type: 'free', data: new Uint8Array([1]) },
+			{ type: 'meta', version: 0, flags: 0, boxes: [] },
+		]
+		const reader = createIsoBoxReadableStream(boxes, { writers: { free: writeFree } }).getReader()
+		const first = await reader.read()
+
+		deepStrictEqual(first.value, new Uint8Array([0, 0, 0, 9, 102, 114, 101, 101, 1]))
+		await rejects(reader.read(), { message: 'No writer found for box type: meta' })
 	})
 })
