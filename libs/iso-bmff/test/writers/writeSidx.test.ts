@@ -21,12 +21,9 @@ describe('writeSidx', function () {
 			timescale: 2,
 			earliestPresentationTime: 3,
 			firstOffset: 4,
-			reserved: 0,
 			references: [
 				{
-					reference: 100,
 					subsegmentDuration: 5,
-					sap: 0x90000000,
 					referenceType: 0,
 					referencedSize: 100,
 					startsWithSap: 1,

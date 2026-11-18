@@ -14,9 +14,6 @@ describe('writeStsd', function () {
 					channelCount: 2,
 					dataReferenceIndex: 1,
 					preDefined: 65534,
-					reserved1: [0, 0, 0, 0, 0, 0],
-					reserved2: [0, 0],
-					reserved3: 0,
 					sampleRate: 48000,
 					sampleSize: 16,
 					boxes: [

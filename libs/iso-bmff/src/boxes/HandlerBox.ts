@@ -9,8 +9,13 @@ import type { FullBox } from './FullBox.ts'
  */
 export type HandlerBox = FullBox & {
 	type: 'hdlr'
-	preDefined: number
+	/** The `pre_defined` field. `writeHdlr` writes 0 for a missing value. */
+	preDefined?: number
 	handlerType: string
-	reserved: number[]
+	/**
+	 * The `reserved` field. QuickTime files can store data here, such as a manufacturer code.
+	 * `writeHdlr` writes 0 for a missing value.
+	 */
+	reserved?: number[]
 	name: string
 }

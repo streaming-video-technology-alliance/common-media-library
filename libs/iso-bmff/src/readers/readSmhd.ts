@@ -12,10 +12,15 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readSmhd(view: IsoBoxReadView<IsoInt64>): SoundMediaHeaderBox {
+	const { version, flags } = view.readFullBox()
+	const balance = view.readInt(2) / 256
+
+	view.jump(2)
+
 	return {
 		type: 'smhd',
-		...view.readFullBox(),
-		balance: view.readInt(2) / 256,
-		reserved: view.readUint(2),
+		version,
+		flags,
+		balance,
 	}
 }

@@ -22,9 +22,9 @@ and this project adheres to
 - Each container box type in `CONTAINERS` now has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result. `readVttc` reads the `vttc` box, and `readVttC` reads the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
 - Each container box type in `CONTAINERS` now has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes. `writeVttc` writes the `vttc` box, and `writeVttC` writes the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
 - `TrackEncryptionBox` has the new optional fields `defaultConstantIvSize` and `defaultConstantIv`. `readTenc` sets the fields for a `tenc` box with a constant IV ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
-- `TrackEncryptionBox` has the new optional field `defaultIsProtected`. `readTenc` sets the field to the protection state, which is the lowest byte of `defaultIsEncrypted`. `writeTenc` does not write the field ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
-- `TrackEncryptionBox` has the new optional fields `defaultCryptByteBlock` and `defaultSkipByteBlock`. `readTenc` sets the fields for a `tenc` box of version 1 or above. The value of `defaultIsEncrypted` does not change ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
-- `writeTenc` now writes `defaultCryptByteBlock` and `defaultSkipByteBlock` to a `tenc` box of version 1 or above. With no pattern field, the writer writes the pattern bits of `defaultIsEncrypted`. To change the pattern of a box from `readTenc`, change the pattern fields ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `TrackEncryptionBox` has the new field `defaultIsProtected`, the protection state of the track. `readTenc` reads the field, and `writeTenc` writes it ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `TrackEncryptionBox` has the new optional fields `defaultCryptByteBlock` and `defaultSkipByteBlock`. `readTenc` sets the fields for a `tenc` box of version 1 or above ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `writeTenc` now writes `defaultCryptByteBlock` and `defaultSkipByteBlock` to a `tenc` box of version 1 or above. With no pattern field, the writer writes 0 ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - `EventMessageBoxUnrecognizedVersion` is the new type of an `emsg` box of a version other than 0 or 1. The type has the fields of the versions 0 and 1 ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 - `EventMessageBoxUnrecognizedVersionNumber` is the new type of the `version` field of `EventMessageBoxUnrecognizedVersion`. The values are 2 to 255 ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 
@@ -97,6 +97,10 @@ and this project adheres to
 - `SyncSampleBox` now has the field `sampleNumber: number[]` in place of `entries`. Replace `box.entries.map((entry) => entry.sampleNumber)` with `box.sampleNumber` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `PreselectionGroupBox` now has the field `entityId: number[]` in place of `entities`. Replace `box.entities.map((entity) => entity.entityId)` with `box.entityId` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - The type parameter of `TypeBox` now accepts only `'ftyp'` and `'styp'` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `AudioSampleEntry` now has the optional field `entryVersion`, from the first 16 bits after `dataReferenceIndex`. `writeAudioSampleEntry` writes 0 for a missing value ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The `pre_defined` fields of `hdlr`, `mdhd`, `mvhd`, and the sample entries are now optional. A writer writes 0 for a missing value, and -1 for a missing `preDefined3` of a visual sample entry ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The `reserved` field of `HandlerBox` is now optional. `writeHdlr` writes 0 for a missing value ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The writers now write 0 in every other reserved field. A box with another value in a reserved field now writes 0 there ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 
 Renames of version 2.0.0:
 
@@ -134,6 +138,10 @@ A field rename also changes the keys of a box that `readIsoBoxes` returns. Code 
 - The constants `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, and `IsoBoxFields` are removed. Pass the string value, such as `view.readArray('uint', 4, count)` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - The class `IsoBoxReadableStream` is removed. Replace `new IsoBoxReadableStream(boxes, config)` with `createIsoBoxReadableStream(boxes, config)` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `isFullBox` is removed. Test the fields of the box, such as `'version' in box && 'flags' in box`, or test the box type with `isIsoBoxType` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The box types no longer have the `reserved` fields of the specification. Remove `reserved1`, `reserved2`, and `reserved3` from `mvhd`, `tkhd`, and the sample entries. Remove `reserved` from `smhd`, `sidx`, and `tfra` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `TrackEncryptionBox` no longer has `defaultIsEncrypted`. Replace `defaultIsEncrypted: 1` with `defaultIsProtected: 1`, and set the pattern with `defaultCryptByteBlock` and `defaultSkipByteBlock` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `LabelBox` no longer has `isGroupLabel`. Replace `box.isGroupLabel` with `(box.flags & 0x1) !== 0` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `SegmentIndexReference` no longer has the packed fields `reference` and `sap`. Use the decoded fields, such as `referenceType` and `sapType` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 
 ### Fixed
 

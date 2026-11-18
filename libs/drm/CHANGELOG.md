@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - `ensureEncryptedInit` now reads and writes the sample entries in the `boxes` field of the `stsd` box, as `@svta/cml-iso-bmff` 2.0.0 returns them. The output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now builds the `tenc` box with `defaultIsProtected`, as `@svta/cml-iso-bmff` 2.0.0 names the field. The output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
 
 ## [1.1.13] - 2026-11-17
 

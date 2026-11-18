@@ -18,21 +18,18 @@ export function readVisualSampleEntry<T extends IsoBoxType>(
 	type: T,
 	view: IsoBoxReadView<IsoInt64>,
 ): VisualSampleEntry<T> {
-	const { readArray, readUint, readInt, readTemplate, readBoxes } = view
+	const { jump, readArray, readUint, readInt, readTemplate, readBoxes } = view
 
 	return {
 		type,
-		reserved1: readArray(UINT, 1, 6),
-		dataReferenceIndex: readUint(2),
+		dataReferenceIndex: (jump(6), readUint(2)),
 		preDefined1: readUint(2),
-		reserved2: readUint(2),
-		preDefined2: readArray(UINT, 4, 3),
+		preDefined2: (jump(2), readArray(UINT, 4, 3)),
 		width: readUint(2),
 		height: readUint(2),
 		horizResolution: readTemplate(4),
 		vertResolution: readTemplate(4),
-		reserved3: readUint(4),
-		frameCount: readUint(2),
+		frameCount: (jump(4), readUint(2)),
 		compressorName: readArray(UINT, 1, 32),
 		depth: readUint(2),
 		preDefined3: readInt(2),

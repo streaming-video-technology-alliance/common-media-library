@@ -15,6 +15,5 @@ export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
 	timescale: number
 	earliestPresentationTime: V
 	firstOffset: V
-	reserved: number
 	references: SegmentIndexReference[]
 }

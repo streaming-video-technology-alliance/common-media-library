@@ -40,10 +40,10 @@ export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWr
 
 	writer.writeUint(box.trackId, 4)
 
-	// Pack reserved with length sizes
-	const reserved =
+	// Pack the length sizes. The 26 reserved bits are 0.
+	const lengthSizes =
 		(box.lengthSizeOfTrafNum << 4) | (box.lengthSizeOfTrunNum << 2) | box.lengthSizeOfSampleNum
-	writer.writeUint(reserved, 4)
+	writer.writeUint(lengthSizes, 4)
 
 	writer.writeUint(box.numberOfEntry, 4)
 

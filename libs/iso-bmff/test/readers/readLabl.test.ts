@@ -27,11 +27,11 @@ describe('readLabl', function () {
 		const boxes = prsl.boxes.filter((child: LabelBox) => child.type === 'labl') as LabelBox[]
 
 		assert.strictEqual(boxes[0].type, 'labl')
-		assert.strictEqual(boxes[0].isGroupLabel, false)
+		assert.strictEqual(boxes[0].flags & 0x1, 0)
 		assert.strictEqual(boxes[0].language, 'en')
 		assert.strictEqual(boxes[0].label, 'Spanish')
 		assert.strictEqual(boxes[1].type, 'labl')
-		assert.strictEqual(boxes[1].isGroupLabel, false)
+		assert.strictEqual(boxes[1].flags & 0x1, 0)
 		assert.strictEqual(boxes[1].language, 'es')
 		assert.strictEqual(boxes[1].label, 'Español')
 	})

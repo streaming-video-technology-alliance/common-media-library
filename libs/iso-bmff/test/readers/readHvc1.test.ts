@@ -21,16 +21,13 @@ describe('readHvc1', function () {
 
 		assert.strictEqual(box.type, 'hvc1')
 
-		assert.deepStrictEqual(box.reserved1, [0, 0, 0, 0, 0, 0])
 		assert.strictEqual(box.dataReferenceIndex, 1)
 		assert.strictEqual(box.preDefined1, 0)
-		assert.strictEqual(box.reserved2, 0)
 		assert.deepStrictEqual(box.preDefined2, [0, 0, 0])
 		assert.strictEqual(box.width, 192)
 		assert.strictEqual(box.height, 108)
 		assert.strictEqual(box.horizResolution, 72)
 		assert.strictEqual(box.vertResolution, 72)
-		assert.strictEqual(box.reserved3, 0)
 		assert.strictEqual(box.frameCount, 1)
 		assert.deepStrictEqual(
 			box.compressorName,

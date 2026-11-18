@@ -19,13 +19,10 @@ describe('readMp4a', function () {
 		assert.strictEqual(box.type, 'mp4a')
 		assert.strictEqual(box.size, 86)
 
-		assert.deepStrictEqual(box.reserved1, [0, 0, 0, 0, 0, 0])
 		assert.strictEqual(box.dataReferenceIndex, 1)
-		assert.deepStrictEqual(box.reserved2, [0, 0])
 		assert.strictEqual(box.channelCount, 2)
 		assert.strictEqual(box.sampleSize, 16)
 		//assert.strictEqual(box.pre_defined, 0); // not conformed value in the file, not tested
-		assert.strictEqual(box.reserved3, 0)
 		assert.strictEqual(box.sampleRate, 48000)
 		assert.strictEqual(box.boxes.length, 1)
 	})

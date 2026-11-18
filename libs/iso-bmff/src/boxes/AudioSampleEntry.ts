@@ -18,11 +18,12 @@ export type AudioSampleEntryChild = any
  */
 export type AudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType> = SampleEntry & {
 	type: T
-	reserved2: number[]
+	/** The `entry_version` field: the first 16 bits after `data_reference_index`. `writeAudioSampleEntry` writes 0 for a missing value. */
+	entryVersion?: number
 	channelCount: number
 	sampleSize: number
-	preDefined: number
-	reserved3: number
+	/** The `pre_defined` field. `writeAudioSampleEntry` writes 0 for a missing value. */
+	preDefined?: number
 	sampleRate: number
 	boxes: AudioSampleEntryChild[]
 }

@@ -16,7 +16,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readMvhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieHeaderBox<V> {
-	const { readUint, readWideUint, readInt, readArray } = view
+	const { jump, readUint, readWideUint, readInt, readArray } = view
 
 	const { version, flags } = view.readFullBox()
 	const size = version == 1 ? 8 : 4
@@ -31,10 +31,10 @@ export function readMvhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieHead
 		duration: readWideUint(size),
 		rate: readInt(4) / 65536,
 		volume: readInt(2) / 256,
-		reserved1: readUint(2),
-		reserved2: readArray(UINT, 4, 2),
 		// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
-		matrix: readArray(INT, 4, 9).map((value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000)),
+		matrix: (jump(10), readArray(INT, 4, 9)).map(
+			(value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000),
+		),
 		preDefined: readArray(UINT, 4, 6),
 		nextTrackId: readUint(4),
 	}

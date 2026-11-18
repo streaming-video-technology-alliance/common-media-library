@@ -92,8 +92,6 @@ describe('a read and a write with the default configs', function () {
 				duration: BigInt('0xffffffffffffffff'),
 				rate: 1,
 				volume: 1,
-				reserved1: 0,
-				reserved2: [0, 0],
 				matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
 				preDefined: [0, 0, 0, 0, 0, 0],
 				nextTrackId: 2,

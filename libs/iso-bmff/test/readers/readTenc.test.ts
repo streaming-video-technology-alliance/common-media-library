@@ -21,7 +21,6 @@ function fields(box: TrackEncryptionBox): Omit<TrackEncryptionBox, 'type'> {
 	return {
 		version: box.version,
 		flags: box.flags,
-		defaultIsEncrypted: box.defaultIsEncrypted,
 		defaultIsProtected: box.defaultIsProtected,
 		defaultPerSampleIvSize: box.defaultPerSampleIvSize,
 		defaultKid: box.defaultKid,
@@ -60,7 +59,6 @@ describe('readTenc', function () {
 		assert.deepStrictEqual(fields(tenc), {
 			version: 1,
 			flags: 0,
-			defaultIsEncrypted: 0x001901,
 			defaultIsProtected: 1,
 			defaultPerSampleIvSize: 0,
 			defaultKid: KID,
@@ -77,7 +75,6 @@ describe('readTenc', function () {
 		assert.deepStrictEqual(fields(tenc), {
 			version: 0,
 			flags: 0,
-			defaultIsEncrypted: 1,
 			defaultIsProtected: 1,
 			defaultPerSampleIvSize: 0,
 			defaultKid: KID,
@@ -94,7 +91,6 @@ describe('readTenc', function () {
 		assert.deepStrictEqual(fields(tenc), {
 			version: 0,
 			flags: 0,
-			defaultIsEncrypted: 1,
 			defaultIsProtected: 1,
 			defaultPerSampleIvSize: 8,
 			defaultKid: KID,
@@ -111,7 +107,6 @@ describe('readTenc', function () {
 		assert.deepStrictEqual(fields(tenc), {
 			version: 1,
 			flags: 0,
-			defaultIsEncrypted: 0x005a01,
 			defaultIsProtected: 1,
 			defaultPerSampleIvSize: 16,
 			defaultKid: KID,
@@ -128,7 +123,6 @@ describe('readTenc', function () {
 		assert.deepStrictEqual(fields(tenc), {
 			version: 1,
 			flags: 0,
-			defaultIsEncrypted: 0,
 			defaultIsProtected: 0,
 			defaultPerSampleIvSize: 0,
 			defaultKid: KID,
@@ -170,7 +164,6 @@ describe('readTenc', function () {
 		assert.deepStrictEqual(fields(tenc), {
 			version: 0,
 			flags: 0,
-			defaultIsEncrypted: 1,
 			defaultIsProtected: 1,
 			defaultPerSampleIvSize: 0,
 			defaultKid: KID,

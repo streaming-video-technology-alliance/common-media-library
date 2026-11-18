@@ -20,11 +20,11 @@ export function readTfra<V extends IsoInt64>(
 ): TrackFragmentRandomAccessBox<V> {
 	const { version, flags } = view.readFullBox()
 	const trackId = view.readUint(4)
-	const reserved = view.readUint(4)
+	const lengthSizes = view.readUint(4)
 
-	const lengthSizeOfTrafNum = (reserved & 0x00000030) >> 4
-	const lengthSizeOfTrunNum = (reserved & 0x0000000c) >> 2
-	const lengthSizeOfSampleNum = reserved & 0x00000003
+	const lengthSizeOfTrafNum = (lengthSizes & 0x00000030) >> 4
+	const lengthSizeOfTrunNum = (lengthSizes & 0x0000000c) >> 2
+	const lengthSizeOfSampleNum = lengthSizes & 0x00000003
 
 	const numberOfEntry = view.readUint(4)
 	const size = version === 1 ? 8 : 4
@@ -42,7 +42,6 @@ export function readTfra<V extends IsoInt64>(
 		version,
 		flags,
 		trackId,
-		reserved,
 		lengthSizeOfTrafNum,
 		lengthSizeOfTrunNum,
 		lengthSizeOfSampleNum,

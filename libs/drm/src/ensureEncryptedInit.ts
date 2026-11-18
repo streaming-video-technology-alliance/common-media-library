@@ -169,7 +169,7 @@ export function ensureEncryptedInit(
 							type: 'tenc',
 							version: 0,
 							flags: 0,
-							defaultIsEncrypted: 1,
+							defaultIsProtected: 1,
 							defaultPerSampleIvSize: 8,
 							defaultKid,
 						},

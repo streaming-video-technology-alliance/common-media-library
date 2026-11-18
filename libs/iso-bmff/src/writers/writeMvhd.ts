@@ -56,8 +56,9 @@ export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView {
 	writer.writeWideUint(box.duration, size)
 	writer.writeTemplate(box.rate, 4)
 	writer.writeTemplate(box.volume, 2)
-	writer.writeUint(box.reserved1, 2)
-	writer.writeArray(box.reserved2, UINT, 4, 2)
+	writer.writeUint(0, 2)
+	writer.writeUint(0, 4)
+	writer.writeUint(0, 4)
 	// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
 	writer.writeArray(
 		box.matrix.map((value, i) => Math.round(value * (i % 3 === 2 ? 0x40000000 : 0x10000))),
@@ -65,7 +66,7 @@ export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView {
 		4,
 		9,
 	)
-	writer.writeArray(box.preDefined, UINT, 4, 6)
+	writer.writeArray(box.preDefined ?? [], UINT, 4, 6)
 	writer.writeUint(box.nextTrackId, 4)
 
 	return writer

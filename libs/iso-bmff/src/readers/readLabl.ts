@@ -18,7 +18,6 @@ export function readLabl(view: IsoBoxReadView<IsoInt64>): LabelBox {
 		type: 'labl',
 		version,
 		flags,
-		isGroupLabel: (flags & 0x1) !== 0,
 		labelId: view.readUint(2),
 		language: view.readUtf8(-1),
 		label: view.readUtf8(-1),
