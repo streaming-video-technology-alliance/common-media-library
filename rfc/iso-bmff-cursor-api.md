@@ -32,7 +32,7 @@ export function getBaseMediaDecodeTime(segment: Uint8Array): number | null {
 }
 ```
 
-`readIsoBoxes` and `writeIsoBoxes` keep their names and their `readers` and `writers` maps. The built-in readers and writers keep their names. A trial build of six boxes was faster and smaller than version 1 in three scenarios. A write of a large payload was slower with the default buffer. [Results of a trial build](#results-of-a-trial-build) shows the numbers and their limits.
+`readIsoBoxes` and `writeIsoBoxes` keep their names and their `readers` and `writers` maps. The built-in readers and writers keep their names. The [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) renames four sample entry functions. A trial build of six boxes was faster and smaller than version 1 in three scenarios. A write of a large payload was slower with the default buffer. [Results of a trial build](#results-of-a-trial-build) shows the numbers and their limits.
 
 ## Motivation
 
@@ -154,14 +154,21 @@ type IsoBoxWriteCursor = {
 type IsoBoxReader<B extends { type: IsoBoxType } = { type: IsoBoxType }, V extends IsoInt64 = number> = (
 	cursor: IsoBoxReadCursor<V>,
 ) => B
-type IsoBoxReaderMap<V extends IsoInt64 = number> = Record<IsoBoxType, IsoBoxReader<{ type: IsoBoxType }, V>>
+type IsoBoxReaderMap<V extends IsoInt64 = number> = {
+	[K in keyof IsoBoxMap]?: IsoBoxReader<{ type: K }, V>
+} & { [type: IsoBoxType]: IsoBoxReader<{ type: IsoBoxType }, V> }
 type IsoBoxWriter<B> = (cursor: IsoBoxWriteCursor, box: B) => void
+type IsoBoxWriterMap = {
+	[K in keyof IsoBoxMap]?: IsoBoxWriter<IsoBoxMap<IsoInt64>[K]>
+} & { [type: IsoBoxType]: IsoBoxWriter<never> }
 type IsoRawBox = { type: IsoBoxType; bytes: Uint8Array; headerSize?: number; usertype?: Uint8Array }
 ```
 
 A read cursor of the `bigint` mode always has the `int64` function. That rule is the rule of the accepted RFC [`int64` reader option](uint64-reader-config.md) for the view. A type that promises `bigint` fields therefore always has the function that produces those fields.
 
 **Variance of the cursor.** The accepted `int64` RFC requires a read handle that is covariant in `V`. A reader of either mode takes `IsoBoxReadCursor<IsoInt64>`. A cursor of each mode must be assignable to that type. The `readers` field declares its entries with a method signature, so TypeScript compares the cursor parameter of an entry in both directions. A field of the type `IsoBoxReaderMap<V>` puts `V` in a parameter position and makes the cursor invariant in `V`. A model with TypeScript 6.0.3 tested both forms. The form with `IsoBoxReaderMap<V>` gave 8 errors. The model with the method signature, the `readonly` fields, and the conditional `int64` field compiled with no error and no cast. A cursor of one mode still rejects a cursor of the other mode. The implementation adds the type tests of the `int64` RFC for the cursor.
+
+**Map types.** The two maps list the known box types for completion. A reader or a writer under the wrong key is a compile error, and a custom key still compiles. Both maps also accept the keys `url` and `urn` for `'url '` and `'urn '`. A model with TypeScript 6.0.3 compiled these map types with the read cursor of this section and passed the cases of the variance model. The [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) states these rules in theme 4.
 
 **Fields that only the package changes.** The fields `view`, `end`, `readers`, `int64`, `bytes`, and `writers` are `readonly`. `pos` is writable, because a caller moves the position. The package functions take an internal type with no `readonly`. That type needs no cast.
 
@@ -179,7 +186,7 @@ A read cursor of the `bigint` mode always has the `int64` function. That rule is
 | `beginIsoBox(cursor, type)` | Writes a box header with no size. Returns the start position. |
 | `beginIsoFullBox(cursor, type, version, flags)` | Does the same and writes the version and the flags. |
 | `endIsoBox(cursor, start)` | Writes the size into the header at `start`. |
-| `writeIsoBoxes(boxes, config)` | Returns one `Uint8Array<ArrayBuffer>` with every box. |
+| `writeIsoBoxes(boxes, config?)` | Returns one `Uint8Array<ArrayBuffer>` with every box. |
 | `writeIsoBox(box, config?)` | Returns one `Uint8Array<ArrayBuffer>` with the box. |
 
 The next table shows the replacements for the read methods of `IsoBoxReadView`. A method with a `size` parameter becomes one function for each size. The table has no row for `slice`, `jump`, and `readBox`.
@@ -191,13 +198,13 @@ The next table shows the replacements for the read methods of `IsoBoxReadView`. 
 | `view.readUint64()` | `readUint64` |
 | `view.readWideUint(size)`, `view.readWideInt(size)` | `readWideUint`, `readWideInt` |
 | `view.readTemplate(size)` | `readTemplate16`, `readTemplate32` |
-| `view.readString(size)`, `view.readUtf8(size)` | `readString`, `readUtf8` |
+| `view.readString(size)`, `view.readUtf8(size)` | `readFourCc`, `readUtf8`, `readTerminatedUtf8` |
 | `view.readData(size)` | `readBytes` |
 | `view.readBoxes()` | `readChildBoxes` |
 | `view.readFullBox()` | `readUint8` for the version, and `readUint24` for the flags |
 | `view.readArray(...)`, `view.readEntries(...)` | A loop in the reader |
 
-The write cursor has the same field functions with the `write` prefix. `findIsoBox`, `filterIsoBoxes`, and `traverseIsoBoxes` do not change. The first signature of `isIsoBoxType` takes a parsed box with a `view` field, so that signature changes. [Result type](#result-type) states the change.
+The write cursor has the same field functions with the `write` prefix. `writeBytes` takes one `ArrayLike<number>`. The [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) states the rules of the string functions in theme 8. `findIsoBox`, `filterIsoBoxes`, and `traverseIsoBoxes` do not change. The first signature of `isIsoBoxType` takes a parsed box with a `view` field, so that signature changes. [Result type](#result-type) states the change.
 
 ### Contract
 
@@ -213,6 +220,8 @@ Read cursor:
 - `seekIsoBox` treats the body of each box in the path as a list of boxes. The function returns `null` for a missing box and for a truncated box. The caller knows whether the data is complete. For partial data, a `null` result means that the caller can try again with more bytes.
 - A box in the path with fields before its child boxes needs two calls. `meta` and `stsd` are such boxes. The caller moves `cursor.pos` past the fields and calls `seekIsoBox` with the cursor.
 - `readIsoBoxes`, `readChildBoxes`, and `nextIsoBox` stop before a truncated box, as `readIsoBoxes` does in version 1. A `uuid` box with a size below its header plus 16 bytes is truncated, as in version 1 ([#664](https://github.com/streaming-video-technology-alliance/common-media-library/pull/664)). After `readChildBoxes` or `nextIsoBox` stops, the position of the cursor is the first byte of the truncated box. A player that reads partial data can then continue with more bytes. That position covers the boxes of one level. That position does not separate a truncated box from a box with a bad size.
+- The tree reader checks the size of a box before it calls the reader. The tree reader does not catch an error of a reader, so that error always reaches the caller.
+- A read throws a `RangeError` for a box that is deeper than 128 levels. The message has the box type and the limit.
 - `nextIsoBox` parses no content and allocates nothing for each box. The caller can keep `cursor.pos` before the call. The bytes from that position to the new position are the complete box.
 - A parsed box has only `type` and its fields. The fields `view`, `size`, `largesize`, and `usertype` do not exist. A raw `uuid` box has the `usertype` field of [Types](#types).
 
@@ -221,6 +230,7 @@ Write cursor:
 - `pos` counts bytes from the first byte of `view` and `bytes`. Both fields cover the complete buffer, with unused capacity. The written bytes are `cursor.bytes.subarray(0, cursor.pos)`.
 - The write cursor doubles its buffer when a field does not fit. The growth allocates a new `ArrayBuffer`, copies the bytes, and replaces `cursor.view` and `cursor.bytes`. A writer writes through the field functions. A writer that stores `cursor.view` or `cursor.bytes` in a variable writes into the old buffer after a growth.
 - `writeIsoBoxes` returns a copy with the exact size.
+- `writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a four-character code that is not 4 characters. The message has the received value.
 - A writer for a `uuid` box calls `beginIsoBox(cursor, 'uuid')` and then writes the 16 bytes of `usertype` with `writeBytes`.
 - `endIsoBox` throws a `RangeError` for a box above 2^32 - 1 bytes. The message has the box type and the size. The write cursor writes the size after the body, so `beginIsoBox` must choose the header size before the body. Version 1 also fails for such a box, because the built-in writers compute the size with a header of 8 bytes.
 - As in version 1, `readIsoBoxes` and `writeIsoBoxes` use the `boxes` field of a box with no map entry only for a type in `CONTAINERS`.
@@ -273,14 +283,16 @@ Many box types have a count next to an array, such as `sampleCount` and `samples
 | `trun` | `sampleCount` | `samples` |
 | `stco`, `co64` | `entryCount` | `chunkOffset` |
 | `stz2` | `sampleCount` | `entrySize` |
-| `stts`, `stsc`, `stss`, `stsh`, `elst`, `sbgp`, `sgpd`, `dref`, `stsd`, `subs` | `entryCount` | `entries` |
+| `stts`, `stsc`, `stsh`, `elst`, `sbgp`, `sgpd`, `subs` | `entryCount` | `entries` |
+| `dref`, `stsd` | `entryCount` | `boxes` |
+| `stss` | `entryCount` | `sampleNumber` |
 | `ctts`, version 0 or 1 | `entryCount` | `entries` |
 | `stsz`, `sampleSize` is 0 | `sampleCount` | `entrySize` |
 | `saiz`, `defaultSampleInfoSize` is 0 | `sampleCount` | `sampleInfoSize` |
 | `saio` | `entryCount` | `offset` |
 | `tfra` | `numberOfEntry` | `entries` |
 | `ssix` | `subsegmentCount` | `subsegments` |
-| `prsl` | `numEntitiesInGroup` | `entities` |
+| `prsl` | `numEntitiesInGroup` | `entityId` |
 | `senc` | `sampleCount` | `samples` |
 | `pssh` | `kidCount`, `dataSize` | `kid`, `data` |
 | `tenc` | `defaultConstantIvSize` | `defaultConstantIv` |
@@ -292,7 +304,7 @@ Many box types have a count next to an array, such as `sampleCount` and `samples
 
 - `trun` follows rule 1 in every form. The flags 0x100 to 0x800 add the fields of a row. If the box sets none of those flags, a row has 0 bytes. The reader then returns one empty object for each sample.
 - `senc` follows rule 1 in every form. A row of `senc` can also have 0 bytes. The IV size is not a field of `senc`, so a custom reader needs that size to split the rows.
-- The `kid` field of `pssh` is a list of bytes, with 16 bytes for each key ID. For version 1 or above, the writer writes the length of `kid` divided by 16. A box of version 0 has no count and no key IDs.
+- The `kid` field of `pssh` has one 16-byte `Uint8Array` for each key ID, as theme 3 of the [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) states. For version 1 or above, the writer writes the length of `kid`. A box of version 0 has no count and no key IDs.
 - `defaultConstantIv` of `tenc` is optional. With no array, the writer writes no size and no bytes, as in version 1.
 - `entrySize` of `stsz` and `sampleInfoSize` of `saiz` are optional. With no array, the writer writes a count of 0.
 - `sidx` already has no count field. `writeSidx` writes the length of `references`.
@@ -305,7 +317,7 @@ Many box types have a count next to an array, such as `sampleCount` and `samples
 | `saiz` | `defaultSampleInfoSize` is not 0 | `sampleCount` |
 | `ctts` | Version 2 or above | `entryCount` |
 
-The package has a type and no reader or writer for 12 of these boxes. The boxes are `co64`, `stz2`, `stsh`, `sbgp`, `sgpd`, `saio`, `saiz`, `senc`, `iinf`, `ipro`, `iloc`, and `iref`. For those boxes, the two rules change only the type.
+The package has a type and no reader or writer for 12 of these boxes. The boxes are `co64`, `stz2`, `stsh`, `sbgp`, `sgpd`, `saio`, `saiz`, `senc`, `iinf`, `ipro`, `iloc`, and `iref`. Issue 652 adds the readers and writers of `co64` and `stz2`. Theme 6 of the [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) removes the types of the other 10 boxes. The rows of the removed types apply when a reader and a writer come in a minor release.
 
 A field that is not the length of an array does not change. Examples are `channelcount`, `frameCount`, `samplesPerChunk`, and the `sampleCount` of an entry in `stts`.
 
@@ -317,16 +329,17 @@ Migration:
 
 ### Changes to accepted RFCs
 
-This RFC changes four rules of two accepted RFCs. No release contains the code of either RFC yet.
+This RFC changes five rules of two accepted RFCs. No release contains the code of either RFC yet.
 
 | Accepted RFC | Rule today | Rule in version 2.0.0 |
 |---|---|---|
 | [`int64` reader option](uint64-reader-config.md) | The two wide write methods are fields of `IsoBoxWriteView`. The decision of 2026-11-10 keeps the same API for the read view and the write view. | `writeWideUint` and `writeWideInt` are field functions. The read side also has field functions, so the reason of that decision still holds. |
 | [`int64` reader option](uint64-reader-config.md) | The first parameter of `IsoInt64Reader` is a view of either mode. | The first parameter is a read cursor of either mode. The function reads with the field functions. |
+| [`int64` reader option](uint64-reader-config.md) | `defaultReaderConfig` and `defaultWriterConfig` build the default configuration. | The functions are `createDefaultReaderConfig` and `createDefaultWriterConfig`, as theme 5 of the [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) states. |
 | [Container readers and writers](iso-bmff-container-readers-writers.md) | A container writer takes a required `config` argument with the writers. That RFC rejects an optional `config`, because a missing writer for a child box then fails at run time. | A container writer takes the write cursor, and the cursor has the writers. A missing writer for a child box throws at run time, as [Contract](#contract) states. |
 | [Container readers and writers](iso-bmff-container-readers-writers.md) | A writer returns an `IsoBoxWriteView`. `writeIsoBoxes` returns one array for each box. | A writer returns nothing. `writeIsoBoxes` returns one array. |
 
-The exported names and the `int64` option do not change. The default of the `int64` option stays `number`. The pull request that implements this RFC amends both accepted RFCs. Each amendment adds a dated line to the Final Decision section.
+The `int64` option does not change. The [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) renames some exported names, and its theme 5 lists each rename. The default of the `int64` option stays `number`. The pull request that implements this RFC amends both accepted RFCs. Each amendment adds a dated line to the Final Decision section.
 
 ### Migration
 
@@ -444,11 +457,17 @@ Limits of the numbers:
 6. **Path syntax.** `seekIsoBox` takes an array of box types. hls.js uses the same form.
 7. **A count above the field width.** Some counts are 8 or 16 bits wide. The reference count of `sidx` is a 16-bit field. That field cannot state 65536 entries. `writeSidx` of version 1 writes 0 for that array, and still writes every reference. Should the writer throw a `RangeError`?
 8. **A count for rows of 0 bytes.** A `trun` box of 16 bytes can state any sample count. The reader creates one object for each sample, as in version 1. Should the reader limit that count?
-9. **A `kid` length that is not a multiple of 16.** Should `writePssh` throw a `RangeError`, or write only the complete key IDs?
+9. **A `kid` length that is not a multiple of 16.** No longer applies. `kid` has one entry for each key ID, as the [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) states.
 10. **A parsed box with a reader, no writer, and a type outside `CONTAINERS`.** Version 1 writes the bytes of the `view` field of such a box. A parsed box has no `view` field in version 2.0.0, so `writeIsoBoxes` throws by the rule of [Contract](#contract). The adopter adds the writer, or removes the reader so that the box stays a raw box. Is that change acceptable? The default answer is yes.
 11. **Members of `IsoBoxReadView` with no replacement.** This RFC states no replacement for `slice`, `jump`, `readBox`, and `bytesRemaining`. The readers of `ftyp` and `sdtp` use `bytesRemaining`. Should a reader use `cursor.pos` and `cursor.end`, or should the package export a function for each member?
 12. **The box type argument of a reader.** In version 1, a reader takes the box type as a second argument. The `IsoBoxReader` type of this RFC has no such argument. Should the read cursor have the box type, or should a reader keep the second argument?
 13. **The start of a box.** A cursor from `seekIsoBox` and the cursor of a reader have their position after the box header. The header has 8, 16, 24, or 32 bytes, so the caller cannot compute the first byte of the box. `parsePsshList` of `@svta/cml-drm` returns the complete bytes of each `pssh` box, so `parsePsshList` needs that first byte. Should the read cursor have a `start` field? A custom reader could then also return the bytes of its box. The default answer is yes. The field adds one number to each cursor, and the package already creates a cursor for each box. The alternative is a field with the bytes on each parsed box. That field keeps the complete source buffer in memory while the caller keeps the box. That field also gives the writer two sources for one box: the bytes and the fields.
+
+The review of the box types RFC added three questions:
+
+25. **`defaultConstantIvSize` of `tenc`.** [Count fields](#count-fields) removes the field. PR 658 kept the field in version 1, to avoid a break in a minor release. Should version 2.0.0 remove it? The default answer is yes, because the field repeats the length of `defaultConstantIv`.
+26. **The type parameter of the traversal functions.** `traverseIsoBoxes`, `findIsoBox`, and `filterIsoBoxes` have a type parameter `T` with no constraint. A `Uint8Array` input therefore compiles and yields numbers. Should `T` extend `object`? The change affects only types. The default answer is yes. [Functions](#functions) then states that change.
+27. **An invalid `maxDepth`.** A `maxDepth` of -1 or `NaN` makes the traversal yield nothing, so `findIsoBox` returns `null` for a configuration error. Should the traversal throw a `RangeError`? The default answer is no. The TSDoc of the option states the rule.
 
 ## Future possibilities
 
@@ -474,3 +493,4 @@ Decided on 2026-11-17:
 - **Step over sibling boxes.** The package exports `nextIsoBox`. Question 5 decides the name.
 - **Box above 4 GiB.** `endIsoBox` throws a `RangeError`.
 - **Version of `@svta/cml-drm` and `@svta/cml-c2pa`.** Both packages get a major version.
+- **Changes from the box types RFC.** The [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715) was accepted on 2026-11-17. Its section "Changes to the cursor RFC" lists the changes of this text.
