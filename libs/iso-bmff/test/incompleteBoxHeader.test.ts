@@ -1,7 +1,7 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	IsoBoxReadView,
 	it,
@@ -15,7 +15,8 @@ import { boxBytes } from './util/wideBoxes.ts'
 type Tree = { type: string; size: number; boxes?: Tree[] }
 
 const ascii = (text: string): Uint8Array => new TextEncoder().encode(text)
-const read = (bytes: Uint8Array): Tree[] => readIsoBoxes(bytes, defaultReaderConfig()) as Tree[]
+const read = (bytes: Uint8Array): Tree[] =>
+	readIsoBoxes(bytes, createDefaultReaderConfig()) as Tree[]
 const types = (boxes: Tree[] = []): string[] => boxes.map(box => box.type)
 
 const FTYP = boxBytes('ftyp', ascii('isom'), [0, 4])
@@ -82,8 +83,8 @@ describe('incomplete box header', function () {
 	it('should omit the bytes after the last child box of a container in a write', function () {
 		const source = boxBytes('moov', boxBytes('udta', FREE, ZEROS))
 
-		const boxes = readIsoBoxes(source, defaultReaderConfig())
-		const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
+		const boxes = readIsoBoxes(source, createDefaultReaderConfig())
+		const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
 
 		assert.strictEqual(written.length, source.length - ZEROS.length)
 		assert.deepStrictEqual(written, boxBytes('moov', boxBytes('udta', FREE)))
@@ -93,8 +94,8 @@ describe('incomplete box header', function () {
 		const fields = new Uint8Array(78)
 		const source = boxBytes('avc1', fields, FREE, ZEROS)
 
-		const boxes = readIsoBoxes(source, defaultReaderConfig())
-		const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
+		const boxes = readIsoBoxes(source, createDefaultReaderConfig())
+		const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
 
 		assert.strictEqual(written.length, source.length - ZEROS.length)
 		assert.deepStrictEqual(written, boxBytes('avc1', fields, FREE))
@@ -113,7 +114,7 @@ const largeHeader = (largesize: number, type: string): Uint8Array =>
 const readWithLimit = (bytes: Uint8Array, limit: number): Tree[] => {
 	const boxes: Tree[] = []
 
-	for (const box of new IsoBoxReadView(bytes, defaultReaderConfig())) {
+	for (const box of new IsoBoxReadView(bytes, createDefaultReaderConfig())) {
 		if (boxes.push(box as Tree) === limit) {
 			break
 		}
@@ -195,7 +196,7 @@ describe('box size below the header size', function () {
 	it('should read a box with the size 1 and the largesize 16 and the box after it', function () {
 		const bytes = reduceUint8Arrays([largeHeader(16, 'free'), FREE])
 
-		const boxes = readIsoBoxes(bytes, defaultReaderConfig())
+		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig())
 
 		assert.deepStrictEqual(
 			boxes.map(box => box.type),
@@ -208,7 +209,7 @@ describe('box size below the header size', function () {
 	it('should read a last box with the size 0 to the end of the data', function () {
 		const bytes = reduceUint8Arrays([FTYP, header(0, 'mdat'), ZEROS])
 
-		const boxes = readIsoBoxes(bytes, defaultReaderConfig())
+		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig())
 		const mdat = boxes[1]
 
 		assert.deepStrictEqual(
@@ -258,7 +259,7 @@ describe('box size below the header size', function () {
 		const usertype = Uint8Array.from({ length: 16 }, (_, i) => i + 1)
 		const bytes = reduceUint8Arrays([header(24, 'uuid'), usertype, FREE])
 
-		const boxes = readIsoBoxes(bytes, defaultReaderConfig())
+		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig())
 
 		assert.deepStrictEqual(
 			boxes.map(box => box.type),
@@ -271,7 +272,7 @@ describe('box size below the header size', function () {
 		const usertype = Uint8Array.from({ length: 16 }, (_, i) => i + 1)
 		const bytes = reduceUint8Arrays([largeHeader(32, 'uuid'), usertype, FREE])
 
-		const boxes = readIsoBoxes(bytes, defaultReaderConfig())
+		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig())
 
 		assert.deepStrictEqual(
 			boxes.map(box => box.type),

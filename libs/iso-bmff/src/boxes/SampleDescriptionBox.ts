@@ -1,7 +1,7 @@
-import type { AudioSampleEntryBox } from './AudioSampleEntryBox.ts'
+import type { AudioSampleEntry } from './AudioSampleEntry.ts'
 import type { FullBox } from './FullBox.ts'
-import type { SampleEntryBox } from './SampleEntryBox.ts'
-import type { VisualSampleEntryBox } from './VisualSampleEntryBox.ts'
+import type { SampleEntry } from './SampleEntry.ts'
+import type { VisualSampleEntry } from './VisualSampleEntry.ts'
 
 /**
  * Sample Description Box (`stsd`).
@@ -10,10 +10,9 @@ import type { VisualSampleEntryBox } from './VisualSampleEntryBox.ts'
  *
  * @public
  */
-export type SampleDescriptionBox<
-	E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox,
-> = FullBox & {
-	type: 'stsd'
-	entryCount: number
-	boxes: E[]
-}
+export type SampleDescriptionBox<E extends SampleEntry = AudioSampleEntry | VisualSampleEntry> =
+	FullBox & {
+		type: 'stsd'
+		entryCount: number
+		boxes: E[]
+	}

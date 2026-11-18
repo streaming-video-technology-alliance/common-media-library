@@ -1,8 +1,8 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
+import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
-import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
+import { readAudioSampleEntry } from './readAudioSampleEntry.ts'
 
 /**
  * Create a reader for an audio sample entry box of a type that `AudioSampleEntryType` does not list, such as `ac-3` or `ec-3`.
@@ -18,6 +18,6 @@ import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
  */
 export function createAudioSampleEntryReader<T extends IsoBoxType>(
 	type: T,
-): (view: IsoBoxReadView<IsoInt64>) => AudioSampleEntryBox<T> {
-	return (view: IsoBoxReadView<IsoInt64>) => readAudioSampleEntryBox<T>(type, view)
+): (view: IsoBoxReadView<IsoInt64>) => AudioSampleEntry<T> {
+	return (view: IsoBoxReadView<IsoInt64>) => readAudioSampleEntry<T>(type, view)
 }

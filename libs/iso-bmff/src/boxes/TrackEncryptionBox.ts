@@ -18,7 +18,7 @@ export type TrackEncryptionBox = FullBox & {
 	defaultIsEncrypted: number
 
 	/** `default_Per_Sample_IV_Size` */
-	defaultIvSize: number
+	defaultPerSampleIvSize: number
 
 	/** `default_KID`: the default key ID, 16 bytes. */
 	defaultKid: number[]
@@ -46,7 +46,7 @@ export type TrackEncryptionBox = FullBox & {
 
 	/**
 	 * `default_constant_IV_size`. `readTenc` sets the field when `default_isProtected` is 1,
-	 * `defaultIvSize` is 0, and the box has the byte. `writeTenc` writes the constant IV when
+	 * `defaultPerSampleIvSize` is 0, and the box has the byte. `writeTenc` writes the constant IV when
 	 * the box has this field or `defaultConstantIv`. With no field, the size is the length of
 	 * `defaultConstantIv`.
 	 */

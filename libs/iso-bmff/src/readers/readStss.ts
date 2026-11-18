@@ -1,5 +1,5 @@
-import type { SyncSample } from '../boxes/SyncSample.ts'
 import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
@@ -21,8 +21,6 @@ export function readStss(view: IsoBoxReadView<IsoInt64>): SyncSampleBox {
 		version,
 		flags,
 		entryCount,
-		entries: view.readEntries<SyncSample>(entryCount, () => ({
-			sampleNumber: view.readUint(4),
-		})),
+		sampleNumber: view.readArray(UINT, 4, entryCount),
 	}
 }

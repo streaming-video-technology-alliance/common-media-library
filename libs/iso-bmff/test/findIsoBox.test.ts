@@ -1,5 +1,5 @@
 import {
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	findIsoBox,
 	readFtyp,
 	readIsoBoxes,
@@ -139,7 +139,7 @@ describe('findIsoBox', function () {
 
 	it('should find the child boxes of stsd and dref', async function () {
 		const isoFile = await readFile(new URL('./fixtures/hvc1_init.mp4', import.meta.url))
-		const boxes = readIsoBoxes(isoFile, defaultReaderConfig())
+		const boxes = readIsoBoxes(isoFile, createDefaultReaderConfig())
 
 		assert.strictEqual(findIsoBox(boxes, box => box.type === 'hvc1')?.type, 'hvc1')
 		assert.ok(findIsoBox(boxes, (box: { type: string }) => box.type === 'hvcC'))

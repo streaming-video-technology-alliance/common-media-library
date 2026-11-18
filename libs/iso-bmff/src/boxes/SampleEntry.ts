@@ -7,7 +7,7 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  *
  * @public
  */
-export type SampleEntryBox<T extends IsoBoxType = IsoBoxType, C = any> = {
+export type SampleEntry<T extends IsoBoxType = IsoBoxType, C = any> = {
 	type: T
 	reserved1: number[]
 	dataReferenceIndex: number

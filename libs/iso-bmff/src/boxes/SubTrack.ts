@@ -6,7 +6,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export type SubTrackBoxChild<V extends IsoInt64 = number> = IsoBox<V>
+export type SubTrackChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
  * Sub Track Box (`strk`).
@@ -15,7 +15,7 @@ export type SubTrackBoxChild<V extends IsoInt64 = number> = IsoBox<V>
  *
  * @public
  */
-export type SubTrackBox<V extends IsoInt64 = number> = {
+export type SubTrack<V extends IsoInt64 = number> = {
 	type: 'strk'
-	boxes: SubTrackBoxChild<V>[]
+	boxes: SubTrackChild<V>[]
 }

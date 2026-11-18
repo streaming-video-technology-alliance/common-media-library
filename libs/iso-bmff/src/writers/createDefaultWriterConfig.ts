@@ -1,4 +1,4 @@
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeArdi } from './writeArdi.ts'
 import { writeAvc1 } from './writeAvc1.ts'
 import { writeAvc2 } from './writeAvc2.ts'
@@ -67,14 +67,14 @@ import { writeVtte } from './writeVtte.ts'
  * Create a default writer configuration with every writer except the container writers, such as `writeMoov`.
  * `writeIsoBoxes` writes a container box that has no writer.
  *
- * @returns An `IsoBoxWriteViewConfig` with all available writers pre-configured, except the container writers
+ * @returns An `IsoBoxWriteConfig` with all available writers pre-configured, except the container writers
  *
  * @example
- * {@includeCode ../../test/writers/defaultWriterConfig.test.ts#example}
+ * {@includeCode ../../test/writers/createDefaultWriterConfig.test.ts#example}
  *
  * @public
  */
-export function defaultWriterConfig(): Required<IsoBoxWriteViewConfig> {
+export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig> {
 	return {
 		writers: {
 			ardi: writeArdi,

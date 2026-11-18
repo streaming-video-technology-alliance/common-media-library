@@ -1,7 +1,7 @@
 import {
 	assert,
 	createInt64OverflowReader,
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	describe,
 	findIsoBox,
 	it,
@@ -14,7 +14,7 @@ import { boxBytes } from '../util/wideBoxes.ts'
 // A version 1 tfdt box. baseMediaDecodeTime is 2^53 + 1, which a number cannot hold.
 const TFDT_V1 = boxBytes('tfdt', [1, 1], [0, 3], [BigInt('9007199254740993'), 8])
 
-describe('defaultReaderConfig', function () {
+describe('createDefaultReaderConfig', function () {
 	it('should read 64-bit fields as bigint with the int64 option', function () {
 		// #region example
 		// A moof box that holds a traf box with a version 1 tfdt box.
@@ -57,7 +57,7 @@ describe('defaultReaderConfig', function () {
 			0,
 			1, // baseMediaDecodeTime
 		])
-		const boxes = readIsoBoxes(bytes, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 
 		// The field is a bigint with the exact value.
 		const tfdt = findIsoBox(boxes, box => box.type === 'tfdt')
@@ -68,7 +68,7 @@ describe('defaultReaderConfig', function () {
 	})
 
 	it('should read 64-bit fields as numbers with no argument', function () {
-		const [box] = readIsoBoxes(TFDT_V1, defaultReaderConfig())
+		const [box] = readIsoBoxes(TFDT_V1, createDefaultReaderConfig())
 
 		assert.ok(box)
 		assert.strictEqual(box.type, 'tfdt')
@@ -76,10 +76,10 @@ describe('defaultReaderConfig', function () {
 	})
 
 	it('should return a configuration with no int64 key by default', function () {
-		const config = defaultReaderConfig()
+		const config = createDefaultReaderConfig()
 
 		assert.deepStrictEqual(Object.keys(config), ['readers'])
-		assert.deepStrictEqual(Object.keys(defaultReaderConfig({})), ['readers'])
+		assert.deepStrictEqual(Object.keys(createDefaultReaderConfig({})), ['readers'])
 		assert.strictEqual(config.readers?.['tfdt'], readTfdt)
 	})
 
@@ -87,9 +87,9 @@ describe('defaultReaderConfig', function () {
 		const int64 = createInt64OverflowReader(error => {
 			throw error
 		})
-		const config = defaultReaderConfig({ int64 })
+		const config = createDefaultReaderConfig({ int64 })
 
 		assert.strictEqual(config.int64, int64)
-		assert.deepStrictEqual(config.readers, defaultReaderConfig().readers)
+		assert.deepStrictEqual(config.readers, createDefaultReaderConfig().readers)
 	})
 })

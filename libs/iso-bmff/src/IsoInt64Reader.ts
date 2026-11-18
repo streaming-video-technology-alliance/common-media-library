@@ -2,7 +2,7 @@ import type { IsoBoxReadView } from './IsoBoxReadView.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
- * The value of the `int64` option of `IsoBoxReadViewConfig`.
+ * The value of the `int64` option of `IsoBoxReadConfig`.
  *
  * The function reads one integer field of 4 or 8 bytes from the view.
  * The view calls the function for every field that a reader reads with `readWideUint` or `readWideInt`.

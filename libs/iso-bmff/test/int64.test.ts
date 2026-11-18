@@ -2,8 +2,8 @@ import {
 	assert,
 	createInt64OverflowReader,
 	createIsoBoxReadableStream,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	it,
 	IsoBoxReadView,
@@ -33,7 +33,7 @@ describe('int64 option', function () {
 			it('should read every 64-bit field above 2^53 exactly with readInt64AsBigInt', function () {
 				const [parsed] = readIsoBoxes(
 					box.bytes(high, 8),
-					defaultReaderConfig({ int64: readInt64AsBigInt }),
+					createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 				)
 
 				assert.ok(parsed)
@@ -43,7 +43,7 @@ describe('int64 option', function () {
 			})
 
 			it('should read the rounded number with no option', function () {
-				const [parsed] = readIsoBoxes(box.bytes(high, 8), defaultReaderConfig())
+				const [parsed] = readIsoBoxes(box.bytes(high, 8), createDefaultReaderConfig())
 
 				assert.ok(parsed)
 				assert.strictEqual(parsed.view.bytesRemaining, 0)
@@ -59,11 +59,11 @@ describe('int64 option', function () {
 				const errors: RangeError[] = []
 				const [checked] = readIsoBoxes(
 					box.bytes(high, 8),
-					defaultReaderConfig({
+					createDefaultReaderConfig({
 						int64: createInt64OverflowReader(error => void errors.push(error)),
 					}),
 				)
-				const [plain] = readIsoBoxes(box.bytes(high, 8), defaultReaderConfig())
+				const [plain] = readIsoBoxes(box.bytes(high, 8), createDefaultReaderConfig())
 
 				assert.ok(checked && plain)
 				assert.strictEqual(checked.view.bytesRemaining, 0)
@@ -80,7 +80,7 @@ describe('int64 option', function () {
 				const safe = wideValues(box, BigInt(Number.MAX_SAFE_INTEGER) - BigInt(8), BigInt(1))
 				const [parsed] = readIsoBoxes(
 					box.bytes(safe, 8),
-					defaultReaderConfig({
+					createDefaultReaderConfig({
 						int64: createInt64OverflowReader(() => assert.fail('no value overflows')),
 					}),
 				)
@@ -100,7 +100,7 @@ describe('int64 option', function () {
 					() =>
 						readIsoBoxes(
 							box.bytes(high, 8),
-							defaultReaderConfig({
+							createDefaultReaderConfig({
 								int64: createInt64OverflowReader(error => {
 									errors.push(error)
 									throw error
@@ -114,12 +114,12 @@ describe('int64 option', function () {
 
 			it('should write a box with bigint fields back to the same bytes', function () {
 				const source = box.bytes(high, 8)
-				const config = defaultReaderConfig({ int64: readInt64AsBigInt })
+				const config = createDefaultReaderConfig({ int64: readInt64AsBigInt })
 				const [parsed] = readIsoBoxes(source, config)
 
 				assert.ok(parsed)
 
-				const written = writeIsoBox(parsed, defaultWriterConfig())
+				const written = writeIsoBox(parsed, createDefaultWriterConfig())
 
 				assert.deepStrictEqual(written, source)
 				assert.deepStrictEqual(bigintFields(readIsoBoxes(written, config)[0]), expected(high))
@@ -128,10 +128,10 @@ describe('int64 option', function () {
 			it('should write a box with number fields back to the same bytes', function () {
 				const safe = wideValues(box, BigInt(Number.MAX_SAFE_INTEGER) - BigInt(8), BigInt(1))
 				const source = box.bytes(safe, 8)
-				const [parsed] = readIsoBoxes(source, defaultReaderConfig())
+				const [parsed] = readIsoBoxes(source, createDefaultReaderConfig())
 
 				assert.ok(parsed)
-				assert.deepStrictEqual(writeIsoBox(parsed, defaultWriterConfig()), source)
+				assert.deepStrictEqual(writeIsoBox(parsed, createDefaultWriterConfig()), source)
 			})
 
 			if (box.fixed) {
@@ -140,29 +140,33 @@ describe('int64 option', function () {
 
 			it('should write a version 0 box with bigint fields back to the same bytes', function () {
 				const source = box.bytes(low, 4)
-				const [parsed] = readIsoBoxes(source, defaultReaderConfig({ int64: readInt64AsBigInt }))
+				const [parsed] = readIsoBoxes(
+					source,
+					createDefaultReaderConfig({ int64: readInt64AsBigInt }),
+				)
 
 				assert.ok(parsed)
-				assert.deepStrictEqual(writeIsoBox(parsed, defaultWriterConfig()), source)
+				assert.deepStrictEqual(writeIsoBox(parsed, createDefaultWriterConfig()), source)
 			})
 
 			it('should write a version 0 box with number fields back to the same bytes', function () {
 				const source = box.bytes(low, 4)
-				const [parsed] = readIsoBoxes(source, defaultReaderConfig())
+				const [parsed] = readIsoBoxes(source, createDefaultReaderConfig())
 
 				assert.ok(parsed)
-				assert.deepStrictEqual(writeIsoBox(parsed, defaultWriterConfig()), source)
+				assert.deepStrictEqual(writeIsoBox(parsed, createDefaultWriterConfig()), source)
 			})
 
 			it('should throw a RangeError for a bigint that does not fit a version 0 field', function () {
 				const [parsed] = readIsoBoxes(
 					box.bytes(high, 8),
-					defaultReaderConfig({ int64: readInt64AsBigInt }),
+					createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 				)
 
 				assert.ok(parsed)
 				assert.throws(
-					() => writeIsoBox({ ...parsed, version: 0 } as typeof parsed, defaultWriterConfig()),
+					() =>
+						writeIsoBox({ ...parsed, version: 0 } as typeof parsed, createDefaultWriterConfig()),
 					RangeError,
 				)
 			})
@@ -170,7 +174,7 @@ describe('int64 option', function () {
 			it('should read a version 0 field as a bigint with readInt64AsBigInt', function () {
 				const [parsed] = readIsoBoxes(
 					box.bytes(low, 4),
-					defaultReaderConfig({ int64: readInt64AsBigInt }),
+					createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 				)
 
 				assert.ok(parsed)
@@ -180,7 +184,7 @@ describe('int64 option', function () {
 			})
 
 			it('should read a version 0 field as a number with no option', function () {
-				const [parsed] = readIsoBoxes(box.bytes(low, 4), defaultReaderConfig())
+				const [parsed] = readIsoBoxes(box.bytes(low, 4), createDefaultReaderConfig())
 
 				assert.ok(parsed)
 				assert.deepStrictEqual(bigintFields(parsed), {})
@@ -193,7 +197,7 @@ describe('int64 option', function () {
 			it('should not call the overflow callback for a version 0 box', function () {
 				const [parsed] = readIsoBoxes(
 					box.bytes(low, 4),
-					defaultReaderConfig({
+					createDefaultReaderConfig({
 						int64: createInt64OverflowReader(() => assert.fail('a 4-byte field never overflows')),
 					}),
 				)
@@ -231,11 +235,11 @@ describe('int64 option', function () {
 		const max = BigInt(2) ** BigInt(63) - BigInt(1)
 		const [parsed] = readIsoBoxes(
 			elst.bytes([BigInt(1), BigInt(-1), BigInt(2), min], 8),
-			defaultReaderConfig({ int64: readInt64AsBigInt }),
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 		)
 		const [other] = readIsoBoxes(
 			elst.bytes([max, max, BigInt(0), -HIGH], 8),
-			defaultReaderConfig({ int64: readInt64AsBigInt }),
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 		)
 
 		assert.ok(parsed && other)
@@ -255,7 +259,7 @@ describe('int64 option', function () {
 
 		const [parsed] = readIsoBoxes(
 			elst.bytes([1, -1, 0xffffffff, -2147483648], 4),
-			defaultReaderConfig({ int64: readInt64AsBigInt }),
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 		)
 
 		assert.ok(parsed)
@@ -271,8 +275,8 @@ describe('int64 option', function () {
 
 	it('should leave an absent baseDataOffset undefined in both modes', function () {
 		const bytes = boxBytes('tfhd', [0, 1], [0, 3], [1, 4])
-		const [big] = readIsoBoxes(bytes, defaultReaderConfig({ int64: readInt64AsBigInt }))
-		const [plain] = readIsoBoxes(bytes, defaultReaderConfig())
+		const [big] = readIsoBoxes(bytes, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
+		const [plain] = readIsoBoxes(bytes, createDefaultReaderConfig())
 
 		assert.ok(big && plain)
 		assert.strictEqual(big.type, 'tfhd')
@@ -292,7 +296,7 @@ describe('int64 option', function () {
 			[10, 4],
 			[1, 4],
 		)
-		const [parsed] = readIsoBoxes(bytes, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const [parsed] = readIsoBoxes(bytes, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 
 		assert.ok(parsed)
 		assert.strictEqual(parsed.type, 'emsg')
@@ -307,7 +311,7 @@ describe('int64 option', function () {
 
 		const traf = boxBytes('traf', tfdt.bytes([HIGH], 8))
 		const moof = boxBytes('moof', boxBytes('mfhd', [0, 1], [0, 3], [7, 4]), traf)
-		const [parsed] = readIsoBoxes(moof, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const [parsed] = readIsoBoxes(moof, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 
 		assert.ok(parsed)
 		assert.strictEqual(parsed.type, 'moof')
@@ -327,16 +331,16 @@ describe('int64 option', function () {
 
 		const traf = boxBytes('traf', tfhd.bytes([HIGH], 8), tfdt.bytes([HIGH + BigInt(2)], 8))
 		const moof = boxBytes('moof', boxBytes('mfhd', [0, 1], [0, 3], [7, 4]), traf)
-		const boxes = readIsoBoxes(moof, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const boxes = readIsoBoxes(moof, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 
-		assert.deepStrictEqual(writeIsoBoxes(boxes, defaultWriterConfig()), [moof])
+		assert.deepStrictEqual(writeIsoBoxes(boxes, createDefaultWriterConfig()), [moof])
 	})
 
 	it('should write a box object with a bigint field', function () {
 		const writer = writeTfdt({ type: 'tfdt', version: 1, flags: 0, baseMediaDecodeTime: HIGH })
 		const bytes = writeIsoBox(
 			{ type: 'tfdt', version: 1, flags: 0, baseMediaDecodeTime: HIGH },
-			defaultWriterConfig(),
+			createDefaultWriterConfig(),
 		)
 
 		assert.deepStrictEqual(
@@ -351,11 +355,11 @@ describe('int64 option', function () {
 		assert.ok(tfdt)
 
 		const source = tfdt.bytes([HIGH], 8)
-		const [big] = readIsoBoxes(source, defaultReaderConfig({ int64: readInt64AsBigInt }))
-		const [plain] = readIsoBoxes(tfdt.bytes([LOW], 8), defaultReaderConfig())
+		const [big] = readIsoBoxes(source, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
+		const [plain] = readIsoBoxes(tfdt.bytes([LOW], 8), createDefaultReaderConfig())
 
 		assert.ok(big && plain)
-		assert.deepStrictEqual(writeIsoBoxes([big, plain], defaultWriterConfig()), [
+		assert.deepStrictEqual(writeIsoBoxes([big, plain], createDefaultWriterConfig()), [
 			source,
 			tfdt.bytes([LOW], 8),
 		])
@@ -368,11 +372,11 @@ describe('int64 option', function () {
 
 		const source = [tfdt.bytes([HIGH], 8), elst.bytes(wideValues(elst, HIGH), 8)]
 		const boxes = source.flatMap(bytes =>
-			readIsoBoxes(bytes, defaultReaderConfig({ int64: readInt64AsBigInt })),
+			readIsoBoxes(bytes, createDefaultReaderConfig({ int64: readInt64AsBigInt })),
 		)
 		const chunks: Uint8Array[] = []
 
-		for await (const chunk of createIsoBoxReadableStream(boxes, defaultWriterConfig())) {
+		for await (const chunk of createIsoBoxReadableStream(boxes, createDefaultWriterConfig())) {
 			chunks.push(chunk)
 		}
 
@@ -383,7 +387,7 @@ describe('int64 option', function () {
 		const tfdt = WIDE_BOXES.find(box => box.type === 'tfdt')
 		assert.ok(tfdt)
 
-		const config = defaultReaderConfig({ int64: readInt64AsBigInt })
+		const config = createDefaultReaderConfig({ int64: readInt64AsBigInt })
 		const [parsed] = [...new IsoBoxReadView(tfdt.bytes([HIGH], 8), config)]
 
 		assert.ok(parsed)
@@ -398,7 +402,7 @@ describe('int64 option', function () {
 		mdat.set([0x6d, 0x64, 0x61, 0x74], 4)
 		view.setBigUint64(8, BigInt(24))
 
-		const [parsed] = readIsoBoxes(mdat, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const [parsed] = readIsoBoxes(mdat, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 
 		assert.ok(parsed)
 		assert.strictEqual(parsed.size, 1)

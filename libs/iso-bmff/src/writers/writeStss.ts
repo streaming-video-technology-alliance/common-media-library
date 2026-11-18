@@ -24,8 +24,8 @@ export function writeStss(box: SyncSampleBox): IsoBoxWriteView {
 
 	writer.writeUint(box.entryCount, 4)
 
-	for (const entry of box.entries) {
-		writer.writeUint(entry.sampleNumber, 4)
+	for (const sampleNumber of box.sampleNumber) {
+		writer.writeUint(sampleNumber, 4)
 	}
 
 	return writer

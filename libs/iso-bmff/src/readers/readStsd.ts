@@ -1,7 +1,7 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
+import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
-import type { SampleEntryBox } from '../boxes/SampleEntryBox.ts'
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { SampleEntry } from '../boxes/SampleEntry.ts'
+import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
@@ -14,7 +14,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readStsd<E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox>(
+export function readStsd<E extends SampleEntry = AudioSampleEntry | VisualSampleEntry>(
 	view: IsoBoxReadView<IsoInt64>,
 ): SampleDescriptionBox<E> {
 	const { version, flags } = view.readFullBox()

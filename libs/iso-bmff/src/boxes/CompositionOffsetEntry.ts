@@ -3,7 +3,7 @@
  *
  * @public
  */
-export type CompositionTimeToSampleEntry = {
+export type CompositionOffsetEntry = {
 	sampleCount: number
 	sampleOffset: number
 }

@@ -1,9 +1,9 @@
-import type { SubTrackBox, SubTrackBoxChild } from '../boxes/SubTrackBox.ts'
+import type { SubTrack, SubTrackChild } from '../boxes/SubTrack.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Read the `strk` box (`SubTrackBox`).
+ * Read the `strk` box (`SubTrack`).
  *
  * The `readers` map does not need an entry for the `strk` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
@@ -13,13 +13,13 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed `SubTrackBox`
+ * @returns A parsed `SubTrack`
  *
  * @public
  */
-export function readStrk<V extends IsoInt64>(view: IsoBoxReadView<V>): SubTrackBox<V> {
+export function readStrk<V extends IsoInt64>(view: IsoBoxReadView<V>): SubTrack<V> {
 	return {
 		type: 'strk',
-		boxes: view.readBoxes<SubTrackBoxChild<V>>(),
+		boxes: view.readBoxes<SubTrackChild<V>>(),
 	}
 }

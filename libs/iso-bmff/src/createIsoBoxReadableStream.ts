@@ -1,5 +1,5 @@
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
-import type { IsoBoxWriteViewConfig } from './IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from './IsoBoxWriteConfig.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import { writeIsoBox } from './writeIsoBox.ts'
 
@@ -25,7 +25,7 @@ import { writeIsoBox } from './writeIsoBox.ts'
  */
 export function createIsoBoxReadableStream(
 	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
-	config: IsoBoxWriteViewConfig = {},
+	config: IsoBoxWriteConfig = {},
 ): ReadableStream<Uint8Array> {
 	if (typeof ReadableStream === 'undefined') {
 		throw new Error('ReadableStream is not available in this environment')

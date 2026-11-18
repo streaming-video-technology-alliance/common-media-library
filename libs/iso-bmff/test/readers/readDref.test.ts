@@ -1,7 +1,7 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterBoxes,
 	it,
@@ -35,7 +35,7 @@ describe('readDref', function () {
 		const url = boxBytes('url ', [0, 1], [1, 3])
 		const bytes = boxBytes('dref', [0, 4], [0, 4], url)
 
-		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as DataReferenceBox[]
+		const [box] = readIsoBoxes(bytes, createDefaultReaderConfig()) as DataReferenceBox[]
 
 		assert.strictEqual(box.entryCount, 0)
 		assert.deepStrictEqual(box.boxes, [])
@@ -45,8 +45,8 @@ describe('readDref', function () {
 		const url = boxBytes('url ', [0, 1], [1, 3])
 		const bytes = boxBytes('dref', [0, 4], [0, 4], url)
 
-		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as DataReferenceBox[]
-		const written = writeIsoBox(box, defaultWriterConfig())
+		const [box] = readIsoBoxes(bytes, createDefaultReaderConfig()) as DataReferenceBox[]
+		const written = writeIsoBox(box, createDefaultWriterConfig())
 
 		assert.deepStrictEqual(written, boxBytes('dref', [0, 4], [0, 4]))
 	})

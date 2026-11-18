@@ -39,13 +39,13 @@ for (const box of traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 })) {
 
 ```typescript
 import {
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	filterIsoBoxes,
 	findIsoBox,
 	readIsoBoxes,
 } from "@svta/cml-iso-bmff";
 
-const boxes = readIsoBoxes(buffer, defaultReaderConfig());
+const boxes = readIsoBoxes(buffer, createDefaultReaderConfig());
 
 const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
 const trafs = filterIsoBoxes(boxes, (box) => box.type === "traf");
@@ -90,9 +90,9 @@ const container = isContainer(box);
 After `isContainer` returns `true`, each element of `box.boxes` has a box type. Test the `type` of a child before you read a field of that child.
 
 ```typescript
-import { defaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bmff";
+import { createDefaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bmff";
 
-for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 	if (isContainer(box)) {
 		for (const child of box.boxes) {
 			if (child.type === "mfhd") {
@@ -101,13 +101,4 @@ for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
 		}
 	}
 }
-```
-
-`isFullBox` checks whether a box is a full box.
-
-```typescript
-import { isFullBox } from "@svta/cml-iso-bmff";
-
-const box = { type: "mfhd", version: 0, flags: 0, sequenceNumber: 1 };
-const fullBox = isFullBox(box);
 ```

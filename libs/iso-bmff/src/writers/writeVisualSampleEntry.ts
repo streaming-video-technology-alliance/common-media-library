@@ -1,26 +1,26 @@
 import type { IsoBox } from '../IsoBox.ts'
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write a visual sample entry box (`VisualSampleEntryBox`) of the type in its `type` field.
+ * Write a visual sample entry box (`VisualSampleEntry`) of the type in its `type` field.
  *
  * ISO/IEC 14496-12:2015 - 12.1.3
  *
- * @param box - The `VisualSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
+ * @param box - The `VisualSampleEntry` fields to write
+ * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = VisualSampleEntryType>(
-	box: VisualSampleEntryBox<T>,
-	config: IsoBoxWriteViewConfig,
+export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(
+	box: VisualSampleEntry<T>,
+	config: IsoBoxWriteConfig,
 ): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
@@ -65,8 +65,8 @@ export function writeVisualSampleEntryBox<T extends VisualSampleEntryType = Visu
 	writer.writeArray(box.preDefined2, UINT, 4, 3)
 	writer.writeUint(box.width, 2)
 	writer.writeUint(box.height, 2)
-	writer.writeTemplate(box.horizresolution, 4)
-	writer.writeTemplate(box.vertresolution, 4)
+	writer.writeTemplate(box.horizResolution, 4)
+	writer.writeTemplate(box.vertResolution, 4)
 	writer.writeUint(box.reserved3, 4)
 	writer.writeUint(box.frameCount, 2)
 	writer.writeArray(box.compressorName, UINT, 1, 32)

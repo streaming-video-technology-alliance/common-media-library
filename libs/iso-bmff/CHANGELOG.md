@@ -12,11 +12,11 @@ and this project adheres to
 
 - `IsoBoxReadView.readUint64` and `IsoBoxWriteView.writeUint64` read and write a 64-bit unsigned integer as a `bigint`. `readUint(8)` and `writeUint(value, 8)` use a `number`, which loses precision above 2^53 - 1. A custom reader for a 64-bit field, such as `baseMediaDecodeTime` in a version 1 `tfdt` box, can now keep the exact value ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `readStco`, `readStsc`, and `readStsz` are new readers for the `stco`, `stsc`, and `stsz` boxes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
-- `IsoBoxReadViewConfig` has a new `int64` option. The option takes a function that reads every 64-bit integer field of the built-in readers. With no option, the readers return the same values and the same types as before ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `IsoBoxReadConfig` has a new `int64` option. The option takes a function that reads every 64-bit integer field of the built-in readers. With no option, the readers return the same values and the same types as before ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `readInt64AsBigInt` is a new function for the `int64` option. The built-in readers then return every 64-bit integer field as a `bigint` with the exact value. The result type of `readIsoBoxes` follows the option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `createInt64OverflowReader` is a new function for the `int64` option. The built-in readers keep `number` fields. The function calls a callback with a `RangeError` when a 64-bit value is outside the safe integer range ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxReadView.readWideUint` and `IsoBoxReadView.readWideInt` read a field of 4 or 8 bytes with the function of the `int64` option. A custom reader that follows the option calls the two methods ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
-- `defaultReaderConfig` takes an optional argument with the `int64` option. The readers of the returned configuration have the types of that option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `createDefaultReaderConfig` takes an optional argument with the `int64` option. The readers of the returned configuration have the types of that option ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoBoxWriteView.writeWideUint` and `IsoBoxWriteView.writeWideInt` write a field of 4 or 8 bytes from a `number` or a `bigint`. The methods throw a `RangeError` for a `bigint` that does not fit the size ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `IsoInt64Reader` is the type of a function for the `int64` option. `IsoInt64` is the type `number | bigint` of a 64-bit integer field ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - Each container box type in `CONTAINERS` now has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result. `readVttc` reads the `vttc` box, and `readVttC` reads the `vttC` box ([#297](https://github.com/streaming-video-technology-alliance/common-media-library/issues/297)).
@@ -38,10 +38,10 @@ and this project adheres to
 - The writers of the boxes with 64-bit integer fields now take a box with `number` fields or `bigint` fields. `writeIsoBox`, `writeIsoBoxes`, and `createIsoBoxReadableStream` take the same boxes. A box that `readIsoBoxes` reads with `readInt64AsBigInt` writes back with the exact values ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `Parameters<typeof writeTfdt>[0]` now has `number | bigint` fields. The other ten writers of boxes with 64-bit integer fields, `writeIsoBox`, and `writeIsoBoxes` have the same change. Use the box type, such as `TrackFragmentBaseMediaDecodeTimeBox`, or `IsoBoxStreamable` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - With `readInt64AsBigInt`, a custom reader of the type `(view: IsoBoxReadView) => ...` is a compile error. Type the view as `IsoBoxReadView<IsoInt64>`, or make the reader generic and call `readWideUint` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
-- `Required<IsoBoxReadViewConfig>` now has a required `int64` key. A value of that type with no `int64` function is a compile error. Use `Required<Pick<IsoBoxReadViewConfig, 'readers'>>` for a configuration with required readers ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
+- `Required<IsoBoxReadConfig>` now has a required `int64` key. A value of that type with no `int64` function is a compile error. Use `Required<Pick<IsoBoxReadConfig, 'readers'>>` for a configuration with required readers ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - A subclass override of `IsoBoxReadView.readUint` or `IsoBoxReadView.readInt` no longer runs for a 64-bit integer field of a built-in reader. The constructor assigns the methods of the base class to `readWideUint` and `readWideInt`. To run the override, pass an `int64` function that calls `view.readUint` and `view.readInt` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - The reading guide has a section on a function that forwards the `int64` option. The guide also states that `JSON.stringify` throws a `TypeError` for a `bigint` ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
-- `UserDataBox`, `GroupsListBox`, `SubTrackBox`, `AdditionalMetadataContainerBox`, and `MetaBox` now have the type parameter for the type of the 64-bit integer fields. The default is `number`, so existing references do not change ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
+- `UserDataBox`, `GroupsListBox`, `SubTrack`, `AdditionalMetadataContainerBox`, and `MetaBox` now have the type parameter for the type of the 64-bit integer fields. The default is `number`, so existing references do not change ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - `readMeta` is now a generic function, so `ReturnType<typeof readMeta>` is `MetaBox<number | bigint>`. Use the type `MetaBox` in place of that utility type ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - `writeMeta` now takes a `MetaBox` with `number` fields or `bigint` fields ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
 - The type of a `udta`, `grpl`, `strk`, or `meco` child no longer has the `view` and `size` fields. Cast the child: `(child as ParsedIsoBox).view` ([#646](https://github.com/streaming-video-technology-alliance/common-media-library/issues/646)).
@@ -56,7 +56,7 @@ and this project adheres to
 - `isIsoBoxType` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
 - `writeIsoBox` and `writeIsoBoxes` now return `Uint8Array<ArrayBuffer>`. The result passes to `SourceBuffer.appendBuffer` without a cast under TypeScript 6 and later. A box given as a view over a `SharedArrayBuffer` is copied, so the result is always backed by an `ArrayBuffer`. The type declarations now need TypeScript 5.7 or later.
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
-- The utilities guide examples now store the results of `isContainer` and `isFullBox` in `container` and `fullBox`. The examples no longer redeclare the imported names.
+- The utilities guide example now stores the result of `isContainer` in `container`. The example no longer redeclares the imported name.
 - Every code example in the guides now typechecks. The writing examples pass each `Uint8Array` to `appendBuffer` directly, and the `traverseIsoBoxes` example reads the boxes first ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 - The reading guide has a section on incomplete boxes, and the writing guide links to that section. The documentation of `readIsoBoxes`, `IsoBoxReadView.readBox`, and `IsoBoxReadView.readBoxes` now states where the read stops ([#650](https://github.com/streaming-video-technology-alliance/common-media-library/issues/650)).
 - The reading guide now states that a box with a size below the size of the box header is incomplete. The documentation of `readIsoBoxes`, `IsoBoxReadView.readBox`, and `IsoBoxReadView.readBoxes` states the same rule ([#663](https://github.com/streaming-video-technology-alliance/common-media-library/issues/663)).
@@ -83,7 +83,6 @@ and this project adheres to
 - `traverseIsoBoxes` is faster. The largest gain is in breadth-first order over many sibling containers. The order of the boxes does not change ([#706](https://github.com/streaming-video-technology-alliance/common-media-library/pull/706)).
 - `IsoBoxReadView.readBox` now reads the four characters of the box type in one call. `readIsoBoxes` is about 3% faster ([#706](https://github.com/streaming-video-technology-alliance/common-media-library/pull/706)).
 - `writeCtts` and `writeTrun` now write the signed offset fields as signed integers, as `readCtts` and `readTrun` read them. The written bytes do not change.
-- `isFullBox` accepts `unknown` as the box argument instead of `any`. The guard now also returns `false` for `null` and for values that are not objects.
 - `IsoBoxType` is now declared as `string`. The type accepts the same values as before. The documentation states that TypeScript does not check the length of a box type.
 - `readVtte` and `writeVtte` now name their parameters `_view` and `_box`, and the documentation describes the parameters.
 - The documentation of `readInt64AsBigInt` and the reading guide now test for `DataView.prototype.getBigUint64`. A runtime can have `BigInt` and no `getBigUint64` method. The documentation of `readUint64`, `writeUint64`, `writeWideUint`, and `writeWideInt` names the `DataView` method that each one needs.
@@ -91,9 +90,41 @@ and this project adheres to
 - The description of the package now states that the package reads and writes boxes.
 - The UTF-8 string reads now call `decodeUtf8` of `@svta/cml-utils`. A bundle with `readIsoBoxes` is about 200 bytes smaller after gzip. The results do not change. The package now needs `@svta/cml-utils` 1.8.0 or later.
 - `writeIsoBoxes` and `createIsoBoxReadableStream` now take an optional configuration, as `writeIsoBox` does. With no configuration, a write takes only containers, byte arrays, and boxes with a `view` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
-- The `writers` field of `IsoBoxWriteViewConfig` is now optional. A call with `{ writers: {} }` still compiles. A custom writer that reads `config.writers` must handle a missing map, and `defaultWriterConfig` still returns the map ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The `writers` field of `IsoBoxWriteConfig` is now optional. A call with `{ writers: {} }` still compiles. A custom writer that reads `config.writers` must handle a missing map, and `createDefaultWriterConfig` still returns the map ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `SampleDescriptionBox` and `DataReferenceBox` now keep their child boxes in `boxes`, not in `entries`. Replace `stsd.entries` with `stsd.boxes`, and `dref.entries` with `dref.boxes` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `findIsoBox`, `filterIsoBoxes`, and `traverseIsoBoxes` now reach the sample entries of `stsd` and the data entries of `dref`. A predicate that matches a type inside those boxes, such as `hvc1`, now finds that box ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The exported names of box types, entry types, fields, and configuration functions now follow the names of the specification. The rename table after this list shows each old name and its new name. The compiler reports each old name ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `SyncSampleBox` now has the field `sampleNumber: number[]` in place of `entries`. Replace `box.entries.map((entry) => entry.sampleNumber)` with `box.sampleNumber` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `PreselectionGroupBox` now has the field `entityId: number[]` in place of `entities`. Replace `box.entities.map((entity) => entity.entityId)` with `box.entityId` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- The type parameter of `TypeBox` now accepts only `'ftyp'` and `'styp'` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+
+Renames of version 2.0.0:
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| `HandlerReferenceBox` | `HandlerBox` |
+| `DecodingTimeToSampleBox` | `TimeToSampleBox` |
+| `CompositionTimeToSampleBox` | `CompositionOffsetBox` |
+| `ProtectionSchemeInformationBox`, `ProtectionSchemeInformationBoxChild` | `ProtectionSchemeInfoBox`, `ProtectionSchemeInfoBoxChild` |
+| `TrackKindBox` | `KindBox` |
+| `SubsampleInformationBox` | `SubSampleInformationBox` |
+| `SubTrackBox`, `SubTrackBoxChild` | `SubTrack`, `SubTrackChild` |
+| `SampleEntryBox`, `AudioSampleEntryBox`, `VisualSampleEntryBox` | `SampleEntry`, `AudioSampleEntry`, `VisualSampleEntry` |
+| `AudioSampleEntryBoxChild`, `VisualSampleEntryBoxChild` | `AudioSampleEntryChild`, `VisualSampleEntryChild` |
+| `readAudioSampleEntryBox`, `writeAudioSampleEntryBox` | `readAudioSampleEntry`, `writeAudioSampleEntry` |
+| `readVisualSampleEntryBox`, `writeVisualSampleEntryBox` | `readVisualSampleEntry`, `writeVisualSampleEntry` |
+| `DecodingTimeSample` | `TimeToSampleEntry` |
+| `CompositionTimeToSampleEntry` | `CompositionOffsetEntry` |
+| `SubsampleEntry`, `Subsample` | `SubSampleInformationEntry`, `SubSampleInformationSubsample` |
+| `Subsegment`, `SubsegmentRange` | `SubsegmentIndexSubsegment`, `SubsegmentIndexRange` |
+| `channelcount`, `samplesize`, `samplerate` | `channelCount`, `sampleSize`, `sampleRate` |
+| `horizresolution`, `vertresolution` | `horizResolution`, `vertResolution` |
+| `graphicsmode`, `opcolor` | `graphicsMode`, `opColor` |
+| `defaultIvSize` | `defaultPerSampleIvSize` |
+| `IsoBoxReadViewConfig`, `IsoBoxWriteViewConfig` | `IsoBoxReadConfig`, `IsoBoxWriteConfig` |
+| `defaultReaderConfig`, `defaultWriterConfig` | `createDefaultReaderConfig`, `createDefaultWriterConfig` |
+
+A field rename also changes the keys of a box that `readIsoBoxes` returns. Code that reads a field by a string key gets no compile error.
 
 ### Removed
 
@@ -102,6 +133,7 @@ and this project adheres to
 - The type aliases `co64`, `stz2`, `url`, and `urn` are removed. Use `ChunkLargeOffsetBox`, `CompactSampleSizeBox`, `DataEntryUrlBox`, and `DataEntryUrnBox`, or a key of `IsoBoxMap` such as `IsoBoxMap['co64']` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - The constants `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, and `IsoBoxFields` are removed. Pass the string value, such as `view.readArray('uint', 4, count)` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - The class `IsoBoxReadableStream` is removed. Replace `new IsoBoxReadableStream(boxes, config)` with `createIsoBoxReadableStream(boxes, config)` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `isFullBox` is removed. Test the fields of the box, such as `'version' in box && 'flags' in box`, or test the box type with `isIsoBoxType` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 
 ### Fixed
 
@@ -121,10 +153,10 @@ and this project adheres to
 - `writeSchm` now writes the null terminator of an empty `schemeUri` when flag `0x000001` is set. The writer writes an empty string for a missing `schemeUri` ([#628](https://github.com/streaming-video-technology-alliance/common-media-library/issues/628)).
 - `IsoBoxReadView.readInt(8)` now returns the correct value for a signed 64-bit integer such as -1. `readElst` now returns the correct `mediaTime` for a version 1 `elst` box, where -1 marks an empty edit. Earlier releases return -4294967297 for -1.
 - `writePrsl` now writes every tag that the flags declare. The writer writes an empty string for an empty or missing `preselectionTag` or `interleavingTag`. Earlier releases omit an empty tag, and a read of the written box returns no child boxes ([#624](https://github.com/streaming-video-technology-alliance/common-media-library/issues/624)).
-- `defaultReaderConfig()` now includes readers for the `stco`, `stsc`, and `stsz` boxes. `writeIsoBoxes` with `defaultWriterConfig()` now writes the `stco`, `stsc`, and `stsz` boxes that `readIsoBoxes` reads with `defaultReaderConfig()`. Earlier releases throw a `RangeError` for `stco` and `stsc`, and write `stsz` without the sample sizes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
+- `createDefaultReaderConfig()` now includes readers for the `stco`, `stsc`, and `stsz` boxes. `writeIsoBoxes` with `createDefaultWriterConfig()` now writes the `stco`, `stsc`, and `stsz` boxes that `readIsoBoxes` reads with `createDefaultReaderConfig()`. Earlier releases throw a `RangeError` for `stco` and `stsc`, and write `stsz` without the sample sizes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
 - `writeUrl` no longer writes the `location` string when flag `0x000001` is set, even when `location` is not empty. Earlier releases add a null byte, so the `url ` box and the enclosing `dref` box are one byte too long ([#623](https://github.com/streaming-video-technology-alliance/common-media-library/issues/623)).
 - `writeIden`, `writePayl`, `writeSttg`, and `writeVlab` now write the string of the box with no null byte after the string. `readIden`, `readPayl`, `readSttg`, and `readVlab` still read the same string from a box that has the null byte. Earlier releases write a null byte after the string ([#636](https://github.com/streaming-video-technology-alliance/common-media-library/issues/636)).
-- `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value, so the bytes `00 01 80 00` read as 1.5. Earlier releases return 8193 for these bytes. The built-in readers now return the correct fraction of `rate`, `volume`, `matrix`, `width`, `height`, `horizresolution`, `vertresolution`, and `samplerate`.
+- `IsoBoxReadView.readTemplate` now reads the fraction of a fixed-point value, so the bytes `00 01 80 00` read as 1.5. Earlier releases return 8193 for these bytes. The built-in readers now return the correct fraction of `rate`, `volume`, `matrix`, `width`, `height`, `horizResolution`, `vertResolution`, and `sampleRate`.
 - `readMvhd` now reads `rate` as a signed value. A `rate` of -1 now reads as -1. Earlier releases return 65535 for this `rate`.
 - `readMvhd` and `readTkhd` now read `volume` and `matrix` as signed values. A `matrix` entry of -1, as in a rotated video, now reads as -1. Earlier releases return 65535 for this entry.
 - `readTkhd` now reads `layer` and `alternateGroup` as signed values. A `layer` of -1 now reads as -1. Earlier releases return 65535 for this `layer`.

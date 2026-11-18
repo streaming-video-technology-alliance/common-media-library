@@ -11,7 +11,7 @@ import type { IsoInt64Reader } from './IsoInt64Reader.ts'
  *
  * @public
  */
-export type IsoBoxReadViewConfig<V extends IsoInt64 = number> = {
+export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
 	/**
 	 * Map of each box type to the reader of that box.
 	 */

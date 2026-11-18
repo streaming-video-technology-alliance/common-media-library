@@ -1,7 +1,7 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterIsoBoxes,
 	findBox,
@@ -53,7 +53,7 @@ describe('writeSttg', function () {
 	})
 
 	it('should write the input bytes of the sttg box in vttc.mp4', function () {
-		const config = defaultReaderConfig()
+		const config = createDefaultReaderConfig()
 		const { data } = findBox('vttc.mp4', 'mdat', config)
 		const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'sttg')
 
@@ -63,7 +63,7 @@ describe('writeSttg', function () {
 			const { view } = box
 
 			assert.deepStrictEqual(
-				writeIsoBox(box, defaultWriterConfig()),
+				writeIsoBox(box, createDefaultWriterConfig()),
 				new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
 			)
 		}

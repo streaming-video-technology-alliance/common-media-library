@@ -2,7 +2,7 @@ import type { IsoBox } from '../IsoBox.ts'
 import { encodeText } from '@svta/cml-utils'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
@@ -12,7 +12,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  * The writer writes an empty string for a missing tag.
  *
  * @param box - The `PreselectionGroupBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
+ * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
@@ -21,10 +21,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @public
  */
-export function writePrsl(
-	box: PreselectionGroupBox,
-	config: IsoBoxWriteViewConfig,
-): IsoBoxWriteView {
+export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteConfig): IsoBoxWriteView {
 	const preselectionTagBytes = box.flags & 0x1000 ? encodeText(box.preselectionTag ?? '') : null
 	const interleavingTagBytes = box.flags & 0x4000 ? encodeText(box.interleavingTag ?? '') : null
 
@@ -55,8 +52,8 @@ export function writePrsl(
 	writer.writeUint(box.groupId, 4)
 	writer.writeUint(box.numEntitiesInGroup, 4)
 
-	for (const entity of box.entities) {
-		writer.writeUint(entity.entityId, 4)
+	for (const entityId of box.entityId) {
+		writer.writeUint(entityId, 4)
 	}
 
 	if (preselectionTagBytes) {

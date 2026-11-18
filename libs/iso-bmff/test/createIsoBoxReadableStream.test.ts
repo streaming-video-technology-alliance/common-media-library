@@ -2,7 +2,7 @@ import { deepStrictEqual, strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	createIsoBoxReadableStream,
-	defaultWriterConfig,
+	createDefaultWriterConfig,
 	describe,
 	it,
 	readFtyp,
@@ -166,7 +166,7 @@ describe('createIsoBoxReadableStream', function () {
 	})
 
 	it('should exit if boxes are empty', async function () {
-		const stream = createIsoBoxReadableStream([], defaultWriterConfig())
+		const stream = createIsoBoxReadableStream([], createDefaultWriterConfig())
 		const buffers = []
 
 		for await (const data of stream) {

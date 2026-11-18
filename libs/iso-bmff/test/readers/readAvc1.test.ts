@@ -6,10 +6,10 @@ import {
 	readAvc1,
 	readIsoBoxes,
 	readStsd,
-	type VisualSampleEntryBox,
+	type VisualSampleEntry,
 } from '../util/box.ts'
 
-type Avc1Box = VisualSampleEntryBox<'avc1'>
+type Avc1Box = VisualSampleEntry<'avc1'>
 
 describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
@@ -29,8 +29,8 @@ describe('readAvc1', function () {
 		assert.deepStrictEqual(box.preDefined2, [0, 0, 0])
 		assert.strictEqual(box.width, 1280)
 		assert.strictEqual(box.height, 720)
-		assert.strictEqual(box.horizresolution, 72)
-		assert.strictEqual(box.vertresolution, 72)
+		assert.strictEqual(box.horizResolution, 72)
+		assert.strictEqual(box.vertResolution, 72)
 		assert.strictEqual(box.reserved3, 0)
 		assert.strictEqual(box.frameCount, 1)
 		assert.deepStrictEqual(
@@ -52,14 +52,14 @@ describe('readAvc1', function () {
 
 		view.setUint32(0, bytes.length)
 		view.setUint32(4, 0x61766331) // 'avc1'
-		view.setUint32(36, 0x00488000) // horizresolution
-		view.setUint32(40, 0x012c4000) // vertresolution
+		view.setUint32(36, 0x00488000) // horizResolution
+		view.setUint32(40, 0x012c4000) // vertResolution
 
 		const [box] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
 
 		assert.ok(box)
 		assert.strictEqual(box.type, 'avc1')
-		assert.strictEqual(box.horizresolution, 72.5)
-		assert.strictEqual(box.vertresolution, 300.25)
+		assert.strictEqual(box.horizResolution, 72.5)
+		assert.strictEqual(box.vertResolution, 300.25)
 	})
 })

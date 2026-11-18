@@ -4,7 +4,7 @@ import type { IsoBox } from './IsoBox.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import { DATA, INT, STRING, TEMPLATE, UINT, UTF8, type IsoBoxFields } from './IsoBoxFields.ts'
 import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
-import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
+import type { IsoBoxReadConfig } from './IsoBoxReadConfig.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoInt64Reader } from './IsoInt64Reader.ts'
@@ -76,9 +76,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 	 */
 	constructor(
 		raw: IsoBoxData,
-		...config: [V] extends [bigint]
-			? [config: IsoBoxReadViewConfig<V>]
-			: [config?: IsoBoxReadViewConfig<V>]
+		...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]
 	)
 	constructor(raw: IsoBoxData, config?: IsoBoxReadView<V>['config']) {
 		this.dataView = ArrayBuffer.isView(raw)
@@ -151,7 +149,7 @@ export class IsoBoxReadView<V extends IsoInt64 = number> {
 		const dataView = new DataView(this.dataView.buffer, offset, size)
 		const isoView = new IsoBoxReadView(
 			dataView,
-			this.config as IsoBoxReadViewConfig<IsoInt64>,
+			this.config as IsoBoxReadConfig<IsoInt64>,
 		) as IsoBoxReadView<V>
 		const headerSize = this.offset - offset
 		const bodySize = size - headerSize

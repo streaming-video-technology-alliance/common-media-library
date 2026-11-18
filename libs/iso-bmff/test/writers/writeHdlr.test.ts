@@ -5,7 +5,7 @@ import {
 	readHdlr,
 	readIsoBoxes,
 	writeHdlr,
-	type HandlerReferenceBox,
+	type HandlerBox,
 } from '../util/box.ts'
 
 // 'é日😀' has one character of two, three, and four UTF-8 bytes.
@@ -18,7 +18,7 @@ const FIELDS = [
 	0,
 ]
 
-function hdlr(name: string): HandlerReferenceBox {
+function hdlr(name: string): HandlerBox {
 	return {
 		type: 'hdlr',
 		version: 0,

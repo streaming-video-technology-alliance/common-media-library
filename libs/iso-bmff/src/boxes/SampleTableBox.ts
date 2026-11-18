@@ -1,6 +1,6 @@
 import type { ChunkOffsetBox } from './ChunkOffsetBox.ts'
-import type { CompositionTimeToSampleBox } from './CompositionTimeToSampleBox.ts'
-import type { DecodingTimeToSampleBox } from './DecodingTimeToSampleBox.ts'
+import type { CompositionOffsetBox } from './CompositionOffsetBox.ts'
+import type { TimeToSampleBox } from './TimeToSampleBox.ts'
 import type { SampleDependencyTypeBox } from './SampleDependencyTypeBox.ts'
 import type { SampleDescriptionBox } from './SampleDescriptionBox.ts'
 import type { SampleSizeBox } from './SampleSizeBox.ts'
@@ -14,8 +14,8 @@ import type { SyncSampleBox } from './SyncSampleBox.ts'
  */
 export type SampleTableBoxChild =
 	| SampleDescriptionBox
-	| DecodingTimeToSampleBox
-	| CompositionTimeToSampleBox
+	| TimeToSampleBox
+	| CompositionOffsetBox
 	| SampleToChunkBox
 	| SampleSizeBox
 	| ChunkOffsetBox

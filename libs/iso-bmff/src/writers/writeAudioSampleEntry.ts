@@ -1,26 +1,26 @@
 import type { IsoBox } from '../IsoBox.ts'
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
+import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import type { AudioSampleEntryType } from '../boxes/AudioSampleEntryType.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
- * Write an audio sample entry box (`AudioSampleEntryBox`) of the type in its `type` field.
+ * Write an audio sample entry box (`AudioSampleEntry`) of the type in its `type` field.
  *
  * ISO/IEC 14496-12:2015 - 12.2.3
  *
- * @param box - The `AudioSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
+ * @param box - The `AudioSampleEntry` fields to write
+ * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeAudioSampleEntryBox<T extends AudioSampleEntryType = AudioSampleEntryType>(
-	box: AudioSampleEntryBox<T>,
-	config: IsoBoxWriteViewConfig,
+export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(
+	box: AudioSampleEntry<T>,
+	config: IsoBoxWriteConfig,
 ): IsoBoxWriteView {
 	const headerSize = 8
 	const reserved1Size = 6
@@ -51,11 +51,11 @@ export function writeAudioSampleEntryBox<T extends AudioSampleEntryType = AudioS
 	writer.writeArray(box.reserved1, UINT, 1, 6)
 	writer.writeUint(box.dataReferenceIndex, 2)
 	writer.writeArray(box.reserved2, UINT, 4, 2)
-	writer.writeUint(box.channelcount, 2)
-	writer.writeUint(box.samplesize, 2)
+	writer.writeUint(box.channelCount, 2)
+	writer.writeUint(box.sampleSize, 2)
 	writer.writeUint(box.preDefined, 2)
 	writer.writeUint(box.reserved3, 2)
-	writer.writeTemplate(box.samplerate, 4)
+	writer.writeTemplate(box.sampleRate, 4)
 	writer.writeBytes(bytes)
 
 	return writer

@@ -3,7 +3,7 @@
  *
  * @public
  */
-export type DecodingTimeSample = {
+export type TimeToSampleEntry = {
 	/** A 32-bit integer that specifies the number of consecutive samples that have the same decoding time delta. */
 	sampleCount: number
 

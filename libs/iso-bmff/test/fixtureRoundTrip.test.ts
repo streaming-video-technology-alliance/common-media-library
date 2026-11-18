@@ -1,8 +1,8 @@
 import { deepStrictEqual } from 'node:assert'
 import { isDeepStrictEqual } from 'node:util'
 import {
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	it,
 	readInt64AsBigInt,
@@ -103,19 +103,19 @@ const BOXES: Record<string, number> = {
 	vtte: 1,
 }
 
-const { readers = {} } = defaultReaderConfig()
-const { writers } = defaultWriterConfig()
+const { readers = {} } = createDefaultReaderConfig()
+const { writers } = createDefaultWriterConfig()
 
 type Read = (data: IsoBoxData) => ParsedIsoBox<IsoInt64>[]
 
 // The test runs one time for each line: the name of the test, the type of the 64-bit fields, and the read function.
 // The counts and the known defects are the same for both.
 const MODES: [string, string, Read][] = [
-	['the default configs', 'number', data => readIsoBoxes(data, defaultReaderConfig())],
+	['the default configs', 'number', data => readIsoBoxes(data, createDefaultReaderConfig())],
 	[
 		'readInt64AsBigInt',
 		'bigint',
-		data => readIsoBoxes(data, defaultReaderConfig({ int64: readInt64AsBigInt })),
+		data => readIsoBoxes(data, createDefaultReaderConfig({ int64: readInt64AsBigInt })),
 	],
 ]
 

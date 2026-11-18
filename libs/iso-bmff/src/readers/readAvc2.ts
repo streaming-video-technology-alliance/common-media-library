@@ -1,17 +1,17 @@
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
+import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
 
 /**
- * Read the `avc2` box (`VisualSampleEntryBox`).
+ * Read the `avc2` box (`VisualSampleEntry`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed `VisualSampleEntryBox`
+ * @returns A parsed `VisualSampleEntry`
  *
  * @public
  */
-export function readAvc2(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<'avc2'> {
-	return readVisualSampleEntryBox('avc2', view)
+export function readAvc2(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<'avc2'> {
+	return readVisualSampleEntry('avc2', view)
 }

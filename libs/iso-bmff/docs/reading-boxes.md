@@ -12,19 +12,19 @@ The `readIsoBoxes` function reads boxes from a buffer and returns an array of pa
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultReaderConfig()`. It returns a configuration with every available reader except the container readers:
+If tree shaking is not a concern, use `createDefaultReaderConfig()`. It returns a configuration with every available reader except the container readers:
 
 ```typescript
-import { defaultReaderConfig, readIsoBoxes } from "@svta/cml-iso-bmff";
+import { createDefaultReaderConfig, readIsoBoxes } from "@svta/cml-iso-bmff";
 
 const buffer = await fetch("https://example.com/bbb.mp4").then((r) =>
 	r.arrayBuffer(),
 );
 
-const boxes = readIsoBoxes(buffer, defaultReaderConfig());
+const boxes = readIsoBoxes(buffer, createDefaultReaderConfig());
 ```
 
-Each call of `defaultReaderConfig()` returns a new configuration object. A player can create the configuration once and pass it to every read.
+Each call of `createDefaultReaderConfig()` returns a new configuration object. A player can create the configuration once and pass it to every read.
 
 `readIsoBoxes` accepts an `ArrayBuffer` and any view, such as a `Uint8Array`, a `DataView`, or a Node.js `Buffer`. The function does not copy the data. Pass the view itself. Do not pass the `buffer` property of a view, because that buffer can contain other data.
 
@@ -128,14 +128,14 @@ Pass `readInt64AsBigInt` as the `int64` option. The built-in readers then return
 
 ```typescript
 import {
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	readInt64AsBigInt,
 	readIsoBoxes,
 } from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(
 	buffer,
-	defaultReaderConfig({ int64: readInt64AsBigInt }),
+	createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 );
 
 for (const box of boxes) {
@@ -151,7 +151,7 @@ for (const box of boxes) {
 }
 ```
 
-Pass the option as the argument of `defaultReaderConfig`. The readers of the returned configuration have the types of that option. If you add `readInt64AsBigInt` to the result of `defaultReaderConfig()` afterward, the code does not compile.
+Pass the option as the argument of `createDefaultReaderConfig`. The readers of the returned configuration have the types of that option. If you add `readInt64AsBigInt` to the result of `createDefaultReaderConfig()` afterward, the code does not compile.
 
 The option works the same way with specific readers:
 
@@ -256,33 +256,33 @@ Your code can have a function that takes a configuration and passes that configu
 
 ```typescript
 import {
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	readInt64AsBigInt,
 	readIsoBoxes,
 	type IsoBoxData,
-	type IsoBoxReadViewConfig,
+	type IsoBoxReadConfig,
 	type IsoInt64,
 	type ParsedIsoBox,
 } from "@svta/cml-iso-bmff";
 
 function readSegment<V extends IsoInt64 = number>(
 	data: IsoBoxData,
-	config: IsoBoxReadViewConfig<V>,
+	config: IsoBoxReadConfig<V>,
 ): ParsedIsoBox<V>[] {
 	return readIsoBoxes(data, config);
 }
 
 // The 64-bit fields are numbers in this result.
-const plain = readSegment(buffer, defaultReaderConfig());
+const plain = readSegment(buffer, createDefaultReaderConfig());
 
 // The 64-bit fields are bigints in this result.
 const exact = readSegment(
 	buffer,
-	defaultReaderConfig({ int64: readInt64AsBigInt }),
+	createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 );
 ```
 
-Do not type the parameter as `IsoBoxReadViewConfig<IsoInt64>`. That type does not accept the result of `defaultReaderConfig({ int64: readInt64AsBigInt })`.
+Do not type the parameter as `IsoBoxReadConfig<IsoInt64>`. That type does not accept the result of `createDefaultReaderConfig({ int64: readInt64AsBigInt })`.
 
 ### A custom reader for one field
 

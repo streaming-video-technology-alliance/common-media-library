@@ -1,9 +1,9 @@
-import { assert, describe, it, writeKind, type TrackKindBox } from '../util/box.ts'
+import { assert, describe, it, writeKind, type KindBox } from '../util/box.ts'
 
 describe('writeKind', function () {
-	it('should write a TrackKindBox correctly', function () {
+	it('should write a KindBox correctly', function () {
 		// #region example
-		const box: TrackKindBox = {
+		const box: KindBox = {
 			type: 'kind',
 			version: 0,
 			flags: 0,

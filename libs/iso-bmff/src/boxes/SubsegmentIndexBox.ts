@@ -1,5 +1,5 @@
 import type { FullBox } from './FullBox.ts'
-import type { Subsegment } from './Subsegment.ts'
+import type { SubsegmentIndexSubsegment } from './SubsegmentIndexSubsegment.ts'
 
 /**
  * Subsegment Index Box (`ssix`).
@@ -11,5 +11,5 @@ import type { Subsegment } from './Subsegment.ts'
 export type SubsegmentIndexBox = FullBox & {
 	type: 'ssix'
 	subsegmentCount: number
-	subsegments: Subsegment[]
+	subsegments: SubsegmentIndexSubsegment[]
 }

@@ -12,7 +12,7 @@ import {
 	readStsd,
 	writeIsoBoxes,
 	writeStsd,
-	writeVisualSampleEntryBox,
+	writeVisualSampleEntry,
 	type IsoBoxReadView,
 } from './util/box.ts'
 
@@ -44,8 +44,8 @@ describe('API', function () {
 
 		const stream = writeIsoBoxes(boxes, {
 			writers: {
-				hvc1: writeVisualSampleEntryBox,
-				dvh1: writeVisualSampleEntryBox,
+				hvc1: writeVisualSampleEntry,
+				dvh1: writeVisualSampleEntry,
 				test: (box: { type: string; value: number }) => {
 					const view = new IsoBoxWriteView(box.type, 4)
 					view.writeUint(box.value, 4)

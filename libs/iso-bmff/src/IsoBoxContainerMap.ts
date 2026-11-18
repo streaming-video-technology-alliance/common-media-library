@@ -8,10 +8,10 @@ import type { MovieBox } from './boxes/MovieBox.ts'
 import type { MovieExtendsBox } from './boxes/MovieExtendsBox.ts'
 import type { MovieFragmentBox } from './boxes/MovieFragmentBox.ts'
 import type { MovieFragmentRandomAccessBox } from './boxes/MovieFragmentRandomAccessBox.ts'
-import type { ProtectionSchemeInformationBox } from './boxes/ProtectionSchemeInformationBox.ts'
+import type { ProtectionSchemeInfoBox } from './boxes/ProtectionSchemeInfoBox.ts'
 import type { SampleTableBox } from './boxes/SampleTableBox.ts'
 import type { SchemeInformationBox } from './boxes/SchemeInformationBox.ts'
-import type { SubTrackBox } from './boxes/SubTrackBox.ts'
+import type { SubTrack } from './boxes/SubTrack.ts'
 import type { TrackBox } from './boxes/TrackBox.ts'
 import type { TrackFragmentBox } from './boxes/TrackFragmentBox.ts'
 import type { TrackReferenceBox } from './boxes/TrackReferenceBox.ts'
@@ -36,9 +36,9 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
 	moov: MovieBox<V>
 	mvex: MovieExtendsBox<V>
 	schi: SchemeInformationBox
-	sinf: ProtectionSchemeInformationBox
+	sinf: ProtectionSchemeInfoBox
 	stbl: SampleTableBox
-	strk: SubTrackBox<V>
+	strk: SubTrack<V>
 	traf: TrackFragmentBox<V>
 	trak: TrackBox<V>
 	tref: TrackReferenceBox
