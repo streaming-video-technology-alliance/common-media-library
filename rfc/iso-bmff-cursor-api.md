@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: Cursor API for ISO BMFF readers and writers
@@ -503,7 +503,7 @@ The review of the box types RFC added three questions:
 
 ## Final Decision
 
-Pending review.
+Accepted on 2026-11-18. Version 2.0.0 of `@svta/cml-iso-bmff` contains this RFC and the [box types RFC](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715). The work follows the build order of the box types RFC.
 
 Decided on 2026-11-17:
 
