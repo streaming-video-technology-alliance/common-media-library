@@ -32,9 +32,9 @@ export function writeHdlr(box: HandlerBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('hdlr', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
-	writer.writeUint(box.preDefined, 4)
+	writer.writeUint(box.preDefined ?? 0, 4)
 	writer.writeString(box.handlerType)
-	writer.writeArray(box.reserved, UINT, 4, 3)
+	writer.writeArray(box.reserved ?? [], UINT, 4, 3)
 	writer.writeBytes(nameBytes)
 	writer.writeUint(0, 1)
 

@@ -17,18 +17,18 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
-	const { version, defaultIsEncrypted, defaultConstantIv } = box
+	const { version, defaultConstantIv } = box
 	const defaultConstantIvSize = box.defaultConstantIvSize ?? defaultConstantIv?.length
 	const headerSize = 8
 	const fullBoxSize = 4
-	const defaultIsEncryptedSize = 3
+	const protectionFieldsSize = 3
 	const defaultIvSizeSize = 1
 	const defaultKidSize = 16
 	const constantIvSize = defaultConstantIvSize === undefined ? 0 : 1 + defaultConstantIvSize
 	const totalSize =
 		headerSize +
 		fullBoxSize +
-		defaultIsEncryptedSize +
+		protectionFieldsSize +
 		defaultIvSizeSize +
 		defaultKidSize +
 		constantIvSize
@@ -36,14 +36,14 @@ export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('tenc', totalSize)
 	writer.writeFullBox(version, box.flags)
 
+	writer.writeUint(0, 1)
 	writer.writeUint(
 		version > 0
-			? (defaultIsEncrypted & 0xff00ff) |
-					(((box.defaultCryptByteBlock ?? defaultIsEncrypted >> 12) & 0xf) << 12) |
-					(((box.defaultSkipByteBlock ?? defaultIsEncrypted >> 8) & 0xf) << 8)
-			: defaultIsEncrypted,
-		3,
+			? (((box.defaultCryptByteBlock ?? 0) & 0xf) << 4) | ((box.defaultSkipByteBlock ?? 0) & 0xf)
+			: 0,
+		1,
 	)
+	writer.writeUint(box.defaultIsProtected, 1)
 	writer.writeUint(box.defaultPerSampleIvSize, 1)
 	writer.writeArray(box.defaultKid, UINT, 1, 16)
 

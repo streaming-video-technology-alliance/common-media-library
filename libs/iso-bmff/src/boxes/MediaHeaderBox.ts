@@ -26,6 +26,6 @@ export type MediaHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	/** The ISO 639-2/T language code, three lower-case letters. */
 	language: string
 
-	/** The `pre_defined` field. The default value is 0. */
-	preDefined: number
+	/** The `pre_defined` field. `writeMdhd` writes 0 for a missing value. */
+	preDefined?: number
 }

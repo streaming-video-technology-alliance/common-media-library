@@ -26,7 +26,7 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView {
 	writer.writeFullBox(box.version, box.flags)
 
 	writer.writeTemplate(box.balance, 2)
-	writer.writeUint(box.reserved, 2)
+	writer.writeUint(0, 2)
 
 	return writer
 }

@@ -12,7 +12,6 @@ import type { TrackFragmentRandomAccessEntry } from './TrackFragmentRandomAccess
 export type TrackFragmentRandomAccessBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'tfra'
 	trackId: number
-	reserved: number
 	numberOfEntry: number
 	/** The byte length of the `trafNumber` field of each entry, minus one. */
 	lengthSizeOfTrafNum: number

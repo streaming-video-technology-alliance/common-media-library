@@ -45,7 +45,7 @@ export function writeMdhd(box: MediaHeaderBox<IsoInt64>): IsoBoxWriteView {
 			: 0 // Default to "und" (undefined) if invalid
 	writer.writeUint(lang, 2)
 
-	writer.writeUint(box.preDefined, 2)
+	writer.writeUint(box.preDefined ?? 0, 2)
 
 	return writer
 }

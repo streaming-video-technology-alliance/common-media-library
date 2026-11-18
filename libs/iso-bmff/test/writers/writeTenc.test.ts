@@ -17,7 +17,7 @@ function tenc(fields: Partial<TrackEncryptionBox>): TrackEncryptionBox {
 		type: 'tenc',
 		version: 0,
 		flags: 0,
-		defaultIsEncrypted: 1,
+		defaultIsProtected: 1,
 		defaultPerSampleIvSize: 0,
 		defaultKid: KID,
 		...fields,
@@ -58,7 +58,7 @@ describe('writeTenc', function () {
 			type: 'tenc',
 			version: 1,
 			flags: 0,
-			defaultIsEncrypted: 1,
+			defaultIsProtected: 1,
 			defaultPerSampleIvSize: 0,
 			defaultKid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
 			defaultCryptByteBlock: 1,
@@ -95,19 +95,16 @@ describe('writeTenc', function () {
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
 	})
 
-	it('should write the 3 bytes of defaultIsEncrypted for a version 1 box with no pattern field', function () {
-		const bytes = write(
-			tenc({ version: 1, defaultIsEncrypted: 0x001901, defaultPerSampleIvSize: 8 }),
-		)
+	it('should write a pattern of 0:0 for a version 1 box with no pattern field', function () {
+		const bytes = write(tenc({ version: 1, defaultPerSampleIvSize: 8 }))
 
-		assert.deepStrictEqual(bytes, tencBox(1, 0, 0, 0, 0, 0x19, 1, 8, ...KID))
+		assert.deepStrictEqual(bytes, tencBox(1, 0, 0, 0, 0, 0, 1, 8, ...KID))
 	})
 
-	it('should write the pattern fields in place of the pattern bits of defaultIsEncrypted', function () {
+	it('should write the pattern fields of a version 1 box', function () {
 		const bytes = write(
 			tenc({
 				version: 1,
-				defaultIsEncrypted: 0x001901,
 				defaultPerSampleIvSize: 8,
 				defaultCryptByteBlock: 5,
 				defaultSkipByteBlock: 10,
@@ -117,33 +114,18 @@ describe('writeTenc', function () {
 		assert.deepStrictEqual(bytes, tencBox(1, 0, 0, 0, 0, 0x5a, 1, 8, ...KID))
 	})
 
-	it('should keep the pattern bits of defaultIsEncrypted for a pattern field that the box does not have', function () {
-		const crypt = write(
-			tenc({
-				version: 1,
-				defaultIsEncrypted: 0x001901,
-				defaultPerSampleIvSize: 8,
-				defaultCryptByteBlock: 5,
-			}),
-		)
-		const skip = write(
-			tenc({
-				version: 1,
-				defaultIsEncrypted: 0x001901,
-				defaultPerSampleIvSize: 8,
-				defaultSkipByteBlock: 10,
-			}),
-		)
+	it('should write 0 for a pattern field that the box does not have', function () {
+		const crypt = write(tenc({ version: 1, defaultPerSampleIvSize: 8, defaultCryptByteBlock: 5 }))
+		const skip = write(tenc({ version: 1, defaultPerSampleIvSize: 8, defaultSkipByteBlock: 10 }))
 
-		assert.deepStrictEqual(crypt, tencBox(1, 0, 0, 0, 0, 0x59, 1, 8, ...KID))
-		assert.deepStrictEqual(skip, tencBox(1, 0, 0, 0, 0, 0x1a, 1, 8, ...KID))
+		assert.deepStrictEqual(crypt, tencBox(1, 0, 0, 0, 0, 0x50, 1, 8, ...KID))
+		assert.deepStrictEqual(skip, tencBox(1, 0, 0, 0, 0, 0x0a, 1, 8, ...KID))
 	})
 
 	it('should write a pattern of 0:0 from pattern fields of 0', function () {
 		const bytes = write(
 			tenc({
 				version: 1,
-				defaultIsEncrypted: 0x001901,
 				defaultPerSampleIvSize: 8,
 				defaultCryptByteBlock: 0,
 				defaultSkipByteBlock: 0,
@@ -181,22 +163,29 @@ describe('writeTenc', function () {
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 8, ...IV.slice(0, 8)))
 	})
 
-	it('should write the lowest byte of defaultIsEncrypted and not defaultIsProtected', function () {
-		const bytes = write(
-			tenc({ defaultIsEncrypted: 1, defaultPerSampleIvSize: 8, defaultIsProtected: 0 }),
-		)
+	it('should write defaultIsProtected', function () {
+		const bytes = write(tenc({ defaultPerSampleIvSize: 8, defaultIsProtected: 0 }))
 
-		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
+		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 0, 8, ...KID))
 	})
 
-	it('should write a changed defaultIsEncrypted of a box that readTenc reads', function () {
+	it('should write 0 for the reserved byte of a box that readTenc reads', function () {
+		const [parsed] = readIsoBoxes(tencBox(1, 0, 0, 0, 0x7f, 0x19, 1, 8, ...KID), {
+			readers: { tenc: readTenc },
+		})
+
+		assert.strictEqual(parsed.type, 'tenc')
+		assert.deepStrictEqual(write(parsed), tencBox(1, 0, 0, 0, 0, 0x19, 1, 8, ...KID))
+	})
+
+	it('should write a changed defaultIsProtected of a box that readTenc reads', function () {
 		const [parsed] = readIsoBoxes(tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID), {
 			readers: { tenc: readTenc },
 		})
 
 		assert.strictEqual(parsed.type, 'tenc')
 
-		parsed.defaultIsEncrypted = 0
+		parsed.defaultIsProtected = 0
 
 		assert.deepStrictEqual(write(parsed), tencBox(0, 0, 0, 0, 0, 0, 0, 8, ...KID))
 	})

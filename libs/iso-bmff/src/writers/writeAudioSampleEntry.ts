@@ -48,13 +48,14 @@ export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSamp
 
 	const writer = new IsoBoxWriteView(box.type, totalSize)
 
-	writer.writeArray(box.reserved1, UINT, 1, 6)
+	writer.writeArray([], UINT, 1, 6)
 	writer.writeUint(box.dataReferenceIndex, 2)
-	writer.writeArray(box.reserved2, UINT, 4, 2)
+	writer.writeUint(box.entryVersion ?? 0, 2)
+	writer.writeArray([], UINT, 2, 3)
 	writer.writeUint(box.channelCount, 2)
 	writer.writeUint(box.sampleSize, 2)
-	writer.writeUint(box.preDefined, 2)
-	writer.writeUint(box.reserved3, 2)
+	writer.writeUint(box.preDefined ?? 0, 2)
+	writer.writeUint(0, 2)
 	writer.writeTemplate(box.sampleRate, 4)
 	writer.writeBytes(bytes)
 

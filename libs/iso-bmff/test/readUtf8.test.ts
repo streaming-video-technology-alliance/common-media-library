@@ -236,7 +236,6 @@ describe('IsoBoxReadView.readUtf8', function () {
 				type: 'labl',
 				version: 0,
 				flags: 0,
-				isGroupLabel: false,
 				labelId: 7,
 				language: '日本',
 				label: 'main',

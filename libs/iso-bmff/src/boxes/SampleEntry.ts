@@ -9,7 +9,6 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  */
 export type SampleEntry<T extends IsoBoxType = IsoBoxType, C = any> = {
 	type: T
-	reserved1: number[]
 	dataReferenceIndex: number
 	boxes: C[]
 }

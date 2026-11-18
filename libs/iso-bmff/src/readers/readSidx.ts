@@ -24,7 +24,7 @@ export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIn
 	const timescale = readUint(4)
 	const earliestPresentationTime = readWideUint(size)
 	const firstOffset = readWideUint(size)
-	const reserved = readUint(2)
+	view.jump(2)
 	const referenceCount = readUint(2)
 	const references = view.readEntries<SegmentIndexReference>(referenceCount, () => {
 		const reference = readUint(4)
@@ -32,9 +32,7 @@ export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIn
 		const sap = readUint(4)
 
 		return {
-			reference,
 			subsegmentDuration,
-			sap,
 			referenceType: (reference >> 31) & 0x00000001,
 			referencedSize: reference & 0x7fffffff,
 			startsWithSap: (sap >> 31) & 0x00000001,
@@ -51,7 +49,6 @@ export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIn
 		timescale,
 		earliestPresentationTime,
 		firstOffset,
-		reserved,
 		references,
 	}
 }

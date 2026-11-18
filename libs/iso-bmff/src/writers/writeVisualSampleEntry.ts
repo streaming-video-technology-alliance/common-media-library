@@ -58,20 +58,20 @@ export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualS
 
 	const writer = new IsoBoxWriteView(box.type, totalSize)
 
-	writer.writeArray(box.reserved1, UINT, 1, 6)
+	writer.writeArray([], UINT, 1, 6)
 	writer.writeUint(box.dataReferenceIndex, 2)
-	writer.writeUint(box.preDefined1, 2)
-	writer.writeUint(box.reserved2, 2)
-	writer.writeArray(box.preDefined2, UINT, 4, 3)
+	writer.writeUint(box.preDefined1 ?? 0, 2)
+	writer.writeUint(0, 2)
+	writer.writeArray(box.preDefined2 ?? [], UINT, 4, 3)
 	writer.writeUint(box.width, 2)
 	writer.writeUint(box.height, 2)
 	writer.writeTemplate(box.horizResolution, 4)
 	writer.writeTemplate(box.vertResolution, 4)
-	writer.writeUint(box.reserved3, 4)
+	writer.writeUint(0, 4)
 	writer.writeUint(box.frameCount, 2)
 	writer.writeArray(box.compressorName, UINT, 1, 32)
 	writer.writeUint(box.depth, 2)
-	writer.writeUint(box.preDefined3 & 0xffff, 2)
+	writer.writeUint((box.preDefined3 ?? -1) & 0xffff, 2)
 	writer.writeBytes(bytes)
 
 	return writer

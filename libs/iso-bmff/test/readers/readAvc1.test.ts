@@ -22,16 +22,13 @@ describe('readAvc1', function () {
 		const box = container[0].boxes[0] as Avc1Box
 		assert.strictEqual(box.type, 'avc1')
 
-		assert.deepStrictEqual(box.reserved1, [0, 0, 0, 0, 0, 0])
 		assert.strictEqual(box.dataReferenceIndex, 1)
 		assert.strictEqual(box.preDefined1, 0)
-		assert.strictEqual(box.reserved2, 0)
 		assert.deepStrictEqual(box.preDefined2, [0, 0, 0])
 		assert.strictEqual(box.width, 1280)
 		assert.strictEqual(box.height, 720)
 		assert.strictEqual(box.horizResolution, 72)
 		assert.strictEqual(box.vertResolution, 72)
-		assert.strictEqual(box.reserved3, 0)
 		assert.strictEqual(box.frameCount, 1)
 		assert.deepStrictEqual(
 			box.compressorName,

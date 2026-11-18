@@ -22,11 +22,10 @@ export type AudioRenderingIndicationBox = FullBox & {
 // @public
 export type AudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType> = SampleEntry & {
     type: T;
-    reserved2: number[];
+    entryVersion?: number;
     channelCount: number;
     sampleSize: number;
-    preDefined: number;
-    reserved3: number;
+    preDefined?: number;
     sampleRate: number;
     boxes: AudioSampleEntryChild[];
 };
@@ -244,9 +243,9 @@ export type GroupsListBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 // @public
 export type HandlerBox = FullBox & {
     type: "hdlr";
-    preDefined: number;
+    preDefined?: number;
     handlerType: string;
-    reserved: number[];
+    reserved?: number[];
     name: string;
 };
 
@@ -505,7 +504,7 @@ export type KindBox = FullBox & {
 // @public
 export type LabelBox = FullBox & {
     type: "labl";
-    isGroupLabel: boolean;
+    flags: number;
     labelId: number;
     language: string;
     label: string;
@@ -534,7 +533,7 @@ export type MediaHeaderBox<V extends IsoInt64 = number> = FullBox & {
     timescale: number;
     duration: V;
     language: string;
-    preDefined: number;
+    preDefined?: number;
 };
 
 // @public
@@ -618,10 +617,8 @@ export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
     duration: V;
     rate: number;
     volume: number;
-    reserved1: number;
-    reserved2: number[];
     matrix: number[];
-    preDefined: number[];
+    preDefined?: number[];
     nextTrackId: number;
 };
 
@@ -967,7 +964,6 @@ export type SampleDescriptionBox<E extends SampleEntry = AudioSampleEntry | Visu
 // @public
 export type SampleEntry<T extends IsoBoxType = IsoBoxType, C = any> = {
     type: T;
-    reserved1: number[];
     dataReferenceIndex: number;
     boxes: C[];
 };
@@ -1027,15 +1023,12 @@ export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
     timescale: number;
     earliestPresentationTime: V;
     firstOffset: V;
-    reserved: number;
     references: SegmentIndexReference[];
 };
 
 // @public
 export type SegmentIndexReference = {
-    reference: number;
     subsegmentDuration: number;
-    sap: number;
     referenceType: number;
     referencedSize: number;
     startsWithSap: number;
@@ -1050,7 +1043,6 @@ export type SegmentTypeBox = TypeBox<"styp">;
 export type SoundMediaHeaderBox = FullBox & {
     type: "smhd";
     balance: number;
-    reserved: number;
 };
 
 // @public
@@ -1140,10 +1132,9 @@ export type TrackBoxChild<V extends IsoInt64 = number> = TrackHeaderBox<V> | Tra
 // @public
 export type TrackEncryptionBox = FullBox & {
     type: "tenc";
-    defaultIsEncrypted: number;
     defaultPerSampleIvSize: number;
     defaultKid: number[];
-    defaultIsProtected?: number;
+    defaultIsProtected: number;
     defaultCryptByteBlock?: number;
     defaultSkipByteBlock?: number;
     defaultConstantIvSize?: number;
@@ -1190,7 +1181,6 @@ export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
 export type TrackFragmentRandomAccessBox<V extends IsoInt64 = number> = FullBox & {
     type: "tfra";
     trackId: number;
-    reserved: number;
     numberOfEntry: number;
     lengthSizeOfTrafNum: number;
     lengthSizeOfTrunNum: number;
@@ -1213,13 +1203,10 @@ export type TrackHeaderBox<V extends IsoInt64 = number> = FullBox & {
     creationTime: V;
     modificationTime: V;
     trackId: number;
-    reserved1: number;
     duration: V;
-    reserved2: number[];
     layer: number;
     alternateGroup: number;
     volume: number;
-    reserved3: number;
     matrix: number[];
     width: number;
     height: number;
@@ -1293,18 +1280,16 @@ export type VideoMediaHeaderBox = FullBox & {
 // @public
 export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType> = SampleEntry & {
     type: T;
-    preDefined1: number;
-    reserved2: number;
-    preDefined2: number[];
+    preDefined1?: number;
+    preDefined2?: number[];
     width: number;
     height: number;
     horizResolution: number;
     vertResolution: number;
-    reserved3: number;
     frameCount: number;
     compressorName: number[];
     depth: number;
-    preDefined3: number;
+    preDefined3?: number;
     boxes: VisualSampleEntryChild[];
 };
 

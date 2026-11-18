@@ -45,7 +45,7 @@ export function writeSidx(box: SegmentIndexBox<IsoInt64>): IsoBoxWriteView {
 	writer.writeUint(box.timescale, 4)
 	writer.writeWideUint(box.earliestPresentationTime, size)
 	writer.writeWideUint(box.firstOffset, size)
-	writer.writeUint(box.reserved ?? 0, 2)
+	writer.writeUint(0, 2)
 	writer.writeUint(box.references.length, 2)
 
 	for (const ref of box.references) {

@@ -18,17 +18,18 @@ export type VisualSampleEntryChild = any
  */
 export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType> = SampleEntry & {
 	type: T
-	preDefined1: number
-	reserved2: number
-	preDefined2: number[]
+	/** The first `pre_defined` field. `writeVisualSampleEntry` writes 0 for a missing value. */
+	preDefined1?: number
+	/** The second `pre_defined` field. `writeVisualSampleEntry` writes 0 for a missing value. */
+	preDefined2?: number[]
 	width: number
 	height: number
 	horizResolution: number
 	vertResolution: number
-	reserved3: number
 	frameCount: number
 	compressorName: number[]
 	depth: number
-	preDefined3: number
+	/** The third `pre_defined` field. `writeVisualSampleEntry` writes -1 for a missing value, the value of the specification. */
+	preDefined3?: number
 	boxes: VisualSampleEntryChild[]
 }

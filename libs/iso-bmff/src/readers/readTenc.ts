@@ -19,22 +19,22 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  */
 export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox {
 	const { version, flags } = view.readFullBox()
-	const defaultIsEncrypted = view.readUint(3)
+	view.jump(1)
+	const pattern = view.readUint(1)
+	const defaultIsProtected = view.readUint(1)
 	const defaultPerSampleIvSize = view.readUint(1)
-	const defaultIsProtected = defaultIsEncrypted & 0xff
 	const box: TrackEncryptionBox = {
 		type: 'tenc',
 		version,
 		flags,
-		defaultIsEncrypted,
 		defaultPerSampleIvSize,
 		defaultKid: view.readArray(UINT, 1, 16),
 		defaultIsProtected,
 	}
 
 	if (version > 0) {
-		box.defaultCryptByteBlock = (defaultIsEncrypted >> 12) & 0xf
-		box.defaultSkipByteBlock = (defaultIsEncrypted >> 8) & 0xf
+		box.defaultCryptByteBlock = pattern >> 4
+		box.defaultSkipByteBlock = pattern & 0xf
 	}
 
 	if (defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && !view.done) {

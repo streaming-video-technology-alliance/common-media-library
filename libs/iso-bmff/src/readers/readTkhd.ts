@@ -1,5 +1,5 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
-import { INT, UINT } from '../IsoBoxFields.ts'
+import { INT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
@@ -19,6 +19,8 @@ export function readTkhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackHead
 	const { version, flags } = view.readFullBox()
 	const size = version === 1 ? 8 : 4
 
+	const { jump } = view
+
 	return {
 		type: 'tkhd',
 		version,
@@ -26,17 +28,14 @@ export function readTkhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackHead
 		creationTime: view.readWideUint(size),
 		modificationTime: view.readWideUint(size),
 		trackId: view.readUint(4),
-		reserved1: view.readUint(4),
-		duration: view.readWideUint(size),
-		reserved2: view.readArray(UINT, 4, 2),
-		layer: view.readInt(2),
+		duration: (jump(4), view.readWideUint(size)),
+		layer: (jump(8), view.readInt(2)),
 		alternateGroup: view.readInt(2),
 		volume: view.readInt(2) / 256,
-		reserved3: view.readUint(2),
 		// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
-		matrix: view
-			.readArray(INT, 4, 9)
-			.map((value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000)),
+		matrix: (jump(2), view.readArray(INT, 4, 9)).map(
+			(value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000),
+		),
 		width: view.readTemplate(4),
 		height: view.readTemplate(4),
 	}
