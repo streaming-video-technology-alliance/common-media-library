@@ -1,5 +1,5 @@
 ---
-status: draft
+status: accepted
 ---
 
 # RFC: Box types, names, and errors of ISO BMFF 2.0.0
@@ -567,7 +567,7 @@ The maintainer decided each question on 2026-11-17. The rules of the themes stat
 
 ## Final Decision
 
-Pending review.
+Accepted on 2026-11-17. The work follows [Build order](#build-order). The cursor RFC ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)) is still a draft. Phase 2 and phase 3 need that RFC.
 
 Decided on 2026-11-17:
 
