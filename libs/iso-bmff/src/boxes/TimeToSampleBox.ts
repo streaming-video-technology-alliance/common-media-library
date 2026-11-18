@@ -1,4 +1,4 @@
-import type { DecodingTimeSample } from './DecodingTimeSample.ts'
+import type { TimeToSampleEntry } from './TimeToSampleEntry.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -8,12 +8,12 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type DecodingTimeToSampleBox = FullBox & {
+export type TimeToSampleBox = FullBox & {
 	type: 'stts'
 
 	/** A 32-bit integer that specifies the number of entries in the decoding time-to-sample table. */
 	entryCount: number
 
 	/** An array of decoding time-to-sample entries. */
-	entries: DecodingTimeSample[]
+	entries: TimeToSampleEntry[]
 }

@@ -1,13 +1,13 @@
 import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
 
 /**
  * Write the `stsd` box (`SampleDescriptionBox`).
  *
  * @param box - The `SampleDescriptionBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
+ * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
@@ -16,10 +16,7 @@ import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
  *
  * @public
  */
-export function writeStsd(
-	box: SampleDescriptionBox,
-	config: IsoBoxWriteViewConfig,
-): IsoBoxWriteView {
+export function writeStsd(box: SampleDescriptionBox, config: IsoBoxWriteConfig): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

@@ -1,7 +1,7 @@
 import type { IsoInt64Reader } from './IsoInt64Reader.ts'
 
 /**
- * Creates a function for the `int64` option of `IsoBoxReadViewConfig` that reports a rounded value.
+ * Creates a function for the `int64` option of `IsoBoxReadConfig` that reports a rounded value.
  *
  * The function reads every 64-bit integer field as a `number`, so the types of the result do not change.
  * A `number` holds integers up to 2^53 - 1 exactly.

@@ -1,7 +1,7 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	it,
 	readIsoBoxes,
@@ -18,7 +18,7 @@ function tenc(fields: Partial<TrackEncryptionBox>): TrackEncryptionBox {
 		version: 0,
 		flags: 0,
 		defaultIsEncrypted: 1,
-		defaultIvSize: 0,
+		defaultPerSampleIvSize: 0,
 		defaultKid: KID,
 		...fields,
 	}
@@ -46,7 +46,7 @@ const SOURCES: [name: string, bytes: Uint8Array][] = [
 	['a version 1 box that is not protected', tencBox(1, 0, 0, 0, 0, 0, 0, 0, ...KID)],
 	['a box with a constant IV of 0 bytes', tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 0)],
 	[
-		'a protected box of 32 bytes with a defaultIvSize of 0',
+		'a protected box of 32 bytes with a defaultPerSampleIvSize of 0',
 		tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID),
 	],
 ]
@@ -59,7 +59,7 @@ describe('writeTenc', function () {
 			version: 1,
 			flags: 0,
 			defaultIsEncrypted: 1,
-			defaultIvSize: 0,
+			defaultPerSampleIvSize: 0,
 			defaultKid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
 			defaultCryptByteBlock: 1,
 			defaultSkipByteBlock: 9,
@@ -90,13 +90,15 @@ describe('writeTenc', function () {
 	})
 
 	it('should write 32 bytes for a box with no new field', function () {
-		const bytes = write(tenc({ defaultIvSize: 8 }))
+		const bytes = write(tenc({ defaultPerSampleIvSize: 8 }))
 
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
 	})
 
 	it('should write the 3 bytes of defaultIsEncrypted for a version 1 box with no pattern field', function () {
-		const bytes = write(tenc({ version: 1, defaultIsEncrypted: 0x001901, defaultIvSize: 8 }))
+		const bytes = write(
+			tenc({ version: 1, defaultIsEncrypted: 0x001901, defaultPerSampleIvSize: 8 }),
+		)
 
 		assert.deepStrictEqual(bytes, tencBox(1, 0, 0, 0, 0, 0x19, 1, 8, ...KID))
 	})
@@ -106,7 +108,7 @@ describe('writeTenc', function () {
 			tenc({
 				version: 1,
 				defaultIsEncrypted: 0x001901,
-				defaultIvSize: 8,
+				defaultPerSampleIvSize: 8,
 				defaultCryptByteBlock: 5,
 				defaultSkipByteBlock: 10,
 			}),
@@ -120,7 +122,7 @@ describe('writeTenc', function () {
 			tenc({
 				version: 1,
 				defaultIsEncrypted: 0x001901,
-				defaultIvSize: 8,
+				defaultPerSampleIvSize: 8,
 				defaultCryptByteBlock: 5,
 			}),
 		)
@@ -128,7 +130,7 @@ describe('writeTenc', function () {
 			tenc({
 				version: 1,
 				defaultIsEncrypted: 0x001901,
-				defaultIvSize: 8,
+				defaultPerSampleIvSize: 8,
 				defaultSkipByteBlock: 10,
 			}),
 		)
@@ -142,7 +144,7 @@ describe('writeTenc', function () {
 			tenc({
 				version: 1,
 				defaultIsEncrypted: 0x001901,
-				defaultIvSize: 8,
+				defaultPerSampleIvSize: 8,
 				defaultCryptByteBlock: 0,
 				defaultSkipByteBlock: 0,
 			}),
@@ -153,7 +155,7 @@ describe('writeTenc', function () {
 
 	it('should not write the pattern fields of a version 0 box', function () {
 		const bytes = write(
-			tenc({ defaultIvSize: 8, defaultCryptByteBlock: 1, defaultSkipByteBlock: 9 }),
+			tenc({ defaultPerSampleIvSize: 8, defaultCryptByteBlock: 1, defaultSkipByteBlock: 9 }),
 		)
 
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
@@ -180,7 +182,9 @@ describe('writeTenc', function () {
 	})
 
 	it('should write the lowest byte of defaultIsEncrypted and not defaultIsProtected', function () {
-		const bytes = write(tenc({ defaultIsEncrypted: 1, defaultIvSize: 8, defaultIsProtected: 0 }))
+		const bytes = write(
+			tenc({ defaultIsEncrypted: 1, defaultPerSampleIvSize: 8, defaultIsProtected: 0 }),
+		)
 
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
 	})
@@ -206,9 +210,9 @@ describe('writeTenc', function () {
 		})
 
 		it(`should write the source bytes of ${name} with the default configurations`, function () {
-			const [parsed] = readIsoBoxes(source, defaultReaderConfig())
+			const [parsed] = readIsoBoxes(source, createDefaultReaderConfig())
 
-			assert.deepStrictEqual(writeIsoBox(parsed, defaultWriterConfig()), source)
+			assert.deepStrictEqual(writeIsoBox(parsed, createDefaultWriterConfig()), source)
 		})
 	}
 })

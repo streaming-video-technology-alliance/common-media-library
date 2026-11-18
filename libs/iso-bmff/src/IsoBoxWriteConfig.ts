@@ -5,7 +5,7 @@ import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
  *
  * @public
  */
-export type IsoBoxWriteViewConfig = {
+export type IsoBoxWriteConfig = {
 	/**
 	 * A map of box writers to their box types. With no map, a write takes only containers, byte arrays, and boxes with a `view`.
 	 */

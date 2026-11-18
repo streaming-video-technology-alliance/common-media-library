@@ -1,8 +1,8 @@
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
+import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
-import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
+import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
 
 /**
  * Create a reader for a visual sample entry box of a type that `VisualSampleEntryType` does not list, such as `av01` or `vp09`.
@@ -18,6 +18,6 @@ import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
  */
 export function createVisualSampleEntryReader<T extends IsoBoxType>(
 	type: T,
-): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntryBox<T> {
-	return (view: IsoBoxReadView<IsoInt64>) => readVisualSampleEntryBox<T>(type, view)
+): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntry<T> {
+	return (view: IsoBoxReadView<IsoInt64>) => readVisualSampleEntry<T>(type, view)
 }

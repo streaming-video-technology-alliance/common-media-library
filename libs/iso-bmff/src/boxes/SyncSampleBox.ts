@@ -1,5 +1,4 @@
 import type { FullBox } from './FullBox.ts'
-import type { SyncSample } from './SyncSample.ts'
 
 /**
  * Sync Sample Box (`stss`).
@@ -11,5 +10,6 @@ import type { SyncSample } from './SyncSample.ts'
 export type SyncSampleBox = FullBox & {
 	type: 'stss'
 	entryCount: number
-	entries: SyncSample[]
+	/** The sample numbers of the sync samples. */
+	sampleNumber: number[]
 }

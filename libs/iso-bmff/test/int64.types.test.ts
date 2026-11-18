@@ -2,7 +2,7 @@ import {
 	assert,
 	createAudioSampleEntryReader,
 	createInt64OverflowReader,
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	describe,
 	findIsoBox,
 	isContainer,
@@ -22,7 +22,7 @@ import {
 	type IsoBox,
 	type IsoBoxData,
 	type IsoBoxReaderMap,
-	type IsoBoxReadViewConfig,
+	type IsoBoxReadConfig,
 	type IsoInt64,
 	type IsoInt64Reader,
 	type IsoBoxStreamable,
@@ -305,8 +305,8 @@ describe('int64 option types', function () {
 	})
 
 	it('5d. narrows a box that can be null or undefined with isIsoBoxType', function () {
-		const big = readIsoBoxes(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))
-		const plain = readIsoBoxes(buffer, defaultReaderConfig())
+		const big = readIsoBoxes(buffer, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
+		const plain = readIsoBoxes(buffer, createDefaultReaderConfig())
 		let count = 0
 
 		const optional = big.at(0)
@@ -461,21 +461,24 @@ describe('int64 option types', function () {
 	})
 
 	it('8. selects the mode of the default configuration with an argument', function () {
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (box.type === 'tfdt') {
 				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
 				assert.strictEqual(box.baseMediaDecodeTime, ROUNDED)
 			}
 		}
 
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))) {
+		for (const box of readIsoBoxes(
+			buffer,
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
+		)) {
 			if (box.type === 'tfdt') {
 				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
 				assert.strictEqual(box.baseMediaDecodeTime, EXACT)
 			}
 		}
 
-		const checked = defaultReaderConfig({ int64: createInt64OverflowReader(log) })
+		const checked = createDefaultReaderConfig({ int64: createInt64OverflowReader(log) })
 		for (const box of readIsoBoxes(buffer, checked)) {
 			if (box.type === 'tfdt') {
 				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
@@ -483,7 +486,7 @@ describe('int64 option types', function () {
 		}
 
 		// @ts-expect-error readers of the number view cannot read a bigint view
-		readIsoBoxes(buffer, { ...defaultReaderConfig(), int64: readInt64AsBigInt })
+		readIsoBoxes(buffer, { ...createDefaultReaderConfig(), int64: readInt64AsBigInt })
 	})
 
 	it('9. keeps the bigint of a readUint64 custom reader without the option', function () {
@@ -554,11 +557,11 @@ describe('int64 option types', function () {
 		// @ts-expect-error a bigint result type requires a configuration
 		const claimed: ParsedIsoBox<bigint>[] = readIsoBoxes(buffer)
 		// @ts-expect-error the bigint instantiation requires the option
-		void defaultReaderConfig<bigint>()
+		void createDefaultReaderConfig<bigint>()
 		// @ts-expect-error the bigint instantiation requires the option
-		void defaultReaderConfig<bigint>({})
+		void createDefaultReaderConfig<bigint>({})
 		// @ts-expect-error a bigint configuration type requires the option
-		const claimedConfig: IsoBoxReadViewConfig<bigint> = defaultReaderConfig()
+		const claimedConfig: IsoBoxReadConfig<bigint> = createDefaultReaderConfig()
 		// @ts-expect-error a bigint view type requires a configuration
 		const claimedView = new IsoBoxReadView<bigint>(buffer)
 
@@ -570,15 +573,15 @@ describe('int64 option types', function () {
 		const plain: ParsedIsoBox[] = readIsoBoxes(buffer, undefined)
 		const big: ParsedIsoBox<bigint>[] = readIsoBoxes(buffer, { int64: readInt64AsBigInt })
 		const either: ParsedIsoBox<IsoInt64>[] = readIsoBoxes<IsoInt64>(buffer)
-		const config: IsoBoxReadViewConfig = defaultReaderConfig({})
-		const bigConfig: IsoBoxReadViewConfig<bigint> = defaultReaderConfig({
+		const config: IsoBoxReadConfig = createDefaultReaderConfig({})
+		const bigConfig: IsoBoxReadConfig<bigint> = createDefaultReaderConfig({
 			int64: readInt64AsBigInt,
 		})
-		const explicit = defaultReaderConfig<bigint>({ int64: readInt64AsBigInt })
-		const none = defaultReaderConfig(undefined)
+		const explicit = createDefaultReaderConfig<bigint>({ int64: readInt64AsBigInt })
+		const none = createDefaultReaderConfig(undefined)
 
-		expectType<Equal<typeof explicit, IsoBoxReadViewConfig<bigint>>>(true)
-		expectType<Equal<typeof none, IsoBoxReadViewConfig>>(true)
+		expectType<Equal<typeof explicit, IsoBoxReadConfig<bigint>>>(true)
+		expectType<Equal<typeof none, IsoBoxReadConfig>>(true)
 		assert.strictEqual(plain.length + big.length + either.length, 9)
 		assert.strictEqual(config.int64, undefined)
 		assert.strictEqual(bigConfig.int64, explicit.int64)
@@ -637,7 +640,7 @@ describe('int64 option types', function () {
 			Equal<ParsedBox<TrackFragmentBaseMediaDecodeTimeBox>['baseMediaDecodeTime'], number>
 		>(true)
 		expectType<Equal<ParsedBox['view'], IsoBoxReadView<number>>>(true)
-		expectType<Equal<IsoBoxReadViewConfig, IsoBoxReadViewConfig<number>>>(true)
+		expectType<Equal<IsoBoxReadConfig, IsoBoxReadConfig<number>>>(true)
 		expectType<Equal<IsoBoxReaderMap, IsoBoxReaderMap<number>>>(true)
 		expectType<Equal<IsoInt64Reader, IsoInt64Reader<number>>>(true)
 	})
@@ -875,7 +878,7 @@ describe('int64 option types', function () {
 
 	it('20e. keeps the utility types of readIsoBoxes', function () {
 		expectType<
-			Equal<Parameters<typeof readIsoBoxes>, [raw: IsoBoxData, config?: IsoBoxReadViewConfig]>
+			Equal<Parameters<typeof readIsoBoxes>, [raw: IsoBoxData, config?: IsoBoxReadConfig]>
 		>(true)
 		expectType<Equal<ReturnType<typeof readIsoBoxes>, ParsedIsoBox[]>>(true)
 
@@ -894,17 +897,17 @@ describe('int64 option types', function () {
 		assert.strictEqual(count, 1)
 	})
 
-	it('20f. keeps the utility types of defaultReaderConfig', function () {
+	it('20f. keeps the utility types of createDefaultReaderConfig', function () {
 		expectType<
-			Equal<Parameters<typeof defaultReaderConfig>, [options?: { int64?: IsoInt64Reader }]>
+			Equal<Parameters<typeof createDefaultReaderConfig>, [options?: { int64?: IsoInt64Reader }]>
 		>(true)
-		expectType<Equal<ReturnType<typeof defaultReaderConfig>, IsoBoxReadViewConfig>>(true)
+		expectType<Equal<ReturnType<typeof createDefaultReaderConfig>, IsoBoxReadConfig>>(true)
 
 		const errors: RangeError[] = []
-		const args: Parameters<typeof defaultReaderConfig> = [
+		const args: Parameters<typeof createDefaultReaderConfig> = [
 			{ int64: createInt64OverflowReader(error => errors.push(error)) },
 		]
-		const config: ReturnType<typeof defaultReaderConfig> = defaultReaderConfig(...args)
+		const config: ReturnType<typeof createDefaultReaderConfig> = createDefaultReaderConfig(...args)
 		let count = 0
 
 		for (const box of readIsoBoxes(buffer, config)) {
@@ -1011,17 +1014,17 @@ describe('int64 option types', function () {
 		assert.strictEqual(readFreeEither(new IsoBoxReadView(buffer)).length, 64)
 
 		// A typed configuration and a typed map accept such a reader in both modes.
-		const typedBig: IsoBoxReadViewConfig<bigint> = {
+		const typedBig: IsoBoxReadConfig<bigint> = {
 			int64: readInt64AsBigInt,
 			readers: { tfdt: readTfdt, mfhd: readMfhd, free: readFreeEither },
 		}
-		const typedNumber: IsoBoxReadViewConfig = { readers: { tfdt: readTfdt, mfhd: readMfhd } }
+		const typedNumber: IsoBoxReadConfig = { readers: { tfdt: readTfdt, mfhd: readMfhd } }
 		const typedBigMap: IsoBoxReaderMap<bigint> = { mfhd: readMfhd, free: readFreeEither }
 		assert.ok(typedBig.readers && typedNumber.readers && typedBigMap)
 
 		// Readers next to the spread of the default configuration.
 		for (const box of readIsoBoxes(buffer, {
-			...defaultReaderConfig({ int64: readInt64AsBigInt }),
+			...createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 			readers: { tfdt: readTfdt, mfhd: readMfhd },
 		})) {
 			if (box.type === 'tfdt') {
@@ -1106,7 +1109,7 @@ describe('int64 option types', function () {
 		// A function that forwards a configuration of either mode.
 		function readWith<V extends IsoInt64 = number>(
 			raw: IsoBoxData,
-			config: IsoBoxReadViewConfig<V>,
+			config: IsoBoxReadConfig<V>,
 		): ParsedIsoBox<V>[] {
 			return readIsoBoxes(raw, config)
 		}
@@ -1116,7 +1119,7 @@ describe('int64 option types', function () {
 			raw: IsoBoxData,
 			int64: IsoInt64Reader<V>,
 		): ParsedIsoBox<V>[] {
-			return readIsoBoxes(raw, defaultReaderConfig({ int64 }))
+			return readIsoBoxes(raw, createDefaultReaderConfig({ int64 }))
 		}
 
 		// A function that forwards the function of the option to a view.
@@ -1127,7 +1130,7 @@ describe('int64 option types', function () {
 			return new IsoBoxReadView(raw, { int64 })
 		}
 
-		const exact = readWith(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		const exact = readWith(buffer, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 		expectType<Equal<typeof exact, ParsedIsoBox<bigint>[]>>(true)
 		for (const box of exact) {
 			if (box.type === 'tfdt') {
@@ -1136,7 +1139,7 @@ describe('int64 option types', function () {
 			}
 		}
 
-		const plain = readWith(buffer, defaultReaderConfig())
+		const plain = readWith(buffer, createDefaultReaderConfig())
 		expectType<Equal<typeof plain, ParsedIsoBox[]>>(true)
 		for (const box of plain) {
 			if (box.type === 'tfdt') {
@@ -1173,15 +1176,15 @@ describe('int64 option types', function () {
 		expectType<Equal<typeof view, IsoBoxReadView<bigint>>>(true)
 		assert.strictEqual(view.readWideUint(4), BigInt(TFDT.length))
 
-		// A parameter of the type `IsoBoxReadViewConfig<IsoInt64>` does not replace the type parameter.
+		// A parameter of the type `IsoBoxReadConfig<IsoInt64>` does not replace the type parameter.
 		function readEither(
 			raw: IsoBoxData,
-			config: IsoBoxReadViewConfig<IsoInt64>,
+			config: IsoBoxReadConfig<IsoInt64>,
 		): ParsedIsoBox<IsoInt64>[] {
 			return readIsoBoxes(raw, config)
 		}
-		void readEither(buffer, defaultReaderConfig())
+		void readEither(buffer, createDefaultReaderConfig())
 		// @ts-expect-error a configuration with bigint readers is not a configuration of either mode
-		readEither(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))
+		readEither(buffer, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 	})
 })

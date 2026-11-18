@@ -4,7 +4,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
 /**
  * Reads an integer field of 4 or 8 bytes as a `bigint`.
  *
- * Pass this function as the `int64` option of `IsoBoxReadViewConfig`.
+ * Pass this function as the `int64` option of `IsoBoxReadConfig`.
  * The built-in readers then return every 64-bit integer field as a `bigint`, with the exact value.
  * A field that is 32 bits in version 0 of its box is a `bigint` too.
  *

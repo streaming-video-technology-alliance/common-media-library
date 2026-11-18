@@ -6,7 +6,7 @@ describe('readVmhd', function () {
 
 		assert.strictEqual(boxes.length, 1)
 		assert.strictEqual(boxes[0].type, 'vmhd')
-		assert.strictEqual(boxes[0].graphicsmode, 0)
-		assert.deepStrictEqual(boxes[0].opcolor, [0, 0, 0])
+		assert.strictEqual(boxes[0].graphicsMode, 0)
+		assert.deepStrictEqual(boxes[0].opColor, [0, 0, 0])
 	})
 })

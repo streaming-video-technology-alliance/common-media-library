@@ -1,7 +1,7 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	it,
 	IsoBoxWriteView,
@@ -15,9 +15,9 @@ import { boxBytes } from './util/wideBoxes.ts'
 const ALL_BITS_SET = new Uint8Array(8).fill(0xff)
 
 function roundTrip(source: Uint8Array): Uint8Array {
-	const [box] = readIsoBoxes(source, defaultReaderConfig())
+	const [box] = readIsoBoxes(source, createDefaultReaderConfig())
 	assert.ok(box)
-	return writeIsoBox(box, defaultWriterConfig())
+	return writeIsoBox(box, createDefaultWriterConfig())
 }
 
 describe('IsoBoxWriteView.writeUint', function () {
@@ -98,7 +98,7 @@ describe('a read and a write with the default configs', function () {
 				preDefined: [0, 0, 0, 0, 0, 0],
 				nextTrackId: 2,
 			} satisfies MovieHeaderBox<bigint | number>,
-			defaultWriterConfig(),
+			createDefaultWriterConfig(),
 		)
 
 		assert.deepStrictEqual(roundTrip(mehd), mehd)

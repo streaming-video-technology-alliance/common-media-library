@@ -3,7 +3,7 @@ import { deepStrictEqual } from 'node:assert'
 import {
 	assert,
 	CONTAINERS,
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	describe,
 	IsoBoxReadView,
 	it,
@@ -87,7 +87,7 @@ describe('container readers', function () {
 	})
 
 	it('should have no entry in the default configuration', function () {
-		const { readers = {} } = defaultReaderConfig()
+		const { readers = {} } = createDefaultReaderConfig()
 
 		deepStrictEqual(
 			CONTAINERS.filter(type => type in readers),
@@ -130,7 +130,7 @@ describe('container readers', function () {
 	}
 
 	it('should give the same boxes for every fixture with and without the container readers', function () {
-		const config = defaultReaderConfig()
+		const config = createDefaultReaderConfig()
 		const containerConfig = { readers: { ...config.readers, ...READERS } }
 
 		for (const file of fixtureFiles()) {

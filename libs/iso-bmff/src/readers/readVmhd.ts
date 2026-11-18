@@ -16,7 +16,7 @@ export function readVmhd(view: IsoBoxReadView<IsoInt64>): VideoMediaHeaderBox {
 	return {
 		type: 'vmhd',
 		...view.readFullBox(),
-		graphicsmode: view.readUint(2),
-		opcolor: view.readArray(UINT, 2, 3),
+		graphicsMode: view.readUint(2),
+		opColor: view.readArray(UINT, 2, 3),
 	}
 }

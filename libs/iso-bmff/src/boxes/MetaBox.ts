@@ -2,7 +2,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import type { DataInformationBox } from './DataInformationBox.ts'
 import type { FullBox } from './FullBox.ts'
 import type { GroupsListBox } from './GroupsListBox.ts'
-import type { HandlerReferenceBox } from './HandlerReferenceBox.ts'
+import type { HandlerBox } from './HandlerBox.ts'
 
 /**
  * Child boxes of Meta Box
@@ -10,7 +10,7 @@ import type { HandlerReferenceBox } from './HandlerReferenceBox.ts'
  * @public
  */
 export type MetaBoxChild<V extends IsoInt64 = number> =
-	| HandlerReferenceBox
+	| HandlerBox
 	| DataInformationBox
 	| GroupsListBox<V>
 

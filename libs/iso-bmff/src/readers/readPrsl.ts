@@ -1,8 +1,8 @@
-import type { Entity } from '../boxes/Entity.ts'
 import type {
 	PreselectionGroupBox,
 	PreselectionGroupBoxChild,
 } from '../boxes/PreselectionGroupBox.ts'
+import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
@@ -19,9 +19,7 @@ export function readPrsl(view: IsoBoxReadView<IsoInt64>): PreselectionGroupBox {
 	const { version, flags } = view.readFullBox()
 	const groupId = view.readUint(4)
 	const numEntitiesInGroup = view.readUint(4)
-	const entities = view.readEntries<Entity>(numEntitiesInGroup, () => ({
-		entityId: view.readUint(4),
-	}))
+	const entityId = view.readArray(UINT, 4, numEntitiesInGroup)
 	const preselectionTag = flags & 0x1000 ? view.readUtf8(-1) : undefined
 	const selectionPriority = flags & 0x2000 ? view.readUint(1) : undefined
 	const interleavingTag = flags & 0x4000 ? view.readUtf8(-1) : undefined
@@ -32,7 +30,7 @@ export function readPrsl(view: IsoBoxReadView<IsoInt64>): PreselectionGroupBox {
 		flags,
 		groupId,
 		numEntitiesInGroup,
-		entities,
+		entityId,
 		preselectionTag,
 		selectionPriority,
 		interleavingTag,

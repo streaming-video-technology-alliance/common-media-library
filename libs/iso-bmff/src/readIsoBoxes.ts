@@ -2,7 +2,7 @@ import type { IsoBoxData } from './IsoBoxData.ts'
 import type { IsoBoxReaderMap } from './IsoBoxReaderMap.ts'
 import type { IsoBoxReaderReturn } from './IsoBoxReaderReturn.ts'
 import { IsoBoxReadView } from './IsoBoxReadView.ts'
-import type { IsoBoxReadViewConfig } from './IsoBoxReadViewConfig.ts'
+import type { IsoBoxReadConfig } from './IsoBoxReadConfig.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 
@@ -30,7 +30,7 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  */
 export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoInt64 = number>(
 	raw: IsoBoxData,
-	config: IsoBoxReadViewConfig<V> & { readers: R },
+	config: IsoBoxReadConfig<V> & { readers: R },
 ): IsoBoxReaderReturn<R, V>[]
 
 /**
@@ -47,9 +47,7 @@ export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoIn
  */
 export function readIsoBoxes<V extends IsoInt64 = number>(
 	raw: IsoBoxData,
-	...config: [V] extends [bigint]
-		? [config: IsoBoxReadViewConfig<V>]
-		: [config?: IsoBoxReadViewConfig<V>]
+	...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]
 ): ParsedIsoBox<V>[]
 
 /**
@@ -66,7 +64,7 @@ export function readIsoBoxes<V extends IsoInt64 = number>(
  *
  * @public
  */
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[]
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadViewConfig): ParsedIsoBox[] {
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadConfig): ParsedIsoBox[]
+export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadConfig): ParsedIsoBox[] {
 	return new IsoBoxReadView(raw, config).readBoxes<ParsedIsoBox>()
 }

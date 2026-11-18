@@ -4,8 +4,8 @@ import {
 	describe,
 	it,
 	createVisualSampleEntryReader,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	filterIsoBoxes,
 	readFtyp,
 	readIsoBoxes,
@@ -173,9 +173,9 @@ describe('writeIsoBoxes', function () {
 		ok(files.length > 0)
 
 		for (const file of files) {
-			const boxes = parseFile(file, defaultReaderConfig())
+			const boxes = parseFile(file, createDefaultReaderConfig())
 
-			doesNotThrow(() => writeIsoBoxes(boxes, defaultWriterConfig()), file)
+			doesNotThrow(() => writeIsoBoxes(boxes, createDefaultWriterConfig()), file)
 		}
 	})
 
@@ -183,9 +183,9 @@ describe('writeIsoBoxes', function () {
 		let count = 0
 
 		for (const file of fixtureFiles()) {
-			const boxes = parseFile(file, defaultReaderConfig())
+			const boxes = parseFile(file, createDefaultReaderConfig())
 			const original = sampleTableBytes(boxes)
-			const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
+			const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
 
 			deepStrictEqual(sampleTableBytes(readIsoBoxes(written)), original, file)
 			count += original.length
@@ -198,9 +198,9 @@ describe('writeIsoBoxes', function () {
 		let count = 0
 
 		for (const file of fixtureFiles()) {
-			const boxes = parseFile(file, defaultReaderConfig())
+			const boxes = parseFile(file, createDefaultReaderConfig())
 			const original = headerBytes(boxes)
-			const written = reduceUint8Arrays(writeIsoBoxes(boxes, defaultWriterConfig()))
+			const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
 
 			deepStrictEqual(headerBytes(readIsoBoxes(written)), original, file)
 			count += original.length
@@ -210,7 +210,7 @@ describe('writeIsoBoxes', function () {
 	})
 
 	it('should exit if boxes are empty', function () {
-		const bytes = writeIsoBoxes([], defaultWriterConfig())
+		const bytes = writeIsoBoxes([], createDefaultWriterConfig())
 		strictEqual(bytes.length, 0)
 	})
 
@@ -234,7 +234,7 @@ describe('writeIsoBoxes', function () {
 		const shared = new Uint8Array(new SharedArrayBuffer(bytes.length))
 		shared.set(bytes)
 
-		const [result] = writeIsoBoxes([shared], defaultWriterConfig())
+		const [result] = writeIsoBoxes([shared], createDefaultWriterConfig())
 
 		ok(result.buffer instanceof ArrayBuffer)
 		deepStrictEqual([...result], bytes)
@@ -243,7 +243,7 @@ describe('writeIsoBoxes', function () {
 	it('should not copy a box given as a view over an ArrayBuffer', function () {
 		const plain = new Uint8Array([0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65])
 
-		const [result] = writeIsoBoxes([plain], defaultWriterConfig())
+		const [result] = writeIsoBoxes([plain], createDefaultWriterConfig())
 
 		strictEqual(result.buffer, plain.buffer)
 	})
@@ -271,7 +271,7 @@ describe('writeIsoBoxes', function () {
 		}
 
 		it('should write the source bytes of a parsed meta box', function () {
-			const boxes = readIsoBoxes(new Uint8Array(META), defaultReaderConfig())
+			const boxes = readIsoBoxes(new Uint8Array(META), createDefaultReaderConfig())
 
 			const [bytes] = writeIsoBoxes(boxes, { writers: {} })
 
@@ -281,19 +281,19 @@ describe('writeIsoBoxes', function () {
 		it('should write the source bytes of a sample entry with no writer', function () {
 			const source = sampleEntry('av01')
 			const readers = {
-				...defaultReaderConfig().readers,
+				...createDefaultReaderConfig().readers,
 				av01: createVisualSampleEntryReader('av01'),
 			}
 			const boxes = readIsoBoxes(source, { readers })
 
-			const [bytes] = writeIsoBoxes(boxes, defaultWriterConfig())
+			const [bytes] = writeIsoBoxes(boxes, createDefaultWriterConfig())
 
 			strictEqual(bytes.length, 137)
 			deepStrictEqual(bytes, source)
 		})
 
 		it('should write a parsed container as a container', function () {
-			const [traf] = readIsoBoxes(new Uint8Array(TRAF), defaultReaderConfig())
+			const [traf] = readIsoBoxes(new Uint8Array(TRAF), createDefaultReaderConfig())
 			ok(traf.type === 'traf')
 			traf.boxes.push(new Uint8Array(FREE) as never)
 

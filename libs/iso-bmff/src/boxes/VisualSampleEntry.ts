@@ -1,5 +1,5 @@
 import type { IsoBoxType } from '../IsoBoxType.ts'
-import type { SampleEntryBox } from './SampleEntryBox.ts'
+import type { SampleEntry } from './SampleEntry.ts'
 import type { VisualSampleEntryType } from './VisualSampleEntryType.ts'
 
 /**
@@ -7,7 +7,7 @@ import type { VisualSampleEntryType } from './VisualSampleEntryType.ts'
  *
  * @public
  */
-export type VisualSampleEntryBoxChild = any
+export type VisualSampleEntryChild = any
 
 /**
  * Visual Sample Entry Box, such as `avc1`, `hvc1`, or `encv`.
@@ -16,19 +16,19 @@ export type VisualSampleEntryBoxChild = any
  *
  * @public
  */
-export type VisualSampleEntryBox<T extends IsoBoxType = VisualSampleEntryType> = SampleEntryBox & {
+export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType> = SampleEntry & {
 	type: T
 	preDefined1: number
 	reserved2: number
 	preDefined2: number[]
 	width: number
 	height: number
-	horizresolution: number
-	vertresolution: number
+	horizResolution: number
+	vertResolution: number
 	reserved3: number
 	frameCount: number
 	compressorName: number[]
 	depth: number
 	preDefined3: number
-	boxes: VisualSampleEntryBoxChild[]
+	boxes: VisualSampleEntryChild[]
 }

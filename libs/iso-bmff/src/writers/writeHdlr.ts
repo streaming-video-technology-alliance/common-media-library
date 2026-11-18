@@ -1,14 +1,14 @@
 import { encodeText } from '@svta/cml-utils'
-import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
+import type { HandlerBox } from '../boxes/HandlerBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write the `hdlr` box (`HandlerReferenceBox`).
+ * Write the `hdlr` box (`HandlerBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.4.3
  *
- * @param box - The `HandlerReferenceBox` fields to write
+ * @param box - The `HandlerBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
@@ -17,7 +17,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * @public
  */
-export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
+export function writeHdlr(box: HandlerBox): IsoBoxWriteView {
 	const nameBytes = encodeText(box.name)
 
 	const headerSize = 8

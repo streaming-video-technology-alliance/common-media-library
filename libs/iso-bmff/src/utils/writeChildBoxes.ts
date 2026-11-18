@@ -1,6 +1,6 @@
 import type { IsoBox } from '../IsoBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeBoxes } from './writeBoxes.ts'
 
 /**
@@ -15,7 +15,7 @@ import { writeBoxes } from './writeBoxes.ts'
  */
 export function writeChildBoxes(
 	boxes: IsoBox<IsoInt64>[],
-	config: IsoBoxWriteViewConfig,
+	config: IsoBoxWriteConfig,
 ): { bytes: Uint8Array[]; size: number } {
 	const bytes = writeBoxes(boxes, config)
 	const size = bytes.reduce((size, byte) => size + byte.byteLength, 0)

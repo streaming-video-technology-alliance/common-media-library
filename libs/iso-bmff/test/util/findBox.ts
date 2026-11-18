@@ -2,7 +2,7 @@ import {
 	readIsoBoxes,
 	traverseIsoBoxes,
 	type IsoBoxMap,
-	type IsoBoxReadViewConfig,
+	type IsoBoxReadConfig,
 	type IsoTypedParsedBox,
 } from '@svta/cml-iso-bmff'
 import assert from 'node:assert'
@@ -11,7 +11,7 @@ import { load } from './load.ts'
 export function findBox<T extends keyof IsoBoxMap>(
 	file: string,
 	type: T,
-	config?: IsoBoxReadViewConfig,
+	config?: IsoBoxReadConfig,
 ): IsoTypedParsedBox<T> {
 	const boxes = readIsoBoxes(load(file), config)
 

@@ -3,8 +3,8 @@ import { deepStrictEqual } from 'node:assert'
 import {
 	assert,
 	CONTAINERS,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	IsoBoxWriteView,
 	it,
@@ -33,7 +33,7 @@ import {
 	writeUdta,
 	writeVttc,
 	type IsoBoxContainerMap,
-	type IsoBoxWriteViewConfig,
+	type IsoBoxWriteConfig,
 	type IsoInt64,
 	type MovieFragmentBox,
 	type MovieFragmentHeaderBox,
@@ -52,7 +52,7 @@ type ContainerType = keyof IsoBoxContainerMap
 type ContainerBoxes = IsoBoxContainerMap<IsoInt64>
 
 type ContainerWriters = {
-	[K in ContainerType]: (box: ContainerBoxes[K], config: IsoBoxWriteViewConfig) => IsoBoxWriteView
+	[K in ContainerType]: (box: ContainerBoxes[K], config: IsoBoxWriteConfig) => IsoBoxWriteView
 }
 
 const WRITERS: ContainerWriters = {
@@ -82,7 +82,7 @@ const TYPES = Object.keys(WRITERS) as ContainerType[]
 // An mfhd box with the sequence number 1.
 const MFHD: MovieFragmentHeaderBox = { type: 'mfhd', version: 0, flags: 0, sequenceNumber: 1 }
 const MFHD_BYTES = boxBytes('mfhd', Uint8Array.of(0, 0, 0, 0, 0, 0, 0, 1))
-const CONFIG: IsoBoxWriteViewConfig = { writers: { mfhd: writeMfhd } }
+const CONFIG: IsoBoxWriteConfig = { writers: { mfhd: writeMfhd } }
 
 function containerBox<K extends ContainerType>(type: K, boxes: unknown[]): ContainerBoxes[K] {
 	return { type, boxes } as ContainerBoxes[K]
@@ -92,7 +92,7 @@ function containerBox<K extends ContainerType>(type: K, boxes: unknown[]): Conta
 function write<K extends ContainerType>(
 	type: K,
 	boxes: unknown[],
-	config: IsoBoxWriteViewConfig,
+	config: IsoBoxWriteConfig,
 ): IsoBoxWriteView {
 	return WRITERS[type](containerBox(type, boxes), config)
 }
@@ -103,7 +103,7 @@ describe('container writers', function () {
 	})
 
 	it('should have no entry in the default configuration', function () {
-		const { writers } = defaultWriterConfig()
+		const { writers } = createDefaultWriterConfig()
 
 		deepStrictEqual(
 			CONTAINERS.filter(type => type in writers),
@@ -150,11 +150,11 @@ describe('container writers', function () {
 	}
 
 	it('should write the same bytes for every fixture with and without the container writers', function () {
-		const config = defaultWriterConfig()
+		const config = createDefaultWriterConfig()
 		const containerConfig = { writers: { ...config.writers, ...WRITERS } }
 
 		for (const file of fixtureFiles()) {
-			const boxes = readIsoBoxes(load(file), defaultReaderConfig())
+			const boxes = readIsoBoxes(load(file), createDefaultReaderConfig())
 
 			deepStrictEqual(
 				reduceUint8Arrays(writeIsoBoxes(boxes, containerConfig)),

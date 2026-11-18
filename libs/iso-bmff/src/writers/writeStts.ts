@@ -1,18 +1,18 @@
-import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
+import type { TimeToSampleBox } from '../boxes/TimeToSampleBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write the `stts` box (`DecodingTimeToSampleBox`).
+ * Write the `stts` box (`TimeToSampleBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.6.1.2
  *
- * @param box - The `DecodingTimeToSampleBox` fields to write
+ * @param box - The `TimeToSampleBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeStts(box: DecodingTimeToSampleBox): IsoBoxWriteView {
+export function writeStts(box: TimeToSampleBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

@@ -1,17 +1,17 @@
-import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.ts'
+import type { SubSampleInformationBox } from '../boxes/SubSampleInformationBox.ts'
 import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
- * Read the `subs` box (`SubsampleInformationBox`).
+ * Read the `subs` box (`SubSampleInformationBox`).
  *
  * @param view - The `IsoBoxReadView` to read data from
  *
- * @returns A parsed `SubsampleInformationBox`
+ * @returns A parsed `SubSampleInformationBox`
  *
  * @public
  */
-export function readSubs(view: IsoBoxReadView<IsoInt64>): SubsampleInformationBox {
+export function readSubs(view: IsoBoxReadView<IsoInt64>): SubSampleInformationBox {
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 	const entries = view.readEntries(entryCount, () => {

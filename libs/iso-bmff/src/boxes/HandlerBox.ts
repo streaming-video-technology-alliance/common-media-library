@@ -7,7 +7,7 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type HandlerReferenceBox = FullBox & {
+export type HandlerBox = FullBox & {
 	type: 'hdlr'
 	preDefined: number
 	handlerType: string

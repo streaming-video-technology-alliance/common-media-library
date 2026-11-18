@@ -5,10 +5,10 @@ import {
 	it,
 	readHvc1,
 	readStsd,
-	type VisualSampleEntryBox,
+	type VisualSampleEntry,
 } from '../util/box.ts'
 
-type Hvc1Box = VisualSampleEntryBox<'hvc1'>
+type Hvc1Box = VisualSampleEntry<'hvc1'>
 
 describe('readHvc1', function () {
 	it('should correctly parse the box', function () {
@@ -28,8 +28,8 @@ describe('readHvc1', function () {
 		assert.deepStrictEqual(box.preDefined2, [0, 0, 0])
 		assert.strictEqual(box.width, 192)
 		assert.strictEqual(box.height, 108)
-		assert.strictEqual(box.horizresolution, 72)
-		assert.strictEqual(box.vertresolution, 72)
+		assert.strictEqual(box.horizResolution, 72)
+		assert.strictEqual(box.vertResolution, 72)
 		assert.strictEqual(box.reserved3, 0)
 		assert.strictEqual(box.frameCount, 1)
 		assert.deepStrictEqual(

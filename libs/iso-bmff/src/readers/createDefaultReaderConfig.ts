@@ -1,4 +1,4 @@
-import type { IsoBoxReadViewConfig } from '../IsoBoxReadViewConfig.ts'
+import type { IsoBoxReadConfig } from '../IsoBoxReadConfig.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoInt64Reader } from '../IsoInt64Reader.ts'
 import { readArdi } from './readArdi.ts'
@@ -74,14 +74,14 @@ import { readVtte } from './readVtte.ts'
  * Pass the option here and do not add it to the configuration afterward.
  *
  * @param options - The options for the configuration. The `int64` option is required when `V` is `bigint`.
- * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured, except the container readers
+ * @returns An `IsoBoxReadConfig` with all available readers pre-configured, except the container readers
  *
  * @example
- * {@includeCode ../../test/readers/defaultReaderConfig.test.ts#example}
+ * {@includeCode ../../test/readers/createDefaultReaderConfig.test.ts#example}
  *
  * @public
  */
-export function defaultReaderConfig<V extends IsoInt64 = number>(
+export function createDefaultReaderConfig<V extends IsoInt64 = number>(
 	...options: [V] extends [bigint]
 		? [
 				options: {
@@ -99,25 +99,25 @@ export function defaultReaderConfig<V extends IsoInt64 = number>(
 					int64?: IsoInt64Reader<V>
 				},
 			]
-): IsoBoxReadViewConfig<V>
+): IsoBoxReadConfig<V>
 
 /**
  * Create a default reader configuration with `number` fields.
  *
- * `Parameters<typeof defaultReaderConfig>` and `ReturnType<typeof defaultReaderConfig>` resolve to this signature.
+ * `Parameters<typeof createDefaultReaderConfig>` and `ReturnType<typeof createDefaultReaderConfig>` resolve to this signature.
  *
  * @param options - The options for the configuration
- * @returns An `IsoBoxReadViewConfig` with all available readers pre-configured, except the container readers
+ * @returns An `IsoBoxReadConfig` with all available readers pre-configured, except the container readers
  *
  * @public
  */
-export function defaultReaderConfig(options?: {
+export function createDefaultReaderConfig(options?: {
 	/**
 	 * The function that reads every 64-bit integer field of the built-in readers.
 	 */
 	int64?: IsoInt64Reader
-}): IsoBoxReadViewConfig
-export function defaultReaderConfig(options?: { int64?: IsoInt64Reader }): IsoBoxReadViewConfig {
+}): IsoBoxReadConfig
+export function createDefaultReaderConfig(options?: { int64?: IsoInt64Reader }): IsoBoxReadConfig {
 	return {
 		...options,
 		readers: {

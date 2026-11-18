@@ -7,10 +7,7 @@ import type { SchemeTypeBox } from './SchemeTypeBox.ts'
  *
  * @public
  */
-export type ProtectionSchemeInformationBoxChild =
-	| OriginalFormatBox
-	| SchemeTypeBox
-	| SchemeInformationBox
+export type ProtectionSchemeInfoBoxChild = OriginalFormatBox | SchemeTypeBox | SchemeInformationBox
 
 /**
  * Protection Scheme Information Box (`sinf`).
@@ -19,7 +16,7 @@ export type ProtectionSchemeInformationBoxChild =
  *
  * @public
  */
-export type ProtectionSchemeInformationBox = {
+export type ProtectionSchemeInfoBox = {
 	type: 'sinf'
-	boxes: ProtectionSchemeInformationBoxChild[]
+	boxes: ProtectionSchemeInfoBoxChild[]
 }

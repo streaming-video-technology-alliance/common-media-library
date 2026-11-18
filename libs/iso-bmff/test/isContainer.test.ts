@@ -1,6 +1,6 @@
 import {
 	assert,
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	describe,
 	isContainer,
 	it,
@@ -9,7 +9,7 @@ import {
 	type AdditionalMetadataContainerBox,
 	type GroupsListBox,
 	type IsoBox,
-	type SubTrackBox,
+	type SubTrack,
 	type UserDataBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
@@ -63,7 +63,7 @@ describe('isContainer', function () {
 		])
 
 		const sequenceNumbers: number[] = []
-		for (const box of readIsoBoxes(bytes, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(bytes, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
 					if (child.type === 'mfhd') {
@@ -80,7 +80,7 @@ describe('isContainer', function () {
 	it('reads a field of a child of a container', function () {
 		const times: number[] = []
 
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
 					if (child.type === 'tfdt') {
@@ -95,7 +95,7 @@ describe('isContainer', function () {
 
 	it('gives each child of a container a box type', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
 					// @ts-expect-error a box has no field with this name
@@ -109,7 +109,7 @@ describe('isContainer', function () {
 
 	it('keeps the number fields of a child with no option', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
 					if (child.type === 'tfdt') {
@@ -125,7 +125,10 @@ describe('isContainer', function () {
 
 	it('keeps the bigint fields of a child with readInt64AsBigInt', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))) {
+		for (const box of readIsoBoxes(
+			buffer,
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
+		)) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
 					if (child.type === 'tfdt') {
@@ -141,7 +144,7 @@ describe('isContainer', function () {
 
 	it('gives each child of a udta box a box type with number fields', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (box.type === 'moov') {
 				for (const child of box.boxes) {
 					if (child.type === 'udta') {
@@ -163,7 +166,10 @@ describe('isContainer', function () {
 
 	it('gives each child of a udta box bigint fields with readInt64AsBigInt', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))) {
+		for (const box of readIsoBoxes(
+			buffer,
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
+		)) {
 			if (box.type === 'moov') {
 				for (const child of box.boxes) {
 					if (child.type === 'udta') {
@@ -184,12 +190,12 @@ describe('isContainer', function () {
 	it('types each child of the udta, grpl, strk, and meco boxes as IsoBox', function () {
 		expectType<Equal<UserDataBox['boxes'][number], IsoBox>>(true)
 		expectType<Equal<GroupsListBox['boxes'][number], IsoBox>>(true)
-		expectType<Equal<SubTrackBox['boxes'][number], IsoBox>>(true)
+		expectType<Equal<SubTrack['boxes'][number], IsoBox>>(true)
 		expectType<Equal<AdditionalMetadataContainerBox['boxes'][number], IsoBox>>(true)
 
 		expectType<Equal<UserDataBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
 		expectType<Equal<GroupsListBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
-		expectType<Equal<SubTrackBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
+		expectType<Equal<SubTrack<bigint>['boxes'][number], IsoBox<bigint>>>(true)
 		expectType<Equal<AdditionalMetadataContainerBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
 	})
 })

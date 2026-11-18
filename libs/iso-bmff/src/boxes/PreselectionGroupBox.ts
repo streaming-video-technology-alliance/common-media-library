@@ -1,4 +1,3 @@
-import type { Entity } from './Entity.ts'
 import type { FullBox } from './FullBox.ts'
 
 // TODO: Find documentation on what children are allowed
@@ -25,8 +24,8 @@ export type PreselectionGroupBox = FullBox & {
 	/** Number of entities in group */
 	numEntitiesInGroup: number
 
-	/** Entities */
-	entities: Entity[]
+	/** The IDs of the entities in the group. */
+	entityId: number[]
 
 	preselectionTag?: string
 	selectionPriority?: number

@@ -1,20 +1,20 @@
-import type { CompositionTimeToSampleBox } from '../boxes/CompositionTimeToSampleBox.ts'
+import type { CompositionOffsetBox } from '../boxes/CompositionOffsetBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write the `ctts` box (`CompositionTimeToSampleBox`).
+ * Write the `ctts` box (`CompositionOffsetBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.6.1.3
  *
  * For a box of version 2 or above, the writer writes `entryCount` and no entries.
  *
- * @param box - The `CompositionTimeToSampleBox` fields to write
+ * @param box - The `CompositionOffsetBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeCtts(box: CompositionTimeToSampleBox): IsoBoxWriteView {
+export function writeCtts(box: CompositionOffsetBox): IsoBoxWriteView {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4

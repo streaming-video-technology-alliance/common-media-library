@@ -44,7 +44,7 @@ export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
 			: defaultIsEncrypted,
 		3,
 	)
-	writer.writeUint(box.defaultIvSize, 1)
+	writer.writeUint(box.defaultPerSampleIvSize, 1)
 	writer.writeArray(box.defaultKid, UINT, 1, 16)
 
 	if (defaultConstantIvSize !== undefined) {

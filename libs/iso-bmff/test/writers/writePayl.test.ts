@@ -1,7 +1,7 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterIsoBoxes,
 	findBox,
@@ -55,7 +55,7 @@ describe('writePayl', function () {
 		['webvtt.m4s', 3],
 	] as const) {
 		it(`should write the input bytes of every payl box in ${file}`, function () {
-			const config = defaultReaderConfig()
+			const config = createDefaultReaderConfig()
 			const { data } = findBox(file, 'mdat', config)
 			const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'payl')
 
@@ -65,7 +65,7 @@ describe('writePayl', function () {
 				const { view } = box
 
 				assert.deepStrictEqual(
-					writeIsoBox(box, defaultWriterConfig()),
+					writeIsoBox(box, createDefaultWriterConfig()),
 					new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
 				)
 			}

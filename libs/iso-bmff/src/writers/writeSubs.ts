@@ -1,18 +1,18 @@
-import type { SubsampleInformationBox } from '../boxes/SubsampleInformationBox.ts'
+import type { SubSampleInformationBox } from '../boxes/SubSampleInformationBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
- * Write the `subs` box (`SubsampleInformationBox`).
+ * Write the `subs` box (`SubSampleInformationBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.7.7
  *
- * @param box - The `SubsampleInformationBox` fields to write
+ * @param box - The `SubSampleInformationBox` fields to write
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeSubs(box: SubsampleInformationBox): IsoBoxWriteView {
+export function writeSubs(box: SubSampleInformationBox): IsoBoxWriteView {
 	const v1 = box.version === 1
 	const subsampleSizeBytes = v1 ? 4 : 2
 

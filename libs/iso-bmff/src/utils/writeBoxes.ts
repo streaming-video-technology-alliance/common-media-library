@@ -1,6 +1,6 @@
 import type { IsoBoxStreamable } from '../IsoBoxStreamable.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeBox } from './writeBox.ts'
 
 /**
@@ -15,7 +15,7 @@ import { writeBox } from './writeBox.ts'
  */
 export function writeBoxes(
 	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
-	config: IsoBoxWriteViewConfig,
+	config: IsoBoxWriteConfig,
 ): Uint8Array<ArrayBuffer>[] {
 	return Array.from(boxes, box => writeBox(box, config))
 }

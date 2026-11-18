@@ -1,21 +1,21 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
+import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
-import { writeAudioSampleEntryBox } from './writeAudioSampleEntryBox.ts'
+import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
+import { writeAudioSampleEntry } from './writeAudioSampleEntry.ts'
 
 /**
- * Write the `enca` box (`AudioSampleEntryBox`).
+ * Write the `enca` box (`AudioSampleEntry`).
  *
- * @param box - The `AudioSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
+ * @param box - The `AudioSampleEntry` fields to write
+ * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
  *
  * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
 export function writeEnca(
-	box: AudioSampleEntryBox<'enca'>,
-	config: IsoBoxWriteViewConfig,
+	box: AudioSampleEntry<'enca'>,
+	config: IsoBoxWriteConfig,
 ): IsoBoxWriteView {
-	return writeAudioSampleEntryBox(box, config)
+	return writeAudioSampleEntry(box, config)
 }

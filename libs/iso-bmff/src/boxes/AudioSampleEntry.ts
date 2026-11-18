@@ -1,13 +1,13 @@
 import type { IsoBoxType } from '../IsoBoxType.ts'
 import type { AudioSampleEntryType } from './AudioSampleEntryType.ts'
-import type { SampleEntryBox } from './SampleEntryBox.ts'
+import type { SampleEntry } from './SampleEntry.ts'
 
 /**
  * Child boxes of Audio Sample Entry Box
  *
  * @public
  */
-export type AudioSampleEntryBoxChild = any
+export type AudioSampleEntryChild = any
 
 /**
  * Audio Sample Entry Box, such as `mp4a` or `enca`.
@@ -16,13 +16,13 @@ export type AudioSampleEntryBoxChild = any
  *
  * @public
  */
-export type AudioSampleEntryBox<T extends IsoBoxType = AudioSampleEntryType> = SampleEntryBox & {
+export type AudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType> = SampleEntry & {
 	type: T
 	reserved2: number[]
-	channelcount: number
-	samplesize: number
+	channelCount: number
+	sampleSize: number
 	preDefined: number
 	reserved3: number
-	samplerate: number
-	boxes: AudioSampleEntryBoxChild[]
+	sampleRate: number
+	boxes: AudioSampleEntryChild[]
 }

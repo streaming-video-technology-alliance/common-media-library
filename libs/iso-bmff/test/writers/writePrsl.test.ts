@@ -1,7 +1,7 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterBoxes,
 	it,
@@ -21,7 +21,7 @@ describe('writePrsl', function () {
 			flags: 0x4000,
 			groupId: 1,
 			numEntitiesInGroup: 1,
-			entities: [{ entityId: 2 }],
+			entityId: [2],
 			interleavingTag: '',
 			boxes: [],
 		}
@@ -55,7 +55,7 @@ describe('writePrsl', function () {
 				0,
 				0,
 				0,
-				2, // entities[0].entityId
+				2, // entityId[0]
 				0, // interleavingTag (empty) and the null terminator
 			]),
 		)
@@ -69,7 +69,7 @@ describe('writePrsl', function () {
 				flags: 0x1000,
 				groupId: 1,
 				numEntitiesInGroup: 0,
-				entities: [],
+				entityId: [],
 				preselectionTag: '',
 				boxes: [],
 			},
@@ -90,7 +90,7 @@ describe('writePrsl', function () {
 				flags: 0x5000,
 				groupId: 1,
 				numEntitiesInGroup: 0,
-				entities: [],
+				entityId: [],
 				boxes: [],
 			},
 			{ writers: {} },
@@ -110,7 +110,7 @@ describe('writePrsl', function () {
 				flags: 0x5000,
 				groupId: 1,
 				numEntitiesInGroup: 0,
-				entities: [],
+				entityId: [],
 				preselectionTag: '',
 				interleavingTag: 'b',
 				boxes: [],
@@ -134,7 +134,7 @@ describe('writePrsl', function () {
 				flags: 0x2000,
 				groupId: 1,
 				numEntitiesInGroup: 0,
-				entities: [],
+				entityId: [],
 				boxes: [],
 			},
 			{ writers: {} },
@@ -154,7 +154,7 @@ describe('writePrsl', function () {
 				flags: 0x1000,
 				groupId: 1,
 				numEntitiesInGroup: 0,
-				entities: [],
+				entityId: [],
 				preselectionTag: 'é',
 				boxes: [],
 			},
@@ -177,7 +177,7 @@ describe('writePrsl', function () {
 				flags: 0x7000,
 				groupId: 1,
 				numEntitiesInGroup: 0,
-				entities: [],
+				entityId: [],
 				preselectionTag: 'a',
 				selectionPriority: 3,
 				interleavingTag: 'b',
@@ -202,7 +202,7 @@ describe('writePrsl', function () {
 				flags: 0,
 				groupId: 1,
 				numEntitiesInGroup: 0,
-				entities: [],
+				entityId: [],
 				preselectionTag: 'a',
 				interleavingTag: 'b',
 				boxes: [],
@@ -228,14 +228,14 @@ describe('writePrsl', function () {
 					flags: flag,
 					groupId: 1,
 					numEntitiesInGroup: 0,
-					entities: [],
+					entityId: [],
 					[tag]: '',
 					boxes: [{ type: 'elng', version: 0, flags: 0, extendedLanguage: 'en' }],
 				},
-				defaultWriterConfig(),
+				createDefaultWriterConfig(),
 			)
 
-			const [prsl] = readIsoBoxes(bytes, defaultReaderConfig())
+			const [prsl] = readIsoBoxes(bytes, createDefaultReaderConfig())
 
 			assert.strictEqual(prsl.type, 'prsl')
 			assert.strictEqual(prsl[tag], '')
@@ -249,7 +249,7 @@ describe('writePrsl', function () {
 	}
 
 	it('should write the bytes of every parsed prsl box of a file', function () {
-		const boxes = filterBoxes('SRMP_AC4.mp4', 'prsl', defaultReaderConfig())
+		const boxes = filterBoxes('SRMP_AC4.mp4', 'prsl', createDefaultReaderConfig())
 
 		assert.strictEqual(boxes.length, 6)
 
@@ -258,7 +258,7 @@ describe('writePrsl', function () {
 			const input = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
 
 			assert.strictEqual(box.interleavingTag, '')
-			assert.deepStrictEqual(writeIsoBox(box, defaultWriterConfig()), input)
+			assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), input)
 		}
 	})
 })

@@ -24,10 +24,10 @@ A write omits the bytes of a source box that the reader stops before. See [Incom
 
 ## Using default config
 
-If tree shaking is not a concern, use `defaultWriterConfig()`. It returns a configuration with every available writer except the container writers:
+If tree shaking is not a concern, use `createDefaultWriterConfig()`. It returns a configuration with every available writer except the container writers:
 
 ```typescript
-import { defaultWriterConfig, writeIsoBoxes, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
+import { createDefaultWriterConfig, writeIsoBoxes, type IsoBoxStreamable } from "@svta/cml-iso-bmff";
 
 const boxes: IsoBoxStreamable[] = [
 	{
@@ -45,7 +45,7 @@ const boxes: IsoBoxStreamable[] = [
 	},
 ];
 
-const byteArrays = writeIsoBoxes(boxes, defaultWriterConfig());
+const byteArrays = writeIsoBoxes(boxes, createDefaultWriterConfig());
 
 for (const byteArray of byteArrays) {
 	sourceBuffer.appendBuffer(byteArray);
@@ -55,7 +55,7 @@ for (const byteArray of byteArrays) {
 }
 ```
 
-Each call of `defaultWriterConfig()` returns a new configuration object. A player can create the configuration once and pass it to every write.
+Each call of `createDefaultWriterConfig()` returns a new configuration object. A player can create the configuration once and pass it to every write.
 
 ## Using specific writers
 
@@ -106,7 +106,7 @@ The `createIsoBoxReadableStream` function writes boxes to a readable stream. It 
 ```typescript
 import {
 	createIsoBoxReadableStream,
-	defaultWriterConfig,
+	createDefaultWriterConfig,
 	type IsoBoxStreamable,
 } from "@svta/cml-iso-bmff";
 
@@ -126,7 +126,7 @@ const boxes: IsoBoxStreamable[] = [
 	},
 ];
 
-const readableStream = createIsoBoxReadableStream(boxes, defaultWriterConfig());
+const readableStream = createIsoBoxReadableStream(boxes, createDefaultWriterConfig());
 
 const stream = await transport.createBidirectionalStream();
 readableStream.pipeTo(stream.writable);

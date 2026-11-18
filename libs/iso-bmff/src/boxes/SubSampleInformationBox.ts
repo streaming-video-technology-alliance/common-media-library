@@ -1,5 +1,5 @@
 import type { FullBox } from './FullBox.ts'
-import type { SubsampleEntry } from './SubsampleEntry.ts'
+import type { SubSampleInformationEntry } from './SubSampleInformationEntry.ts'
 
 /**
  * Subsample Information Box (`subs`).
@@ -8,8 +8,8 @@ import type { SubsampleEntry } from './SubsampleEntry.ts'
  *
  * @public
  */
-export type SubsampleInformationBox = FullBox & {
+export type SubSampleInformationBox = FullBox & {
 	type: 'subs'
 	entryCount: number
-	entries: SubsampleEntry[]
+	entries: SubSampleInformationEntry[]
 }

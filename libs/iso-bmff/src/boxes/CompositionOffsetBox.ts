@@ -1,4 +1,4 @@
-import type { CompositionTimeToSampleEntry } from './CompositionTimeToSampleEntry.ts'
+import type { CompositionOffsetEntry } from './CompositionOffsetEntry.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -8,8 +8,8 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type CompositionTimeToSampleBox = FullBox & {
+export type CompositionOffsetBox = FullBox & {
 	type: 'ctts'
 	entryCount: number
-	entries: CompositionTimeToSampleEntry[]
+	entries: CompositionOffsetEntry[]
 }

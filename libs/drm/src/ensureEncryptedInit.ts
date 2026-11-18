@@ -5,18 +5,18 @@ import {
 	fourCcToUint32,
 	readIsoBoxes,
 	readStsd,
-	writeAudioSampleEntryBox,
+	writeAudioSampleEntry,
 	writeFrma,
 	writeIsoBoxes,
 	writeSchm,
 	writeStsd,
 	writeTenc,
-	writeVisualSampleEntryBox,
-	type AudioSampleEntryBox,
+	writeVisualSampleEntry,
+	type AudioSampleEntry,
 	type IsoBoxReaderMap,
 	type IsoBoxType,
 	type IsoBoxWriterMap,
-	type VisualSampleEntryBox,
+	type VisualSampleEntry,
 } from '@svta/cml-iso-bmff'
 
 const audioTypes: IsoBoxType[] = ['mp4a', 'ac-3', 'ec-3', 'ac-4', 'fLaC', 'Opus']
@@ -50,12 +50,12 @@ const writers = /* @__PURE__ */ (() => {
 		frma: writeFrma,
 		schm: writeSchm,
 		tenc: writeTenc,
-		encv: writeVisualSampleEntryBox,
-		enca: writeAudioSampleEntryBox,
+		encv: writeVisualSampleEntry,
+		enca: writeAudioSampleEntry,
 	}
 	const dynamic: IsoBoxWriterMap = map
-	audioTypes.forEach(type => (dynamic[type] = writeAudioSampleEntryBox))
-	videoTypes.forEach(type => (dynamic[type] = writeVisualSampleEntryBox))
+	audioTypes.forEach(type => (dynamic[type] = writeAudioSampleEntry))
+	videoTypes.forEach(type => (dynamic[type] = writeVisualSampleEntry))
 	return map
 })()
 
@@ -139,8 +139,8 @@ export function ensureEncryptedInit(
 	for (const entry of entries) {
 		const type = videoTypes.includes(entry.type) ? 'encv' : 'enca'
 		const box = { ...entry, boxes: entry.boxes.slice(), type } as
-			| AudioSampleEntryBox
-			| VisualSampleEntryBox
+			| AudioSampleEntry
+			| VisualSampleEntry
 
 		if (prepend) {
 			stsd.boxes.unshift(box)
@@ -170,7 +170,7 @@ export function ensureEncryptedInit(
 							version: 0,
 							flags: 0,
 							defaultIsEncrypted: 1,
-							defaultIvSize: 8,
+							defaultPerSampleIvSize: 8,
 							defaultKid,
 						},
 					],
