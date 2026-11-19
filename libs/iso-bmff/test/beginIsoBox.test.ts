@@ -59,6 +59,16 @@ describe('beginIsoBox, beginIsoFullBox, and endIsoBox', function () {
 		assert.throws(() => beginIsoFullBox(createIsoBoxWriteCursor(), 'mvhd2', 0, 0), RangeError)
 	})
 
+	it('should write a size of exactly 2^32 - 1 bytes', function () {
+		const cursor = createIsoBoxWriteCursor()
+		const start = beginIsoBox(cursor, 'mdat')
+
+		cursor.pos = start + 2 ** 32 - 1
+		endIsoBox(cursor, start)
+
+		assert.strictEqual(cursor.view.getUint32(start), 2 ** 32 - 1)
+	})
+
 	it('should throw a RangeError for a box above 2^32 - 1 bytes', function () {
 		const cursor = createIsoBoxWriteCursor()
 		const start = beginIsoBox(cursor, 'mdat')

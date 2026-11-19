@@ -1,5 +1,6 @@
 import {
 	assert,
+	createDefaultReaderConfig,
 	createIsoBoxReadCursor,
 	describe,
 	isIsoBoxType,
@@ -170,6 +171,28 @@ describe('readIsoBoxes on the read cursor', function () {
 			boxes.map(box => box.type),
 			['mfhd', 'mdat'],
 		)
+	})
+
+	it('should use the reader of a container type in place of the child boxes', function () {
+		const readers = { traf: () => ({ type: 'traf' as const, custom: true }) }
+		const [traf] = readIsoBoxes(boxBytes('traf', MFHD), { readers })
+
+		assert.deepStrictEqual(traf, { type: 'traf', custom: true })
+	})
+
+	it('should throw a RangeError at 129 levels of boxes with the default readers', function () {
+		const meta = (depth: number): Uint8Array => {
+			let bytes: Uint8Array = boxBytes('free')
+
+			for (let i = 0; i < depth; i++) {
+				bytes = boxBytes('meta', new Uint8Array(4), bytes)
+			}
+
+			return bytes
+		}
+
+		assert.strictEqual(readIsoBoxes(meta(127), createDefaultReaderConfig()).length, 1)
+		assert.throws(() => readIsoBoxes(meta(128), createDefaultReaderConfig()), /free.*128/)
 	})
 
 	it('should read 128 levels and throw a RangeError at 129 levels', function () {

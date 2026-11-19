@@ -174,6 +174,13 @@ describe('read field functions', function () {
 			assert.strictEqual(cursor.pos, 2)
 		})
 
+		it('should stop at the end of a cursor inside the buffer', function () {
+			const cursor = { ...cursorOf([0x61, 0x62, 0x63, 0x00]), end: 2 }
+
+			assert.strictEqual(readTerminatedUtf8(cursor), 'ab')
+			assert.strictEqual(cursor.pos, 2)
+		})
+
 		it('should read an empty string at the end', function () {
 			const cursor = cursorOf([])
 

@@ -7,6 +7,7 @@ import {
 	it,
 	readIsoBoxes,
 	readMfhd,
+	writeBytes,
 	writeChildBoxes,
 	writeIsoBox,
 	writeIsoBoxes,
@@ -133,6 +134,18 @@ describe('writeIsoBoxes on the write cursor', function () {
 
 		assert.deepStrictEqual(moov.subarray(8), alone)
 		assert.strictEqual(new DataView(moov.buffer).getUint32(0), alone.length + 8)
+	})
+
+	it('should use the writer of a container type in place of the child boxes', function () {
+		const marker = [0, 0, 0, 9, 0x74, 0x72, 0x61, 0x66, 7]
+		const writers = {
+			traf: (cursor: IsoBoxWriteCursor) => writeBytes(cursor, marker),
+		}
+
+		assert.deepStrictEqual(
+			Array.from(writeIsoBoxes([{ type: 'traf', boxes: [] }], { writers })),
+			marker,
+		)
 	})
 
 	it('should not catch an error of a writer', function () {

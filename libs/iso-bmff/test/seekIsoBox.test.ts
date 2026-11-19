@@ -173,6 +173,17 @@ describe('seekIsoBox', function () {
 		assert.throws(() => seekIsoBox(boxBytes('free'), ['moov', 'x']), /"x"/)
 	})
 
+	it('should search only inside the parent box', function () {
+		assert.strictEqual(seekIsoBox(load('mss_moof_tfdt.mp4'), ['moof', 'mdat']), null)
+	})
+
+	it('should return null for a child that passes the end of its parent', function () {
+		const child = new Uint8Array([0, 0, 0, 16, 0x62, 0x62, 0x62, 0x62])
+		const data = reduceUint8Arrays([boxBytes('aaaa', child), boxBytes('free', new Uint8Array(8))])
+
+		assert.strictEqual(seekIsoBox(data, ['aaaa', 'bbbb']), null)
+	})
+
 	it('should find a box past the boxes of other types', function () {
 		const data = load('test_frag.mp4')
 
