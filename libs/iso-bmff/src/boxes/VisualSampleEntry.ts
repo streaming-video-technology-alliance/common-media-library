@@ -24,7 +24,10 @@ export type VisualSampleEntry<
 	horizResolution: number
 	vertResolution: number
 	frameCount: number
-	compressorName: number[]
+	/**
+	 * The name of the compressor, at most 31 bytes of UTF-8. The writer cuts a longer name at a character boundary.
+	 */
+	compressorName: string
 	depth: number
 	/** The third `pre_defined` field. `writeVisualSampleEntry` writes -1 for a missing value, the value of the specification. */
 	preDefined3?: number

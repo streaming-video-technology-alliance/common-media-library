@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `sdtp` box (`SampleDependencyTypeBox`).
@@ -14,17 +15,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSdtp(cursor: IsoBoxWriteCursor, box: SampleDependencyTypeBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const sampleDependencyTableSize = box.sampleDependencyTable.length
-	const totalSize = headerSize + fullBoxSize + sampleDependencyTableSize
+	const start = beginIsoFullBox(cursor, 'sdtp', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('sdtp', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	for (const entry of box.sampleDependencyTable) {
-		writer.writeUint(entry, 1)
-	}
-
-	writeLegacyView(cursor, writer)
+	writeBytes(cursor, box.sampleDependencyTable)
+	endIsoBox(cursor, start)
 }

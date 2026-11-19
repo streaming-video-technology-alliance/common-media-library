@@ -11,14 +11,14 @@ describe('createIsoBoxReadableStream in a runtime without ReadableStream', () =>
 		delete globalThis.ReadableStream
 
 		try {
-			const { createIsoBoxReadableStream, fourCcToUint32, writeFree } =
+			const { createIsoBoxReadableStream, isContainer, writeFree } =
 				await import('@svta/cml-iso-bmff')
 
 			throws(
 				() => createIsoBoxReadableStream([], { writers: {} }),
 				/ReadableStream is not available in this environment/,
 			)
-			strictEqual(fourCcToUint32('ftyp'), 0x66747970)
+			strictEqual(isContainer({ type: 'moov' }), true)
 
 			class Polyfill<R> extends NativeReadableStream<R> {}
 			globalThis.ReadableStream = Polyfill as typeof ReadableStream

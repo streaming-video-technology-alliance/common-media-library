@@ -41,16 +41,14 @@ export type Box<T extends IsoBoxType> = {
 };
 
 // @public
-export type ChunkLargeOffsetBox = FullBox & {
+export type ChunkLargeOffsetBox<V extends IsoInt64 = number> = FullBox & {
     type: "co64";
-    entryCount: number;
-    chunkOffset: number[];
+    chunkOffset: V[];
 };
 
 // @public
 export type ChunkOffsetBox = FullBox & {
     type: "stco";
-    entryCount: number;
     chunkOffset: number[];
 };
 
@@ -58,14 +56,13 @@ export type ChunkOffsetBox = FullBox & {
 export type CompactSampleSizeBox = FullBox & {
     type: "stz2";
     fieldSize: number;
-    sampleCount: number;
     entrySize: number[];
 };
 
 // @public
 export type CompositionOffsetBox = FullBox & {
     type: "ctts";
-    entryCount: number;
+    entryCount?: number;
     entries: CompositionOffsetEntry[];
 };
 
@@ -117,14 +114,14 @@ export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): <V
 // @public
 export type DataEntryUrlBox = FullBox & {
     type: "url ";
-    location: string;
+    location?: string;
 };
 
 // @public
 export type DataEntryUrnBox = FullBox & {
     type: "urn ";
     name: string;
-    location: string;
+    location?: string;
 };
 
 // @public
@@ -136,7 +133,6 @@ export type DataInformationBox<V extends IsoInt64 = number> = {
 // @public
 export type DataReferenceBox<V extends IsoInt64 = number> = FullBox & {
     type: "dref";
-    entryCount: number;
     boxes: ParsedIsoBox<V>[];
 };
 
@@ -149,7 +145,6 @@ export type EditBox<V extends IsoInt64 = number> = {
 // @public
 export type EditListBox<V extends IsoInt64 = number> = FullBox & {
     type: "elst";
-    entryCount: number;
     entries: EditListEntry<V>[];
 };
 
@@ -220,9 +215,6 @@ export function findIsoBox<T, S extends T>(boxes: Iterable<T>, callback: (box: T
 
 // @public
 export function findIsoBox<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null;
-
-// @public
-export function fourCcToUint32(str: string): number;
 
 // @public
 export type FreeSpaceBox<T extends "free" | "skip" = "free"> = {
@@ -320,7 +312,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     avc2: VisualSampleEntry<"avc2", V>;
     avc3: VisualSampleEntry<"avc3", V>;
     avc4: VisualSampleEntry<"avc4", V>;
-    co64: ChunkLargeOffsetBox;
+    co64: ChunkLargeOffsetBox<V>;
     ctts: CompositionOffsetBox;
     dinf: DataInformationBox<V>;
     dref: DataReferenceBox<V>;
@@ -605,7 +597,7 @@ export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
     duration: V;
     rate: number;
     volume: number;
-    matrix: number[];
+    matrix: [a: number, b: number, u: number, c: number, d: number, v: number, x: number, y: number, w: number];
     preDefined?: number[];
     nextTrackId: number;
 };
@@ -616,7 +608,7 @@ export function nextIsoBox(cursor: IsoBoxReadCursor<IsoInt64>): IsoBoxType | nul
 // @public
 export type OriginalFormatBox = {
     type: "frma";
-    dataFormat: number;
+    dataFormat: string;
 };
 
 // @public
@@ -626,7 +618,6 @@ export type ParsedIsoBox<V extends IsoInt64 = number> = IsoBox<V> | IsoRawBox;
 export type PreselectionGroupBox<V extends IsoInt64 = number> = FullBox & {
     type: "prsl";
     groupId: number;
-    numEntitiesInGroup: number;
     entityId: number[];
     preselectionTag?: string;
     selectionPriority?: number;
@@ -652,11 +643,9 @@ export type ProtectionSchemeInfoBox<V extends IsoInt64 = number> = {
 // @public
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
     type: "pssh";
-    systemId: number[];
-    kidCount: number;
-    kid: number[];
-    dataSize: number;
-    data: number[];
+    systemId: Uint8Array;
+    kid: Uint8Array[];
+    data: Uint8Array;
 };
 
 // @public
@@ -682,6 +671,9 @@ export function readBytes(cursor: IsoBoxReadCursor<IsoInt64>, length: number): U
 
 // @public
 export function readChildBoxes<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, count?: number): ParsedIsoBox<V>[];
+
+// @public
+export function readCo64<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): ChunkLargeOffsetBox<V>;
 
 // @public
 export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetBox;
@@ -884,6 +876,9 @@ export function readStts(cursor: IsoBoxReadCursor<IsoInt64>): TimeToSampleBox;
 export function readStyp(cursor: IsoBoxReadCursor<IsoInt64>): SegmentTypeBox;
 
 // @public
+export function readStz2(cursor: IsoBoxReadCursor<IsoInt64>): CompactSampleSizeBox;
+
+// @public
 export function readSubs(cursor: IsoBoxReadCursor<IsoInt64>): SubSampleInformationBox;
 
 // @public
@@ -979,13 +974,12 @@ export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCurs
 // @public
 export type SampleDependencyTypeBox = FullBox & {
     type: "sdtp";
-    sampleDependencyTable: number[];
+    sampleDependencyTable: Uint8Array;
 };
 
 // @public
 export type SampleDescriptionBox<V extends IsoInt64 = number, E extends SampleEntry<IsoBoxType, V> | IsoRawBox = AudioSampleEntry<AudioSampleEntryType, V> | VisualSampleEntry<VisualSampleEntryType, V> | IsoRawBox> = FullBox & {
     type: "stsd";
-    entryCount: number;
     boxes: E[];
 };
 
@@ -1000,7 +994,7 @@ export type SampleEntry<T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = 
 export type SampleSizeBox = FullBox & {
     type: "stsz";
     sampleSize: number;
-    sampleCount: number;
+    sampleCount?: number;
     entrySize?: number[];
 };
 
@@ -1013,7 +1007,6 @@ export type SampleTableBox<V extends IsoInt64 = number> = {
 // @public
 export type SampleToChunkBox = FullBox & {
     type: "stsc";
-    entryCount: number;
     entries: SampleToChunkEntry[];
 };
 
@@ -1033,7 +1026,7 @@ export type SchemeInformationBox<V extends IsoInt64 = number> = {
 // @public
 export type SchemeTypeBox = FullBox & {
     type: "schm";
-    schemeType: number;
+    schemeType: string;
     schemeVersion: number;
     schemeUri?: string;
 };
@@ -1076,14 +1069,12 @@ export type SoundMediaHeaderBox = FullBox & {
 // @public
 export type SubSampleInformationBox = FullBox & {
     type: "subs";
-    entryCount: number;
     entries: SubSampleInformationEntry[];
 };
 
 // @public
 export type SubSampleInformationEntry = {
     sampleDelta: number;
-    subsampleCount: number;
     subsamples: SubSampleInformationSubsample[];
 };
 
@@ -1098,7 +1089,6 @@ export type SubSampleInformationSubsample = {
 // @public
 export type SubsegmentIndexBox = FullBox & {
     type: "ssix";
-    subsegmentCount: number;
     subsegments: SubsegmentIndexSubsegment[];
 };
 
@@ -1110,7 +1100,6 @@ export type SubsegmentIndexRange = {
 
 // @public
 export type SubsegmentIndexSubsegment = {
-    rangesCount: number;
     ranges: SubsegmentIndexRange[];
 };
 
@@ -1128,14 +1117,12 @@ export type SubTrack<V extends IsoInt64 = number> = {
 // @public
 export type SyncSampleBox = FullBox & {
     type: "stss";
-    entryCount: number;
     sampleNumber: number[];
 };
 
 // @public
 export type TimeToSampleBox = FullBox & {
     type: "stts";
-    entryCount: number;
     entries: TimeToSampleEntry[];
 };
 
@@ -1155,12 +1142,11 @@ export type TrackBox<V extends IsoInt64 = number> = {
 export type TrackEncryptionBox = FullBox & {
     type: "tenc";
     defaultPerSampleIvSize: number;
-    defaultKid: number[];
+    defaultKid: Uint8Array;
     defaultIsProtected: number;
     defaultCryptByteBlock?: number;
     defaultSkipByteBlock?: number;
-    defaultConstantIvSize?: number;
-    defaultConstantIv?: number[];
+    defaultConstantIv?: Uint8Array;
 };
 
 // @public
@@ -1200,7 +1186,6 @@ export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
 export type TrackFragmentRandomAccessBox<V extends IsoInt64 = number> = FullBox & {
     type: "tfra";
     trackId: number;
-    numberOfEntry: number;
     lengthSizeOfTrafNum: number;
     lengthSizeOfTrunNum: number;
     lengthSizeOfSampleNum: number;
@@ -1226,7 +1211,7 @@ export type TrackHeaderBox<V extends IsoInt64 = number> = FullBox & {
     layer: number;
     alternateGroup: number;
     volume: number;
-    matrix: number[];
+    matrix: [a: number, b: number, u: number, c: number, d: number, v: number, x: number, y: number, w: number];
     width: number;
     height: number;
 };
@@ -1240,7 +1225,6 @@ export type TrackReferenceBox<V extends IsoInt64 = number> = {
 // @public
 export type TrackRunBox = FullBox & {
     type: "trun";
-    sampleCount: number;
     dataOffset?: number;
     firstSampleFlags?: number;
     samples: TrackRunSample[];
@@ -1281,7 +1265,7 @@ export type UserDataBox<V extends IsoInt64 = number> = {
 export type VideoMediaHeaderBox = FullBox & {
     type: "vmhd";
     graphicsMode: number;
-    opColor: number[];
+    opColor: [red: number, green: number, blue: number];
 };
 
 // @public
@@ -1294,7 +1278,7 @@ export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType, V ex
     horizResolution: number;
     vertResolution: number;
     frameCount: number;
-    compressorName: number[];
+    compressorName: string;
     depth: number;
     preDefined3?: number;
 };
@@ -1366,6 +1350,9 @@ export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): 
 
 // @public
 export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<IsoInt64>>): void;
+
+// @public
+export function writeCo64(cursor: IsoBoxWriteCursor, box: ChunkLargeOffsetBox<IsoInt64>): void;
 
 // @public
 export function writeCtts(cursor: IsoBoxWriteCursor, box: CompositionOffsetBox): void;
@@ -1558,6 +1545,9 @@ export function writeStts(cursor: IsoBoxWriteCursor, box: TimeToSampleBox): void
 
 // @public
 export function writeStyp(cursor: IsoBoxWriteCursor, box: SegmentTypeBox): void;
+
+// @public
+export function writeStz2(cursor: IsoBoxWriteCursor, box: CompactSampleSizeBox): void;
 
 // @public
 export function writeSubs(cursor: IsoBoxWriteCursor, box: SubSampleInformationBox): void;

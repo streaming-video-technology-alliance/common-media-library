@@ -49,7 +49,6 @@ describe('writeCtts', function () {
 			type: 'ctts',
 			version: 1,
 			flags: 0,
-			entryCount: 1,
 			entries: [{ sampleCount: 1, sampleOffset: -1 }],
 		})
 		const bytes = new Uint8Array(writer.buffer)
@@ -65,7 +64,6 @@ describe('writeCtts', function () {
 			type: 'ctts',
 			version: 0,
 			flags: 0,
-			entryCount: 1,
 			entries: [{ sampleCount: 1, sampleOffset: 3_000_000_000 }],
 		})
 

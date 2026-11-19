@@ -172,7 +172,7 @@ describe('reserved fields', function () {
 				horizResolution: 72,
 				vertResolution: 72,
 				frameCount: 1,
-				compressorName: new Array<number>(32).fill(0),
+				compressorName: '',
 				depth: 0x18,
 				boxes: [],
 			},
@@ -213,7 +213,7 @@ describe('reserved fields', function () {
 			flags: 0,
 			defaultIsProtected: 1,
 			defaultPerSampleIvSize: 8,
-			defaultKid: new Array<number>(16).fill(1),
+			defaultKid: new Uint8Array(16).fill(1),
 			defaultCryptByteBlock: 1,
 			defaultSkipByteBlock: 9,
 		})

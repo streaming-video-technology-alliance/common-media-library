@@ -1,6 +1,6 @@
 import type { UserDataBox } from '../boxes/UserDataBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -19,10 +19,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readUdta<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): UserDataBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'udta',
-		boxes: view.readBoxes(),
+		boxes: readChildBoxes(cursor),
 	}
 }

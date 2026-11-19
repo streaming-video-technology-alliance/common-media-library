@@ -96,11 +96,9 @@ describe('writeIsoBoxes', function () {
 								type: 'subs',
 								version: 1,
 								flags: 0,
-								entryCount: 1,
 								entries: [
 									{
 										sampleDelta: 1,
-										subsampleCount: 3,
 										subsamples: [
 											{
 												subsampleSize: 5,
@@ -128,7 +126,6 @@ describe('writeIsoBoxes', function () {
 								type: 'trun',
 								version: 0,
 								flags: 1793,
-								sampleCount: 1,
 								dataOffset: 160,
 								samples: [
 									{

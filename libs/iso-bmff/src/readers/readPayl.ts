@@ -1,7 +1,7 @@
 import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUtf8 } from '../cursor/readUtf8.ts'
 
 /**
  * Read the `payl` box (`WebVttCuePayloadBox`).
@@ -13,10 +13,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readPayl(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCuePayloadBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'payl',
-		cueText: view.readUtf8(-1),
+		cueText: readUtf8(cursor, cursor.end - cursor.pos),
 	}
 }

@@ -1,7 +1,9 @@
 import type { KindBox } from '../boxes/KindBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readTerminatedUtf8 } from '../cursor/readTerminatedUtf8.ts'
 
 /**
  * Read the `kind` box (`KindBox`).
@@ -13,12 +15,11 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'kind',
-		...view.readFullBox(),
-		schemeUri: view.readUtf8(-1),
-		value: view.readUtf8(-1),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		schemeUri: readTerminatedUtf8(cursor),
+		value: readTerminatedUtf8(cursor),
 	}
 }

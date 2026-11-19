@@ -7,5 +7,6 @@
  */
 export type OriginalFormatBox = {
 	type: 'frma'
-	dataFormat: number
+	/** The four-character code of the original sample entry, such as `avc1`. */
+	dataFormat: string
 }

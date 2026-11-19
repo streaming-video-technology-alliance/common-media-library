@@ -42,6 +42,9 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `if (box.type === "tfdt")` before a field read | `if (isIsoBoxType("tfdt", box))` |
 | `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
+| A malformed `stsd` or `dref` box returns fewer entries | The read throws a `RangeError` |
+| `readVlab`, `readPayl`, `readIden`, and `readSttg` stop at a null byte | The readers read to the end of the box. A box from release 1.0.7 or earlier gives a trailing U+0000. |
+| A `co64` or `stz2` box with the default readers has no fields | The box has `chunkOffset`, or `fieldSize` and `entrySize` |
 | An error `Truncated box` from a custom reader | The error reaches the caller of `readIsoBoxes`. A truncated box stops the read with no error. |
 
 `seekIsoBox` reads one box without a read of the other boxes. Use it in place of a full read when your code needs one box, such as `tfdt`. See [Reading one box](reading-boxes.md#reading-one-box).
@@ -124,6 +127,15 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `writeIsoBox` returns a view of the input for an `ArrayBufferView` | `writeIsoBox` returns a new array |
 | `createIsoBoxReadableStream` throws an error of the first box | The error rejects the first read |
 | `new IsoBoxReadableStream(boxes, config)` | `createIsoBoxReadableStream(boxes, config)` |
+| `writeSidx` writes the low 16 bits of a reference count above 65535 | `writeSidx` throws a `RangeError` |
+| `writeEmsg` writes the text after a U+0000 in `schemeIdUri` or `value` | The string ends at the first U+0000 |
+| `writeSubs` writes the low 16 bits of a subsample count above 65535 | `writeSubs` throws a `RangeError` |
+| `writeFtyp`, `writeStyp`, and `writeHdlr` write a code that does not have 4 characters | The writers throw a `RangeError` |
+| `writeMdhd` writes 0 or a wrong code for a `language` that is not 3 characters from U+0060 to U+007F | `writeMdhd` writes the code of `und` |
+| `writeHdlr` writes the text after a U+0000 in `name` | The name ends at the first U+0000 |
+| `writeSchm` writes the text after a U+0000 in `schemeUri` | The string ends at the first U+0000 |
+| `writePrsl`, `writeLabl`, `writeKind`, and `writeElng` write the text after a U+0000 | Each string ends at the first U+0000 |
+| `writeTenc` writes the low 8 bits of a constant IV size above 255 | `writeTenc` throws a `RangeError` |
 
 The stream writes one box for each read and writes no box before the first read.
 
@@ -217,6 +229,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `ParsedBox`, `IsoTypedParsedBox` | `ParsedIsoBox` |
 | `IsoFieldTypeMap`, `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, `IsoBoxFields` | The field functions, such as `readUint32` |
 | `IsoBoxReadableStream` | `createIsoBoxReadableStream` |
+| `fourCcToUint32` | A field with a four-character code is a string. To convert a code, compute `new DataView(Uint8Array.from(code, char => char.charCodeAt(0)).buffer).getUint32(0)`. |
 | `isFullBox` | `isIsoBoxType`, or a test such as `'version' in box && 'flags' in box` |
 | The child types, such as `MovieBoxChild` and `VisualSampleEntryBoxChild` | `ParsedIsoBox` |
 | `TrackReferenceTypeBox` | A raw box. A child of a `tref` box is a raw box. |
@@ -235,6 +248,25 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `defaultIsEncrypted` of `tenc` | `defaultIsProtected`, with the pattern in `defaultCryptByteBlock` and `defaultSkipByteBlock` |
 | `isGroupLabel` of `labl` | `(box.flags & 0x1) !== 0` |
 | `reference` and `sap` of a `sidx` reference | The decoded fields, such as `referenceType` and `sapType` |
+| `sampleCount` of `trun` | `samples.length`. The writer writes the length of `samples`. |
+| `numberOfEntry` of `tfra` | `entries.length` |
+| `subsegmentCount` of `ssix`, `rangesCount` of a subsegment | `subsegments.length`, `ranges.length` |
+| `sampleDependencyTable: number[]` of `sdtp` | A `Uint8Array`, a view of the input. Wrap a list in `new Uint8Array(...)`. |
+| `entryCount` of `stts`, `stsc`, `stco`, `stss`, and `subs` | The length of the list: `entries`, `chunkOffset`, or `sampleNumber` |
+| `subsampleCount` of a `subs` entry | `subsamples.length` |
+| `entryCount` of a `ctts` box of version 0 or 1 | `entries.length`. A box of version 2 or above keeps `entryCount`. |
+| `sampleCount` of a `stsz` box with a `sampleSize` of 0 | `entrySize.length`. A box with a `sampleSize` above 0 keeps `sampleCount`. |
+| `entryCount` of `co64`, `sampleCount` of `stz2` | `chunkOffset.length`, `entrySize.length` |
+| `entryCount` of `elst` | `entries.length` |
+| `entryCount` of `stsd` and `dref` | `boxes.length` |
+| `numEntitiesInGroup` of `prsl` | `entityId.length` |
+| `compressorName: number[]` of a visual sample entry | `compressorName: string`. The writer writes the length byte and the padding. |
+| `location: string` of `url ` and `urn ` | `location?: string`. A box with no bytes after the flags or after `name` has no `location`. |
+| `kidCount` and `kid: number[]` of `pssh` | `kid: Uint8Array[]`, one entry for each key ID. The count is `kid.length`. |
+| `dataSize` and `data: number[]` of `pssh` | `data: Uint8Array`. The size is `data.length`. |
+| `systemId: number[]` of `pssh`, `defaultKid: number[]` of `tenc` | A `Uint8Array` of 16 bytes |
+| `dataFormat: number` of `frma`, `schemeType: number` of `schm` | A string, such as `'avc1'` or `'cenc'` |
+| `matrix: number[]` of `mvhd` and `tkhd`, `opColor: number[]` of `vmhd` | Labeled tuples of 9 and 3 numbers. Annotate an array that your code builds, such as `matrix as MovieHeaderBox['matrix']`. |
 
 ### Changed types
 

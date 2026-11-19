@@ -1,11 +1,19 @@
 import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
 import type { TrackRunSample } from '../boxes/TrackRunSample.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readInt32 } from '../cursor/readInt32.ts'
 
 /**
  * Read the `trun` box (`TrackRunBox`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.8
+ *
+ * The reader creates one object for each sample of `sample_count`. The reader sets no limit on that count.
+ * If the box sets none of the flags 0x100 to 0x800, each object is empty and uses no bytes of the box.
  *
  * @param cursor - The read cursor at the first byte after the box header
  *
@@ -14,45 +22,36 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readTrun(cursor: IsoBoxReadCursor<IsoInt64>): TrackRunBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const sampleCount = readUint32(cursor)
+	const dataOffset = flags & 0x1 ? readInt32(cursor) : undefined
+	const firstSampleFlags = flags & 0x4 ? readUint32(cursor) : undefined
+	const samples: TrackRunSample[] = []
 
-	const { version, flags } = view.readFullBox()
-	const sampleCount = view.readUint(4)
-	let dataOffset: number | undefined
-	let firstSampleFlags: number | undefined
-
-	if (flags & 0x1) {
-		dataOffset = view.readInt(4)
-	}
-
-	if (flags & 0x4) {
-		firstSampleFlags = view.readUint(4)
-	}
-
-	const samples = view.readEntries<TrackRunSample>(sampleCount, () => {
+	for (let i = 0; i < sampleCount; i++) {
 		const sample: TrackRunSample = {}
 
 		if (flags & 0x100) {
-			sample.sampleDuration = view.readUint(4)
+			sample.sampleDuration = readUint32(cursor)
 		}
 		if (flags & 0x200) {
-			sample.sampleSize = view.readUint(4)
+			sample.sampleSize = readUint32(cursor)
 		}
 		if (flags & 0x400) {
-			sample.sampleFlags = view.readUint(4)
+			sample.sampleFlags = readUint32(cursor)
 		}
 		if (flags & 0x800) {
-			sample.sampleCompositionTimeOffset = version === 0 ? view.readUint(4) : view.readInt(4)
+			sample.sampleCompositionTimeOffset = version === 0 ? readUint32(cursor) : readInt32(cursor)
 		}
 
-		return sample
-	})
+		samples.push(sample)
+	}
 
 	return {
 		type: 'trun',
 		version,
 		flags,
-		sampleCount,
 		dataOffset,
 		firstSampleFlags,
 		samples,

@@ -6,6 +6,7 @@ import { readAvc1 } from './readAvc1.ts'
 import { readAvc2 } from './readAvc2.ts'
 import { readAvc3 } from './readAvc3.ts'
 import { readAvc4 } from './readAvc4.ts'
+import { readCo64 } from './readCo64.ts'
 import { readCtts } from './readCtts.ts'
 import { readDref } from './readDref.ts'
 import { readElng } from './readElng.ts'
@@ -50,6 +51,7 @@ import { readStsz } from './readStsz.ts'
 import { readSttg } from './readSttg.ts'
 import { readStts } from './readStts.ts'
 import { readStyp } from './readStyp.ts'
+import { readStz2 } from './readStz2.ts'
 import { readSubs } from './readSubs.ts'
 import { readTenc } from './readTenc.ts'
 import { readTfdt } from './readTfdt.ts'
@@ -126,6 +128,7 @@ export function createDefaultReaderConfig(options?: { int64?: IsoInt64Reader }):
 			avc2: readAvc2,
 			avc3: readAvc3,
 			avc4: readAvc4,
+			co64: readCo64,
 			ctts: readCtts,
 			dref: readDref,
 			elng: readElng,
@@ -170,6 +173,7 @@ export function createDefaultReaderConfig(options?: { int64?: IsoInt64Reader }):
 			sttg: readSttg,
 			stts: readStts,
 			styp: readStyp,
+			stz2: readStz2,
 			subs: readSubs,
 			tenc: readTenc,
 			tfdt: readTfdt,

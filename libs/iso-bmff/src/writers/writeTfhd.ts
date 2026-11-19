@@ -1,8 +1,10 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackFragmentHeaderBox } from '../boxes/TrackFragmentHeaderBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `tfhd` box (`TrackFragmentHeaderBox`).
@@ -18,48 +20,30 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeTfhd(cursor: IsoBoxWriteCursor, box: TrackFragmentHeaderBox<IsoInt64>): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const trackIdSize = 4
-	const baseDataOffsetSize = box.flags & 0x01 ? 8 : 0
-	const sampleDescriptionIndexSize = box.flags & 0x02 ? 4 : 0
-	const defaultSampleDurationSize = box.flags & 0x08 ? 4 : 0
-	const defaultSampleSizeSize = box.flags & 0x10 ? 4 : 0
-	const defaultSampleFlagsSize = box.flags & 0x20 ? 4 : 0
-	const totalSize =
-		headerSize +
-		fullBoxSize +
-		trackIdSize +
-		baseDataOffsetSize +
-		sampleDescriptionIndexSize +
-		defaultSampleDurationSize +
-		defaultSampleSizeSize +
-		defaultSampleFlagsSize
+	const { flags } = box
+	const start = beginIsoFullBox(cursor, 'tfhd', box.version, flags)
 
-	const writer = new IsoBoxWriteView('tfhd', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+	writeUint32(cursor, box.trackId)
 
-	writer.writeUint(box.trackId, 4)
-
-	if (box.flags & 0x01) {
-		writer.writeWideUint(box.baseDataOffset ?? 0, 8)
+	if (flags & 0x01) {
+		writeWideUint(cursor, box.baseDataOffset ?? 0, 8)
 	}
 
-	if (box.flags & 0x02) {
-		writer.writeUint(box.sampleDescriptionIndex ?? 0, 4)
+	if (flags & 0x02) {
+		writeUint32(cursor, box.sampleDescriptionIndex ?? 0)
 	}
 
-	if (box.flags & 0x08) {
-		writer.writeUint(box.defaultSampleDuration ?? 0, 4)
+	if (flags & 0x08) {
+		writeUint32(cursor, box.defaultSampleDuration ?? 0)
 	}
 
-	if (box.flags & 0x10) {
-		writer.writeUint(box.defaultSampleSize ?? 0, 4)
+	if (flags & 0x10) {
+		writeUint32(cursor, box.defaultSampleSize ?? 0)
 	}
 
-	if (box.flags & 0x20) {
-		writer.writeUint(box.defaultSampleFlags ?? 0, 4)
+	if (flags & 0x20) {
+		writeUint32(cursor, box.defaultSampleFlags ?? 0)
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

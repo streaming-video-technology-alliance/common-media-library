@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SampleToChunkBox } from '../boxes/SampleToChunkBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `stsc` box (`SampleToChunkBox`).
@@ -17,22 +18,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeStsc(cursor: IsoBoxWriteCursor, box: SampleToChunkBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entriesSize = box.entryCount * 12 // 4 bytes firstChunk + 4 bytes samplesPerChunk + 4 bytes sampleDescriptionIndex
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+	const start = beginIsoFullBox(cursor, 'stsc', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stsc', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.entryCount, 4)
+	writeUint32(cursor, box.entries.length)
 
 	for (const entry of box.entries) {
-		writer.writeUint(entry.firstChunk, 4)
-		writer.writeUint(entry.samplesPerChunk, 4)
-		writer.writeUint(entry.sampleDescriptionIndex, 4)
+		writeUint32(cursor, entry.firstChunk)
+		writeUint32(cursor, entry.samplesPerChunk)
+		writeUint32(cursor, entry.sampleDescriptionIndex)
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

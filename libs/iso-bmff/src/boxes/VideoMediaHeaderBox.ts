@@ -10,5 +10,6 @@ import type { FullBox } from './FullBox.ts'
 export type VideoMediaHeaderBox = FullBox & {
 	type: 'vmhd'
 	graphicsMode: number
-	opColor: number[]
+	/** The red, green, and blue values of the color for the graphics mode. */
+	opColor: [red: number, green: number, blue: number]
 }

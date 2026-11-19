@@ -19,14 +19,7 @@ describe('readHvc1', function () {
 		assert.strictEqual(box.horizResolution, 72)
 		assert.strictEqual(box.vertResolution, 72)
 		assert.strictEqual(box.frameCount, 1)
-		assert.deepStrictEqual(
-			box.compressorName,
-			[
-				0x0b, 0x48, 0x45, 0x56, 0x43, 0x20, 0x43, 0x6f, 0x64, 0x69, 0x6e, 0x67, 0x00, 0x00, 0x00,
-				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00,
-			],
-		) // length + 'HEVC Coding'
+		assert.strictEqual(box.compressorName, 'HEVC Coding')
 		assert.strictEqual(box.depth, 24)
 		assert.strictEqual(box.preDefined3, -1)
 		assert.strictEqual(box.boxes.length, 2)

@@ -1,6 +1,6 @@
 import type { SubTrack } from '../boxes/SubTrack.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -19,10 +19,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readStrk<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SubTrack<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'strk',
-		boxes: view.readBoxes(),
+		boxes: readChildBoxes(cursor),
 	}
 }

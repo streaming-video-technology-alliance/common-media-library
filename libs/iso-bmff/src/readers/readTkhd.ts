@@ -1,8 +1,13 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
-import { INT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readInt16 } from '../cursor/readInt16.ts'
+import { readTemplate32 } from '../cursor/readTemplate32.ts'
+import { readWideUint } from '../cursor/readWideUint.ts'
+import { readMatrix } from '../cursor/readMatrix.ts'
 
 /**
  * Read the `tkhd` box (`TrackHeaderBox`).
@@ -17,29 +22,38 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readTkhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackHeaderBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
-	const { version, flags } = view.readFullBox()
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
 	const size = version === 1 ? 8 : 4
+	const creationTime = readWideUint(cursor, size)
+	const modificationTime = readWideUint(cursor, size)
+	const trackId = readUint32(cursor)
 
-	const { jump } = view
+	cursor.pos += 4
+
+	const duration = readWideUint(cursor, size)
+
+	cursor.pos += 8
+
+	const layer = readInt16(cursor)
+	const alternateGroup = readInt16(cursor)
+	const volume = readInt16(cursor) / 0x100
+
+	cursor.pos += 2
 
 	return {
 		type: 'tkhd',
 		version,
 		flags,
-		creationTime: view.readWideUint(size),
-		modificationTime: view.readWideUint(size),
-		trackId: view.readUint(4),
-		duration: (jump(4), view.readWideUint(size)),
-		layer: (jump(8), view.readInt(2)),
-		alternateGroup: view.readInt(2),
-		volume: view.readInt(2) / 256,
-		// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
-		matrix: (jump(2), view.readArray(INT, 4, 9)).map(
-			(value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000),
-		),
-		width: view.readTemplate(4),
-		height: view.readTemplate(4),
+		creationTime,
+		modificationTime,
+		trackId,
+		duration,
+		layer,
+		alternateGroup,
+		volume,
+		matrix: readMatrix(cursor),
+		width: readTemplate32(cursor),
+		height: readTemplate32(cursor),
 	}
 }

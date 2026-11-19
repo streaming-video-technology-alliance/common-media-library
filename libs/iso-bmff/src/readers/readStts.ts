@@ -1,7 +1,10 @@
 import type { TimeToSampleBox } from '../boxes/TimeToSampleBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import type { TimeToSampleEntry } from '../boxes/TimeToSampleEntry.ts'
 
 /**
  * Read the `stts` box (`TimeToSampleBox`).
@@ -13,20 +16,22 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readStts(cursor: IsoBoxReadCursor<IsoInt64>): TimeToSampleBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const entryCount = readUint32(cursor)
+	const entries: TimeToSampleEntry[] = []
 
-	const { version, flags } = view.readFullBox()
-	const entryCount = view.readUint(4)
-	const entries = view.readEntries(entryCount, () => ({
-		sampleCount: view.readUint(4),
-		sampleDelta: view.readUint(4),
-	}))
+	for (let i = 0; i < entryCount; i++) {
+		entries.push({
+			sampleCount: readUint32(cursor),
+			sampleDelta: readUint32(cursor),
+		})
+	}
 
 	return {
 		type: 'stts',
 		version,
 		flags,
-		entryCount,
 		entries,
 	}
 }

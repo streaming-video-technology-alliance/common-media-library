@@ -1,8 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeUtf8 } from '../cursor/writeUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `sttg` box (`WebVttSettingsBox`).
@@ -16,14 +16,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSttg(cursor: IsoBoxWriteCursor, box: WebVttSettingsBox): void {
-	const settingsBytes = encodeText(box.settings)
+	const start = beginIsoBox(cursor, 'sttg')
 
-	const headerSize = 8
-	const settingsSize = settingsBytes.length
-	const totalSize = headerSize + settingsSize
-
-	const writer = new IsoBoxWriteView('sttg', totalSize)
-	writer.writeBytes(settingsBytes)
-
-	writeLegacyView(cursor, writer)
+	writeUtf8(cursor, box.settings)
+	endIsoBox(cursor, start)
 }

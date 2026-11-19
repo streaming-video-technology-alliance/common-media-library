@@ -9,7 +9,6 @@ import type { FullBox } from './FullBox.ts'
  */
 export type SyncSampleBox = FullBox & {
 	type: 'stss'
-	entryCount: number
 	/** The sample numbers of the sync samples. */
 	sampleNumber: number[]
 }

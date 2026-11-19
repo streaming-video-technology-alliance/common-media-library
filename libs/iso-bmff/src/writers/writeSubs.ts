@@ -1,7 +1,10 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SubSampleInformationBox } from '../boxes/SubSampleInformationBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `subs` box (`SubSampleInformationBox`).
@@ -14,37 +17,28 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSubs(cursor: IsoBoxWriteCursor, box: SubSampleInformationBox): void {
-	const v1 = box.version === 1
-	const subsampleSizeBytes = v1 ? 4 : 2
+	const start = beginIsoFullBox(cursor, 'subs', box.version, box.flags)
+	const writeSubsampleSize = box.version === 1 ? writeUint32 : writeUint16
 
-	let entriesSize = 0
-	for (const entry of box.entries) {
-		entriesSize += 4 // sampleDelta
-		entriesSize += 2 // subsampleCount
-		entriesSize += entry.subsampleCount * (subsampleSizeBytes + 1 + 1 + 4) // size + priority + discardable + codecSpecificParameters
-	}
+	writeUint32(cursor, box.entries.length)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+	for (const { sampleDelta, subsamples } of box.entries) {
+		if (subsamples.length > 0xffff) {
+			throw new RangeError(
+				`The subs box has ${subsamples.length} subsamples in one entry, and the limit is 65535`,
+			)
+		}
 
-	const writer = new IsoBoxWriteView('subs', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+		writeUint32(cursor, sampleDelta)
+		writeUint16(cursor, subsamples.length)
 
-	writer.writeUint(box.entryCount, 4)
-
-	for (const entry of box.entries) {
-		writer.writeUint(entry.sampleDelta, 4)
-		writer.writeUint(entry.subsampleCount, 2)
-
-		for (const subsample of entry.subsamples) {
-			writer.writeUint(subsample.subsampleSize, subsampleSizeBytes)
-			writer.writeUint(subsample.subsamplePriority, 1)
-			writer.writeUint(subsample.discardable, 1)
-			writer.writeUint(subsample.codecSpecificParameters, 4)
+		for (const subsample of subsamples) {
+			writeSubsampleSize(cursor, subsample.subsampleSize)
+			writeUint8(cursor, subsample.subsamplePriority)
+			writeUint8(cursor, subsample.discardable)
+			writeUint32(cursor, subsample.codecSpecificParameters)
 		}
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

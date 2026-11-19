@@ -105,4 +105,19 @@ describe('writeUrn', function () {
 			)
 		})
 	}
+
+	it('should write no string for a box with the flag 0x000001', function () {
+		const bytes = writeWith(writeUrn, { type: 'urn ', version: 0, flags: 1, name: 'a' })
+
+		assert.strictEqual(bytes.length, 12)
+	})
+
+	it('should keep the size of a box with a name and no location', function () {
+		const input = new Uint8Array([0, 0, 0, 14, 0x75, 0x72, 0x6e, 0x20, 0, 0, 0, 0, 0x61, 0])
+		const [box] = readIsoBoxes(input, { readers: { 'urn ': readUrn } })
+
+		assert.ok(isIsoBoxType('urn ', box))
+		assert.ok(!('location' in box))
+		assert.deepStrictEqual(writeWith(writeUrn, box), input)
+	})
 })

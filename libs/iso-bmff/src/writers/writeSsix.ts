@@ -1,7 +1,10 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { writeUint24 } from '../cursor/writeUint24.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `ssix` box (`SubsegmentIndexBox`).
@@ -14,31 +17,18 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSsix(cursor: IsoBoxWriteCursor, box: SubsegmentIndexBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const subsegmentCountSize = 4
+	const start = beginIsoFullBox(cursor, 'ssix', box.version, box.flags)
 
-	let rangesSize = 0
-	for (const subsegment of box.subsegments) {
-		rangesSize += 4 // rangesCount
-		rangesSize += subsegment.rangesCount * 4 // level (1) + rangeSize (3) per range
-	}
+	writeUint32(cursor, box.subsegments.length)
 
-	const totalSize = headerSize + fullBoxSize + subsegmentCountSize + rangesSize
+	for (const { ranges } of box.subsegments) {
+		writeUint32(cursor, ranges.length)
 
-	const writer = new IsoBoxWriteView('ssix', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.subsegmentCount, 4)
-
-	for (const subsegment of box.subsegments) {
-		writer.writeUint(subsegment.rangesCount, 4)
-
-		for (const range of subsegment.ranges) {
-			writer.writeUint(range.level, 1)
-			writer.writeUint(range.rangeSize, 3)
+		for (const range of ranges) {
+			writeUint8(cursor, range.level)
+			writeUint24(cursor, range.rangeSize)
 		}
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

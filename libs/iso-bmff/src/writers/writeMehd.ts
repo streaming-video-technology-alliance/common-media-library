@@ -1,8 +1,9 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `mehd` box (`MovieExtendsHeaderBox`).
@@ -18,16 +19,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeMehd(cursor: IsoBoxWriteCursor, box: MovieExtendsHeaderBox<IsoInt64>): void {
-	const v1 = box.version === 1
-	const size = v1 ? 8 : 4
-	const headerSize = 8
-	const fullBoxSize = 4
-	const fragmentDurationSize = size
-	const totalSize = headerSize + fullBoxSize + fragmentDurationSize
+	const start = beginIsoFullBox(cursor, 'mehd', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('mehd', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-	writer.writeWideUint(box.fragmentDuration, size)
-
-	writeLegacyView(cursor, writer)
+	writeWideUint(cursor, box.fragmentDuration, box.version === 1 ? 8 : 4)
+	endIsoBox(cursor, start)
 }

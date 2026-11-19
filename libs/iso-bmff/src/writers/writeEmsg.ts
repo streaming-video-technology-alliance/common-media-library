@@ -1,9 +1,12 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `emsg` box (`EventMessageBox`).
@@ -21,50 +24,24 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeEmsg(cursor: IsoBoxWriteCursor, box: EventMessageBox<IsoInt64>): void {
-	const schemeIdUriBytes = encodeText(box.schemeIdUri)
-	const valueBytes = encodeText(box.value)
-
-	const headerSize = 8
-	const fullBoxSize = 4
-	const schemeIdUriSize = schemeIdUriBytes.length + 1 // null-terminated
-	const valueSize = valueBytes.length + 1 // null-terminated
-
-	let contentSize = box.messageData.length
+	const start = beginIsoFullBox(cursor, 'emsg', box.version, box.flags)
 
 	if (box.version === 0) {
-		// version 0: scheme_id_uri, value, timescale, presentation_time_delta, event_duration, id, message_data
-		contentSize += schemeIdUriSize + valueSize + 4 + 4 + 4 + 4
+		writeTerminatedUtf8(cursor, box.schemeIdUri)
+		writeTerminatedUtf8(cursor, box.value)
+		writeUint32(cursor, box.timescale)
+		writeUint32(cursor, box.presentationTimeDelta ?? 0)
+		writeUint32(cursor, box.eventDuration)
+		writeUint32(cursor, box.id)
 	} else if (box.version === 1) {
-		// version 1: timescale, presentation_time, event_duration, id, scheme_id_uri, value, message_data
-		contentSize += 4 + 8 + 4 + 4 + schemeIdUriSize + valueSize
+		writeUint32(cursor, box.timescale)
+		writeWideUint(cursor, box.presentationTime ?? 0, 8)
+		writeUint32(cursor, box.eventDuration)
+		writeUint32(cursor, box.id)
+		writeTerminatedUtf8(cursor, box.schemeIdUri)
+		writeTerminatedUtf8(cursor, box.value)
 	}
 
-	const totalSize = headerSize + fullBoxSize + contentSize
-
-	const writer = new IsoBoxWriteView('emsg', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	if (box.version === 0) {
-		writer.writeBytes(schemeIdUriBytes)
-		writer.writeUint(0, 1)
-		writer.writeBytes(valueBytes)
-		writer.writeUint(0, 1)
-		writer.writeUint(box.timescale, 4)
-		writer.writeUint(box.presentationTimeDelta ?? 0, 4)
-		writer.writeUint(box.eventDuration, 4)
-		writer.writeUint(box.id, 4)
-	} else if (box.version === 1) {
-		writer.writeUint(box.timescale, 4)
-		writer.writeWideUint(box.presentationTime ?? 0, 8)
-		writer.writeUint(box.eventDuration, 4)
-		writer.writeUint(box.id, 4)
-		writer.writeBytes(schemeIdUriBytes)
-		writer.writeUint(0, 1)
-		writer.writeBytes(valueBytes)
-		writer.writeUint(0, 1)
-	}
-
-	writer.writeBytes(box.messageData)
-
-	writeLegacyView(cursor, writer)
+	writeBytes(cursor, box.messageData)
+	endIsoBox(cursor, start)
 }

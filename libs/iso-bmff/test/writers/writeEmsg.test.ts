@@ -369,4 +369,26 @@ describe('writeEmsg', function () {
 			assert.deepStrictEqual(new Uint8Array(writer.buffer), source)
 		})
 	}
+
+	it('should end a string at the first U+0000', function () {
+		const bytes = writeWith(writeEmsg, {
+			type: 'emsg',
+			version: 0,
+			flags: 0,
+			schemeIdUri: 'a\0b',
+			value: '',
+			timescale: 1000,
+			presentationTimeDelta: 0,
+			eventDuration: 0,
+			id: 7,
+			messageData: new Uint8Array(),
+		})
+		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
+
+		assert.deepStrictEqual(Array.from(bytes.subarray(12, 15)), [0x61, 0, 0])
+		assert.ok(isIsoBoxType('emsg', box))
+		assert.strictEqual(box.schemeIdUri, 'a')
+		assert.strictEqual(box.timescale, 1000)
+		assert.strictEqual(box.id, 7)
+	})
 })

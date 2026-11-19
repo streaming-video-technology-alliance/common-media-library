@@ -20,7 +20,7 @@ function schm(flags: number, schemeUri?: string): SchemeTypeBox {
 		type: 'schm',
 		version: 0,
 		flags,
-		schemeType: 0x63656e63, // cenc
+		schemeType: 'cenc',
 		schemeVersion: 0x00010000,
 		schemeUri,
 	}
@@ -34,7 +34,7 @@ describe('writeSchm', function () {
 				type: 'schm',
 				version: 0,
 				flags: 1,
-				schemeType: 0x63656e63, // cenc
+				schemeType: 'cenc',
 				schemeVersion: 0x00010000,
 				schemeUri: '',
 			},
@@ -75,7 +75,7 @@ describe('writeSchm', function () {
 			type: 'schm',
 			version: 0,
 			flags: 1,
-			schemeType: 0x63656e63,
+			schemeType: 'cenc',
 			schemeVersion: 0x00010000,
 		})
 
@@ -143,7 +143,7 @@ describe('writeSchm', function () {
 			type: 'schm',
 			version: 0,
 			flags: 0,
-			schemeType: 0x63656e63,
+			schemeType: 'cenc',
 			schemeVersion: 0x00010000,
 		})
 

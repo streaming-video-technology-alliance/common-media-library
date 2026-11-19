@@ -13,6 +13,7 @@ import {
 	writeStsz,
 } from '../util/box.ts'
 import { fixtureFiles } from '../util/fixtureFiles.ts'
+import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('readStsz', function () {
 	it('should provide an example', async function () {
@@ -29,7 +30,7 @@ describe('readStsz', function () {
 		assert.ok(stsz)
 		assert.ok(isIsoBoxType('stsz', stsz))
 		assert.strictEqual(stsz.sampleSize, 0)
-		assert.strictEqual(stsz.sampleCount, 31)
+		assert.strictEqual(stsz.entrySize?.length, 31)
 		assert.strictEqual(stsz.entrySize?.[0], 687)
 		// #endregion example
 	})
@@ -43,12 +44,12 @@ describe('readStsz', function () {
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].flags, 0)
 		assert.strictEqual(boxes[0].sampleSize, 0)
-		assert.strictEqual(boxes[0].sampleCount, 5)
+		assert.strictEqual(boxes[0].entrySize?.length, 5)
 		assert.deepStrictEqual(boxes[0].entrySize, [11410, 947, 788, 560, 482])
 
 		assert.ok(isIsoBoxType('stsz', boxes[1]))
 		assert.strictEqual(boxes[1].sampleSize, 0)
-		assert.strictEqual(boxes[1].sampleCount, 10)
+		assert.strictEqual(boxes[1].entrySize?.length, 10)
 		assert.deepStrictEqual(boxes[1].entrySize, [24, 6, 6, 6, 6, 6, 6, 6, 6, 6])
 	})
 
@@ -60,7 +61,7 @@ describe('readStsz', function () {
 
 		assert.ok(isIsoBoxType('stsz', box))
 		assert.strictEqual(box.sampleSize, 0)
-		assert.strictEqual(box.sampleCount, 0)
+		assert.strictEqual(box.entrySize?.length, 0)
 		assert.deepStrictEqual(box.entrySize, [])
 	})
 
@@ -123,5 +124,15 @@ describe('readStsz', function () {
 		}
 
 		assert.ok(count > 0)
+	})
+
+	it('should have no sampleCount when the box has entry sizes', function () {
+		const [box] = readIsoBoxes(boxBytes('stsz', [0, 1], [0, 3], [0, 4], [1, 4], [512, 4]), {
+			readers: { stsz: readStsz },
+		})
+
+		assert.ok(isIsoBoxType('stsz', box))
+		assert.ok(!('sampleCount' in box))
+		assert.deepStrictEqual(box.entrySize, [512])
 	})
 })

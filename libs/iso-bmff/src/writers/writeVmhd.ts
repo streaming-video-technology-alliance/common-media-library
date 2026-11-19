@@ -1,8 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `vmhd` box (`VideoMediaHeaderBox`).
@@ -15,17 +15,13 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeVmhd(cursor: IsoBoxWriteCursor, box: VideoMediaHeaderBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const graphicsmodeSize = 2
-	const opcolorSize = 6 // 3 x 2 bytes
-	const totalSize = headerSize + fullBoxSize + graphicsmodeSize + opcolorSize
+	const start = beginIsoFullBox(cursor, 'vmhd', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('vmhd', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+	writeUint16(cursor, box.graphicsMode)
 
-	writer.writeUint(box.graphicsMode, 2)
-	writer.writeArray(box.opColor, UINT, 2, 3)
+	for (let i = 0; i < 3; i++) {
+		writeUint16(cursor, box.opColor[i] ?? 0)
+	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

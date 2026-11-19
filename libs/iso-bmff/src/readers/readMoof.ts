@@ -1,6 +1,6 @@
 import type { MovieFragmentBox } from '../boxes/MovieFragmentBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -19,10 +19,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readMoof<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieFragmentBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'moof',
-		boxes: view.readBoxes(),
+		boxes: readChildBoxes(cursor),
 	}
 }

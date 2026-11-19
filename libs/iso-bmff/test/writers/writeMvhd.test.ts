@@ -13,7 +13,7 @@ function createBox(matrix: number[]): MovieHeaderBox {
 		duration: 0,
 		rate: 1,
 		volume: 1,
-		matrix,
+		matrix: matrix as MovieHeaderBox['matrix'],
 		preDefined: [0, 0, 0, 0, 0, 0],
 		nextTrackId: 2,
 	}

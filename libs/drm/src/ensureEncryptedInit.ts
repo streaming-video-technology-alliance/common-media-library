@@ -2,7 +2,6 @@ import {
 	createAudioSampleEntryReader,
 	createVisualSampleEntryReader,
 	findIsoBox,
-	fourCcToUint32,
 	isIsoBoxType,
 	readIsoBoxes,
 	readStsd,
@@ -81,18 +80,19 @@ export type EnsureEncryptedInitOptions = {
 	includeOriginal: boolean
 
 	/**
-	 * The scheme type to use for the encryption. Defaults to `cenc`.
+	 * The scheme type to use for the encryption, as a four-character code such as `cbcs`.
+	 * A number is the code as a 32-bit integer, such as `0x63626373` for `cbcs`.
 	 *
-	 * @defaultValue `1667591779`
+	 * @defaultValue `'cenc'`
 	 */
-	schemeType: number
+	schemeType: string | number
 
 	/**
-	 * The default KID to use for the encryption.
+	 * The default KID to use for the encryption, 16 bytes.
 	 *
-	 * @defaultValue `[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]`
+	 * @defaultValue 16 bytes of 0
 	 */
-	defaultKid: number[]
+	defaultKid: Uint8Array | number[]
 }
 
 /**
@@ -116,8 +116,8 @@ export function ensureEncryptedInit(
 	const {
 		prepend = true,
 		includeOriginal = true,
-		schemeType = 1667591779,
-		defaultKid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		schemeType = 'cenc',
+		defaultKid = new Uint8Array(16),
 	} = options ?? {}
 	const boxes = readIsoBoxes(init, { readers })
 	const stsd = findIsoBox(boxes, box => isIsoBoxType('stsd', box))
@@ -155,13 +155,21 @@ export function ensureEncryptedInit(
 			boxes: [
 				{
 					type: 'frma',
-					dataFormat: fourCcToUint32(entry.type),
+					dataFormat: entry.type,
 				},
 				{
 					type: 'schm',
 					version: 0,
 					flags: 0,
-					schemeType,
+					schemeType:
+						typeof schemeType === 'number'
+							? String.fromCharCode(
+									schemeType >>> 24,
+									(schemeType >>> 16) & 0xff,
+									(schemeType >>> 8) & 0xff,
+									schemeType & 0xff,
+								)
+							: schemeType,
 					schemeVersion: 65536,
 				},
 				{
@@ -173,7 +181,7 @@ export function ensureEncryptedInit(
 							flags: 0,
 							defaultIsProtected: 1,
 							defaultPerSampleIvSize: 8,
-							defaultKid,
+							defaultKid: Uint8Array.from(defaultKid),
 						},
 					],
 				},

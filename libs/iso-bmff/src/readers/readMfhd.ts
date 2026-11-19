@@ -1,7 +1,9 @@
 import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
 
 /**
  * Read the `mfhd` box (`MovieFragmentHeaderBox`).
@@ -13,11 +15,10 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readMfhd(cursor: IsoBoxReadCursor<IsoInt64>): MovieFragmentHeaderBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'mfhd',
-		...view.readFullBox(),
-		sequenceNumber: view.readUint(4),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		sequenceNumber: readUint32(cursor),
 	}
 }

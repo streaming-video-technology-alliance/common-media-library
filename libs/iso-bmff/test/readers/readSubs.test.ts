@@ -12,7 +12,7 @@ describe('readSubs', function () {
 
 		const entry = entries[0]
 		assert.strictEqual(entry.sampleDelta, 1)
-		assert.strictEqual(entry.subsampleCount, 3)
+		assert.strictEqual(entry.subsamples.length, 3)
 		assert.strictEqual(entry.subsamples.length, 3)
 
 		const subsample = entry.subsamples[0]

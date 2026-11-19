@@ -27,7 +27,6 @@ function fields(box: TrackEncryptionBox): Omit<TrackEncryptionBox, 'type'> {
 		defaultKid: box.defaultKid,
 		defaultCryptByteBlock: box.defaultCryptByteBlock,
 		defaultSkipByteBlock: box.defaultSkipByteBlock,
-		defaultConstantIvSize: box.defaultConstantIvSize,
 		defaultConstantIv: box.defaultConstantIv,
 	}
 }
@@ -50,10 +49,12 @@ describe('readTenc', function () {
 		assert.strictEqual(tenc.defaultPerSampleIvSize, 0)
 		assert.strictEqual(tenc.defaultCryptByteBlock, 1)
 		assert.strictEqual(tenc.defaultSkipByteBlock, 9)
-		assert.strictEqual(tenc.defaultConstantIvSize, 16)
+		assert.strictEqual(tenc.defaultConstantIv?.length, 16)
 		assert.deepStrictEqual(
 			tenc.defaultConstantIv,
-			[161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176],
+			new Uint8Array([
+				161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176,
+			]),
 		)
 		// #endregion example
 
@@ -65,7 +66,6 @@ describe('readTenc', function () {
 			defaultKid: KID,
 			defaultCryptByteBlock: 1,
 			defaultSkipByteBlock: 9,
-			defaultConstantIvSize: 16,
 			defaultConstantIv: IV,
 		})
 	})
@@ -81,7 +81,6 @@ describe('readTenc', function () {
 			defaultKid: KID,
 			defaultCryptByteBlock: undefined,
 			defaultSkipByteBlock: undefined,
-			defaultConstantIvSize: 8,
 			defaultConstantIv: IV.slice(0, 8),
 		})
 	})
@@ -97,7 +96,6 @@ describe('readTenc', function () {
 			defaultKid: KID,
 			defaultCryptByteBlock: undefined,
 			defaultSkipByteBlock: undefined,
-			defaultConstantIvSize: undefined,
 			defaultConstantIv: undefined,
 		})
 	})
@@ -113,7 +111,6 @@ describe('readTenc', function () {
 			defaultKid: KID,
 			defaultCryptByteBlock: 5,
 			defaultSkipByteBlock: 10,
-			defaultConstantIvSize: undefined,
 			defaultConstantIv: undefined,
 		})
 	})
@@ -129,7 +126,6 @@ describe('readTenc', function () {
 			defaultKid: KID,
 			defaultCryptByteBlock: 0,
 			defaultSkipByteBlock: 0,
-			defaultConstantIvSize: undefined,
 			defaultConstantIv: undefined,
 		})
 	})
@@ -137,8 +133,7 @@ describe('readTenc', function () {
 	it('should read a constant IV of 0 bytes', function () {
 		const tenc = read(tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 0))
 
-		assert.strictEqual(tenc.defaultConstantIvSize, 0)
-		assert.deepStrictEqual(tenc.defaultConstantIv, [])
+		assert.deepStrictEqual(tenc.defaultConstantIv, new Uint8Array())
 	})
 
 	it('should read no constant IV from a protected box of 32 bytes with a defaultPerSampleIvSize of 0', function () {
@@ -170,7 +165,6 @@ describe('readTenc', function () {
 			defaultKid: KID,
 			defaultCryptByteBlock: undefined,
 			defaultSkipByteBlock: undefined,
-			defaultConstantIvSize: undefined,
 			defaultConstantIv: undefined,
 		})
 	})
