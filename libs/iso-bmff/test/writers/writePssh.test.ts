@@ -11,17 +11,16 @@ import {
 	type ProtectionSystemSpecificHeaderBox,
 } from '../util/box.ts'
 import { KID_A, KID_B, psshBox, SYSTEM_ID } from '../util/psshBoxes.ts'
+import { boxBytes } from '../util/wideBoxes.ts'
 
-function pssh(version: number, kidCount: number, kid: number[]): ProtectionSystemSpecificHeaderBox {
+function pssh(version: number, kid: number[][]): ProtectionSystemSpecificHeaderBox {
 	return {
 		type: 'pssh',
 		version,
 		flags: 0,
-		systemId: SYSTEM_ID,
-		kidCount,
-		kid,
-		dataSize: 4,
-		data: [1, 2, 3, 4],
+		systemId: new Uint8Array(SYSTEM_ID),
+		kid: kid.map(id => new Uint8Array(id)),
+		data: new Uint8Array([1, 2, 3, 4]),
 	}
 }
 
@@ -33,17 +32,9 @@ describe('writePssh', function () {
 				type: 'pssh',
 				version: 1,
 				flags: 0,
-				systemId: [
-					0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-					0xaa,
-				],
-				kidCount: 1,
-				kid: [
-					0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
-					0x11,
-				],
-				dataSize: 4,
-				data: [1, 2, 3, 4],
+				systemId: new Uint8Array(16).fill(0xaa),
+				kid: [new Uint8Array(16).fill(0x11)],
+				data: new Uint8Array([1, 2, 3, 4]),
 			},
 			{ writers: { pssh: writePssh } },
 		)
@@ -62,7 +53,7 @@ describe('writePssh', function () {
 	})
 
 	it('should write the 32 bytes of two key IDs in a version 1 box', function () {
-		const writer = writeWith(writePssh, pssh(1, 2, [...KID_A, ...KID_B]))
+		const writer = writeWith(writePssh, pssh(1, [KID_A, KID_B]))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -71,7 +62,7 @@ describe('writePssh', function () {
 	})
 
 	it('should write a version 1 box with no key ID', function () {
-		const writer = writeWith(writePssh, pssh(1, 0, []))
+		const writer = writeWith(writePssh, pssh(1, []))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -80,7 +71,7 @@ describe('writePssh', function () {
 	})
 
 	it('should write a version 0 box', function () {
-		const writer = writeWith(writePssh, pssh(0, 0, []))
+		const writer = writeWith(writePssh, pssh(0, []))
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), psshBox(0, [0, 0, 0, 4, 1, 2, 3, 4]))
 	})
@@ -102,4 +93,30 @@ describe('writePssh', function () {
 			assert.deepStrictEqual(new Uint8Array(writeWith(writePssh, parsed).buffer), input)
 		})
 	}
+
+	it('should write 16 bytes for a short or a long systemId and key ID', function () {
+		const short = new Uint8Array(SYSTEM_ID.slice(0, 15))
+		const long = new Uint8Array([...KID_A, 0xff])
+		const writer = writeWith(writePssh, {
+			type: 'pssh',
+			version: 1,
+			flags: 0,
+			systemId: short,
+			kid: [long],
+			data: new Uint8Array(),
+		})
+
+		assert.deepStrictEqual(
+			new Uint8Array(writer.buffer),
+			boxBytes(
+				'pssh',
+				[1, 1],
+				[0, 3],
+				new Uint8Array([...SYSTEM_ID.slice(0, 15), 0]),
+				[1, 4],
+				new Uint8Array(KID_A),
+				[0, 4],
+			),
+		)
+	})
 })

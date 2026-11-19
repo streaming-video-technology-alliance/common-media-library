@@ -1,8 +1,10 @@
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readBytes } from '../cursor/readBytes.ts'
 
 /**
  * Read the `pssh` box (`ProtectionSystemSpecificHeaderBox`).
@@ -17,32 +19,25 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readPssh(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSystemSpecificHeaderBox {
-	const view = new IsoBoxReadView(cursor)
-
-	const { readUint, readArray } = view
-	const { version, flags } = view.readFullBox()
-
-	const systemId = readArray(UINT, 1, 16)
-
-	let kidCount: number = 0
-	let kid: number[] = []
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const systemId = readBytes(cursor, 16)
+	const kid: Uint8Array[] = []
 
 	if (version > 0) {
-		kidCount = readUint(4)
-		kid = readArray(UINT, 1, kidCount * 16)
-	}
+		const kidCount = readUint32(cursor)
 
-	const dataSize = readUint(4)
-	const data = readArray(UINT, 1, dataSize)
+		for (let i = 0; i < kidCount; i++) {
+			kid.push(readBytes(cursor, 16))
+		}
+	}
 
 	return {
 		type: 'pssh',
 		version,
 		flags,
 		systemId,
-		kidCount,
 		kid,
-		dataSize,
-		data,
+		data: readBytes(cursor, readUint32(cursor)),
 	}
 }

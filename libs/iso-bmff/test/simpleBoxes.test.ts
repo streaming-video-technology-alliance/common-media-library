@@ -33,7 +33,7 @@ const ROWS: Row[] = [
 		readers: { frma: readFrma },
 		writers: { frma: writeFrma },
 		bytes: boxBytes('frma', [0x61766331, 4]),
-		expected: { type: 'frma', dataFormat: 0x61766331 },
+		expected: { type: 'frma', dataFormat: 'avc1' },
 	},
 	{
 		type: 'imda',

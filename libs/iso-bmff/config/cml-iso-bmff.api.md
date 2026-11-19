@@ -218,9 +218,6 @@ export function findIsoBox<T, S extends T>(boxes: Iterable<T>, callback: (box: T
 export function findIsoBox<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null;
 
 // @public
-export function fourCcToUint32(str: string): number;
-
-// @public
 export type FreeSpaceBox<T extends "free" | "skip" = "free"> = {
     type: T;
     data: Uint8Array;
@@ -612,7 +609,7 @@ export function nextIsoBox(cursor: IsoBoxReadCursor<IsoInt64>): IsoBoxType | nul
 // @public
 export type OriginalFormatBox = {
     type: "frma";
-    dataFormat: number;
+    dataFormat: string;
 };
 
 // @public
@@ -648,11 +645,9 @@ export type ProtectionSchemeInfoBox<V extends IsoInt64 = number> = {
 // @public
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
     type: "pssh";
-    systemId: number[];
-    kidCount: number;
-    kid: number[];
-    dataSize: number;
-    data: number[];
+    systemId: Uint8Array;
+    kid: Uint8Array[];
+    data: Uint8Array;
 };
 
 // @public
@@ -1034,7 +1029,7 @@ export type SchemeInformationBox<V extends IsoInt64 = number> = {
 // @public
 export type SchemeTypeBox = FullBox & {
     type: "schm";
-    schemeType: number;
+    schemeType: string;
     schemeVersion: number;
     schemeUri?: string;
 };
@@ -1150,12 +1145,11 @@ export type TrackBox<V extends IsoInt64 = number> = {
 export type TrackEncryptionBox = FullBox & {
     type: "tenc";
     defaultPerSampleIvSize: number;
-    defaultKid: number[];
+    defaultKid: Uint8Array;
     defaultIsProtected: number;
     defaultCryptByteBlock?: number;
     defaultSkipByteBlock?: number;
-    defaultConstantIvSize?: number;
-    defaultConstantIv?: number[];
+    defaultConstantIv?: Uint8Array;
 };
 
 // @public

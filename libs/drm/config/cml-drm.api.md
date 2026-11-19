@@ -60,8 +60,8 @@ export function ensureEncryptedInit(init: Uint8Array, options?: Partial<EnsureEn
 export type EnsureEncryptedInitOptions = {
     prepend: boolean;
     includeOriginal: boolean;
-    schemeType: number;
-    defaultKid: number[];
+    schemeType: string | number;
+    defaultKid: Uint8Array | number[];
 };
 
 // @public

@@ -18,11 +18,9 @@ describe('readPssh', function () {
 		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.version, 1)
 		assert.strictEqual(pssh.flags, 0)
-		assert.deepStrictEqual(pssh.systemId, SYSTEM_ID)
-		assert.strictEqual(pssh.kidCount, 1)
-		assert.deepStrictEqual(pssh.kid, KID_A)
-		assert.strictEqual(pssh.dataSize, 4)
-		assert.deepStrictEqual(pssh.data, [1, 2, 3, 4])
+		assert.deepStrictEqual(pssh.systemId, new Uint8Array(SYSTEM_ID))
+		assert.deepStrictEqual(pssh.kid, [new Uint8Array(KID_A)])
+		assert.deepStrictEqual(pssh.data, new Uint8Array([1, 2, 3, 4]))
 	})
 
 	it('should read the 32 bytes of two key IDs in a version 1 box', function () {
@@ -33,10 +31,8 @@ describe('readPssh', function () {
 
 		assert.ok(pssh)
 		assert.ok(isIsoBoxType('pssh', pssh))
-		assert.strictEqual(pssh.kidCount, 2)
-		assert.deepStrictEqual(pssh.kid, [...KID_A, ...KID_B])
-		assert.strictEqual(pssh.dataSize, 4)
-		assert.deepStrictEqual(pssh.data, [1, 2, 3, 4])
+		assert.deepStrictEqual(pssh.kid, [new Uint8Array(KID_A), new Uint8Array(KID_B)])
+		assert.deepStrictEqual(pssh.data, new Uint8Array([1, 2, 3, 4]))
 	})
 
 	it('should read a version 1 box with one key ID and no data', function () {
@@ -46,10 +42,8 @@ describe('readPssh', function () {
 
 		assert.ok(pssh)
 		assert.ok(isIsoBoxType('pssh', pssh))
-		assert.strictEqual(pssh.kidCount, 1)
-		assert.deepStrictEqual(pssh.kid, KID_A)
-		assert.strictEqual(pssh.dataSize, 0)
-		assert.deepStrictEqual(pssh.data, [])
+		assert.deepStrictEqual(pssh.kid, [new Uint8Array(KID_A)])
+		assert.deepStrictEqual(pssh.data, new Uint8Array())
 	})
 
 	it('should read a version 1 box with no key ID', function () {
@@ -60,11 +54,9 @@ describe('readPssh', function () {
 		assert.ok(pssh)
 		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.version, 1)
-		assert.deepStrictEqual(pssh.systemId, SYSTEM_ID)
-		assert.strictEqual(pssh.kidCount, 0)
+		assert.deepStrictEqual(pssh.systemId, new Uint8Array(SYSTEM_ID))
 		assert.deepStrictEqual(pssh.kid, [])
-		assert.strictEqual(pssh.dataSize, 4)
-		assert.deepStrictEqual(pssh.data, [1, 2, 3, 4])
+		assert.deepStrictEqual(pssh.data, new Uint8Array([1, 2, 3, 4]))
 	})
 
 	it('should read a version 0 box', function () {
@@ -75,10 +67,19 @@ describe('readPssh', function () {
 		assert.ok(pssh)
 		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.version, 0)
-		assert.deepStrictEqual(pssh.systemId, SYSTEM_ID)
-		assert.strictEqual(pssh.kidCount, 0)
+		assert.deepStrictEqual(pssh.systemId, new Uint8Array(SYSTEM_ID))
 		assert.deepStrictEqual(pssh.kid, [])
-		assert.strictEqual(pssh.dataSize, 4)
-		assert.deepStrictEqual(pssh.data, [1, 2, 3, 4])
+		assert.deepStrictEqual(pssh.data, new Uint8Array([1, 2, 3, 4]))
+	})
+
+	it('should return views of the input for the byte fields', function () {
+		const bytes = psshBox(1, [0, 0, 0, 1, ...KID_A, 0, 0, 0, 4, 1, 2, 3, 4])
+		const [pssh] = readIsoBoxes(bytes, { readers: { pssh: readPssh } })
+
+		assert.ok(isIsoBoxType('pssh', pssh))
+		assert.strictEqual(pssh.systemId.buffer, bytes.buffer)
+		assert.strictEqual(pssh.kid[0].buffer, bytes.buffer)
+		assert.strictEqual(pssh.kid[0].byteOffset, 32)
+		assert.strictEqual(pssh.data.buffer, bytes.buffer)
 	})
 })
