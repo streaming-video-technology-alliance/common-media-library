@@ -1,13 +1,13 @@
 ---
 title: Writing Boxes
-description: Write boxes to byte arrays or streams
+description: Write boxes to a byte array or a stream
 ---
 
 # Writing Boxes
 
 The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable items and returns one `Uint8Array` with every box. Streamable items include:
 
-- Raw box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
+- Box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
 - Boxes that `readIsoBoxes` returns. A box with no reader is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
 
@@ -91,7 +91,7 @@ sourceBuffer.appendBuffer(bytes);
 
 ## Streaming boxes
 
-The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers. The function needs `ReadableStream`. On a runtime without `ReadableStream`, the function throws an error.
+The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers. The stream writes one box for each read and writes no box before the first read. An error of a box rejects the read. The function needs `ReadableStream`. On a runtime without `ReadableStream`, the function throws an error.
 
 ```typescript
 import {
@@ -121,6 +121,71 @@ const readableStream = createIsoBoxReadableStream(boxes, createDefaultWriterConf
 const stream = await transport.createBidirectionalStream();
 readableStream.pipeTo(stream.writable);
 ```
+
+## Writing a custom box
+
+A writer takes a write cursor and a box object, and returns nothing. The writer writes the header with `beginIsoBox` or `beginIsoFullBox`, then the fields with the write field functions, then the size with `endIsoBox`. A writer does not compute the size of its box:
+
+```typescript
+import {
+	beginIsoBox,
+	endIsoBox,
+	writeFourCc,
+	writeIsoBox,
+	writeUint16,
+	writeUint32,
+	type IsoBoxWriteCursor,
+} from "@svta/cml-iso-bmff";
+
+// A box type that the package does not name.
+type AbcdBox = { type: "abcd"; brand: string; count: number; flags: number };
+
+const writeAbcd = (cursor: IsoBoxWriteCursor, box: AbcdBox) => {
+	const start = beginIsoBox(cursor, box.type);
+	writeFourCc(cursor, box.brand);
+	writeUint32(cursor, box.count);
+	writeUint16(cursor, box.flags);
+	endIsoBox(cursor, start);
+};
+
+const box: AbcdBox = { type: "abcd", brand: "isom", count: 1, flags: 0 };
+const bytes = writeIsoBox(box, { writers: { abcd: writeAbcd } });
+```
+
+A writer of a box with child boxes writes them with `writeChildBoxes(cursor, box.boxes)`. The writers of the cursor then apply to the child boxes. A writer of a `uuid` box calls `beginIsoBox(cursor, "uuid")`, then writes the 16 bytes of `usertype` with `writeBytes`.
+
+`writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a code that does not have 4 characters. `endIsoBox` throws a `RangeError` for a box above 2^32 - 1 bytes.
+
+## Writing with a cursor
+
+`writeIsoBoxes` creates a write cursor, writes every box, and returns a copy of the written bytes with the exact size. Your code can also write on a cursor directly. The written bytes are `cursor.bytes.subarray(0, cursor.pos)`, with no copy:
+
+```typescript
+import {
+	createIsoBoxWriteCursor,
+	writeChildBoxes,
+	writeMdat,
+	writeMfhd,
+} from "@svta/cml-iso-bmff";
+
+const payload = new Uint8Array(1_000_000);
+
+const cursor = createIsoBoxWriteCursor({
+	capacity: payload.length + 1024,
+	writers: { mfhd: writeMfhd, mdat: writeMdat },
+});
+
+writeChildBoxes(cursor, [
+	{ type: "moof", boxes: [{ type: "mfhd", version: 0, flags: 0, sequenceNumber: 1 }] },
+	{ type: "mdat", data: payload },
+]);
+
+const segment = cursor.bytes.subarray(0, cursor.pos);
+```
+
+The cursor doubles its buffer when a field does not fit. Each growth copies the written bytes. A `capacity` above the final size avoids the growth. The default capacity is 1024 bytes.
+
+The growth replaces `cursor.view` and `cursor.bytes`. Write through the field functions, and read `cursor.bytes` after the last write.
 
 ## Writing 64-bit fields
 
@@ -157,7 +222,7 @@ if (tfdt) {
 }
 ```
 
-A raw box object can hold a `bigint` too:
+A box object can hold a `bigint` too:
 
 ```typescript
 import { writeIsoBox, writeTfdt } from "@svta/cml-iso-bmff";
@@ -225,7 +290,7 @@ The `mfraSize` field of an `mfro` box is the size in bytes of the enclosing `mfr
 
 ## Type safety
 
-In TypeScript, give a raw box object a box type. Annotate the object with a box type from the package:
+In TypeScript, give a box object a box type. Annotate the object with a box type from the package:
 
 ```typescript
 import type { FileTypeBox } from "@svta/cml-iso-bmff";

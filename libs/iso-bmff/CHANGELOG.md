@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Added
 
+- The guide [Migrating to version 2](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/migrating-to-v2.md) lists each change of version 2.0.0 and its replacement ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `createIsoBoxReadCursor` creates a read cursor for ISO BMFF data. The cursor is a plain object with a `DataView`, a start, a position, and an end ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - The read field functions read one field at the position of a read cursor and move the position past the field. The functions are `readUint8`, `readUint16`, `readUint24`, `readUint32`, `readUint64`, `readInt8`, `readInt16`, `readInt32`, `readTemplate16`, `readTemplate32`, `readFourCc`, `readBytes`, `readUtf8`, and `readTerminatedUtf8` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - A read field function throws a `RangeError` for a field that passes the end of the cursor. `readBytes` and `readUtf8` also throw a `RangeError` for a negative length. A length of 0 reads nothing ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
@@ -125,7 +126,7 @@ and this project adheres to
 - The runtime requirements table of the README now lists the `DataView` methods that the `bigint` reads and writes need.
 - The description of the package now states that the package reads and writes boxes.
 - The UTF-8 string reads now call `decodeUtf8` of `@svta/cml-utils`. A bundle with `readIsoBoxes` is about 200 bytes smaller after gzip. The results do not change. The package now needs `@svta/cml-utils` 1.8.0 or later.
-- `writeIsoBoxes` and `createIsoBoxReadableStream` now take an optional configuration, as `writeIsoBox` does. With no configuration, a write takes only containers, byte arrays, and boxes with a `view` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `writeIsoBoxes` and `createIsoBoxReadableStream` now take an optional configuration, as `writeIsoBox` does. With no configuration, a write takes only containers, byte arrays, and raw boxes ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - The `writers` field of `IsoBoxWriteConfig` is now optional. A call with `{ writers: {} }` still compiles. A custom writer that reads `config.writers` must handle a missing map. `createDefaultWriterConfig` still returns the map ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `SampleDescriptionBox` and `DataReferenceBox` now keep their child boxes in `boxes`, not in `entries`. Replace `stsd.entries` with `stsd.boxes`, and `dref.entries` with `dref.boxes` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `findIsoBox`, `filterIsoBoxes`, and `traverseIsoBoxes` now reach the sample entries of `stsd` and the data entries of `dref`, if the configuration has `readStsd` or `readDref`. A predicate that matches a type inside those boxes, such as `hvc1`, now finds that box ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
@@ -146,12 +147,11 @@ Renames of version 2.0.0:
 | `HandlerReferenceBox` | `HandlerBox` |
 | `DecodingTimeToSampleBox` | `TimeToSampleBox` |
 | `CompositionTimeToSampleBox` | `CompositionOffsetBox` |
-| `ProtectionSchemeInformationBox`, `ProtectionSchemeInformationBoxChild` | `ProtectionSchemeInfoBox`, `ProtectionSchemeInfoBoxChild` |
+| `ProtectionSchemeInformationBox` | `ProtectionSchemeInfoBox` |
 | `TrackKindBox` | `KindBox` |
 | `SubsampleInformationBox` | `SubSampleInformationBox` |
-| `SubTrackBox`, `SubTrackBoxChild` | `SubTrack`, `SubTrackChild` |
+| `SubTrackBox` | `SubTrack` |
 | `SampleEntryBox`, `AudioSampleEntryBox`, `VisualSampleEntryBox` | `SampleEntry`, `AudioSampleEntry`, `VisualSampleEntry` |
-| `AudioSampleEntryBoxChild`, `VisualSampleEntryBoxChild` | `AudioSampleEntryChild`, `VisualSampleEntryChild` |
 | `readAudioSampleEntryBox`, `writeAudioSampleEntryBox` | `readAudioSampleEntry`, `writeAudioSampleEntry` |
 | `readVisualSampleEntryBox`, `writeVisualSampleEntryBox` | `readVisualSampleEntry`, `writeVisualSampleEntry` |
 | `DecodingTimeSample` | `TimeToSampleEntry` |
@@ -171,7 +171,7 @@ A field rename also changes the keys of a box that `readIsoBoxes` returns. Code 
 
 - `IsoBoxReadView` is removed. A custom reader reads the fields with the read field functions on a read cursor. `view.bytesRemaining` becomes `cursor.end - cursor.pos`, `view.jump(size)` becomes `cursor.pos += size`, `view.readBoxes()` becomes `readChildBoxes(cursor)`, and `view.readBox()` becomes `nextIsoBox(cursor)` or `readChildBoxes(cursor, 1)` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `IsoBoxWriteView` is removed. A custom writer writes the fields with the write field functions on a write cursor. `writer.writeUint(value, 4)` becomes `writeUint32(cursor, value)`, and `writer.writeFullBox(version, flags)` becomes `beginIsoFullBox(cursor, type, version, flags)` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
-- The child types are removed: `AdditionalMetadataContainerBoxChild`, `AudioSampleEntryChild`, `DataInformationBoxChild`, `EditBoxChild`, `GroupsListBoxChild`, `MediaBoxChild`, `MediaInformationBoxChild`, `MetaBoxChild`, `MovieBoxChild`, `MovieExtendsBoxChild`, `MovieFragmentBoxChild`, `MovieFragmentRandomAccessBoxChild`, `PreselectionGroupBoxChild`, `ProtectionSchemeInfoBoxChild`, `SampleTableBoxChild`, `SchemeInformationBoxChild`, `SubTrackChild`, `TrackBoxChild`, `TrackFragmentBoxChild`, `TrackReferenceBoxChild`, `UserDataBoxChild`, `VisualSampleEntryChild`, and `WebVttCueChild`. Use `ParsedIsoBox` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
+- The child types are removed: `AdditionalMetadataContainerBoxChild`, `AudioSampleEntryChild`, `DataInformationBoxChild`, `EditBoxChild`, `GroupsListBoxChild`, `MediaBoxChild`, `MediaInformationBoxChild`, `MetaBoxChild`, `MovieBoxChild`, `MovieExtendsBoxChild`, `MovieFragmentBoxChild`, `MovieFragmentRandomAccessBoxChild`, `PreselectionGroupBoxChild`, `ProtectionSchemeInfoBoxChild`, `SampleTableBoxChild`, `SchemeInformationBoxChild`, `SubTrackChild`, `TrackBoxChild`, `TrackFragmentBoxChild`, `TrackReferenceBoxChild`, `UserDataBoxChild`, `VisualSampleEntryChild`, and `WebVttCueChild`. The version 1 names `ProtectionSchemeInformationBoxChild`, `SubTrackBoxChild`, `AudioSampleEntryBoxChild`, and `VisualSampleEntryBoxChild` are removed too. Use `ParsedIsoBox` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `TrackReferenceTypeBox` is removed, because no reader returns that type. A child of a `tref` box is a raw box ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `IsoFieldTypeMap` is removed. A reader or a writer reads or writes an array of values with a loop ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `ParsedBox` and `IsoTypedParsedBox` are removed, because a parsed box has no `view` and no `size`. `ParsedIsoBox` is the type of a box that `readIsoBoxes` returns ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
