@@ -1,17 +1,20 @@
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `trex` box (`TrackExtendsBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `TrackExtendsBox`
  *
  * @public
  */
-export function readTrex(view: IsoBoxReadView<IsoInt64>): TrackExtendsBox {
+export function readTrex(cursor: IsoBoxReadCursor<IsoInt64>): TrackExtendsBox {
+	const view = new IsoBoxReadView(cursor)
+
 	return {
 		type: 'trex',
 		...view.readFullBox(),

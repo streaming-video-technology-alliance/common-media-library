@@ -141,6 +141,7 @@ A box that `readIsoBoxes` reads with `readInt64AsBigInt` has `bigint` fields. Th
 ```typescript
 import {
 	findIsoBox,
+	isIsoBoxType,
 	readInt64AsBigInt,
 	readIsoBoxes,
 	readTfdt,
@@ -156,7 +157,7 @@ const boxes = readIsoBoxes(buffer, {
 });
 
 // A tfdt box is inside a traf box, inside a moof box.
-const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
 
 if (tfdt) {
 	tfdt.baseMediaDecodeTime += BigInt(90000);

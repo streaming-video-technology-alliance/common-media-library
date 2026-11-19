@@ -1,4 +1,12 @@
-import { assert, describe, it, readCtts, readIsoBoxes, writeCtts } from '../util/box.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	readCtts,
+	readIsoBoxes,
+	writeCtts,
+} from '../util/box.ts'
 import { boxBytes } from '../util/wideBoxes.ts'
 import { cttsBox } from '../util/versionBoxes.ts'
 
@@ -8,7 +16,7 @@ describe('writeCtts', function () {
 			const source = cttsBox(version)
 			const [box] = readIsoBoxes(source, { readers: { ctts: readCtts } })
 
-			assert.strictEqual(box.type, 'ctts')
+			assert.ok(isIsoBoxType('ctts', box))
 			assert.deepStrictEqual(new Uint8Array(writeCtts(box).buffer), source)
 		})
 	}
@@ -16,7 +24,7 @@ describe('writeCtts', function () {
 	it('should write only entry_count after a read of a version 2 box', function () {
 		const [box] = readIsoBoxes(cttsBox(2), { readers: { ctts: readCtts } })
 
-		assert.strictEqual(box.type, 'ctts')
+		assert.ok(isIsoBoxType('ctts', box))
 		assert.deepStrictEqual(
 			new Uint8Array(writeCtts(box).buffer),
 			boxBytes('ctts', [2, 1], [0, 3], [1, 4]),
@@ -47,7 +55,7 @@ describe('writeCtts', function () {
 		const [box] = readIsoBoxes(bytes, { readers: { ctts: readCtts } })
 
 		assert.deepStrictEqual(bytes, boxBytes('ctts', [1, 1], [0, 3], [1, 4], [1, 4], [0xffffffff, 4]))
-		assert.strictEqual(box.type, 'ctts')
+		assert.ok(isIsoBoxType('ctts', box))
 		assert.strictEqual(box.entries[0].sampleOffset, -1)
 	})
 

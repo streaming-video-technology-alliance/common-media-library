@@ -1,11 +1,12 @@
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `schm` box (`SchemeTypeBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `SchemeTypeBox`
  *
@@ -14,7 +15,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readSchm(view: IsoBoxReadView<IsoInt64>): SchemeTypeBox {
+export function readSchm(cursor: IsoBoxReadCursor<IsoInt64>): SchemeTypeBox {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 
 	return {

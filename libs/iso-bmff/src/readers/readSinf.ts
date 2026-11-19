@@ -2,7 +2,8 @@ import type {
 	ProtectionSchemeInfoBox,
 	ProtectionSchemeInfoBoxChild,
 } from '../boxes/ProtectionSchemeInfoBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -11,13 +12,15 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * The `readers` map does not need an entry for the `sinf` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `ProtectionSchemeInfoBox`
  *
  * @public
  */
-export function readSinf(view: IsoBoxReadView<IsoInt64>): ProtectionSchemeInfoBox {
+export function readSinf(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSchemeInfoBox {
+	const view = new IsoBoxReadView(cursor)
+
 	return {
 		type: 'sinf',
 		boxes: view.readBoxes<ProtectionSchemeInfoBoxChild>(),

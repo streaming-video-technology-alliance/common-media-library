@@ -1,9 +1,10 @@
 import {
 	assert,
-	createInt64OverflowReader,
 	createDefaultReaderConfig,
+	createInt64OverflowReader,
 	describe,
 	findIsoBox,
+	isIsoBoxType,
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
@@ -60,7 +61,7 @@ describe('createDefaultReaderConfig', function () {
 		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 
 		// The field is a bigint with the exact value.
-		const tfdt = findIsoBox(boxes, box => box.type === 'tfdt')
+		const tfdt = findIsoBox(boxes, box => isIsoBoxType('tfdt', box))
 		// #endregion example
 
 		assert.ok(tfdt)
@@ -71,7 +72,7 @@ describe('createDefaultReaderConfig', function () {
 		const [box] = readIsoBoxes(TFDT_V1, createDefaultReaderConfig())
 
 		assert.ok(box)
-		assert.strictEqual(box.type, 'tfdt')
+		assert.ok(isIsoBoxType('tfdt', box))
 		assert.strictEqual(box.baseMediaDecodeTime, 2 ** 53)
 	})
 

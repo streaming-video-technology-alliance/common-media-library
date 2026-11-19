@@ -1,4 +1,5 @@
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Moves the cursor past a field and returns the position of the field.
@@ -11,7 +12,7 @@ import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
  *
  * @internal
  */
-export function take(cursor: IsoBoxReadCursor, size: number): number {
+export function take(cursor: IsoBoxReadCursor<IsoInt64>, size: number): number {
 	const { pos, end } = cursor
 
 	if (!(size >= 0 && pos + size <= end)) {

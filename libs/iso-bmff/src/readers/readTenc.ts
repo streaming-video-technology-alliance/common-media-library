@@ -1,6 +1,7 @@
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -8,7 +9,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * ISO/IEC 23001-7:2016 - 8.2
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `TrackEncryptionBox`
  *
@@ -17,7 +18,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox {
+export function readTenc(cursor: IsoBoxReadCursor<IsoInt64>): TrackEncryptionBox {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 	view.jump(1)
 	const pattern = view.readUint(1)
@@ -37,7 +40,7 @@ export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox {
 		box.defaultSkipByteBlock = pattern & 0xf
 	}
 
-	if (defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && !view.done) {
+	if (defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && view.bytesRemaining > 0) {
 		box.defaultConstantIvSize = view.readUint(1)
 		box.defaultConstantIv = view.readArray(UINT, 1, box.defaultConstantIvSize)
 	}

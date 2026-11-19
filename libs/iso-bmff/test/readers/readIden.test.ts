@@ -3,6 +3,7 @@ import {
 	describe,
 	findBox,
 	isContainer,
+	isIsoBoxType,
 	it,
 	readIden,
 	readIsoBoxes,
@@ -14,6 +15,7 @@ describe('readIden', function () {
 	it('should correctly parse the box from sample data', function () {
 		const { data } = findBox('vttc.mp4', 'mdat', { readers: { mdat: readMdat } })
 		const boxes = readIsoBoxes(data, { readers: { iden: readIden } })
+		assert(isIsoBoxType('vttc', boxes[0]))
 		assert(isContainer(boxes[0]))
 		assert.strictEqual((boxes[0].boxes[0] as WebVttCueIdBox).cueId, '70')
 	})

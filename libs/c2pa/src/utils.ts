@@ -1,4 +1,4 @@
-import type { IsoBoxReadView, ParsedIsoBox } from '@svta/cml-iso-bmff'
+import type { IsoRawBox, ParsedIsoBox } from '@svta/cml-iso-bmff'
 
 const MILLISECONDS_PER_SECOND = 1000
 const SHA_ALGORITHM_PATTERN = /^sha(\d+)$/i
@@ -76,7 +76,7 @@ export const JUMBF_UUID: readonly number[] = [
 
 // Compares a uuid box usertype against an expected 16-byte extended type.
 /** @internal */
-export function matchesUuid(usertype: readonly number[], expected: readonly number[]): boolean {
+export function matchesUuid(usertype: ArrayLike<number>, expected: readonly number[]): boolean {
 	return usertype.length === expected.length && expected.every((b, i) => b === usertype[i])
 }
 
@@ -103,24 +103,14 @@ export function asString(value: unknown): string | null {
 	return typeof value === 'string' ? value : null
 }
 
-function isC2paUuid(usertype: readonly number[]): boolean {
+function isC2paUuid(usertype: ArrayLike<number>): boolean {
 	return matchesUuid(usertype, C2PA_MANIFEST_UUID) || matchesUuid(usertype, JUMBF_UUID)
 }
 
-/**
- * A parsed ISO BMFF box with a UUID type.
- *
- * `ParsedIsoBox` does not include 'uuid' in its type union because UUID boxes
- * are not part of the standard `IsoBoxMap`. This type represents the structural
- * shape needed to work with UUID boxes at runtime.
- *
- * @internal
- */
-export type UuidParsedBox = {
-	type: string
-	usertype?: number[]
-	view: IsoBoxReadView
-	size: number
+// The body of a raw box, after the box header and the user type of a uuid box.
+/** @internal */
+export function rawBoxBody(box: IsoRawBox): Uint8Array {
+	return box.bytes.subarray(box.headerSize ?? 8)
 }
 
 /**
@@ -131,9 +121,10 @@ export type UuidParsedBox = {
  *
  * @internal
  */
-export function findC2paUuidBox(boxes: ParsedIsoBox[]): UuidParsedBox | undefined {
-	return (boxes as UuidParsedBox[]).find(
-		box => box.type === 'uuid' && isC2paUuid(box.usertype ?? []),
+export function findC2paUuidBox(boxes: ParsedIsoBox[]): IsoRawBox | undefined {
+	return boxes.find(
+		(box): box is IsoRawBox =>
+			box.type === 'uuid' && 'bytes' in box && isC2paUuid(box.usertype ?? []),
 	)
 }
 

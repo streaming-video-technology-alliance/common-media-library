@@ -4,19 +4,21 @@ import {
 	createDefaultReaderConfig,
 	createDefaultWriterConfig,
 	describe,
+	isIsoBoxType,
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
 	writeIsoBox,
 	writeIsoBoxes,
 	type IsoBoxData,
+	type IsoBoxReadConfig,
 	type IsoInt64,
 	type ParsedIsoBox,
 } from './util/box.ts'
-import { bytes } from './util/bytes.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
+import { record, sourceOf } from './util/sources.ts'
 import { values } from './util/values.ts'
 
 // Known defects. A line is `fixture/box type/check` and the count of boxes that fail the check.
@@ -107,21 +109,30 @@ const { readers = {} } = createDefaultReaderConfig()
 const { writers } = createDefaultWriterConfig()
 
 type Read = (data: IsoBoxData) => ParsedIsoBox<IsoInt64>[]
-
 // The test runs one time for each line: the name of the test, the type of the 64-bit fields, and the read function.
 // The counts and the known defects are the same for both.
 const MODES: [string, string, Read][] = [
-	['the default configs', 'number', data => readIsoBoxes(data, createDefaultReaderConfig())],
+	[
+		'the default configs',
+		'number',
+		data => readIsoBoxes(data, record(createDefaultReaderConfig())),
+	],
 	[
 		'readInt64AsBigInt',
 		'bigint',
-		data => readIsoBoxes(data, createDefaultReaderConfig({ int64: readInt64AsBigInt })),
+		data =>
+			readIsoBoxes(
+				data,
+				record(
+					createDefaultReaderConfig({ int64: readInt64AsBigInt }) as IsoBoxReadConfig<IsoInt64>,
+				),
+			),
 	],
 ]
 
 // Writers that return the source bytes of a box.
 const sourceWriters = Object.fromEntries(
-	Object.keys(writers).map(type => [type, ({ view }: ParsedIsoBox<IsoInt64>) => view]),
+	Object.keys(writers).map(type => [type, (box: ParsedIsoBox<IsoInt64>) => sourceOf(box).bytes]),
 )
 
 function counts(config: object): Record<string, number> {
@@ -150,7 +161,7 @@ function* walkSamples(
 ): Generator<ParsedIsoBox<IsoInt64>> {
 	for (const box of boxes) {
 		if (
-			box.type === 'mdat' &&
+			isIsoBoxType('mdat', box) &&
 			['vttc', 'vtte'].includes(String.fromCharCode(...box.data.subarray(4, 8)))
 		) {
 			yield* walk(read(box.data))
@@ -177,17 +188,18 @@ describe('fixture round trip', function () {
 				let changed = false
 
 				for (const box of [...tree, ...walkSamples(tree, read)]) {
-					const { type, view } = box
+					const { type } = box
+					const { bytes: original, remaining } = sourceOf(box)
 					const writer = writers[type]
 
-					if (box.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', box)) {
 						fields.add(typeof box.baseMediaDecodeTime)
 					}
 
 					if (type in readers) {
 						parsed[type]++
 
-						if (view.bytesRemaining !== 0) {
+						if (remaining !== 0) {
 							fail(type, 'remaining')
 						}
 					}
@@ -201,7 +213,7 @@ describe('fixture round trip', function () {
 
 					written[type]++
 
-					if (!same(output, bytes(view))) {
+					if (!same(output, original)) {
 						fail(type, 'bytes')
 						changed ||= tree.includes(box)
 					}
@@ -212,7 +224,7 @@ describe('fixture round trip', function () {
 				}
 
 				const output = reduceUint8Arrays(writeIsoBoxes(boxes, { writers }))
-				const end = boxes.reduce((size, box) => size + box.view.byteLength, 0)
+				const end = boxes.reduce((size, box) => size + sourceOf(box).bytes.length, 0)
 
 				if (end !== source.length) {
 					fail('file', 'remaining')
@@ -224,12 +236,11 @@ describe('fixture round trip', function () {
 				}
 
 				for (const box of tree) {
-					const offsets =
-						box.type === 'stco'
-							? box.chunkOffset
-							: box.type === 'tfra'
-								? box.entries.map(entry => Number(entry.moofOffset))
-								: []
+					const offsets = isIsoBoxType('stco', box)
+						? box.chunkOffset
+						: isIsoBoxType('tfra', box)
+							? box.entries.map(entry => Number(entry.moofOffset))
+							: []
 
 					for (const offset of offsets) {
 						if (!same(output.subarray(offset, offset + 16), source.subarray(offset, offset + 16))) {

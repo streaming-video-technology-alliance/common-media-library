@@ -1,21 +1,24 @@
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
 import { INT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `tkhd` box (`TrackHeaderBox`).
  *
- * The 64-bit integer fields of the result have the type that the `int64` option of the view returns.
+ * The 64-bit integer fields of the result have the type that the `int64` function of the cursor returns.
  * With no option, they are numbers.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `TrackHeaderBox`
  *
  * @public
  */
-export function readTkhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackHeaderBox<V> {
+export function readTkhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackHeaderBox<V> {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 	const size = version === 1 ? 8 : 4
 

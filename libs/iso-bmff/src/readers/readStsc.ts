@@ -1,6 +1,7 @@
 import type { SampleToChunkBox } from '../boxes/SampleToChunkBox.ts'
 import type { SampleToChunkEntry } from '../boxes/SampleToChunkEntry.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -8,7 +9,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.7.4
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `SampleToChunkBox`
  *
@@ -17,7 +18,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readStsc(view: IsoBoxReadView<IsoInt64>): SampleToChunkBox {
+export function readStsc(cursor: IsoBoxReadCursor<IsoInt64>): SampleToChunkBox {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 

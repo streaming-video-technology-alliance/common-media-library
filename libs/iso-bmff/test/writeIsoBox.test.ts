@@ -1,4 +1,4 @@
-import { readIsoBoxes, readTfdt, writeIsoBox, writeTfdt } from '@svta/cml-iso-bmff'
+import { isIsoBoxType, readIsoBoxes, readTfdt, writeIsoBox, writeTfdt } from '@svta/cml-iso-bmff'
 import assert from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 
@@ -14,7 +14,7 @@ describe('writeIsoBox', function () {
 		const [tfdt] = readIsoBoxes(bytes, { readers: { tfdt: readTfdt } })
 
 		assert.strictEqual(bytes.length, 20)
-		assert.ok(tfdt?.type === 'tfdt')
+		assert.ok(isIsoBoxType('tfdt', tfdt))
 		assert.strictEqual(tfdt.baseMediaDecodeTime, 90000)
 	})
 })

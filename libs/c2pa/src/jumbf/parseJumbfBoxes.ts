@@ -1,4 +1,5 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
+import { rawBoxBody } from '../utils.ts'
 import type { JumbfBox } from './JumbfBox.ts'
 
 /**
@@ -18,6 +19,6 @@ import type { JumbfBox } from './JumbfBox.ts'
 export function parseJumbfBoxes(bytes: Uint8Array): JumbfBox[] {
 	return readIsoBoxes(bytes).map(box => ({
 		type: box.type,
-		data: box.view.readData(box.view.bytesRemaining),
+		data: 'bytes' in box ? rawBoxBody(box) : new Uint8Array(0),
 	}))
 }

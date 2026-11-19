@@ -3,6 +3,7 @@ import {
 	describe,
 	findBox,
 	isContainer,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readMdat,
@@ -14,11 +15,11 @@ describe('readSttg', function () {
 	it('should correctly parse the box from sample data', function () {
 		const { data } = findBox('vttc.mp4', 'mdat', { readers: { mdat: readMdat } })
 		const boxes = readIsoBoxes(data, { readers: { sttg: readSttg } })
+		assert(isIsoBoxType('vttc', boxes[1]))
 		assert(isContainer(boxes[1]))
-		assert.strictEqual(
-			(boxes[1].boxes[1] as WebVttSettingsBox).settings,
-			'align:left line:89% position:25% size:65%',
-		)
+		const sttg: { type: string } = boxes[1].boxes[1]
+		assert(isIsoBoxType('sttg', sttg))
+		assert.strictEqual(sttg.settings, 'align:left line:89% position:25% size:65%')
 	})
 
 	it('should read a box that has a null byte after the settings', function () {

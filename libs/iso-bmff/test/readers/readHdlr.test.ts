@@ -1,11 +1,10 @@
-import { assert, describe, findBox, it, readHdlr, readIsoBoxes } from '../util/box.ts'
+import { assert, describe, findBox, isIsoBoxType, it, readHdlr, readIsoBoxes } from '../util/box.ts'
 
 describe('readHdlr', function () {
 	it('should correctly parse the box', function () {
 		const box = findBox('captions.mp4', 'hdlr', { readers: { hdlr: readHdlr } })
 
-		assert.strictEqual(box.type, 'hdlr')
-		assert.strictEqual(box.size, 68)
+		assert.ok(isIsoBoxType('hdlr', box))
 
 		assert.strictEqual(box.preDefined, 0)
 		assert.strictEqual(box.handlerType, 'subt')
@@ -31,7 +30,7 @@ describe('readHdlr', function () {
 		// #endregion example
 
 		assert.ok(hdlr)
-		assert.strictEqual(hdlr.type, 'hdlr')
+		assert.ok(isIsoBoxType('hdlr', hdlr))
 		assert.strictEqual(hdlr.preDefined, 0)
 		assert.strictEqual(hdlr.handlerType, 'vide')
 		assert.deepStrictEqual(hdlr.reserved, [0, 0, 0])
@@ -46,7 +45,7 @@ describe('readHdlr', function () {
 		const [hdlr] = readIsoBoxes(bytes, { readers: { hdlr: readHdlr } })
 
 		assert.ok(hdlr)
-		assert.strictEqual(hdlr.type, 'hdlr')
+		assert.ok(isIsoBoxType('hdlr', hdlr))
 		assert.strictEqual(hdlr.handlerType, 'vide')
 		assert.strictEqual(hdlr.name, '')
 	})

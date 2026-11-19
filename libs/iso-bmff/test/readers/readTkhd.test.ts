@@ -1,4 +1,12 @@
-import { assert, describe, it, readIsoBoxes, readTkhd, writeTkhd } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	isIsoBoxType,
+	it,
+	readIsoBoxes,
+	readTkhd,
+	writeTkhd,
+} from '../util/box.ts'
 import { IDENTITY, LIMITS, PROJECTION, ROTATION } from '../util/matrices.ts'
 
 // A tkhd box. The arguments are the stored integers of the fixed-point fields.
@@ -29,7 +37,7 @@ function read(bytes: Uint8Array) {
 	const [box] = readIsoBoxes(bytes, { readers: { tkhd: readTkhd } })
 
 	assert.ok(box)
-	assert.strictEqual(box.type, 'tkhd')
+	assert.ok(isIsoBoxType('tkhd', box))
 
 	return box
 }

@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	assert,
 	describe,
 	it,
@@ -82,7 +83,7 @@ describe('writeHdlr', function () {
 			})
 
 			assert.ok(parsed)
-			assert.strictEqual(parsed.type, 'hdlr')
+			assert.ok(isIsoBoxType('hdlr', parsed))
 
 			const { type, version, flags, preDefined, handlerType, reserved, name } = parsed
 

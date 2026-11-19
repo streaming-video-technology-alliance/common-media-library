@@ -11,6 +11,7 @@ import {
 	writeIsoBox,
 	type WebVttCueIdBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 describe('writeIden', function () {
 	it('should write a WebVttCueIdBox correctly', function () {
@@ -51,19 +52,14 @@ describe('writeIden', function () {
 	})
 
 	it('should write the input bytes of every iden box in vttc.mp4', function () {
-		const config = createDefaultReaderConfig()
+		const config = record(createDefaultReaderConfig())
 		const { data } = findBox('vttc.mp4', 'mdat', config)
 		const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'iden')
 
 		assert.strictEqual(boxes.length, 2)
 
 		for (const box of boxes) {
-			const { view } = box
-
-			assert.deepStrictEqual(
-				writeIsoBox(box, createDefaultWriterConfig()),
-				new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
-			)
+			assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), sourceOf(box).bytes)
 		}
 	})
 })

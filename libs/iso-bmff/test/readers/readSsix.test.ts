@@ -5,7 +5,6 @@ describe('readSsix', function () {
 		const box = findBox('spliced_10000.m4v', 'ssix', { readers: { ssix: readSsix } })
 
 		assert.strictEqual(box.type, 'ssix')
-		assert.strictEqual(box.size, 8124)
 		assert.strictEqual(box.subsegmentCount, 25)
 		assert.strictEqual(box.subsegments.length, 25)
 

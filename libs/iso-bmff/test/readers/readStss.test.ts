@@ -2,6 +2,7 @@ import {
 	assert,
 	describe,
 	filterBoxes,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readStss,
@@ -18,7 +19,7 @@ describe('readStss', function () {
 		// #region example
 		const [box] = readIsoBoxes(STSS, { readers: { stss: readStss } })
 
-		assert.ok(box.type === 'stss')
+		assert.ok(isIsoBoxType('stss', box))
 		assert.deepStrictEqual(box.sampleNumber, [1, 31])
 		// #endregion example
 	})
@@ -33,7 +34,7 @@ describe('readStss', function () {
 	it('should write the bytes that it reads', function () {
 		const [box] = readIsoBoxes(STSS, { readers: { stss: readStss } })
 
-		assert.ok(box.type === 'stss')
+		assert.ok(isIsoBoxType('stss', box))
 		assert.deepStrictEqual(new Uint8Array(writeStss(box).buffer), STSS)
 	})
 })

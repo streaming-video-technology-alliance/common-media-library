@@ -2,6 +2,7 @@ import {
 	assert,
 	describe,
 	filterBoxes,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readSmhd,
@@ -24,7 +25,7 @@ function read(bytes: Uint8Array) {
 	const [box] = readIsoBoxes(bytes, { readers: { smhd: readSmhd } })
 
 	assert.ok(box)
-	assert.strictEqual(box.type, 'smhd')
+	assert.ok(isIsoBoxType('smhd', box))
 
 	return box
 }
@@ -33,7 +34,7 @@ describe('readSmhd', function () {
 	it('should correctly parse the box from sample data', function () {
 		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', 'smhd', { readers: { smhd: readSmhd } })
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'smhd')
+		assert.ok(isIsoBoxType('smhd', boxes[0]))
 		assert.strictEqual(boxes[0].balance, 0.0)
 	})
 

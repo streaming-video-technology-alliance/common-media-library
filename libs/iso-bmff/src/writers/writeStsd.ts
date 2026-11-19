@@ -1,3 +1,5 @@
+import type { IsoBox } from '../IsoBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
@@ -23,7 +25,7 @@ export function writeStsd(box: SampleDescriptionBox, config: IsoBoxWriteConfig):
 	const entryCount = box.boxes.length
 
 	// TODO: Is there a way to avoid creating the intermediate Uint8Arrays?
-	const { bytes, size } = writeChildBoxes(box.boxes, config)
+	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox<IsoInt64>[], config)
 	const totalSize = headerSize + fullBoxSize + entryCountSize + size
 
 	const writer = new IsoBoxWriteView('stsd', totalSize)

@@ -3,6 +3,7 @@ import {
 	createDefaultReaderConfig,
 	describe,
 	isContainer,
+	isIsoBoxType,
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
@@ -145,7 +146,7 @@ describe('isContainer', function () {
 	it('gives each child of a udta box a box type with number fields', function () {
 		let count = 0
 		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
-			if (box.type === 'moov') {
+			if (isIsoBoxType('moov', box)) {
 				for (const child of box.boxes) {
 					if (child.type === 'udta') {
 						for (const inner of child.boxes) {
@@ -170,7 +171,7 @@ describe('isContainer', function () {
 			buffer,
 			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
 		)) {
-			if (box.type === 'moov') {
+			if (isIsoBoxType('moov', box)) {
 				for (const child of box.boxes) {
 					if (child.type === 'udta') {
 						for (const inner of child.boxes) {

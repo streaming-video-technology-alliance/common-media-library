@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	assert,
 	describe,
 	it,
@@ -92,7 +93,7 @@ describe('writePssh', function () {
 		it(`should write the source bytes of ${name} that readPssh parsed`, function () {
 			const [parsed] = readIsoBoxes(input, { readers: { pssh: readPssh } })
 
-			assert.strictEqual(parsed.type, 'pssh')
+			assert.ok(isIsoBoxType('pssh', parsed))
 			assert.deepStrictEqual(new Uint8Array(writePssh(parsed).buffer), input)
 		})
 	}

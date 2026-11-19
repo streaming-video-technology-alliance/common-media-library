@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	assert,
 	describe,
 	filterBoxes,
@@ -8,8 +9,8 @@ import {
 	readUrl,
 	writeUrl,
 	type DataEntryUrlBox,
-	type ParsedBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 // 'é日😀' has one character of two, three, and four UTF-8 bytes.
 const TEXT = 'é日😀'
@@ -122,7 +123,7 @@ describe('writeUrl', function () {
 			})
 
 			assert.ok(parsed)
-			assert.strictEqual(parsed.type, 'url ')
+			assert.ok(isIsoBoxType('url ', parsed))
 
 			const { type, version, flags, location } = parsed
 
@@ -131,16 +132,17 @@ describe('writeUrl', function () {
 	}
 
 	it('should write the bytes of a parsed box that has flag 0x000001', function () {
-		const [dref] = filterBoxes('captions.mp4', 'dref', {
-			readers: { dref: readDref, 'url ': readUrl },
-		})
+		const [dref] = filterBoxes(
+			'captions.mp4',
+			'dref',
+			record({ readers: { dref: readDref, 'url ': readUrl } }),
+		)
 		const [entry] = dref.boxes
 
-		assert.strictEqual(entry.type, 'url ')
+		assert.ok(isIsoBoxType('url ', entry))
 		assert.strictEqual(entry.flags, 1)
 
-		const { view } = entry as ParsedBox<DataEntryUrlBox>
-		const input = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
+		const input = sourceOf(entry).bytes
 
 		assert.deepStrictEqual(new Uint8Array(writeUrl(entry).buffer), input)
 	})

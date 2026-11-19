@@ -1,6 +1,6 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
 import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
-import { findC2paUuidBox, stripJumbfUuidPrefix } from './utils.ts'
+import { findC2paUuidBox, rawBoxBody, stripJumbfUuidPrefix } from './utils.ts'
 import type { JumbfBox } from './jumbf/JumbfBox.ts'
 import { parseJumbfBoxes } from './jumbf/parseJumbfBoxes.ts'
 import { parseJumbfLabel } from './jumbf/parseJumbfLabel.ts'
@@ -68,7 +68,7 @@ export function extractManifestCertificate(mp4Bytes: Uint8Array): Uint8Array | n
 		const uuidBox = findC2paUuidBox(boxes)
 		if (!uuidBox) return null
 
-		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
+		const rawPayload = rawBoxBody(uuidBox)
 		const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
 		if (!jumbfPayload) return null
 		const signatureBytes = findSignatureContentBytes(parseJumbfBoxes(jumbfPayload))

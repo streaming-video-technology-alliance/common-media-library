@@ -1,5 +1,6 @@
 import type { AudioSampleEntry, AudioSampleEntryChild } from '../boxes/AudioSampleEntry.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
@@ -7,7 +8,7 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  * Read an audio sample entry box (`AudioSampleEntry`) of the given type.
  *
  * @param type - The type of `AudioSampleEntry` to read
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `AudioSampleEntry`
  *
@@ -15,8 +16,10 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  */
 export function readAudioSampleEntry<T extends IsoBoxType>(
 	type: T,
-	view: IsoBoxReadView<IsoInt64>,
+	cursor: IsoBoxReadCursor<IsoInt64>,
 ): AudioSampleEntry<T> {
+	const view = new IsoBoxReadView(cursor)
+
 	const { jump, readUint, readTemplate, readBoxes } = view
 
 	return {

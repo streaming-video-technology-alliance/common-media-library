@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `ensureEncryptedInit` now reads the boxes with the read cursor of `@svta/cml-iso-bmff` 2.0.0. The function skips a sample entry that the package returns as a raw box. This change does not change the public API or the output bytes ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `@svta/cml-drm` now needs `@svta/cml-iso-bmff` 2.0.0 or later ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
 - `ensureEncryptedInit` now reads and writes the sample entries in the `boxes` field of the `stsd` box, as `@svta/cml-iso-bmff` 2.0.0 returns them. For a source with 0 in the reserved fields of its sample entries, the output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
 - `ensureEncryptedInit` now writes 0 in the reserved fields of the sample entries that it copies. Earlier releases keep the bytes of the source entry, such as the revision and the vendor of a QuickTime sound description ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).

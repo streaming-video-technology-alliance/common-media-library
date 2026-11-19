@@ -1,4 +1,5 @@
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { take } from './take.ts'
 
 /**
@@ -16,6 +17,6 @@ import { take } from './take.ts'
  *
  * @public
  */
-export function readUint64(cursor: IsoBoxReadCursor): bigint {
+export function readUint64(cursor: IsoBoxReadCursor<IsoInt64>): bigint {
 	return cursor.view.getBigUint64(take(cursor, 8))
 }

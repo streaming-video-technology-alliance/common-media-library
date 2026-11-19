@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	assert,
 	describe,
 	it,
@@ -154,7 +155,7 @@ describe('writeSchm', function () {
 
 		const [parsed] = readIsoBoxes(input, { readers: { schm: readSchm } })
 
-		assert.strictEqual(parsed.type, 'schm')
+		assert.ok(isIsoBoxType('schm', parsed))
 		assert.strictEqual(parsed.schemeUri, '')
 		assert.deepStrictEqual(new Uint8Array(writeSchm(parsed).buffer), input)
 	})
@@ -165,7 +166,7 @@ describe('writeSchm', function () {
 				readers: { schm: readSchm },
 			})
 
-			assert.strictEqual(parsed.type, 'schm')
+			assert.ok(isIsoBoxType('schm', parsed))
 
 			const { type, version, flags, schemeType, schemeVersion, schemeUri } = parsed
 

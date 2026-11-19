@@ -483,3 +483,7 @@ The `IsoBoxReaderReturn` fix shipped on its own in #614.
 Amended on 2026-11-18, by [theme 5 of the box types RFC](iso-bmff-v2-box-types.md#theme-5-names):
 
 - **Names.** `defaultReaderConfig` and `defaultWriterConfig` are now `createDefaultReaderConfig` and `createDefaultWriterConfig`. `IsoBoxReadViewConfig` and `IsoBoxWriteViewConfig` are now `IsoBoxReadConfig` and `IsoBoxWriteConfig`. The text of this RFC keeps the old names.
+
+Amended on 2026-11-18, by [Changes to accepted RFCs](iso-bmff-cursor-api.md#changes-to-accepted-rfcs) of the cursor RFC:
+
+- **Read handle.** The first parameter of `IsoInt64Reader` is now a read cursor of either mode, `IsoBoxReadCursor<IsoInt64>`, in place of a view. The function reads the field with the read field functions, such as `readUint32` and `readUint64`. `readWideUint` and `readWideInt` are field functions that take the cursor. The text of this RFC still names `IsoBoxReadView`, the type of version 1.

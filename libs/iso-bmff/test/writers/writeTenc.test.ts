@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	assert,
 	createDefaultReaderConfig,
 	createDefaultWriterConfig,
@@ -174,7 +175,7 @@ describe('writeTenc', function () {
 			readers: { tenc: readTenc },
 		})
 
-		assert.strictEqual(parsed.type, 'tenc')
+		assert.ok(isIsoBoxType('tenc', parsed))
 		assert.deepStrictEqual(write(parsed), tencBox(1, 0, 0, 0, 0, 0x19, 1, 8, ...KID))
 	})
 
@@ -183,7 +184,7 @@ describe('writeTenc', function () {
 			readers: { tenc: readTenc },
 		})
 
-		assert.strictEqual(parsed.type, 'tenc')
+		assert.ok(isIsoBoxType('tenc', parsed))
 
 		parsed.defaultIsProtected = 0
 
@@ -194,7 +195,7 @@ describe('writeTenc', function () {
 		it(`should write the source bytes of ${name} that readTenc reads`, function () {
 			const [parsed] = readIsoBoxes(source, { readers: { tenc: readTenc } })
 
-			assert.strictEqual(parsed.type, 'tenc')
+			assert.ok(isIsoBoxType('tenc', parsed))
 			assert.deepStrictEqual(write(parsed), source)
 		})
 

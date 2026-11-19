@@ -6,14 +6,16 @@ import {
 	describe,
 	filterIsoBoxes,
 	findIsoBox,
+	isIsoBoxType,
 	IsoBoxWriteView,
 	it,
 	readIsoBoxes,
+	readUint32,
 	readStsd,
 	writeIsoBoxes,
 	writeStsd,
 	writeVisualSampleEntry,
-	type IsoBoxReadView,
+	type IsoBoxReadCursor,
 } from './util/box.ts'
 
 describe('API', function () {
@@ -22,7 +24,7 @@ describe('API', function () {
 		const boxes = readIsoBoxes(isoFile, {
 			readers: {
 				stsd: readStsd,
-				test: (view: IsoBoxReadView) => ({ type: 'test' as const, value: view.readUint(4) }),
+				test: (cursor: IsoBoxReadCursor) => ({ type: 'test' as const, value: readUint32(cursor) }),
 				hvc1: createVisualSampleEntryReader('hvc1'),
 				'ac-3': createAudioSampleEntryReader('ac-3'),
 			},
@@ -34,12 +36,12 @@ describe('API', function () {
 
 		const stsd = findIsoBox(boxes, box => box.type === 'stsd')
 		assert.ok(stsd)
-		assert.strictEqual(stsd.type, 'stsd')
+		assert.ok(isIsoBoxType('stsd', stsd))
 		assert.strictEqual(stsd.boxes.length, 1)
 
 		const entry = stsd.boxes[0]
 		assert.ok(entry)
-		assert.strictEqual(entry.type, 'hvc1')
+		assert.ok(isIsoBoxType('hvc1', entry))
 		assert.strictEqual(entry.boxes.length, 2)
 
 		const stream = writeIsoBoxes(boxes, {

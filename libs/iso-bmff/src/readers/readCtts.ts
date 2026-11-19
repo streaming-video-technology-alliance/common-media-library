@@ -1,6 +1,7 @@
 import type { CompositionOffsetBox } from '../boxes/CompositionOffsetBox.ts'
 import type { CompositionOffsetEntry } from '../boxes/CompositionOffsetEntry.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -10,13 +11,15 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * A box of version 2 or above has no entries in the syntax. The result then has an empty `entries` list.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `CompositionOffsetBox`
  *
  * @public
  */
-export function readCtts(view: IsoBoxReadView<IsoInt64>): CompositionOffsetBox {
+export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetBox {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 	const read = version === 1 ? view.readInt : view.readUint
 

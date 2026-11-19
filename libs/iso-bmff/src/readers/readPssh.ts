@@ -1,12 +1,13 @@
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `pssh` box (`ProtectionSystemSpecificHeaderBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `ProtectionSystemSpecificHeaderBox`
  *
@@ -15,7 +16,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecificHeaderBox {
+export function readPssh(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSystemSpecificHeaderBox {
+	const view = new IsoBoxReadView(cursor)
+
 	const { readUint, readArray } = view
 	const { version, flags } = view.readFullBox()
 

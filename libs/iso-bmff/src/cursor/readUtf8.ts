@@ -1,5 +1,6 @@
 import { decodeUtf8 } from '@svta/cml-utils'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { readBytes } from './readBytes.ts'
 
 /**
@@ -19,7 +20,7 @@ import { readBytes } from './readBytes.ts'
  *
  * @public
  */
-export function readUtf8(cursor: IsoBoxReadCursor, length: number): string {
+export function readUtf8(cursor: IsoBoxReadCursor<IsoInt64>, length: number): string {
 	const bytes = readBytes(cursor, length)
 
 	return length ? decodeUtf8(bytes) : ''

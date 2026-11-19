@@ -1,11 +1,12 @@
 import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `urn ` box (`DataEntryUrnBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `DataEntryUrnBox`
  *
@@ -14,7 +15,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readUrn(view: IsoBoxReadView<IsoInt64>): DataEntryUrnBox {
+export function readUrn(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrnBox {
+	const view = new IsoBoxReadView(cursor)
+
 	return {
 		type: 'urn ',
 		...view.readFullBox(),
