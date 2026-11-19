@@ -1,6 +1,6 @@
 import type { TrackBox } from '../boxes/TrackBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -19,10 +19,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readTrak<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'trak',
-		boxes: view.readBoxes(),
+		boxes: readChildBoxes(cursor),
 	}
 }

@@ -1,6 +1,6 @@
 import type { SampleTableBox } from '../boxes/SampleTableBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -16,10 +16,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readStbl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SampleTableBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'stbl',
-		boxes: view.readBoxes(),
+		boxes: readChildBoxes(cursor),
 	}
 }

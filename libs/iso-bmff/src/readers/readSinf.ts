@@ -1,6 +1,6 @@
 import type { ProtectionSchemeInfoBox } from '../boxes/ProtectionSchemeInfoBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -18,10 +18,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export function readSinf<V extends IsoInt64>(
 	cursor: IsoBoxReadCursor<V>,
 ): ProtectionSchemeInfoBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'sinf',
-		boxes: view.readBoxes(),
+		boxes: readChildBoxes(cursor),
 	}
 }
