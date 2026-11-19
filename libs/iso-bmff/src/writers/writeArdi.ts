@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `ardi` box (`AudioRenderingIndicationBox`).
@@ -12,14 +13,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeArdi(cursor: IsoBoxWriteCursor, box: AudioRenderingIndicationBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const audioRenderingIndicationSize = 1
-	const totalSize = headerSize + fullBoxSize + audioRenderingIndicationSize
+	const start = beginIsoFullBox(cursor, 'ardi', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('ardi', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-	writer.writeUint(box.audioRenderingIndication, 1)
-
-	writeLegacyView(cursor, writer)
+	writeUint8(cursor, box.audioRenderingIndication)
+	endIsoBox(cursor, start)
 }

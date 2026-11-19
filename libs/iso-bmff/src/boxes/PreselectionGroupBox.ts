@@ -15,9 +15,6 @@ export type PreselectionGroupBox<V extends IsoInt64 = number> = FullBox & {
 	/** Group ID */
 	groupId: number
 
-	/** Number of entities in group */
-	numEntitiesInGroup: number
-
 	/** The IDs of the entities in the group. */
 	entityId: number[]
 

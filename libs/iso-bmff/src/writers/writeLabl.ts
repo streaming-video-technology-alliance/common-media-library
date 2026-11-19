@@ -1,8 +1,9 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { LabelBox } from '../boxes/LabelBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `labl` box (`LabelBox`).
@@ -16,24 +17,10 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeLabl(cursor: IsoBoxWriteCursor, box: LabelBox): void {
-	const languageBytes = encodeText(box.language)
-	const labelBytes = encodeText(box.label)
+	const start = beginIsoFullBox(cursor, 'labl', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const labelIdSize = 2
-	const languageSize = languageBytes.length + 1 // null-terminated
-	const labelSize = labelBytes.length + 1 // null-terminated
-	const totalSize = headerSize + fullBoxSize + labelIdSize + languageSize + labelSize
-
-	const writer = new IsoBoxWriteView('labl', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.labelId, 2)
-	writer.writeBytes(languageBytes)
-	writer.writeUint(0, 1)
-	writer.writeBytes(labelBytes)
-	writer.writeUint(0, 1)
-
-	writeLegacyView(cursor, writer)
+	writeUint16(cursor, box.labelId)
+	writeTerminatedUtf8(cursor, box.language)
+	writeTerminatedUtf8(cursor, box.label)
+	endIsoBox(cursor, start)
 }

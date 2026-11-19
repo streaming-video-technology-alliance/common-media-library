@@ -19,12 +19,12 @@ describe('readVlab', function () {
 		assert.strictEqual((boxes[0] as WebVttSourceLabelBox).sourceLabel, 'source')
 	})
 
-	it('should read a box that has a null byte after the sourceLabel', function () {
+	it('should keep a null byte after the sourceLabel as U+0000', function () {
 		// size (15), type (vlab), sourceLabel, null byte
 		const data = new Uint8Array([0, 0, 0, 15, 118, 108, 97, 98, 115, 111, 117, 114, 99, 101, 0])
 
 		const boxes = readIsoBoxes(data, { readers: { vlab: readVlab } })
 
-		assert.strictEqual((boxes[0] as WebVttSourceLabelBox).sourceLabel, 'source')
+		assert.strictEqual((boxes[0] as WebVttSourceLabelBox).sourceLabel, 'source\0')
 	})
 })

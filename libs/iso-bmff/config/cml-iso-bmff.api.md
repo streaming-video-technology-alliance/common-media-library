@@ -618,7 +618,6 @@ export type ParsedIsoBox<V extends IsoInt64 = number> = IsoBox<V> | IsoRawBox;
 export type PreselectionGroupBox<V extends IsoInt64 = number> = FullBox & {
     type: "prsl";
     groupId: number;
-    numEntitiesInGroup: number;
     entityId: number[];
     preselectionTag?: string;
     selectionPriority?: number;

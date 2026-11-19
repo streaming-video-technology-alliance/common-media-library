@@ -1,8 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { ExtendedLanguageBox } from '../boxes/ExtendedLanguageBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `elng` box (`ExtendedLanguageBox`).
@@ -18,18 +18,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeElng(cursor: IsoBoxWriteCursor, box: ExtendedLanguageBox): void {
-	const extendedLanguageBytes = encodeText(box.extendedLanguage)
+	const start = beginIsoFullBox(cursor, 'elng', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const extendedLanguageSize = extendedLanguageBytes.length + 1 // null-terminated
-	const totalSize = headerSize + fullBoxSize + extendedLanguageSize
-
-	const writer = new IsoBoxWriteView('elng', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeBytes(extendedLanguageBytes)
-	writer.writeUint(0, 1)
-
-	writeLegacyView(cursor, writer)
+	writeTerminatedUtf8(cursor, box.extendedLanguage)
+	endIsoBox(cursor, start)
 }

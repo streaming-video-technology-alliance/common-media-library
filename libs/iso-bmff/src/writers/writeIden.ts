@@ -1,8 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeUtf8 } from '../cursor/writeUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `iden` box (`WebVttCueIdBox`).
@@ -16,14 +16,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeIden(cursor: IsoBoxWriteCursor, box: WebVttCueIdBox): void {
-	const cueIdBytes = encodeText(box.cueId)
+	const start = beginIsoBox(cursor, 'iden')
 
-	const headerSize = 8
-	const cueIdSize = cueIdBytes.length
-	const totalSize = headerSize + cueIdSize
-
-	const writer = new IsoBoxWriteView('iden', totalSize)
-	writer.writeBytes(cueIdBytes)
-
-	writeLegacyView(cursor, writer)
+	writeUtf8(cursor, box.cueId)
+	endIsoBox(cursor, start)
 }
