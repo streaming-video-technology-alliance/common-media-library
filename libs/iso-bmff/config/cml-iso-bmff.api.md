@@ -41,10 +41,9 @@ export type Box<T extends IsoBoxType> = {
 };
 
 // @public
-export type ChunkLargeOffsetBox = FullBox & {
+export type ChunkLargeOffsetBox<V extends IsoInt64 = number> = FullBox & {
     type: "co64";
-    entryCount: number;
-    chunkOffset: number[];
+    chunkOffset: V[];
 };
 
 // @public
@@ -57,7 +56,6 @@ export type ChunkOffsetBox = FullBox & {
 export type CompactSampleSizeBox = FullBox & {
     type: "stz2";
     fieldSize: number;
-    sampleCount: number;
     entrySize: number[];
 };
 
@@ -319,7 +317,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     avc2: VisualSampleEntry<"avc2", V>;
     avc3: VisualSampleEntry<"avc3", V>;
     avc4: VisualSampleEntry<"avc4", V>;
-    co64: ChunkLargeOffsetBox;
+    co64: ChunkLargeOffsetBox<V>;
     ctts: CompositionOffsetBox;
     dinf: DataInformationBox<V>;
     dref: DataReferenceBox<V>;
@@ -683,6 +681,9 @@ export function readBytes(cursor: IsoBoxReadCursor<IsoInt64>, length: number): U
 export function readChildBoxes<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, count?: number): ParsedIsoBox<V>[];
 
 // @public
+export function readCo64<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): ChunkLargeOffsetBox<V>;
+
+// @public
 export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetBox;
 
 // @public
@@ -881,6 +882,9 @@ export function readStts(cursor: IsoBoxReadCursor<IsoInt64>): TimeToSampleBox;
 
 // @public
 export function readStyp(cursor: IsoBoxReadCursor<IsoInt64>): SegmentTypeBox;
+
+// @public
+export function readStz2(cursor: IsoBoxReadCursor<IsoInt64>): CompactSampleSizeBox;
 
 // @public
 export function readSubs(cursor: IsoBoxReadCursor<IsoInt64>): SubSampleInformationBox;
@@ -1358,6 +1362,9 @@ export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): 
 export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<IsoInt64>>): void;
 
 // @public
+export function writeCo64(cursor: IsoBoxWriteCursor, box: ChunkLargeOffsetBox<IsoInt64>): void;
+
+// @public
 export function writeCtts(cursor: IsoBoxWriteCursor, box: CompositionOffsetBox): void;
 
 // @public
@@ -1548,6 +1555,9 @@ export function writeStts(cursor: IsoBoxWriteCursor, box: TimeToSampleBox): void
 
 // @public
 export function writeStyp(cursor: IsoBoxWriteCursor, box: SegmentTypeBox): void;
+
+// @public
+export function writeStz2(cursor: IsoBoxWriteCursor, box: CompactSampleSizeBox): void;
 
 // @public
 export function writeSubs(cursor: IsoBoxWriteCursor, box: SubSampleInformationBox): void;
