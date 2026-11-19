@@ -42,6 +42,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `if (box.type === "tfdt")` before a field read | `if (isIsoBoxType("tfdt", box))` |
 | `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
+| A `co64` or `stz2` box with the default readers has no fields | The box has `chunkOffset`, or `fieldSize` and `entrySize` |
 | An error `Truncated box` from a custom reader | The error reaches the caller of `readIsoBoxes`. A truncated box stops the read with no error. |
 
 `seekIsoBox` reads one box without a read of the other boxes. Use it in place of a full read when your code needs one box, such as `tfdt`. See [Reading one box](reading-boxes.md#reading-one-box).
@@ -246,6 +247,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `subsampleCount` of a `subs` entry | `subsamples.length` |
 | `entryCount` of a `ctts` box of version 0 or 1 | `entries.length`. A box of version 2 or above keeps `entryCount`. |
 | `sampleCount` of a `stsz` box with a `sampleSize` of 0 | `entrySize.length`. A box with a `sampleSize` above 0 keeps `sampleCount`. |
+| `entryCount` of `co64`, `sampleCount` of `stz2` | `chunkOffset.length`, `entrySize.length` |
 
 ### Changed types
 

@@ -87,7 +87,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	avc2: VisualSampleEntry<'avc2', V>
 	avc3: VisualSampleEntry<'avc3', V>
 	avc4: VisualSampleEntry<'avc4', V>
-	co64: ChunkLargeOffsetBox
+	co64: ChunkLargeOffsetBox<V>
 	ctts: CompositionOffsetBox
 	dinf: DataInformationBox<V>
 	dref: DataReferenceBox<V>

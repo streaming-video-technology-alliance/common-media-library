@@ -115,6 +115,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `if (box.type === "tfdt")` before a field read | `if (isIsoBoxType("tfdt", box))` |
 | `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
+| A `co64` or `stz2` box with the default readers has no fields | The box has `chunkOffset`, or `fieldSize` and `entrySize` |
 | An error `Truncated box` from a custom reader | The error reaches the caller of `readIsoBoxes`. A truncated box stops the read with no error. |
 
 `seekIsoBox` reads one box without a read of the other boxes. Use it in place of a full read when your code needs one box, such as `tfdt`. See [Reading one box](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#reading-one-box).
@@ -319,6 +320,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `subsampleCount` of a `subs` entry | `subsamples.length` |
 | `entryCount` of a `ctts` box of version 0 or 1 | `entries.length`. A box of version 2 or above keeps `entryCount`. |
 | `sampleCount` of a `stsz` box with a `sampleSize` of 0 | `entrySize.length`. A box with a `sampleSize` above 0 keeps `sampleCount`. |
+| `entryCount` of `co64`, `sampleCount` of `stz2` | `chunkOffset.length`, `entrySize.length` |
 
 ### Changed types
 
@@ -1229,10 +1231,9 @@ export type Box<T extends IsoBoxType> = {
 };
 
 // @public
-export type ChunkLargeOffsetBox = FullBox & {
+export type ChunkLargeOffsetBox<V extends IsoInt64 = number> = FullBox & {
     type: "co64";
-    entryCount: number;
-    chunkOffset: number[];
+    chunkOffset: V[];
 };
 
 // @public
@@ -1245,7 +1246,6 @@ export type ChunkOffsetBox = FullBox & {
 export type CompactSampleSizeBox = FullBox & {
     type: "stz2";
     fieldSize: number;
-    sampleCount: number;
     entrySize: number[];
 };
 
@@ -1507,7 +1507,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     avc2: VisualSampleEntry<"avc2", V>;
     avc3: VisualSampleEntry<"avc3", V>;
     avc4: VisualSampleEntry<"avc4", V>;
-    co64: ChunkLargeOffsetBox;
+    co64: ChunkLargeOffsetBox<V>;
     ctts: CompositionOffsetBox;
     dinf: DataInformationBox<V>;
     dref: DataReferenceBox<V>;
@@ -1871,6 +1871,9 @@ export function readBytes(cursor: IsoBoxReadCursor<IsoInt64>, length: number): U
 export function readChildBoxes<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, count?: number): ParsedIsoBox<V>[];
 
 // @public
+export function readCo64<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): ChunkLargeOffsetBox<V>;
+
+// @public
 export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetBox;
 
 // @public
@@ -2069,6 +2072,9 @@ export function readStts(cursor: IsoBoxReadCursor<IsoInt64>): TimeToSampleBox;
 
 // @public
 export function readStyp(cursor: IsoBoxReadCursor<IsoInt64>): SegmentTypeBox;
+
+// @public
+export function readStz2(cursor: IsoBoxReadCursor<IsoInt64>): CompactSampleSizeBox;
 
 // @public
 export function readSubs(cursor: IsoBoxReadCursor<IsoInt64>): SubSampleInformationBox;
@@ -2546,6 +2552,9 @@ export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): 
 export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<IsoInt64>>): void;
 
 // @public
+export function writeCo64(cursor: IsoBoxWriteCursor, box: ChunkLargeOffsetBox<IsoInt64>): void;
+
+// @public
 export function writeCtts(cursor: IsoBoxWriteCursor, box: CompositionOffsetBox): void;
 
 // @public
@@ -2736,6 +2745,9 @@ export function writeStts(cursor: IsoBoxWriteCursor, box: TimeToSampleBox): void
 
 // @public
 export function writeStyp(cursor: IsoBoxWriteCursor, box: SegmentTypeBox): void;
+
+// @public
+export function writeStz2(cursor: IsoBoxWriteCursor, box: CompactSampleSizeBox): void;
 
 // @public
 export function writeSubs(cursor: IsoBoxWriteCursor, box: SubSampleInformationBox): void;

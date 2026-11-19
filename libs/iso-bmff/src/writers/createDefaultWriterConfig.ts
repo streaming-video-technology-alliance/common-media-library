@@ -4,6 +4,7 @@ import { writeAvc1 } from './writeAvc1.ts'
 import { writeAvc2 } from './writeAvc2.ts'
 import { writeAvc3 } from './writeAvc3.ts'
 import { writeAvc4 } from './writeAvc4.ts'
+import { writeCo64 } from './writeCo64.ts'
 import { writeCtts } from './writeCtts.ts'
 import { writeDref } from './writeDref.ts'
 import { writeElng } from './writeElng.ts'
@@ -48,6 +49,7 @@ import { writeStsz } from './writeStsz.ts'
 import { writeSttg } from './writeSttg.ts'
 import { writeStts } from './writeStts.ts'
 import { writeStyp } from './writeStyp.ts'
+import { writeStz2 } from './writeStz2.ts'
 import { writeSubs } from './writeSubs.ts'
 import { writeTenc } from './writeTenc.ts'
 import { writeTfdt } from './writeTfdt.ts'
@@ -82,6 +84,7 @@ export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig> {
 			avc2: writeAvc2,
 			avc3: writeAvc3,
 			avc4: writeAvc4,
+			co64: writeCo64,
 			ctts: writeCtts,
 			dref: writeDref,
 			elng: writeElng,
@@ -126,6 +129,7 @@ export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig> {
 			sttg: writeSttg,
 			stts: writeStts,
 			styp: writeStyp,
+			stz2: writeStz2,
 			subs: writeSubs,
 			tenc: writeTenc,
 			tfdt: writeTfdt,
