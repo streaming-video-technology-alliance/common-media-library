@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import { encodeText } from '@svta/cml-utils'
 import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -5,13 +7,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `vttC` box (`WebVttConfigurationBox`).
  *
+ * @param cursor - The write cursor
  * @param box - The `WebVttConfigurationBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView {
+export function writeVttC(cursor: IsoBoxWriteCursor, box: WebVttConfigurationBox): void {
 	const configBytes = encodeText(box.config)
 
 	const headerSize = 8
@@ -21,5 +22,5 @@ export function writeVttC(box: WebVttConfigurationBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('vttC', totalSize)
 	writer.writeBytes(configBytes)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

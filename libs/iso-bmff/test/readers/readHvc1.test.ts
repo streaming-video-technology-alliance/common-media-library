@@ -1,25 +1,15 @@
-import {
-	assert,
-	describe,
-	filterBoxes,
-	it,
-	readHvc1,
-	readStsd,
-	type VisualSampleEntry,
-} from '../util/box.ts'
-
-type Hvc1Box = VisualSampleEntry<'hvc1'>
+import { assert, describe, filterBoxes, isIsoBoxType, it, readHvc1, readStsd } from '../util/box.ts'
 
 describe('readHvc1', function () {
 	it('should correctly parse the box', function () {
 		const container = filterBoxes('hvc1_init.mp4', 'stsd', {
-			readers: { stsd: readStsd<Hvc1Box>, hvc1: readHvc1 },
+			readers: { stsd: readStsd, hvc1: readHvc1 },
 		})
 
 		assert.strictEqual(container[0].type, 'stsd')
-		const box = container[0].boxes[0] as Hvc1Box
+		const box = container[0].boxes[0]
 
-		assert.strictEqual(box.type, 'hvc1')
+		assert.ok(isIsoBoxType('hvc1', box))
 
 		assert.strictEqual(box.dataReferenceIndex, 1)
 		assert.strictEqual(box.preDefined1, 0)

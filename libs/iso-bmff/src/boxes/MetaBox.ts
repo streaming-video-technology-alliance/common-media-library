@@ -1,18 +1,6 @@
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import type { DataInformationBox } from './DataInformationBox.ts'
 import type { FullBox } from './FullBox.ts'
-import type { GroupsListBox } from './GroupsListBox.ts'
-import type { HandlerBox } from './HandlerBox.ts'
-
-/**
- * Child boxes of Meta Box
- *
- * @public
- */
-export type MetaBoxChild<V extends IsoInt64 = number> =
-	| HandlerBox
-	| DataInformationBox
-	| GroupsListBox<V>
 
 /**
  * Meta Box (`meta`).
@@ -23,5 +11,5 @@ export type MetaBoxChild<V extends IsoInt64 = number> =
  */
 export type MetaBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'meta'
-	boxes: MetaBoxChild<V>[]
+	boxes: ParsedIsoBox<V>[]
 }

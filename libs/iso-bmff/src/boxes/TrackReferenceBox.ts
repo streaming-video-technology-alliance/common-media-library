@@ -1,11 +1,5 @@
-import type { TrackReferenceTypeBox } from './TrackReferenceTypeBox.ts'
-
-/**
- * Child boxes of Track Reference Box
- *
- * @public
- */
-export type TrackReferenceBoxChild = TrackReferenceTypeBox
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 
 /**
  * Track Reference Box (`tref`).
@@ -14,7 +8,7 @@ export type TrackReferenceBoxChild = TrackReferenceTypeBox
  *
  * @public
  */
-export type TrackReferenceBox = {
+export type TrackReferenceBox<V extends IsoInt64 = number> = {
 	type: 'tref'
-	boxes: TrackReferenceBoxChild[]
+	boxes: ParsedIsoBox<V>[]
 }

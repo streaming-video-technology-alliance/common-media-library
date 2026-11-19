@@ -2,6 +2,7 @@ import {
 	assert,
 	describe,
 	findBox,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readMdat,
@@ -15,7 +16,7 @@ describe('readVttc', function () {
 		const boxes = readIsoBoxes(data, { readers: { vttc: readVttc, payl: readPayl } })
 		const box = boxes[0]
 
-		assert.strictEqual(box.type, 'vttc')
+		assert.ok(isIsoBoxType('vttc', box))
 		assert.strictEqual(box.boxes.length, 1)
 		assert.strictEqual(box.boxes[0].type, 'payl')
 	})

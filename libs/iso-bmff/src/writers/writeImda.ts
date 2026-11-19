@@ -1,16 +1,17 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write the `imda` box (`IdentifiedMediaDataBox`).
  *
+ * @param cursor - The write cursor
  * @param box - The `IdentifiedMediaDataBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView {
+export function writeImda(cursor: IsoBoxWriteCursor, box: IdentifiedMediaDataBox): void {
 	const headerSize = 8
 	const imdaIdentifierSize = 4
 	const dataSize = box.data.length
@@ -20,5 +21,5 @@ export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView {
 	writer.writeUint(box.imdaIdentifier, 4)
 	writer.writeBytes(box.data)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

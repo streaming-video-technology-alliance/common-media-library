@@ -3,9 +3,12 @@ import { TEMPLATE, UINT } from './IsoBoxFields.ts'
 import type { IsoFieldTypeMap } from './IsoFieldTypeMap.ts'
 
 /**
- * A view for writing ISO BMFF data.
+ * The version 1 write view. A built-in writer that phase 3 of version 2.0.0 did not move yet writes its box with this view,
+ * then copies the bytes to the write cursor with `writeLegacyView`.
  *
- * @public
+ * The last pull request of phase 3 deletes the class.
+ *
+ * @internal
  */
 export class IsoBoxWriteView {
 	private dataView: DataView

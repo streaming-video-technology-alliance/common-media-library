@@ -5,7 +5,6 @@ describe('readMdat', function () {
 		const box = findBox('captions.mp4', 'mdat', { readers: { mdat: readMdat } })
 
 		assert.strictEqual(box.type, 'mdat')
-		assert.strictEqual(box.size, 21530)
 		assert.strictEqual(box.data.byteLength, 21522)
 	})
 })

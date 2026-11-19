@@ -1,3 +1,4 @@
+import { writeWith } from './util/writeWith.ts'
 import * as isoBmff from '@svta/cml-iso-bmff'
 import { deepStrictEqual } from 'node:assert'
 import {
@@ -6,7 +7,6 @@ import {
 	createDefaultReaderConfig,
 	createDefaultWriterConfig,
 	describe,
-	IsoBoxWriteView,
 	it,
 	readIsoBoxes,
 	writeDinf,
@@ -34,16 +34,15 @@ import {
 	writeVttc,
 	type IsoBoxContainerMap,
 	type IsoBoxWriteConfig,
+	type IsoBoxWriter,
 	type IsoInt64,
 	type MovieFragmentBox,
 	type MovieFragmentHeaderBox,
 	type TrackFragmentBaseMediaDecodeTimeBox,
 	type TrackFragmentBox,
 } from './util/box.ts'
-import { bytes } from './util/bytes.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
-import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
 type ContainerType = keyof IsoBoxContainerMap
@@ -52,7 +51,7 @@ type ContainerType = keyof IsoBoxContainerMap
 type ContainerBoxes = IsoBoxContainerMap<IsoInt64>
 
 type ContainerWriters = {
-	[K in ContainerType]: (box: ContainerBoxes[K], config: IsoBoxWriteConfig) => IsoBoxWriteView
+	[K in ContainerType]: IsoBoxWriter<ContainerBoxes[K]>
 }
 
 const WRITERS: ContainerWriters = {
@@ -93,8 +92,12 @@ function write<K extends ContainerType>(
 	type: K,
 	boxes: unknown[],
 	config: IsoBoxWriteConfig,
-): IsoBoxWriteView {
-	return WRITERS[type](containerBox(type, boxes), config)
+): Uint8Array {
+	return writeWith(
+		WRITERS[type] as IsoBoxWriter<ContainerBoxes[K]>,
+		containerBox(type, boxes),
+		config,
+	)
 }
 
 describe('container writers', function () {
@@ -122,20 +125,17 @@ describe('container writers', function () {
 			})
 
 			it('should write the box header and the child boxes', function () {
-				const view = write(type, [MFHD], CONFIG)
-
-				assert.ok(view instanceof IsoBoxWriteView)
-				deepStrictEqual(bytes(view), boxBytes(type, MFHD_BYTES))
+				deepStrictEqual(write(type, [MFHD], CONFIG), boxBytes(type, MFHD_BYTES))
 			})
 
 			it('should write an empty box', function () {
-				deepStrictEqual(bytes(write(type, [], { writers: {} })), boxBytes(type))
+				deepStrictEqual(write(type, [], { writers: {} }), boxBytes(type))
 			})
 
 			it('should write the same bytes as writeIsoBox', function () {
 				const box = containerBox(type, [MFHD])
 
-				deepStrictEqual(bytes(write(type, [MFHD], CONFIG)), writeIsoBox(box, CONFIG))
+				deepStrictEqual(write(type, [MFHD], CONFIG), writeIsoBox(box, CONFIG))
 			})
 
 			it('should write the same bytes as a configuration with no entry for the box type', function () {
@@ -143,7 +143,7 @@ describe('container writers', function () {
 				const expected = writeIsoBoxes([box], CONFIG)
 				const output = writeIsoBoxes([box], { writers: { mfhd: writeMfhd, [type]: writer } })
 
-				deepStrictEqual(expected, [boxBytes(type, MFHD_BYTES)])
+				deepStrictEqual(expected, boxBytes(type, MFHD_BYTES))
 				deepStrictEqual(output, expected)
 			})
 		})
@@ -156,11 +156,7 @@ describe('container writers', function () {
 		for (const file of fixtureFiles()) {
 			const boxes = readIsoBoxes(load(file), createDefaultReaderConfig())
 
-			deepStrictEqual(
-				reduceUint8Arrays(writeIsoBoxes(boxes, containerConfig)),
-				reduceUint8Arrays(writeIsoBoxes(boxes, config)),
-				file,
-			)
+			deepStrictEqual(writeIsoBoxes(boxes, containerConfig), writeIsoBoxes(boxes, config), file)
 		}
 	})
 
@@ -175,10 +171,10 @@ describe('container writers', function () {
 		}
 		const traf: TrackFragmentBox<bigint> = { type: 'traf', boxes: [tfdt] }
 		const moof: MovieFragmentBox<bigint> = { type: 'moof', boxes: [traf] }
-		const view = writeMoof(moof, { writers: { traf: writeTraf, tfdt: writeTfdt } })
+		const view = writeWith(writeMoof, moof, { writers: { traf: writeTraf, tfdt: writeTfdt } })
 
 		deepStrictEqual(
-			bytes(view),
+			view,
 			boxBytes('moof', boxBytes('traf', boxBytes('tfdt', [1, 1], [0, 3], [exact, 8]))),
 		)
 	})
@@ -187,7 +183,7 @@ describe('container writers', function () {
 		const moof: MovieFragmentBox = { type: 'moof', boxes: [] }
 
 		// @ts-expect-error A moof box is not a MovieBox.
-		const view = writeMoov(moof, { writers: {} })
+		const view = writeWith(writeMoov, moof, { writers: {} })
 
 		assert.strictEqual(view.byteLength, 8)
 	})

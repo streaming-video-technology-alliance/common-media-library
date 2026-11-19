@@ -6,14 +6,19 @@ import {
 	describe,
 	filterIsoBoxes,
 	findIsoBox,
-	IsoBoxWriteView,
+	isIsoBoxType,
+	beginIsoBox,
+	endIsoBox,
+	writeUint32,
+	type IsoBoxWriteCursor,
 	it,
 	readIsoBoxes,
+	readUint32,
 	readStsd,
 	writeIsoBoxes,
 	writeStsd,
 	writeVisualSampleEntry,
-	type IsoBoxReadView,
+	type IsoBoxReadCursor,
 } from './util/box.ts'
 
 describe('API', function () {
@@ -22,7 +27,7 @@ describe('API', function () {
 		const boxes = readIsoBoxes(isoFile, {
 			readers: {
 				stsd: readStsd,
-				test: (view: IsoBoxReadView) => ({ type: 'test' as const, value: view.readUint(4) }),
+				test: (cursor: IsoBoxReadCursor) => ({ type: 'test' as const, value: readUint32(cursor) }),
 				hvc1: createVisualSampleEntryReader('hvc1'),
 				'ac-3': createAudioSampleEntryReader('ac-3'),
 			},
@@ -34,36 +39,27 @@ describe('API', function () {
 
 		const stsd = findIsoBox(boxes, box => box.type === 'stsd')
 		assert.ok(stsd)
-		assert.strictEqual(stsd.type, 'stsd')
+		assert.ok(isIsoBoxType('stsd', stsd))
 		assert.strictEqual(stsd.boxes.length, 1)
 
 		const entry = stsd.boxes[0]
 		assert.ok(entry)
-		assert.strictEqual(entry.type, 'hvc1')
+		assert.ok(isIsoBoxType('hvc1', entry))
 		assert.strictEqual(entry.boxes.length, 2)
 
 		const stream = writeIsoBoxes(boxes, {
 			writers: {
 				hvc1: writeVisualSampleEntry,
 				dvh1: writeVisualSampleEntry,
-				test: (box: { type: string; value: number }) => {
-					const view = new IsoBoxWriteView(box.type, 4)
-					view.writeUint(box.value, 4)
-					return view
+				test: (cursor: IsoBoxWriteCursor, box: { type: string; value: number }) => {
+					const start = beginIsoBox(cursor, box.type)
+					writeUint32(cursor, box.value)
+					endIsoBox(cursor, start)
 				},
 				stsd: writeStsd,
 			},
 		})
 
-		const size = stream.reduce((acc, chunk) => acc + chunk.byteLength, 0)
-		const result = new Uint8Array(size)
-		let offset = 0
-
-		for (const box of stream) {
-			result.set(box, offset)
-			offset += box.byteLength
-		}
-
-		assert.strictEqual(Buffer.compare(isoFile, result), 0)
+		assert.strictEqual(Buffer.compare(isoFile, stream), 0)
 	})
 })

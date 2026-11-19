@@ -1,4 +1,14 @@
-import { assert, describe, it, readFtyp, readIsoBoxes, writeFtyp } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	writeIsoBox,
+	readFtyp,
+	readIsoBoxes,
+	writeFtyp,
+} from '../util/box.ts'
 
 describe('writeFtyp', function () {
 	it('should write a FileTypeBox correctly', function () {
@@ -10,7 +20,7 @@ describe('writeFtyp', function () {
 			compatibleBrands: ['isom'],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeIsoBox(box, { writers: { ftyp: writeFtyp } })
 		const buffer = new Uint8Array(writer.buffer)
 		// #endregion example
 
@@ -52,7 +62,7 @@ describe('writeFtyp', function () {
 			compatibleBrands: ['mp41', 'iso2', 'dash'],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeWith(writeFtyp, box)
 		const buffer = new Uint8Array(writer.buffer)
 		assert.strictEqual(
 			Buffer.compare(
@@ -100,11 +110,11 @@ describe('writeFtyp', function () {
 			compatibleBrands: ['isom', 'iso2'],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeWith(writeFtyp, box)
 		const boxes = readIsoBoxes(writer.buffer, { readers: { ftyp: readFtyp } })
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'ftyp')
+		assert.ok(isIsoBoxType('ftyp', boxes[0]))
 		assert.strictEqual(boxes[0].majorBrand, 'isom')
 		assert.strictEqual(boxes[0].minorVersion, 1)
 		assert.deepStrictEqual(boxes[0].compatibleBrands, ['isom', 'iso2'])
@@ -118,7 +128,7 @@ describe('writeFtyp', function () {
 			compatibleBrands: [],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeWith(writeFtyp, box)
 		const buffer = new Uint8Array(writer.buffer)
 
 		assert.strictEqual(

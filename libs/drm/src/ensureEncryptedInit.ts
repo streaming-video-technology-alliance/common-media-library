@@ -3,6 +3,7 @@ import {
 	createVisualSampleEntryReader,
 	findIsoBox,
 	fourCcToUint32,
+	isIsoBoxType,
 	readIsoBoxes,
 	readStsd,
 	writeAudioSampleEntry,
@@ -119,10 +120,10 @@ export function ensureEncryptedInit(
 		defaultKid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 	} = options ?? {}
 	const boxes = readIsoBoxes(init, { readers })
-	const stsd = findIsoBox(boxes, box => box.type === 'stsd')
+	const stsd = findIsoBox(boxes, box => isIsoBoxType('stsd', box))
 
 	// No stsd box found, return original init
-	if (stsd?.type !== 'stsd') {
+	if (!stsd) {
 		return init
 	}
 
@@ -132,7 +133,8 @@ export function ensureEncryptedInit(
 	}
 
 	const entries = stsd.boxes.filter(
-		({ type }) => videoTypes.includes(type) || audioTypes.includes(type),
+		(entry): entry is AudioSampleEntry | VisualSampleEntry =>
+			!('bytes' in entry) && (videoTypes.includes(entry.type) || audioTypes.includes(entry.type)),
 	)
 
 	// Add sinf to each sample entry box
@@ -179,21 +181,5 @@ export function ensureEncryptedInit(
 		})
 	}
 
-	// Write the boxes to a new Uint8Array
-	const chunks = writeIsoBoxes(boxes, { writers })
-	const size = chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0)
-	const length = includeOriginal ? init.length + size : size
-	const result = new Uint8Array(length)
-	let offset = 0
-
-	for (const box of chunks) {
-		result.set(box, offset)
-		offset += box.byteLength
-	}
-
-	if (includeOriginal) {
-		result.set(init, offset)
-	}
-
-	return result
+	return writeIsoBoxes(includeOriginal ? [...boxes, init] : boxes, { writers })
 }

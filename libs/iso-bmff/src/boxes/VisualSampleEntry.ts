@@ -1,13 +1,7 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 import type { SampleEntry } from './SampleEntry.ts'
 import type { VisualSampleEntryType } from './VisualSampleEntryType.ts'
-
-/**
- * Child boxes of Visual Sample Entry Box
- *
- * @public
- */
-export type VisualSampleEntryChild = any
 
 /**
  * Visual Sample Entry Box, such as `avc1`, `hvc1`, or `encv`.
@@ -16,7 +10,10 @@ export type VisualSampleEntryChild = any
  *
  * @public
  */
-export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType> = SampleEntry & {
+export type VisualSampleEntry<
+	T extends IsoBoxType = VisualSampleEntryType,
+	V extends IsoInt64 = number,
+> = SampleEntry<T, V> & {
 	type: T
 	/** The first `pre_defined` field. `writeVisualSampleEntry` writes 0 for a missing value. */
 	preDefined1?: number
@@ -31,5 +28,4 @@ export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType> = Sa
 	depth: number
 	/** The third `pre_defined` field. `writeVisualSampleEntry` writes -1 for a missing value, the value of the specification. */
 	preDefined3?: number
-	boxes: VisualSampleEntryChild[]
 }

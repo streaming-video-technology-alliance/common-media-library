@@ -1,4 +1,4 @@
-import { deepStrictEqual, rejects, strictEqual, throws } from 'node:assert'
+import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	createIsoBoxReadableStream,
@@ -217,12 +217,50 @@ describe('createIsoBoxReadableStream', function () {
 		deepStrictEqual(chunks, [0, 1, 2])
 	})
 
-	it('should throw from the call for a first box with no writer', function () {
-		const box: IsoBoxStreamable = { type: 'meta', version: 0, flags: 0, boxes: [] }
+	it('should keep the bytes of a large chunk after the next read', async function () {
+		const large = new Uint8Array(4096).fill(0xaa)
+		const small = new Uint8Array([0, 0, 0, 9, 0x66, 0x72, 0x65, 0x65, 0xbb])
+		const chunks: Uint8Array[] = []
 
-		throws(() => createIsoBoxReadableStream([box], { writers: {} }), {
-			message: 'No writer found for box type: meta',
-		})
+		for await (const data of createIsoBoxReadableStream([large, small])) {
+			chunks.push(data)
+		}
+
+		strictEqual(chunks[0].length, 4096)
+		strictEqual(
+			chunks[0].every(byte => byte === 0xaa),
+			true,
+		)
+		deepStrictEqual(Array.from(chunks[1]), Array.from(small))
+	})
+
+	it('should reject the first read for a first box with no writer', async function () {
+		const box: IsoBoxStreamable = { type: 'meta', version: 0, flags: 0, boxes: [] }
+		const reader = createIsoBoxReadableStream([box], { writers: {} }).getReader()
+
+		await rejects(reader.read(), { message: 'No writer found for box type: meta' })
+	})
+
+	it('should write no box before the first read', async function () {
+		let count = 0
+
+		function* source(): Generator<IsoBoxStreamable> {
+			for (let i = 0; i < 3; i++) {
+				count++
+				yield { type: 'free', data: new Uint8Array([i]) }
+			}
+		}
+
+		const reader = createIsoBoxReadableStream(source(), {
+			writers: { free: writeFree },
+		}).getReader()
+
+		await new Promise(resolve => setTimeout(resolve, 0))
+		strictEqual(count, 0)
+
+		await reader.read()
+		await new Promise(resolve => setTimeout(resolve, 0))
+		strictEqual(count, 1)
 	})
 
 	it('should error the stream for a later box with no writer', async function () {

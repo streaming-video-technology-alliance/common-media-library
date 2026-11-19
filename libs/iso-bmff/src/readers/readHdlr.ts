@@ -1,12 +1,13 @@
 import type { HandlerBox } from '../boxes/HandlerBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `hdlr` box (`HandlerBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `HandlerBox`
  *
@@ -15,7 +16,9 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readHdlr(view: IsoBoxReadView<IsoInt64>): HandlerBox {
+export function readHdlr(cursor: IsoBoxReadCursor<IsoInt64>): HandlerBox {
+	const view = new IsoBoxReadView(cursor)
+
 	return {
 		type: 'hdlr',
 		...view.readFullBox(),

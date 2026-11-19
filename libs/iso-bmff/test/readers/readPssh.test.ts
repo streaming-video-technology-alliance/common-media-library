@@ -1,4 +1,4 @@
-import { assert, describe, it, readIsoBoxes, readPssh } from '../util/box.ts'
+import { assert, describe, isIsoBoxType, it, readIsoBoxes, readPssh } from '../util/box.ts'
 import { KID_A, KID_B, psshBox, SYSTEM_ID } from '../util/psshBoxes.ts'
 
 describe('readPssh', function () {
@@ -15,7 +15,7 @@ describe('readPssh', function () {
 		// #endregion example
 
 		assert.ok(pssh)
-		assert.strictEqual(pssh.type, 'pssh')
+		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.version, 1)
 		assert.strictEqual(pssh.flags, 0)
 		assert.deepStrictEqual(pssh.systemId, SYSTEM_ID)
@@ -32,7 +32,7 @@ describe('readPssh', function () {
 		)
 
 		assert.ok(pssh)
-		assert.strictEqual(pssh.type, 'pssh')
+		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.kidCount, 2)
 		assert.deepStrictEqual(pssh.kid, [...KID_A, ...KID_B])
 		assert.strictEqual(pssh.dataSize, 4)
@@ -45,7 +45,7 @@ describe('readPssh', function () {
 		})
 
 		assert.ok(pssh)
-		assert.strictEqual(pssh.type, 'pssh')
+		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.kidCount, 1)
 		assert.deepStrictEqual(pssh.kid, KID_A)
 		assert.strictEqual(pssh.dataSize, 0)
@@ -58,7 +58,7 @@ describe('readPssh', function () {
 		})
 
 		assert.ok(pssh)
-		assert.strictEqual(pssh.type, 'pssh')
+		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.version, 1)
 		assert.deepStrictEqual(pssh.systemId, SYSTEM_ID)
 		assert.strictEqual(pssh.kidCount, 0)
@@ -73,7 +73,7 @@ describe('readPssh', function () {
 		})
 
 		assert.ok(pssh)
-		assert.strictEqual(pssh.type, 'pssh')
+		assert.ok(isIsoBoxType('pssh', pssh))
 		assert.strictEqual(pssh.version, 0)
 		assert.deepStrictEqual(pssh.systemId, SYSTEM_ID)
 		assert.strictEqual(pssh.kidCount, 0)

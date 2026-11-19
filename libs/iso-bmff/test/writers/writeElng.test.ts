@@ -1,4 +1,12 @@
-import { assert, describe, it, writeElng, type ExtendedLanguageBox } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	describe,
+	it,
+	writeIsoBox,
+	writeElng,
+	type ExtendedLanguageBox,
+} from '../util/box.ts'
 
 describe('writeElng', function () {
 	it('should write an ExtendedLanguageBox correctly', function () {
@@ -10,7 +18,7 @@ describe('writeElng', function () {
 			extendedLanguage: 'en-US',
 		}
 
-		const writer = writeElng(box)
+		const writer = writeIsoBox(box, { writers: { elng: writeElng } })
 		// #endregion example
 
 		// size (18), type (elng), version and flags, extendedLanguage, null terminator
@@ -21,7 +29,12 @@ describe('writeElng', function () {
 	})
 
 	it('should write the UTF-8 bytes of an extendedLanguage that is not ASCII', function () {
-		const writer = writeElng({ type: 'elng', version: 0, flags: 0, extendedLanguage: 'é日😀' })
+		const writer = writeWith(writeElng, {
+			type: 'elng',
+			version: 0,
+			flags: 0,
+			extendedLanguage: 'é日😀',
+		})
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -32,7 +45,12 @@ describe('writeElng', function () {
 	})
 
 	it('should write the null terminator of an empty extendedLanguage', function () {
-		const writer = writeElng({ type: 'elng', version: 0, flags: 0, extendedLanguage: '' })
+		const writer = writeWith(writeElng, {
+			type: 'elng',
+			version: 0,
+			flags: 0,
+			extendedLanguage: '',
+		})
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),

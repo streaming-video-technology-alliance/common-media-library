@@ -1,13 +1,5 @@
-import type { OriginalFormatBox } from './OriginalFormatBox.ts'
-import type { SchemeInformationBox } from './SchemeInformationBox.ts'
-import type { SchemeTypeBox } from './SchemeTypeBox.ts'
-
-/**
- * Child boxes of Protection Scheme Information Box
- *
- * @public
- */
-export type ProtectionSchemeInfoBoxChild = OriginalFormatBox | SchemeTypeBox | SchemeInformationBox
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 
 /**
  * Protection Scheme Information Box (`sinf`).
@@ -16,7 +8,7 @@ export type ProtectionSchemeInfoBoxChild = OriginalFormatBox | SchemeTypeBox | S
  *
  * @public
  */
-export type ProtectionSchemeInfoBox = {
+export type ProtectionSchemeInfoBox<V extends IsoInt64 = number> = {
 	type: 'sinf'
-	boxes: ProtectionSchemeInfoBoxChild[]
+	boxes: ParsedIsoBox<V>[]
 }

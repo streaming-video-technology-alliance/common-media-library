@@ -2,11 +2,11 @@ import {
 	assert,
 	describe,
 	filterBoxes,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readMp4a,
 	readStsd,
-	type IsoTypedParsedBox,
 } from '../util/box.ts'
 
 describe('readMp4a', function () {
@@ -14,10 +14,9 @@ describe('readMp4a', function () {
 		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', {
 			readers: { stsd: readStsd, mp4a: readMp4a },
 		})
-		const box = container[1].boxes[0] as IsoTypedParsedBox<'mp4a'>
+		const box = container[1].boxes[0]
 
-		assert.strictEqual(box.type, 'mp4a')
-		assert.strictEqual(box.size, 86)
+		assert.ok(isIsoBoxType('mp4a', box))
 
 		assert.strictEqual(box.dataReferenceIndex, 1)
 		assert.strictEqual(box.channelCount, 2)
@@ -38,7 +37,7 @@ describe('readMp4a', function () {
 		const [box] = readIsoBoxes(bytes, { readers: { mp4a: readMp4a } })
 
 		assert.ok(box)
-		assert.strictEqual(box.type, 'mp4a')
+		assert.ok(isIsoBoxType('mp4a', box))
 		assert.strictEqual(box.sampleRate, 44100.5)
 	})
 })

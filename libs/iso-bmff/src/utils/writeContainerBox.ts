@@ -1,33 +1,21 @@
-import type { IsoBox } from '../IsoBox.ts'
-import type { IsoInt64 } from '../IsoInt64.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 import type { IsoBoxContainer } from '../IsoBoxContainer.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
-import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import { writeChildBoxes } from '../writeChildBoxes.ts'
 
 /**
- * Writes a container box from the child boxes in its `boxes` field.
+ * Writes a container box: the header, then the `boxes` field with the writers of the cursor.
  *
- * @param box - The container box to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @param cursor - The write cursor.
+ * @param box - The container box.
  *
  * @internal
  */
-export function writeContainerBox<T extends IsoBoxContainer<IsoInt64>>(
-	box: T,
-	config: IsoBoxWriteConfig,
-): IsoBoxWriteView {
-	const headerSize = 8
-	// TODO: Is there a way to avoid creating the intermediate Uint8Arrays?
-	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox<IsoInt64>[], config)
+export function writeContainerBox(cursor: IsoBoxWriteCursor, box: IsoBoxContainer<IsoInt64>): void {
+	const start = beginIsoBox(cursor, box.type)
 
-	const totalSize = headerSize + size
-
-	const writer = new IsoBoxWriteView(box.type, totalSize)
-
-	writer.writeBytes(bytes)
-
-	return writer
+	writeChildBoxes(cursor, box.boxes)
+	endIsoBox(cursor, start)
 }

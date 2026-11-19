@@ -1,8 +1,6 @@
-import type {
-	SchemeInformationBox,
-	SchemeInformationBoxChild,
-} from '../boxes/SchemeInformationBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { SchemeInformationBox } from '../boxes/SchemeInformationBox.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -11,15 +9,17 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * The `readers` map does not need an entry for the `schi` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `SchemeInformationBox`
  *
  * @public
  */
-export function readSchi(view: IsoBoxReadView<IsoInt64>): SchemeInformationBox {
+export function readSchi<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SchemeInformationBox<V> {
+	const view = new IsoBoxReadView(cursor)
+
 	return {
 		type: 'schi',
-		boxes: view.readBoxes<SchemeInformationBoxChild>(),
+		boxes: view.readBoxes(),
 	}
 }

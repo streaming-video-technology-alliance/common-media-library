@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -7,13 +9,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 12.1.2
  *
+ * @param cursor - The write cursor
  * @param box - The `VideoMediaHeaderBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView {
+export function writeVmhd(cursor: IsoBoxWriteCursor, box: VideoMediaHeaderBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const graphicsmodeSize = 2
@@ -26,5 +27,5 @@ export function writeVmhd(box: VideoMediaHeaderBox): IsoBoxWriteView {
 	writer.writeUint(box.graphicsMode, 2)
 	writer.writeArray(box.opColor, UINT, 2, 3)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

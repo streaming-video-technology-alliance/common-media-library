@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.16.4
  *
+ * @param cursor - The write cursor
  * @param box - The `SubsegmentIndexBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView {
+export function writeSsix(cursor: IsoBoxWriteCursor, box: SubsegmentIndexBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const subsegmentCountSize = 4
@@ -39,5 +40,5 @@ export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView {
 		}
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

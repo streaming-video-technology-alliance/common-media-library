@@ -217,9 +217,9 @@ Read and write ISO Base Media File Format (ISO BMFF) boxes
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read a 64-bit field, such as a tfdt time at a 10 MHz timescale, exactly or with an overflow report: `readInt64AsBigInt`, `createInt64OverflowReader`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
-- Write or patch boxes, such as inserting emsg or rewriting tfdt, to byte arrays or a ReadableStream: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`, `createIsoBoxReadableStream`
+- Write or patch boxes, such as inserting emsg or rewriting tfdt, to a byte array or a ReadableStream: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`, `createIsoBoxReadableStream`
 - Read or write a container box, such as moov or moof, with an optional named function: `readMoov`, `writeMoov`
-- Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
+- Read or write a box type that the package does not name: `createIsoBoxReadCursor`, `readUint32`, `readChildBoxes`, `beginIsoBox`, `writeUint32`, `writeChildBoxes`
 
 Do not write your own box parser, box walker, or box writer. Open an issue for a box that is missing.
 

@@ -1,78 +1,56 @@
-import type { IsoBox } from '../IsoBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
 import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
-import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
+import { writeTemplate32 } from '../cursor/writeTemplate32.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeChildBoxes } from '../writeChildBoxes.ts'
 
 /**
  * Write a visual sample entry box (`VisualSampleEntry`) of the type in its `type` field.
  *
  * ISO/IEC 14496-12:2015 - 12.1.3
  *
- * @param box - The `VisualSampleEntry` fields to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
+ * The writer writes the child boxes with the writers of the cursor.
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @param cursor - The write cursor
+ * @param box - The `VisualSampleEntry` fields to write
  *
  * @public
  */
 export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(
-	box: VisualSampleEntry<T>,
-	config: IsoBoxWriteConfig,
-): IsoBoxWriteView {
-	const headerSize = 8
-	const reserved1Size = 6
-	const dataReferenceIndexSize = 2
-	const preDefined1Size = 2
-	const reserved2Size = 2
-	const preDefined2Size = 12 // 3 x 4 bytes
-	const widthSize = 2
-	const heightSize = 2
-	const horizresolutionSize = 4
-	const vertresolutionSize = 4
-	const reserved3Size = 4
-	const frameCountSize = 2
-	const compressorNameSize = 32
-	const depthSize = 2
-	const preDefined3Size = 2
-	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox[], config)
-	const totalSize =
-		headerSize +
-		reserved1Size +
-		dataReferenceIndexSize +
-		preDefined1Size +
-		reserved2Size +
-		preDefined2Size +
-		widthSize +
-		heightSize +
-		horizresolutionSize +
-		vertresolutionSize +
-		reserved3Size +
-		frameCountSize +
-		compressorNameSize +
-		depthSize +
-		preDefined3Size +
-		size
+	cursor: IsoBoxWriteCursor,
+	box: VisualSampleEntry<T, IsoInt64>,
+): void {
+	const start = beginIsoBox(cursor, box.type)
 
-	const writer = new IsoBoxWriteView(box.type, totalSize)
+	writeUint32(cursor, 0) // reserved
+	writeUint16(cursor, 0) // reserved
+	writeUint16(cursor, box.dataReferenceIndex)
+	writeUint16(cursor, box.preDefined1 ?? 0)
+	writeUint16(cursor, 0) // reserved
 
-	writer.writeArray([], UINT, 1, 6)
-	writer.writeUint(box.dataReferenceIndex, 2)
-	writer.writeUint(box.preDefined1 ?? 0, 2)
-	writer.writeUint(0, 2)
-	writer.writeArray(box.preDefined2 ?? [], UINT, 4, 3)
-	writer.writeUint(box.width, 2)
-	writer.writeUint(box.height, 2)
-	writer.writeTemplate(box.horizResolution, 4)
-	writer.writeTemplate(box.vertResolution, 4)
-	writer.writeUint(0, 4)
-	writer.writeUint(box.frameCount, 2)
-	writer.writeArray(box.compressorName, UINT, 1, 32)
-	writer.writeUint(box.depth, 2)
-	writer.writeUint((box.preDefined3 ?? -1) & 0xffff, 2)
-	writer.writeBytes(bytes)
+	for (let i = 0; i < 3; i++) {
+		writeUint32(cursor, box.preDefined2?.[i] ?? 0)
+	}
 
-	return writer
+	writeUint16(cursor, box.width)
+	writeUint16(cursor, box.height)
+	writeTemplate32(cursor, box.horizResolution)
+	writeTemplate32(cursor, box.vertResolution)
+	writeUint32(cursor, 0) // reserved
+	writeUint16(cursor, box.frameCount)
+
+	for (let i = 0; i < 32; i++) {
+		writeUint8(cursor, box.compressorName[i] ?? 0)
+	}
+
+	writeUint16(cursor, box.depth)
+	writeUint16(cursor, (box.preDefined3 ?? -1) & 0xffff)
+	writeChildBoxes(cursor, box.boxes)
+	endIsoBox(cursor, start)
 }

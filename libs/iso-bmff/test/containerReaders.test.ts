@@ -5,7 +5,8 @@ import {
 	CONTAINERS,
 	createDefaultReaderConfig,
 	describe,
-	IsoBoxReadView,
+	isIsoBoxType,
+	createIsoBoxReadCursor,
 	it,
 	readDinf,
 	readEdts,
@@ -32,10 +33,10 @@ import {
 	readUdta,
 	readVttc,
 	type IsoBoxContainerMap,
+	type IsoBoxReadCursor,
 	type IsoBoxReader,
-	type IsoBoxType,
 	type IsoInt64,
-	type MovieBoxChild,
+	type ParsedIsoBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
@@ -44,7 +45,7 @@ import { values } from './util/values.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
 type ContainerReaders<V extends IsoInt64> = {
-	[K in keyof IsoBoxContainerMap<V>]: IsoBoxReader<IsoBoxContainerMap<V>[K], IsoBoxType, V>
+	[K in keyof IsoBoxContainerMap<V>]: IsoBoxReader<IsoBoxContainerMap<V>[K], V>
 }
 
 // Each reader accepts a view with number fields and a view with bigint fields.
@@ -70,7 +71,9 @@ const CONTAINER_READERS = {
 	vttc: readVttc,
 } satisfies ContainerReaders<number> & ContainerReaders<bigint>
 
-const READERS: ContainerReaders<number> = CONTAINER_READERS
+const READERS: {
+	[K in keyof IsoBoxContainerMap]: (cursor: IsoBoxReadCursor, type: string) => IsoBoxContainerMap[K]
+} = CONTAINER_READERS
 
 const TYPES = Object.keys(READERS) as (keyof IsoBoxContainerMap)[]
 
@@ -106,15 +109,14 @@ describe('container readers', function () {
 			})
 
 			it('should read the type and the child boxes', function () {
-				const view = new IsoBoxReadView(MFHD, { readers: { mfhd: readMfhd } })
+				const cursor = createIsoBoxReadCursor(MFHD, { readers: { mfhd: readMfhd } })
 
-				deepStrictEqual(values(reader(view, type)), { type, boxes: [MFHD_VALUES] })
+				deepStrictEqual(values(reader(cursor, type)), { type, boxes: [MFHD_VALUES] })
 			})
 
 			it('should read an empty box', function () {
 				const boxes = readIsoBoxes(boxBytes(type), { readers: { [type]: reader } })
 
-				assert.strictEqual(boxes[0].size, 8)
 				deepStrictEqual(values(boxes), [{ type, boxes: [] }])
 			})
 
@@ -148,10 +150,10 @@ describe('container readers', function () {
 		const boxes = readIsoBoxes(load('captions.mp4'), {
 			readers: { moov: readMoov, mvhd: readMvhd },
 		})
-		let children: MovieBoxChild[] = []
+		let children: ParsedIsoBox[] = []
 
 		for (const box of boxes) {
-			if (box.type === 'moov') {
+			if (isIsoBoxType('moov', box)) {
 				children = box.boxes
 			}
 		}
@@ -171,17 +173,17 @@ describe('container readers', function () {
 		let value: bigint | undefined
 
 		for (const moof of boxes) {
-			if (moof.type !== 'moof') {
+			if (!isIsoBoxType('moof', moof)) {
 				continue
 			}
 
 			for (const traf of moof.boxes) {
-				if (traf.type !== 'traf') {
+				if (!isIsoBoxType('traf', traf)) {
 					continue
 				}
 
 				for (const child of traf.boxes) {
-					if (child.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', child)) {
 						expectType<Equal<typeof child.baseMediaDecodeTime, bigint>>(true)
 						value = child.baseMediaDecodeTime
 					}

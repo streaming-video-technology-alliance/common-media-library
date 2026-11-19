@@ -3,6 +3,7 @@ import {
 	describe,
 	findBox,
 	isContainer,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readMdat,
@@ -16,12 +17,13 @@ describe('readPayl', function () {
 		const boxes = readIsoBoxes(data, { readers: { payl: readPayl } })
 
 		const container = boxes[0]
+		assert(isIsoBoxType('vttc', container))
 		assert(isContainer(container))
 
 		const box = container.boxes[0] as WebVttCuePayloadBox
 
 		assert.ok(box)
-		assert.strictEqual(box.type, 'payl')
+		assert.ok(isIsoBoxType('payl', box))
 		assert.strictEqual(box.cueText, "You're a jerk, Thom.\n")
 	})
 

@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.1.2
  *
+ * @param cursor - The write cursor
  * @param box - The `FreeSpaceBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeFree(box: FreeSpaceBox<'free'>): IsoBoxWriteView {
+export function writeFree(cursor: IsoBoxWriteCursor, box: FreeSpaceBox<'free'>): void {
 	const headerSize = 8
 	const dataSize = box.data.length
 	const totalSize = headerSize + dataSize
@@ -20,5 +21,5 @@ export function writeFree(box: FreeSpaceBox<'free'>): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('free', totalSize)
 	writer.writeBytes(box.data)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

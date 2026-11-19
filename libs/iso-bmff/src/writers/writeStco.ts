@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { ChunkOffsetBox } from '../boxes/ChunkOffsetBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,16 +8,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.7.5
  *
+ * @param cursor - The write cursor
  * @param box - The `ChunkOffsetBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeStco.test.ts#example}
  *
  * @public
  */
-export function writeStco(box: ChunkOffsetBox): IsoBoxWriteView {
+export function writeStco(cursor: IsoBoxWriteCursor, box: ChunkOffsetBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4
@@ -31,5 +32,5 @@ export function writeStco(box: ChunkOffsetBox): IsoBoxWriteView {
 		writer.writeUint(offset, 4)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

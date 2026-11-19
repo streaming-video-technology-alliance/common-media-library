@@ -1,63 +1,43 @@
-import type { IsoBox } from '../IsoBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
 import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import type { AudioSampleEntryType } from '../boxes/AudioSampleEntryType.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
-import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
+import { writeTemplate32 } from '../cursor/writeTemplate32.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeChildBoxes } from '../writeChildBoxes.ts'
 
 /**
  * Write an audio sample entry box (`AudioSampleEntry`) of the type in its `type` field.
  *
  * ISO/IEC 14496-12:2015 - 12.2.3
  *
- * @param box - The `AudioSampleEntry` fields to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
+ * The writer writes the child boxes with the writers of the cursor.
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @param cursor - The write cursor
+ * @param box - The `AudioSampleEntry` fields to write
  *
  * @public
  */
 export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(
-	box: AudioSampleEntry<T>,
-	config: IsoBoxWriteConfig,
-): IsoBoxWriteView {
-	const headerSize = 8
-	const reserved1Size = 6
-	const dataReferenceIndexSize = 2
-	const reserved2Size = 8 // 2 x 4 bytes
-	const channelcountSize = 2
-	const samplesizeSize = 2
-	const preDefinedSize = 2
-	const reserved3Size = 2
-	const samplerateSize = 4
+	cursor: IsoBoxWriteCursor,
+	box: AudioSampleEntry<T, IsoInt64>,
+): void {
+	const start = beginIsoBox(cursor, box.type)
 
-	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox[], config)
-
-	const totalSize =
-		headerSize +
-		reserved1Size +
-		dataReferenceIndexSize +
-		reserved2Size +
-		channelcountSize +
-		samplesizeSize +
-		preDefinedSize +
-		reserved3Size +
-		samplerateSize +
-		size
-
-	const writer = new IsoBoxWriteView(box.type, totalSize)
-
-	writer.writeArray([], UINT, 1, 6)
-	writer.writeUint(box.dataReferenceIndex, 2)
-	writer.writeUint(box.entryVersion ?? 0, 2)
-	writer.writeArray([], UINT, 2, 3)
-	writer.writeUint(box.channelCount, 2)
-	writer.writeUint(box.sampleSize, 2)
-	writer.writeUint(box.preDefined ?? 0, 2)
-	writer.writeUint(0, 2)
-	writer.writeTemplate(box.sampleRate, 4)
-	writer.writeBytes(bytes)
-
-	return writer
+	writeUint32(cursor, 0) // reserved
+	writeUint16(cursor, 0) // reserved
+	writeUint16(cursor, box.dataReferenceIndex)
+	writeUint16(cursor, box.entryVersion ?? 0)
+	writeUint16(cursor, 0) // reserved
+	writeUint32(cursor, 0) // reserved
+	writeUint16(cursor, box.channelCount)
+	writeUint16(cursor, box.sampleSize)
+	writeUint16(cursor, box.preDefined ?? 0)
+	writeUint16(cursor, 0) // reserved
+	writeTemplate32(cursor, box.sampleRate)
+	writeChildBoxes(cursor, box.boxes)
+	endIsoBox(cursor, start)
 }

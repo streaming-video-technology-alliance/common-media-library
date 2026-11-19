@@ -1,9 +1,12 @@
+import { writeWith } from '../util/writeWith.ts'
 import { readFile } from 'node:fs/promises'
+import { rawBytes } from '../util/rawBytes.ts'
 import {
 	assert,
 	describe,
 	filterBoxes,
 	findIsoBox,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readStco,
@@ -21,10 +24,10 @@ describe('readStco', function () {
 			},
 		})
 
-		const stco = findIsoBox(boxes, box => box.type === 'stco')
+		const stco = findIsoBox(boxes, box => isIsoBoxType('stco', box))
 
 		assert.ok(stco)
-		assert.strictEqual(stco.type, 'stco')
+		assert.ok(isIsoBoxType('stco', stco))
 		assert.strictEqual(stco.entryCount, 30)
 		assert.strictEqual(stco.chunkOffset[0], 1056)
 		// #endregion example
@@ -35,13 +38,13 @@ describe('readStco', function () {
 
 		assert.strictEqual(boxes.length, 2)
 
-		assert.strictEqual(boxes[0].type, 'stco')
+		assert.ok(isIsoBoxType('stco', boxes[0]))
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].flags, 0)
 		assert.strictEqual(boxes[0].entryCount, 4)
 		assert.deepStrictEqual(boxes[0].chunkOffset, [48, 12429, 13229, 13801])
 
-		assert.strictEqual(boxes[1].type, 'stco')
+		assert.ok(isIsoBoxType('stco', boxes[1]))
 		assert.strictEqual(boxes[1].entryCount, 4)
 		assert.deepStrictEqual(boxes[1].chunkOffset, [12405, 13217, 13789, 14283])
 	})
@@ -52,7 +55,7 @@ describe('readStco', function () {
 
 		assert.strictEqual(boxes.length, 1)
 
-		assert.strictEqual(box.type, 'stco')
+		assert.ok(isIsoBoxType('stco', box))
 		assert.strictEqual(box.entryCount, 0)
 		assert.deepStrictEqual(box.chunkOffset, [])
 	})
@@ -90,21 +93,24 @@ describe('readStco', function () {
 
 		assert.strictEqual(boxes.length, 1)
 
-		assert.strictEqual(box.type, 'stco')
+		assert.ok(isIsoBoxType('stco', box))
 		assert.strictEqual(box.entryCount, 2)
 		assert.deepStrictEqual(box.chunkOffset, [2147483648, 4294967295])
 
-		assert.deepStrictEqual(new Uint8Array(writeStco(box).buffer), data)
+		assert.deepStrictEqual(new Uint8Array(writeWith(writeStco, box).buffer), data)
 	})
 
 	it('should return a box that writeStco writes as the original bytes', function () {
 		let count = 0
 
 		for (const file of fixtureFiles()) {
-			for (const box of filterBoxes(file, 'stco', { readers: { stco: readStco } })) {
-				const { view } = box
-				const original = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
-				const written = writeStco(box)
+			const originals = rawBytes(file, 'stco')
+
+			for (const [index, box] of filterBoxes(file, 'stco', {
+				readers: { stco: readStco },
+			}).entries()) {
+				const original = originals[index]
+				const written = writeWith(writeStco, box)
 
 				assert.deepStrictEqual(
 					new Uint8Array(written.buffer, written.byteOffset, written.byteLength),

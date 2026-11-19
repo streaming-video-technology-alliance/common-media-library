@@ -1,22 +1,22 @@
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriteConfig } from './IsoBoxWriteConfig.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
-import { writeIsoBox } from './writeIsoBox.ts'
+import { createIsoBoxWriteCursor } from './createIsoBoxWriteCursor.ts'
+import { writeChildBoxes } from './writeChildBoxes.ts'
 
 /**
  * Creates a ReadableStream of ISO BMFF boxes as Uint8Arrays.
  *
  * The function reads the global `ReadableStream` at each call. A polyfill that the caller installs after the import works.
- * An error of a writer reaches the caller for the first box, and the consumer of the stream for a later box.
+ * The stream writes one box for each read, and writes no box before the first read. An error of any box rejects the read.
+ * The stream writes every box into one buffer. The buffer keeps the size of the largest box until the stream ends.
  *
  * @param boxes - The boxes to stream.
- * @param config - The optional configuration with the writers. With no writers, the function writes only containers, byte arrays, and boxes with a `view`.
+ * @param config - The optional configuration with the writers. With no writers, the function writes only byte arrays, raw boxes, and containers.
  *
  * @returns A new `ReadableStream` with one chunk for each box.
  *
  * @throws Error if `ReadableStream` is not available in this environment.
- * @throws Error if the first box has no writer, no `boxes` field of a container, and no `view`. The message starts with "No writer found for box type". For a later box, the same error errors the stream.
- * @throws RangeError if a `bigint` field of the first box does not fit its size. For a later box, the same error errors the stream.
  *
  * @example
  * {@includeCode ../test/createIsoBoxReadableStream.test.ts#example}
@@ -26,20 +26,23 @@ import { writeIsoBox } from './writeIsoBox.ts'
 export function createIsoBoxReadableStream(
 	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
 	config: IsoBoxWriteConfig = {},
-): ReadableStream<Uint8Array> {
+): ReadableStream<Uint8Array<ArrayBuffer>> {
 	if (typeof ReadableStream === 'undefined') {
 		throw new Error('ReadableStream is not available in this environment')
 	}
 
 	const iterator = boxes[Symbol.iterator]()
+	const cursor = createIsoBoxWriteCursor(config)
 
-	function pull(controller: ReadableStreamDefaultController<Uint8Array>): void {
+	function pull(controller: ReadableStreamDefaultController<Uint8Array<ArrayBuffer>>): void {
 		const next = iterator.next()
 
 		if (next.done) {
 			controller.close()
 		} else {
-			controller.enqueue(writeIsoBox(next.value, config))
+			cursor.pos = 0
+			writeChildBoxes(cursor, [next.value])
+			controller.enqueue(cursor.bytes.slice(0, cursor.pos))
 		}
 	}
 
@@ -47,5 +50,5 @@ export function createIsoBoxReadableStream(
 		iterator.return?.()
 	}
 
-	return new ReadableStream<Uint8Array>({ start: pull, pull, cancel })
+	return new ReadableStream<Uint8Array<ArrayBuffer>>({ pull, cancel }, { highWaterMark: 0 })
 }

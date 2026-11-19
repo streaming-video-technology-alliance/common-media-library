@@ -1,6 +1,7 @@
-import type { VisualSampleEntry, VisualSampleEntryChild } from '../boxes/VisualSampleEntry.ts'
+import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import { UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
@@ -8,16 +9,18 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  * Read a visual sample entry box (`VisualSampleEntry`) of the given type.
  *
  * @param type - The type of `VisualSampleEntry` to read
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `VisualSampleEntry`
  *
  * @public
  */
-export function readVisualSampleEntry<T extends IsoBoxType>(
+export function readVisualSampleEntry<T extends IsoBoxType, V extends IsoInt64>(
 	type: T,
-	view: IsoBoxReadView<IsoInt64>,
-): VisualSampleEntry<T> {
+	cursor: IsoBoxReadCursor<V>,
+): VisualSampleEntry<T, V> {
+	const view = new IsoBoxReadView(cursor)
+
 	const { jump, readArray, readUint, readInt, readTemplate, readBoxes } = view
 
 	return {
@@ -33,6 +36,6 @@ export function readVisualSampleEntry<T extends IsoBoxType>(
 		compressorName: readArray(UINT, 1, 32),
 		depth: readUint(2),
 		preDefined3: readInt(2),
-		boxes: readBoxes<VisualSampleEntryChild>(),
+		boxes: readBoxes(),
 	}
 }

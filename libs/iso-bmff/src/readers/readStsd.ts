@@ -1,22 +1,20 @@
-import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
-import type { SampleEntry } from '../boxes/SampleEntry.ts'
-import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `stsd` box (`SampleDescriptionBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `SampleDescriptionBox`
  *
  * @public
  */
-export function readStsd<E extends SampleEntry = AudioSampleEntry | VisualSampleEntry>(
-	view: IsoBoxReadView<IsoInt64>,
-): SampleDescriptionBox<E> {
+export function readStsd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SampleDescriptionBox<V> {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 
@@ -25,6 +23,6 @@ export function readStsd<E extends SampleEntry = AudioSampleEntry | VisualSample
 		version,
 		flags,
 		entryCount,
-		boxes: view.readBoxes<E>(entryCount),
+		boxes: view.readBoxes<SampleDescriptionBox<V>['boxes'][number]>(entryCount),
 	}
 }

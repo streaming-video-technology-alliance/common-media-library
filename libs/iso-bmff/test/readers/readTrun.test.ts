@@ -1,4 +1,4 @@
-import { assert, describe, findBox, it, readIsoBoxes, readTrun } from '../util/box.ts'
+import { assert, describe, findBox, isIsoBoxType, it, readIsoBoxes, readTrun } from '../util/box.ts'
 import { trunBox } from '../util/versionBoxes.ts'
 
 describe('readTrun', function () {
@@ -28,7 +28,7 @@ describe('readTrun versions', function () {
 		it(`should read the composition time offset of a version ${version} box`, function () {
 			const [box] = readIsoBoxes(trunBox(version), { readers: { trun: readTrun } })
 
-			assert.strictEqual(box.type, 'trun')
+			assert.ok(isIsoBoxType('trun', box))
 			assert.strictEqual(box.version, version)
 			assert.strictEqual(box.sampleCount, 1)
 			assert.strictEqual(box.samples[0].sampleCompositionTimeOffset, offset)

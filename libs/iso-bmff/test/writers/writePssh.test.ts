@@ -1,7 +1,10 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
+	isIsoBoxType,
 	assert,
 	describe,
 	it,
+	writeIsoBox,
 	readIsoBoxes,
 	readPssh,
 	writePssh,
@@ -25,22 +28,25 @@ function pssh(version: number, kidCount: number, kid: number[]): ProtectionSyste
 describe('writePssh', function () {
 	it('should write the 16 bytes of one key ID in a version 1 box', function () {
 		// #region example
-		const writer = writePssh({
-			type: 'pssh',
-			version: 1,
-			flags: 0,
-			systemId: [
-				0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
-				0xaa,
-			],
-			kidCount: 1,
-			kid: [
-				0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
-				0x11,
-			],
-			dataSize: 4,
-			data: [1, 2, 3, 4],
-		})
+		const writer = writeIsoBox(
+			{
+				type: 'pssh',
+				version: 1,
+				flags: 0,
+				systemId: [
+					0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
+					0xaa,
+				],
+				kidCount: 1,
+				kid: [
+					0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11,
+					0x11,
+				],
+				dataSize: 4,
+				data: [1, 2, 3, 4],
+			},
+			{ writers: { pssh: writePssh } },
+		)
 
 		// size (56), type (pssh), version and flags, SystemID, KID_count (1),
 		// the 16 bytes of the KID, DataSize (4), then the Data
@@ -56,7 +62,7 @@ describe('writePssh', function () {
 	})
 
 	it('should write the 32 bytes of two key IDs in a version 1 box', function () {
-		const writer = writePssh(pssh(1, 2, [...KID_A, ...KID_B]))
+		const writer = writeWith(writePssh, pssh(1, 2, [...KID_A, ...KID_B]))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -65,7 +71,7 @@ describe('writePssh', function () {
 	})
 
 	it('should write a version 1 box with no key ID', function () {
-		const writer = writePssh(pssh(1, 0, []))
+		const writer = writeWith(writePssh, pssh(1, 0, []))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -74,7 +80,7 @@ describe('writePssh', function () {
 	})
 
 	it('should write a version 0 box', function () {
-		const writer = writePssh(pssh(0, 0, []))
+		const writer = writeWith(writePssh, pssh(0, 0, []))
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), psshBox(0, [0, 0, 0, 4, 1, 2, 3, 4]))
 	})
@@ -92,8 +98,8 @@ describe('writePssh', function () {
 		it(`should write the source bytes of ${name} that readPssh parsed`, function () {
 			const [parsed] = readIsoBoxes(input, { readers: { pssh: readPssh } })
 
-			assert.strictEqual(parsed.type, 'pssh')
-			assert.deepStrictEqual(new Uint8Array(writePssh(parsed).buffer), input)
+			assert.ok(isIsoBoxType('pssh', parsed))
+			assert.deepStrictEqual(new Uint8Array(writeWith(writePssh, parsed).buffer), input)
 		})
 	}
 })

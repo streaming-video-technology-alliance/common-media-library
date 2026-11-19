@@ -1,12 +1,5 @@
-import type { IsoBox } from '../IsoBox.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-
-/**
- * Child boxes of Additional Metadata Container Box
- *
- * @public
- */
-export type AdditionalMetadataContainerBoxChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
  * Additional Metadata Container Box (`meco`).
@@ -17,5 +10,5 @@ export type AdditionalMetadataContainerBoxChild<V extends IsoInt64 = number> = I
  */
 export type AdditionalMetadataContainerBox<V extends IsoInt64 = number> = {
 	type: 'meco'
-	boxes: AdditionalMetadataContainerBoxChild<V>[]
+	boxes: ParsedIsoBox<V>[]
 }

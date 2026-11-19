@@ -1,6 +1,7 @@
 import {
 	assert,
 	describe,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readTenc,
@@ -12,7 +13,7 @@ function read(bytes: Uint8Array): TrackEncryptionBox {
 	const [tenc] = readIsoBoxes(bytes, { readers: { tenc: readTenc } })
 
 	assert.ok(tenc)
-	assert.strictEqual(tenc.type, 'tenc')
+	assert.ok(isIsoBoxType('tenc', tenc))
 
 	return tenc
 }
@@ -44,7 +45,7 @@ describe('readTenc', function () {
 		])
 		const [tenc] = readIsoBoxes(bytes, { readers: { tenc: readTenc } })
 
-		assert.strictEqual(tenc.type, 'tenc')
+		assert.ok(isIsoBoxType('tenc', tenc))
 		assert.strictEqual(tenc.defaultIsProtected, 1)
 		assert.strictEqual(tenc.defaultPerSampleIvSize, 0)
 		assert.strictEqual(tenc.defaultCryptByteBlock, 1)
@@ -160,7 +161,7 @@ describe('readTenc', function () {
 
 		assert.strictEqual(boxes.length, 2)
 		assert.strictEqual(free.type, 'free')
-		assert.strictEqual(tenc.type, 'tenc')
+		assert.ok(isIsoBoxType('tenc', tenc))
 		assert.deepStrictEqual(fields(tenc), {
 			version: 0,
 			flags: 0,

@@ -1,4 +1,13 @@
-import { assert, describe, it, readIsoBoxes, readSidx, writeSidx } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	readIsoBoxes,
+	readSidx,
+	writeSidx,
+} from '../util/box.ts'
 import { sidxBox } from '../util/versionBoxes.ts'
 
 describe('writeSidx', function () {
@@ -7,13 +16,13 @@ describe('writeSidx', function () {
 			const source = sidxBox(version)
 			const [box] = readIsoBoxes(source, { readers: { sidx: readSidx } })
 
-			assert.strictEqual(box.type, 'sidx')
-			assert.deepStrictEqual(new Uint8Array(writeSidx(box).buffer), source)
+			assert.ok(isIsoBoxType('sidx', box))
+			assert.deepStrictEqual(new Uint8Array(writeWith(writeSidx, box).buffer), source)
 		})
 	}
 
 	it('should write 64-bit fields for a version 2 box', function () {
-		const writer = writeSidx({
+		const writer = writeWith(writeSidx, {
 			type: 'sidx',
 			version: 2,
 			flags: 0,

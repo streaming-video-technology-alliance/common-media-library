@@ -1,21 +1,24 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
 import { INT, UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `mvhd` box (`MovieHeaderBox`).
  *
- * The 64-bit integer fields of the result have the type that the `int64` option of the view returns.
+ * The 64-bit integer fields of the result have the type that the `int64` function of the cursor returns.
  * With no option, they are numbers.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `MovieHeaderBox`
  *
  * @public
  */
-export function readMvhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieHeaderBox<V> {
+export function readMvhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieHeaderBox<V> {
+	const view = new IsoBoxReadView(cursor)
+
 	const { jump, readUint, readWideUint, readInt, readArray } = view
 
 	const { version, flags } = view.readFullBox()

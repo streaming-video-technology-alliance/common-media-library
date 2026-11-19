@@ -1,6 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { MovieBox } from '../boxes/MovieBox.ts'
-import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
@@ -12,13 +11,11 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *
+ * @param cursor - The write cursor
  * @param box - The `MovieBox` fields to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeMoov(box: MovieBox<IsoInt64>, config: IsoBoxWriteConfig): IsoBoxWriteView {
-	return writeContainerBox(box, config)
+export function writeMoov(cursor: IsoBoxWriteCursor, box: MovieBox<IsoInt64>): void {
+	writeContainerBox(cursor, box)
 }

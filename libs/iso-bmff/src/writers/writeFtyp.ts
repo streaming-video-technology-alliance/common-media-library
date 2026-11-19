@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,16 +8,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 4.3
  *
+ * @param cursor - The write cursor
  * @param box - The `FileTypeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeFtyp.test.ts#example}
  *
  * @public
  */
-export function writeFtyp(box: FileTypeBox): IsoBoxWriteView {
+export function writeFtyp(cursor: IsoBoxWriteCursor, box: FileTypeBox): void {
 	const headerSize = 8
 	const majorBrandSize = 4
 	const minorVersionSize = 4
@@ -30,5 +31,5 @@ export function writeFtyp(box: FileTypeBox): IsoBoxWriteView {
 		writer.writeString(brand)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

@@ -1,6 +1,6 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { DataInformationBox } from '../boxes/DataInformationBox.ts'
-import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
@@ -9,13 +9,11 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  * The `writers` map does not need an entry for the `dinf` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.
  *
+ * @param cursor - The write cursor
  * @param box - The `DataInformationBox` fields to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeDinf(box: DataInformationBox, config: IsoBoxWriteConfig): IsoBoxWriteView {
-	return writeContainerBox(box, config)
+export function writeDinf(cursor: IsoBoxWriteCursor, box: DataInformationBox<IsoInt64>): void {
+	writeContainerBox(cursor, box)
 }

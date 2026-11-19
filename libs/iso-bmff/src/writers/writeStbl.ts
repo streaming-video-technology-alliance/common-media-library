@@ -1,6 +1,6 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SampleTableBox } from '../boxes/SampleTableBox.ts'
-import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
 /**
@@ -9,13 +9,11 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  * The `writers` map does not need an entry for the `stbl` box type.
  * `writeIsoBoxes` writes the same bytes with this writer and without this writer.
  *
+ * @param cursor - The write cursor
  * @param box - The `SampleTableBox` fields to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeStbl(box: SampleTableBox, config: IsoBoxWriteConfig): IsoBoxWriteView {
-	return writeContainerBox(box, config)
+export function writeStbl(cursor: IsoBoxWriteCursor, box: SampleTableBox<IsoInt64>): void {
+	writeContainerBox(cursor, box)
 }

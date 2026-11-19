@@ -1,16 +1,17 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write the `ardi` box (`AudioRenderingIndicationBox`).
  *
+ * @param cursor - The write cursor
  * @param box - The `AudioRenderingIndicationBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView {
+export function writeArdi(cursor: IsoBoxWriteCursor, box: AudioRenderingIndicationBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const audioRenderingIndicationSize = 1
@@ -20,5 +21,5 @@ export function writeArdi(box: AudioRenderingIndicationBox): IsoBoxWriteView {
 	writer.writeFullBox(box.version, box.flags)
 	writer.writeUint(box.audioRenderingIndication, 1)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

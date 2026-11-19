@@ -1,4 +1,5 @@
-import { assert, describe, it, writeStsz } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import { assert, describe, it, writeIsoBox, writeStsz } from '../util/box.ts'
 
 describe('writeStsz', function () {
 	it('should write a SampleSizeBox with uniform sample size', function () {
@@ -11,7 +12,7 @@ describe('writeStsz', function () {
 			sampleCount: 100,
 		}
 
-		const writer = writeStsz(box)
+		const writer = writeIsoBox(box, { writers: { stsz: writeStsz } })
 		const buffer = new Uint8Array(writer.buffer)
 		// #endregion example
 
@@ -55,7 +56,7 @@ describe('writeStsz', function () {
 			entrySize: [512, 1024, 768],
 		}
 
-		const writer = writeStsz(box)
+		const writer = writeWith(writeStsz, box)
 		const buffer = new Uint8Array(writer.buffer)
 
 		assert.strictEqual(

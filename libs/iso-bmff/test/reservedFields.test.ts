@@ -1,8 +1,10 @@
+import { writeWith } from './util/writeWith.ts'
 import {
 	assert,
 	createDefaultReaderConfig,
 	createDefaultWriterConfig,
 	describe,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readMp4a,
@@ -137,7 +139,7 @@ describe('reserved fields', function () {
 	it('should read and write the entryVersion of an audio sample entry', function () {
 		const [box] = readIsoBoxes(AUDIO_V1, { readers: { mp4a: readMp4a } })
 
-		assert.ok(box?.type === 'mp4a')
+		assert.ok(isIsoBoxType('mp4a', box))
 		assert.strictEqual(box.entryVersion, 1)
 		assert.deepStrictEqual(writeIsoBox(box, { writers: { mp4a: writeMp4a } }), AUDIO_V1)
 	})
@@ -160,7 +162,8 @@ describe('reserved fields', function () {
 	})
 
 	it('should write -1 for a missing preDefined3 of a visual sample entry', function () {
-		const writer = writeAvc1(
+		const writer = writeWith(
+			writeAvc1,
 			{
 				type: 'avc1',
 				dataReferenceIndex: 1,
@@ -184,7 +187,7 @@ describe('reserved fields', function () {
 	})
 
 	it('should write zeros for the reserved and pre_defined fields of mvhd', function () {
-		const writer = writeMvhd({
+		const writer = writeWith(writeMvhd, {
 			type: 'mvhd',
 			version: 0,
 			flags: 0,
@@ -204,7 +207,7 @@ describe('reserved fields', function () {
 	})
 
 	it('should write 0 for the reserved byte of tenc', function () {
-		const writer = writeTenc({
+		const writer = writeWith(writeTenc, {
 			type: 'tenc',
 			version: 1,
 			flags: 0,
@@ -234,7 +237,8 @@ describe('reserved fields', function () {
 
 	it('should write zeros for a missing preDefined and reserved of hdlr', function () {
 		const bytes = new Uint8Array(
-			writeHdlr({ type: 'hdlr', version: 0, flags: 0, handlerType: 'vide', name: '' }).buffer,
+			writeWith(writeHdlr, { type: 'hdlr', version: 0, flags: 0, handlerType: 'vide', name: '' })
+				.buffer,
 		)
 
 		assert.deepStrictEqual(bytes.subarray(12, 16), new Uint8Array(4))
@@ -243,7 +247,7 @@ describe('reserved fields', function () {
 
 	it('should write zeros for a missing preDefined of mdhd', function () {
 		const bytes = new Uint8Array(
-			writeMdhd({
+			writeWith(writeMdhd, {
 				type: 'mdhd',
 				version: 0,
 				flags: 0,
@@ -286,7 +290,7 @@ describe('reserved fields', function () {
 			bytes.subarray(32, 44),
 			new Uint8Array([0x80, 0, 0, 100, 0, 0, 3, 0xe8, 0x80, 0xab, 0xcd, 0xef]),
 		)
-		assert.ok(box?.type === 'sidx')
+		assert.ok(isIsoBoxType('sidx', box))
 		assert.deepStrictEqual(box.references, [reference])
 	})
 })
