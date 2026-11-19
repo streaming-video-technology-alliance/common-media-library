@@ -156,4 +156,20 @@ describe('writeFtyp', function () {
 			0,
 		)
 	})
+
+	it('should throw a RangeError for a brand that does not have 4 characters', function () {
+		assert.throws(
+			() =>
+				writeWith(writeFtyp, {
+					type: 'ftyp',
+					majorBrand: 'mp4',
+					minorVersion: 0,
+					compatibleBrands: [],
+				}),
+			{
+				name: 'RangeError',
+				message: 'A four-character code must have 4 characters, received "mp4"',
+			},
+		)
+	})
 })

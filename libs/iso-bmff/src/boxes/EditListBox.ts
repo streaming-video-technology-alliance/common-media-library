@@ -11,6 +11,5 @@ import type { FullBox } from './FullBox.ts'
  */
 export type EditListBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'elst'
-	entryCount: number
 	entries: EditListEntry<V>[]
 }

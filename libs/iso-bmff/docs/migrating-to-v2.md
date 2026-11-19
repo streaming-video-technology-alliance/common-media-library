@@ -128,6 +128,9 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `writeSidx` writes the low 16 bits of a reference count above 65535 | `writeSidx` throws a `RangeError` |
 | `writeEmsg` writes the text after a U+0000 in `schemeIdUri` or `value` | The string ends at the first U+0000 |
 | `writeSubs` writes the low 16 bits of a subsample count above 65535 | `writeSubs` throws a `RangeError` |
+| `writeFtyp`, `writeStyp`, and `writeHdlr` write a code that does not have 4 characters | The writers throw a `RangeError` |
+| `writeMdhd` writes 0 or a wrong code for a `language` that is not 3 lower-case letters | `writeMdhd` writes the code of `und` |
+| `writeHdlr` writes the text after a U+0000 in `name` | The name ends at the first U+0000 |
 
 The stream writes one box for each read and writes no box before the first read.
 
@@ -248,6 +251,8 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `entryCount` of a `ctts` box of version 0 or 1 | `entries.length`. A box of version 2 or above keeps `entryCount`. |
 | `sampleCount` of a `stsz` box with a `sampleSize` of 0 | `entrySize.length`. A box with a `sampleSize` above 0 keeps `sampleCount`. |
 | `entryCount` of `co64`, `sampleCount` of `stz2` | `chunkOffset.length`, `entrySize.length` |
+| `entryCount` of `elst` | `entries.length` |
+| `matrix: number[]` of `mvhd` and `tkhd`, `opColor: number[]` of `vmhd` | Labeled tuples of 9 and 3 numbers. Annotate an array that your code builds, such as `matrix as MovieHeaderBox['matrix']`. |
 
 ### Changed types
 

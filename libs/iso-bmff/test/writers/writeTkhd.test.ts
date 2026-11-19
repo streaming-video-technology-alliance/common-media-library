@@ -14,7 +14,7 @@ function createBox(matrix: number[]): TrackHeaderBox {
 		layer: 0,
 		alternateGroup: 0,
 		volume: 0,
-		matrix,
+		matrix: matrix as TrackHeaderBox['matrix'],
 		width: 1920,
 		height: 1080,
 	}

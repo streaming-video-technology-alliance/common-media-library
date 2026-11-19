@@ -146,7 +146,6 @@ export type EditBox<V extends IsoInt64 = number> = {
 // @public
 export type EditListBox<V extends IsoInt64 = number> = FullBox & {
     type: "elst";
-    entryCount: number;
     entries: EditListEntry<V>[];
 };
 
@@ -602,7 +601,7 @@ export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
     duration: V;
     rate: number;
     volume: number;
-    matrix: number[];
+    matrix: [a: number, b: number, u: number, c: number, d: number, v: number, x: number, y: number, w: number];
     preDefined?: number[];
     nextTrackId: number;
 };
@@ -1221,7 +1220,7 @@ export type TrackHeaderBox<V extends IsoInt64 = number> = FullBox & {
     layer: number;
     alternateGroup: number;
     volume: number;
-    matrix: number[];
+    matrix: [a: number, b: number, u: number, c: number, d: number, v: number, x: number, y: number, w: number];
     width: number;
     height: number;
 };
@@ -1275,7 +1274,7 @@ export type UserDataBox<V extends IsoInt64 = number> = {
 export type VideoMediaHeaderBox = FullBox & {
     type: "vmhd";
     graphicsMode: number;
-    opColor: number[];
+    opColor: [red: number, green: number, blue: number];
 };
 
 // @public

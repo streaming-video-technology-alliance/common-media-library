@@ -1,7 +1,9 @@
 import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readInt16 } from '../cursor/readInt16.ts'
 
 /**
  * Read the `smhd` box (`SoundMediaHeaderBox`).
@@ -13,12 +15,11 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readSmhd(cursor: IsoBoxReadCursor<IsoInt64>): SoundMediaHeaderBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const balance = readInt16(cursor) / 0x100
 
-	const { version, flags } = view.readFullBox()
-	const balance = view.readInt(2) / 256
-
-	view.jump(2)
+	cursor.pos += 2
 
 	return {
 		type: 'smhd',

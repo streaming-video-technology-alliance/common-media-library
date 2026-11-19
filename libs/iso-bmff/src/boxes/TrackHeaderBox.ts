@@ -29,7 +29,17 @@ export type TrackHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	 * The identity matrix is `[1, 0, 0, 0, 1, 0, 0, 0, 1]`.
 	 * The box stores u, v, and w as 2.30 values, and the other entries as 16.16 values.
 	 */
-	matrix: number[]
+	matrix: [
+		a: number,
+		b: number,
+		u: number,
+		c: number,
+		d: number,
+		v: number,
+		x: number,
+		y: number,
+		w: number,
+	]
 	/** The visual width of the track. The box stores an unsigned 16.16 value, and the reader returns the decoded number. */
 	width: number
 	/** The visual height of the track. The box stores an unsigned 16.16 value, and the reader returns the decoded number. */
