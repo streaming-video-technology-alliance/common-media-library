@@ -4,6 +4,7 @@ import {
 	describe,
 	isIsoBoxType,
 	it,
+	nextIsoBox,
 	readBytes,
 	readChildBoxes,
 	readIsoBoxes,
@@ -133,6 +134,32 @@ describe('readIsoBoxes on the read cursor', function () {
 		)
 	})
 
+	it('should restore the cursor to the first byte of the box after an error of a reader', function () {
+		const readers = { mfhd: (cursor: IsoBoxReadCursor) => readBytes(cursor, 9) as never }
+		const bytes = reduceUint8Arrays([MDAT, MFHD, boxBytes('free')])
+		const cursor = createIsoBoxReadCursor(bytes, { readers })
+
+		assert.throws(() => readChildBoxes(cursor), RangeError)
+		assert.strictEqual(cursor.start, 0)
+		assert.strictEqual(cursor.pos, MDAT.length)
+		assert.strictEqual(cursor.end, bytes.length)
+		assert.strictEqual(nextIsoBox(cursor), 'mfhd')
+		assert.deepStrictEqual(
+			readChildBoxes(cursor).map(box => box.type),
+			['free'],
+		)
+	})
+
+	it('should restore the cursor to the first byte of the box after the depth error', function () {
+		const bytes = nest(128)
+		const cursor = createIsoBoxReadCursor(bytes)
+
+		assert.throws(() => readChildBoxes(cursor), /128/)
+		assert.strictEqual(cursor.pos, 0)
+		assert.strictEqual(cursor.end, bytes.length)
+		assert.strictEqual(readChildBoxes(cursor, 0).length, 0)
+	})
+
 	it('should set the position to the end of the box after a reader', function () {
 		const readers = {
 			mfhd: (cursor: IsoBoxReadCursor) => ({ type: 'mfhd' as const, first: readUint8(cursor) }),
@@ -201,8 +228,9 @@ describe('readChildBoxes', function () {
 		assert.strictEqual(readChildBoxes(cursor, 0).length, 0)
 	})
 
-	it('should throw a RangeError for a negative count', function () {
+	it('should throw a RangeError for a negative count or NaN', function () {
 		assert.throws(() => readChildBoxes(createIsoBoxReadCursor(MFHD), -1), RangeError)
+		assert.throws(() => readChildBoxes(createIsoBoxReadCursor(MFHD), NaN), /NaN/)
 	})
 
 	it('should stop at the first byte of a truncated box', function () {

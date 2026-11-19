@@ -169,6 +169,10 @@ describe('seekIsoBox', function () {
 		assert.throws(() => seekIsoBox(boxBytes('free'), ['freee']), RangeError)
 	})
 
+	it('should throw a RangeError for a bad type after a missing box', function () {
+		assert.throws(() => seekIsoBox(boxBytes('free'), ['moov', 'x']), /"x"/)
+	})
+
 	it('should find a box past the boxes of other types', function () {
 		const data = load('test_frag.mp4')
 

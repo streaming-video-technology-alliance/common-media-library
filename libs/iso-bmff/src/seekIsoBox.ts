@@ -71,7 +71,9 @@ export function seekIsoBox(
 		if (type.length !== 4) {
 			throw new RangeError(`A four-character code must have 4 characters, received "${type}"`)
 		}
+	}
 
+	for (const type of path) {
 		const code =
 			((type.charCodeAt(0) << 24) |
 				(type.charCodeAt(1) << 16) |

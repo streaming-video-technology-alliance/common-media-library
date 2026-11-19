@@ -1,7 +1,6 @@
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { readInt32 } from './readInt32.ts'
-import { readUint32 } from './readUint32.ts'
+import { take } from './take.ts'
 
 /**
  * Reads an integer field of 4 or 8 bytes as a `number`.
@@ -19,7 +18,9 @@ export function readWideNumber(
 	size: 4 | 8,
 	signed: boolean,
 ): number {
-	const value = signed ? readInt32(cursor) : readUint32(cursor)
+	const at = take(cursor, size)
+	const { view } = cursor
+	const value = signed ? view.getInt32(at) : view.getUint32(at)
 
-	return size === 8 ? value * 0x100000000 + readUint32(cursor) : value
+	return size === 8 ? value * 0x100000000 + view.getUint32(at + 4) : value
 }

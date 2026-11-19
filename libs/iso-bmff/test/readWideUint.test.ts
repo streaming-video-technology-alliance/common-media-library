@@ -56,8 +56,12 @@ describe('readWideUint', function () {
 		assert.strictEqual(cursor.pos, 8)
 	})
 
-	it('should throw a RangeError past the end of the cursor', function () {
-		assert.throws(() => readWideUint(createIsoBoxReadCursor(new Uint8Array(7)), 8), RangeError)
+	it('should throw a RangeError past the end of the cursor and keep the position', function () {
+		const cursor = createIsoBoxReadCursor(new Uint8Array(7))
+
+		assert.throws(() => readWideUint(cursor, 8), RangeError)
+		assert.throws(() => readWideInt(cursor, 8), RangeError)
+		assert.strictEqual(cursor.pos, 0)
 	})
 })
 

@@ -16,13 +16,14 @@ import { CONTAINERS } from './utils/CONTAINERS.ts'
  *
  * The function stops before a truncated box: the data ends inside the box, or the size is below the header size.
  * The position of the cursor is then the first byte of that box.
- * The function does not catch an error of a reader.
+ * The function does not catch an error of a reader. After an error, the position of the cursor is the first byte of the box that failed,
+ * and `start` and `end` do not change.
  *
  * @param cursor - The cursor at the first byte of the first box.
  * @param count - The maximum number of boxes. With no count, the function reads every box to `cursor.end`.
  * @returns The boxes.
  *
- * @throws RangeError if `count` is negative.
+ * @throws RangeError if `count` is negative or `NaN`.
  * @throws RangeError if a box is deeper than 128 levels. The message has the box type and the limit.
  *
  * @example
@@ -40,7 +41,7 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 	const max = count ?? Infinity
 	const boxes: ParsedIsoBox<V>[] = []
 
-	if (max < 0) {
+	if (!(max >= 0)) {
 		throw new RangeError(`readChildBoxes: count must be 0 or more, received ${count}`)
 	}
 
@@ -61,35 +62,39 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 		const reader = readers?.[type] || readers?.[type.trim()] // url and urn boxes have a trailing space in their type field
 		let box: ParsedIsoBox<V>
 
-		if (depth >= 128) {
-			throw new RangeError(`The box ${type} is deeper than the limit of 128 levels`)
-		}
-
-		state.pos = boxStart + header
-		state.start = boxStart
-		state.end = boxEnd
-		state.depth = depth + 1
-
-		if (reader) {
-			box = reader(state, type) as ParsedIsoBox<V>
-		} else if (CONTAINERS.includes(type)) {
-			box = { type, boxes: readChildBoxes(state) } as ParsedIsoBox<V>
-		} else {
-			const bytes = new Uint8Array(view.buffer, view.byteOffset + boxStart, size)
-			const raw: IsoRawBox = { type, bytes, headerSize: header }
-
-			if (type === 'uuid') {
-				raw.headerSize = header + 16
-				raw.usertype = bytes.subarray(header, header + 16)
+		try {
+			if (depth >= 128) {
+				throw new RangeError(`The box ${type} is deeper than the limit of 128 levels`)
 			}
 
-			box = raw
+			state.pos = boxStart + header
+			state.start = boxStart
+			state.end = boxEnd
+			state.depth = depth + 1
+
+			if (reader) {
+				box = reader(state, type) as ParsedIsoBox<V>
+			} else if (CONTAINERS.includes(type)) {
+				box = { type, boxes: readChildBoxes(state) } as ParsedIsoBox<V>
+			} else {
+				const bytes = new Uint8Array(view.buffer, view.byteOffset + boxStart, size)
+				const raw: IsoRawBox = { type, bytes, headerSize: header }
+
+				if (type === 'uuid') {
+					raw.headerSize = header + 16
+					raw.usertype = bytes.subarray(header, header + 16)
+				}
+
+				box = raw
+			}
+		} finally {
+			state.pos = boxStart
+			state.start = start
+			state.end = end
+			state.depth = depth
 		}
 
 		state.pos = boxEnd
-		state.start = start
-		state.end = end
-		state.depth = depth
 		boxes.push(box)
 	}
 
