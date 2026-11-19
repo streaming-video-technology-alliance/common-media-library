@@ -224,7 +224,7 @@ describe('int64 option types', function () {
 							}
 							if (part.type === 'edts' && 'boxes' in part) {
 								for (const list of part.boxes) {
-									assert.ok('entries' in list)
+									assert.ok(isIsoBoxType('elst', list))
 									expectType<Equal<(typeof list.entries)[number]['mediaTime'], bigint>>(true)
 									expectType<Equal<(typeof list.entries)[number]['mediaRateInteger'], number>>(true)
 								}

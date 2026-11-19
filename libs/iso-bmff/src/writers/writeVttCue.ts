@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { WebVttCueBox } from '../boxes/WebVttCueBox.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
@@ -13,6 +14,6 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * @public
  */
-export function writeVttc(cursor: IsoBoxWriteCursor, box: WebVttCueBox): void {
+export function writeVttc(cursor: IsoBoxWriteCursor, box: WebVttCueBox<IsoInt64>): void {
 	writeContainerBox(cursor, box)
 }

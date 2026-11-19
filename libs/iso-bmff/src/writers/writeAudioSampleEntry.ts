@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { beginIsoBox } from '../beginIsoBox.ts'
 import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import type { AudioSampleEntryType } from '../boxes/AudioSampleEntryType.ts'
@@ -22,7 +23,7 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  */
 export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(
 	cursor: IsoBoxWriteCursor,
-	box: AudioSampleEntry<T>,
+	box: AudioSampleEntry<T, IsoInt64>,
 ): void {
 	const start = beginIsoBox(cursor, box.type)
 

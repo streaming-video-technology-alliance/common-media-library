@@ -1,12 +1,5 @@
-import type { IsoBox } from '../IsoBox.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-
-/**
- * Child boxes of Groups List Box
- *
- * @public
- */
-export type GroupsListBoxChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
  * Groups List Box (`grpl`).
@@ -17,5 +10,5 @@ export type GroupsListBoxChild<V extends IsoInt64 = number> = IsoBox<V>
  */
 export type GroupsListBox<V extends IsoInt64 = number> = {
 	type: 'grpl'
-	boxes: GroupsListBoxChild<V>[]
+	boxes: ParsedIsoBox<V>[]
 }

@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import { writeAudioSampleEntry } from './writeAudioSampleEntry.ts'
@@ -10,6 +11,9 @@ import { writeAudioSampleEntry } from './writeAudioSampleEntry.ts'
  *
  * @public
  */
-export function writeEnca(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<'enca'>): void {
+export function writeEnca(
+	cursor: IsoBoxWriteCursor,
+	box: AudioSampleEntry<'enca', IsoInt64>,
+): void {
 	writeAudioSampleEntry(cursor, box)
 }

@@ -1,5 +1,5 @@
-import type { DataEntryUrlBox } from './DataEntryUrlBox.ts'
-import type { DataEntryUrnBox } from './DataEntryUrnBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { FullBox } from './FullBox.ts'
 
 /**
@@ -9,8 +9,8 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type DataReferenceBox = FullBox & {
+export type DataReferenceBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'dref'
 	entryCount: number
-	boxes: (DataEntryUrlBox | DataEntryUrnBox)[]
+	boxes: ParsedIsoBox<V>[]
 }

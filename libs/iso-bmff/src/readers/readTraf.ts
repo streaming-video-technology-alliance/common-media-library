@@ -1,4 +1,4 @@
-import type { TrackFragmentBox, TrackFragmentBoxChild } from '../boxes/TrackFragmentBox.ts'
+import type { TrackFragmentBox } from '../boxes/TrackFragmentBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -23,6 +23,6 @@ export function readTraf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Track
 
 	return {
 		type: 'traf',
-		boxes: view.readBoxes<TrackFragmentBoxChild<V>>(),
+		boxes: view.readBoxes(),
 	}
 }

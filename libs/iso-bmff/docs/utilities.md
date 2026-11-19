@@ -77,9 +77,9 @@ for (const box of traverseIsoBoxes(boxes)) {
 
 ## Type guards
 
-The package provides type guards that check whether a box is a container box or a full box. These guards narrow the type of a box in TypeScript.
+The package provides type guards that check the type of a box. These guards narrow the type of a box in TypeScript.
 
-`isContainer` checks whether a box is a container box.
+`isContainer` checks whether a box has child boxes. The function returns `true` for a box with a `boxes` field and for a box with a type in `CONTAINERS`. In TypeScript, a `true` result narrows the box to the box types with a `boxes` field. These types are the container types, `meta`, `stsd`, `dref`, `prsl`, and the sample entries.
 
 ```typescript
 import { isContainer, type IsoBox } from "@svta/cml-iso-bmff";
@@ -88,15 +88,15 @@ const box: IsoBox = { type: "moov", boxes: [] };
 const container = isContainer(box);
 ```
 
-After `isContainer` returns `true`, each element of `box.boxes` has a box type. Test the `type` of a child before you read a field of that child.
+After `isContainer` returns `true`, each element of `box.boxes` is a box or a raw box. Test a child with `isIsoBoxType` before you read a field of that child.
 
 ```typescript
-import { createDefaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bmff";
+import { createDefaultReaderConfig, isContainer, isIsoBoxType, readIsoBoxes } from "@svta/cml-iso-bmff";
 
 for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 	if (isContainer(box)) {
 		for (const child of box.boxes) {
-			if (child.type === "mfhd") {
+			if (isIsoBoxType("mfhd", child)) {
 				console.log(child.sequenceNumber);
 			}
 		}

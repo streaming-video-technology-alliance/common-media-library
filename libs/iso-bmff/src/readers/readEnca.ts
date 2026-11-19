@@ -12,6 +12,8 @@ import { readAudioSampleEntry } from './readAudioSampleEntry.ts'
  *
  * @public
  */
-export function readEnca(cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<'enca'> {
+export function readEnca<V extends IsoInt64>(
+	cursor: IsoBoxReadCursor<V>,
+): AudioSampleEntry<'enca', V> {
 	return readAudioSampleEntry('enca', cursor)
 }

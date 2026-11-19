@@ -1,12 +1,5 @@
-import type { WebVttCueIdBox } from './WebVttCueIdBox.ts'
-import type { WebVttCuePayloadBox } from './WebVttCuePayloadBox.ts'
-
-/**
- * Child boxes of WebVTT Cue Box
- *
- * @public
- */
-export type WebVttCueChild = WebVttCueIdBox | WebVttCuePayloadBox
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 
 /**
  * WebVTT Cue Box (`vttc`).
@@ -15,7 +8,7 @@ export type WebVttCueChild = WebVttCueIdBox | WebVttCuePayloadBox
  *
  * @public
  */
-export type WebVttCueBox = {
+export type WebVttCueBox<V extends IsoInt64 = number> = {
 	type: 'vttc'
-	boxes: WebVttCueChild[]
+	boxes: ParsedIsoBox<V>[]
 }

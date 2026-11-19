@@ -1,4 +1,4 @@
-import type { EditBox, EditBoxChild } from '../boxes/EditBox.ts'
+import type { EditBox } from '../boxes/EditBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -23,6 +23,6 @@ export function readEdts<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EditB
 
 	return {
 		type: 'edts',
-		boxes: view.readBoxes<EditBoxChild<V>>(),
+		boxes: view.readBoxes(),
 	}
 }

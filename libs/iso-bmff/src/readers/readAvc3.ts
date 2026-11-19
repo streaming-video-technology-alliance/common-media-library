@@ -12,6 +12,8 @@ import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
  *
  * @public
  */
-export function readAvc3(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<'avc3'> {
+export function readAvc3<V extends IsoInt64>(
+	cursor: IsoBoxReadCursor<V>,
+): VisualSampleEntry<'avc3', V> {
 	return readVisualSampleEntry('avc3', cursor)
 }

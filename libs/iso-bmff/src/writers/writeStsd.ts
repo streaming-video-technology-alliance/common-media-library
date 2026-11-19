@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { beginIsoFullBox } from '../beginIsoFullBox.ts'
 import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
@@ -18,7 +19,7 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  *
  * @public
  */
-export function writeStsd(cursor: IsoBoxWriteCursor, box: SampleDescriptionBox): void {
+export function writeStsd(cursor: IsoBoxWriteCursor, box: SampleDescriptionBox<IsoInt64>): void {
 	const start = beginIsoFullBox(cursor, 'stsd', box.version, box.flags)
 
 	writeUint32(cursor, box.boxes.length)

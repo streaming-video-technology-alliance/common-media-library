@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SampleTableBox } from '../boxes/SampleTableBox.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
@@ -13,6 +14,6 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * @public
  */
-export function writeStbl(cursor: IsoBoxWriteCursor, box: SampleTableBox): void {
+export function writeStbl(cursor: IsoBoxWriteCursor, box: SampleTableBox<IsoInt64>): void {
 	writeContainerBox(cursor, box)
 }

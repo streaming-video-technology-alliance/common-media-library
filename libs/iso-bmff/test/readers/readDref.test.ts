@@ -4,6 +4,7 @@ import {
 	createDefaultWriterConfig,
 	describe,
 	filterBoxes,
+	isIsoBoxType,
 	it,
 	readDref,
 	readIsoBoxes,
@@ -25,7 +26,7 @@ describe('readDref', function () {
 		assert.strictEqual(box.boxes.length, 1)
 
 		const entry = box.boxes[0]
-		assert.strictEqual(entry.type, 'url ')
+		assert.ok(isIsoBoxType('url ', entry))
 		assert.strictEqual(entry.version, 0)
 		assert.strictEqual(entry.flags, 1)
 		assert.strictEqual(entry.location, '')

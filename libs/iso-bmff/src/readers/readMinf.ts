@@ -1,4 +1,4 @@
-import type { MediaInformationBox, MediaInformationBoxChild } from '../boxes/MediaInformationBox.ts'
+import type { MediaInformationBox } from '../boxes/MediaInformationBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -15,11 +15,11 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readMinf(cursor: IsoBoxReadCursor<IsoInt64>): MediaInformationBox {
+export function readMinf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MediaInformationBox<V> {
 	const view = new IsoBoxReadView(cursor)
 
 	return {
 		type: 'minf',
-		boxes: view.readBoxes<MediaInformationBoxChild>(),
+		boxes: view.readBoxes(),
 	}
 }

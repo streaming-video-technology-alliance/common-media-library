@@ -1,4 +1,4 @@
-import type { GroupsListBox, GroupsListBoxChild } from '../boxes/GroupsListBox.ts'
+import type { GroupsListBox } from '../boxes/GroupsListBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -23,6 +23,6 @@ export function readGrpl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Group
 
 	return {
 		type: 'grpl',
-		boxes: view.readBoxes<GroupsListBoxChild<V>>(),
+		boxes: view.readBoxes(),
 	}
 }

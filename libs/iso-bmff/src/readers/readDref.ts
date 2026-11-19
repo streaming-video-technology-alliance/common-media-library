@@ -14,7 +14,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readDref(cursor: IsoBoxReadCursor<IsoInt64>): DataReferenceBox {
+export function readDref<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): DataReferenceBox<V> {
 	const view = new IsoBoxReadView(cursor)
 
 	const { version, flags } = view.readFullBox()

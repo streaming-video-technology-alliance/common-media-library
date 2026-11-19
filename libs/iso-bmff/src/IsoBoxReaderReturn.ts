@@ -12,6 +12,7 @@ import type { IsoRawBox } from './IsoRawBox.ts'
  * A container type whose reader the map replaces is not in the union either.
  * A `url` or `urn` key also replaces `'url '` or `'urn '`.
  * When a key is not a literal, such as `string` from a computed key, the union has every built-in box type.
+ * A reader result with a `type` field that is not a literal, such as `string`, adds no member to the union.
  *
  * The type parameter `V` is the type of the 64-bit integer fields of the built-in box types.
  * TypeScript does not instantiate a generic reader that the map holds in a variable.
@@ -33,7 +34,11 @@ export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> =
 									? IsoBoxMap<V>[N]
 									: B
 								: B
-							: B
+							: [B] extends [{ type: infer N extends string }]
+								? string extends N
+									? never
+									: B
+								: B
 					: never
 			}[keyof T]
 	  >

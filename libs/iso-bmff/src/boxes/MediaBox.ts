@@ -1,17 +1,5 @@
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import type { HandlerBox } from './HandlerBox.ts'
-import type { MediaHeaderBox } from './MediaHeaderBox.ts'
-import type { MediaInformationBox } from './MediaInformationBox.ts'
-
-/**
- * Child boxes of Media Box
- *
- * @public
- */
-export type MediaBoxChild<V extends IsoInt64 = number> =
-	| MediaHeaderBox<V>
-	| HandlerBox
-	| MediaInformationBox
 
 /**
  * Media Box (`mdia`).
@@ -22,5 +10,5 @@ export type MediaBoxChild<V extends IsoInt64 = number> =
  */
 export type MediaBox<V extends IsoInt64 = number> = {
 	type: 'mdia'
-	boxes: MediaBoxChild<V>[]
+	boxes: ParsedIsoBox<V>[]
 }

@@ -1,7 +1,4 @@
-import type {
-	PreselectionGroupBox,
-	PreselectionGroupBoxChild,
-} from '../boxes/PreselectionGroupBox.ts'
+import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
@@ -16,7 +13,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readPrsl(cursor: IsoBoxReadCursor<IsoInt64>): PreselectionGroupBox {
+export function readPrsl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): PreselectionGroupBox<V> {
 	const view = new IsoBoxReadView(cursor)
 
 	const { version, flags } = view.readFullBox()
@@ -37,6 +34,6 @@ export function readPrsl(cursor: IsoBoxReadCursor<IsoInt64>): PreselectionGroupB
 		preselectionTag,
 		selectionPriority,
 		interleavingTag,
-		boxes: view.readBoxes<PreselectionGroupBoxChild>(),
+		boxes: view.readBoxes(),
 	}
 }

@@ -2,6 +2,7 @@ import {
 	assert,
 	describe,
 	findBox,
+	isIsoBoxType,
 	it,
 	readLabl,
 	readMeta,
@@ -16,15 +17,16 @@ describe('readLabl', function () {
 		const meta = findBox('SRMP_AC4.mp4', 'meta', {
 			readers: { meta: readMeta, prsl: readPrsl, labl: readLabl },
 		}) as MetaBox
-		const grpl = meta.boxes.find(child => child.type === 'grpl')
-		assert.ok(grpl)
+		const grpl = meta.boxes.find(child => isIsoBoxType('grpl', child))
+		assert.ok(isIsoBoxType('grpl', grpl))
 
 		const prsl = grpl.boxes.find(
-			(child): child is PreselectionGroupBox => child.type === 'prsl' && child.groupId === 234,
+			(child): child is PreselectionGroupBox =>
+				isIsoBoxType('prsl', child) && child.groupId === 234,
 		)
 		assert.ok(prsl)
 
-		const boxes = prsl.boxes.filter((child: LabelBox) => child.type === 'labl') as LabelBox[]
+		const boxes = prsl.boxes.filter((child): child is LabelBox => isIsoBoxType('labl', child))
 
 		assert.strictEqual(boxes[0].type, 'labl')
 		assert.strictEqual(boxes[0].flags & 0x1, 0)

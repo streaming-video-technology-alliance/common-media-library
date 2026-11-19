@@ -12,6 +12,8 @@ import { readAudioSampleEntry } from './readAudioSampleEntry.ts'
  *
  * @public
  */
-export function readMp4a(cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<'mp4a'> {
+export function readMp4a<V extends IsoInt64>(
+	cursor: IsoBoxReadCursor<V>,
+): AudioSampleEntry<'mp4a', V> {
 	return readAudioSampleEntry('mp4a', cursor)
 }

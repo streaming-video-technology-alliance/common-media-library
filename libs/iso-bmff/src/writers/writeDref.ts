@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { beginIsoFullBox } from '../beginIsoFullBox.ts'
 import type { DataReferenceBox } from '../boxes/DataReferenceBox.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
@@ -15,7 +16,7 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  *
  * @public
  */
-export function writeDref(cursor: IsoBoxWriteCursor, box: DataReferenceBox): void {
+export function writeDref(cursor: IsoBoxWriteCursor, box: DataReferenceBox<IsoInt64>): void {
 	const start = beginIsoFullBox(cursor, 'dref', box.version, box.flags)
 
 	writeUint32(cursor, box.boxes.length)
