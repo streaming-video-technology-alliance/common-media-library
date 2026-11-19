@@ -181,16 +181,5 @@ export function ensureEncryptedInit(
 		})
 	}
 
-	const written = writeIsoBoxes(boxes, { writers })
-
-	if (!includeOriginal) {
-		return written
-	}
-
-	const result = new Uint8Array(written.length + init.length)
-
-	result.set(written)
-	result.set(init, written.length)
-
-	return result
+	return writeIsoBoxes(includeOriginal ? [...boxes, init] : boxes, { writers })
 }
