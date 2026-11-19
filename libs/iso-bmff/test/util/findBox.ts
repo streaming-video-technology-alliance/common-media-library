@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	readIsoBoxes,
 	traverseIsoBoxes,
 	type IsoBoxMap,
@@ -15,10 +16,8 @@ export function findBox<T extends keyof IsoBoxMap>(
 	const boxes = readIsoBoxes(load(file), config)
 
 	for (const box of traverseIsoBoxes(boxes)) {
-		if (box.type === type) {
-			// TypeScript can't narrow ParsedBox to IsoBoxMap[T] based on runtime type value,
-			// but we know at runtime that box.type === type, so the box matches IsoBoxMap[T]
-			return box as unknown as IsoBoxMap[T]
+		if (isIsoBoxType(type, box)) {
+			return box
 		}
 	}
 

@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	readIsoBoxes,
 	traverseIsoBoxes,
 	type IsoBoxMap,
@@ -16,8 +17,8 @@ export function filterBoxes<T extends keyof IsoBoxMap>(
 	const found: IsoBoxMap[T][] = []
 
 	for (const box of traverseIsoBoxes(boxes)) {
-		if (box.type === type) {
-			found.push(box as unknown as IsoBoxMap[T])
+		if (isIsoBoxType(type, box)) {
+			found.push(box)
 		}
 	}
 

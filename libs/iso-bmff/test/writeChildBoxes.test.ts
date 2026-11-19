@@ -21,14 +21,11 @@ import {
 } from './util/box.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { boxBytes } from './util/wideBoxes.ts'
+import { written } from './util/written.ts'
 
 const MFHD: MovieFragmentHeaderBox = { type: 'mfhd', version: 0, flags: 0, sequenceNumber: 7 }
 const MFHD_BYTES = boxBytes('mfhd', new Uint8Array([0, 0, 0, 0, 0, 0, 0, 7]))
 const MDAT_BYTES = boxBytes('mdat', new Uint8Array([0xaa, 0xbb]))
-
-function written(cursor: IsoBoxWriteCursor): number[] {
-	return Array.from(cursor.bytes.subarray(0, cursor.pos))
-}
 
 describe('writeChildBoxes', function () {
 	it('should write each box at the position of the cursor with the writers of the cursor', function () {

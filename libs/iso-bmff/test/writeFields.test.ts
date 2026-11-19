@@ -19,12 +19,8 @@ import {
 	writeUtf8,
 	writeWideInt,
 	writeWideUint,
-	type IsoBoxWriteCursor,
 } from './util/box.ts'
-
-function written(cursor: IsoBoxWriteCursor): number[] {
-	return Array.from(cursor.bytes.subarray(0, cursor.pos))
-}
+import { written } from './util/written.ts'
 
 describe('write field functions', function () {
 	it('should write fields at the position and move the position', function () {
