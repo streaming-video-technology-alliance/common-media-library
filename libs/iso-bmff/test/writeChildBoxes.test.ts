@@ -18,6 +18,7 @@ import {
 	type IsoBoxWriteCursor,
 	type IsoRawBox,
 	type MovieFragmentHeaderBox,
+	type MovieHeaderBox,
 } from './util/box.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { boxBytes } from './util/wideBoxes.ts'
@@ -112,8 +113,8 @@ describe('writeIsoBoxes on the write cursor', function () {
 	})
 
 	it('should write the child boxes of a container with the writers of the configuration', function () {
-		const mvhd = {
-			type: 'mvhd' as const,
+		const mvhd: MovieHeaderBox = {
+			type: 'mvhd',
 			version: 0,
 			flags: 0,
 			creationTime: 0,

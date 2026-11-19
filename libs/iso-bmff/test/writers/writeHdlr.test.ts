@@ -95,4 +95,19 @@ describe('writeHdlr', function () {
 			assert.deepStrictEqual({ type, version, flags, preDefined, handlerType, reserved, name }, box)
 		})
 	}
+
+	it('should end the name at the first U+0000', function () {
+		const bytes = writeWith(writeHdlr, {
+			type: 'hdlr',
+			version: 0,
+			flags: 0,
+			handlerType: 'vide',
+			name: 'a\0b',
+		})
+		const [box] = readIsoBoxes(bytes, { readers: { hdlr: readHdlr } })
+
+		assert.deepStrictEqual(Array.from(bytes.subarray(32)), [0x61, 0])
+		assert.ok(isIsoBoxType('hdlr', box))
+		assert.strictEqual(box.name, 'a')
+	})
 })

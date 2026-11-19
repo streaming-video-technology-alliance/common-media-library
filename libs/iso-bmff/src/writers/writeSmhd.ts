@@ -1,7 +1,9 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { writeTemplate16 } from '../cursor/writeTemplate16.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `smhd` box (`SoundMediaHeaderBox`).
@@ -17,17 +19,9 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSmhd(cursor: IsoBoxWriteCursor, box: SoundMediaHeaderBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const balanceSize = 2
-	const reservedSize = 2
-	const totalSize = headerSize + fullBoxSize + balanceSize + reservedSize
+	const start = beginIsoFullBox(cursor, 'smhd', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('smhd', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeTemplate(box.balance, 2)
-	writer.writeUint(0, 2)
-
-	writeLegacyView(cursor, writer)
+	writeTemplate16(cursor, box.balance)
+	writeUint16(cursor, 0)
+	endIsoBox(cursor, start)
 }

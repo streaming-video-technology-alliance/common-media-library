@@ -1,8 +1,12 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { EditListBox } from '../boxes/EditListBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeInt16 } from '../cursor/writeInt16.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { writeWideInt } from '../cursor/writeWideInt.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `elst` box (`EditListBox`).
@@ -18,26 +22,17 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeElst(cursor: IsoBoxWriteCursor, box: EditListBox<IsoInt64>): void {
-	const v1 = box.version === 1
-	const size = v1 ? 8 : 4
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entrySize = size + size + 2 + 2 // segmentDuration + mediaTime + mediaRateInteger + mediaRateFraction
-	const entriesSize = box.entryCount * entrySize
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+	const size = box.version === 1 ? 8 : 4
+	const start = beginIsoFullBox(cursor, 'elst', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('elst', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.entryCount, 4)
+	writeUint32(cursor, box.entries.length)
 
 	for (const entry of box.entries) {
-		writer.writeWideUint(entry.segmentDuration, size)
-		writer.writeWideInt(entry.mediaTime, size)
-		writer.writeInt(entry.mediaRateInteger, 2)
-		writer.writeInt(entry.mediaRateFraction, 2)
+		writeWideUint(cursor, entry.segmentDuration, size)
+		writeWideInt(cursor, entry.mediaTime, size)
+		writeInt16(cursor, entry.mediaRateInteger)
+		writeInt16(cursor, entry.mediaRateFraction)
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

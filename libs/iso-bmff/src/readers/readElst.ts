@@ -1,8 +1,13 @@
 import type { EditListBox } from '../boxes/EditListBox.ts'
 import type { EditListEntry } from '../boxes/EditListEntry.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readInt16 } from '../cursor/readInt16.ts'
+import { readWideUint } from '../cursor/readWideUint.ts'
+import { readWideInt } from '../cursor/readWideInt.ts'
 
 /**
  * Read the `elst` box (`EditListBox`).
@@ -17,25 +22,25 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readElst<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EditListBox<V> {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const size = version === 1 ? 8 : 4
+	const entryCount = readUint32(cursor)
+	const entries: EditListEntry<V>[] = []
 
-	const { version, flags } = view.readFullBox()
-	const v1 = version === 1
-	const size = v1 ? 8 : 4
-
-	const entryCount = view.readUint(4)
-	const entries = view.readEntries<EditListEntry<V>>(entryCount, () => ({
-		segmentDuration: view.readWideUint(size),
-		mediaTime: view.readWideInt(size),
-		mediaRateInteger: view.readInt(2),
-		mediaRateFraction: view.readInt(2),
-	}))
+	for (let i = 0; i < entryCount; i++) {
+		entries.push({
+			segmentDuration: readWideUint(cursor, size),
+			mediaTime: readWideInt(cursor, size),
+			mediaRateInteger: readInt16(cursor),
+			mediaRateFraction: readInt16(cursor),
+		})
+	}
 
 	return {
 		type: 'elst',
 		version,
 		flags,
-		entryCount,
 		entries,
 	}
 }

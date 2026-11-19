@@ -1,8 +1,13 @@
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
-import { INT, UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readInt16 } from '../cursor/readInt16.ts'
+import { readInt32 } from '../cursor/readInt32.ts'
+import { readWideUint } from '../cursor/readWideUint.ts'
+import { readMatrix } from '../cursor/readMatrix.ts'
 
 /**
  * Read the `mvhd` box (`MovieHeaderBox`).
@@ -17,28 +22,37 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readMvhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieHeaderBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
-	const { jump, readUint, readWideUint, readInt, readArray } = view
-
-	const { version, flags } = view.readFullBox()
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
 	const size = version == 1 ? 8 : 4
+	const creationTime = readWideUint(cursor, size)
+	const modificationTime = readWideUint(cursor, size)
+	const timescale = readUint32(cursor)
+	const duration = readWideUint(cursor, size)
+	const rate = readInt32(cursor) / 0x10000
+	const volume = readInt16(cursor) / 0x100
+
+	cursor.pos += 10
+
+	const matrix = readMatrix(cursor)
+	const preDefined: number[] = []
+
+	for (let i = 0; i < 6; i++) {
+		preDefined.push(readUint32(cursor))
+	}
 
 	return {
 		type: 'mvhd',
 		version,
 		flags,
-		creationTime: readWideUint(size),
-		modificationTime: readWideUint(size),
-		timescale: readUint(4),
-		duration: readWideUint(size),
-		rate: readInt(4) / 65536,
-		volume: readInt(2) / 256,
-		// ISO/IEC 14496-12, 6.2.2: u, v, and w are 2.30 values.
-		matrix: (jump(10), readArray(INT, 4, 9)).map(
-			(value, i) => value / (i % 3 === 2 ? 0x40000000 : 0x10000),
-		),
-		preDefined: readArray(UINT, 4, 6),
-		nextTrackId: readUint(4),
+		creationTime,
+		modificationTime,
+		timescale,
+		duration,
+		rate,
+		volume,
+		matrix,
+		preDefined,
+		nextTrackId: readUint32(cursor),
 	}
 }
