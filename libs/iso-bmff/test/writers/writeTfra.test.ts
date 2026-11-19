@@ -7,12 +7,13 @@ import {
 	readIsoBoxes,
 	readTfra,
 	writeTfra,
+	type TrackFragmentRandomAccessBox,
 } from '../util/box.ts'
 import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('writeTfra', function () {
 	it('should write each number with its length size and read back the same entries', function () {
-		const box = {
+		const box: TrackFragmentRandomAccessBox = {
 			type: 'tfra',
 			version: 0,
 			flags: 0,
@@ -21,7 +22,7 @@ describe('writeTfra', function () {
 			lengthSizeOfTrunNum: 1,
 			lengthSizeOfSampleNum: 3,
 			entries: [{ time: 100, moofOffset: 200, trafNumber: 1, trunNumber: 2, sampleNumber: 3 }],
-		} as const
+		}
 		const bytes = writeWith(writeTfra, box)
 		const [read] = readIsoBoxes(bytes, { readers: { tfra: readTfra } })
 
