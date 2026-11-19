@@ -10,6 +10,9 @@ and this project adheres to
 
 ### Added
 
+- `createIsoBoxReadCursor` creates a read cursor for ISO BMFF data. The cursor is a plain object with a `DataView`, a start, a position, and an end ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
+- The read field functions read one field at the position of a read cursor and move the position past the field. The functions are `readUint8`, `readUint16`, `readUint24`, `readUint32`, `readUint64`, `readInt8`, `readInt16`, `readInt32`, `readTemplate16`, `readTemplate32`, `readFourCc`, `readBytes`, `readUtf8`, and `readTerminatedUtf8` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
+- A read field function throws a `RangeError` for a field that passes the end of the cursor. `readBytes` and `readUtf8` also throw a `RangeError` for a negative length. A length of 0 reads nothing ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `IsoBoxReadView.readUint64` and `IsoBoxWriteView.writeUint64` read and write a 64-bit unsigned integer as a `bigint`. `readUint(8)` and `writeUint(value, 8)` use a `number`, which loses precision above 2^53 - 1. A custom reader for a 64-bit field, such as `baseMediaDecodeTime` in a version 1 `tfdt` box, can now keep the exact value ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).
 - `readStco`, `readStsc`, and `readStsz` are new readers for the `stco`, `stsc`, and `stsz` boxes ([#619](https://github.com/streaming-video-technology-alliance/common-media-library/issues/619)).
 - `IsoBoxReadConfig` has a new `int64` option. The option takes a function that reads every 64-bit integer field of the built-in readers. With no option, the readers return the same values and the same types as before ([#611](https://github.com/streaming-video-technology-alliance/common-media-library/issues/611)).

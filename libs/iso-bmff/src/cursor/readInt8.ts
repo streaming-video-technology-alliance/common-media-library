@@ -1,0 +1,19 @@
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { take } from './take.ts'
+
+/**
+ * Reads a signed integer of 1 byte.
+ *
+ * @param cursor - The cursor to read from. The function moves the cursor past the field.
+ * @returns The value of the field.
+ *
+ * @throws RangeError if the field passes `cursor.end`.
+ *
+ * @example
+ * {@includeCode ../../test/readFields.test.ts#example}
+ *
+ * @public
+ */
+export function readInt8(cursor: IsoBoxReadCursor): number {
+	return cursor.view.getInt8(take(cursor, 1))
+}

@@ -104,6 +104,9 @@ export function createInt64OverflowReader(onOverflow: (error: RangeError) => voi
 export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array>;
 
 // @public
+export function createIsoBoxReadCursor(data: IsoBoxData): IsoBoxReadCursor;
+
+// @public
 export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntry<T>;
 
 // @public
@@ -395,6 +398,14 @@ export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
 } : {
     int64?: IsoInt64Reader<V>;
 });
+
+// @public
+export type IsoBoxReadCursor = {
+    readonly view: DataView;
+    readonly start: number;
+    pos: number;
+    readonly end: number;
+};
 
 // @public
 export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = number> = (view: IsoBoxReadView<V>, type: T) => B;
@@ -701,6 +712,9 @@ export function readAvc3(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"avc
 export function readAvc4(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"avc4">;
 
 // @public
+export function readBytes(cursor: IsoBoxReadCursor, length: number): Uint8Array;
+
+// @public
 export function readCtts(view: IsoBoxReadView<IsoInt64>): CompositionOffsetBox;
 
 // @public
@@ -726,6 +740,9 @@ export function readEnca(view: IsoBoxReadView<IsoInt64>): AudioSampleEntry<"enca
 
 // @public
 export function readEncv(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"encv">;
+
+// @public
+export function readFourCc(cursor: IsoBoxReadCursor): string;
 
 // @public
 export function readFree(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox;
@@ -755,7 +772,16 @@ export function readIden(view: IsoBoxReadView<IsoInt64>): WebVttCueIdBox;
 export function readImda(view: IsoBoxReadView<IsoInt64>): IdentifiedMediaDataBox;
 
 // @public
+export function readInt16(cursor: IsoBoxReadCursor): number;
+
+// @public
+export function readInt32(cursor: IsoBoxReadCursor): number;
+
+// @public
 export function readInt64AsBigInt(view: IsoBoxReadView<IsoInt64>, size: 4 | 8, signed: boolean): bigint;
+
+// @public
+export function readInt8(cursor: IsoBoxReadCursor): number;
 
 // @public
 export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoInt64 = number>(raw: IsoBoxData, config: IsoBoxReadConfig<V> & {
@@ -892,7 +918,16 @@ export function readStyp(view: IsoBoxReadView<IsoInt64>): SegmentTypeBox;
 export function readSubs(view: IsoBoxReadView<IsoInt64>): SubSampleInformationBox;
 
 // @public
+export function readTemplate16(cursor: IsoBoxReadCursor): number;
+
+// @public
+export function readTemplate32(cursor: IsoBoxReadCursor): number;
+
+// @public
 export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox;
+
+// @public
+export function readTerminatedUtf8(cursor: IsoBoxReadCursor): string;
 
 // @public
 export function readTfdt<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentBaseMediaDecodeTimeBox<V>;
@@ -925,10 +960,28 @@ export function readTrun(view: IsoBoxReadView<IsoInt64>): TrackRunBox;
 export function readUdta<V extends IsoInt64>(view: IsoBoxReadView<V>): UserDataBox<V>;
 
 // @public
+export function readUint16(cursor: IsoBoxReadCursor): number;
+
+// @public
+export function readUint24(cursor: IsoBoxReadCursor): number;
+
+// @public
+export function readUint32(cursor: IsoBoxReadCursor): number;
+
+// @public
+export function readUint64(cursor: IsoBoxReadCursor): bigint;
+
+// @public
+export function readUint8(cursor: IsoBoxReadCursor): number;
+
+// @public
 export function readUrl(view: IsoBoxReadView<IsoInt64>): DataEntryUrlBox;
 
 // @public
 export function readUrn(view: IsoBoxReadView<IsoInt64>): DataEntryUrnBox;
+
+// @public
+export function readUtf8(cursor: IsoBoxReadCursor, length: number): string;
 
 // @public
 export function readVisualSampleEntry<T extends IsoBoxType>(type: T, view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<T>;
