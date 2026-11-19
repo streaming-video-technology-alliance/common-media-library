@@ -1,6 +1,8 @@
 import type { MetaBox } from '../boxes/MetaBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -16,11 +18,10 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readMeta<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MetaBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'meta',
-		...view.readFullBox(),
-		boxes: view.readBoxes(),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		boxes: readChildBoxes(cursor),
 	}
 }

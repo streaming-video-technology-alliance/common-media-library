@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write the `free` box (`FreeSpaceBox`).
@@ -14,12 +15,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeFree(cursor: IsoBoxWriteCursor, box: FreeSpaceBox<'free'>): void {
-	const headerSize = 8
-	const dataSize = box.data.length
-	const totalSize = headerSize + dataSize
-
-	const writer = new IsoBoxWriteView('free', totalSize)
-	writer.writeBytes(box.data)
-
-	writeLegacyView(cursor, writer)
+	const start = beginIsoBox(cursor, 'free')
+	writeBytes(cursor, box.data)
+	endIsoBox(cursor, start)
 }

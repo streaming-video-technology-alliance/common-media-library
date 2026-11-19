@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 import type { MediaDataBox } from '../boxes/MediaDataBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write the `mdat` box (`MediaDataBox`).
@@ -14,12 +15,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeMdat(cursor: IsoBoxWriteCursor, box: MediaDataBox): void {
-	const headerSize = 8
-	const dataSize = box.data.length
-	const totalSize = headerSize + dataSize
-
-	const writer = new IsoBoxWriteView('mdat', totalSize)
-	writer.writeBytes(box.data)
-
-	writeLegacyView(cursor, writer)
+	const start = beginIsoBox(cursor, 'mdat')
+	writeBytes(cursor, box.data)
+	endIsoBox(cursor, start)
 }

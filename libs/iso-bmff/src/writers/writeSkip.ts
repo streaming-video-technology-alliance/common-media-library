@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write the `skip` box (`FreeSpaceBox`).
@@ -14,12 +15,7 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSkip(cursor: IsoBoxWriteCursor, box: FreeSpaceBox<'skip'>): void {
-	const headerSize = 8
-	const dataSize = box.data.length
-	const totalSize = headerSize + dataSize
-
-	const writer = new IsoBoxWriteView('skip', totalSize)
-	writer.writeBytes(box.data)
-
-	writeLegacyView(cursor, writer)
+	const start = beginIsoBox(cursor, 'skip')
+	writeBytes(cursor, box.data)
+	endIsoBox(cursor, start)
 }

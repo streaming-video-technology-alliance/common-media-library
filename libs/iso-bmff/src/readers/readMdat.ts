@@ -1,6 +1,6 @@
 import type { MediaDataBox } from '../boxes/MediaDataBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readBytes } from '../cursor/readBytes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -13,10 +13,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readMdat(cursor: IsoBoxReadCursor<IsoInt64>): MediaDataBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'mdat',
-		data: view.readData(-1),
+		data: readBytes(cursor, cursor.end - cursor.pos),
 	}
 }

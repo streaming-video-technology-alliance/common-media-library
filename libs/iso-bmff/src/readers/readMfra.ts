@@ -1,6 +1,6 @@
 import type { MovieFragmentRandomAccessBox } from '../boxes/MovieFragmentRandomAccessBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -21,10 +21,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export function readMfra<V extends IsoInt64>(
 	cursor: IsoBoxReadCursor<V>,
 ): MovieFragmentRandomAccessBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'mfra',
-		boxes: view.readBoxes(),
+		boxes: readChildBoxes(cursor),
 	}
 }
