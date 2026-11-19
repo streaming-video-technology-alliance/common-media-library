@@ -15,9 +15,7 @@ and this project adheres to
 - A read field function throws a `RangeError` for a field that passes the end of the cursor. `readBytes` and `readUtf8` also throw a `RangeError` for a negative length. A length of 0 reads nothing ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `readWideUint` and `readWideInt` read an integer field of 4 or 8 bytes with the `int64` function of the read cursor. With no function, they return a `number`. A custom reader that follows the `int64` option calls the two functions ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `readChildBoxes` reads the boxes from the position of a read cursor to its end, with the readers of the cursor. The optional `count` sets the maximum number of boxes. A negative `count` throws a `RangeError` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
-
 - `seekIsoBox` finds a box by its path, such as `['moof', 'traf', 'tfdt']`, and returns a read cursor for that box. The function decodes no other box. The result is `null` for a missing box and for a truncated box ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
-
 - `nextIsoBox` returns the type of the box at the position of a read cursor and moves the position past that box. The function parses no content of the box ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `IsoRawBox` is the type of a box with no reader: `{ type, bytes, headerSize, usertype }`. `bytes` is the complete box, with its header ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `createIsoBoxReadCursor` takes the configuration of `readIsoBoxes`, with the readers map and the `int64` option ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
