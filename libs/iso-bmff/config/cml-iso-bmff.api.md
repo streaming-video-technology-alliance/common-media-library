@@ -100,7 +100,7 @@ export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig>;
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array>;
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
 
 // @public
 export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V>;
@@ -259,12 +259,18 @@ export type IdentifiedMediaDataBox = {
 };
 
 // @public
-export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]> | IsoRawBox>(box: T): box is [Extract<T, {
+export function isContainer<T extends {
+    type: IsoBoxType;
+}>(box: T): box is [Extract<T, {
     boxes: unknown;
+} | {
+    type: keyof IsoBoxContainerMap;
 }>] extends [never] ? T & Extract<IsoBox<IsoInt64>, {
     boxes: unknown;
 }> : Extract<T, {
     boxes: unknown;
+} | {
+    type: keyof IsoBoxContainerMap;
 }>;
 
 // @public

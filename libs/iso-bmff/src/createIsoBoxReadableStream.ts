@@ -24,14 +24,14 @@ import { writeIsoBox } from './writeIsoBox.ts'
 export function createIsoBoxReadableStream(
 	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
 	config: IsoBoxWriteConfig = {},
-): ReadableStream<Uint8Array> {
+): ReadableStream<Uint8Array<ArrayBuffer>> {
 	if (typeof ReadableStream === 'undefined') {
 		throw new Error('ReadableStream is not available in this environment')
 	}
 
 	const iterator = boxes[Symbol.iterator]()
 
-	function pull(controller: ReadableStreamDefaultController<Uint8Array>): void {
+	function pull(controller: ReadableStreamDefaultController<Uint8Array<ArrayBuffer>>): void {
 		const next = iterator.next()
 
 		if (next.done) {
@@ -45,5 +45,5 @@ export function createIsoBoxReadableStream(
 		iterator.return?.()
 	}
 
-	return new ReadableStream<Uint8Array>({ pull, cancel }, { highWaterMark: 0 })
+	return new ReadableStream<Uint8Array<ArrayBuffer>>({ pull, cancel }, { highWaterMark: 0 })
 }

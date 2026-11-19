@@ -1,7 +1,7 @@
-import type { Box } from '../boxes/Box.ts'
 import type { IsoBox } from '../IsoBox.ts'
+import type { IsoBoxContainerMap } from '../IsoBoxContainerMap.ts'
+import type { IsoBoxType } from '../IsoBoxType.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import type { IsoRawBox } from '../IsoRawBox.ts'
 import { CONTAINERS } from './CONTAINERS.ts'
 
 /**
@@ -11,6 +11,7 @@ import { CONTAINERS } from './CONTAINERS.ts'
  *
  * In TypeScript, a `true` result narrows the box to the box types in the type of the box that have a `boxes` field.
  * These types are the container types, `meta`, `stsd`, `dref`, `prsl`, and the sample entries.
+ * The result also keeps a box type with a type in `CONTAINERS` and no `boxes` field, such as the result of a custom `moov` reader.
  * A 64-bit integer field of a child has the type of the `int64` option.
  * If the type of the box includes no type with a `boxes` field, the box narrows to every box type with a `boxes` field.
  *
@@ -23,10 +24,10 @@ import { CONTAINERS } from './CONTAINERS.ts'
  *
  * @public
  */
-export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox['type']> | IsoRawBox>(
+export function isContainer<T extends { type: IsoBoxType }>(
 	box: T,
-): box is [Extract<T, { boxes: unknown }>] extends [never]
+): box is [Extract<T, { boxes: unknown } | { type: keyof IsoBoxContainerMap }>] extends [never]
 	? T & Extract<IsoBox<IsoInt64>, { boxes: unknown }>
-	: Extract<T, { boxes: unknown }> {
+	: Extract<T, { boxes: unknown } | { type: keyof IsoBoxContainerMap }> {
 	return 'boxes' in box || CONTAINERS.includes(box.type)
 }

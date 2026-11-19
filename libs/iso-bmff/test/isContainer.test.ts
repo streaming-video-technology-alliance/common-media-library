@@ -2,13 +2,16 @@ import {
 	assert,
 	createDefaultReaderConfig,
 	describe,
+	filterIsoBoxes,
 	isContainer,
 	isIsoBoxType,
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
+	readUint8,
 	type AdditionalMetadataContainerBox,
 	type GroupsListBox,
+	type IsoBoxReadCursor,
 	type ParsedIsoBox,
 	type SubTrack,
 	type UserDataBox,
@@ -200,5 +203,39 @@ describe('isContainer', function () {
 		expectType<
 			Equal<AdditionalMetadataContainerBox<bigint>['boxes'][number], ParsedIsoBox<bigint>>
 		>(true)
+	})
+
+	it('takes the result of a custom reader', function () {
+		const readers = {
+			abcd: (cursor: IsoBoxReadCursor) => ({ type: 'abcd' as const, x: readUint8(cursor) }),
+		}
+		const boxes = readIsoBoxes(buffer, { readers })
+
+		assert.deepStrictEqual(
+			filterIsoBoxes(boxes, isContainer).map(box => box.type),
+			['traf', 'moov', 'udta'],
+		)
+
+		for (const box of boxes) {
+			if (isContainer(box)) {
+				assert.ok(Array.isArray(box.boxes))
+			}
+		}
+	})
+
+	it('keeps a custom result with a container type and no boxes field', function () {
+		const readers = { traf: () => ({ type: 'traf' as const, note: 1 }) }
+		let count = 0
+
+		for (const box of readIsoBoxes(buffer, { readers })) {
+			if (isContainer(box) && box.type === 'traf') {
+				// @ts-expect-error the custom traf result has no boxes field
+				assert.strictEqual(box.boxes, undefined)
+				assert.strictEqual(box.note, 1)
+				count++
+			}
+		}
+
+		assert.strictEqual(count, 1)
 	})
 })

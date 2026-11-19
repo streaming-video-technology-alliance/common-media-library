@@ -7,6 +7,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
  *
  * The function returns `false` for a raw box, because a raw box has no fields of its box type.
  * A box that `readIsoBoxes` returns narrows to the built-in box type with the 64-bit integer fields of that box.
+ * The function checks the type and the absence of `bytes`, not the fields. The result of a custom reader for a built-in type also narrows to the built-in box type.
  * A value of another type narrows to the built-in box type with `number` fields.
  *
  * @param type - The type to check for
