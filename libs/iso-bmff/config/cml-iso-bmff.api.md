@@ -37,6 +37,12 @@ export type AudioSampleEntryChild = any;
 export type AudioSampleEntryType = "mp4a" | "enca";
 
 // @public
+export function beginIsoBox(cursor: IsoBoxWriteCursor, type: string): number;
+
+// @public
+export function beginIsoFullBox(cursor: IsoBoxWriteCursor, type: string, version: number, flags: number): number;
+
+// @public
 export type Box<T extends IsoBoxType = never> = {
     type: T;
 };
@@ -107,6 +113,11 @@ export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoI
 export function createIsoBoxReadCursor(data: IsoBoxData): IsoBoxReadCursor;
 
 // @public
+export function createIsoBoxWriteCursor(config?: {
+    capacity?: number;
+}): IsoBoxWriteCursor;
+
+// @public
 export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntry<T>;
 
 // @public
@@ -161,6 +172,9 @@ export type EditListEntry<V extends IsoInt64 = number> = {
     mediaRateInteger: number;
     mediaRateFraction: number;
 };
+
+// @public
+export function endIsoBox(cursor: IsoBoxWriteCursor, start: number): void;
 
 // @public
 export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V> | EventMessageBoxUnrecognizedVersion;
@@ -457,6 +471,13 @@ export type IsoBoxType = string;
 // @public
 export type IsoBoxWriteConfig = {
     writers?: IsoBoxWriterMap;
+};
+
+// @public
+export type IsoBoxWriteCursor = {
+    readonly view: DataView;
+    readonly bytes: Uint8Array<ArrayBuffer>;
+    pos: number;
 };
 
 // @public
@@ -1415,6 +1436,9 @@ export function writeAvc3(box: VisualSampleEntry<"avc3">, config: IsoBoxWriteCon
 export function writeAvc4(box: VisualSampleEntry<"avc4">, config: IsoBoxWriteConfig): IsoBoxWriteView;
 
 // @public
+export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): void;
+
+// @public
 export function writeCtts(box: CompositionOffsetBox): IsoBoxWriteView;
 
 // @public
@@ -1442,6 +1466,9 @@ export function writeEnca(box: AudioSampleEntry<"enca">, config: IsoBoxWriteConf
 export function writeEncv(box: VisualSampleEntry<"encv">, config: IsoBoxWriteConfig): IsoBoxWriteView;
 
 // @public
+export function writeFourCc(cursor: IsoBoxWriteCursor, value: string): void;
+
+// @public
 export function writeFree(box: FreeSpaceBox<"free">): IsoBoxWriteView;
 
 // @public
@@ -1467,6 +1494,15 @@ export function writeIden(box: WebVttCueIdBox): IsoBoxWriteView;
 
 // @public
 export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView;
+
+// @public
+export function writeInt16(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
+export function writeInt32(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
+export function writeInt8(cursor: IsoBoxWriteCursor, value: number): void;
 
 // @public
 export function writeIsoBox(box: IsoBoxStreamable<IsoInt64>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
@@ -1598,7 +1634,16 @@ export function writeStyp(box: SegmentTypeBox): IsoBoxWriteView;
 export function writeSubs(box: SubSampleInformationBox): IsoBoxWriteView;
 
 // @public
+export function writeTemplate16(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
+export function writeTemplate32(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
 export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView;
+
+// @public
+export function writeTerminatedUtf8(cursor: IsoBoxWriteCursor, value: string): void;
 
 // @public
 export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>): IsoBoxWriteView;
@@ -1631,10 +1676,28 @@ export function writeTrun(box: TrackRunBox): IsoBoxWriteView;
 export function writeUdta(box: UserDataBox<IsoInt64>, config: IsoBoxWriteConfig): IsoBoxWriteView;
 
 // @public
+export function writeUint16(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
+export function writeUint24(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
+export function writeUint32(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
+export function writeUint64(cursor: IsoBoxWriteCursor, value: bigint): void;
+
+// @public
+export function writeUint8(cursor: IsoBoxWriteCursor, value: number): void;
+
+// @public
 export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView;
 
 // @public
 export function writeUrn(box: DataEntryUrnBox): IsoBoxWriteView;
+
+// @public
+export function writeUtf8(cursor: IsoBoxWriteCursor, value: string): void;
 
 // @public
 export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(box: VisualSampleEntry<T>, config: IsoBoxWriteConfig): IsoBoxWriteView;
@@ -1653,6 +1716,12 @@ export function writeVttc(box: WebVttCueBox, config: IsoBoxWriteConfig): IsoBoxW
 
 // @public
 export function writeVtte(_box: WebVttEmptySampleBox): IsoBoxWriteView;
+
+// @public
+export function writeWideInt(cursor: IsoBoxWriteCursor, value: number | bigint, size: 4 | 8): void;
+
+// @public
+export function writeWideUint(cursor: IsoBoxWriteCursor, value: number | bigint, size: 4 | 8): void;
 
 // (No @packageDocumentation comment for this package)
 
