@@ -1,5 +1,6 @@
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { decodeFourCc } from './decodeFourCc.ts'
 import { take } from './take.ts'
 
 /**
@@ -16,13 +17,5 @@ import { take } from './take.ts'
  * @public
  */
 export function readFourCc(cursor: IsoBoxReadCursor<IsoInt64>): string {
-	const pos = take(cursor, 4)
-	const { view } = cursor
-
-	return String.fromCharCode(
-		view.getUint8(pos),
-		view.getUint8(pos + 1),
-		view.getUint8(pos + 2),
-		view.getUint8(pos + 3),
-	)
+	return decodeFourCc(cursor.view, take(cursor, 4))
 }

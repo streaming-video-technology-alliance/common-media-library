@@ -1,5 +1,5 @@
 import type { IsoBoxReadCursorState } from './cursor/IsoBoxReadCursorState.ts'
-import { readFourCc } from './cursor/readFourCc.ts'
+import { decodeFourCc } from './cursor/decodeFourCc.ts'
 import { readIsoBoxHeader } from './cursor/readIsoBoxHeader.ts'
 import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
@@ -57,9 +57,7 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 		const boxEnd = boxStart + size
 		const header = view.getUint32(boxStart) === 1 ? 16 : 8
 
-		state.pos = boxStart + 4
-
-		const type = readFourCc(state)
+		const type = decodeFourCc(view, boxStart + 4)
 		const reader = readers?.[type] || readers?.[type.trim()] // url and urn boxes have a trailing space in their type field
 		let box: ParsedIsoBox<V>
 

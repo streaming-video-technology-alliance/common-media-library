@@ -1,5 +1,4 @@
-import type { IsoBoxReadCursorState } from './cursor/IsoBoxReadCursorState.ts'
-import { readFourCc } from './cursor/readFourCc.ts'
+import { decodeFourCc } from './cursor/decodeFourCc.ts'
 import { readIsoBoxHeader } from './cursor/readIsoBoxHeader.ts'
 import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoBoxType } from './IsoBoxType.ts'
@@ -19,19 +18,14 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * @public
  */
 export function nextIsoBox(cursor: IsoBoxReadCursor<IsoInt64>): IsoBoxType | null {
-	const state = cursor as IsoBoxReadCursorState
-	const at = state.pos
-	const size = readIsoBoxHeader(state, at)
+	const at = cursor.pos
+	const size = readIsoBoxHeader(cursor, at)
 
 	if (!size) {
 		return null
 	}
 
-	state.pos = at + 4
+	cursor.pos = at + size
 
-	const type = readFourCc(state)
-
-	state.pos = at + size
-
-	return type
+	return decodeFourCc(cursor.view, at + 4)
 }

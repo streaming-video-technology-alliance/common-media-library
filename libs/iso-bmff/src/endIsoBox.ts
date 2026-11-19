@@ -1,3 +1,4 @@
+import { decodeFourCc } from './cursor/decodeFourCc.ts'
 import type { IsoBoxWriteCursor } from './IsoBoxWriteCursor.ts'
 
 /**
@@ -18,14 +19,9 @@ export function endIsoBox(cursor: IsoBoxWriteCursor, start: number): void {
 	const size = cursor.pos - start
 
 	if (size > 0xffffffff) {
-		const type = String.fromCharCode(
-			view.getUint8(start + 4),
-			view.getUint8(start + 5),
-			view.getUint8(start + 6),
-			view.getUint8(start + 7),
+		throw new RangeError(
+			`The box ${decodeFourCc(view, start + 4)} has ${size} bytes, above the limit of 2^32 - 1 bytes`,
 		)
-
-		throw new RangeError(`The box ${type} has ${size} bytes, above the limit of 2^32 - 1 bytes`)
 	}
 
 	view.setUint32(start, size)
