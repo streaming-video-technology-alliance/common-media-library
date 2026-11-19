@@ -43,12 +43,12 @@ describe('readUrl', function () {
 		assert.strictEqual(url.location, '')
 	})
 
-	it('should read an empty location from a box that has flag 0x000001 and no string', function () {
+	it('should omit location for a box that has flag 0x000001 and no string', function () {
 		const [url] = readIsoBoxes(urlBox(1, []), { readers: { 'url ': readUrl } })
 
 		assert.ok(url)
 		assert.ok(isIsoBoxType('url ', url))
 		assert.strictEqual(url.flags, 1)
-		assert.strictEqual(url.location, '')
+		assert.ok(!('location' in url))
 	})
 })

@@ -1,7 +1,9 @@
 import type { SampleDescriptionBox } from '../boxes/SampleDescriptionBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readEntryBoxes } from '../cursor/readEntryBoxes.ts'
 
 /**
  * Read the `stsd` box (`SampleDescriptionBox`).
@@ -13,16 +15,13 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readStsd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SampleDescriptionBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
-	const { version, flags } = view.readFullBox()
-	const entryCount = view.readUint(4)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
 
 	return {
 		type: 'stsd',
 		version,
 		flags,
-		entryCount,
-		boxes: view.readBoxes<SampleDescriptionBox<V>['boxes'][number]>(entryCount),
+		boxes: readEntryBoxes(cursor, 'stsd') as SampleDescriptionBox<V>['boxes'],
 	}
 }

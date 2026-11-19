@@ -172,7 +172,7 @@ describe('reserved fields', function () {
 				horizResolution: 72,
 				vertResolution: 72,
 				frameCount: 1,
-				compressorName: new Array<number>(32).fill(0),
+				compressorName: '',
 				depth: 0x18,
 				boxes: [],
 			},

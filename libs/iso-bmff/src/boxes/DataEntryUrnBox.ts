@@ -10,5 +10,6 @@ import type { FullBox } from './FullBox.ts'
 export type DataEntryUrnBox = FullBox & {
 	type: 'urn '
 	name: string
-	location: string
+	/** The optional location of the data. The reader omits the field when the box has no bytes after `name`. */
+	location?: string
 }

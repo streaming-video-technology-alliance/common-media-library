@@ -1,8 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { DataEntryUrnBox } from '../boxes/DataEntryUrnBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `urn ` box (`DataEntryUrnBox`).
@@ -18,22 +18,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeUrn(cursor: IsoBoxWriteCursor, box: DataEntryUrnBox): void {
-	const nameBytes = encodeText(box.name)
-	const locationBytes = encodeText(box.location)
+	const start = beginIsoFullBox(cursor, 'urn ', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const nameSize = nameBytes.length + 1 // null-terminated
-	const locationSize = locationBytes.length + 1 // null-terminated
-	const totalSize = headerSize + fullBoxSize + nameSize + locationSize
+	if (!(box.flags & 0x000001)) {
+		writeTerminatedUtf8(cursor, box.name)
 
-	const writer = new IsoBoxWriteView('urn ', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+		if (box.location !== undefined) {
+			writeTerminatedUtf8(cursor, box.location)
+		}
+	}
 
-	writer.writeBytes(nameBytes)
-	writer.writeUint(0, 1)
-	writer.writeBytes(locationBytes)
-	writer.writeUint(0, 1)
-
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

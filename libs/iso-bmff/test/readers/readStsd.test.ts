@@ -31,7 +31,6 @@ describe('readStsd', function () {
 
 		const [box] = readIsoBoxes(bytes, createDefaultReaderConfig()) as SampleDescriptionBox[]
 
-		assert.strictEqual(box.entryCount, 0)
 		assert.deepStrictEqual(box.boxes, [])
 	})
 
@@ -43,5 +42,15 @@ describe('readStsd', function () {
 		const written = writeIsoBox(box, createDefaultWriterConfig())
 
 		assert.deepStrictEqual(written, boxBytes('stsd', [0, 4], [0, 4]))
+	})
+
+	it('should throw a RangeError for fewer complete entries than entry_count', function () {
+		const avc1 = boxBytes('avc1', new Uint8Array(78))
+		const bytes = boxBytes('stsd', [0, 4], [2, 4], avc1)
+
+		assert.throws(() => readIsoBoxes(bytes, createDefaultReaderConfig()), {
+			name: 'RangeError',
+			message: 'The stsd box has an entry_count of 2, and the number of complete child boxes is 1',
+		})
 	})
 })

@@ -9,5 +9,9 @@ import type { FullBox } from './FullBox.ts'
  */
 export type DataEntryUrlBox = FullBox & {
 	type: 'url '
-	location: string
+	/**
+	 * The URL of the data. A box with the flag `0x000001` has the data in the same file and no location.
+	 * The reader omits the field when the box has no bytes after the flags. The writer writes no location for the flag.
+	 */
+	location?: string
 }

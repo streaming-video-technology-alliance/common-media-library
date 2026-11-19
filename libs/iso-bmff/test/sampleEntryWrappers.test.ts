@@ -49,7 +49,7 @@ const VISUAL = {
 	horizResolution: 72,
 	vertResolution: 72,
 	frameCount: 1,
-	compressorName: NAME,
+	compressorName: 'test',
 	depth: 0x18,
 	preDefined3: -1,
 	boxes: [],

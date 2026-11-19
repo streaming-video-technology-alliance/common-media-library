@@ -114,14 +114,14 @@ export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): <V
 // @public
 export type DataEntryUrlBox = FullBox & {
     type: "url ";
-    location: string;
+    location?: string;
 };
 
 // @public
 export type DataEntryUrnBox = FullBox & {
     type: "urn ";
     name: string;
-    location: string;
+    location?: string;
 };
 
 // @public
@@ -133,7 +133,6 @@ export type DataInformationBox<V extends IsoInt64 = number> = {
 // @public
 export type DataReferenceBox<V extends IsoInt64 = number> = FullBox & {
     type: "dref";
-    entryCount: number;
     boxes: ParsedIsoBox<V>[];
 };
 
@@ -982,7 +981,6 @@ export type SampleDependencyTypeBox = FullBox & {
 // @public
 export type SampleDescriptionBox<V extends IsoInt64 = number, E extends SampleEntry<IsoBoxType, V> | IsoRawBox = AudioSampleEntry<AudioSampleEntryType, V> | VisualSampleEntry<VisualSampleEntryType, V> | IsoRawBox> = FullBox & {
     type: "stsd";
-    entryCount: number;
     boxes: E[];
 };
 
@@ -1281,7 +1279,7 @@ export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType, V ex
     horizResolution: number;
     vertResolution: number;
     frameCount: number;
-    compressorName: number[];
+    compressorName: string;
     depth: number;
     preDefined3?: number;
 };
