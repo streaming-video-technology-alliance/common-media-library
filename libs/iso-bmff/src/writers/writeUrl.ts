@@ -1,8 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `url ` box (`DataEntryUrlBox`).
@@ -20,20 +20,11 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeUrl(cursor: IsoBoxWriteCursor, box: DataEntryUrlBox): void {
-	const locationBytes = box.flags & 0x000001 ? undefined : encodeText(box.location)
+	const start = beginIsoFullBox(cursor, 'url ', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const locationSize = locationBytes ? locationBytes.length + 1 : 0 // null-terminated
-	const totalSize = headerSize + fullBoxSize + locationSize
-
-	const writer = new IsoBoxWriteView('url ', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	if (locationBytes) {
-		writer.writeBytes(locationBytes)
-		writer.writeUint(0, 1)
+	if (!(box.flags & 0x000001)) {
+		writeTerminatedUtf8(cursor, box.location ?? '')
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

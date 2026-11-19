@@ -11,6 +11,5 @@ import type { FullBox } from './FullBox.ts'
  */
 export type DataReferenceBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'dref'
-	entryCount: number
 	boxes: ParsedIsoBox<V>[]
 }

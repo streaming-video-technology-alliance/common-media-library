@@ -7,6 +7,8 @@ import {
 	readAvc1,
 	readIsoBoxes,
 	readStsd,
+	writeAvc1,
+	writeIsoBox,
 } from '../util/box.ts'
 
 describe('readAvc1', function () {
@@ -28,14 +30,7 @@ describe('readAvc1', function () {
 		assert.strictEqual(box.horizResolution, 72)
 		assert.strictEqual(box.vertResolution, 72)
 		assert.strictEqual(box.frameCount, 1)
-		assert.deepStrictEqual(
-			box.compressorName,
-			[
-				0x11, 0x47, 0x6f, 0x50, 0x72, 0x6f, 0x20, 0x41, 0x56, 0x43, 0x20, 0x65, 0x6e, 0x63, 0x6f,
-				0x64, 0x65, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00,
-			],
-		) // length + 'GoPro AVC encoder'
+		assert.strictEqual(box.compressorName, 'GoPro AVC encoder')
 		assert.strictEqual(box.depth, 24)
 		assert.strictEqual(box.preDefined3, -1)
 		assert.strictEqual(box.boxes.length, 2)
@@ -56,5 +51,42 @@ describe('readAvc1', function () {
 		assert.ok(isIsoBoxType('avc1', box))
 		assert.strictEqual(box.horizResolution, 72.5)
 		assert.strictEqual(box.vertResolution, 300.25)
+	})
+
+	it('should cut a long compressor name at a character boundary and read it back', function () {
+		const box = {
+			type: 'avc1' as const,
+			dataReferenceIndex: 1,
+			width: 640,
+			height: 360,
+			horizResolution: 72,
+			vertResolution: 72,
+			frameCount: 1,
+			compressorName: 'é'.repeat(16),
+			depth: 0x18,
+			boxes: [],
+		}
+		const bytes = writeIsoBox(box, { writers: { avc1: writeAvc1 } })
+		const [read] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
+
+		assert.strictEqual(bytes[50], 30)
+		assert.deepStrictEqual(bytes.subarray(81, 82), new Uint8Array(1))
+		assert.ok(isIsoBoxType('avc1', read))
+		assert.strictEqual(read.compressorName, 'é'.repeat(15))
+	})
+
+	it('should read at most 31 bytes for a length byte above 31', function () {
+		const bytes = new Uint8Array(86)
+		const view = new DataView(bytes.buffer)
+
+		view.setUint32(0, 86)
+		bytes.set([0x61, 0x76, 0x63, 0x31], 4)
+		bytes[50] = 0xff
+		bytes.fill(0x61, 51, 82)
+
+		const [box] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
+
+		assert.ok(isIsoBoxType('avc1', box))
+		assert.strictEqual(box.compressorName, 'a'.repeat(31))
 	})
 })

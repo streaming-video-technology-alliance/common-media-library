@@ -23,6 +23,5 @@ export type SampleDescriptionBox<
 		| IsoRawBox,
 > = FullBox & {
 	type: 'stsd'
-	entryCount: number
 	boxes: E[]
 }

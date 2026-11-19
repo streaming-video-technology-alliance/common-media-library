@@ -42,6 +42,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `if (box.type === "tfdt")` before a field read | `if (isIsoBoxType("tfdt", box))` |
 | `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
+| A malformed `stsd` or `dref` box returns fewer entries | The read throws a `RangeError` |
 | A `co64` or `stz2` box with the default readers has no fields | The box has `chunkOffset`, or `fieldSize` and `entrySize` |
 | An error `Truncated box` from a custom reader | The error reaches the caller of `readIsoBoxes`. A truncated box stops the read with no error. |
 
@@ -255,6 +256,9 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `sampleCount` of a `stsz` box with a `sampleSize` of 0 | `entrySize.length`. A box with a `sampleSize` above 0 keeps `sampleCount`. |
 | `entryCount` of `co64`, `sampleCount` of `stz2` | `chunkOffset.length`, `entrySize.length` |
 | `entryCount` of `elst` | `entries.length` |
+| `entryCount` of `stsd` and `dref` | `boxes.length` |
+| `compressorName: number[]` of a visual sample entry | `compressorName: string`. The writer writes the length byte and the padding. |
+| `location: string` of `url ` and `urn ` | `location?: string`. A box with no bytes after the flags or after `name` has no `location`. |
 | `kidCount` and `kid: number[]` of `pssh` | `kid: Uint8Array[]`, one entry for each key ID. The count is `kid.length`. |
 | `dataSize` and `data: number[]` of `pssh` | `data: Uint8Array`. The size is `data.length`. |
 | `systemId: number[]` of `pssh`, `defaultKid: number[]` of `tenc` | A `Uint8Array` of 16 bytes |

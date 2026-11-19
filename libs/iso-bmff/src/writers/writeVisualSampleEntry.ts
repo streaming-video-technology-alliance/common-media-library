@@ -5,7 +5,7 @@ import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
 import { writeTemplate32 } from '../cursor/writeTemplate32.ts'
 import { writeUint16 } from '../cursor/writeUint16.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
-import { writeUint8 } from '../cursor/writeUint8.ts'
+import { writeCompressorName } from '../cursor/writeCompressorName.ts'
 import { endIsoBox } from '../endIsoBox.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import { writeChildBoxes } from '../writeChildBoxes.ts'
@@ -45,9 +45,7 @@ export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualS
 	writeUint32(cursor, 0) // reserved
 	writeUint16(cursor, box.frameCount)
 
-	for (let i = 0; i < 32; i++) {
-		writeUint8(cursor, box.compressorName[i] ?? 0)
-	}
+	writeCompressorName(cursor, box.compressorName)
 
 	writeUint16(cursor, box.depth)
 	writeUint16(cursor, (box.preDefined3 ?? -1) & 0xffff)

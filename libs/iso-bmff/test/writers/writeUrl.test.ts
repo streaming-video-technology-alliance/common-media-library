@@ -151,4 +151,13 @@ describe('writeUrl', function () {
 
 		assert.deepStrictEqual(new Uint8Array(writeWith(writeUrl, entry).buffer), input)
 	})
+
+	it('should write an empty location for a box with flag 0 and no location', function () {
+		const bytes = writeWith(writeUrl, { type: 'url ', version: 0, flags: 0 })
+
+		assert.deepStrictEqual(
+			bytes,
+			new Uint8Array([0, 0, 0, 13, 0x75, 0x72, 0x6c, 0x20, 0, 0, 0, 0, 0]),
+		)
+	})
 })
