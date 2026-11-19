@@ -66,8 +66,257 @@ Some exports need a runtime API:
 ## Usage
 
 - [Reading boxes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md) - Read ISO BMFF boxes from a buffer
-- [Writing boxes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md) - Write boxes to byte arrays or streams
+- [Writing boxes](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md) - Write boxes to a byte array or a stream
 - [Utilities](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/utilities.md) - Traverse boxes and type guards
+- [Migrating to version 2](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/migrating-to-v2.md) - Update code from version 1 to version 2.0.0
+
+<!-- libs/iso-bmff/docs/migrating-to-v2.md -->
+---
+title: Migrating to Version 2
+description: Update code from version 1 to version 2.0.0
+---
+
+# Migrating to Version 2
+
+Version 2.0.0 replaces the classes `IsoBoxReadView` and `IsoBoxWriteView` with two plain objects: the read cursor and the write cursor. A field function reads or writes one field at the position of a cursor. Every built-in reader and writer takes a cursor.
+
+The guide uses two terms:
+
+- A **box object** is an object with a `type` field and the fields of the box, such as the result of `readTfdt`.
+- A **raw box** is the result of `readIsoBoxes` for a box with no reader: `{ type, bytes, headerSize }`.
+
+The compiler reports most changes. The tables in this guide list each change and its replacement.
+
+## Reading boxes
+
+`readIsoBoxes` keeps its arguments. Its result changes:
+
+- A box with no reader is a raw box. `bytes` is the complete box, with its header. The body is `box.bytes.subarray(box.headerSize)`. The bytes share memory with the input.
+- A box object has only `type` and its fields. The fields `view`, `size`, `largesize`, and `usertype` do not exist.
+- A test of `box.type` does not exclude a raw box, because a raw box can have any type. Narrow a box with `isIsoBoxType`.
+
+```typescript
+import { findIsoBox, isIsoBoxType, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+
+const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
+
+const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
+
+console.log(tfdt?.baseMediaDecodeTime);
+```
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| `box.view` | Omit the reader of the box, and use `box.bytes` of the raw box |
+| `box.size` | `box.bytes.length` of a raw box |
+| `box.largesize` | `box.bytes.length` of a raw box |
+| `box.usertype` of a parsed `uuid` box | `box.usertype` of a raw `uuid` box, or `readBytes(cursor, 16)` in a reader |
+| `if (box.type === "tfdt")` before a field read | `if (isIsoBoxType("tfdt", box))` |
+| `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
+| `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
+| An error `Truncated box` from a custom reader | The error reaches the caller of `readIsoBoxes`. A truncated box stops the read with no error. |
+
+`seekIsoBox` reads one box without a read of the other boxes. Use it in place of a full read when your code needs one box, such as `tfdt`. See [Reading one box](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#reading-one-box).
+
+## Custom readers
+
+A reader takes a read cursor and the box type, and returns the complete box object with its `type` field. The cursor of a reader starts at the first byte after the box header. For a `uuid` box, the cursor starts at the first byte of `usertype`.
+
+```typescript
+import {
+	readIsoBoxes,
+	readUint24,
+	readUint32,
+	readUint8,
+	type IsoBoxReadCursor,
+	type IsoInt64,
+} from "@svta/cml-iso-bmff";
+
+const readMfhd = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
+	type: "mfhd" as const,
+	version: readUint8(cursor),
+	flags: readUint24(cursor),
+	sequenceNumber: readUint32(cursor),
+});
+
+const boxes = readIsoBoxes(buffer, { readers: { mfhd: readMfhd } });
+```
+
+The table shows the replacement for each member of `IsoBoxReadView`. A method with a `size` parameter becomes one function for each size.
+
+| `IsoBoxReadView` member | Version 2.0.0 |
+|---|---|
+| `view.readUint(1)`, `view.readUint(2)`, `view.readUint(3)`, `view.readUint(4)` | `readUint8(cursor)`, `readUint16(cursor)`, `readUint24(cursor)`, `readUint32(cursor)` |
+| `view.readUint(8)` | `readWideUint(cursor, 8)` |
+| `view.readInt(1)`, `view.readInt(2)`, `view.readInt(4)` | `readInt8(cursor)`, `readInt16(cursor)`, `readInt32(cursor)` |
+| `view.readUint64()` | `readUint64(cursor)` |
+| `view.readWideUint(size)`, `view.readWideInt(size)` | `readWideUint(cursor, size)`, `readWideInt(cursor, size)` |
+| `view.readTemplate(2)`, `view.readTemplate(4)` | `readTemplate16(cursor)`, `readTemplate32(cursor)` |
+| `view.readString(4)` for a four-character code | `readFourCc(cursor)` |
+| `view.readUtf8(size)` | `readUtf8(cursor, size)` |
+| `view.readUtf8(-1)`, `view.readString(-1)` | `readTerminatedUtf8(cursor)` |
+| `view.readUtf8()` | `readUtf8(cursor, cursor.end - cursor.pos)` |
+| `view.readData(size)` | `readBytes(cursor, size)` |
+| `view.readData(-1)` | `readBytes(cursor, cursor.end - cursor.pos)` |
+| `view.readFullBox()` | `readUint8(cursor)` for the version, then `readUint24(cursor)` for the flags |
+| `view.readArray(...)`, `view.readEntries(...)` | A loop in the reader |
+| `view.readBoxes()` | `readChildBoxes(cursor)` |
+| `view.readBoxes(count)` | `readChildBoxes(cursor, count)` |
+| `view.readBox()` | `nextIsoBox(cursor)` or `readChildBoxes(cursor, 1)` |
+| `for (const box of view)` | A loop with `nextIsoBox(cursor)` |
+| `view.jump(size)` | `cursor.pos += size` |
+| `view.bytesRemaining` | `cursor.end - cursor.pos` |
+| `view.cursor` | `cursor.pos - cursor.start` |
+| `view.slice(offset, size)` | `readBytes`, then `createIsoBoxReadCursor` |
+| `view.buffer`, `view.byteOffset`, `view.byteLength` | `cursor.view.buffer`, `cursor.view.byteOffset`, `cursor.view.byteLength` |
+
+A read past `cursor.end` throws a `RangeError`, so a reader cannot read the bytes of the next box. A length below 0 throws a `RangeError` too. No length value has a special meaning.
+
+The function of the `int64` option takes a read cursor in place of a view. `readInt64AsBigInt` and `createInt64OverflowReader` take the cursor.
+
+## Writing boxes
+
+`writeIsoBoxes` keeps its arguments and returns one `Uint8Array` with every box. Remove the code that joins the arrays of version 1:
+
+```typescript
+import { createDefaultWriterConfig, readIsoBoxes, writeIsoBoxes } from "@svta/cml-iso-bmff";
+
+const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
+```
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| `writeIsoBoxes` returns one `Uint8Array` for each box | `writeIsoBoxes` returns one `Uint8Array` |
+| A writer in the map comes before the bytes of a parsed box | The bytes of a raw box come before a writer. To change a raw box, build a box object with no `bytes` field. |
+| A box object with a reader and no writer writes the bytes of `view` | Add the writer of the type, or remove the reader so that the box stays a raw box |
+| `writeIsoBox` returns a view of the input for an `ArrayBufferView` | `writeIsoBox` returns a new array |
+| `createIsoBoxReadableStream` throws an error of the first box | The error rejects the first read |
+| `new IsoBoxReadableStream(boxes, config)` | `createIsoBoxReadableStream(boxes, config)` |
+
+The stream writes one box for each read and writes no box before the first read.
+
+## Custom writers
+
+A writer takes a write cursor and the box object, and returns nothing. The writer writes the header with `beginIsoBox` or `beginIsoFullBox`, then the fields, then the size with `endIsoBox`. A writer of a box with child boxes writes them with `writeChildBoxes`. The writers of the cursor then apply to the child boxes.
+
+```typescript
+import {
+	beginIsoFullBox,
+	endIsoBox,
+	writeIsoBox,
+	writeUint32,
+	type IsoBoxWriteCursor,
+	type MovieFragmentHeaderBox,
+} from "@svta/cml-iso-bmff";
+
+const writeMfhd = (cursor: IsoBoxWriteCursor, box: MovieFragmentHeaderBox) => {
+	const start = beginIsoFullBox(cursor, "mfhd", box.version, box.flags);
+	writeUint32(cursor, box.sequenceNumber);
+	endIsoBox(cursor, start);
+};
+
+const bytes = writeIsoBox(
+	{ type: "mfhd", version: 0, flags: 0, sequenceNumber: 1 },
+	{ writers: { mfhd: writeMfhd } },
+);
+```
+
+The table shows the replacement for each member of `IsoBoxWriteView`:
+
+| `IsoBoxWriteView` member | Version 2.0.0 |
+|---|---|
+| `new IsoBoxWriteView(type, size)` | `const start = beginIsoBox(cursor, type)` at the start, and `endIsoBox(cursor, start)` at the end |
+| `writer.writeFullBox(version, flags)` | `beginIsoFullBox(cursor, type, version, flags)` in place of `beginIsoBox` |
+| `writer.writeBoxHeader(type, size)` | `beginIsoBox(cursor, type)` and `endIsoBox(cursor, start)` |
+| `writer.writeUint(value, 1)`, `2`, `3`, `4` | `writeUint8`, `writeUint16`, `writeUint24`, `writeUint32` |
+| `writer.writeUint(value, 8)` | `writeWideUint(cursor, value, 8)` |
+| `writer.writeInt(value, 1)`, `2`, `4` | `writeInt8`, `writeInt16`, `writeInt32` |
+| `writer.writeUint64(value)` | `writeUint64(cursor, value)` |
+| `writer.writeWideUint(value, size)`, `writer.writeWideInt(value, size)` | `writeWideUint(cursor, value, size)`, `writeWideInt(cursor, value, size)` |
+| `writer.writeTemplate(value, 2)`, `writer.writeTemplate(value, 4)` | `writeTemplate16(cursor, value)`, `writeTemplate32(cursor, value)` |
+| `writer.writeString(code)` for a four-character code | `writeFourCc(cursor, code)` |
+| `writer.writeString(text)` for ASCII text | `writeUtf8(cursor, text)` |
+| `writer.writeTerminatedString(text)`, `writer.writeUtf8TerminatedString(text)` | `writeTerminatedUtf8(cursor, text)` |
+| `writer.writeBytes(data)` | `writeBytes(cursor, data)` |
+| `writer.writeBytes([a, b])` | `writeBytes(cursor, a)`, then `writeBytes(cursor, b)` |
+| `writer.writeArray(...)` | A loop in the writer |
+| `writer.buffer`, `writer.byteOffset`, `writer.byteLength` | `cursor.bytes.subarray(0, cursor.pos)` |
+
+A writer does not compute the size of its box. `endIsoBox` writes the size, and throws a `RangeError` for a box above 2^32 - 1 bytes. `writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a code that does not have 4 characters.
+
+The writers of the boxes with child boxes, such as `writeStsd` and `writeMoov`, have no `config` parameter. They write the child boxes with the writers of the cursor. To call a writer directly, create the cursor with `createIsoBoxWriteCursor({ writers })`.
+
+## Types
+
+### Renamed exports and fields
+
+The names of the box types, entry types, and fields follow the names of the specification.
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| `HandlerReferenceBox` | `HandlerBox` |
+| `DecodingTimeToSampleBox` | `TimeToSampleBox` |
+| `CompositionTimeToSampleBox` | `CompositionOffsetBox` |
+| `ProtectionSchemeInformationBox` | `ProtectionSchemeInfoBox` |
+| `TrackKindBox` | `KindBox` |
+| `SubsampleInformationBox` | `SubSampleInformationBox` |
+| `SubTrackBox` | `SubTrack` |
+| `SampleEntryBox`, `AudioSampleEntryBox`, `VisualSampleEntryBox` | `SampleEntry`, `AudioSampleEntry`, `VisualSampleEntry` |
+| `readAudioSampleEntryBox`, `writeAudioSampleEntryBox` | `readAudioSampleEntry`, `writeAudioSampleEntry` |
+| `readVisualSampleEntryBox`, `writeVisualSampleEntryBox` | `readVisualSampleEntry`, `writeVisualSampleEntry` |
+| `DecodingTimeSample` | `TimeToSampleEntry` |
+| `CompositionTimeToSampleEntry` | `CompositionOffsetEntry` |
+| `SubsampleEntry`, `Subsample` | `SubSampleInformationEntry`, `SubSampleInformationSubsample` |
+| `Subsegment`, `SubsegmentRange` | `SubsegmentIndexSubsegment`, `SubsegmentIndexRange` |
+| `channelcount`, `samplesize`, `samplerate` | `channelCount`, `sampleSize`, `sampleRate` |
+| `horizresolution`, `vertresolution` | `horizResolution`, `vertResolution` |
+| `graphicsmode`, `opcolor` | `graphicsMode`, `opColor` |
+| `defaultIvSize` | `defaultPerSampleIvSize` |
+| `IsoBoxReadViewConfig`, `IsoBoxWriteViewConfig` | `IsoBoxReadConfig`, `IsoBoxWriteConfig` |
+| `defaultReaderConfig`, `defaultWriterConfig` | `createDefaultReaderConfig`, `createDefaultWriterConfig` |
+
+A field rename changes the keys of a reader result. The compiler does not report code that reads a field with a string key.
+
+### Removed exports
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| `IsoBoxReadView`, `IsoBoxWriteView` | The read cursor and the write cursor. See [Custom readers](#custom-readers) and [Custom writers](#custom-writers). |
+| `ParsedBox`, `IsoTypedParsedBox` | `ParsedIsoBox` |
+| `IsoFieldTypeMap`, `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, `IsoBoxFields` | The field functions, such as `readUint32` |
+| `IsoBoxReadableStream` | `createIsoBoxReadableStream` |
+| `isFullBox` | `isIsoBoxType`, or a test such as `'version' in box && 'flags' in box` |
+| The child types, such as `MovieBoxChild` and `VisualSampleEntryBoxChild` | `ParsedIsoBox` |
+| `TrackReferenceTypeBox` | A raw box. A child of a `tref` box is a raw box. |
+| The aliases `co64`, `stz2`, `url`, and `urn` | `ChunkLargeOffsetBox`, `CompactSampleSizeBox`, `DataEntryUrlBox`, `DataEntryUrnBox`, or a key of `IsoBoxMap` such as `IsoBoxMap['co64']` |
+| `SyncSample`, `Entity` | A `number` in `sampleNumber` and `entityId` |
+| The types of 16 boxes with no reader and no writer: `hmhd`, `iinf`, `iloc`, `imif`, `infe`, `ipro`, `iref`, `nmhd`, `pitm`, `saio`, `saiz`, `sbgp`, `senc`, `sgpd`, `stdp`, and `stsh` | A type that your code declares, with a custom reader |
+
+### Changed fields
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| `stss.entries: { sampleNumber }[]` | `stss.sampleNumber: number[]` |
+| `prsl.entities: { entityId }[]` | `prsl.entityId: number[]` |
+| `reserved1`, `reserved2`, `reserved3` of `mvhd`, `tkhd`, and the sample entries | Removed. The writers write 0. |
+| `reserved` of `smhd`, `sidx`, and `tfra` | Removed. The writers write 0. |
+| `defaultIsEncrypted` of `tenc` | `defaultIsProtected`, with the pattern in `defaultCryptByteBlock` and `defaultSkipByteBlock` |
+| `isGroupLabel` of `labl` | `(box.flags & 0x1) !== 0` |
+| `reference` and `sap` of a `sidx` reference | The decoded fields, such as `referenceType` and `sapType` |
+
+### Changed types
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| The `boxes` field of a container has a list of child types | The `boxes` field of every box type is `ParsedIsoBox<V>[]`. Narrow a child with `isIsoBoxType`. |
+| A child of a sample entry can be a `Uint8Array` | A child is a box object or a raw box, such as `{ type: "esds", bytes }` |
+| `SampleEntry<T, C>` | `SampleEntry<T, V>` |
+| `SampleDescriptionBox<E>` | `SampleDescriptionBox<V, E>` |
+| `Box` with no type argument | `Box<"abcd">` for one box type, or `IsoBox` |
+| A reader result with `type: string` adds a member to the result type | Give the `type` field a literal type, such as `"abcd" as const` |
+| `IsoBoxReader<B, T>`, with the box type `T` as the second parameter | `IsoBoxReader<B, V>`, with the type `V` of the 64-bit fields as the second parameter. `B` has a `type` field. |
+| `IsoBoxWriter<B>` returns an `ArrayBufferView` | `IsoBoxWriter<B>` takes the cursor and the box, and returns nothing |
+| `IsoBoxReaderMap` and `IsoBoxWriterMap` accept a function under any key | A reader or a writer under the key of another known box type is a compile error |
 
 <!-- libs/iso-bmff/docs/reading-boxes.md -->
 ---
@@ -77,7 +326,12 @@ description: Read ISO BMFF boxes from a buffer
 
 # Reading Boxes
 
-The `readIsoBoxes` function reads boxes from a buffer and returns an array of parsed boxes. By default, the function reads only the box header. To read the content of a box, provide a reader function for that box type.
+The `readIsoBoxes` function reads boxes from a buffer and returns an array of boxes. To read the fields of a box, provide a reader function for that box type. The result has two kinds of boxes:
+
+- A **box object** has a `type` field and the fields of the box. A reader returns a box object.
+- A **raw box** is a box with no reader: `{ type, bytes, headerSize }`. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `usertype`.
+
+The bytes of a raw box share memory with the input. A raw box can have any type, so a test of `box.type` does not exclude a raw box. Narrow a box with `isIsoBoxType`, which returns `false` for a raw box.
 
 > [!NOTE]
 > The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
@@ -117,6 +371,53 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 ```
+
+## Reading one box
+
+`seekIsoBox` finds a box by its path and returns a read cursor for that box. The function reads no other box. Pass the cursor to the reader of the box:
+
+```typescript
+import { readTfdt, seekIsoBox } from "@svta/cml-iso-bmff";
+
+const cursor = seekIsoBox(buffer, ["moof", "traf", "tfdt"]);
+const time = cursor ? readTfdt(cursor).baseMediaDecodeTime : null;
+```
+
+The function returns `null` for a missing box and for a truncated box. If your code reads partial data, a `null` result means that the box can be in the next bytes. The third argument takes the `int64` option, as `readIsoBoxes` does.
+
+`seekIsoBox` treats the body of each box in the path as a list of boxes. Some boxes have fields before their child boxes, such as `meta`, `stsd`, and the sample entries. For such a box, move the position of the cursor past the fields, then call `seekIsoBox` again with the cursor. The second call does not move the first cursor:
+
+```typescript
+import { seekIsoBox } from "@svta/cml-iso-bmff";
+
+const stsd = seekIsoBox(buffer, ["moov", "trak", "mdia", "minf", "stbl", "stsd"]);
+
+if (stsd) {
+	stsd.pos += 8; // version, flags, and entry_count
+	const avc1 = seekIsoBox(stsd, ["avc1"]);
+	console.log(avc1 && avc1.end - avc1.start);
+}
+```
+
+## Stepping over boxes
+
+`nextIsoBox` returns the type of the box at the position of a cursor and moves the position past that box. The function reads no field of the box. The bytes from the old position to the new position are the complete box:
+
+```typescript
+import { createIsoBoxReadCursor, nextIsoBox } from "@svta/cml-iso-bmff";
+
+const cursor = createIsoBoxReadCursor(buffer);
+let start = cursor.pos;
+let type = nextIsoBox(cursor);
+
+while (type) {
+	console.log(type, cursor.pos - start); // the type and the size of each box
+	start = cursor.pos;
+	type = nextIsoBox(cursor);
+}
+```
+
+The function returns `null` at the end of the cursor and before a truncated box. The position then stays at the first byte of that box.
 
 ## Extending a built-in reader
 
@@ -160,19 +461,55 @@ for (const box of boxes) {
 
 A byte field such as `messageData` is a view over the input data. The field shares memory with that data and is not a copy. To keep the bytes after your code releases or changes the input, call `slice()` on the field.
 
+## Writing a custom reader
+
+A reader takes a read cursor and the box type, and returns the box object with its `type` field. A field function reads one field at `cursor.pos` and moves the position past the field, such as `readUint32` or `readFourCc`:
+
+```typescript
+import {
+	readFourCc,
+	readIsoBoxes,
+	readUint16,
+	readUint32,
+	type IsoBoxReadCursor,
+	type IsoInt64,
+} from "@svta/cml-iso-bmff";
+
+// A box type that the package does not name.
+const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
+	type: "abcd" as const,
+	brand: readFourCc(cursor),
+	count: readUint32(cursor),
+	flags: readUint16(cursor),
+});
+
+const boxes = readIsoBoxes(buffer, { readers: { abcd: readAbcd } });
+```
+
+The cursor follows these rules:
+
+- `cursor.start` is the first byte of the box header, and `cursor.end` is the first byte after the box. The cursor of a reader starts at the first byte after the header. For a `uuid` box, the cursor starts at the first byte of `usertype`. Read it with `readBytes(cursor, 16)`.
+- A read past `cursor.end` throws a `RangeError`, so a reader cannot read the bytes of the next box. A reader can stop before the end of its box.
+- The bytes that remain are `cursor.end - cursor.pos`. To skip bytes, add to `cursor.pos`.
+- A reader of a box with child boxes reads them with `readChildBoxes(cursor)`. The readers of the configuration then apply to the child boxes.
+- `readIsoBoxes` uses one cursor for every box. A reader must not keep the cursor after it returns. A reader that needs bytes later keeps the result of `readBytes`.
+- The `type` field of the result needs a literal type, such as `"abcd" as const`. A result with `type: string` adds no member to the result type of `readIsoBoxes`.
+
+`readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
+
 `readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
 
 ## Incomplete boxes
 
 A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw for an incomplete box.
 
-A box with a reader in the configuration and a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
+A box with a reader in the configuration and a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. A box that is deeper than 128 levels also throws a `RangeError`. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
 
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
 
-The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes.
+The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The box object has the child boxes and no field for those bytes.
 
-A writer builds a container or a sample entry from the child boxes of the parsed box. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes. The `mfraSize` field of an `mfro` box has the same limit. See [Writing a changed `mfra` box](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md#writing-a-changed-mfra-box).
+A writer builds a container or a sample entry from the child boxes of the box object. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes. The `mfraSize` field of an `mfro` box has the same limit. See [Writing a changed `mfra` box](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md#writing-a-changed-mfra-box).
 
 ## Reading 64-bit fields
 
@@ -431,7 +768,7 @@ for (const box of traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 })) {
 
 ## Finding boxes
 
-`findIsoBox` returns the first box that matches a callback, or `null`. `filterIsoBoxes` returns every box that matches. Both functions traverse the boxes as `traverseIsoBoxes` does and take the same configuration. A callback that tests `box.type` narrows the result to that box type.
+`findIsoBox` returns the first box that matches a callback, or `null`. `filterIsoBoxes` returns every box that matches. Both functions traverse the boxes as `traverseIsoBoxes` does and take the same configuration. A callback that calls `isIsoBoxType` narrows the result to that box type. A callback that tests `box.type` also matches a raw box of that type.
 
 ```typescript
 import {
@@ -503,14 +840,14 @@ for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 <!-- libs/iso-bmff/docs/writing-boxes.md -->
 ---
 title: Writing Boxes
-description: Write boxes to byte arrays or streams
+description: Write boxes to a byte array or a stream
 ---
 
 # Writing Boxes
 
 The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable items and returns one `Uint8Array` with every box. Streamable items include:
 
-- Raw box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
+- Box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
 - Boxes that `readIsoBoxes` returns. A box with no reader is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
 
@@ -594,7 +931,7 @@ sourceBuffer.appendBuffer(bytes);
 
 ## Streaming boxes
 
-The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers. The function needs `ReadableStream`. On a runtime without `ReadableStream`, the function throws an error.
+The `createIsoBoxReadableStream` function writes boxes to a readable stream. It supports both the default config and specific writers. The stream writes one box for each read and writes no box before the first read. An error of a box rejects the read. The function needs `ReadableStream`. On a runtime without `ReadableStream`, the function throws an error.
 
 ```typescript
 import {
@@ -624,6 +961,71 @@ const readableStream = createIsoBoxReadableStream(boxes, createDefaultWriterConf
 const stream = await transport.createBidirectionalStream();
 readableStream.pipeTo(stream.writable);
 ```
+
+## Writing a custom box
+
+A writer takes a write cursor and a box object, and returns nothing. The writer writes the header with `beginIsoBox` or `beginIsoFullBox`, then the fields with the write field functions, then the size with `endIsoBox`. A writer does not compute the size of its box:
+
+```typescript
+import {
+	beginIsoBox,
+	endIsoBox,
+	writeFourCc,
+	writeIsoBox,
+	writeUint16,
+	writeUint32,
+	type IsoBoxWriteCursor,
+} from "@svta/cml-iso-bmff";
+
+// A box type that the package does not name.
+type AbcdBox = { type: "abcd"; brand: string; count: number; flags: number };
+
+const writeAbcd = (cursor: IsoBoxWriteCursor, box: AbcdBox) => {
+	const start = beginIsoBox(cursor, box.type);
+	writeFourCc(cursor, box.brand);
+	writeUint32(cursor, box.count);
+	writeUint16(cursor, box.flags);
+	endIsoBox(cursor, start);
+};
+
+const box: AbcdBox = { type: "abcd", brand: "isom", count: 1, flags: 0 };
+const bytes = writeIsoBox(box, { writers: { abcd: writeAbcd } });
+```
+
+A writer of a box with child boxes writes them with `writeChildBoxes(cursor, box.boxes)`. The writers of the cursor then apply to the child boxes. A writer of a `uuid` box calls `beginIsoBox(cursor, "uuid")`, then writes the 16 bytes of `usertype` with `writeBytes`.
+
+`writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a code that does not have 4 characters. `endIsoBox` throws a `RangeError` for a box above 2^32 - 1 bytes.
+
+## Writing with a cursor
+
+`writeIsoBoxes` creates a write cursor, writes every box, and returns a copy of the written bytes with the exact size. Your code can also write on a cursor directly. The written bytes are `cursor.bytes.subarray(0, cursor.pos)`, with no copy:
+
+```typescript
+import {
+	createIsoBoxWriteCursor,
+	writeChildBoxes,
+	writeMdat,
+	writeMfhd,
+} from "@svta/cml-iso-bmff";
+
+const payload = new Uint8Array(1_000_000);
+
+const cursor = createIsoBoxWriteCursor({
+	capacity: payload.length + 1024,
+	writers: { mfhd: writeMfhd, mdat: writeMdat },
+});
+
+writeChildBoxes(cursor, [
+	{ type: "moof", boxes: [{ type: "mfhd", version: 0, flags: 0, sequenceNumber: 1 }] },
+	{ type: "mdat", data: payload },
+]);
+
+const segment = cursor.bytes.subarray(0, cursor.pos);
+```
+
+The cursor doubles its buffer when a field does not fit. Each growth copies the written bytes. A `capacity` above the final size avoids the growth. The default capacity is 1024 bytes.
+
+The growth replaces `cursor.view` and `cursor.bytes`. Write through the field functions, and read `cursor.bytes` after the last write.
 
 ## Writing 64-bit fields
 
@@ -660,7 +1062,7 @@ if (tfdt) {
 }
 ```
 
-A raw box object can hold a `bigint` too:
+A box object can hold a `bigint` too:
 
 ```typescript
 import { writeIsoBox, writeTfdt } from "@svta/cml-iso-bmff";
@@ -728,7 +1130,7 @@ The `mfraSize` field of an `mfro` box is the size in bytes of the enclosing `mfr
 
 ## Type safety
 
-In TypeScript, give a raw box object a box type. Annotate the object with a box type from the package:
+In TypeScript, give a box object a box type. Annotate the object with a box type from the package:
 
 ```typescript
 import type { FileTypeBox } from "@svta/cml-iso-bmff";

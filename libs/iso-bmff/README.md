@@ -65,5 +65,6 @@ Some exports need a runtime API:
 ## Usage
 
 - [Reading boxes](docs/reading-boxes.md) - Read ISO BMFF boxes from a buffer
-- [Writing boxes](docs/writing-boxes.md) - Write boxes to byte arrays or streams
+- [Writing boxes](docs/writing-boxes.md) - Write boxes to a byte array or a stream
 - [Utilities](docs/utilities.md) - Traverse boxes and type guards
+- [Migrating to version 2](docs/migrating-to-v2.md) - Update code from version 1 to version 2.0.0
