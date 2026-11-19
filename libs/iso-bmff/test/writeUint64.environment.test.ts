@@ -5,7 +5,7 @@ import { describe, it } from 'vite-plus/test'
 // evaluated for the first time after BigInt has been removed to simulate a
 // runtime without BigInt.
 
-describe('IsoBoxWriteView.writeUint64 in a runtime without BigInt', () => {
+describe('writeUint64 in a runtime without BigInt', () => {
 	it('can be imported, and only writeUint64 throws', async () => {
 		const NativeBigInt = globalThis.BigInt
 		const one = NativeBigInt(1)
@@ -14,13 +14,14 @@ describe('IsoBoxWriteView.writeUint64 in a runtime without BigInt', () => {
 		delete globalThis.BigInt
 
 		try {
-			const { fourCcToUint32, IsoBoxWriteView } = await import('@svta/cml-iso-bmff')
+			const { createIsoBoxWriteCursor, fourCcToUint32, writeUint64, writeWideUint } =
+				await import('@svta/cml-iso-bmff')
 
-			const writer = new IsoBoxWriteView('test', 16)
-			writer.writeUint(1, 8)
-			strictEqual(new Uint8Array(writer.buffer)[15], 1)
+			const cursor = createIsoBoxWriteCursor()
+			writeWideUint(cursor, 1, 8)
+			strictEqual(cursor.bytes[7], 1)
 
-			throws(() => new IsoBoxWriteView('test', 16).writeUint64(one), ReferenceError)
+			throws(() => writeUint64(createIsoBoxWriteCursor(), one), ReferenceError)
 
 			// Exports that do not use BigInt remain fully usable
 			strictEqual(fourCcToUint32('ftyp'), 0x66747970)

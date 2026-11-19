@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	isIsoBoxType,
@@ -16,12 +17,12 @@ describe('writeSidx', function () {
 			const [box] = readIsoBoxes(source, { readers: { sidx: readSidx } })
 
 			assert.ok(isIsoBoxType('sidx', box))
-			assert.deepStrictEqual(new Uint8Array(writeSidx(box).buffer), source)
+			assert.deepStrictEqual(new Uint8Array(writeWith(writeSidx, box).buffer), source)
 		})
 	}
 
 	it('should write 64-bit fields for a version 2 box', function () {
-		const writer = writeSidx({
+		const writer = writeWith(writeSidx, {
 			type: 'sidx',
 			version: 2,
 			flags: 0,

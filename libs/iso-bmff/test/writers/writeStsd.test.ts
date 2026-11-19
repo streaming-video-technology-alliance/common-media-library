@@ -1,4 +1,4 @@
-import { assert, describe, it, writeMp4a, writeStsd } from '../util/box.ts'
+import { assert, describe, it, writeIsoBox, writeMp4a, writeStsd } from '../util/box.ts'
 
 describe('writeStsd', function () {
 	it('should write a SampleDescriptionBox correctly', function () {
@@ -28,7 +28,7 @@ describe('writeStsd', function () {
 			],
 		}
 
-		const writer = writeStsd(box, {
+		const writer = writeIsoBox(box, {
 			writers: {
 				mp4a: writeMp4a,
 				stsd: writeStsd,

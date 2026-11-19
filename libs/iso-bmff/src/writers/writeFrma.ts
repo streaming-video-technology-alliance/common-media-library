@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.12.2
  *
+ * @param cursor - The write cursor
  * @param box - The `OriginalFormatBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView {
+export function writeFrma(cursor: IsoBoxWriteCursor, box: OriginalFormatBox): void {
 	const headerSize = 8
 	const dataFormatSize = 4
 	const totalSize = headerSize + dataFormatSize
@@ -20,5 +21,5 @@ export function writeFrma(box: OriginalFormatBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('frma', totalSize)
 	writer.writeUint(box.dataFormat, 4)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

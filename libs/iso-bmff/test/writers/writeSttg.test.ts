@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	createDefaultReaderConfig,
@@ -21,7 +22,7 @@ describe('writeSttg', function () {
 			settings: 'align:start',
 		}
 
-		const writer = writeSttg(box)
+		const writer = writeIsoBox(box, { writers: { sttg: writeSttg } })
 		// #endregion example
 
 		// size (19), type (sttg), settings
@@ -34,7 +35,7 @@ describe('writeSttg', function () {
 	})
 
 	it('should write the UTF-8 bytes of settings that are not ASCII', function () {
-		const writer = writeSttg({ type: 'sttg', settings: 'é日😀' })
+		const writer = writeWith(writeSttg, { type: 'sttg', settings: 'é日😀' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -45,7 +46,7 @@ describe('writeSttg', function () {
 	})
 
 	it('should write only the box header for empty settings', function () {
-		const writer = writeSttg({ type: 'sttg', settings: '' })
+		const writer = writeWith(writeSttg, { type: 'sttg', settings: '' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),

@@ -1,6 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { MovieFragmentRandomAccessBox } from '../boxes/MovieFragmentRandomAccessBox.ts'
-import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
@@ -14,16 +13,14 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * The writer does not change the `mfraSize` field of the `mfro` child. Set `mfraSize` after a change to the children.
  *
+ * @param cursor - The write cursor
  * @param box - The `MovieFragmentRandomAccessBox` fields to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
 export function writeMfra(
+	cursor: IsoBoxWriteCursor,
 	box: MovieFragmentRandomAccessBox<IsoInt64>,
-	config: IsoBoxWriteConfig,
-): IsoBoxWriteView {
-	return writeContainerBox(box, config)
+): void {
+	writeContainerBox(cursor, box)
 }

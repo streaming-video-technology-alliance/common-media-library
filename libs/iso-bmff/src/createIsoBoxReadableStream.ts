@@ -7,16 +7,14 @@ import { writeIsoBox } from './writeIsoBox.ts'
  * Creates a ReadableStream of ISO BMFF boxes as Uint8Arrays.
  *
  * The function reads the global `ReadableStream` at each call. A polyfill that the caller installs after the import works.
- * An error of a writer reaches the caller for the first box, and the consumer of the stream for a later box.
+ * The stream writes one box for each read, and writes no box before the first read. An error of any box rejects the read.
  *
  * @param boxes - The boxes to stream.
- * @param config - The optional configuration with the writers. With no writers, the function writes only containers, byte arrays, and boxes with a `view`.
+ * @param config - The optional configuration with the writers. With no writers, the function writes only byte arrays, raw boxes, and containers.
  *
  * @returns A new `ReadableStream` with one chunk for each box.
  *
  * @throws Error if `ReadableStream` is not available in this environment.
- * @throws Error if the first box has no writer, no `boxes` field of a container, and no `view`. The message starts with "No writer found for box type". For a later box, the same error errors the stream.
- * @throws RangeError if a `bigint` field of the first box does not fit its size. For a later box, the same error errors the stream.
  *
  * @example
  * {@includeCode ../test/createIsoBoxReadableStream.test.ts#example}
@@ -47,5 +45,5 @@ export function createIsoBoxReadableStream(
 		iterator.return?.()
 	}
 
-	return new ReadableStream<Uint8Array>({ start: pull, pull, cancel })
+	return new ReadableStream<Uint8Array>({ pull, cancel }, { highWaterMark: 0 })
 }

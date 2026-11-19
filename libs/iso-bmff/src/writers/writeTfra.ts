@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -10,13 +12,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackFragmentRandomAccessBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWriteView {
+export function writeTfra(
+	cursor: IsoBoxWriteCursor,
+	box: TrackFragmentRandomAccessBox<IsoInt64>,
+): void {
 	const v1 = box.version === 1
 	const timeSize = v1 ? 8 : 4
 	const entrySize =
@@ -55,5 +59,5 @@ export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWr
 		writer.writeUint(entry.sampleNumber, box.lengthSizeOfSampleNum + 1)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

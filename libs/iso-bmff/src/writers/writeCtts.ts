@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { CompositionOffsetBox } from '../boxes/CompositionOffsetBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -8,13 +10,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * For a box of version 2 or above, the writer writes `entryCount` and no entries.
  *
+ * @param cursor - The write cursor
  * @param box - The `CompositionOffsetBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeCtts(box: CompositionOffsetBox): IsoBoxWriteView {
+export function writeCtts(cursor: IsoBoxWriteCursor, box: CompositionOffsetBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4
@@ -36,5 +37,5 @@ export function writeCtts(box: CompositionOffsetBox): IsoBoxWriteView {
 		}
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

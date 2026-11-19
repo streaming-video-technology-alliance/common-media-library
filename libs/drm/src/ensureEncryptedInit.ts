@@ -181,21 +181,16 @@ export function ensureEncryptedInit(
 		})
 	}
 
-	// Write the boxes to a new Uint8Array
-	const chunks = writeIsoBoxes(boxes, { writers })
-	const size = chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0)
-	const length = includeOriginal ? init.length + size : size
-	const result = new Uint8Array(length)
-	let offset = 0
+	const written = writeIsoBoxes(boxes, { writers })
 
-	for (const box of chunks) {
-		result.set(box, offset)
-		offset += box.byteLength
+	if (!includeOriginal) {
+		return written
 	}
 
-	if (includeOriginal) {
-		result.set(init, offset)
-	}
+	const result = new Uint8Array(written.length + init.length)
+
+	result.set(written)
+	result.set(init, written.length)
 
 	return result
 }

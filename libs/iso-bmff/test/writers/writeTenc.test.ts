@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	isIsoBoxType,
 	assert,
@@ -26,7 +27,7 @@ function tenc(fields: Partial<TrackEncryptionBox>): TrackEncryptionBox {
 }
 
 function write(box: TrackEncryptionBox): Uint8Array {
-	return new Uint8Array(writeTenc(box).buffer)
+	return new Uint8Array(writeWith(writeTenc, box).buffer)
 }
 
 const SOURCES: [name: string, bytes: Uint8Array][] = [
@@ -55,20 +56,23 @@ const SOURCES: [name: string, bytes: Uint8Array][] = [
 describe('writeTenc', function () {
 	it('should write the pattern and the constant IV of a version 1 box', function () {
 		// #region example
-		const writer = writeTenc({
-			type: 'tenc',
-			version: 1,
-			flags: 0,
-			defaultIsProtected: 1,
-			defaultPerSampleIvSize: 0,
-			defaultKid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-			defaultCryptByteBlock: 1,
-			defaultSkipByteBlock: 9,
-			defaultConstantIvSize: 16,
-			defaultConstantIv: [
-				161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176,
-			],
-		})
+		const writer = writeIsoBox(
+			{
+				type: 'tenc',
+				version: 1,
+				flags: 0,
+				defaultIsProtected: 1,
+				defaultPerSampleIvSize: 0,
+				defaultKid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+				defaultCryptByteBlock: 1,
+				defaultSkipByteBlock: 9,
+				defaultConstantIvSize: 16,
+				defaultConstantIv: [
+					161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176,
+				],
+			},
+			{ writers: { tenc: writeTenc } },
+		)
 
 		// size (49), type (tenc), version, flags, a reserved byte, the pattern 1:9,
 		// default_isProtected (1), default_Per_Sample_IV_Size (0), default_KID,

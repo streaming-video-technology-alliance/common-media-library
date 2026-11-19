@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { EditListBox } from '../boxes/EditListBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -10,13 +12,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `EditListBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeElst(box: EditListBox<IsoInt64>): IsoBoxWriteView {
+export function writeElst(cursor: IsoBoxWriteCursor, box: EditListBox<IsoInt64>): void {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -38,5 +39,5 @@ export function writeElst(box: EditListBox<IsoInt64>): IsoBoxWriteView {
 		writer.writeInt(entry.mediaRateFraction, 2)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

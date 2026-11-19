@@ -25,7 +25,6 @@ import {
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
 import { parseFile } from './util/parseFile.ts'
-import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { sourceOf } from './util/sources.ts'
 
 function boxBytes(boxes: ParsedIsoBox[], types: string[]): Uint8Array[] {
@@ -57,7 +56,7 @@ describe('writeIsoBoxes', function () {
 			},
 		})
 
-		deepStrictEqual(new Uint8Array(isoFile), reduceUint8Arrays(bytes))
+		deepStrictEqual(bytes, new Uint8Array(isoFile))
 		// #endregion example
 	})
 
@@ -164,7 +163,7 @@ describe('writeIsoBoxes', function () {
 		})
 
 		const isoFile = await readFile(new URL('./fixtures/subsample.m4s', import.meta.url))
-		deepStrictEqual(new Uint8Array(isoFile), reduceUint8Arrays(bytes))
+		deepStrictEqual(bytes, new Uint8Array(isoFile))
 	})
 
 	it('should write every fixture that the default readers parse', function () {
@@ -185,7 +184,7 @@ describe('writeIsoBoxes', function () {
 		for (const file of fixtureFiles()) {
 			const boxes = parseFile(file, createDefaultReaderConfig())
 			const original = sampleTableBytes(readIsoBoxes(load(file)))
-			const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
+			const written = writeIsoBoxes(boxes, createDefaultWriterConfig())
 
 			deepStrictEqual(sampleTableBytes(readIsoBoxes(written)), original, file)
 			count += original.length
@@ -200,7 +199,7 @@ describe('writeIsoBoxes', function () {
 		for (const file of fixtureFiles()) {
 			const boxes = parseFile(file, createDefaultReaderConfig())
 			const original = headerBytes(readIsoBoxes(load(file)))
-			const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
+			const written = writeIsoBoxes(boxes, createDefaultWriterConfig())
 
 			deepStrictEqual(headerBytes(readIsoBoxes(written)), original, file)
 			count += original.length
@@ -217,16 +216,13 @@ describe('writeIsoBoxes', function () {
 	it('should write the boxes of a read with no configuration', async function () {
 		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 
-		deepStrictEqual(
-			reduceUint8Arrays(writeIsoBoxes(readIsoBoxes(isoFile))),
-			new Uint8Array(isoFile),
-		)
+		deepStrictEqual(writeIsoBoxes(readIsoBoxes(isoFile)), new Uint8Array(isoFile))
 	})
 
 	it('should write a configuration with no writers map', function () {
 		const free = new Uint8Array([0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65])
 
-		deepStrictEqual([...writeIsoBoxes([free], {})[0]], [...free])
+		deepStrictEqual([...writeIsoBoxes([free], {})], [...free])
 	})
 
 	it('should copy a box given as a view over a SharedArrayBuffer', function () {
@@ -234,18 +230,19 @@ describe('writeIsoBoxes', function () {
 		const shared = new Uint8Array(new SharedArrayBuffer(bytes.length))
 		shared.set(bytes)
 
-		const [result] = writeIsoBoxes([shared], createDefaultWriterConfig())
+		const result = writeIsoBoxes([shared], createDefaultWriterConfig())
 
 		ok(result.buffer instanceof ArrayBuffer)
 		deepStrictEqual([...result], bytes)
 	})
 
-	it('should not copy a box given as a view over an ArrayBuffer', function () {
+	it('should copy a box given as a view over an ArrayBuffer', function () {
 		const plain = new Uint8Array([0x00, 0x00, 0x00, 0x08, 0x66, 0x72, 0x65, 0x65])
 
-		const [result] = writeIsoBoxes([plain], createDefaultWriterConfig())
+		const result = writeIsoBoxes([plain], createDefaultWriterConfig())
 
-		strictEqual(result.buffer, plain.buffer)
+		ok(result.buffer !== plain.buffer)
+		deepStrictEqual(result, plain)
 	})
 
 	describe('a box with a boxes field and no writer', function () {
@@ -270,7 +267,7 @@ describe('writeIsoBoxes', function () {
 		it('should write the bytes of a raw meta box', function () {
 			const boxes = readIsoBoxes(new Uint8Array(META))
 
-			const [bytes] = writeIsoBoxes(boxes, { writers: {} })
+			const bytes = writeIsoBoxes(boxes, { writers: {} })
 
 			deepStrictEqual([...bytes], META)
 		})
@@ -279,7 +276,7 @@ describe('writeIsoBoxes', function () {
 			const source = sampleEntry('av01')
 			const boxes = readIsoBoxes(source, createDefaultReaderConfig())
 
-			const [bytes] = writeIsoBoxes(boxes, createDefaultWriterConfig())
+			const bytes = writeIsoBoxes(boxes, createDefaultWriterConfig())
 
 			strictEqual(bytes.length, 137)
 			deepStrictEqual(bytes, source)
@@ -290,7 +287,7 @@ describe('writeIsoBoxes', function () {
 			ok(isIsoBoxType('traf', traf))
 			traf.boxes.push(new Uint8Array(FREE) as never)
 
-			const [bytes] = writeIsoBoxes([traf], { writers: {} })
+			const bytes = writeIsoBoxes([traf], { writers: {} })
 
 			deepStrictEqual(
 				[...bytes],
@@ -301,7 +298,7 @@ describe('writeIsoBoxes', function () {
 		it('should write a container that code builds as a container', function () {
 			const box = { type: 'udta', boxes: [new Uint8Array(FREE)] } as IsoBoxStreamable
 
-			const [bytes] = writeIsoBoxes([box], { writers: {} })
+			const bytes = writeIsoBoxes([box], { writers: {} })
 
 			deepStrictEqual([...bytes], [0x00, 0x00, 0x00, 0x11, 0x75, 0x64, 0x74, 0x61, ...FREE])
 		})

@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackHeaderBox } from '../boxes/TrackHeaderBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { INT } from '../IsoBoxFields.ts'
@@ -11,16 +13,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackHeaderBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeTkhd.test.ts#example}
  *
  * @public
  */
-export function writeTkhd(box: TrackHeaderBox<IsoInt64>): IsoBoxWriteView {
+export function writeTkhd(cursor: IsoBoxWriteCursor, box: TrackHeaderBox<IsoInt64>): void {
 	const v1 = box.version === 1
 	const size = v1 ? 8 : 4
 	const headerSize = 8
@@ -76,5 +77,5 @@ export function writeTkhd(box: TrackHeaderBox<IsoInt64>): IsoBoxWriteView {
 	writer.writeTemplate(box.width, 4)
 	writer.writeTemplate(box.height, 4)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

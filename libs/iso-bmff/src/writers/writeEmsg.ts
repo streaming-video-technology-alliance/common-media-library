@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import { encodeText } from '@svta/cml-utils'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
@@ -13,13 +15,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * For a version other than 0 or 1, the writer writes the full box fields and `messageData` only.
  *
+ * @param cursor - The write cursor
  * @param box - The `EventMessageBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView {
+export function writeEmsg(cursor: IsoBoxWriteCursor, box: EventMessageBox<IsoInt64>): void {
 	const schemeIdUriBytes = encodeText(box.schemeIdUri)
 	const valueBytes = encodeText(box.value)
 
@@ -65,5 +66,5 @@ export function writeEmsg(box: EventMessageBox<IsoInt64>): IsoBoxWriteView {
 
 	writer.writeBytes(box.messageData)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

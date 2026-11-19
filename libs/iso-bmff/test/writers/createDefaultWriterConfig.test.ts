@@ -14,11 +14,10 @@ describe('createDefaultWriterConfig', function () {
 		const isoFile = await readFile(new URL('../fixtures/emsg.m4s', import.meta.url))
 		const boxes = readIsoBoxes(isoFile, createDefaultReaderConfig())
 
-		const byteArrays = writeIsoBoxes(boxes, createDefaultWriterConfig())
+		const bytes = writeIsoBoxes(boxes, createDefaultWriterConfig())
 		// #endregion example
 
-		const written = Buffer.concat(byteArrays)
-		assert.strictEqual(Buffer.compare(written, isoFile), 0)
+		assert.strictEqual(Buffer.compare(bytes, isoFile), 0)
 	})
 
 	it('should have a writer for each box type of createDefaultReaderConfig', function () {

@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	describe,
@@ -108,7 +109,7 @@ describe('readMvhd', function () {
 		]
 
 		for (const bytes of boxes) {
-			const writer = writeMvhd(read(bytes))
+			const writer = writeWith(writeMvhd, read(bytes))
 
 			assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)
 		}

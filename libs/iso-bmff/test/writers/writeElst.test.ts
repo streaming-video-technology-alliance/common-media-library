@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	isIsoBoxType,
@@ -16,7 +17,7 @@ describe('writeElst', function () {
 		assert.ok(box)
 		assert.ok(isIsoBoxType('elst', box))
 
-		const writer = writeElst(box)
+		const writer = writeWith(writeElst, box)
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), ELST_V1)
 	})

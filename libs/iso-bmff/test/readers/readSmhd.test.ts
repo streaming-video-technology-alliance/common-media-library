@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	describe,
@@ -53,7 +54,7 @@ describe('readSmhd', function () {
 	it('should read values that writeSmhd writes back as the same bytes', function () {
 		for (const balance of [0x0100, -0x0080, -0x8000, 0x7fff]) {
 			const bytes = createSmhd(balance)
-			const writer = writeSmhd(read(bytes))
+			const writer = writeWith(writeSmhd, read(bytes))
 
 			assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)
 		}

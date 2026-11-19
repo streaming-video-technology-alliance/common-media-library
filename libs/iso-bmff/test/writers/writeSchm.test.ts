@@ -1,8 +1,10 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	isIsoBoxType,
 	assert,
 	describe,
 	it,
+	writeIsoBox,
 	readIsoBoxes,
 	readSchm,
 	writeSchm,
@@ -27,14 +29,17 @@ function schm(flags: number, schemeUri?: string): SchemeTypeBox {
 describe('writeSchm', function () {
 	it('should write the null terminator of an empty schemeUri when flag 0x000001 is set', function () {
 		// #region example
-		const writer = writeSchm({
-			type: 'schm',
-			version: 0,
-			flags: 1,
-			schemeType: 0x63656e63, // cenc
-			schemeVersion: 0x00010000,
-			schemeUri: '',
-		})
+		const writer = writeIsoBox(
+			{
+				type: 'schm',
+				version: 0,
+				flags: 1,
+				schemeType: 0x63656e63, // cenc
+				schemeVersion: 0x00010000,
+				schemeUri: '',
+			},
+			{ writers: { schm: writeSchm } },
+		)
 		// #endregion example
 
 		assert.deepStrictEqual(
@@ -66,7 +71,7 @@ describe('writeSchm', function () {
 	})
 
 	it('should write an empty schemeUri when flag 0x000001 is set and the box has no schemeUri', function () {
-		const writer = writeSchm({
+		const writer = writeWith(writeSchm, {
 			type: 'schm',
 			version: 0,
 			flags: 1,
@@ -81,7 +86,7 @@ describe('writeSchm', function () {
 	})
 
 	it('should write the schemeUri and a null terminator when flag 0x000001 is set', function () {
-		const writer = writeSchm(schm(1, 'urn:a'))
+		const writer = writeWith(writeSchm, schm(1, 'urn:a'))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -93,7 +98,7 @@ describe('writeSchm', function () {
 	})
 
 	it('should write the UTF-8 bytes of a schemeUri that is not ASCII', function () {
-		const writer = writeSchm(schm(1, TEXT))
+		const writer = writeWith(writeSchm, schm(1, TEXT))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -125,7 +130,7 @@ describe('writeSchm', function () {
 	})
 
 	it('should not write the schemeUri when flag 0x000001 is not set', function () {
-		const writer = writeSchm(schm(0, 'urn:a'))
+		const writer = writeWith(writeSchm, schm(0, 'urn:a'))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -134,7 +139,7 @@ describe('writeSchm', function () {
 	})
 
 	it('should write no schemeUri when flag 0x000001 is not set and the box has no schemeUri', function () {
-		const writer = writeSchm({
+		const writer = writeWith(writeSchm, {
 			type: 'schm',
 			version: 0,
 			flags: 0,
@@ -157,12 +162,12 @@ describe('writeSchm', function () {
 
 		assert.ok(isIsoBoxType('schm', parsed))
 		assert.strictEqual(parsed.schemeUri, '')
-		assert.deepStrictEqual(new Uint8Array(writeSchm(parsed).buffer), input)
+		assert.deepStrictEqual(new Uint8Array(writeWith(writeSchm, parsed).buffer), input)
 	})
 
 	for (const box of [schm(1, 'urn:a'), schm(1, TEXT), schm(1, ''), schm(0)]) {
 		it(`should write a box that readSchm reads with flags ${box.flags} and the schemeUri ${JSON.stringify(box.schemeUri)}`, function () {
-			const [parsed] = readIsoBoxes(new Uint8Array(writeSchm(box).buffer), {
+			const [parsed] = readIsoBoxes(new Uint8Array(writeWith(writeSchm, box).buffer), {
 				readers: { schm: readSchm },
 			})
 

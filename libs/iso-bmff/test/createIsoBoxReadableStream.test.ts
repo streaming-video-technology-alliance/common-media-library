@@ -1,4 +1,4 @@
-import { deepStrictEqual, rejects, strictEqual, throws } from 'node:assert'
+import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	createIsoBoxReadableStream,
@@ -217,12 +217,33 @@ describe('createIsoBoxReadableStream', function () {
 		deepStrictEqual(chunks, [0, 1, 2])
 	})
 
-	it('should throw from the call for a first box with no writer', function () {
+	it('should reject the first read for a first box with no writer', async function () {
 		const box: IsoBoxStreamable = { type: 'meta', version: 0, flags: 0, boxes: [] }
+		const reader = createIsoBoxReadableStream([box], { writers: {} }).getReader()
 
-		throws(() => createIsoBoxReadableStream([box], { writers: {} }), {
-			message: 'No writer found for box type: meta',
-		})
+		await rejects(reader.read(), { message: 'No writer found for box type: meta' })
+	})
+
+	it('should write no box before the first read', async function () {
+		let count = 0
+
+		function* source(): Generator<IsoBoxStreamable> {
+			for (let i = 0; i < 3; i++) {
+				count++
+				yield { type: 'free', data: new Uint8Array([i]) }
+			}
+		}
+
+		const reader = createIsoBoxReadableStream(source(), {
+			writers: { free: writeFree },
+		}).getReader()
+
+		await new Promise(resolve => setTimeout(resolve, 0))
+		strictEqual(count, 0)
+
+		await reader.read()
+		await new Promise(resolve => setTimeout(resolve, 0))
+		strictEqual(count, 1)
 	})
 
 	it('should error the stream for a later box with no writer', async function () {

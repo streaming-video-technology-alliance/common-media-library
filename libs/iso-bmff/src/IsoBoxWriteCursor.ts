@@ -1,5 +1,7 @@
+import type { IsoBoxWriterMap } from './IsoBoxWriterMap.ts'
+
 /**
- * A position in a buffer that grows, for the write field functions.
+ * A position in a buffer that grows, for the write field functions and the box writers.
  *
  * A field function writes at `pos` and moves `pos` past the field.
  * The written bytes are `cursor.bytes.subarray(0, cursor.pos)`.
@@ -24,4 +26,9 @@ export type IsoBoxWriteCursor = {
 	 * The position of the next write.
 	 */
 	pos: number
+
+	/**
+	 * Map of each box type to the writer of that box. `writeChildBoxes` uses the map.
+	 */
+	readonly writers?: IsoBoxWriterMap
 }

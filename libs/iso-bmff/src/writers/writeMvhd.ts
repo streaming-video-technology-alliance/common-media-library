@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { MovieHeaderBox } from '../boxes/MovieHeaderBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { INT, UINT } from '../IsoBoxFields.ts'
@@ -11,16 +13,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `MovieHeaderBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeMvhd.test.ts#example}
  *
  * @public
  */
-export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView {
+export function writeMvhd(cursor: IsoBoxWriteCursor, box: MovieHeaderBox<IsoInt64>): void {
 	const size = box.version === 1 ? 8 : 4
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -69,5 +70,5 @@ export function writeMvhd(box: MovieHeaderBox<IsoInt64>): IsoBoxWriteView {
 	writer.writeArray(box.preDefined ?? [], UINT, 4, 6)
 	writer.writeUint(box.nextTrackId, 4)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

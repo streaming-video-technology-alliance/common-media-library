@@ -1,9 +1,11 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	isIsoBoxType,
 	assert,
 	describe,
 	filterBoxes,
 	it,
+	writeIsoBox,
 	readDref,
 	readIsoBoxes,
 	readUrl,
@@ -19,7 +21,10 @@ const TEXT_BYTES = [0xc3, 0xa9, 0xe6, 0x97, 0xa5, 0xf0, 0x9f, 0x98, 0x80]
 describe('writeUrl', function () {
 	it('should write no location string when flag 0x000001 is set', function () {
 		// #region example
-		const writer = writeUrl({ type: 'url ', version: 0, flags: 1, location: '' })
+		const writer = writeIsoBox(
+			{ type: 'url ', version: 0, flags: 1, location: '' },
+			{ writers: { url: writeUrl } },
+		)
 		// #endregion example
 
 		assert.deepStrictEqual(
@@ -42,7 +47,7 @@ describe('writeUrl', function () {
 	})
 
 	it('should write the location string when flag 0x000001 is not set', function () {
-		const writer = writeUrl({ type: 'url ', version: 0, flags: 0, location: 'a.mp4' })
+		const writer = writeWith(writeUrl, { type: 'url ', version: 0, flags: 0, location: 'a.mp4' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -70,7 +75,7 @@ describe('writeUrl', function () {
 	})
 
 	it('should write the null terminator of an empty location when flag 0x000001 is not set', function () {
-		const writer = writeUrl({ type: 'url ', version: 0, flags: 0, location: '' })
+		const writer = writeWith(writeUrl, { type: 'url ', version: 0, flags: 0, location: '' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -79,7 +84,7 @@ describe('writeUrl', function () {
 	})
 
 	it('should omit a location that is not empty when flag 0x000001 is set', function () {
-		const writer = writeUrl({ type: 'url ', version: 0, flags: 1, location: 'a.mp4' })
+		const writer = writeWith(writeUrl, { type: 'url ', version: 0, flags: 1, location: 'a.mp4' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -88,7 +93,7 @@ describe('writeUrl', function () {
 	})
 
 	it('should write no location string when flag 0x000001 is set with another flag', function () {
-		const writer = writeUrl({ type: 'url ', version: 0, flags: 3, location: 'a' })
+		const writer = writeWith(writeUrl, { type: 'url ', version: 0, flags: 3, location: 'a' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -97,7 +102,7 @@ describe('writeUrl', function () {
 	})
 
 	it('should write the location string when only another flag is set', function () {
-		const writer = writeUrl({ type: 'url ', version: 0, flags: 2, location: 'a' })
+		const writer = writeWith(writeUrl, { type: 'url ', version: 0, flags: 2, location: 'a' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -106,7 +111,7 @@ describe('writeUrl', function () {
 	})
 
 	it('should write the UTF-8 bytes of a location that is not ASCII', function () {
-		const writer = writeUrl({ type: 'url ', version: 0, flags: 0, location: TEXT })
+		const writer = writeWith(writeUrl, { type: 'url ', version: 0, flags: 0, location: TEXT })
 
 		// size: 12 + 9 location bytes + 1 null terminator = 22
 		assert.deepStrictEqual(
@@ -118,7 +123,7 @@ describe('writeUrl', function () {
 	for (const text of ['a.mp4', '', TEXT]) {
 		it(`should write a box that readUrl reads with the location '${text}'`, function () {
 			const box: DataEntryUrlBox = { type: 'url ', version: 0, flags: 0, location: text }
-			const [parsed] = readIsoBoxes(new Uint8Array(writeUrl(box).buffer), {
+			const [parsed] = readIsoBoxes(new Uint8Array(writeWith(writeUrl, box).buffer), {
 				readers: { 'url ': readUrl },
 			})
 
@@ -144,6 +149,6 @@ describe('writeUrl', function () {
 
 		const input = sourceOf(entry).bytes
 
-		assert.deepStrictEqual(new Uint8Array(writeUrl(entry).buffer), input)
+		assert.deepStrictEqual(new Uint8Array(writeWith(writeUrl, entry).buffer), input)
 	})
 })

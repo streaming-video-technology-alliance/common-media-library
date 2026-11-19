@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SoundMediaHeaderBox } from '../boxes/SoundMediaHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,16 +8,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 12.2.2
  *
+ * @param cursor - The write cursor
  * @param box - The `SoundMediaHeaderBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeSmhd.test.ts#example}
  *
  * @public
  */
-export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView {
+export function writeSmhd(cursor: IsoBoxWriteCursor, box: SoundMediaHeaderBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const balanceSize = 2
@@ -28,5 +29,5 @@ export function writeSmhd(box: SoundMediaHeaderBox): IsoBoxWriteView {
 	writer.writeTemplate(box.balance, 2)
 	writer.writeUint(0, 2)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

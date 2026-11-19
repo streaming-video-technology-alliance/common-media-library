@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	describe,
@@ -13,7 +14,7 @@ const VALUE = [0xe6, 0x97, 0xa5, 0xe6, 0x9c, 0xac] // '日本'
 
 describe('writeEmsg', function () {
 	it('should write UTF-8 strings in a version 0 box', function () {
-		const writer = writeEmsg({
+		const writer = writeWith(writeEmsg, {
 			type: 'emsg',
 			version: 0,
 			flags: 0,
@@ -67,7 +68,7 @@ describe('writeEmsg', function () {
 	})
 
 	it('should write UTF-8 strings in a version 1 box', function () {
-		const writer = writeEmsg({
+		const writer = writeWith(writeEmsg, {
 			type: 'emsg',
 			version: 1,
 			flags: 0,
@@ -125,7 +126,7 @@ describe('writeEmsg', function () {
 	})
 
 	it('should read back a version 0 box whose value has the character U+0100', function () {
-		const writer = writeEmsg({
+		const writer = writeWith(writeEmsg, {
 			type: 'emsg',
 			version: 0,
 			flags: 0,
@@ -160,7 +161,7 @@ describe('writeEmsg', function () {
 			messageData: new Uint8Array([0x49, 0x44, 0x33, 0x04, 0x00, 0x01]),
 		}
 
-		const writer = writeEmsg(box)
+		const writer = writeWith(writeEmsg, box)
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
@@ -187,7 +188,7 @@ describe('writeEmsg', function () {
 			messageData: new Uint8Array([0xff]),
 		}
 
-		const writer = writeEmsg(box)
+		const writer = writeWith(writeEmsg, box)
 		const buffer = new Uint8Array(writer.buffer)
 
 		assert.strictEqual(
@@ -251,7 +252,7 @@ describe('writeEmsg', function () {
 			messageData,
 		}
 
-		const writer = writeEmsg(box)
+		const writer = writeWith(writeEmsg, box)
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
@@ -275,7 +276,7 @@ describe('writeEmsg', function () {
 			messageData,
 		}
 
-		const writer = writeEmsg(box)
+		const writer = writeWith(writeEmsg, box)
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
@@ -300,7 +301,7 @@ describe('writeEmsg', function () {
 			messageData,
 		}
 
-		const writer = writeEmsg(box)
+		const writer = writeWith(writeEmsg, box)
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
@@ -330,7 +331,7 @@ describe('writeEmsg', function () {
 			messageData: new Uint8Array([1]),
 		}
 
-		const writer = writeEmsg(box)
+		const writer = writeWith(writeEmsg, box)
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -362,7 +363,7 @@ describe('writeEmsg', function () {
 
 			const [box] = readIsoBoxes(source, { readers: { emsg: readEmsg } })
 			assert.ok(isIsoBoxType('emsg', box))
-			const writer = writeEmsg(box)
+			const writer = writeWith(writeEmsg, box)
 
 			assert.strictEqual(box.version, version)
 			assert.deepStrictEqual(new Uint8Array(writer.buffer), source)

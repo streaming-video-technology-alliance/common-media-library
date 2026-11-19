@@ -89,7 +89,7 @@ describe('incomplete box header', function () {
 		const source = boxBytes('moov', boxBytes('udta', FREE, ZEROS))
 
 		const boxes = readIsoBoxes(source, createDefaultReaderConfig())
-		const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
+		const written = writeIsoBoxes(boxes, createDefaultWriterConfig())
 
 		assert.strictEqual(written.length, source.length - ZEROS.length)
 		assert.deepStrictEqual(written, boxBytes('moov', boxBytes('udta', FREE)))
@@ -100,7 +100,7 @@ describe('incomplete box header', function () {
 		const source = boxBytes('avc1', fields, FREE, ZEROS)
 
 		const boxes = readIsoBoxes(source, createDefaultReaderConfig())
-		const written = reduceUint8Arrays(writeIsoBoxes(boxes, createDefaultWriterConfig()))
+		const written = writeIsoBoxes(boxes, createDefaultWriterConfig())
 
 		assert.strictEqual(written.length, source.length - ZEROS.length)
 		assert.deepStrictEqual(written, boxBytes('avc1', fields, FREE))

@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SampleSizeBox } from '../boxes/SampleSizeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,16 +8,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.7.3
  *
+ * @param cursor - The write cursor
  * @param box - The `SampleSizeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeStsz.test.ts#example}
  *
  * @public
  */
-export function writeStsz(box: SampleSizeBox): IsoBoxWriteView {
+export function writeStsz(cursor: IsoBoxWriteCursor, box: SampleSizeBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleSizeFieldSize = 4
@@ -36,5 +37,5 @@ export function writeStsz(box: SampleSizeBox): IsoBoxWriteView {
 		}
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

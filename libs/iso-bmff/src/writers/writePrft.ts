@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -10,13 +12,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `ProducerReferenceTimeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writePrft(box: ProducerReferenceTimeBox<IsoInt64>): IsoBoxWriteView {
+export function writePrft(
+	cursor: IsoBoxWriteCursor,
+	box: ProducerReferenceTimeBox<IsoInt64>,
+): void {
 	const mediaTimeSize = box.version === 0 ? 4 : 8
 	const headerSize = 8
 	const fullBoxSize = 4
@@ -39,5 +43,5 @@ export function writePrft(box: ProducerReferenceTimeBox<IsoInt64>): IsoBoxWriteV
 	writer.writeUint(box.ntpTimestampFrac, 4)
 	writer.writeWideUint(box.mediaTime, mediaTimeSize)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

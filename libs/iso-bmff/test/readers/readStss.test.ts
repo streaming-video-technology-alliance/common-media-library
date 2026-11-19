@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	describe,
@@ -35,6 +36,6 @@ describe('readStss', function () {
 		const [box] = readIsoBoxes(STSS, { readers: { stss: readStss } })
 
 		assert.ok(isIsoBoxType('stss', box))
-		assert.deepStrictEqual(new Uint8Array(writeStss(box).buffer), STSS)
+		assert.deepStrictEqual(new Uint8Array(writeWith(writeStss, box).buffer), STSS)
 	})
 })

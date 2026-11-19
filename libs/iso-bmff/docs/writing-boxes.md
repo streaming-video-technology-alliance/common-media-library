@@ -5,20 +5,20 @@ description: Write boxes to byte arrays or streams
 
 # Writing Boxes
 
-The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable items and returns an array of `Uint8Array`s. Streamable items include:
+The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable items and returns one `Uint8Array` with every box. Streamable items include:
 
 - Raw box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
-- Boxes that `readIsoBoxes` returns. If the `writers` map has a writer for the type, the function writes the fields of the box. If the map has no writer and the type is not a container, the function writes the source bytes of the box. A changed field then has no effect.
+- Boxes that `readIsoBoxes` returns. A box with no reader is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
 
-If you provide raw box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space.
+If you provide box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space. The keys `url` and `urn` also find the writers of those boxes.
 
 A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.
 
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
 >
-> The function does not write a box of another type as a container, even if the box has a `boxes` field. Examples are `meta` and the sample entries. If the `writers` map has no writer for such a type, the function writes the `view` bytes of a parsed box. For a box with no `view`, the function throws `No writer found for box type`.
+> The function does not write a box of another type as a container, even if the box has a `boxes` field. Examples are `meta` and the sample entries. A raw box of such a type keeps its bytes. For any other box of such a type with no writer, the function throws `No writer found for box type`.
 
 A write omits the bytes of a source box that the reader stops before. See [Incomplete boxes](reading-boxes.md#incomplete-boxes).
 
@@ -45,14 +45,9 @@ const boxes: IsoBoxStreamable[] = [
 	},
 ];
 
-const byteArrays = writeIsoBoxes(boxes, createDefaultWriterConfig());
+const bytes = writeIsoBoxes(boxes, createDefaultWriterConfig());
 
-for (const byteArray of byteArrays) {
-	sourceBuffer.appendBuffer(byteArray);
-	await new Promise((resolve) =>
-		sourceBuffer.addEventListener("updateend", resolve, { once: true }),
-	);
-}
+sourceBuffer.appendBuffer(bytes);
 ```
 
 Each call of `createDefaultWriterConfig()` returns a new configuration object. A player can create the configuration once and pass it to every write.
@@ -84,19 +79,14 @@ const boxes: IsoBoxStreamable[] = [
 	},
 ];
 
-const byteArrays = writeIsoBoxes(boxes, {
+const bytes = writeIsoBoxes(boxes, {
 	writers: {
 		ftyp: writeFtyp,
 		mdat: writeMdat,
 	},
 });
 
-for (const byteArray of byteArrays) {
-	sourceBuffer.appendBuffer(byteArray);
-	await new Promise((resolve) =>
-		sourceBuffer.addEventListener("updateend", resolve, { once: true }),
-	);
-}
+sourceBuffer.appendBuffer(bytes);
 ```
 
 ## Streaming boxes
@@ -163,7 +153,7 @@ if (tfdt) {
 	tfdt.baseMediaDecodeTime += BigInt(90000);
 
 	// Write the whole segment. A player cannot append a lone tfdt box.
-	const byteArrays = writeIsoBoxes(boxes, { writers: { tfdt: writeTfdt } });
+	const bytes = writeIsoBoxes(boxes, { writers: { tfdt: writeTfdt } });
 }
 ```
 
@@ -187,40 +177,47 @@ A writer throws a `RangeError` for a `bigint` that does not fit the field. One e
 
 A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. See [Reporting a rounded value](reading-boxes.md#reporting-a-rounded-value) for the read of that value.
 
-A custom writer calls `writeWideUint` or `writeWideInt` on `IsoBoxWriteView`. Both methods take a `number` or a `bigint`, and the size of the field in bytes, 4 or 8:
+A custom writer takes a write cursor and a box. The writer calls the field functions `writeWideUint` or `writeWideInt`. Both functions take the cursor, a `number` or a `bigint`, and the size of the field in bytes, 4 or 8:
 
 ```typescript
 import {
-	IsoBoxWriteView,
+	beginIsoFullBox,
+	endIsoBox,
+	writeIsoBox,
+	writeWideUint,
+	type IsoBoxWriteCursor,
 	type IsoInt64,
 	type TrackFragmentBaseMediaDecodeTimeBox,
 } from "@svta/cml-iso-bmff";
 
-const writeTfdtWide = (box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>) => {
-	const size = box.version === 1 ? 8 : 4;
-	const writer = new IsoBoxWriteView("tfdt", 12 + size);
-	writer.writeFullBox(box.version, box.flags);
-	writer.writeWideUint(box.baseMediaDecodeTime, size);
-	return writer;
+const writeTfdtWide = (
+	cursor: IsoBoxWriteCursor,
+	box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>,
+) => {
+	const start = beginIsoFullBox(cursor, "tfdt", box.version, box.flags);
+	writeWideUint(cursor, box.baseMediaDecodeTime, box.version === 1 ? 8 : 4);
+	endIsoBox(cursor, start);
 };
+
+const bytes = writeIsoBox(
+	{ type: "tfdt", version: 1, flags: 0, baseMediaDecodeTime: BigInt("17900000000000000") },
+	{ writers: { tfdt: writeTfdtWide } },
+);
 ```
 
 `writeUint64` writes a 64-bit field from a `bigint` only:
 
 ```typescript
-import { IsoBoxWriteView } from "@svta/cml-iso-bmff";
+import { beginIsoFullBox, createIsoBoxWriteCursor, endIsoBox, writeUint64 } from "@svta/cml-iso-bmff";
 
-const writeTfdt64 = (baseMediaDecodeTime: bigint) => {
-	const writer = new IsoBoxWriteView("tfdt", 20);
-	writer.writeFullBox(1, 0);
-	writer.writeUint64(baseMediaDecodeTime);
-	return writer;
-};
+const cursor = createIsoBoxWriteCursor();
+const start = beginIsoFullBox(cursor, "tfdt", 1, 0);
 
-const tfdt = writeTfdt64(BigInt("17900000000000000"));
+writeUint64(cursor, BigInt("17900000000000000"));
+endIsoBox(cursor, start);
+
+const tfdt = cursor.bytes.slice(0, cursor.pos);
 ```
-
-The view implements `ArrayBufferView`. Pass the view to `writeIsoBoxes` in the same list as raw box objects.
 
 ## Writing a changed `mfra` box
 

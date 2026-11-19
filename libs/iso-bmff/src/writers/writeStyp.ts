@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.16.2
  *
+ * @param cursor - The write cursor
  * @param box - The `SegmentTypeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeStyp(box: SegmentTypeBox): IsoBoxWriteView {
+export function writeStyp(cursor: IsoBoxWriteCursor, box: SegmentTypeBox): void {
 	const headerSize = 8
 	const majorBrandSize = 4
 	const minorVersionSize = 4
@@ -27,5 +28,5 @@ export function writeStyp(box: SegmentTypeBox): IsoBoxWriteView {
 		writer.writeString(brand)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

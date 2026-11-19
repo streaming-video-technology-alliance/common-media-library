@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SubSampleInformationBox } from '../boxes/SubSampleInformationBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.7.7
  *
+ * @param cursor - The write cursor
  * @param box - The `SubSampleInformationBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeSubs(box: SubSampleInformationBox): IsoBoxWriteView {
+export function writeSubs(cursor: IsoBoxWriteCursor, box: SubSampleInformationBox): void {
 	const v1 = box.version === 1
 	const subsampleSizeBytes = v1 ? 4 : 2
 
@@ -45,5 +46,5 @@ export function writeSubs(box: SubSampleInformationBox): IsoBoxWriteView {
 		}
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

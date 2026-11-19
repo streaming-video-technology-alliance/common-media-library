@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import { encodeText } from '@svta/cml-utils'
 import type { HandlerBox } from '../boxes/HandlerBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
@@ -8,16 +10,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.4.3
  *
+ * @param cursor - The write cursor
  * @param box - The `HandlerBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeHdlr.test.ts#example}
  *
  * @public
  */
-export function writeHdlr(box: HandlerBox): IsoBoxWriteView {
+export function writeHdlr(cursor: IsoBoxWriteCursor, box: HandlerBox): void {
 	const nameBytes = encodeText(box.name)
 
 	const headerSize = 8
@@ -38,5 +39,5 @@ export function writeHdlr(box: HandlerBox): IsoBoxWriteView {
 	writer.writeBytes(nameBytes)
 	writer.writeUint(0, 1)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

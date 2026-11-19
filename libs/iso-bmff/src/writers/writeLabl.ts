@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import { encodeText } from '@svta/cml-utils'
 import type { LabelBox } from '../boxes/LabelBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -5,16 +7,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 /**
  * Write the `labl` box (`LabelBox`).
  *
+ * @param cursor - The write cursor
  * @param box - The `LabelBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeLabl.test.ts#example}
  *
  * @public
  */
-export function writeLabl(box: LabelBox): IsoBoxWriteView {
+export function writeLabl(cursor: IsoBoxWriteCursor, box: LabelBox): void {
 	const languageBytes = encodeText(box.language)
 	const labelBytes = encodeText(box.label)
 
@@ -34,5 +35,5 @@ export function writeLabl(box: LabelBox): IsoBoxWriteView {
 	writer.writeBytes(labelBytes)
 	writer.writeUint(0, 1)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

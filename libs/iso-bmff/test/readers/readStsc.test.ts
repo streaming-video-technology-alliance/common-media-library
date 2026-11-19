@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import { readFile } from 'node:fs/promises'
 import { rawBytes } from '../util/rawBytes.ts'
 import {
@@ -80,7 +81,7 @@ describe('readStsc', function () {
 				readers: { stsc: readStsc },
 			}).entries()) {
 				const original = originals[index]
-				const written = writeStsc(box)
+				const written = writeWith(writeStsc, box)
 
 				assert.deepStrictEqual(
 					new Uint8Array(written.buffer, written.byteOffset, written.byteLength),

@@ -1,4 +1,4 @@
-import { writeEmsg } from '@svta/cml-iso-bmff'
+import { writeEmsg, writeIsoBox } from '@svta/cml-iso-bmff'
 import { Tag } from 'cbor-x'
 import { Encoder } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
@@ -313,8 +313,8 @@ async function buildVsiEmsgBox(
 		segmentInfoBytes,
 		segmentInfoBytes,
 	)
-	return new Uint8Array(
-		writeEmsg({
+	return writeIsoBox(
+		{
 			type: 'emsg',
 			version: 0,
 			flags: 0,
@@ -326,7 +326,8 @@ async function buildVsiEmsgBox(
 			// The emsg version 0 id field has 32 bits.
 			id: Number(sequenceNumber) % 2 ** 32,
 			messageData: Uint8Array.from(CBOR.encode(verifiableSegmentInfo)),
-		}).buffer,
+		},
+		{ writers: { emsg: writeEmsg } },
 	)
 }
 
