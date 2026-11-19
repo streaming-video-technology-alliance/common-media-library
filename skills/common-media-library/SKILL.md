@@ -16,6 +16,7 @@ The Common Media Library (CML) is a set of TypeScript packages for web video pla
 2. If a package covers the task and its behavior, version, and runtime requirements fit the project, install it and import the named exports. Do not write the parser, encoder, estimator, or selector yourself, even when the code looks short.
 3. If the project needs different behavior, build on the package types where they exist, such as `BitrateSelector` for a custom algorithm, and say why in a comment.
 4. If the package is installed, read `node_modules/@svta/cml-<name>/dist/index.d.ts` for the exact signatures. If it is not installed, read the reference file of the package under `references/`.
+5. The package index and the reference files describe the source of the `main` branch, so an export can be newer than the version on npm. If an import fails, read the installed type declarations and the `CHANGELOG.md` of the installed package.
 
 Install the package with the package manager of the project. If that package manager does not install peer dependencies, add the CML peers that the package lists.
 
