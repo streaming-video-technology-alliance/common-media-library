@@ -27,7 +27,6 @@ describe('writeTrun', function () {
 			type: 'trun',
 			version: 1,
 			flags: 0x801,
-			sampleCount: 1,
 			dataOffset: -8,
 			samples: [{ sampleCompositionTimeOffset: -1 }],
 		})
@@ -48,7 +47,6 @@ describe('writeTrun', function () {
 			type: 'trun',
 			version: 0,
 			flags: 0x800,
-			sampleCount: 1,
 			samples: [{ sampleCompositionTimeOffset: 3_000_000_000 }],
 		})
 
@@ -56,5 +54,16 @@ describe('writeTrun', function () {
 			new Uint8Array(writer.buffer),
 			boxBytes('trun', [0, 1], [0x800, 3], [1, 4], [0xb2d05e00, 4]),
 		)
+	})
+
+	it('should write the length of samples as the sample count', function () {
+		const bytes = writeWith(writeTrun, {
+			type: 'trun',
+			version: 0,
+			flags: 0x100,
+			samples: [{ sampleDuration: 1 }, { sampleDuration: 2 }],
+		})
+
+		assert.deepStrictEqual(bytes, boxBytes('trun', [0, 1], [0x100, 3], [2, 4], [1, 4], [2, 4]))
 	})
 })

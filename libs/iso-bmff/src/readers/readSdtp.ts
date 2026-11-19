@@ -1,8 +1,9 @@
 import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readBytes } from '../cursor/readBytes.ts'
 
 /**
  * Read the `sdtp` box (`SampleDependencyTypeBox`).
@@ -14,11 +15,10 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readSdtp(cursor: IsoBoxReadCursor<IsoInt64>): SampleDependencyTypeBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'sdtp',
-		...view.readFullBox(),
-		sampleDependencyTable: view.readArray(UINT, 1, view.bytesRemaining),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		sampleDependencyTable: readBytes(cursor, cursor.end - cursor.pos),
 	}
 }

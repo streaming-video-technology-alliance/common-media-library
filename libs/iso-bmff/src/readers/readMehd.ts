@@ -1,7 +1,9 @@
 import type { MovieExtendsHeaderBox } from '../boxes/MovieExtendsHeaderBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readWideUint } from '../cursor/readWideUint.ts'
 
 /**
  * Read the `mehd` box (`MovieExtendsHeaderBox`).
@@ -18,14 +20,12 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 export function readMehd<V extends IsoInt64>(
 	cursor: IsoBoxReadCursor<V>,
 ): MovieExtendsHeaderBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
-	const { version, flags } = view.readFullBox()
+	const version = readUint8(cursor)
 
 	return {
 		type: 'mehd',
 		version,
-		flags,
-		fragmentDuration: view.readWideUint(version === 1 ? 8 : 4),
+		flags: readUint24(cursor),
+		fragmentDuration: readWideUint(cursor, version === 1 ? 8 : 4),
 	}
 }

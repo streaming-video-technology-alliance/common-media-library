@@ -47,7 +47,12 @@ const ROWS: Row[] = [
 		readers: { sdtp: readSdtp },
 		writers: { sdtp: writeSdtp },
 		bytes: boxBytes('sdtp', [0, 1], [0, 3], [0x10, 1], [0x28, 1], [0x04, 1]),
-		expected: { type: 'sdtp', version: 0, flags: 0, sampleDependencyTable: [0x10, 0x28, 0x04] },
+		expected: {
+			type: 'sdtp',
+			version: 0,
+			flags: 0,
+			sampleDependencyTable: new Uint8Array([0x10, 0x28, 0x04]),
+		},
 	},
 	{
 		type: 'skip',

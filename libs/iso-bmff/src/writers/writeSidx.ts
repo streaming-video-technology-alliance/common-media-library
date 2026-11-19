@@ -1,8 +1,11 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SegmentIndexBox } from '../boxes/SegmentIndexBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `sidx` box (`SegmentIndexBox`).
@@ -18,51 +21,32 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSidx(cursor: IsoBoxWriteCursor, box: SegmentIndexBox<IsoInt64>): void {
+	const { references } = box
 	const size = box.version === 0 ? 4 : 8
-	const headerSize = 8
-	const fullBoxSize = 4
-	const referenceIdSize = 4
-	const timescaleSize = 4
-	const earliestPresentationTimeSize = size
-	const firstOffsetSize = size
-	const reservedSize = 2
-	const referenceCountSize = 2
-	const referencesSize = box.references.length * 12 // 3 x 4 bytes per reference
-	const totalSize =
-		headerSize +
-		fullBoxSize +
-		referenceIdSize +
-		timescaleSize +
-		earliestPresentationTimeSize +
-		firstOffsetSize +
-		reservedSize +
-		referenceCountSize +
-		referencesSize
 
-	const writer = new IsoBoxWriteView('sidx', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.referenceId, 4)
-	writer.writeUint(box.timescale, 4)
-	writer.writeWideUint(box.earliestPresentationTime, size)
-	writer.writeWideUint(box.firstOffset, size)
-	writer.writeUint(0, 2)
-	writer.writeUint(box.references.length, 2)
-
-	for (const ref of box.references) {
-		// Pack referenceType (1 bit) + referencedSize (31 bits)
-		const reference = ((ref.referenceType & 0x1) << 31) | (ref.referencedSize & 0x7fffffff)
-		writer.writeUint(reference, 4)
-
-		writer.writeUint(ref.subsegmentDuration, 4)
-
-		// Pack startsWithSap (1 bit) + sapType (3 bits) + sapDeltaTime (28 bits)
-		const sap =
-			((ref.startsWithSap & 0x1) << 31) |
-			((ref.sapType & 0x7) << 28) |
-			(ref.sapDeltaTime & 0x0fffffff)
-		writer.writeUint(sap, 4)
+	if (references.length > 0xffff) {
+		throw new RangeError(`The sidx box has ${references.length} references, and the limit is 65535`)
 	}
 
-	writeLegacyView(cursor, writer)
+	const start = beginIsoFullBox(cursor, 'sidx', box.version, box.flags)
+
+	writeUint32(cursor, box.referenceId)
+	writeUint32(cursor, box.timescale)
+	writeWideUint(cursor, box.earliestPresentationTime, size)
+	writeWideUint(cursor, box.firstOffset, size)
+	writeUint16(cursor, 0)
+	writeUint16(cursor, references.length)
+
+	for (const ref of references) {
+		writeUint32(cursor, ((ref.referenceType & 0x1) << 31) | (ref.referencedSize & 0x7fffffff))
+		writeUint32(cursor, ref.subsegmentDuration)
+		writeUint32(
+			cursor,
+			((ref.startsWithSap & 0x1) << 31) |
+				((ref.sapType & 0x7) << 28) |
+				(ref.sapDeltaTime & 0x0fffffff),
+		)
+	}
+
+	endIsoBox(cursor, start)
 }
