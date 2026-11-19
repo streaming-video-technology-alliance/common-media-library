@@ -1,4 +1,4 @@
-import type { MediaBox, MediaBoxChild } from '../boxes/MediaBox.ts'
+import type { MediaBox } from '../boxes/MediaBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -23,6 +23,6 @@ export function readMdia<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Media
 
 	return {
 		type: 'mdia',
-		boxes: view.readBoxes<MediaBoxChild<V>>(),
+		boxes: view.readBoxes(),
 	}
 }

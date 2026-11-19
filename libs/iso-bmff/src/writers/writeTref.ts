@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { TrackReferenceBox } from '../boxes/TrackReferenceBox.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
@@ -13,6 +14,6 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * @public
  */
-export function writeTref(cursor: IsoBoxWriteCursor, box: TrackReferenceBox): void {
+export function writeTref(cursor: IsoBoxWriteCursor, box: TrackReferenceBox<IsoInt64>): void {
 	writeContainerBox(cursor, box)
 }

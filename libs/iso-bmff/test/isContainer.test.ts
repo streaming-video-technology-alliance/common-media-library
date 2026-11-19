@@ -9,7 +9,7 @@ import {
 	readIsoBoxes,
 	type AdditionalMetadataContainerBox,
 	type GroupsListBox,
-	type IsoBox,
+	type ParsedIsoBox,
 	type SubTrack,
 	type UserDataBox,
 } from './util/box.ts'
@@ -67,7 +67,7 @@ describe('isContainer', function () {
 		for (const box of readIsoBoxes(bytes, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'mfhd') {
+					if (isIsoBoxType('mfhd', child)) {
 						sequenceNumbers.push(child.sequenceNumber)
 					}
 				}
@@ -84,7 +84,7 @@ describe('isContainer', function () {
 		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', child)) {
 						times.push(child.baseMediaDecodeTime)
 					}
 				}
@@ -113,7 +113,7 @@ describe('isContainer', function () {
 		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', child)) {
 						expectType<Equal<typeof child.baseMediaDecodeTime, number>>(true)
 						assert.strictEqual(child.baseMediaDecodeTime, ROUNDED)
 						count++
@@ -132,7 +132,7 @@ describe('isContainer', function () {
 		)) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', child)) {
 						expectType<Equal<typeof child.baseMediaDecodeTime, bigint>>(true)
 						assert.strictEqual(child.baseMediaDecodeTime, EXACT)
 						count++
@@ -148,11 +148,11 @@ describe('isContainer', function () {
 		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isIsoBoxType('moov', box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'udta') {
+					if (isIsoBoxType('udta', child)) {
 						for (const inner of child.boxes) {
 							// @ts-expect-error a box has no field with this name
 							assert.strictEqual(inner.noSuchField, undefined)
-							if (inner.type === 'tfdt') {
+							if (isIsoBoxType('tfdt', inner)) {
 								expectType<Equal<typeof inner.baseMediaDecodeTime, number>>(true)
 								assert.strictEqual(inner.baseMediaDecodeTime, ROUNDED)
 								count++
@@ -173,9 +173,9 @@ describe('isContainer', function () {
 		)) {
 			if (isIsoBoxType('moov', box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'udta') {
+					if (isIsoBoxType('udta', child)) {
 						for (const inner of child.boxes) {
-							if (inner.type === 'tfdt') {
+							if (isIsoBoxType('tfdt', inner)) {
 								expectType<Equal<typeof inner.baseMediaDecodeTime, bigint>>(true)
 								assert.strictEqual(inner.baseMediaDecodeTime, EXACT)
 								count++
@@ -188,15 +188,17 @@ describe('isContainer', function () {
 		assert.strictEqual(count, 1)
 	})
 
-	it('types each child of the udta, grpl, strk, and meco boxes as IsoBox', function () {
-		expectType<Equal<UserDataBox['boxes'][number], IsoBox>>(true)
-		expectType<Equal<GroupsListBox['boxes'][number], IsoBox>>(true)
-		expectType<Equal<SubTrack['boxes'][number], IsoBox>>(true)
-		expectType<Equal<AdditionalMetadataContainerBox['boxes'][number], IsoBox>>(true)
+	it('types each child of the udta, grpl, strk, and meco boxes as ParsedIsoBox', function () {
+		expectType<Equal<UserDataBox['boxes'][number], ParsedIsoBox>>(true)
+		expectType<Equal<GroupsListBox['boxes'][number], ParsedIsoBox>>(true)
+		expectType<Equal<SubTrack['boxes'][number], ParsedIsoBox>>(true)
+		expectType<Equal<AdditionalMetadataContainerBox['boxes'][number], ParsedIsoBox>>(true)
 
-		expectType<Equal<UserDataBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
-		expectType<Equal<GroupsListBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
-		expectType<Equal<SubTrack<bigint>['boxes'][number], IsoBox<bigint>>>(true)
-		expectType<Equal<AdditionalMetadataContainerBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
+		expectType<Equal<UserDataBox<bigint>['boxes'][number], ParsedIsoBox<bigint>>>(true)
+		expectType<Equal<GroupsListBox<bigint>['boxes'][number], ParsedIsoBox<bigint>>>(true)
+		expectType<Equal<SubTrack<bigint>['boxes'][number], ParsedIsoBox<bigint>>>(true)
+		expectType<
+			Equal<AdditionalMetadataContainerBox<bigint>['boxes'][number], ParsedIsoBox<bigint>>
+		>(true)
 	})
 })

@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { beginIsoBox } from '../beginIsoBox.ts'
 import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
@@ -23,7 +24,7 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  */
 export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(
 	cursor: IsoBoxWriteCursor,
-	box: VisualSampleEntry<T>,
+	box: VisualSampleEntry<T, IsoInt64>,
 ): void {
 	const start = beginIsoBox(cursor, box.type)
 

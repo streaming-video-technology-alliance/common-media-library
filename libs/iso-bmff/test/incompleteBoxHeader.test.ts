@@ -19,7 +19,7 @@ type Tree = { type: string; boxes?: Tree[] }
 
 const ascii = (text: string): Uint8Array => new TextEncoder().encode(text)
 const read = (bytes: Uint8Array): Tree[] =>
-	readIsoBoxes(bytes, record(createDefaultReaderConfig<IsoInt64>())) as Tree[]
+	readIsoBoxes(bytes, record(createDefaultReaderConfig<IsoInt64>()))
 const size = (box: Tree | undefined): number | undefined => box && sourceOf(box).bytes.length
 const types = (boxes: Tree[] = []): string[] => boxes.map(box => box.type)
 

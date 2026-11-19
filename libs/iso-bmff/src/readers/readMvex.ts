@@ -1,4 +1,4 @@
-import type { MovieExtendsBox, MovieExtendsBoxChild } from '../boxes/MovieExtendsBox.ts'
+import type { MovieExtendsBox } from '../boxes/MovieExtendsBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -23,6 +23,6 @@ export function readMvex<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Movie
 
 	return {
 		type: 'mvex',
-		boxes: view.readBoxes<MovieExtendsBoxChild<V>>(),
+		boxes: view.readBoxes(),
 	}
 }

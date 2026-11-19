@@ -18,6 +18,6 @@ import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
  */
 export function createVisualSampleEntryReader<T extends IsoBoxType>(
 	type: T,
-): (cursor: IsoBoxReadCursor<IsoInt64>) => VisualSampleEntry<T> {
-	return (cursor: IsoBoxReadCursor<IsoInt64>) => readVisualSampleEntry<T>(type, cursor)
+): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => VisualSampleEntry<T, V> {
+	return <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => readVisualSampleEntry(type, cursor)
 }

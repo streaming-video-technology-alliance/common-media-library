@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
 import { writeAudioSampleEntry } from './writeAudioSampleEntry.ts'
@@ -12,6 +13,9 @@ import { writeAudioSampleEntry } from './writeAudioSampleEntry.ts'
  *
  * @public
  */
-export function writeMp4a(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<'mp4a'>): void {
+export function writeMp4a(
+	cursor: IsoBoxWriteCursor,
+	box: AudioSampleEntry<'mp4a', IsoInt64>,
+): void {
 	writeAudioSampleEntry(cursor, box)
 }

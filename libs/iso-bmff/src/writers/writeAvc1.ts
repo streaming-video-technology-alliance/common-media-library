@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import { writeVisualSampleEntry } from './writeVisualSampleEntry.ts'
@@ -12,6 +13,9 @@ import { writeVisualSampleEntry } from './writeVisualSampleEntry.ts'
  *
  * @public
  */
-export function writeAvc1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<'avc1'>): void {
+export function writeAvc1(
+	cursor: IsoBoxWriteCursor,
+	box: VisualSampleEntry<'avc1', IsoInt64>,
+): void {
 	writeVisualSampleEntry(cursor, box)
 }

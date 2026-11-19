@@ -1,4 +1,4 @@
-import type { MovieBox, MovieBoxChild } from '../boxes/MovieBox.ts'
+import type { MovieBox } from '../boxes/MovieBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -23,6 +23,6 @@ export function readMoov<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Movie
 
 	return {
 		type: 'moov',
-		boxes: view.readBoxes<MovieBoxChild<V>>(),
+		boxes: view.readBoxes(),
 	}
 }

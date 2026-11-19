@@ -12,7 +12,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readStsd(cursor: IsoBoxReadCursor<IsoInt64>): SampleDescriptionBox {
+export function readStsd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SampleDescriptionBox<V> {
 	const view = new IsoBoxReadView(cursor)
 
 	const { version, flags } = view.readFullBox()
@@ -23,6 +23,6 @@ export function readStsd(cursor: IsoBoxReadCursor<IsoInt64>): SampleDescriptionB
 		version,
 		flags,
 		entryCount,
-		boxes: view.readBoxes<SampleDescriptionBox['boxes'][number]>(entryCount),
+		boxes: view.readBoxes<SampleDescriptionBox<V>['boxes'][number]>(entryCount),
 	}
 }

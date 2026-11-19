@@ -1,4 +1,4 @@
-import type { MetaBox, MetaBoxChild } from '../boxes/MetaBox.ts'
+import type { MetaBox } from '../boxes/MetaBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -21,6 +21,6 @@ export function readMeta<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MetaB
 	return {
 		type: 'meta',
 		...view.readFullBox(),
-		boxes: view.readBoxes<MetaBoxChild<V>>(),
+		boxes: view.readBoxes(),
 	}
 }

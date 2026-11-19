@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { encodeText } from '@svta/cml-utils'
 import { beginIsoFullBox } from '../beginIsoFullBox.ts'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
@@ -22,7 +23,7 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  *
  * @public
  */
-export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox): void {
+export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox<IsoInt64>): void {
 	const { flags } = box
 	const start = beginIsoFullBox(cursor, 'prsl', box.version, flags)
 

@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SchemeInformationBox } from '../boxes/SchemeInformationBox.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
@@ -13,6 +14,6 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * @public
  */
-export function writeSchi(cursor: IsoBoxWriteCursor, box: SchemeInformationBox): void {
+export function writeSchi(cursor: IsoBoxWriteCursor, box: SchemeInformationBox<IsoInt64>): void {
 	writeContainerBox(cursor, box)
 }

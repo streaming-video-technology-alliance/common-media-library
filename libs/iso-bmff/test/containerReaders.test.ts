@@ -36,7 +36,7 @@ import {
 	type IsoBoxReadCursor,
 	type IsoBoxReader,
 	type IsoInt64,
-	type MovieBoxChild,
+	type ParsedIsoBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
@@ -150,7 +150,7 @@ describe('container readers', function () {
 		const boxes = readIsoBoxes(load('captions.mp4'), {
 			readers: { moov: readMoov, mvhd: readMvhd },
 		})
-		let children: MovieBoxChild[] = []
+		let children: ParsedIsoBox[] = []
 
 		for (const box of boxes) {
 			if (isIsoBoxType('moov', box)) {

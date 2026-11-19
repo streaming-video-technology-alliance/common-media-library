@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import { writeVisualSampleEntry } from './writeVisualSampleEntry.ts'
@@ -10,6 +11,9 @@ import { writeVisualSampleEntry } from './writeVisualSampleEntry.ts'
  *
  * @public
  */
-export function writeEncv(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<'encv'>): void {
+export function writeEncv(
+	cursor: IsoBoxWriteCursor,
+	box: VisualSampleEntry<'encv', IsoInt64>,
+): void {
 	writeVisualSampleEntry(cursor, box)
 }

@@ -7,11 +7,8 @@
 // @public
 export type AdditionalMetadataContainerBox<V extends IsoInt64 = number> = {
     type: "meco";
-    boxes: AdditionalMetadataContainerBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type AdditionalMetadataContainerBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export type AudioRenderingIndicationBox = FullBox & {
@@ -20,18 +17,14 @@ export type AudioRenderingIndicationBox = FullBox & {
 };
 
 // @public
-export type AudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType> = SampleEntry & {
+export type AudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType, V extends IsoInt64 = number> = SampleEntry<T, V> & {
     type: T;
     entryVersion?: number;
     channelCount: number;
     sampleSize: number;
     preDefined?: number;
     sampleRate: number;
-    boxes: AudioSampleEntryChild[];
 };
-
-// @public
-export type AudioSampleEntryChild = any;
 
 // @public
 export type AudioSampleEntryType = "mp4a" | "enca";
@@ -43,7 +36,7 @@ export function beginIsoBox(cursor: IsoBoxWriteCursor, type: string): number;
 export function beginIsoFullBox(cursor: IsoBoxWriteCursor, type: string, version: number, flags: number): number;
 
 // @public
-export type Box<T extends IsoBoxType = never> = {
+export type Box<T extends IsoBoxType> = {
     type: T;
 };
 
@@ -86,7 +79,7 @@ export type CompositionOffsetEntry = {
 export const CONTAINERS: string[];
 
 // @public
-export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (cursor: IsoBoxReadCursor<IsoInt64>) => AudioSampleEntry<T>;
+export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => AudioSampleEntry<T, V>;
 
 // @public
 export function createDefaultReaderConfig<V extends IsoInt64 = number>(...options: [V] extends [bigint] ? [options: {
@@ -119,7 +112,7 @@ export function createIsoBoxWriteCursor(config?: {
 }): IsoBoxWriteCursor;
 
 // @public
-export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (cursor: IsoBoxReadCursor<IsoInt64>) => VisualSampleEntry<T>;
+export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => VisualSampleEntry<T, V>;
 
 // @public
 export type DataEntryUrlBox = FullBox & {
@@ -135,29 +128,23 @@ export type DataEntryUrnBox = FullBox & {
 };
 
 // @public
-export type DataInformationBox = {
+export type DataInformationBox<V extends IsoInt64 = number> = {
     type: "dinf";
-    boxes: DataInformationBoxChild[];
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
-export type DataInformationBoxChild = DataReferenceBox;
-
-// @public
-export type DataReferenceBox = FullBox & {
+export type DataReferenceBox<V extends IsoInt64 = number> = FullBox & {
     type: "dref";
     entryCount: number;
-    boxes: (DataEntryUrlBox | DataEntryUrnBox)[];
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
 export type EditBox<V extends IsoInt64 = number> = {
     type: "edts";
-    boxes: EditBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type EditBoxChild<V extends IsoInt64 = number> = EditListBox<V>;
 
 // @public
 export type EditListBox<V extends IsoInt64 = number> = FullBox & {
@@ -252,11 +239,8 @@ export type FullBox = {
 // @public
 export type GroupsListBox<V extends IsoInt64 = number> = {
     type: "grpl";
-    boxes: GroupsListBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type GroupsListBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export type HandlerBox = FullBox & {
@@ -275,7 +259,13 @@ export type IdentifiedMediaDataBox = {
 };
 
 // @public
-export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]> | IsoRawBox>(box: T): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never] ? T & IsoBoxContainer<IsoInt64> : Extract<T, IsoBoxContainer<IsoInt64>>;
+export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]> | IsoRawBox>(box: T): box is [Extract<T, {
+    boxes: unknown;
+}>] extends [never] ? T & Extract<IsoBox<IsoInt64>, {
+    boxes: unknown;
+}> : Extract<T, {
+    boxes: unknown;
+}>;
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
@@ -293,25 +283,25 @@ export type IsoBoxContainer<V extends IsoInt64 = number> = IsoBoxContainerMap<V>
 
 // @public
 export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
-    dinf: DataInformationBox;
+    dinf: DataInformationBox<V>;
     edts: EditBox<V>;
     grpl: GroupsListBox<V>;
     mdia: MediaBox<V>;
     meco: AdditionalMetadataContainerBox<V>;
     mfra: MovieFragmentRandomAccessBox<V>;
-    minf: MediaInformationBox;
+    minf: MediaInformationBox<V>;
     moof: MovieFragmentBox<V>;
     moov: MovieBox<V>;
     mvex: MovieExtendsBox<V>;
-    schi: SchemeInformationBox;
-    sinf: ProtectionSchemeInfoBox;
-    stbl: SampleTableBox;
+    schi: SchemeInformationBox<V>;
+    sinf: ProtectionSchemeInfoBox<V>;
+    stbl: SampleTableBox<V>;
     strk: SubTrack<V>;
     traf: TrackFragmentBox<V>;
     trak: TrackBox<V>;
-    tref: TrackReferenceBox;
+    tref: TrackReferenceBox<V>;
     udta: UserDataBox<V>;
-    vttc: WebVttCueBox;
+    vttc: WebVttCueBox<V>;
 };
 
 // @public
@@ -320,27 +310,27 @@ export type IsoBoxData = ArrayBufferLike | ArrayBufferView;
 // @public
 export type IsoBoxMap<V extends IsoInt64 = number> = {
     ardi: AudioRenderingIndicationBox;
-    avc1: VisualSampleEntry<"avc1">;
-    avc2: VisualSampleEntry<"avc2">;
-    avc3: VisualSampleEntry<"avc3">;
-    avc4: VisualSampleEntry<"avc4">;
+    avc1: VisualSampleEntry<"avc1", V>;
+    avc2: VisualSampleEntry<"avc2", V>;
+    avc3: VisualSampleEntry<"avc3", V>;
+    avc4: VisualSampleEntry<"avc4", V>;
     co64: ChunkLargeOffsetBox;
     ctts: CompositionOffsetBox;
-    dinf: DataInformationBox;
-    dref: DataReferenceBox;
+    dinf: DataInformationBox<V>;
+    dref: DataReferenceBox<V>;
     edts: EditBox<V>;
     elng: ExtendedLanguageBox;
     elst: EditListBox<V>;
     emsg: EventMessageBox<V>;
-    enca: AudioSampleEntry<"enca">;
-    encv: VisualSampleEntry<"encv">;
+    enca: AudioSampleEntry<"enca", V>;
+    encv: VisualSampleEntry<"encv", V>;
     free: FreeSpaceBox<"free">;
     frma: OriginalFormatBox;
     ftyp: FileTypeBox;
     grpl: GroupsListBox<V>;
     hdlr: HandlerBox;
-    hev1: VisualSampleEntry<"hev1">;
-    hvc1: VisualSampleEntry<"hvc1">;
+    hev1: VisualSampleEntry<"hev1", V>;
+    hvc1: VisualSampleEntry<"hvc1", V>;
     iden: WebVttCueIdBox;
     imda: IdentifiedMediaDataBox;
     kind: KindBox;
@@ -354,30 +344,30 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     mfhd: MovieFragmentHeaderBox;
     mfra: MovieFragmentRandomAccessBox<V>;
     mfro: MovieFragmentRandomAccessOffsetBox;
-    minf: MediaInformationBox;
+    minf: MediaInformationBox<V>;
     moof: MovieFragmentBox<V>;
     moov: MovieBox<V>;
-    mp4a: AudioSampleEntry<"mp4a">;
+    mp4a: AudioSampleEntry<"mp4a", V>;
     mvex: MovieExtendsBox<V>;
     mvhd: MovieHeaderBox<V>;
     payl: WebVttCuePayloadBox;
     prft: ProducerReferenceTimeBox<V>;
-    prsl: PreselectionGroupBox;
+    prsl: PreselectionGroupBox<V>;
     pssh: ProtectionSystemSpecificHeaderBox;
-    schi: SchemeInformationBox;
+    schi: SchemeInformationBox<V>;
     schm: SchemeTypeBox;
     sdtp: SampleDependencyTypeBox;
     sidx: SegmentIndexBox<V>;
-    sinf: ProtectionSchemeInfoBox;
+    sinf: ProtectionSchemeInfoBox<V>;
     skip: FreeSpaceBox<"skip">;
     smhd: SoundMediaHeaderBox;
     ssix: SubsegmentIndexBox;
-    stbl: SampleTableBox;
+    stbl: SampleTableBox<V>;
     stco: ChunkOffsetBox;
     sthd: SubtitleMediaHeaderBox;
     strk: SubTrack<V>;
     stsc: SampleToChunkBox;
-    stsd: SampleDescriptionBox;
+    stsd: SampleDescriptionBox<V>;
     stss: SyncSampleBox;
     stsz: SampleSizeBox;
     sttg: WebVttSettingsBox;
@@ -392,7 +382,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     tkhd: TrackHeaderBox<V>;
     traf: TrackFragmentBox<V>;
     trak: TrackBox<V>;
-    tref: TrackReferenceBox;
+    tref: TrackReferenceBox<V>;
     trex: TrackExtendsBox;
     trun: TrackRunBox;
     udta: UserDataBox<V>;
@@ -400,7 +390,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     "urn ": DataEntryUrnBox;
     vlab: WebVttSourceLabelBox;
     vmhd: VideoMediaHeaderBox;
-    vttc: WebVttCueBox;
+    vttc: WebVttCueBox<V>;
     vttC: WebVttConfigurationBox;
     vtte: WebVttEmptySampleBox;
 };
@@ -457,7 +447,9 @@ export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxM
 // @public
 export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? 0 extends 1 & B ? B : [B] extends [{
         type: infer N extends keyof IsoBoxMap;
-    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
+    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : [B] extends [{
+        type: infer N extends string;
+    }] ? string extends N ? never : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
     type: R;
 }> : never) | IsoRawBox;
 
@@ -524,11 +516,8 @@ export type LabelBox = FullBox & {
 // @public
 export type MediaBox<V extends IsoInt64 = number> = {
     type: "mdia";
-    boxes: MediaBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type MediaBoxChild<V extends IsoInt64 = number> = MediaHeaderBox<V> | HandlerBox | MediaInformationBox;
 
 // @public
 export type MediaDataBox = {
@@ -548,40 +537,28 @@ export type MediaHeaderBox<V extends IsoInt64 = number> = FullBox & {
 };
 
 // @public
-export type MediaInformationBox = {
+export type MediaInformationBox<V extends IsoInt64 = number> = {
     type: "minf";
-    boxes: MediaInformationBoxChild[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type MediaInformationBoxChild = VideoMediaHeaderBox | SoundMediaHeaderBox | DataInformationBox | SampleTableBox | SubtitleMediaHeaderBox;
 
 // @public
 export type MetaBox<V extends IsoInt64 = number> = FullBox & {
     type: "meta";
-    boxes: MetaBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type MetaBoxChild<V extends IsoInt64 = number> = HandlerBox | DataInformationBox | GroupsListBox<V>;
 
 // @public
 export type MovieBox<V extends IsoInt64 = number> = {
     type: "moov";
-    boxes: MovieBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type MovieBoxChild<V extends IsoInt64 = number> = MovieHeaderBox<V> | TrackBox<V> | MovieExtendsBox<V> | UserDataBox<V>;
 
 // @public
 export type MovieExtendsBox<V extends IsoInt64 = number> = {
     type: "mvex";
-    boxes: MovieExtendsBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type MovieExtendsBoxChild<V extends IsoInt64 = number> = MovieExtendsHeaderBox<V> | TrackExtendsBox;
 
 // @public
 export type MovieExtendsHeaderBox<V extends IsoInt64 = number> = FullBox & {
@@ -592,11 +569,8 @@ export type MovieExtendsHeaderBox<V extends IsoInt64 = number> = FullBox & {
 // @public
 export type MovieFragmentBox<V extends IsoInt64 = number> = {
     type: "moof";
-    boxes: MovieFragmentBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type MovieFragmentBoxChild<V extends IsoInt64 = number> = MovieFragmentHeaderBox | TrackFragmentBox<V>;
 
 // @public
 export type MovieFragmentHeaderBox = FullBox & {
@@ -607,11 +581,8 @@ export type MovieFragmentHeaderBox = FullBox & {
 // @public
 export type MovieFragmentRandomAccessBox<V extends IsoInt64 = number> = {
     type: "mfra";
-    boxes: MovieFragmentRandomAccessBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type MovieFragmentRandomAccessBoxChild<V extends IsoInt64 = number> = TrackFragmentRandomAccessBox<V> | MovieFragmentRandomAccessOffsetBox;
 
 // @public
 export type MovieFragmentRandomAccessOffsetBox = FullBox & {
@@ -646,7 +617,7 @@ export type OriginalFormatBox = {
 export type ParsedIsoBox<V extends IsoInt64 = number> = IsoBox<V> | IsoRawBox;
 
 // @public
-export type PreselectionGroupBox = FullBox & {
+export type PreselectionGroupBox<V extends IsoInt64 = number> = FullBox & {
     type: "prsl";
     groupId: number;
     numEntitiesInGroup: number;
@@ -654,11 +625,8 @@ export type PreselectionGroupBox = FullBox & {
     preselectionTag?: string;
     selectionPriority?: number;
     interleavingTag?: string;
-    boxes: PreselectionGroupBoxChild[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type PreselectionGroupBoxChild = any;
 
 // @public
 export type ProducerReferenceTimeBox<V extends IsoInt64 = number> = FullBox & {
@@ -670,13 +638,10 @@ export type ProducerReferenceTimeBox<V extends IsoInt64 = number> = FullBox & {
 };
 
 // @public
-export type ProtectionSchemeInfoBox = {
+export type ProtectionSchemeInfoBox<V extends IsoInt64 = number> = {
     type: "sinf";
-    boxes: ProtectionSchemeInfoBoxChild[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type ProtectionSchemeInfoBoxChild = OriginalFormatBox | SchemeTypeBox | SchemeInformationBox;
 
 // @public
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
@@ -692,19 +657,19 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 export function readArdi(cursor: IsoBoxReadCursor<IsoInt64>): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntry<T extends IsoBoxType>(type: T, cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<T>;
+export function readAudioSampleEntry<T extends IsoBoxType, V extends IsoInt64>(type: T, cursor: IsoBoxReadCursor<V>): AudioSampleEntry<T, V>;
 
 // @public
-export function readAvc1(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc1">;
+export function readAvc1<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"avc1", V>;
 
 // @public
-export function readAvc2(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc2">;
+export function readAvc2<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"avc2", V>;
 
 // @public
-export function readAvc3(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc3">;
+export function readAvc3<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"avc3", V>;
 
 // @public
-export function readAvc4(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc4">;
+export function readAvc4<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"avc4", V>;
 
 // @public
 export function readBytes(cursor: IsoBoxReadCursor<IsoInt64>, length: number): Uint8Array;
@@ -716,10 +681,10 @@ export function readChildBoxes<V extends IsoInt64 = number>(cursor: IsoBoxReadCu
 export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetBox;
 
 // @public
-export function readDinf(cursor: IsoBoxReadCursor<IsoInt64>): DataInformationBox;
+export function readDinf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): DataInformationBox<V>;
 
 // @public
-export function readDref(cursor: IsoBoxReadCursor<IsoInt64>): DataReferenceBox;
+export function readDref<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): DataReferenceBox<V>;
 
 // @public
 export function readEdts<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EditBox<V>;
@@ -734,10 +699,10 @@ export function readElst<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EditL
 export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EventMessageBox<V>;
 
 // @public
-export function readEnca(cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<"enca">;
+export function readEnca<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): AudioSampleEntry<"enca", V>;
 
 // @public
-export function readEncv(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"encv">;
+export function readEncv<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"encv", V>;
 
 // @public
 export function readFourCc(cursor: IsoBoxReadCursor<IsoInt64>): string;
@@ -758,10 +723,10 @@ export function readGrpl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Group
 export function readHdlr(cursor: IsoBoxReadCursor<IsoInt64>): HandlerBox;
 
 // @public
-export function readHev1(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"hev1">;
+export function readHev1<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"hev1", V>;
 
 // @public
-export function readHvc1(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"hvc1">;
+export function readHvc1<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"hvc1", V>;
 
 // @public
 export function readIden(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCueIdBox;
@@ -826,7 +791,7 @@ export function readMfra<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Movie
 export function readMfro(cursor: IsoBoxReadCursor<IsoInt64>): MovieFragmentRandomAccessOffsetBox;
 
 // @public
-export function readMinf(cursor: IsoBoxReadCursor<IsoInt64>): MediaInformationBox;
+export function readMinf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MediaInformationBox<V>;
 
 // @public
 export function readMoof<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieFragmentBox<V>;
@@ -835,7 +800,7 @@ export function readMoof<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Movie
 export function readMoov<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieBox<V>;
 
 // @public
-export function readMp4a(cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<"mp4a">;
+export function readMp4a<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): AudioSampleEntry<"mp4a", V>;
 
 // @public
 export function readMvex<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieExtendsBox<V>;
@@ -850,13 +815,13 @@ export function readPayl(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCuePayloadBo
 export function readPrft<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): ProducerReferenceTimeBox<V>;
 
 // @public
-export function readPrsl(cursor: IsoBoxReadCursor<IsoInt64>): PreselectionGroupBox;
+export function readPrsl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): PreselectionGroupBox<V>;
 
 // @public
 export function readPssh(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSystemSpecificHeaderBox;
 
 // @public
-export function readSchi(cursor: IsoBoxReadCursor<IsoInt64>): SchemeInformationBox;
+export function readSchi<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SchemeInformationBox<V>;
 
 // @public
 export function readSchm(cursor: IsoBoxReadCursor<IsoInt64>): SchemeTypeBox;
@@ -868,7 +833,7 @@ export function readSdtp(cursor: IsoBoxReadCursor<IsoInt64>): SampleDependencyTy
 export function readSidx<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SegmentIndexBox<V>;
 
 // @public
-export function readSinf(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSchemeInfoBox;
+export function readSinf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): ProtectionSchemeInfoBox<V>;
 
 // @public
 export function readSkip(cursor: IsoBoxReadCursor<IsoInt64>): FreeSpaceBox<"skip">;
@@ -880,7 +845,7 @@ export function readSmhd(cursor: IsoBoxReadCursor<IsoInt64>): SoundMediaHeaderBo
 export function readSsix(cursor: IsoBoxReadCursor<IsoInt64>): SubsegmentIndexBox;
 
 // @public
-export function readStbl(cursor: IsoBoxReadCursor<IsoInt64>): SampleTableBox;
+export function readStbl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SampleTableBox<V>;
 
 // @public
 export function readStco(cursor: IsoBoxReadCursor<IsoInt64>): ChunkOffsetBox;
@@ -895,7 +860,7 @@ export function readStrk<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SubTr
 export function readStsc(cursor: IsoBoxReadCursor<IsoInt64>): SampleToChunkBox;
 
 // @public
-export function readStsd(cursor: IsoBoxReadCursor<IsoInt64>): SampleDescriptionBox;
+export function readStsd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SampleDescriptionBox<V>;
 
 // @public
 export function readStss(cursor: IsoBoxReadCursor<IsoInt64>): SyncSampleBox;
@@ -946,7 +911,7 @@ export function readTraf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Track
 export function readTrak<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackBox<V>;
 
 // @public
-export function readTref(cursor: IsoBoxReadCursor<IsoInt64>): TrackReferenceBox;
+export function readTref<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackReferenceBox<V>;
 
 // @public
 export function readTrex(cursor: IsoBoxReadCursor<IsoInt64>): TrackExtendsBox;
@@ -982,7 +947,7 @@ export function readUrn(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrnBox;
 export function readUtf8(cursor: IsoBoxReadCursor<IsoInt64>, length: number): string;
 
 // @public
-export function readVisualSampleEntry<T extends IsoBoxType>(type: T, cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<T>;
+export function readVisualSampleEntry<T extends IsoBoxType, V extends IsoInt64>(type: T, cursor: IsoBoxReadCursor<V>): VisualSampleEntry<T, V>;
 
 // @public
 export function readVlab(cursor: IsoBoxReadCursor<IsoInt64>): WebVttSourceLabelBox;
@@ -994,7 +959,7 @@ export function readVmhd(cursor: IsoBoxReadCursor<IsoInt64>): VideoMediaHeaderBo
 export function readVttC(cursor: IsoBoxReadCursor<IsoInt64>): WebVttConfigurationBox;
 
 // @public
-export function readVttc(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCueBox;
+export function readVttc<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): WebVttCueBox<V>;
 
 // @public
 export function readVtte(_cursor: IsoBoxReadCursor<IsoInt64>): WebVttEmptySampleBox;
@@ -1012,17 +977,17 @@ export type SampleDependencyTypeBox = FullBox & {
 };
 
 // @public
-export type SampleDescriptionBox<E extends SampleEntry | IsoRawBox = AudioSampleEntry | VisualSampleEntry | IsoRawBox> = FullBox & {
+export type SampleDescriptionBox<V extends IsoInt64 = number, E extends SampleEntry<IsoBoxType, V> | IsoRawBox = AudioSampleEntry<AudioSampleEntryType, V> | VisualSampleEntry<VisualSampleEntryType, V> | IsoRawBox> = FullBox & {
     type: "stsd";
     entryCount: number;
     boxes: E[];
 };
 
 // @public
-export type SampleEntry<T extends IsoBoxType = IsoBoxType, C = any> = {
+export type SampleEntry<T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = number> = {
     type: T;
     dataReferenceIndex: number;
-    boxes: C[];
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
@@ -1034,13 +999,10 @@ export type SampleSizeBox = FullBox & {
 };
 
 // @public
-export type SampleTableBox = {
+export type SampleTableBox<V extends IsoInt64 = number> = {
     type: "stbl";
-    boxes: SampleTableBoxChild[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type SampleTableBoxChild = SampleDescriptionBox | TimeToSampleBox | CompositionOffsetBox | SampleToChunkBox | SampleSizeBox | ChunkOffsetBox | SyncSampleBox | SampleDependencyTypeBox;
 
 // @public
 export type SampleToChunkBox = FullBox & {
@@ -1057,13 +1019,10 @@ export type SampleToChunkEntry = {
 };
 
 // @public
-export type SchemeInformationBox = {
+export type SchemeInformationBox<V extends IsoInt64 = number> = {
     type: "schi";
-    boxes: SchemeInformationBoxChild[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type SchemeInformationBoxChild = TrackEncryptionBox;
 
 // @public
 export type SchemeTypeBox = FullBox & {
@@ -1157,11 +1116,8 @@ export type SubtitleMediaHeaderBox = FullBox & {
 // @public
 export type SubTrack<V extends IsoInt64 = number> = {
     type: "strk";
-    boxes: SubTrackChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type SubTrackChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export type SyncSampleBox = FullBox & {
@@ -1186,11 +1142,8 @@ export type TimeToSampleEntry = {
 // @public
 export type TrackBox<V extends IsoInt64 = number> = {
     type: "trak";
-    boxes: TrackBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type TrackBoxChild<V extends IsoInt64 = number> = TrackHeaderBox<V> | TrackReferenceBox | EditBox<V> | MediaBox<V> | UserDataBox<V>;
 
 // @public
 export type TrackEncryptionBox = FullBox & {
@@ -1223,11 +1176,8 @@ export type TrackFragmentBaseMediaDecodeTimeBox<V extends IsoInt64 = number> = F
 // @public
 export type TrackFragmentBox<V extends IsoInt64 = number> = {
     type: "traf";
-    boxes: TrackFragmentBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type TrackFragmentBoxChild<V extends IsoInt64 = number> = TrackFragmentHeaderBox<V> | TrackFragmentBaseMediaDecodeTimeBox<V> | TrackRunBox | SubSampleInformationBox;
 
 // @public
 export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
@@ -1276,18 +1226,9 @@ export type TrackHeaderBox<V extends IsoInt64 = number> = FullBox & {
 };
 
 // @public
-export type TrackReferenceBox = {
+export type TrackReferenceBox<V extends IsoInt64 = number> = {
     type: "tref";
-    boxes: TrackReferenceBoxChild[];
-};
-
-// @public
-export type TrackReferenceBoxChild = TrackReferenceTypeBox;
-
-// @public
-export type TrackReferenceTypeBox = {
-    type: "tref";
-    trackIds: number[];
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
@@ -1327,11 +1268,8 @@ export type TypeBox<T extends "ftyp" | "styp"> = {
 // @public
 export type UserDataBox<V extends IsoInt64 = number> = {
     type: "udta";
-    boxes: UserDataBoxChild<V>[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type UserDataBoxChild<V extends IsoInt64 = number> = IsoBox<V>;
 
 // @public
 export type VideoMediaHeaderBox = FullBox & {
@@ -1341,7 +1279,7 @@ export type VideoMediaHeaderBox = FullBox & {
 };
 
 // @public
-export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType> = SampleEntry & {
+export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType, V extends IsoInt64 = number> = SampleEntry<T, V> & {
     type: T;
     preDefined1?: number;
     preDefined2?: number[];
@@ -1353,11 +1291,7 @@ export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType> = Sa
     compressorName: number[];
     depth: number;
     preDefined3?: number;
-    boxes: VisualSampleEntryChild[];
 };
-
-// @public
-export type VisualSampleEntryChild = any;
 
 // @public
 export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv";
@@ -1369,13 +1303,10 @@ export type WebVttConfigurationBox = {
 };
 
 // @public
-export type WebVttCueBox = {
+export type WebVttCueBox<V extends IsoInt64 = number> = {
     type: "vttc";
-    boxes: WebVttCueChild[];
+    boxes: ParsedIsoBox<V>[];
 };
-
-// @public
-export type WebVttCueChild = WebVttCueIdBox | WebVttCuePayloadBox;
 
 // @public
 export type WebVttCueIdBox = {
@@ -1410,19 +1341,19 @@ export type WebVttSourceLabelBox = {
 export function writeArdi(cursor: IsoBoxWriteCursor, box: AudioRenderingIndicationBox): void;
 
 // @public
-export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<T>): void;
+export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<T, IsoInt64>): void;
 
 // @public
-export function writeAvc1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc1">): void;
+export function writeAvc1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc1", IsoInt64>): void;
 
 // @public
-export function writeAvc2(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc2">): void;
+export function writeAvc2(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc2", IsoInt64>): void;
 
 // @public
-export function writeAvc3(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc3">): void;
+export function writeAvc3(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc3", IsoInt64>): void;
 
 // @public
-export function writeAvc4(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc4">): void;
+export function writeAvc4(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc4", IsoInt64>): void;
 
 // @public
 export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): void;
@@ -1434,10 +1365,10 @@ export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBo
 export function writeCtts(cursor: IsoBoxWriteCursor, box: CompositionOffsetBox): void;
 
 // @public
-export function writeDinf(cursor: IsoBoxWriteCursor, box: DataInformationBox): void;
+export function writeDinf(cursor: IsoBoxWriteCursor, box: DataInformationBox<IsoInt64>): void;
 
 // @public
-export function writeDref(cursor: IsoBoxWriteCursor, box: DataReferenceBox): void;
+export function writeDref(cursor: IsoBoxWriteCursor, box: DataReferenceBox<IsoInt64>): void;
 
 // @public
 export function writeEdts(cursor: IsoBoxWriteCursor, box: EditBox<IsoInt64>): void;
@@ -1452,10 +1383,10 @@ export function writeElst(cursor: IsoBoxWriteCursor, box: EditListBox<IsoInt64>)
 export function writeEmsg(cursor: IsoBoxWriteCursor, box: EventMessageBox<IsoInt64>): void;
 
 // @public
-export function writeEnca(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<"enca">): void;
+export function writeEnca(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<"enca", IsoInt64>): void;
 
 // @public
-export function writeEncv(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"encv">): void;
+export function writeEncv(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"encv", IsoInt64>): void;
 
 // @public
 export function writeFourCc(cursor: IsoBoxWriteCursor, value: string): void;
@@ -1476,10 +1407,10 @@ export function writeGrpl(cursor: IsoBoxWriteCursor, box: GroupsListBox<IsoInt64
 export function writeHdlr(cursor: IsoBoxWriteCursor, box: HandlerBox): void;
 
 // @public
-export function writeHev1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"hev1">): void;
+export function writeHev1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"hev1", IsoInt64>): void;
 
 // @public
-export function writeHvc1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"hvc1">): void;
+export function writeHvc1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"hvc1", IsoInt64>): void;
 
 // @public
 export function writeIden(cursor: IsoBoxWriteCursor, box: WebVttCueIdBox): void;
@@ -1536,7 +1467,7 @@ export function writeMfra(cursor: IsoBoxWriteCursor, box: MovieFragmentRandomAcc
 export function writeMfro(cursor: IsoBoxWriteCursor, box: MovieFragmentRandomAccessOffsetBox): void;
 
 // @public
-export function writeMinf(cursor: IsoBoxWriteCursor, box: MediaInformationBox): void;
+export function writeMinf(cursor: IsoBoxWriteCursor, box: MediaInformationBox<IsoInt64>): void;
 
 // @public
 export function writeMoof(cursor: IsoBoxWriteCursor, box: MovieFragmentBox<IsoInt64>): void;
@@ -1545,7 +1476,7 @@ export function writeMoof(cursor: IsoBoxWriteCursor, box: MovieFragmentBox<IsoIn
 export function writeMoov(cursor: IsoBoxWriteCursor, box: MovieBox<IsoInt64>): void;
 
 // @public
-export function writeMp4a(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<"mp4a">): void;
+export function writeMp4a(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<"mp4a", IsoInt64>): void;
 
 // @public
 export function writeMvex(cursor: IsoBoxWriteCursor, box: MovieExtendsBox<IsoInt64>): void;
@@ -1560,13 +1491,13 @@ export function writePayl(cursor: IsoBoxWriteCursor, box: WebVttCuePayloadBox): 
 export function writePrft(cursor: IsoBoxWriteCursor, box: ProducerReferenceTimeBox<IsoInt64>): void;
 
 // @public
-export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox): void;
+export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox<IsoInt64>): void;
 
 // @public
 export function writePssh(cursor: IsoBoxWriteCursor, box: ProtectionSystemSpecificHeaderBox): void;
 
 // @public
-export function writeSchi(cursor: IsoBoxWriteCursor, box: SchemeInformationBox): void;
+export function writeSchi(cursor: IsoBoxWriteCursor, box: SchemeInformationBox<IsoInt64>): void;
 
 // @public
 export function writeSchm(cursor: IsoBoxWriteCursor, box: SchemeTypeBox): void;
@@ -1578,7 +1509,7 @@ export function writeSdtp(cursor: IsoBoxWriteCursor, box: SampleDependencyTypeBo
 export function writeSidx(cursor: IsoBoxWriteCursor, box: SegmentIndexBox<IsoInt64>): void;
 
 // @public
-export function writeSinf(cursor: IsoBoxWriteCursor, box: ProtectionSchemeInfoBox): void;
+export function writeSinf(cursor: IsoBoxWriteCursor, box: ProtectionSchemeInfoBox<IsoInt64>): void;
 
 // @public
 export function writeSkip(cursor: IsoBoxWriteCursor, box: FreeSpaceBox<"skip">): void;
@@ -1590,7 +1521,7 @@ export function writeSmhd(cursor: IsoBoxWriteCursor, box: SoundMediaHeaderBox): 
 export function writeSsix(cursor: IsoBoxWriteCursor, box: SubsegmentIndexBox): void;
 
 // @public
-export function writeStbl(cursor: IsoBoxWriteCursor, box: SampleTableBox): void;
+export function writeStbl(cursor: IsoBoxWriteCursor, box: SampleTableBox<IsoInt64>): void;
 
 // @public
 export function writeStco(cursor: IsoBoxWriteCursor, box: ChunkOffsetBox): void;
@@ -1605,7 +1536,7 @@ export function writeStrk(cursor: IsoBoxWriteCursor, box: SubTrack<IsoInt64>): v
 export function writeStsc(cursor: IsoBoxWriteCursor, box: SampleToChunkBox): void;
 
 // @public
-export function writeStsd(cursor: IsoBoxWriteCursor, box: SampleDescriptionBox): void;
+export function writeStsd(cursor: IsoBoxWriteCursor, box: SampleDescriptionBox<IsoInt64>): void;
 
 // @public
 export function writeStss(cursor: IsoBoxWriteCursor, box: SyncSampleBox): void;
@@ -1656,7 +1587,7 @@ export function writeTraf(cursor: IsoBoxWriteCursor, box: TrackFragmentBox<IsoIn
 export function writeTrak(cursor: IsoBoxWriteCursor, box: TrackBox<IsoInt64>): void;
 
 // @public
-export function writeTref(cursor: IsoBoxWriteCursor, box: TrackReferenceBox): void;
+export function writeTref(cursor: IsoBoxWriteCursor, box: TrackReferenceBox<IsoInt64>): void;
 
 // @public
 export function writeTrex(cursor: IsoBoxWriteCursor, box: TrackExtendsBox): void;
@@ -1692,7 +1623,7 @@ export function writeUrn(cursor: IsoBoxWriteCursor, box: DataEntryUrnBox): void;
 export function writeUtf8(cursor: IsoBoxWriteCursor, value: string): void;
 
 // @public
-export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<T>): void;
+export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<T, IsoInt64>): void;
 
 // @public
 export function writeVlab(cursor: IsoBoxWriteCursor, box: WebVttSourceLabelBox): void;
@@ -1704,7 +1635,7 @@ export function writeVmhd(cursor: IsoBoxWriteCursor, box: VideoMediaHeaderBox): 
 export function writeVttC(cursor: IsoBoxWriteCursor, box: WebVttConfigurationBox): void;
 
 // @public
-export function writeVttc(cursor: IsoBoxWriteCursor, box: WebVttCueBox): void;
+export function writeVttc(cursor: IsoBoxWriteCursor, box: WebVttCueBox<IsoInt64>): void;
 
 // @public
 export function writeVtte(cursor: IsoBoxWriteCursor, _box: WebVttEmptySampleBox): void;

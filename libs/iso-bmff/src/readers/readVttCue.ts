@@ -1,4 +1,4 @@
-import type { WebVttCueBox, WebVttCueChild } from '../boxes/WebVttCueBox.ts'
+import type { WebVttCueBox } from '../boxes/WebVttCueBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -15,11 +15,11 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readVttc(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCueBox {
+export function readVttc<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): WebVttCueBox<V> {
 	const view = new IsoBoxReadView(cursor)
 
 	return {
 		type: 'vttc',
-		boxes: view.readBoxes<WebVttCueChild>(),
+		boxes: view.readBoxes(),
 	}
 }

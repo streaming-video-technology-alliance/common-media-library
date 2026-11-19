@@ -83,27 +83,27 @@ import type { IsoInt64 } from './IsoInt64.ts'
  */
 export type IsoBoxMap<V extends IsoInt64 = number> = {
 	ardi: AudioRenderingIndicationBox
-	avc1: VisualSampleEntry<'avc1'>
-	avc2: VisualSampleEntry<'avc2'>
-	avc3: VisualSampleEntry<'avc3'>
-	avc4: VisualSampleEntry<'avc4'>
+	avc1: VisualSampleEntry<'avc1', V>
+	avc2: VisualSampleEntry<'avc2', V>
+	avc3: VisualSampleEntry<'avc3', V>
+	avc4: VisualSampleEntry<'avc4', V>
 	co64: ChunkLargeOffsetBox
 	ctts: CompositionOffsetBox
-	dinf: DataInformationBox
-	dref: DataReferenceBox
+	dinf: DataInformationBox<V>
+	dref: DataReferenceBox<V>
 	edts: EditBox<V>
 	elng: ExtendedLanguageBox
 	elst: EditListBox<V>
 	emsg: EventMessageBox<V>
-	enca: AudioSampleEntry<'enca'>
-	encv: VisualSampleEntry<'encv'>
+	enca: AudioSampleEntry<'enca', V>
+	encv: VisualSampleEntry<'encv', V>
 	free: FreeSpaceBox<'free'>
 	frma: OriginalFormatBox
 	ftyp: FileTypeBox
 	grpl: GroupsListBox<V>
 	hdlr: HandlerBox
-	hev1: VisualSampleEntry<'hev1'>
-	hvc1: VisualSampleEntry<'hvc1'>
+	hev1: VisualSampleEntry<'hev1', V>
+	hvc1: VisualSampleEntry<'hvc1', V>
 	iden: WebVttCueIdBox
 	imda: IdentifiedMediaDataBox
 	kind: KindBox
@@ -117,30 +117,30 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	mfhd: MovieFragmentHeaderBox
 	mfra: MovieFragmentRandomAccessBox<V>
 	mfro: MovieFragmentRandomAccessOffsetBox
-	minf: MediaInformationBox
+	minf: MediaInformationBox<V>
 	moof: MovieFragmentBox<V>
 	moov: MovieBox<V>
-	mp4a: AudioSampleEntry<'mp4a'>
+	mp4a: AudioSampleEntry<'mp4a', V>
 	mvex: MovieExtendsBox<V>
 	mvhd: MovieHeaderBox<V>
 	payl: WebVttCuePayloadBox
 	prft: ProducerReferenceTimeBox<V>
-	prsl: PreselectionGroupBox
+	prsl: PreselectionGroupBox<V>
 	pssh: ProtectionSystemSpecificHeaderBox
-	schi: SchemeInformationBox
+	schi: SchemeInformationBox<V>
 	schm: SchemeTypeBox
 	sdtp: SampleDependencyTypeBox
 	sidx: SegmentIndexBox<V>
-	sinf: ProtectionSchemeInfoBox
+	sinf: ProtectionSchemeInfoBox<V>
 	skip: FreeSpaceBox<'skip'>
 	smhd: SoundMediaHeaderBox
 	ssix: SubsegmentIndexBox
-	stbl: SampleTableBox
+	stbl: SampleTableBox<V>
 	stco: ChunkOffsetBox
 	sthd: SubtitleMediaHeaderBox
 	strk: SubTrack<V>
 	stsc: SampleToChunkBox
-	stsd: SampleDescriptionBox
+	stsd: SampleDescriptionBox<V>
 	stss: SyncSampleBox
 	stsz: SampleSizeBox
 	sttg: WebVttSettingsBox
@@ -155,7 +155,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	tkhd: TrackHeaderBox<V>
 	traf: TrackFragmentBox<V>
 	trak: TrackBox<V>
-	tref: TrackReferenceBox
+	tref: TrackReferenceBox<V>
 	trex: TrackExtendsBox
 	trun: TrackRunBox
 	udta: UserDataBox<V>
@@ -163,7 +163,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	'urn ': DataEntryUrnBox
 	vlab: WebVttSourceLabelBox
 	vmhd: VideoMediaHeaderBox
-	vttc: WebVttCueBox
+	vttc: WebVttCueBox<V>
 	vttC: WebVttConfigurationBox
 	vtte: WebVttEmptySampleBox
 }

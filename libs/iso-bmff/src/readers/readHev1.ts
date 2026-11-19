@@ -12,6 +12,8 @@ import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
  *
  * @public
  */
-export function readHev1(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<'hev1'> {
+export function readHev1<V extends IsoInt64>(
+	cursor: IsoBoxReadCursor<V>,
+): VisualSampleEntry<'hev1', V> {
 	return readVisualSampleEntry('hev1', cursor)
 }

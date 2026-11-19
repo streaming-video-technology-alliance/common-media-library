@@ -1,20 +1,5 @@
-import type { DataInformationBox } from './DataInformationBox.ts'
-import type { SampleTableBox } from './SampleTableBox.ts'
-import type { SoundMediaHeaderBox } from './SoundMediaHeaderBox.ts'
-import type { SubtitleMediaHeaderBox } from './SubtitleMediaHeaderBox.ts'
-import type { VideoMediaHeaderBox } from './VideoMediaHeaderBox.ts'
-
-/**
- * Child boxes of Media Information Box
- *
- * @public
- */
-export type MediaInformationBoxChild =
-	| VideoMediaHeaderBox
-	| SoundMediaHeaderBox
-	| DataInformationBox
-	| SampleTableBox
-	| SubtitleMediaHeaderBox
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 
 /**
  * Media Information Box (`minf`).
@@ -23,7 +8,7 @@ export type MediaInformationBoxChild =
  *
  * @public
  */
-export type MediaInformationBox = {
+export type MediaInformationBox<V extends IsoInt64 = number> = {
 	type: 'minf'
-	boxes: MediaInformationBoxChild[]
+	boxes: ParsedIsoBox<V>[]
 }

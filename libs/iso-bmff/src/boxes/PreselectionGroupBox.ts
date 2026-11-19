@@ -1,12 +1,6 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { FullBox } from './FullBox.ts'
-
-// TODO: Find documentation on what children are allowed
-/**
- * Child boxes of Preselection Group Box
- *
- * @public
- */
-export type PreselectionGroupBoxChild = any
 
 /**
  * Preselection Group Box (`prsl`).
@@ -15,7 +9,7 @@ export type PreselectionGroupBoxChild = any
  *
  * @public
  */
-export type PreselectionGroupBox = FullBox & {
+export type PreselectionGroupBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'prsl'
 
 	/** Group ID */
@@ -30,5 +24,5 @@ export type PreselectionGroupBox = FullBox & {
 	preselectionTag?: string
 	selectionPriority?: number
 	interleavingTag?: string
-	boxes: PreselectionGroupBoxChild[]
+	boxes: ParsedIsoBox<V>[]
 }

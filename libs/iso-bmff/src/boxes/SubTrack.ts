@@ -1,12 +1,5 @@
-import type { IsoBox } from '../IsoBox.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-
-/**
- * Child boxes of Sub Track Box
- *
- * @public
- */
-export type SubTrackChild<V extends IsoInt64 = number> = IsoBox<V>
 
 /**
  * Sub Track Box (`strk`).
@@ -17,5 +10,5 @@ export type SubTrackChild<V extends IsoInt64 = number> = IsoBox<V>
  */
 export type SubTrack<V extends IsoInt64 = number> = {
 	type: 'strk'
-	boxes: SubTrackChild<V>[]
+	boxes: ParsedIsoBox<V>[]
 }

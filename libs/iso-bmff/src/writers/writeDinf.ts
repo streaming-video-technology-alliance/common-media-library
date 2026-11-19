@@ -1,3 +1,4 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { DataInformationBox } from '../boxes/DataInformationBox.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
@@ -13,6 +14,6 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * @public
  */
-export function writeDinf(cursor: IsoBoxWriteCursor, box: DataInformationBox): void {
+export function writeDinf(cursor: IsoBoxWriteCursor, box: DataInformationBox<IsoInt64>): void {
 	writeContainerBox(cursor, box)
 }

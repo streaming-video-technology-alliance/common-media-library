@@ -1,7 +1,4 @@
-import type {
-	SchemeInformationBox,
-	SchemeInformationBoxChild,
-} from '../boxes/SchemeInformationBox.ts'
+import type { SchemeInformationBox } from '../boxes/SchemeInformationBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
@@ -18,11 +15,11 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readSchi(cursor: IsoBoxReadCursor<IsoInt64>): SchemeInformationBox {
+export function readSchi<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SchemeInformationBox<V> {
 	const view = new IsoBoxReadView(cursor)
 
 	return {
 		type: 'schi',
-		boxes: view.readBoxes<SchemeInformationBoxChild>(),
+		boxes: view.readBoxes(),
 	}
 }

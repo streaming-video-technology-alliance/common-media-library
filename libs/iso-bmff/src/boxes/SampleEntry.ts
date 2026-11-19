@@ -1,3 +1,5 @@
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
 /**
@@ -7,8 +9,8 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  *
  * @public
  */
-export type SampleEntry<T extends IsoBoxType = IsoBoxType, C = any> = {
+export type SampleEntry<T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = number> = {
 	type: T
 	dataReferenceIndex: number
-	boxes: C[]
+	boxes: ParsedIsoBox<V>[]
 }
