@@ -217,6 +217,23 @@ describe('createIsoBoxReadableStream', function () {
 		deepStrictEqual(chunks, [0, 1, 2])
 	})
 
+	it('should keep the bytes of a large chunk after the next read', async function () {
+		const large = new Uint8Array(4096).fill(0xaa)
+		const small = new Uint8Array([0, 0, 0, 9, 0x66, 0x72, 0x65, 0x65, 0xbb])
+		const chunks: Uint8Array[] = []
+
+		for await (const data of createIsoBoxReadableStream([large, small])) {
+			chunks.push(data)
+		}
+
+		strictEqual(chunks[0].length, 4096)
+		strictEqual(
+			chunks[0].every(byte => byte === 0xaa),
+			true,
+		)
+		deepStrictEqual(Array.from(chunks[1]), Array.from(small))
+	})
+
 	it('should reject the first read for a first box with no writer', async function () {
 		const box: IsoBoxStreamable = { type: 'meta', version: 0, flags: 0, boxes: [] }
 		const reader = createIsoBoxReadableStream([box], { writers: {} }).getReader()
