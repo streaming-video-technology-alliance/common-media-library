@@ -8,8 +8,8 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * Map of each box type to the reader of that box.
  *
  * The map lists the known box types for completion. A reader under the key of another known box type is a compile error.
- * A custom key takes any reader. The index signature takes the type argument as `never` and declares the reader with a method signature,
- * so a map of known readers stays assignable to the map type after a spread. The keys `url` and `urn` find the readers of `'url '` and `'urn '`.
+ * A custom key takes any reader. The index signature declares the reader with a method signature and takes the type argument as `never`.
+ * A spread of a map of known readers stays assignable to the map type. The keys `url` and `urn` find the readers of `'url '` and `'urn '`.
  *
  * @public
  */

@@ -527,3 +527,4 @@ Decided on 2026-11-18:
 Amended on 2026-11-18, by the review of phase 2 ([#729](https://github.com/streaming-video-technology-alliance/common-media-library/pull/729)):
 
 - **Result type rule 1.** The result types of a readers map apply only to the top level of the result of `readIsoBoxes`. The element type of every `boxes` field is `ParsedIsoBox<V>`, the built-in box types and `IsoRawBox`. A child with a custom reader has that type too. Code that reads such a child casts it to the result type of its reader. Box types that are generic in the element type of `boxes` would change every box type with child boxes.
+- **Changes to accepted RFCs.** The table has no row for the container readers. A container reader of the [container RFC](iso-bmff-container-readers-writers.md) takes a read cursor in place of an `IsoBoxReadView`. The amendment of that RFC states the change.

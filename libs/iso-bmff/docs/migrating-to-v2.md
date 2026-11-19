@@ -10,7 +10,7 @@ Version 2.0.0 replaces the classes `IsoBoxReadView` and `IsoBoxWriteView` with t
 The guide uses two terms:
 
 - A **box object** is an object with a `type` field and the fields of the box, such as the result of `readTfdt`.
-- A **raw box** is the result of `readIsoBoxes` for a box with no reader: `{ type, bytes, headerSize }`.
+- A **raw box** is the result of `readIsoBoxes` for a box with no reader and a type outside `CONTAINERS`: `{ type, bytes, headerSize }`.
 
 The compiler reports most changes. The tables in this guide list each change and its replacement.
 
@@ -18,7 +18,7 @@ The compiler reports most changes. The tables in this guide list each change and
 
 `readIsoBoxes` keeps its arguments. Its result changes:
 
-- A box with no reader is a raw box. `bytes` is the complete box, with its header. The body is `box.bytes.subarray(box.headerSize)`. The bytes share memory with the input.
+- A box with no reader and a type outside `CONTAINERS` is a raw box. `bytes` is the complete box, with its header. The body is `box.bytes.subarray(box.headerSize)`. The bytes share memory with the input.
 - A box object has only `type` and its fields. The fields `view`, `size`, `largesize`, and `usertype` do not exist.
 - A test of `box.type` does not exclude a raw box, because a raw box can have any type. Narrow a box with `isIsoBoxType`.
 - The result types of a custom readers map apply only to the boxes at the top level. A child in a `boxes` field has the type `ParsedIsoBox`. Cast a child with a custom reader to the result type of that reader.
@@ -74,6 +74,7 @@ The table shows the replacement for each member of `IsoBoxReadView`. A method wi
 
 | `IsoBoxReadView` member | Version 2.0.0 |
 |---|---|
+| `new IsoBoxReadView(raw, config)` | `createIsoBoxReadCursor(raw, config)` |
 | `view.readUint(1)`, `view.readUint(2)`, `view.readUint(3)`, `view.readUint(4)` | `readUint8(cursor)`, `readUint16(cursor)`, `readUint24(cursor)`, `readUint32(cursor)` |
 | `view.readUint(8)` | `readWideUint(cursor, 8)` |
 | `view.readInt(1)`, `view.readInt(2)`, `view.readInt(4)` | `readInt8(cursor)`, `readInt16(cursor)`, `readInt32(cursor)` |
@@ -82,7 +83,8 @@ The table shows the replacement for each member of `IsoBoxReadView`. A method wi
 | `view.readTemplate(2)`, `view.readTemplate(4)` | `readTemplate16(cursor)`, `readTemplate32(cursor)` |
 | `view.readString(4)` for a four-character code | `readFourCc(cursor)` |
 | `view.readUtf8(size)` | `readUtf8(cursor, size)` |
-| `view.readUtf8(-1)`, `view.readString(-1)` | `readTerminatedUtf8(cursor)` |
+| `view.readString(size)` for other sizes | `readUtf8(cursor, size)`. `readString` gave one character for each byte, so a byte above 0x7F now decodes as UTF-8. |
+| `view.readUtf8(-1)`, `view.readString(-1)` | `readTerminatedUtf8(cursor)`. For `readString`, a byte above 0x7F now decodes as UTF-8. |
 | `view.readUtf8()` | `readUtf8(cursor, cursor.end - cursor.pos)` |
 | `view.readData(size)` | `readBytes(cursor, size)` |
 | `view.readData(-1)` | `readBytes(cursor, cursor.end - cursor.pos)` |
@@ -90,10 +92,12 @@ The table shows the replacement for each member of `IsoBoxReadView`. A method wi
 | `view.readArray(...)`, `view.readEntries(...)` | A loop in the reader |
 | `view.readBoxes()` | `readChildBoxes(cursor)` |
 | `view.readBoxes(count)` | `readChildBoxes(cursor, count)` |
-| `view.readBox()` | `nextIsoBox(cursor)` or `readChildBoxes(cursor, 1)` |
-| `for (const box of view)` | A loop with `nextIsoBox(cursor)` |
+| `view.readBoxes(-1)` | `readChildBoxes(cursor)`. A negative count now throws a `RangeError`. |
+| `view.readBox()` | `readChildBoxes(cursor, 1)[0]`. To skip the box, `nextIsoBox(cursor)` returns its type and moves past it. |
+| `for (const box of view)` | `for (const box of readChildBoxes(cursor))` |
 | `view.jump(size)` | `cursor.pos += size` |
 | `view.bytesRemaining` | `cursor.end - cursor.pos` |
+| `view.done` | `cursor.pos >= cursor.end`. Before a truncated box, `nextIsoBox(cursor)` returns `null`. |
 | `view.cursor` | `cursor.pos - cursor.start` |
 | `view.slice(offset, size)` | `readBytes`, then `createIsoBoxReadCursor` |
 | `view.buffer`, `view.byteOffset`, `view.byteLength` | `cursor.view.buffer`, `cursor.view.byteOffset`, `cursor.view.byteLength` |
@@ -242,6 +246,6 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `SampleDescriptionBox<E>` | `SampleDescriptionBox<V, E>` |
 | `Box` with no type argument | `Box<"abcd">` for one box type, or `IsoBox` |
 | A reader result with `type: string` adds a member to the result type | Give the `type` field a literal type, such as `"abcd" as const` |
-| `IsoBoxReader<B, T>`, with the box type `T` as the second parameter | `IsoBoxReader<B, V>`, with the type `V` of the 64-bit fields as the second parameter. `B` has a `type` field. |
+| `IsoBoxReader<B, T, V>`, with the box type `T` as the second parameter | `IsoBoxReader<B, V>`, with the type `V` of the 64-bit fields as the second parameter. Replace `IsoBoxReader<MyBox, 'abcd', bigint>` with `IsoBoxReader<MyBox, bigint>`. `B` has a `type` field. |
 | `IsoBoxWriter<B>` returns an `ArrayBufferView` | `IsoBoxWriter<B>` takes the cursor and the box, and returns nothing |
 | `IsoBoxReaderMap` and `IsoBoxWriterMap` accept a function under any key | A reader or a writer under the key of another known box type is a compile error |

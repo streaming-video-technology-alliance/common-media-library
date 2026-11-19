@@ -9,7 +9,7 @@ The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable it
 
 - Box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
-- Boxes that `readIsoBoxes` returns. A box with no reader is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
+- Boxes that `readIsoBoxes` returns. A box with no reader and a type outside `CONTAINERS` is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
 
 If you provide box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space. The keys `url` and `urn` also find the writers of those boxes.
 

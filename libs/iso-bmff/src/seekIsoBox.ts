@@ -10,11 +10,12 @@ import type { IsoInt64 } from './IsoInt64.ts'
 /**
  * Finds a box by its path and returns a read cursor for that box. The function decodes no other box.
  *
- * The function treats the body of each box in the path as a list of boxes, and compares the type of each box with the path.
- * The cursor of the result has `start` at the first byte of the box header, `pos` at the first byte after the header, and `end` after the box.
+ * The function treats the body of each box in the path as a list of boxes. It compares the type of each box with the path.
+ * In the cursor of the result, `start` is the first byte of the box header. `pos` is the first byte after the header, and `end` is the first byte after the box.
  * For a `uuid` box, `pos` is the first byte of `usertype`.
  *
- * The function knows no box type. For a box with fields before its child boxes, such as `meta` or `stsd`, move `pos` past the fields and call the function again with that cursor.
+ * The function knows no box type. A box such as `meta` or `stsd` has fields before its child boxes.
+ * For such a box, move `pos` past the fields, then call the function again with that cursor.
  *
  * @param data - The data, or a read cursor. The search starts at the position of a cursor, and the function does not move that cursor. The result keeps the readers map and the `int64` option of a cursor.
  * @param path - The type of each box, from the outer box to the box to find. With an empty path, the result is a cursor at the position of the input.

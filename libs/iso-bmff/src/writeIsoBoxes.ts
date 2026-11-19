@@ -7,7 +7,8 @@ import { writeChildBoxes } from './writeChildBoxes.ts'
 /**
  * Writes ISO boxes to one `Uint8Array`.
  *
- * The function writes each box in the order of `writeChildBoxes`: an `ArrayBufferView` or a raw box is copied, then a writer applies, then a container writes its `boxes` field.
+ * The function writes each box in the order of `writeChildBoxes`.
+ * It copies an `ArrayBufferView` or a raw box, then calls a writer, then writes the `boxes` field of a container.
  *
  * @param boxes - The boxes to write
  * @param config - The optional configuration with the writers. With no writers, the function writes only byte arrays, raw boxes, and containers.

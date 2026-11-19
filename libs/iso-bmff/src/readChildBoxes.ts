@@ -11,6 +11,7 @@ import { CONTAINERS } from './utils/CONTAINERS.ts'
  * Reads the boxes from the position of a cursor to its end.
  *
  * For each box, the function calls the reader of `cursor.readers` with the cursor at the first byte after the box header.
+ * For a `uuid` box, the position is the first byte of `usertype`.
  * After the reader, the function moves the cursor to the end of the box, so a reader can stop before the end of its box.
  * A box with no reader and a type in `CONTAINERS` gets its child boxes in `boxes`. Any other box with no reader is a raw box.
  *
