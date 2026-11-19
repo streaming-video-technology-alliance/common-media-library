@@ -5,7 +5,6 @@ describe('readMfro', function () {
 		const box = findBox('test_frag.mp4', 'mfro', { readers: { mfro: readMfro } })
 
 		assert.strictEqual(box.type, 'mfro')
-		assert.strictEqual(box.size, 16)
 		assert.strictEqual(box.mfraSize, 105)
 	})
 })

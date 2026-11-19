@@ -1,4 +1,4 @@
-import { assert, describe, it, readIsoBoxes, readUrl } from '../util/box.ts'
+import { assert, describe, isIsoBoxType, it, readIsoBoxes, readUrl } from '../util/box.ts'
 
 const TYPE = [117, 114, 108, 32] // 'url '
 
@@ -19,7 +19,7 @@ describe('readUrl', function () {
 		// #endregion example
 
 		assert.ok(url)
-		assert.strictEqual(url.type, 'url ')
+		assert.ok(isIsoBoxType('url ', url))
 		assert.strictEqual(url.version, 0)
 		assert.strictEqual(url.flags, 0)
 		assert.strictEqual(url.location, 'é日😀')
@@ -31,7 +31,7 @@ describe('readUrl', function () {
 		})
 
 		assert.ok(url)
-		assert.strictEqual(url.type, 'url ')
+		assert.ok(isIsoBoxType('url ', url))
 		assert.strictEqual(url.location, 'a.mp4')
 	})
 
@@ -39,7 +39,7 @@ describe('readUrl', function () {
 		const [url] = readIsoBoxes(urlBox(0, [0]), { readers: { 'url ': readUrl } })
 
 		assert.ok(url)
-		assert.strictEqual(url.type, 'url ')
+		assert.ok(isIsoBoxType('url ', url))
 		assert.strictEqual(url.location, '')
 	})
 
@@ -47,7 +47,7 @@ describe('readUrl', function () {
 		const [url] = readIsoBoxes(urlBox(1, []), { readers: { 'url ': readUrl } })
 
 		assert.ok(url)
-		assert.strictEqual(url.type, 'url ')
+		assert.ok(isIsoBoxType('url ', url))
 		assert.strictEqual(url.flags, 1)
 		assert.strictEqual(url.location, '')
 	})

@@ -5,7 +5,6 @@ describe('readMehd', function () {
 		const box = findBox('test_frag.mp4', 'mehd', { readers: { mehd: readMehd } })
 
 		assert.strictEqual(box.type, 'mehd')
-		assert.strictEqual(box.size, 16)
 		assert.strictEqual(box.fragmentDuration, 2047)
 	})
 })

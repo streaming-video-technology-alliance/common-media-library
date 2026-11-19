@@ -11,6 +11,7 @@ import {
 	writePayl,
 	type WebVttCuePayloadBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 describe('writePayl', function () {
 	it('should write a WebVttCuePayloadBox correctly', function () {
@@ -55,19 +56,14 @@ describe('writePayl', function () {
 		['webvtt.m4s', 3],
 	] as const) {
 		it(`should write the input bytes of every payl box in ${file}`, function () {
-			const config = createDefaultReaderConfig()
+			const config = record(createDefaultReaderConfig())
 			const { data } = findBox(file, 'mdat', config)
 			const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'payl')
 
 			assert.strictEqual(boxes.length, count)
 
 			for (const box of boxes) {
-				const { view } = box
-
-				assert.deepStrictEqual(
-					writeIsoBox(box, createDefaultWriterConfig()),
-					new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
-				)
+				assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), sourceOf(box).bytes)
 			}
 		})
 	}

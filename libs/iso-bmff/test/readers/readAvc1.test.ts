@@ -2,25 +2,23 @@ import {
 	assert,
 	describe,
 	filterBoxes,
+	isIsoBoxType,
 	it,
 	readAvc1,
 	readIsoBoxes,
 	readStsd,
-	type VisualSampleEntry,
 } from '../util/box.ts'
-
-type Avc1Box = VisualSampleEntry<'avc1'>
 
 describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
 		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', {
-			readers: { stsd: readStsd<Avc1Box>, avc1: readAvc1 },
+			readers: { stsd: readStsd, avc1: readAvc1 },
 		})
 
-		assert.strictEqual(container[0].type, 'stsd')
+		assert.ok(isIsoBoxType('stsd', container[0]))
 
-		const box = container[0].boxes[0] as Avc1Box
-		assert.strictEqual(box.type, 'avc1')
+		const box = container[0].boxes[0]
+		assert.ok(isIsoBoxType('avc1', box))
 
 		assert.strictEqual(box.dataReferenceIndex, 1)
 		assert.strictEqual(box.preDefined1, 0)
@@ -55,7 +53,7 @@ describe('readAvc1', function () {
 		const [box] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
 
 		assert.ok(box)
-		assert.strictEqual(box.type, 'avc1')
+		assert.ok(isIsoBoxType('avc1', box))
 		assert.strictEqual(box.horizResolution, 72.5)
 		assert.strictEqual(box.vertResolution, 300.25)
 	})

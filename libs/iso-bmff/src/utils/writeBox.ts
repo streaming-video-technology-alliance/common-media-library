@@ -24,13 +24,13 @@ export function writeBox(
 		const { type } = box
 		const writer = config.writers?.[type]
 
-		if (writer) {
+		if ('bytes' in box) {
+			view = box.bytes
+		} else if (writer) {
 			// TODO: Find a better way to do this without casting to any
 			view = writer(box as any, config)
 		} else if (CONTAINERS.includes(type)) {
 			view = writeContainerBox(box as IsoBoxContainer<IsoInt64>, config)
-		} else if ('view' in box) {
-			view = box.view
 		}
 
 		if (!view) {

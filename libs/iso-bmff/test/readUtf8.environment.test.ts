@@ -1,5 +1,5 @@
 import { strictEqual } from 'node:assert'
-import { readHdlr, readIsoBoxes } from '@svta/cml-iso-bmff'
+import { isIsoBoxType, readHdlr, readIsoBoxes } from '@svta/cml-iso-bmff'
 import { describe, it } from 'vite-plus/test'
 import { boxBytes } from './util/wideBoxes.ts'
 
@@ -12,7 +12,7 @@ const HDLR = boxBytes('hdlr', [0, 1], [0, 3], [0, 4], [0x76696465, 4], [0, 4], [
 function readName(): string {
 	const [box] = readIsoBoxes(HDLR, { readers: { hdlr: readHdlr } })
 
-	return box.type === 'hdlr' ? box.name : ''
+	return isIsoBoxType('hdlr', box) ? box.name : ''
 }
 
 describe('UTF-8 strings in a runtime without TextDecoder', () => {

@@ -1,11 +1,12 @@
-import type { Box } from './boxes/Box.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
-import type { ParsedBox } from './ParsedBox.ts'
+import type { IsoRawBox } from './IsoRawBox.ts'
 
 /**
- * Parsed Box Type
+ * A box that `readIsoBoxes` returns: a box object of a built-in box type, or a raw box.
+ *
+ * A test of `box.type` does not exclude a raw box. Use `isIsoBoxType` to narrow a box to a box type.
  *
  * @public
  */
-export type ParsedIsoBox<V extends IsoInt64 = number> = ParsedBox<IsoBox<V> | Box, V>
+export type ParsedIsoBox<V extends IsoInt64 = number> = IsoBox<V> | IsoRawBox

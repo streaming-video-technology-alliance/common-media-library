@@ -7,7 +7,6 @@ describe('readTrex', function () {
 		assert.strictEqual(boxes.length, 2)
 
 		assert.strictEqual(boxes[0].type, 'trex')
-		assert.strictEqual(boxes[0].size, 32)
 		assert.strictEqual(boxes[0].trackId, 1)
 		assert.strictEqual(boxes[0].defaultSampleDescriptionIndex, 1)
 		assert.strictEqual(boxes[0].defaultSampleDuration, 0)
@@ -15,7 +14,6 @@ describe('readTrex', function () {
 		assert.strictEqual(boxes[0].defaultSampleFlags, 0)
 
 		assert.strictEqual(boxes[1].type, 'trex')
-		assert.strictEqual(boxes[1].size, 32)
 		assert.strictEqual(boxes[1].trackId, 2)
 		assert.strictEqual(boxes[1].defaultSampleDescriptionIndex, 1)
 		assert.strictEqual(boxes[1].defaultSampleDuration, 0)

@@ -1,4 +1,5 @@
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { take } from './take.ts'
 
 /**
@@ -14,7 +15,7 @@ import { take } from './take.ts'
  *
  * @public
  */
-export function readFourCc(cursor: IsoBoxReadCursor): string {
+export function readFourCc(cursor: IsoBoxReadCursor<IsoInt64>): string {
 	const pos = take(cursor, 4)
 	const { view } = cursor
 

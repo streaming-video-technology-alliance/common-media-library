@@ -1,6 +1,7 @@
 import type { VisualSampleEntry, VisualSampleEntryChild } from '../boxes/VisualSampleEntry.ts'
 import { UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { IsoBoxType } from '../IsoBoxType.ts'
 
@@ -8,7 +9,7 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  * Read a visual sample entry box (`VisualSampleEntry`) of the given type.
  *
  * @param type - The type of `VisualSampleEntry` to read
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `VisualSampleEntry`
  *
@@ -16,8 +17,10 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  */
 export function readVisualSampleEntry<T extends IsoBoxType>(
 	type: T,
-	view: IsoBoxReadView<IsoInt64>,
+	cursor: IsoBoxReadCursor<IsoInt64>,
 ): VisualSampleEntry<T> {
+	const view = new IsoBoxReadView(cursor)
+
 	const { jump, readArray, readUint, readInt, readTemplate, readBoxes } = view
 
 	return {

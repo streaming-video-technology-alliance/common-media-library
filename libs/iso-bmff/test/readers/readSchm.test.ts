@@ -1,4 +1,4 @@
-import { assert, describe, it, readIsoBoxes, readSchm } from '../util/box.ts'
+import { assert, describe, isIsoBoxType, it, readIsoBoxes, readSchm } from '../util/box.ts'
 
 const TYPE = [115, 99, 104, 109] // 'schm'
 const SCHEME = [99, 101, 110, 99, 0, 1, 0, 0] // scheme_type (cenc) and scheme_version (0x00010000)
@@ -23,7 +23,7 @@ describe('readSchm', function () {
 		// #endregion example
 
 		assert.ok(schm)
-		assert.strictEqual(schm.type, 'schm')
+		assert.ok(isIsoBoxType('schm', schm))
 		assert.strictEqual(schm.version, 0)
 		assert.strictEqual(schm.flags, 1)
 		assert.strictEqual(schm.schemeType, 0x63656e63)
@@ -37,7 +37,7 @@ describe('readSchm', function () {
 		})
 
 		assert.ok(schm)
-		assert.strictEqual(schm.type, 'schm')
+		assert.ok(isIsoBoxType('schm', schm))
 		assert.strictEqual(schm.schemeUri, 'urn:a')
 	})
 
@@ -45,7 +45,7 @@ describe('readSchm', function () {
 		const [schm] = readIsoBoxes(schmBox(1, [0]), { readers: { schm: readSchm } })
 
 		assert.ok(schm)
-		assert.strictEqual(schm.type, 'schm')
+		assert.ok(isIsoBoxType('schm', schm))
 		assert.strictEqual(schm.schemeUri, '')
 	})
 
@@ -53,7 +53,7 @@ describe('readSchm', function () {
 		const [schm] = readIsoBoxes(schmBox(0, []), { readers: { schm: readSchm } })
 
 		assert.ok(schm)
-		assert.strictEqual(schm.type, 'schm')
+		assert.ok(isIsoBoxType('schm', schm))
 		assert.strictEqual(schm.schemeType, 0x63656e63)
 		assert.strictEqual(schm.schemeVersion, 0x00010000)
 		assert.strictEqual(schm.schemeUri, undefined)

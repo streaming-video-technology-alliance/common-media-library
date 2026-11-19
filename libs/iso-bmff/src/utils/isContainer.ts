@@ -2,6 +2,7 @@ import type { Box } from '../boxes/Box.ts'
 import type { IsoBox } from '../IsoBox.ts'
 import type { IsoBoxContainer } from '../IsoBoxContainer.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import type { IsoRawBox } from '../IsoRawBox.ts'
 import { CONTAINERS } from './CONTAINERS.ts'
 
 /**
@@ -21,7 +22,7 @@ import { CONTAINERS } from './CONTAINERS.ts'
  *
  * @public
  */
-export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox['type']>>(
+export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox['type']> | IsoRawBox>(
 	box: T,
 ): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never]
 	? T & IsoBoxContainer<IsoInt64>

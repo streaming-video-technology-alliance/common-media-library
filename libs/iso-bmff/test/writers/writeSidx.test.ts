@@ -1,4 +1,12 @@
-import { assert, describe, it, readIsoBoxes, readSidx, writeSidx } from '../util/box.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	readIsoBoxes,
+	readSidx,
+	writeSidx,
+} from '../util/box.ts'
 import { sidxBox } from '../util/versionBoxes.ts'
 
 describe('writeSidx', function () {
@@ -7,7 +15,7 @@ describe('writeSidx', function () {
 			const source = sidxBox(version)
 			const [box] = readIsoBoxes(source, { readers: { sidx: readSidx } })
 
-			assert.strictEqual(box.type, 'sidx')
+			assert.ok(isIsoBoxType('sidx', box))
 			assert.deepStrictEqual(new Uint8Array(writeSidx(box).buffer), source)
 		})
 	}

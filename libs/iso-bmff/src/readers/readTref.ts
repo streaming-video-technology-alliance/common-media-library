@@ -1,5 +1,6 @@
 import type { TrackReferenceBox, TrackReferenceBoxChild } from '../boxes/TrackReferenceBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -8,13 +9,15 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * The `readers` map does not need an entry for the `tref` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `TrackReferenceBox`
  *
  * @public
  */
-export function readTref(view: IsoBoxReadView<IsoInt64>): TrackReferenceBox {
+export function readTref(cursor: IsoBoxReadCursor<IsoInt64>): TrackReferenceBox {
+	const view = new IsoBoxReadView(cursor)
+
 	return {
 		type: 'tref',
 		boxes: view.readBoxes<TrackReferenceBoxChild>(),

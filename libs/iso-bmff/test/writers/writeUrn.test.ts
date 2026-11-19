@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	assert,
 	describe,
 	it,
@@ -89,7 +90,7 @@ describe('writeUrn', function () {
 			})
 
 			assert.ok(parsed)
-			assert.strictEqual(parsed.type, 'urn ')
+			assert.ok(isIsoBoxType('urn ', parsed))
 
 			const { type, version, flags } = parsed
 

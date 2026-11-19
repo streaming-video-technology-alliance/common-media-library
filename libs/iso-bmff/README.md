@@ -13,7 +13,7 @@ Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/is
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
 - Write or patch boxes, such as inserting emsg or rewriting tfdt, to byte arrays or a ReadableStream: `writeIsoBoxes`, `writeIsoBox`, `writeEmsg`, `writeTfdt`, `createIsoBoxReadableStream`
 - Read or write a container box, such as moov or moof, with an optional named function: `readMoov`, `writeMoov`
-- Read or write a box type that the package does not name: `IsoBoxReadView`, `IsoBoxWriteView`
+- Read or write a box type that the package does not name: `createIsoBoxReadCursor`, `readUint32`, `readChildBoxes`, `IsoBoxWriteView`
 
 Do not write your own box parser, box walker, or box writer. Open an issue for a box that is missing.
 
@@ -28,14 +28,14 @@ npm i @svta/cml-iso-bmff
 Read the boxes of a media segment, and find the `tfdt` box inside `moof` and `traf`:
 
 ```typescript
-import { findIsoBox, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+import { findIsoBox, isIsoBoxType, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
 
 const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
 	r.arrayBuffer(),
 );
 
 const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
-const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
 
 console.log(tfdt?.baseMediaDecodeTime);
 ```
@@ -58,8 +58,8 @@ Some exports need a runtime API:
 | API | Exports | Fallback |
 | --- | --- | --- |
 | `TextEncoder` | Every writer of a UTF-8 string field, such as `writeHdlr` and `writeEmsg` | None |
-| `BigInt` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, and the boxes with `bigint` fields | None, and no check |
-| `DataView` methods `getBigUint64`, `setBigUint64`, and `setBigInt64` | `readInt64AsBigInt`, `IsoBoxReadView.readUint64`, `IsoBoxWriteView.writeUint64`, `IsoBoxWriteView.writeWideUint`, and `IsoBoxWriteView.writeWideInt` with a `bigint` of 8 bytes | None, and no check |
+| `BigInt` | `readInt64AsBigInt`, `readUint64`, `IsoBoxWriteView.writeUint64`, and the boxes with `bigint` fields | None, and no check |
+| `DataView` methods `getBigUint64`, `setBigUint64`, and `setBigInt64` | `readInt64AsBigInt`, `readUint64`, `IsoBoxWriteView.writeUint64`, `IsoBoxWriteView.writeWideUint`, and `IsoBoxWriteView.writeWideInt` with a `bigint` of 8 bytes | None, and no check |
 | `ReadableStream` | `createIsoBoxReadableStream` | None. The function throws an `Error` with the message "ReadableStream is not available in this environment" |
 
 ## Usage

@@ -1,3 +1,4 @@
+import { readWideNumber } from './cursor/readWideNumber.ts'
 import type { IsoInt64Reader } from './IsoInt64Reader.ts'
 
 /**
@@ -23,8 +24,8 @@ import type { IsoInt64Reader } from './IsoInt64Reader.ts'
  * @public
  */
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader {
-	return (view, size, signed) => {
-		const value = signed ? view.readInt(size) : view.readUint(size)
+	return (cursor, size, signed) => {
+		const value = readWideNumber(cursor, size, signed)
 
 		if (!Number.isSafeInteger(value)) {
 			onOverflow(new RangeError('64-bit value is outside the safe integer range'))

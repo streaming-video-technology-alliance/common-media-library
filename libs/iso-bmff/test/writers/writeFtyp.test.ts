@@ -1,4 +1,12 @@
-import { assert, describe, it, readFtyp, readIsoBoxes, writeFtyp } from '../util/box.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	readFtyp,
+	readIsoBoxes,
+	writeFtyp,
+} from '../util/box.ts'
 
 describe('writeFtyp', function () {
 	it('should write a FileTypeBox correctly', function () {
@@ -104,7 +112,7 @@ describe('writeFtyp', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { ftyp: readFtyp } })
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'ftyp')
+		assert.ok(isIsoBoxType('ftyp', boxes[0]))
 		assert.strictEqual(boxes[0].majorBrand, 'isom')
 		assert.strictEqual(boxes[0].minorVersion, 1)
 		assert.deepStrictEqual(boxes[0].compatibleBrands, ['isom', 'iso2'])

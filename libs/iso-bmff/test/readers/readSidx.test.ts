@@ -1,4 +1,4 @@
-import { assert, describe, it, readIsoBoxes, readSidx } from '../util/box.ts'
+import { assert, describe, isIsoBoxType, it, readIsoBoxes, readSidx } from '../util/box.ts'
 import { sidxBox } from '../util/versionBoxes.ts'
 
 describe('readSidx', function () {
@@ -6,7 +6,7 @@ describe('readSidx', function () {
 		it(`should read the fields of a version ${version} box`, function () {
 			const [box] = readIsoBoxes(sidxBox(version), { readers: { sidx: readSidx } })
 
-			assert.strictEqual(box.type, 'sidx')
+			assert.ok(isIsoBoxType('sidx', box))
 			assert.strictEqual(box.version, version)
 			assert.strictEqual(box.referenceId, 1)
 			assert.strictEqual(box.timescale, 2)

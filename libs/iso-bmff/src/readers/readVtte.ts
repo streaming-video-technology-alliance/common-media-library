@@ -1,5 +1,5 @@
 import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -14,7 +14,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 // oxlint-disable-next-line no-unused-vars
-export function readVtte(_view: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox {
+export function readVtte(_cursor: IsoBoxReadCursor<IsoInt64>): WebVttEmptySampleBox {
 	return {
 		type: 'vtte',
 	}

@@ -1,17 +1,20 @@
 import type { SubSampleInformationBox } from '../boxes/SubSampleInformationBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `subs` box (`SubSampleInformationBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `SubSampleInformationBox`
  *
  * @public
  */
-export function readSubs(view: IsoBoxReadView<IsoInt64>): SubSampleInformationBox {
+export function readSubs(cursor: IsoBoxReadCursor<IsoInt64>): SubSampleInformationBox {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 	const entryCount = view.readUint(4)
 	const entries = view.readEntries(entryCount, () => {

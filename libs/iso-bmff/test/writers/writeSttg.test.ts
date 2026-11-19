@@ -11,6 +11,7 @@ import {
 	writeSttg,
 	type WebVttSettingsBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 describe('writeSttg', function () {
 	it('should write a WebVttSettingsBox correctly', function () {
@@ -53,19 +54,14 @@ describe('writeSttg', function () {
 	})
 
 	it('should write the input bytes of the sttg box in vttc.mp4', function () {
-		const config = createDefaultReaderConfig()
+		const config = record(createDefaultReaderConfig())
 		const { data } = findBox('vttc.mp4', 'mdat', config)
 		const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'sttg')
 
 		assert.strictEqual(boxes.length, 1)
 
 		for (const box of boxes) {
-			const { view } = box
-
-			assert.deepStrictEqual(
-				writeIsoBox(box, createDefaultWriterConfig()),
-				new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
-			)
+			assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), sourceOf(box).bytes)
 		}
 	})
 })

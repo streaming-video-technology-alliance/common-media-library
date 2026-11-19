@@ -3,6 +3,7 @@ import {
 	createDefaultReaderConfig,
 	createDefaultWriterConfig,
 	describe,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readMp4a,
@@ -137,7 +138,7 @@ describe('reserved fields', function () {
 	it('should read and write the entryVersion of an audio sample entry', function () {
 		const [box] = readIsoBoxes(AUDIO_V1, { readers: { mp4a: readMp4a } })
 
-		assert.ok(box?.type === 'mp4a')
+		assert.ok(isIsoBoxType('mp4a', box))
 		assert.strictEqual(box.entryVersion, 1)
 		assert.deepStrictEqual(writeIsoBox(box, { writers: { mp4a: writeMp4a } }), AUDIO_V1)
 	})
@@ -286,7 +287,7 @@ describe('reserved fields', function () {
 			bytes.subarray(32, 44),
 			new Uint8Array([0x80, 0, 0, 100, 0, 0, 3, 0xe8, 0x80, 0xab, 0xcd, 0xef]),
 		)
-		assert.ok(box?.type === 'sidx')
+		assert.ok(isIsoBoxType('sidx', box))
 		assert.deepStrictEqual(box.references, [reference])
 	})
 })

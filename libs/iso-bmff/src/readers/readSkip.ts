@@ -1,4 +1,4 @@
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
 import { readFree } from './readFree.ts'
@@ -6,15 +6,15 @@ import { readFree } from './readFree.ts'
 /**
  * Read the `skip` box (`FreeSpaceBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `FreeSpaceBox`
  *
  * @public
  */
-export function readSkip(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox<'skip'> {
+export function readSkip(cursor: IsoBoxReadCursor<IsoInt64>): FreeSpaceBox<'skip'> {
 	return {
-		...readFree(view),
+		...readFree(cursor),
 		type: 'skip',
 	}
 }

@@ -9,11 +9,11 @@ import {
 	bytesToHex,
 	hashesEqual,
 	matchesUuid,
+	rawBoxBody,
 	normalizeAlgorithmName,
 	readUuidBoxPurpose,
 	toUint8Array,
 } from '../utils.ts'
-import type { UuidParsedBox } from '../utils.ts'
 import type {
 	MerkleMap,
 	MerkleSegmentState,
@@ -39,12 +39,10 @@ function extractMerkleAuxBoxes(segmentBytes: Uint8Array): Uint8Array[] {
 	const payloads: Uint8Array[] = []
 
 	for (const box of readIsoBoxes(segmentBytes)) {
-		const uuidBox = box as unknown as UuidParsedBox
-		if (uuidBox.type !== 'uuid') continue
-		const usertype = uuidBox.usertype ?? []
-		if (!matchesUuid(usertype, JUMBF_UUID)) continue
+		if (box.type !== 'uuid' || !('bytes' in box)) continue
+		if (!matchesUuid(box.usertype ?? [], JUMBF_UUID)) continue
 
-		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
+		const rawPayload = rawBoxBody(box)
 		const payload = readAuxPayload(rawPayload)
 		if (payload !== 'other') payloads.push(payload)
 	}

@@ -1,6 +1,7 @@
 import {
 	createDefaultReaderConfig,
 	findIsoBox,
+	isIsoBoxType,
 	readFtyp,
 	readIsoBoxes,
 	type ParsedIsoBox,
@@ -28,7 +29,7 @@ describe('findIsoBox', function () {
 			},
 		})
 
-		const ftyp = findIsoBox(boxes, box => box.type === 'ftyp')
+		const ftyp = findIsoBox(boxes, box => isIsoBoxType('ftyp', box))
 
 		assert.ok(ftyp)
 		assert.strictEqual(ftyp.type, 'ftyp')
@@ -119,11 +120,14 @@ describe('findIsoBox', function () {
 	})
 
 	it('should work with complex callback conditions', function () {
-		const box1 = { type: 'trak', size: 100 } as ParsedIsoBox
-		const box2 = { type: 'trak', size: 200 } as ParsedIsoBox
-		const box3 = { type: 'trak', size: 300 } as ParsedIsoBox
+		const box1: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(100) }
+		const box2: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(200) }
+		const box3: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(300) }
 
-		const result = findIsoBox([box1, box2, box3], box => box.type === 'trak' && box.size > 150)
+		const result = findIsoBox(
+			[box1, box2, box3],
+			box => box.type === 'trak' && 'bytes' in box && box.bytes.length > 150,
+		)
 		assert.strictEqual(result, box2)
 	})
 

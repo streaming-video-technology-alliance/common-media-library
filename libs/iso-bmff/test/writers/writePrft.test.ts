@@ -1,4 +1,12 @@
-import { assert, describe, it, readIsoBoxes, readPrft, writePrft } from '../util/box.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	readIsoBoxes,
+	readPrft,
+	writePrft,
+} from '../util/box.ts'
 import { prftBox } from '../util/versionBoxes.ts'
 
 describe('writePrft', function () {
@@ -7,7 +15,7 @@ describe('writePrft', function () {
 			const source = prftBox(version)
 			const [box] = readIsoBoxes(source, { readers: { prft: readPrft } })
 
-			assert.strictEqual(box.type, 'prft')
+			assert.ok(isIsoBoxType('prft', box))
 			assert.deepStrictEqual(new Uint8Array(writePrft(box).buffer), source)
 		})
 	}

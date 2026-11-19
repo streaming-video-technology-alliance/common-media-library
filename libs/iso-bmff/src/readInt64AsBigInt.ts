@@ -1,4 +1,7 @@
-import type { IsoBoxReadView } from './IsoBoxReadView.ts'
+import { readInt32 } from './cursor/readInt32.ts'
+import { readUint32 } from './cursor/readUint32.ts'
+import { readUint64 } from './cursor/readUint64.ts'
+import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
@@ -13,7 +16,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * If your code supports such a runtime, test `typeof DataView.prototype.getBigUint64 === 'function'` before you pass this function.
  * The test is `false` on a runtime without `BigInt` too.
  *
- * @param view - The view to read the field from.
+ * @param cursor - The cursor to read the field from.
  * @param size - The size of the field in bytes.
  * @param signed - Whether the field is a signed integer.
  * @returns The value of the field.
@@ -24,14 +27,14 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * @public
  */
 export function readInt64AsBigInt(
-	view: IsoBoxReadView<IsoInt64>,
+	cursor: IsoBoxReadCursor<IsoInt64>,
 	size: 4 | 8,
 	signed: boolean,
 ): bigint {
 	if (size === 8) {
-		const value = view.readUint64()
+		const value = readUint64(cursor)
 		return signed ? BigInt.asIntN(64, value) : value
 	}
 
-	return BigInt(signed ? view.readInt(size) : view.readUint(size))
+	return BigInt(signed ? readInt32(cursor) : readUint32(cursor))
 }

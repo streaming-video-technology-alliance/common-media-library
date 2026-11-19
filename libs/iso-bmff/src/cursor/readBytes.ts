@@ -1,4 +1,5 @@
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { take } from './take.ts'
 
 /**
@@ -17,7 +18,7 @@ import { take } from './take.ts'
  *
  * @public
  */
-export function readBytes(cursor: IsoBoxReadCursor, length: number): Uint8Array {
+export function readBytes(cursor: IsoBoxReadCursor<IsoInt64>, length: number): Uint8Array {
 	const pos = take(cursor, length)
 	const { view } = cursor
 

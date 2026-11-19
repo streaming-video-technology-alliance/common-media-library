@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- The package now reads the `uuid` boxes and the JUMBF boxes with the read cursor of `@svta/cml-iso-bmff` 2.0.0. The package then requires `@svta/cml-iso-bmff` 2.0.0. This change does not change the public API or the results ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/c2pa](https://cml.svta.org/packages/c2pa/).

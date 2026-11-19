@@ -1,17 +1,17 @@
 import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
 
 /**
  * Read the `avc4` box (`VisualSampleEntry`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `VisualSampleEntry`
  *
  * @public
  */
-export function readAvc4(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<'avc4'> {
-	return readVisualSampleEntry('avc4', view)
+export function readAvc4(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<'avc4'> {
+	return readVisualSampleEntry('avc4', cursor)
 }

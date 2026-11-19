@@ -1,17 +1,20 @@
 import type { LabelBox } from '../boxes/LabelBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `labl` box (`LabelBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `LabelBox`
  *
  * @public
  */
-export function readLabl(view: IsoBoxReadView<IsoInt64>): LabelBox {
+export function readLabl(cursor: IsoBoxReadCursor<IsoInt64>): LabelBox {
+	const view = new IsoBoxReadView(cursor)
+
 	const { version, flags } = view.readFullBox()
 
 	return {

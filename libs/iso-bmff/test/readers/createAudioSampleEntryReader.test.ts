@@ -1,6 +1,7 @@
 import {
 	createAudioSampleEntryReader,
 	findIsoBox,
+	isIsoBoxType,
 	readIsoBoxes,
 	readStsd,
 	type AudioSampleEntry,
@@ -20,7 +21,7 @@ describe('createAudioSampleEntryReader', function () {
 			},
 		})
 
-		const stsd = findIsoBox(boxes, box => box.type === 'stsd')
+		const stsd = findIsoBox(boxes, box => isIsoBoxType('stsd', box))
 
 		// The type of `entries` lists the built-in sample entries, so give the entry its type.
 		const entry = stsd?.boxes[0] as AudioSampleEntry<'ac-4'> | undefined

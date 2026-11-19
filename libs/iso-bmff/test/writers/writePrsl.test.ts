@@ -1,4 +1,5 @@
 import {
+	isIsoBoxType,
 	assert,
 	createDefaultReaderConfig,
 	createDefaultWriterConfig,
@@ -11,6 +12,7 @@ import {
 	type ExtendedLanguageBox,
 	type PreselectionGroupBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 describe('writePrsl', function () {
 	it('should write the null terminator of an empty interleavingTag when flag 0x4000 is set', function () {
@@ -235,27 +237,26 @@ describe('writePrsl', function () {
 				createDefaultWriterConfig(),
 			)
 
-			const [prsl] = readIsoBoxes(bytes, createDefaultReaderConfig())
+			const [prsl] = readIsoBoxes(bytes, record(createDefaultReaderConfig()))
 
-			assert.strictEqual(prsl.type, 'prsl')
+			assert.ok(isIsoBoxType('prsl', prsl))
 			assert.strictEqual(prsl[tag], '')
 			assert.strictEqual(prsl.boxes.length, 1)
 
 			const [child] = prsl.boxes as ExtendedLanguageBox[]
 
-			assert.strictEqual(child.type, 'elng')
+			assert.ok(isIsoBoxType('elng', child))
 			assert.strictEqual(child.extendedLanguage, 'en')
 		})
 	}
 
 	it('should write the bytes of every parsed prsl box of a file', function () {
-		const boxes = filterBoxes('SRMP_AC4.mp4', 'prsl', createDefaultReaderConfig())
+		const boxes = filterBoxes('SRMP_AC4.mp4', 'prsl', record(createDefaultReaderConfig()))
 
 		assert.strictEqual(boxes.length, 6)
 
 		for (const box of boxes) {
-			const { view } = box
-			const input = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
+			const input = sourceOf(box).bytes
 
 			assert.strictEqual(box.interleavingTag, '')
 			assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), input)

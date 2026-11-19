@@ -86,7 +86,7 @@ export type CompositionOffsetEntry = {
 export const CONTAINERS: string[];
 
 // @public
-export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => AudioSampleEntry<T>;
+export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): (cursor: IsoBoxReadCursor<IsoInt64>) => AudioSampleEntry<T>;
 
 // @public
 export function createDefaultReaderConfig<V extends IsoInt64 = number>(...options: [V] extends [bigint] ? [options: {
@@ -110,7 +110,7 @@ export function createInt64OverflowReader(onOverflow: (error: RangeError) => voi
 export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array>;
 
 // @public
-export function createIsoBoxReadCursor(data: IsoBoxData): IsoBoxReadCursor;
+export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V>;
 
 // @public
 export function createIsoBoxWriteCursor(config?: {
@@ -118,7 +118,7 @@ export function createIsoBoxWriteCursor(config?: {
 }): IsoBoxWriteCursor;
 
 // @public
-export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (view: IsoBoxReadView<IsoInt64>) => VisualSampleEntry<T>;
+export function createVisualSampleEntryReader<T extends IsoBoxType>(type: T): (cursor: IsoBoxReadCursor<IsoInt64>) => VisualSampleEntry<T>;
 
 // @public
 export type DataEntryUrlBox = FullBox & {
@@ -274,11 +274,11 @@ export type IdentifiedMediaDataBox = {
 };
 
 // @public
-export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]>>(box: T): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never] ? T & IsoBoxContainer<IsoInt64> : Extract<T, IsoBoxContainer<IsoInt64>>;
+export function isContainer<T extends IsoBox<IsoInt64> | Box<IsoBox["type"]> | IsoRawBox>(box: T): box is [Extract<T, IsoBoxContainer<IsoInt64>>] extends [never] ? T & IsoBoxContainer<IsoInt64> : Extract<T, IsoBoxContainer<IsoInt64>>;
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
-    view: IsoBoxReadView<V>;
+    type: string;
 } | null | undefined): box is IsoBoxMap<V>[T];
 
 // @public
@@ -414,56 +414,56 @@ export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
 });
 
 // @public
-export type IsoBoxReadCursor = {
+export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
     readonly view: DataView;
     readonly start: number;
     pos: number;
     readonly end: number;
-};
+    readonly readers?: Record<IsoBoxType, {
+        r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): {
+            type: IsoBoxType;
+        };
+    }["r"]>;
+} & ([V] extends [bigint] ? {
+    readonly int64: IsoInt64Reader<V>;
+} : {
+    readonly int64?: IsoInt64Reader<V>;
+});
 
 // @public
-export type IsoBoxReader<B = unknown, T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = number> = (view: IsoBoxReadView<V>, type: T) => B;
+export type IsoBoxReader<B extends {
+    type: IsoBoxType;
+} = {
+    type: IsoBoxType;
+}, V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<V>, type: B["type"]) => B;
 
 // @public
-export type IsoBoxReaderMap<V extends IsoInt64 = number> = Record<IsoBoxType, IsoBoxReader<unknown, IsoBoxType, V>>;
+export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxMap]?: IsoBoxReader<{
+        type: K;
+    }, V>; } & {
+    url?: IsoBoxReader<{
+        type: "url ";
+    }, V>;
+    urn?: IsoBoxReader<{
+        type: "urn ";
+    }, V>;
+} & Record<IsoBoxType, {
+    r(cursor: IsoBoxReadCursor<V>, type: never): {
+        type: IsoBoxType;
+    };
+}["r"]>;
 
 // @public
-export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? ParsedBox<0 extends 1 & B ? B : [B] extends [{
+export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? 0 extends 1 & B ? B : [B] extends [{
         type: infer N extends keyof IsoBoxMap;
-    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : B, V> : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? ParsedBox<([string] extends [R] ? IsoBox<V> : Exclude<IsoBox<V>, {
+    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
     type: R;
-}>) | Box, V> : never);
+}> : never) | IsoRawBox;
 
 // @public
-export class IsoBoxReadView<V extends IsoInt64 = number> {
-    [Symbol.iterator](): Generator<ParsedIsoBox<V>>;
-    constructor(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]);
-    get buffer(): ArrayBufferLike;
-    get byteLength(): number;
-    get byteOffset(): number;
-    get bytesRemaining(): number;
-    get cursor(): number;
-    get done(): boolean;
-    jump: (size: number) => void;
-    readArray: <T extends keyof IsoFieldTypeMap>(type: T, size: number, length: number) => IsoFieldTypeMap[T][];
-    readBox: () => ParsedBox<Box, V>;
-    readBoxes: <T = IsoBox<V>>(length?: number) => T[];
-    readData: (size: number) => Uint8Array;
-    readEntries: <T>(length: number, map: () => T) => T[];
-    readFullBox: () => FullBox;
-    readInt: (size: number) => number;
-    readString: (size: number) => string;
-    readTemplate: (size: number) => number;
-    readUint: (size: number) => number;
-    readUint64: () => bigint;
-    readUtf8: (size?: number) => string;
-    readWideInt: (size: 4 | 8) => V;
-    readWideUint: (size: 4 | 8) => V;
-    slice: (offset: number, size: number) => IsoBoxReadView<V>;
-}
-
-// @public
-export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | ParsedBox<unknown, V> | ArrayBufferView;
+export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | {
+    type: IsoBoxType;
+} | ArrayBufferView;
 
 // @public
 export type IsoBoxType = string;
@@ -521,10 +521,15 @@ export type IsoFieldTypeMap = {
 export type IsoInt64 = number | bigint;
 
 // @public
-export type IsoInt64Reader<V extends IsoInt64 = number> = (view: IsoBoxReadView<IsoInt64>, size: 4 | 8, signed: boolean) => V;
+export type IsoInt64Reader<V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<IsoInt64>, size: 4 | 8, signed: boolean) => V;
 
 // @public
-export type IsoTypedParsedBox<T extends keyof IsoBoxMap, V extends IsoInt64 = number> = ParsedBox<IsoBoxMap<V>[T], V>;
+export type IsoRawBox = {
+    type: IsoBoxType;
+    bytes: Uint8Array;
+    headerSize?: number;
+    usertype?: Uint8Array;
+};
 
 // @public
 export type KindBox = FullBox & {
@@ -661,15 +666,7 @@ export type OriginalFormatBox = {
 };
 
 // @public
-export type ParsedBox<T = Box, V extends IsoInt64 = number> = (T extends IsoBox<V> ? T & Omit<Box, "type"> : T) & {
-    view: IsoBoxReadView<V>;
-    size: number;
-    largesize?: number;
-    usertype?: number[];
-};
-
-// @public
-export type ParsedIsoBox<V extends IsoInt64 = number> = ParsedBox<IsoBox<V> | Box, V>;
+export type ParsedIsoBox<V extends IsoInt64 = number> = IsoBox<V> | IsoRawBox;
 
 // @public
 export type PreselectionGroupBox = FullBox & {
@@ -715,94 +712,97 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 };
 
 // @public
-export function readArdi(view: IsoBoxReadView<IsoInt64>): AudioRenderingIndicationBox;
+export function readArdi(cursor: IsoBoxReadCursor<IsoInt64>): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntry<T extends IsoBoxType>(type: T, view: IsoBoxReadView<IsoInt64>): AudioSampleEntry<T>;
+export function readAudioSampleEntry<T extends IsoBoxType>(type: T, cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<T>;
 
 // @public
-export function readAvc1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"avc1">;
+export function readAvc1(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc1">;
 
 // @public
-export function readAvc2(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"avc2">;
+export function readAvc2(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc2">;
 
 // @public
-export function readAvc3(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"avc3">;
+export function readAvc3(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc3">;
 
 // @public
-export function readAvc4(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"avc4">;
+export function readAvc4(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"avc4">;
 
 // @public
-export function readBytes(cursor: IsoBoxReadCursor, length: number): Uint8Array;
+export function readBytes(cursor: IsoBoxReadCursor<IsoInt64>, length: number): Uint8Array;
 
 // @public
-export function readCtts(view: IsoBoxReadView<IsoInt64>): CompositionOffsetBox;
+export function readChildBoxes<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, count?: number): ParsedIsoBox<V>[];
 
 // @public
-export function readDinf(view: IsoBoxReadView<IsoInt64>): DataInformationBox;
+export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetBox;
 
 // @public
-export function readDref(view: IsoBoxReadView<IsoInt64>): DataReferenceBox;
+export function readDinf(cursor: IsoBoxReadCursor<IsoInt64>): DataInformationBox;
 
 // @public
-export function readEdts<V extends IsoInt64>(view: IsoBoxReadView<V>): EditBox<V>;
+export function readDref(cursor: IsoBoxReadCursor<IsoInt64>): DataReferenceBox;
 
 // @public
-export function readElng(view: IsoBoxReadView<IsoInt64>): ExtendedLanguageBox;
+export function readEdts<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EditBox<V>;
 
 // @public
-export function readElst<V extends IsoInt64>(view: IsoBoxReadView<V>): EditListBox<V>;
+export function readElng(cursor: IsoBoxReadCursor<IsoInt64>): ExtendedLanguageBox;
 
 // @public
-export function readEmsg<V extends IsoInt64>(view: IsoBoxReadView<V>): EventMessageBox<V>;
+export function readElst<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EditListBox<V>;
 
 // @public
-export function readEnca(view: IsoBoxReadView<IsoInt64>): AudioSampleEntry<"enca">;
+export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EventMessageBox<V>;
 
 // @public
-export function readEncv(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"encv">;
+export function readEnca(cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<"enca">;
 
 // @public
-export function readFourCc(cursor: IsoBoxReadCursor): string;
+export function readEncv(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"encv">;
 
 // @public
-export function readFree(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox;
+export function readFourCc(cursor: IsoBoxReadCursor<IsoInt64>): string;
 
 // @public
-export function readFrma(view: IsoBoxReadView<IsoInt64>): OriginalFormatBox;
+export function readFree(cursor: IsoBoxReadCursor<IsoInt64>): FreeSpaceBox;
 
 // @public
-export function readFtyp(view: IsoBoxReadView<IsoInt64>): FileTypeBox;
+export function readFrma(cursor: IsoBoxReadCursor<IsoInt64>): OriginalFormatBox;
 
 // @public
-export function readGrpl<V extends IsoInt64>(view: IsoBoxReadView<V>): GroupsListBox<V>;
+export function readFtyp(cursor: IsoBoxReadCursor<IsoInt64>): FileTypeBox;
 
 // @public
-export function readHdlr(view: IsoBoxReadView<IsoInt64>): HandlerBox;
+export function readGrpl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): GroupsListBox<V>;
 
 // @public
-export function readHev1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"hev1">;
+export function readHdlr(cursor: IsoBoxReadCursor<IsoInt64>): HandlerBox;
 
 // @public
-export function readHvc1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<"hvc1">;
+export function readHev1(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"hev1">;
 
 // @public
-export function readIden(view: IsoBoxReadView<IsoInt64>): WebVttCueIdBox;
+export function readHvc1(cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<"hvc1">;
 
 // @public
-export function readImda(view: IsoBoxReadView<IsoInt64>): IdentifiedMediaDataBox;
+export function readIden(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCueIdBox;
 
 // @public
-export function readInt16(cursor: IsoBoxReadCursor): number;
+export function readImda(cursor: IsoBoxReadCursor<IsoInt64>): IdentifiedMediaDataBox;
 
 // @public
-export function readInt32(cursor: IsoBoxReadCursor): number;
+export function readInt16(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readInt64AsBigInt(view: IsoBoxReadView<IsoInt64>, size: 4 | 8, signed: boolean): bigint;
+export function readInt32(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readInt8(cursor: IsoBoxReadCursor): number;
+export function readInt64AsBigInt(cursor: IsoBoxReadCursor<IsoInt64>, size: 4 | 8, signed: boolean): bigint;
+
+// @public
+export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
 export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoInt64 = number>(raw: IsoBoxData, config: IsoBoxReadConfig<V> & {
@@ -816,211 +816,217 @@ export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, ...co
 export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadConfig): ParsedIsoBox[];
 
 // @public
-export function readKind(view: IsoBoxReadView<IsoInt64>): KindBox;
+export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
 
 // @public
-export function readLabl(view: IsoBoxReadView<IsoInt64>): LabelBox;
+export function readLabl(cursor: IsoBoxReadCursor<IsoInt64>): LabelBox;
 
 // @public
-export function readMdat(view: IsoBoxReadView<IsoInt64>): MediaDataBox;
+export function readMdat(cursor: IsoBoxReadCursor<IsoInt64>): MediaDataBox;
 
 // @public
-export function readMdhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MediaHeaderBox<V>;
+export function readMdhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MediaHeaderBox<V>;
 
 // @public
-export function readMdia<V extends IsoInt64>(view: IsoBoxReadView<V>): MediaBox<V>;
+export function readMdia<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MediaBox<V>;
 
 // @public
-export function readMeco<V extends IsoInt64>(view: IsoBoxReadView<V>): AdditionalMetadataContainerBox<V>;
+export function readMeco<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): AdditionalMetadataContainerBox<V>;
 
 // @public
-export function readMehd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieExtendsHeaderBox<V>;
+export function readMehd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieExtendsHeaderBox<V>;
 
 // @public
-export function readMeta<V extends IsoInt64>(view: IsoBoxReadView<V>): MetaBox<V>;
+export function readMeta<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MetaBox<V>;
 
 // @public
-export function readMfhd(view: IsoBoxReadView<IsoInt64>): MovieFragmentHeaderBox;
+export function readMfhd(cursor: IsoBoxReadCursor<IsoInt64>): MovieFragmentHeaderBox;
 
 // @public
-export function readMfra<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieFragmentRandomAccessBox<V>;
+export function readMfra<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieFragmentRandomAccessBox<V>;
 
 // @public
-export function readMfro(view: IsoBoxReadView<IsoInt64>): MovieFragmentRandomAccessOffsetBox;
+export function readMfro(cursor: IsoBoxReadCursor<IsoInt64>): MovieFragmentRandomAccessOffsetBox;
 
 // @public
-export function readMinf(view: IsoBoxReadView<IsoInt64>): MediaInformationBox;
+export function readMinf(cursor: IsoBoxReadCursor<IsoInt64>): MediaInformationBox;
 
 // @public
-export function readMoof<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieFragmentBox<V>;
+export function readMoof<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieFragmentBox<V>;
 
 // @public
-export function readMoov<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieBox<V>;
+export function readMoov<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieBox<V>;
 
 // @public
-export function readMp4a(view: IsoBoxReadView<IsoInt64>): AudioSampleEntry<"mp4a">;
+export function readMp4a(cursor: IsoBoxReadCursor<IsoInt64>): AudioSampleEntry<"mp4a">;
 
 // @public
-export function readMvex<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieExtendsBox<V>;
+export function readMvex<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieExtendsBox<V>;
 
 // @public
-export function readMvhd<V extends IsoInt64>(view: IsoBoxReadView<V>): MovieHeaderBox<V>;
+export function readMvhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MovieHeaderBox<V>;
 
 // @public
-export function readPayl(view: IsoBoxReadView<IsoInt64>): WebVttCuePayloadBox;
+export function readPayl(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCuePayloadBox;
 
 // @public
-export function readPrft<V extends IsoInt64>(view: IsoBoxReadView<V>): ProducerReferenceTimeBox<V>;
+export function readPrft<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): ProducerReferenceTimeBox<V>;
 
 // @public
-export function readPrsl(view: IsoBoxReadView<IsoInt64>): PreselectionGroupBox;
+export function readPrsl(cursor: IsoBoxReadCursor<IsoInt64>): PreselectionGroupBox;
 
 // @public
-export function readPssh(view: IsoBoxReadView<IsoInt64>): ProtectionSystemSpecificHeaderBox;
+export function readPssh(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSystemSpecificHeaderBox;
 
 // @public
-export function readSchi(view: IsoBoxReadView<IsoInt64>): SchemeInformationBox;
+export function readSchi(cursor: IsoBoxReadCursor<IsoInt64>): SchemeInformationBox;
 
 // @public
-export function readSchm(view: IsoBoxReadView<IsoInt64>): SchemeTypeBox;
+export function readSchm(cursor: IsoBoxReadCursor<IsoInt64>): SchemeTypeBox;
 
 // @public
-export function readSdtp(view: IsoBoxReadView<IsoInt64>): SampleDependencyTypeBox;
+export function readSdtp(cursor: IsoBoxReadCursor<IsoInt64>): SampleDependencyTypeBox;
 
 // @public
-export function readSidx<V extends IsoInt64>(view: IsoBoxReadView<V>): SegmentIndexBox<V>;
+export function readSidx<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SegmentIndexBox<V>;
 
 // @public
-export function readSinf(view: IsoBoxReadView<IsoInt64>): ProtectionSchemeInfoBox;
+export function readSinf(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSchemeInfoBox;
 
 // @public
-export function readSkip(view: IsoBoxReadView<IsoInt64>): FreeSpaceBox<"skip">;
+export function readSkip(cursor: IsoBoxReadCursor<IsoInt64>): FreeSpaceBox<"skip">;
 
 // @public
-export function readSmhd(view: IsoBoxReadView<IsoInt64>): SoundMediaHeaderBox;
+export function readSmhd(cursor: IsoBoxReadCursor<IsoInt64>): SoundMediaHeaderBox;
 
 // @public
-export function readSsix(view: IsoBoxReadView<IsoInt64>): SubsegmentIndexBox;
+export function readSsix(cursor: IsoBoxReadCursor<IsoInt64>): SubsegmentIndexBox;
 
 // @public
-export function readStbl(view: IsoBoxReadView<IsoInt64>): SampleTableBox;
+export function readStbl(cursor: IsoBoxReadCursor<IsoInt64>): SampleTableBox;
 
 // @public
-export function readStco(view: IsoBoxReadView<IsoInt64>): ChunkOffsetBox;
+export function readStco(cursor: IsoBoxReadCursor<IsoInt64>): ChunkOffsetBox;
 
 // @public
-export function readSthd(view: IsoBoxReadView<IsoInt64>): SubtitleMediaHeaderBox;
+export function readSthd(cursor: IsoBoxReadCursor<IsoInt64>): SubtitleMediaHeaderBox;
 
 // @public
-export function readStrk<V extends IsoInt64>(view: IsoBoxReadView<V>): SubTrack<V>;
+export function readStrk<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SubTrack<V>;
 
 // @public
-export function readStsc(view: IsoBoxReadView<IsoInt64>): SampleToChunkBox;
+export function readStsc(cursor: IsoBoxReadCursor<IsoInt64>): SampleToChunkBox;
 
 // @public
-export function readStsd<E extends SampleEntry = AudioSampleEntry | VisualSampleEntry>(view: IsoBoxReadView<IsoInt64>): SampleDescriptionBox<E>;
+export function readStsd(cursor: IsoBoxReadCursor<IsoInt64>): SampleDescriptionBox;
 
 // @public
-export function readStss(view: IsoBoxReadView<IsoInt64>): SyncSampleBox;
+export function readStss(cursor: IsoBoxReadCursor<IsoInt64>): SyncSampleBox;
 
 // @public
-export function readStsz(view: IsoBoxReadView<IsoInt64>): SampleSizeBox;
+export function readStsz(cursor: IsoBoxReadCursor<IsoInt64>): SampleSizeBox;
 
 // @public
-export function readSttg(view: IsoBoxReadView<IsoInt64>): WebVttSettingsBox;
+export function readSttg(cursor: IsoBoxReadCursor<IsoInt64>): WebVttSettingsBox;
 
 // @public
-export function readStts(view: IsoBoxReadView<IsoInt64>): TimeToSampleBox;
+export function readStts(cursor: IsoBoxReadCursor<IsoInt64>): TimeToSampleBox;
 
 // @public
-export function readStyp(view: IsoBoxReadView<IsoInt64>): SegmentTypeBox;
+export function readStyp(cursor: IsoBoxReadCursor<IsoInt64>): SegmentTypeBox;
 
 // @public
-export function readSubs(view: IsoBoxReadView<IsoInt64>): SubSampleInformationBox;
+export function readSubs(cursor: IsoBoxReadCursor<IsoInt64>): SubSampleInformationBox;
 
 // @public
-export function readTemplate16(cursor: IsoBoxReadCursor): number;
+export function readTemplate16(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readTemplate32(cursor: IsoBoxReadCursor): number;
+export function readTemplate32(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox;
+export function readTenc(cursor: IsoBoxReadCursor<IsoInt64>): TrackEncryptionBox;
 
 // @public
-export function readTerminatedUtf8(cursor: IsoBoxReadCursor): string;
+export function readTerminatedUtf8(cursor: IsoBoxReadCursor<IsoInt64>): string;
 
 // @public
-export function readTfdt<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentBaseMediaDecodeTimeBox<V>;
+export function readTfdt<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackFragmentBaseMediaDecodeTimeBox<V>;
 
 // @public
-export function readTfhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentHeaderBox<V>;
+export function readTfhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackFragmentHeaderBox<V>;
 
 // @public
-export function readTfra<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentRandomAccessBox<V>;
+export function readTfra<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackFragmentRandomAccessBox<V>;
 
 // @public
-export function readTkhd<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackHeaderBox<V>;
+export function readTkhd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackHeaderBox<V>;
 
 // @public
-export function readTraf<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackFragmentBox<V>;
+export function readTraf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackFragmentBox<V>;
 
 // @public
-export function readTrak<V extends IsoInt64>(view: IsoBoxReadView<V>): TrackBox<V>;
+export function readTrak<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackBox<V>;
 
 // @public
-export function readTref(view: IsoBoxReadView<IsoInt64>): TrackReferenceBox;
+export function readTref(cursor: IsoBoxReadCursor<IsoInt64>): TrackReferenceBox;
 
 // @public
-export function readTrex(view: IsoBoxReadView<IsoInt64>): TrackExtendsBox;
+export function readTrex(cursor: IsoBoxReadCursor<IsoInt64>): TrackExtendsBox;
 
 // @public
-export function readTrun(view: IsoBoxReadView<IsoInt64>): TrackRunBox;
+export function readTrun(cursor: IsoBoxReadCursor<IsoInt64>): TrackRunBox;
 
 // @public
-export function readUdta<V extends IsoInt64>(view: IsoBoxReadView<V>): UserDataBox<V>;
+export function readUdta<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): UserDataBox<V>;
 
 // @public
-export function readUint16(cursor: IsoBoxReadCursor): number;
+export function readUint16(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readUint24(cursor: IsoBoxReadCursor): number;
+export function readUint24(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readUint32(cursor: IsoBoxReadCursor): number;
+export function readUint32(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readUint64(cursor: IsoBoxReadCursor): bigint;
+export function readUint64(cursor: IsoBoxReadCursor<IsoInt64>): bigint;
 
 // @public
-export function readUint8(cursor: IsoBoxReadCursor): number;
+export function readUint8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readUrl(view: IsoBoxReadView<IsoInt64>): DataEntryUrlBox;
+export function readUrl(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrlBox;
 
 // @public
-export function readUrn(view: IsoBoxReadView<IsoInt64>): DataEntryUrnBox;
+export function readUrn(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrnBox;
 
 // @public
-export function readUtf8(cursor: IsoBoxReadCursor, length: number): string;
+export function readUtf8(cursor: IsoBoxReadCursor<IsoInt64>, length: number): string;
 
 // @public
-export function readVisualSampleEntry<T extends IsoBoxType>(type: T, view: IsoBoxReadView<IsoInt64>): VisualSampleEntry<T>;
+export function readVisualSampleEntry<T extends IsoBoxType>(type: T, cursor: IsoBoxReadCursor<IsoInt64>): VisualSampleEntry<T>;
 
 // @public
-export function readVlab(view: IsoBoxReadView<IsoInt64>): WebVttSourceLabelBox;
+export function readVlab(cursor: IsoBoxReadCursor<IsoInt64>): WebVttSourceLabelBox;
 
 // @public
-export function readVmhd(view: IsoBoxReadView<IsoInt64>): VideoMediaHeaderBox;
+export function readVmhd(cursor: IsoBoxReadCursor<IsoInt64>): VideoMediaHeaderBox;
 
 // @public
-export function readVttC(view: IsoBoxReadView<IsoInt64>): WebVttConfigurationBox;
+export function readVttC(cursor: IsoBoxReadCursor<IsoInt64>): WebVttConfigurationBox;
 
 // @public
-export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox;
+export function readVttc(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCueBox;
 
 // @public
-export function readVtte(_view: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox;
+export function readVtte(_cursor: IsoBoxReadCursor<IsoInt64>): WebVttEmptySampleBox;
+
+// @public
+export function readWideInt<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, size: 4 | 8): V;
+
+// @public
+export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, size: 4 | 8): V;
 
 // @public
 export type SampleDependencyTypeBox = FullBox & {
@@ -1029,7 +1035,7 @@ export type SampleDependencyTypeBox = FullBox & {
 };
 
 // @public
-export type SampleDescriptionBox<E extends SampleEntry = AudioSampleEntry | VisualSampleEntry> = FullBox & {
+export type SampleDescriptionBox<E extends SampleEntry | IsoRawBox = AudioSampleEntry | VisualSampleEntry | IsoRawBox> = FullBox & {
     type: "stsd";
     entryCount: number;
     boxes: E[];

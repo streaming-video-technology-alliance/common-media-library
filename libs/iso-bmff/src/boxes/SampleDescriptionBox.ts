@@ -1,5 +1,6 @@
 import type { AudioSampleEntry } from './AudioSampleEntry.ts'
 import type { FullBox } from './FullBox.ts'
+import type { IsoRawBox } from '../IsoRawBox.ts'
 import type { SampleEntry } from './SampleEntry.ts'
 import type { VisualSampleEntry } from './VisualSampleEntry.ts'
 
@@ -10,9 +11,10 @@ import type { VisualSampleEntry } from './VisualSampleEntry.ts'
  *
  * @public
  */
-export type SampleDescriptionBox<E extends SampleEntry = AudioSampleEntry | VisualSampleEntry> =
-	FullBox & {
-		type: 'stsd'
-		entryCount: number
-		boxes: E[]
-	}
+export type SampleDescriptionBox<
+	E extends SampleEntry | IsoRawBox = AudioSampleEntry | VisualSampleEntry | IsoRawBox,
+> = FullBox & {
+	type: 'stsd'
+	entryCount: number
+	boxes: E[]
+}

@@ -48,7 +48,7 @@ const boxes = readIsoBoxes(buffer, {
 
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. `box.type === "emsg"` therefore narrows to the return type of the custom reader.
+A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. A test of `box.type` does not exclude a raw box, so the loop also tests for the `frames` field.
 
 HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
@@ -57,11 +57,11 @@ import { ID3_SCHEME_ID_URI, getId3Frames, type Id3Frame } from "@svta/cml-id3";
 import {
 	readEmsg,
 	readIsoBoxes,
-	type IsoBoxReadView,
+	type IsoBoxReadCursor,
 } from "@svta/cml-iso-bmff";
 
-const readEmsgWithId3 = (view: IsoBoxReadView) => {
-	const emsg = readEmsg(view);
+const readEmsgWithId3 = (cursor: IsoBoxReadCursor) => {
+	const emsg = readEmsg(cursor);
 	const frames: Id3Frame[] =
 		emsg.schemeIdUri === ID3_SCHEME_ID_URI
 			? getId3Frames(emsg.messageData)
@@ -80,7 +80,7 @@ const boxes = readIsoBoxes(segment, {
 });
 
 for (const box of boxes) {
-	if (box.type === "emsg") {
+	if (box.type === "emsg" && "frames" in box) {
 		console.log(box.frames);
 	}
 }
@@ -88,7 +88,7 @@ for (const box of boxes) {
 
 A byte field such as `messageData` is a view over the input data. The field shares memory with that data and is not a copy. To keep the bytes after your code releases or changes the input, call `slice()` on the field.
 
-The view finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
+`readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
 
 ## Incomplete boxes
 
@@ -98,7 +98,7 @@ A box with a reader in the configuration and a body shorter than its fields is n
 
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
 
-The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes. The `size` field of the parsed box is the `size` field of the source box header, so it counts those bytes. The field is 1 when the box has a `largesize` field, and the parsed box then has `largesize`. The field is 0 when the box extends to the end of the data.
+The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The parsed box has the child boxes and no field for those bytes.
 
 A writer builds a container or a sample entry from the child boxes of the parsed box. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes. The `mfraSize` field of an `mfro` box has the same limit. See [Writing a changed `mfra` box](writing-boxes.md#writing-a-changed-mfra-box).
 
@@ -129,6 +129,7 @@ Pass `readInt64AsBigInt` as the `int64` option. The built-in readers then return
 ```typescript
 import {
 	createDefaultReaderConfig,
+	isIsoBoxType,
 	readInt64AsBigInt,
 	readIsoBoxes,
 } from "@svta/cml-iso-bmff";
@@ -139,7 +140,7 @@ const boxes = readIsoBoxes(
 );
 
 for (const box of boxes) {
-	if (box.type === "sidx") {
+	if (isIsoBoxType("sidx", box)) {
 		// earliestPresentationTime is a bigint. The division of two bigints
 		// drops the fraction, so add the remainder as a number.
 		const scale = BigInt(box.timescale);
@@ -158,6 +159,7 @@ The option works the same way with specific readers:
 ```typescript
 import {
 	findIsoBox,
+	isIsoBoxType,
 	readInt64AsBigInt,
 	readIsoBoxes,
 	readTfdt,
@@ -171,7 +173,7 @@ const boxes = readIsoBoxes(buffer, {
 });
 
 // A tfdt box is inside a traf box, inside a moof box.
-const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
 
 // baseMediaDecodeTime is a bigint.
 console.log(tfdt?.baseMediaDecodeTime);
@@ -204,28 +206,32 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
-The types of the result do not change, and the function does not need `BigInt`. The function checks the fields of the table above. The function does not check a call of `readUint(8)` in a custom reader. A configuration takes one function for the option. The configuration selects `bigint` fields or the report, not both.
+The types of the result do not change, and the function does not need `BigInt`. The function checks the fields of the table above. The function does not check a field that a custom reader reads with `readUint32` and no `readWideUint`. A configuration takes one function for the option. The configuration selects `bigint` fields or the report, not both.
 
 ### Custom readers and the option
 
-A custom reader of the type `(view: IsoBoxReadView) => ...` works with no option and with `createInt64OverflowReader`. With `readInt64AsBigInt`, that reader is a compile error, because the view then has `bigint` fields. Use one of two forms:
+A custom reader of the type `(cursor: IsoBoxReadCursor) => ...` works with no option and with `createInt64OverflowReader`. With `readInt64AsBigInt`, that reader is a compile error, because the cursor then has `bigint` fields. Use one of two forms:
 
-- A reader that reads no 64-bit field takes `IsoBoxReadView<IsoInt64>`. That type accepts the view of every configuration.
+- A reader that reads no 64-bit field takes `IsoBoxReadCursor<IsoInt64>`. That type accepts the cursor of every configuration.
 - A reader that follows the option is generic. That reader reads each 64-bit field with `readWideUint` or `readWideInt`.
 
-`readWideUint` and `readWideInt` take the size of the field in bytes, 4 or 8. With no option, they return a `number`, as `readUint` and `readInt` do. With the option, they return the result of the `int64` function:
+`readWideUint` and `readWideInt` take the size of the field in bytes, 4 or 8. With no option, they return a `number`. With the option, they return the result of the `int64` function:
 
 ```typescript
 import {
 	readInt64AsBigInt,
 	readIsoBoxes,
-	type IsoBoxReadView,
+	readUint24,
+	readUint8,
+	readWideUint,
+	type IsoBoxReadCursor,
 	type IsoInt64,
 } from "@svta/cml-iso-bmff";
 
-const readTfdtWide = <V extends IsoInt64>(view: IsoBoxReadView<V>) => {
-	const { version, flags } = view.readFullBox();
-	const baseMediaDecodeTime = view.readWideUint(version === 1 ? 8 : 4);
+const readTfdtWide = <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => {
+	const version = readUint8(cursor);
+	const flags = readUint24(cursor);
+	const baseMediaDecodeTime = readWideUint(cursor, version === 1 ? 8 : 4);
 	return {
 		type: "tfdt" as const,
 		version,
@@ -286,15 +292,23 @@ Do not type the parameter as `IsoBoxReadConfig<IsoInt64>`. That type does not ac
 
 ### A custom reader for one field
 
-If your code needs the exact value of one field only, a custom reader can call `readUint64`. The method returns a `bigint` and needs no option:
+If your code needs the exact value of one field only, a custom reader can call `readUint64`. The function returns a `bigint` and needs no option:
 
 ```typescript
-import { readIsoBoxes, type IsoBoxReadView } from "@svta/cml-iso-bmff";
+import {
+	readIsoBoxes,
+	readUint24,
+	readUint32,
+	readUint64,
+	readUint8,
+	type IsoBoxReadCursor,
+} from "@svta/cml-iso-bmff";
 
-const readTfdt64 = (view: IsoBoxReadView) => {
-	const { version, flags } = view.readFullBox();
+const readTfdt64 = (cursor: IsoBoxReadCursor) => {
+	const version = readUint8(cursor);
+	const flags = readUint24(cursor);
 	const baseMediaDecodeTime =
-		version === 1 ? view.readUint64() : BigInt(view.readUint(4));
+		version === 1 ? readUint64(cursor) : BigInt(readUint32(cursor));
 	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
 };
 

@@ -140,7 +140,7 @@ describe('writeEmsg', function () {
 
 		const [box] = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
-		assert.strictEqual(box.type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', box))
 		assert.strictEqual(box.value, 'AĀB')
 		assert.strictEqual(box.timescale, 1000)
 		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array([0xff]))
@@ -164,7 +164,7 @@ describe('writeEmsg', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', boxes[0]))
 		assert.strictEqual(boxes[0].version, 1)
 		assert.strictEqual(boxes[0].schemeIdUri, 'urn:test:scheme')
 		assert.strictEqual(boxes[0].value, '1')
@@ -255,7 +255,7 @@ describe('writeEmsg', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', boxes[0]))
 		assert.strictEqual(boxes[0].value, '')
 		assert.deepStrictEqual(new Uint8Array(boxes[0].messageData), messageData)
 	})
@@ -279,7 +279,7 @@ describe('writeEmsg', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', boxes[0]))
 		assert.strictEqual(boxes[0].schemeIdUri, '')
 		assert.strictEqual(boxes[0].value, '1')
 		assert.deepStrictEqual(new Uint8Array(boxes[0].messageData), messageData)
@@ -304,7 +304,7 @@ describe('writeEmsg', function () {
 		const boxes = readIsoBoxes(writer.buffer, { readers: { emsg: readEmsg } })
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', boxes[0]))
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].schemeIdUri, '')
 		assert.strictEqual(boxes[0].value, '')

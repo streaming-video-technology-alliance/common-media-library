@@ -13,7 +13,7 @@ import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
 import type { JumbfBox } from './jumbf/JumbfBox.ts'
 import { parseJumbfBoxes } from './jumbf/parseJumbfBoxes.ts'
 import { parseJumbfLabel } from './jumbf/parseJumbfLabel.ts'
-import { asString, findC2paUuidBox, stripJumbfUuidPrefix } from './utils.ts'
+import { asString, findC2paUuidBox, rawBoxBody, stripJumbfUuidPrefix } from './utils.ts'
 import { extractCertificateInfo } from './x509/extractCertificateInfo.ts'
 
 const MAX_JUMBF_NESTING_DEPTH = 20
@@ -231,7 +231,7 @@ export function readC2paManifest(
 		throw new Error('No C2PA UUID box found in the provided bytes')
 	}
 
-	const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
+	const rawPayload = rawBoxBody(uuidBox)
 	const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
 	if (!jumbfPayload) {
 		throw new Error('Invalid JUMBF UUID prefix in C2PA box')

@@ -1,4 +1,5 @@
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 import { readUtf8 } from './readUtf8.ts'
 
 /**
@@ -15,7 +16,7 @@ import { readUtf8 } from './readUtf8.ts'
  *
  * @public
  */
-export function readTerminatedUtf8(cursor: IsoBoxReadCursor): string {
+export function readTerminatedUtf8(cursor: IsoBoxReadCursor<IsoInt64>): string {
 	const { view, pos, end } = cursor
 	let i = pos
 
