@@ -1,7 +1,7 @@
 import type { WebVttConfigurationBox } from '../boxes/WebVttConfigurationBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUtf8 } from '../cursor/readUtf8.ts'
 
 /**
  * Read the `vttC` box (`WebVttConfigurationBox`).
@@ -13,10 +13,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readVttC(cursor: IsoBoxReadCursor<IsoInt64>): WebVttConfigurationBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'vttC',
-		config: view.readUtf8(),
+		config: readUtf8(cursor, cursor.end - cursor.pos),
 	}
 }

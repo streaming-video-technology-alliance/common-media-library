@@ -1,8 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { WebVttSourceLabelBox } from '../boxes/WebVttSourceLabelBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeUtf8 } from '../cursor/writeUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `vlab` box (`WebVttSourceLabelBox`).
@@ -16,14 +16,8 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeVlab(cursor: IsoBoxWriteCursor, box: WebVttSourceLabelBox): void {
-	const sourceLabelBytes = encodeText(box.sourceLabel)
+	const start = beginIsoBox(cursor, 'vlab')
 
-	const headerSize = 8
-	const sourceLabelSize = sourceLabelBytes.length
-	const totalSize = headerSize + sourceLabelSize
-
-	const writer = new IsoBoxWriteView('vlab', totalSize)
-	writer.writeBytes(sourceLabelBytes)
-
-	writeLegacyView(cursor, writer)
+	writeUtf8(cursor, box.sourceLabel)
+	endIsoBox(cursor, start)
 }

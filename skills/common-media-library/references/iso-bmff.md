@@ -116,6 +116,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
 | A malformed `stsd` or `dref` box returns fewer entries | The read throws a `RangeError` |
+| `readVlab`, `readPayl`, `readIden`, and `readSttg` stop at a null byte | The readers read to the end of the box. A box from release 1.0.7 or earlier gives a trailing U+0000. |
 | A `co64` or `stz2` box with the default readers has no fields | The box has `chunkOffset`, or `fieldSize` and `entrySize` |
 | An error `Truncated box` from a custom reader | The error reaches the caller of `readIsoBoxes`. A truncated box stops the read with no error. |
 
@@ -206,6 +207,7 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `writeMdhd` writes 0 or a wrong code for a `language` that is not 3 lower-case letters | `writeMdhd` writes the code of `und` |
 | `writeHdlr` writes the text after a U+0000 in `name` | The name ends at the first U+0000 |
 | `writeSchm` writes the text after a U+0000 in `schemeUri` | The string ends at the first U+0000 |
+| `writePrsl`, `writeLabl`, `writeKind`, and `writeElng` write the text after a U+0000 | Each string ends at the first U+0000 |
 | `writeTenc` writes the low 8 bits of a constant IV size above 255 | `writeTenc` throws a `RangeError` |
 
 The stream writes one box for each read and writes no box before the first read.
@@ -330,6 +332,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `entryCount` of `co64`, `sampleCount` of `stz2` | `chunkOffset.length`, `entrySize.length` |
 | `entryCount` of `elst` | `entries.length` |
 | `entryCount` of `stsd` and `dref` | `boxes.length` |
+| `numEntitiesInGroup` of `prsl` | `entityId.length` |
 | `compressorName: number[]` of a visual sample entry | `compressorName: string`. The writer writes the length byte and the padding. |
 | `location: string` of `url ` and `urn ` | `location?: string`. A box with no bytes after the flags or after `name` has no `location`. |
 | `kidCount` and `kid: number[]` of `pssh` | `kid: Uint8Array[]`, one entry for each key ID. The count is `kid.length`. |
@@ -1825,7 +1828,6 @@ export type ParsedIsoBox<V extends IsoInt64 = number> = IsoBox<V> | IsoRawBox;
 export type PreselectionGroupBox<V extends IsoInt64 = number> = FullBox & {
     type: "prsl";
     groupId: number;
-    numEntitiesInGroup: number;
     entityId: number[];
     preselectionTag?: string;
     selectionPriority?: number;

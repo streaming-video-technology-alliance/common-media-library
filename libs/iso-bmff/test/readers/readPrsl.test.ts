@@ -9,7 +9,7 @@ describe('readPrsl', function () {
 		assert.strictEqual(boxes.length, 6)
 		assert.strictEqual(boxes[1].type, 'prsl')
 		assert.strictEqual(boxes[1].groupId, 234)
-		assert.strictEqual(boxes[1].numEntitiesInGroup, 1)
+		assert.strictEqual(boxes[1].entityId.length, 1)
 		assert.strictEqual(boxes[1].entityId[0], 1)
 		assert.strictEqual(boxes[1].preselectionTag, '1')
 		assert.strictEqual(boxes[1].selectionPriority, 1)

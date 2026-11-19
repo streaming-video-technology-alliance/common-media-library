@@ -23,7 +23,6 @@ describe('writePrsl', function () {
 			version: 0,
 			flags: 0x4000,
 			groupId: 1,
-			numEntitiesInGroup: 1,
 			entityId: [2],
 			interleavingTag: '',
 			boxes: [],
@@ -72,7 +71,6 @@ describe('writePrsl', function () {
 				version: 0,
 				flags: 0x1000,
 				groupId: 1,
-				numEntitiesInGroup: 0,
 				entityId: [],
 				preselectionTag: '',
 				boxes: [],
@@ -94,7 +92,6 @@ describe('writePrsl', function () {
 				version: 0,
 				flags: 0x5000,
 				groupId: 1,
-				numEntitiesInGroup: 0,
 				entityId: [],
 				boxes: [],
 			},
@@ -115,7 +112,6 @@ describe('writePrsl', function () {
 				version: 0,
 				flags: 0x5000,
 				groupId: 1,
-				numEntitiesInGroup: 0,
 				entityId: [],
 				preselectionTag: '',
 				interleavingTag: 'b',
@@ -140,7 +136,6 @@ describe('writePrsl', function () {
 				version: 0,
 				flags: 0x2000,
 				groupId: 1,
-				numEntitiesInGroup: 0,
 				entityId: [],
 				boxes: [],
 			},
@@ -161,7 +156,6 @@ describe('writePrsl', function () {
 				version: 0,
 				flags: 0x1000,
 				groupId: 1,
-				numEntitiesInGroup: 0,
 				entityId: [],
 				preselectionTag: 'é',
 				boxes: [],
@@ -185,7 +179,6 @@ describe('writePrsl', function () {
 				version: 0,
 				flags: 0x7000,
 				groupId: 1,
-				numEntitiesInGroup: 0,
 				entityId: [],
 				preselectionTag: 'a',
 				selectionPriority: 3,
@@ -211,7 +204,6 @@ describe('writePrsl', function () {
 				version: 0,
 				flags: 0,
 				groupId: 1,
-				numEntitiesInGroup: 0,
 				entityId: [],
 				preselectionTag: 'a',
 				interleavingTag: 'b',
@@ -237,7 +229,6 @@ describe('writePrsl', function () {
 					version: 0,
 					flags: flag,
 					groupId: 1,
-					numEntitiesInGroup: 0,
 					entityId: [],
 					[tag]: '',
 					boxes: [{ type: 'elng', version: 0, flags: 0, extendedLanguage: 'en' }],
@@ -269,5 +260,28 @@ describe('writePrsl', function () {
 			assert.strictEqual(box.interleavingTag, '')
 			assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), input)
 		}
+	})
+
+	it('should write the length of entityId and end each tag at the first U+0000', function () {
+		const bytes = writeIsoBox(
+			{
+				type: 'prsl',
+				version: 0,
+				flags: 0x5000,
+				groupId: 1,
+				entityId: [7, 8],
+				preselectionTag: 'a\0b',
+				interleavingTag: 'c',
+				boxes: [],
+			},
+			{ writers: { prsl: writePrsl } },
+		)
+		const [box] = readIsoBoxes(bytes, createDefaultReaderConfig())
+
+		assert.deepStrictEqual(Array.from(bytes.subarray(16, 20)), [0, 0, 0, 2])
+		assert.deepStrictEqual(Array.from(bytes.subarray(28)), [0x61, 0, 0x63, 0])
+		assert.ok(isIsoBoxType('prsl', box))
+		assert.strictEqual(box.preselectionTag, 'a')
+		assert.strictEqual(box.interleavingTag, 'c')
 	})
 })

@@ -1,7 +1,8 @@
 import type { AudioRenderingIndicationBox } from '../boxes/AudioRenderingIndicationBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
 
 /**
  * Read the `ardi` box (`AudioRenderingIndicationBox`).
@@ -13,11 +14,10 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readArdi(cursor: IsoBoxReadCursor<IsoInt64>): AudioRenderingIndicationBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'ardi',
-		...view.readFullBox(),
-		audioRenderingIndication: view.readUint(1),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		audioRenderingIndication: readUint8(cursor),
 	}
 }

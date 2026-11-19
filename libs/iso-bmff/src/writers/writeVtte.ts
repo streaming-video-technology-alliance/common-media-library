@@ -1,7 +1,7 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `vtte` box (`WebVttEmptySampleBox`).
@@ -15,9 +15,5 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  */
 // oxlint-disable-next-line no-unused-vars
 export function writeVtte(cursor: IsoBoxWriteCursor, _box: WebVttEmptySampleBox): void {
-	const headerSize = 8
-	const totalSize = headerSize
-
-	const writer = new IsoBoxWriteView('vtte', totalSize)
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, beginIsoBox(cursor, 'vtte'))
 }
