@@ -45,7 +45,7 @@ and this project adheres to
 
 ### Changed
 
-- The container readers, `readMeta`, and the readers and writers of `mdat`, `free`, `skip`, and `imda` now use the field functions of the cursor. Their results and written bytes do not change. A bundle with only these functions no longer has the code of the internal classes `IsoBoxReadView` and `IsoBoxWriteView` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
+- Every built-in reader and writer now uses the field functions of the cursor. The internal classes `IsoBoxReadView` and `IsoBoxWriteView` are removed, so no bundle includes their code ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `trun`, `tfra`, and `ssix` no longer have count fields that repeat the length of a list. The removed fields are `sampleCount`, `numberOfEntry`, `subsegmentCount`, and `rangesCount`. The writers write the length of each list, so replace `box.sampleCount` with `box.samples.length` ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `sampleDependencyTable` of `sdtp` is now a `Uint8Array` with one byte for each sample. The array is a view of the input. For a write, wrap a list of numbers in `new Uint8Array(...)` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `writeSidx` now throws a `RangeError` for more than 65535 references, the limit of the 16-bit `reference_count`. Earlier releases write the low 16 bits of the count, so a read returns fewer references ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
