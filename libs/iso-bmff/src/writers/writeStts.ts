@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TimeToSampleBox } from '../boxes/TimeToSampleBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `stts` box (`TimeToSampleBox`).
@@ -14,21 +15,14 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeStts(cursor: IsoBoxWriteCursor, box: TimeToSampleBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entriesSize = box.entryCount * 8 // 4 bytes sampleCount + 4 bytes sampleDelta
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+	const start = beginIsoFullBox(cursor, 'stts', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stts', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.entryCount, 4)
+	writeUint32(cursor, box.entries.length)
 
 	for (const entry of box.entries) {
-		writer.writeUint(entry.sampleCount, 4)
-		writer.writeUint(entry.sampleDelta, 4)
+		writeUint32(cursor, entry.sampleCount)
+		writeUint32(cursor, entry.sampleDelta)
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

@@ -7,7 +7,6 @@ describe('writeStsc', function () {
 			type: 'stsc' as const,
 			version: 0,
 			flags: 0,
-			entryCount: 2,
 			entries: [
 				{
 					firstChunk: 1,

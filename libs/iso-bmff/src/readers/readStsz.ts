@@ -1,8 +1,9 @@
 import type { SampleSizeBox } from '../boxes/SampleSizeBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
 
 /**
  * Read the `stsz` box (`SampleSizeBox`).
@@ -21,18 +22,32 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readStsz(cursor: IsoBoxReadCursor<IsoInt64>): SampleSizeBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const sampleSize = readUint32(cursor)
+	const sampleCount = readUint32(cursor)
 
-	const { version, flags } = view.readFullBox()
-	const sampleSize = view.readUint(4)
-	const sampleCount = view.readUint(4)
+	if (sampleSize !== 0) {
+		return {
+			type: 'stsz',
+			version,
+			flags,
+			sampleSize,
+			sampleCount,
+		}
+	}
+
+	const entrySize: number[] = []
+
+	for (let i = 0; i < sampleCount; i++) {
+		entrySize.push(readUint32(cursor))
+	}
 
 	return {
 		type: 'stsz',
 		version,
 		flags,
 		sampleSize,
-		sampleCount,
-		entrySize: sampleSize === 0 ? view.readArray(UINT, 4, sampleCount) : undefined,
+		entrySize,
 	}
 }

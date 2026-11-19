@@ -1,8 +1,9 @@
 import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
 
 /**
  * Read the `stss` box (`SyncSampleBox`).
@@ -14,16 +15,19 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readStss(cursor: IsoBoxReadCursor<IsoInt64>): SyncSampleBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const entryCount = readUint32(cursor)
+	const sampleNumber: number[] = []
 
-	const { version, flags } = view.readFullBox()
-	const entryCount = view.readUint(4)
+	for (let i = 0; i < entryCount; i++) {
+		sampleNumber.push(readUint32(cursor))
+	}
 
 	return {
 		type: 'stss',
 		version,
 		flags,
-		entryCount,
-		sampleNumber: view.readArray(UINT, 4, entryCount),
+		sampleNumber,
 	}
 }

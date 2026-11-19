@@ -18,8 +18,6 @@ describe('readCtts', function () {
 
 		assert.ok(isIsoBoxType('ctts', box))
 
-		assert.strictEqual(box.entryCount, 5)
-
 		const { entries } = box
 		assert.strictEqual(entries.length, 5)
 		assert.strictEqual(entries[0].sampleCount, 1)
@@ -41,7 +39,6 @@ describe('readCtts versions', function () {
 
 		assert.ok(isIsoBoxType('ctts', box))
 		assert.strictEqual(box.version, 0)
-		assert.strictEqual(box.entryCount, 1)
 		assert.deepStrictEqual(box.entries, [{ sampleCount: 1, sampleOffset: 4294967294 }])
 	})
 
@@ -50,7 +47,6 @@ describe('readCtts versions', function () {
 
 		assert.ok(isIsoBoxType('ctts', box))
 		assert.strictEqual(box.version, 1)
-		assert.strictEqual(box.entryCount, 1)
 		assert.deepStrictEqual(box.entries, [{ sampleCount: 1, sampleOffset: -2 }])
 	})
 
@@ -61,5 +57,14 @@ describe('readCtts versions', function () {
 		assert.strictEqual(box.version, 2)
 		assert.strictEqual(box.entryCount, 1)
 		assert.deepStrictEqual(box.entries, [])
+	})
+
+	it('should have no entryCount for a version 0 or 1 box', function () {
+		for (const version of [0, 1]) {
+			const [box] = readIsoBoxes(cttsBox(version), { readers: { ctts: readCtts } })
+
+			assert.ok(isIsoBoxType('ctts', box))
+			assert.ok(!('entryCount' in box))
+		}
 	})
 })

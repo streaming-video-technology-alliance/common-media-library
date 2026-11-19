@@ -1,8 +1,11 @@
 import type { CompositionOffsetBox } from '../boxes/CompositionOffsetBox.ts'
 import type { CompositionOffsetEntry } from '../boxes/CompositionOffsetEntry.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readInt32 } from '../cursor/readInt32.ts'
 
 /**
  * Read the `ctts` box (`CompositionOffsetBox`).
@@ -18,25 +21,34 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const entryCount = readUint32(cursor)
 
-	const { version, flags } = view.readFullBox()
-	const read = version === 1 ? view.readInt : view.readUint
+	if (version > 1) {
+		return {
+			type: 'ctts',
+			version,
+			flags,
+			entryCount,
+			entries: [],
+		}
+	}
 
-	const entryCount = view.readUint(4)
-	const entries =
-		version < 2
-			? view.readEntries<CompositionOffsetEntry>(entryCount, () => ({
-					sampleCount: view.readUint(4),
-					sampleOffset: read(4),
-				}))
-			: []
+	const readOffset = version === 1 ? readInt32 : readUint32
+	const entries: CompositionOffsetEntry[] = []
+
+	for (let i = 0; i < entryCount; i++) {
+		entries.push({
+			sampleCount: readUint32(cursor),
+			sampleOffset: readOffset(cursor),
+		})
+	}
 
 	return {
 		type: 'ctts',
 		version,
 		flags,
-		entryCount,
 		entries,
 	}
 }

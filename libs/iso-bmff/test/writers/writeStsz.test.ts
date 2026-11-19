@@ -1,5 +1,6 @@
 import { writeWith } from '../util/writeWith.ts'
 import { assert, describe, it, writeIsoBox, writeStsz } from '../util/box.ts'
+import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('writeStsz', function () {
 	it('should write a SampleSizeBox with uniform sample size', function () {
@@ -52,7 +53,6 @@ describe('writeStsz', function () {
 			version: 0,
 			flags: 0,
 			sampleSize: 0,
-			sampleCount: 3,
 			entrySize: [512, 1024, 768],
 		}
 
@@ -99,5 +99,13 @@ describe('writeStsz', function () {
 			),
 			0,
 		)
+	})
+
+	it('should write a count of 0 for a box with no count and no entrySize', function () {
+		const uniform = writeWith(writeStsz, { type: 'stsz', version: 0, flags: 0, sampleSize: 512 })
+		const empty = writeWith(writeStsz, { type: 'stsz', version: 0, flags: 0, sampleSize: 0 })
+
+		assert.deepStrictEqual(uniform, boxBytes('stsz', [0, 1], [0, 3], [512, 4], [0, 4]))
+		assert.deepStrictEqual(empty, boxBytes('stsz', [0, 1], [0, 3], [0, 4], [0, 4]))
 	})
 })

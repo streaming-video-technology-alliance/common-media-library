@@ -50,7 +50,6 @@ export type ChunkLargeOffsetBox = FullBox & {
 // @public
 export type ChunkOffsetBox = FullBox & {
     type: "stco";
-    entryCount: number;
     chunkOffset: number[];
 };
 
@@ -65,7 +64,7 @@ export type CompactSampleSizeBox = FullBox & {
 // @public
 export type CompositionOffsetBox = FullBox & {
     type: "ctts";
-    entryCount: number;
+    entryCount?: number;
     entries: CompositionOffsetEntry[];
 };
 
@@ -1000,7 +999,7 @@ export type SampleEntry<T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = 
 export type SampleSizeBox = FullBox & {
     type: "stsz";
     sampleSize: number;
-    sampleCount: number;
+    sampleCount?: number;
     entrySize?: number[];
 };
 
@@ -1013,7 +1012,6 @@ export type SampleTableBox<V extends IsoInt64 = number> = {
 // @public
 export type SampleToChunkBox = FullBox & {
     type: "stsc";
-    entryCount: number;
     entries: SampleToChunkEntry[];
 };
 
@@ -1076,14 +1074,12 @@ export type SoundMediaHeaderBox = FullBox & {
 // @public
 export type SubSampleInformationBox = FullBox & {
     type: "subs";
-    entryCount: number;
     entries: SubSampleInformationEntry[];
 };
 
 // @public
 export type SubSampleInformationEntry = {
     sampleDelta: number;
-    subsampleCount: number;
     subsamples: SubSampleInformationSubsample[];
 };
 
@@ -1126,14 +1122,12 @@ export type SubTrack<V extends IsoInt64 = number> = {
 // @public
 export type SyncSampleBox = FullBox & {
     type: "stss";
-    entryCount: number;
     sampleNumber: number[];
 };
 
 // @public
 export type TimeToSampleBox = FullBox & {
     type: "stts";
-    entryCount: number;
     entries: TimeToSampleEntry[];
 };
 

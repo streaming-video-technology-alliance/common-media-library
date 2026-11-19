@@ -28,7 +28,7 @@ describe('readStco', function () {
 
 		assert.ok(stco)
 		assert.ok(isIsoBoxType('stco', stco))
-		assert.strictEqual(stco.entryCount, 30)
+		assert.strictEqual(stco.chunkOffset.length, 30)
 		assert.strictEqual(stco.chunkOffset[0], 1056)
 		// #endregion example
 	})
@@ -41,11 +41,11 @@ describe('readStco', function () {
 		assert.ok(isIsoBoxType('stco', boxes[0]))
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].flags, 0)
-		assert.strictEqual(boxes[0].entryCount, 4)
+		assert.strictEqual(boxes[0].chunkOffset.length, 4)
 		assert.deepStrictEqual(boxes[0].chunkOffset, [48, 12429, 13229, 13801])
 
 		assert.ok(isIsoBoxType('stco', boxes[1]))
-		assert.strictEqual(boxes[1].entryCount, 4)
+		assert.strictEqual(boxes[1].chunkOffset.length, 4)
 		assert.deepStrictEqual(boxes[1].chunkOffset, [12405, 13217, 13789, 14283])
 	})
 
@@ -56,7 +56,7 @@ describe('readStco', function () {
 		assert.strictEqual(boxes.length, 1)
 
 		assert.ok(isIsoBoxType('stco', box))
-		assert.strictEqual(box.entryCount, 0)
+		assert.strictEqual(box.chunkOffset.length, 0)
 		assert.deepStrictEqual(box.chunkOffset, [])
 	})
 
@@ -94,7 +94,7 @@ describe('readStco', function () {
 		assert.strictEqual(boxes.length, 1)
 
 		assert.ok(isIsoBoxType('stco', box))
-		assert.strictEqual(box.entryCount, 2)
+		assert.strictEqual(box.chunkOffset.length, 2)
 		assert.deepStrictEqual(box.chunkOffset, [2147483648, 4294967295])
 
 		assert.deepStrictEqual(new Uint8Array(writeWith(writeStco, box).buffer), data)

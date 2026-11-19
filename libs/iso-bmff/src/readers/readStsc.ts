@@ -1,8 +1,10 @@
 import type { SampleToChunkBox } from '../boxes/SampleToChunkBox.ts'
 import type { SampleToChunkEntry } from '../boxes/SampleToChunkEntry.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
 
 /**
  * Read the `stsc` box (`SampleToChunkBox`).
@@ -19,20 +21,23 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readStsc(cursor: IsoBoxReadCursor<IsoInt64>): SampleToChunkBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const entryCount = readUint32(cursor)
+	const entries: SampleToChunkEntry[] = []
 
-	const { version, flags } = view.readFullBox()
-	const entryCount = view.readUint(4)
+	for (let i = 0; i < entryCount; i++) {
+		entries.push({
+			firstChunk: readUint32(cursor),
+			samplesPerChunk: readUint32(cursor),
+			sampleDescriptionIndex: readUint32(cursor),
+		})
+	}
 
 	return {
 		type: 'stsc',
 		version,
 		flags,
-		entryCount,
-		entries: view.readEntries<SampleToChunkEntry>(entryCount, () => ({
-			firstChunk: view.readUint(4),
-			samplesPerChunk: view.readUint(4),
-			sampleDescriptionIndex: view.readUint(4),
-		})),
+		entries,
 	}
 }
