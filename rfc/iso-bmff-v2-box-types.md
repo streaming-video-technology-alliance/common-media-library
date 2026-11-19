@@ -574,3 +574,7 @@ Decided on 2026-11-17:
 - **Key IDs of `pssh`.** `kid` is a `Uint8Array[]` with one entry for each key ID.
 - **Child boxes of `stsd` and `dref`.** The field is `boxes`.
 - **Questions 1 to 22.** [Unresolved questions](#unresolved-questions) states each decision.
+
+Amended on 2026-11-18, by phase 2 of the build order ([#724](https://github.com/streaming-video-technology-alliance/common-media-library/pull/724) and [#726](https://github.com/streaming-video-technology-alliance/common-media-library/pull/726)):
+
+- **Map types.** The index part of `IsoBoxReaderMap` declares the reader with a method signature. The `type` parameter of that reader has the type `never`. With the form of [theme 4](#theme-4-four-character-codes), a spread of `createDefaultReaderConfig().readers` with one custom key does not compile. The index part of `IsoBoxWriterMap` is `Record<IsoBoxType, IsoBoxWriter<never>>`. That type equals the index signature of theme 4. The lint rule `consistent-indexed-object-style` requires the `Record` form. The known keys keep the types of theme 4, so a reader or a writer under the key of another known box type is still a compile error. The text of theme 4 and the Types section of the cursor RFC keep the form of the proposal.
