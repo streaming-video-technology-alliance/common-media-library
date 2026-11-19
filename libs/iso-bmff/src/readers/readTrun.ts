@@ -10,6 +10,11 @@ import { readInt32 } from '../cursor/readInt32.ts'
 /**
  * Read the `trun` box (`TrackRunBox`).
  *
+ * ISO/IEC 14496-12:2015 - 8.8.8
+ *
+ * The reader creates one object for each sample of `sample_count`. The reader sets no limit on that count.
+ * If the box sets none of the flags 0x100 to 0x800, each object is empty and uses no bytes of the box.
+ *
  * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `TrackRunBox`
