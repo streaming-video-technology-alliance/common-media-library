@@ -7,7 +7,6 @@ describe('writeStco', function () {
 			type: 'stco' as const,
 			version: 0,
 			flags: 0,
-			entryCount: 3,
 			chunkOffset: [1000, 5000, 9000],
 		}
 

@@ -199,6 +199,7 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `new IsoBoxReadableStream(boxes, config)` | `createIsoBoxReadableStream(boxes, config)` |
 | `writeSidx` writes the low 16 bits of a reference count above 65535 | `writeSidx` throws a `RangeError` |
 | `writeEmsg` writes the text after a U+0000 in `schemeIdUri` or `value` | The string ends at the first U+0000 |
+| `writeSubs` writes the low 16 bits of a subsample count above 65535 | `writeSubs` throws a `RangeError` |
 
 The stream writes one box for each read and writes no box before the first read.
 
@@ -314,6 +315,10 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `numberOfEntry` of `tfra` | `entries.length` |
 | `subsegmentCount` of `ssix`, `rangesCount` of a subsegment | `subsegments.length`, `ranges.length` |
 | `sampleDependencyTable: number[]` of `sdtp` | A `Uint8Array`, a view of the input. Wrap a list in `new Uint8Array(...)`. |
+| `entryCount` of `stts`, `stsc`, `stco`, `stss`, and `subs` | The length of the list: `entries`, `chunkOffset`, or `sampleNumber` |
+| `subsampleCount` of a `subs` entry | `subsamples.length` |
+| `entryCount` of a `ctts` box of version 0 or 1 | `entries.length`. A box of version 2 or above keeps `entryCount`. |
+| `sampleCount` of a `stsz` box with a `sampleSize` of 0 | `entrySize.length`. A box with a `sampleSize` above 0 keeps `sampleCount`. |
 
 ### Changed types
 
@@ -1233,7 +1238,6 @@ export type ChunkLargeOffsetBox = FullBox & {
 // @public
 export type ChunkOffsetBox = FullBox & {
     type: "stco";
-    entryCount: number;
     chunkOffset: number[];
 };
 
@@ -1248,7 +1252,7 @@ export type CompactSampleSizeBox = FullBox & {
 // @public
 export type CompositionOffsetBox = FullBox & {
     type: "ctts";
-    entryCount: number;
+    entryCount?: number;
     entries: CompositionOffsetEntry[];
 };
 
@@ -2183,7 +2187,7 @@ export type SampleEntry<T extends IsoBoxType = IsoBoxType, V extends IsoInt64 = 
 export type SampleSizeBox = FullBox & {
     type: "stsz";
     sampleSize: number;
-    sampleCount: number;
+    sampleCount?: number;
     entrySize?: number[];
 };
 
@@ -2196,7 +2200,6 @@ export type SampleTableBox<V extends IsoInt64 = number> = {
 // @public
 export type SampleToChunkBox = FullBox & {
     type: "stsc";
-    entryCount: number;
     entries: SampleToChunkEntry[];
 };
 
@@ -2259,14 +2262,12 @@ export type SoundMediaHeaderBox = FullBox & {
 // @public
 export type SubSampleInformationBox = FullBox & {
     type: "subs";
-    entryCount: number;
     entries: SubSampleInformationEntry[];
 };
 
 // @public
 export type SubSampleInformationEntry = {
     sampleDelta: number;
-    subsampleCount: number;
     subsamples: SubSampleInformationSubsample[];
 };
 
@@ -2309,14 +2310,12 @@ export type SubTrack<V extends IsoInt64 = number> = {
 // @public
 export type SyncSampleBox = FullBox & {
     type: "stss";
-    entryCount: number;
     sampleNumber: number[];
 };
 
 // @public
 export type TimeToSampleBox = FullBox & {
     type: "stts";
-    entryCount: number;
     entries: TimeToSampleEntry[];
 };
 

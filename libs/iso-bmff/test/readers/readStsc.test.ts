@@ -28,7 +28,7 @@ describe('readStsc', function () {
 
 		assert.ok(stsc)
 		assert.ok(isIsoBoxType('stsc', stsc))
-		assert.strictEqual(stsc.entryCount, 3)
+		assert.strictEqual(stsc.entries.length, 3)
 		assert.deepStrictEqual(stsc.entries[0], {
 			firstChunk: 1,
 			samplesPerChunk: 2,
@@ -45,14 +45,14 @@ describe('readStsc', function () {
 		assert.ok(isIsoBoxType('stsc', boxes[0]))
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].flags, 0)
-		assert.strictEqual(boxes[0].entryCount, 2)
+		assert.strictEqual(boxes[0].entries.length, 2)
 		assert.deepStrictEqual(boxes[0].entries, [
 			{ firstChunk: 1, samplesPerChunk: 2, sampleDescriptionIndex: 1 },
 			{ firstChunk: 2, samplesPerChunk: 1, sampleDescriptionIndex: 1 },
 		])
 
 		assert.ok(isIsoBoxType('stsc', boxes[1]))
-		assert.strictEqual(boxes[1].entryCount, 3)
+		assert.strictEqual(boxes[1].entries.length, 3)
 		assert.deepStrictEqual(boxes[1].entries, [
 			{ firstChunk: 1, samplesPerChunk: 1, sampleDescriptionIndex: 1 },
 			{ firstChunk: 2, samplesPerChunk: 2, sampleDescriptionIndex: 1 },
@@ -67,7 +67,7 @@ describe('readStsc', function () {
 		assert.strictEqual(boxes.length, 1)
 
 		assert.ok(isIsoBoxType('stsc', box))
-		assert.strictEqual(box.entryCount, 0)
+		assert.strictEqual(box.entries.length, 0)
 		assert.deepStrictEqual(box.entries, [])
 	})
 

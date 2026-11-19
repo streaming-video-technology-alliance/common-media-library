@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SampleSizeBox } from '../boxes/SampleSizeBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `stsz` box (`SampleSizeBox`).
@@ -17,25 +18,21 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeStsz(cursor: IsoBoxWriteCursor, box: SampleSizeBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const sampleSizeFieldSize = 4
-	const sampleCountFieldSize = 4
-	const entrySizeSize = box.sampleSize === 0 ? box.sampleCount * 4 : 0
-	const totalSize =
-		headerSize + fullBoxSize + sampleSizeFieldSize + sampleCountFieldSize + entrySizeSize
+	const start = beginIsoFullBox(cursor, 'stsz', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stsz', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+	writeUint32(cursor, box.sampleSize)
 
-	writer.writeUint(box.sampleSize, 4)
-	writer.writeUint(box.sampleCount, 4)
+	if (box.sampleSize !== 0) {
+		writeUint32(cursor, box.sampleCount ?? 0)
+	} else {
+		const entrySize = box.entrySize ?? []
 
-	if (box.sampleSize === 0 && box.entrySize) {
-		for (const size of box.entrySize) {
-			writer.writeUint(size, 4)
+		writeUint32(cursor, entrySize.length)
+
+		for (const size of entrySize) {
+			writeUint32(cursor, size)
 		}
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

@@ -85,11 +85,9 @@ describe('createIsoBoxReadableStream', function () {
 								type: 'subs',
 								version: 1,
 								flags: 0,
-								entryCount: 1,
 								entries: [
 									{
 										sampleDelta: 1,
-										subsampleCount: 3,
 										subsamples: [
 											{
 												subsampleSize: 5,

@@ -7,6 +7,5 @@ import type { SubSampleInformationSubsample } from './SubSampleInformationSubsam
  */
 export type SubSampleInformationEntry = {
 	sampleDelta: number
-	subsampleCount: number
 	subsamples: SubSampleInformationSubsample[]
 }
