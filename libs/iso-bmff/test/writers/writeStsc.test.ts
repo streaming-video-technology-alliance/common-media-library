@@ -1,4 +1,4 @@
-import { assert, describe, it, writeStsc } from '../util/box.ts'
+import { assert, describe, it, writeIsoBox, writeStsc } from '../util/box.ts'
 
 describe('writeStsc', function () {
 	it('should write a SampleToChunkBox correctly', function () {
@@ -22,7 +22,7 @@ describe('writeStsc', function () {
 			],
 		}
 
-		const writer = writeStsc(box)
+		const writer = writeIsoBox(box, { writers: { stsc: writeStsc } })
 		const buffer = new Uint8Array(writer.buffer)
 		// #endregion example
 

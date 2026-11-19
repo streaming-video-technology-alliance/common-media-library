@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import { readFile } from 'node:fs/promises'
 import { rawBytes } from '../util/rawBytes.ts'
 import {
@@ -96,7 +97,7 @@ describe('readStco', function () {
 		assert.strictEqual(box.entryCount, 2)
 		assert.deepStrictEqual(box.chunkOffset, [2147483648, 4294967295])
 
-		assert.deepStrictEqual(new Uint8Array(writeStco(box).buffer), data)
+		assert.deepStrictEqual(new Uint8Array(writeWith(writeStco, box).buffer), data)
 	})
 
 	it('should return a box that writeStco writes as the original bytes', function () {
@@ -109,7 +110,7 @@ describe('readStco', function () {
 				readers: { stco: readStco },
 			}).entries()) {
 				const original = originals[index]
-				const written = writeStco(box)
+				const written = writeWith(writeStco, box)
 
 				assert.deepStrictEqual(
 					new Uint8Array(written.buffer, written.byteOffset, written.byteLength),

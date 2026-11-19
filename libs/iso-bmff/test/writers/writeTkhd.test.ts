@@ -1,4 +1,5 @@
-import { assert, describe, it, writeTkhd, type TrackHeaderBox } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import { assert, describe, it, writeIsoBox, writeTkhd, type TrackHeaderBox } from '../util/box.ts'
 import { ROTATION } from '../util/matrices.ts'
 
 function createBox(matrix: number[]): TrackHeaderBox {
@@ -29,21 +30,24 @@ function storedMatrix(buffer: ArrayBufferLike): number[] {
 describe('writeTkhd', function () {
 	it('should write the identity matrix', function () {
 		// #region example
-		const writer = writeTkhd({
-			type: 'tkhd',
-			version: 0,
-			flags: 3,
-			creationTime: 0,
-			modificationTime: 0,
-			trackId: 1,
-			duration: 0,
-			layer: 0,
-			alternateGroup: 0,
-			volume: 0,
-			matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-			width: 1920,
-			height: 1080,
-		})
+		const writer = writeIsoBox(
+			{
+				type: 'tkhd',
+				version: 0,
+				flags: 3,
+				creationTime: 0,
+				modificationTime: 0,
+				trackId: 1,
+				duration: 0,
+				layer: 0,
+				alternateGroup: 0,
+				volume: 0,
+				matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+				width: 1920,
+				height: 1080,
+			},
+			{ writers: { tkhd: writeTkhd } },
+		)
 		// #endregion example
 
 		assert.strictEqual(writer.byteLength, 92)
@@ -54,13 +58,13 @@ describe('writeTkhd', function () {
 	})
 
 	it('should write a negative matrix entry', function () {
-		const writer = writeTkhd(createBox([0, 1, 0, -1, 0, 0, 1080, 0, 1]))
+		const writer = writeWith(writeTkhd, createBox([0, 1, 0, -1, 0, 0, 1080, 0, 1]))
 
 		assert.deepStrictEqual(storedMatrix(writer.buffer), ROTATION)
 	})
 
 	it('should write u, v, and w as 2.30 values', function () {
-		const writer = writeTkhd(createBox([1, 0, -0.5, 0, 1, 1.5, 0, 0, 1]))
+		const writer = writeWith(writeTkhd, createBox([1, 0, -0.5, 0, 1, 1.5, 0, 0, 1]))
 
 		assert.deepStrictEqual(
 			storedMatrix(writer.buffer),
@@ -69,7 +73,7 @@ describe('writeTkhd', function () {
 	})
 
 	it('should write 0 for a missing matrix entry', function () {
-		const writer = writeTkhd(createBox([1, 0, 0, 0, 1]))
+		const writer = writeWith(writeTkhd, createBox([1, 0, 0, 0, 1]))
 
 		assert.deepStrictEqual(storedMatrix(writer.buffer), [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0])
 	})

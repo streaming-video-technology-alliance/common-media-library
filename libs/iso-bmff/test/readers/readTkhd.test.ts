@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	describe,
@@ -142,7 +143,7 @@ describe('readTkhd', function () {
 			view.setInt16(40 + shift, -1)
 			view.setInt16(42 + shift, -2)
 
-			const writer = writeTkhd(read(bytes))
+			const writer = writeWith(writeTkhd, read(bytes))
 
 			assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)
 		}

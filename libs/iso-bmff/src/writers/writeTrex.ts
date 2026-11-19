@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.8.3
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackExtendsBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView {
+export function writeTrex(cursor: IsoBoxWriteCursor, box: TrackExtendsBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const trackIdSize = 4
@@ -38,5 +39,5 @@ export function writeTrex(box: TrackExtendsBox): IsoBoxWriteView {
 	writer.writeUint(box.defaultSampleSize, 4)
 	writer.writeUint(box.defaultSampleFlags, 4)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

@@ -224,3 +224,8 @@ None.
 ## Final Decision
 
 Accepted on 2026-11-12. The RFC PR #622 carries the functions and the contract above. The implementation PR #654 follows the signatures in [Functions](#functions).
+
+Amended on 2026-11-18, by [Changes to accepted RFCs](iso-bmff-cursor-api.md#changes-to-accepted-rfcs) of the cursor RFC:
+
+- **Writer argument.** A container writer takes a write cursor and the box, in place of the box and a required `config` argument. The cursor has the writers of the child boxes. A missing writer for a child box throws at run time, as the contract of the cursor RFC states.
+- **Writer result.** A writer returns nothing, in place of an `IsoBoxWriteView`. `writeIsoBoxes` returns one array with every box, in place of one array for each box. The text of this RFC keeps the signatures of version 1.

@@ -8,16 +8,17 @@ import {
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
+	writeBytes,
 	writeIsoBox,
 	writeIsoBoxes,
 	type IsoBoxData,
 	type IsoBoxReadConfig,
+	type IsoBoxWriteCursor,
 	type IsoInt64,
 	type ParsedIsoBox,
 } from './util/box.ts'
 import { fixtureFiles } from './util/fixtureFiles.ts'
 import { load } from './util/load.ts'
-import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { record, sourceOf } from './util/sources.ts'
 import { values } from './util/values.ts'
 
@@ -132,7 +133,11 @@ const MODES: [string, string, Read][] = [
 
 // Writers that return the source bytes of a box.
 const sourceWriters = Object.fromEntries(
-	Object.keys(writers).map(type => [type, (box: ParsedIsoBox<IsoInt64>) => sourceOf(box).bytes]),
+	Object.keys(writers).map(type => [
+		type,
+		(cursor: IsoBoxWriteCursor, box: ParsedIsoBox<IsoInt64>) =>
+			writeBytes(cursor, sourceOf(box).bytes),
+	]),
 )
 
 function counts(config: object): Record<string, number> {
@@ -223,7 +228,7 @@ describe('fixture round trip', function () {
 					}
 				}
 
-				const output = reduceUint8Arrays(writeIsoBoxes(boxes, { writers }))
+				const output = writeIsoBoxes(boxes, { writers })
 				const end = boxes.reduce((size, box) => size + sourceOf(box).bytes.length, 0)
 
 				if (end !== source.length) {

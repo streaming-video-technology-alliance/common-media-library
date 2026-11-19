@@ -1,8 +1,10 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	isIsoBoxType,
 	describe,
 	it,
+	writeIsoBox,
 	readFtyp,
 	readIsoBoxes,
 	writeFtyp,
@@ -18,7 +20,7 @@ describe('writeFtyp', function () {
 			compatibleBrands: ['isom'],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeIsoBox(box, { writers: { ftyp: writeFtyp } })
 		const buffer = new Uint8Array(writer.buffer)
 		// #endregion example
 
@@ -60,7 +62,7 @@ describe('writeFtyp', function () {
 			compatibleBrands: ['mp41', 'iso2', 'dash'],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeWith(writeFtyp, box)
 		const buffer = new Uint8Array(writer.buffer)
 		assert.strictEqual(
 			Buffer.compare(
@@ -108,7 +110,7 @@ describe('writeFtyp', function () {
 			compatibleBrands: ['isom', 'iso2'],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeWith(writeFtyp, box)
 		const boxes = readIsoBoxes(writer.buffer, { readers: { ftyp: readFtyp } })
 
 		assert.strictEqual(boxes.length, 1)
@@ -126,7 +128,7 @@ describe('writeFtyp', function () {
 			compatibleBrands: [],
 		}
 
-		const writer = writeFtyp(box)
+		const writer = writeWith(writeFtyp, box)
 		const buffer = new Uint8Array(writer.buffer)
 
 		assert.strictEqual(

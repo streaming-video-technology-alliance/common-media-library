@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	isIsoBoxType,
 	assert,
@@ -28,7 +29,7 @@ describe('writePrsl', function () {
 			boxes: [],
 		}
 
-		const writer = writePrsl(box, { writers: {} })
+		const writer = writeIsoBox(box, { writers: { prsl: writePrsl } })
 		// #endregion example
 
 		assert.deepStrictEqual(
@@ -64,7 +65,8 @@ describe('writePrsl', function () {
 	})
 
 	it('should write the null terminator of an empty preselectionTag when flag 0x1000 is set', function () {
-		const writer = writePrsl(
+		const writer = writeWith(
+			writePrsl,
 			{
 				type: 'prsl',
 				version: 0,
@@ -85,7 +87,8 @@ describe('writePrsl', function () {
 	})
 
 	it('should write an empty tag for each flag when the box has no tag values', function () {
-		const writer = writePrsl(
+		const writer = writeWith(
+			writePrsl,
 			{
 				type: 'prsl',
 				version: 0,
@@ -105,7 +108,8 @@ describe('writePrsl', function () {
 	})
 
 	it('should write an empty tag before a tag that is not empty', function () {
-		const writer = writePrsl(
+		const writer = writeWith(
+			writePrsl,
 			{
 				type: 'prsl',
 				version: 0,
@@ -129,7 +133,8 @@ describe('writePrsl', function () {
 	})
 
 	it('should write a selection priority of 0 when flag 0x2000 is set and the box has no value', function () {
-		const writer = writePrsl(
+		const writer = writeWith(
+			writePrsl,
 			{
 				type: 'prsl',
 				version: 0,
@@ -149,7 +154,8 @@ describe('writePrsl', function () {
 	})
 
 	it('should write a tag as UTF-8 bytes', function () {
-		const writer = writePrsl(
+		const writer = writeWith(
+			writePrsl,
 			{
 				type: 'prsl',
 				version: 0,
@@ -172,7 +178,8 @@ describe('writePrsl', function () {
 	})
 
 	it('should write the tags and the selection priority that the flags declare', function () {
-		const writer = writePrsl(
+		const writer = writeWith(
+			writePrsl,
 			{
 				type: 'prsl',
 				version: 0,
@@ -197,7 +204,8 @@ describe('writePrsl', function () {
 	})
 
 	it('should not write a tag when the flag of the tag is not set', function () {
-		const writer = writePrsl(
+		const writer = writeWith(
+			writePrsl,
 			{
 				type: 'prsl',
 				version: 0,

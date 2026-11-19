@@ -1,3 +1,4 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
 	isIsoBoxType,
@@ -17,12 +18,12 @@ describe('writeTrun', function () {
 			const [box] = readIsoBoxes(source, { readers: { trun: readTrun } })
 
 			assert.ok(isIsoBoxType('trun', box))
-			assert.deepStrictEqual(new Uint8Array(writeTrun(box).buffer), source)
+			assert.deepStrictEqual(new Uint8Array(writeWith(writeTrun, box).buffer), source)
 		})
 	}
 
 	it('should write a negative data offset and composition time offset as signed fields', function () {
-		const writer = writeTrun({
+		const writer = writeWith(writeTrun, {
 			type: 'trun',
 			version: 1,
 			flags: 0x801,
@@ -43,7 +44,7 @@ describe('writeTrun', function () {
 	})
 
 	it('should keep the bytes of a version 0 composition time offset above 2^31', function () {
-		const writer = writeTrun({
+		const writer = writeWith(writeTrun, {
 			type: 'trun',
 			version: 0,
 			flags: 0x800,

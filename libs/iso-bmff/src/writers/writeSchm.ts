@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import { encodeText } from '@svta/cml-utils'
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -9,16 +11,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.12.5
  *
+ * @param cursor - The write cursor
  * @param box - The `SchemeTypeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeSchm.test.ts#example}
  *
  * @public
  */
-export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView {
+export function writeSchm(cursor: IsoBoxWriteCursor, box: SchemeTypeBox): void {
 	const schemeUriBytes = box.flags & 0x000001 ? encodeText(box.schemeUri ?? '') : undefined
 
 	const headerSize = 8
@@ -39,5 +40,5 @@ export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView {
 		writer.writeUint(0, 1)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

@@ -1,3 +1,4 @@
+import { writeWith } from './util/writeWith.ts'
 import {
 	assert,
 	createInt64OverflowReader,
@@ -338,11 +339,16 @@ describe('int64 option', function () {
 		const moof = boxBytes('moof', boxBytes('mfhd', [0, 1], [0, 3], [7, 4]), traf)
 		const boxes = readIsoBoxes(moof, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
 
-		assert.deepStrictEqual(writeIsoBoxes(boxes, createDefaultWriterConfig()), [moof])
+		assert.deepStrictEqual(writeIsoBoxes(boxes, createDefaultWriterConfig()), moof)
 	})
 
 	it('should write a box object with a bigint field', function () {
-		const writer = writeTfdt({ type: 'tfdt', version: 1, flags: 0, baseMediaDecodeTime: HIGH })
+		const writer = writeWith(writeTfdt, {
+			type: 'tfdt',
+			version: 1,
+			flags: 0,
+			baseMediaDecodeTime: HIGH,
+		})
 		const bytes = writeIsoBox(
 			{ type: 'tfdt', version: 1, flags: 0, baseMediaDecodeTime: HIGH },
 			createDefaultWriterConfig(),
@@ -364,10 +370,10 @@ describe('int64 option', function () {
 		const [plain] = readIsoBoxes(tfdt.bytes([LOW], 8), createDefaultReaderConfig())
 
 		assert.ok(big && plain)
-		assert.deepStrictEqual(writeIsoBoxes([big, plain], createDefaultWriterConfig()), [
-			source,
-			tfdt.bytes([LOW], 8),
-		])
+		assert.deepStrictEqual(
+			writeIsoBoxes([big, plain], createDefaultWriterConfig()),
+			new Uint8Array([...source, ...tfdt.bytes([LOW], 8)]),
+		)
 	})
 
 	it('should write boxes with bigint fields to a readable stream', async function () {

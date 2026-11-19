@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SubtitleMediaHeaderBox } from '../boxes/SubtitleMediaHeaderBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 12.6.2
  *
+ * @param cursor - The write cursor
  * @param box - The `SubtitleMediaHeaderBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView {
+export function writeSthd(cursor: IsoBoxWriteCursor, box: SubtitleMediaHeaderBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const totalSize = headerSize + fullBoxSize
@@ -20,5 +21,5 @@ export function writeSthd(box: SubtitleMediaHeaderBox): IsoBoxWriteView {
 	const writer = new IsoBoxWriteView('sthd', totalSize)
 	writer.writeFullBox(box.version, box.flags)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

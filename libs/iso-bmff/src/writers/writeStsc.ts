@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { SampleToChunkBox } from '../boxes/SampleToChunkBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,16 +8,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.7.4
  *
+ * @param cursor - The write cursor
  * @param box - The `SampleToChunkBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeStsc.test.ts#example}
  *
  * @public
  */
-export function writeStsc(box: SampleToChunkBox): IsoBoxWriteView {
+export function writeStsc(cursor: IsoBoxWriteCursor, box: SampleToChunkBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const entryCountSize = 4
@@ -33,5 +34,5 @@ export function writeStsc(box: SampleToChunkBox): IsoBoxWriteView {
 		writer.writeUint(entry.sampleDescriptionIndex, 4)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

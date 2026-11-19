@@ -1,76 +1,52 @@
-import type { IsoBox } from '../IsoBox.ts'
 import { encodeText } from '@svta/cml-utils'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
 import type { PreselectionGroupBox } from '../boxes/PreselectionGroupBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteConfig } from '../IsoBoxWriteConfig.ts'
-import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeChildBoxes } from '../writeChildBoxes.ts'
 
 /**
  * Write the `prsl` box (`PreselectionGroupBox`).
  *
  * The writer writes `preselectionTag` when flag `0x1000` is set and `interleavingTag` when flag `0x4000` is set.
- * The writer writes an empty string for a missing tag.
+ * The writer writes an empty string for a missing tag. The writer writes the child boxes with the writers of the cursor.
  *
+ * @param cursor - The write cursor
  * @param box - The `PreselectionGroupBox` fields to write
- * @param config - The `IsoBoxWriteConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writePrsl.test.ts#example}
  *
  * @public
  */
-export function writePrsl(box: PreselectionGroupBox, config: IsoBoxWriteConfig): IsoBoxWriteView {
-	const preselectionTagBytes = box.flags & 0x1000 ? encodeText(box.preselectionTag ?? '') : null
-	const interleavingTagBytes = box.flags & 0x4000 ? encodeText(box.interleavingTag ?? '') : null
+export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox): void {
+	const { flags } = box
+	const start = beginIsoFullBox(cursor, 'prsl', box.version, flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const groupIdSize = 4
-	const numEntitiesInGroupSize = 4
-	const entitiesSize = box.numEntitiesInGroup * 4
-	const preselectionTagSize = preselectionTagBytes ? preselectionTagBytes.length + 1 : 0
-	const selectionPrioritySize = box.flags & 0x2000 ? 1 : 0
-	const interleavingTagSize = interleavingTagBytes ? interleavingTagBytes.length + 1 : 0
-	const { bytes, size } = writeChildBoxes(box.boxes as IsoBox[], config)
-
-	const totalSize =
-		headerSize +
-		fullBoxSize +
-		groupIdSize +
-		numEntitiesInGroupSize +
-		entitiesSize +
-		preselectionTagSize +
-		selectionPrioritySize +
-		interleavingTagSize +
-		size
-
-	const writer = new IsoBoxWriteView('prsl', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.groupId, 4)
-	writer.writeUint(box.numEntitiesInGroup, 4)
+	writeUint32(cursor, box.groupId)
+	writeUint32(cursor, box.numEntitiesInGroup)
 
 	for (const entityId of box.entityId) {
-		writer.writeUint(entityId, 4)
+		writeUint32(cursor, entityId)
 	}
 
-	if (preselectionTagBytes) {
-		writer.writeBytes(preselectionTagBytes)
-		writer.writeUint(0, 1)
+	if (flags & 0x1000) {
+		writeBytes(cursor, encodeText(box.preselectionTag ?? ''))
+		writeUint8(cursor, 0)
 	}
 
-	if (box.flags & 0x2000) {
-		writer.writeUint(box.selectionPriority ?? 0, 1)
+	if (flags & 0x2000) {
+		writeUint8(cursor, box.selectionPriority ?? 0)
 	}
 
-	if (interleavingTagBytes) {
-		writer.writeBytes(interleavingTagBytes)
-		writer.writeUint(0, 1)
+	if (flags & 0x4000) {
+		writeBytes(cursor, encodeText(box.interleavingTag ?? ''))
+		writeUint8(cursor, 0)
 	}
 
-	writer.writeBytes(bytes)
-
-	return writer
+	writeChildBoxes(cursor, box.boxes)
+	endIsoBox(cursor, start)
 }

@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -7,16 +9,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 23001-7:2016 - 8.2
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackEncryptionBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeTenc.test.ts#example}
  *
  * @public
  */
-export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
+export function writeTenc(cursor: IsoBoxWriteCursor, box: TrackEncryptionBox): void {
 	const { version, defaultConstantIv } = box
 	const defaultConstantIvSize = box.defaultConstantIvSize ?? defaultConstantIv?.length
 	const headerSize = 8
@@ -52,5 +53,5 @@ export function writeTenc(box: TrackEncryptionBox): IsoBoxWriteView {
 		writer.writeArray(defaultConstantIv ?? [], UINT, 1, defaultConstantIvSize)
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

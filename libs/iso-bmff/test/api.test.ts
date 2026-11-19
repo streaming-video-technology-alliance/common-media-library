@@ -7,7 +7,10 @@ import {
 	filterIsoBoxes,
 	findIsoBox,
 	isIsoBoxType,
-	IsoBoxWriteView,
+	beginIsoBox,
+	endIsoBox,
+	writeUint32,
+	type IsoBoxWriteCursor,
 	it,
 	readIsoBoxes,
 	readUint32,
@@ -48,24 +51,15 @@ describe('API', function () {
 			writers: {
 				hvc1: writeVisualSampleEntry,
 				dvh1: writeVisualSampleEntry,
-				test: (box: { type: string; value: number }) => {
-					const view = new IsoBoxWriteView(box.type, 4)
-					view.writeUint(box.value, 4)
-					return view
+				test: (cursor: IsoBoxWriteCursor, box: { type: string; value: number }) => {
+					const start = beginIsoBox(cursor, box.type)
+					writeUint32(cursor, box.value)
+					endIsoBox(cursor, start)
 				},
 				stsd: writeStsd,
 			},
 		})
 
-		const size = stream.reduce((acc, chunk) => acc + chunk.byteLength, 0)
-		const result = new Uint8Array(size)
-		let offset = 0
-
-		for (const box of stream) {
-			result.set(box, offset)
-			offset += box.byteLength
-		}
-
-		assert.strictEqual(Buffer.compare(isoFile, result), 0)
+		assert.strictEqual(Buffer.compare(isoFile, stream), 0)
 	})
 })

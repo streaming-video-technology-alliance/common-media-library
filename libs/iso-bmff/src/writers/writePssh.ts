@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
 import { UINT } from '../IsoBoxFields.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
@@ -7,16 +9,15 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 23001-7:2016 - 8.1
  *
+ * @param cursor - The write cursor
  * @param box - The `ProtectionSystemSpecificHeaderBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writePssh.test.ts#example}
  *
  * @public
  */
-export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView {
+export function writePssh(cursor: IsoBoxWriteCursor, box: ProtectionSystemSpecificHeaderBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const systemIdSize = 16
@@ -40,5 +41,5 @@ export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteVi
 	writer.writeUint(box.dataSize, 4)
 	writer.writeArray(box.data, UINT, 1, box.dataSize)
 
-	return writer
+	writeLegacyView(cursor, writer)
 }

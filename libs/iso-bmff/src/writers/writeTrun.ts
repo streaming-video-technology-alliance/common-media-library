@@ -1,3 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
 import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
@@ -6,13 +8,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.8.8
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackRunBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
+export function writeTrun(cursor: IsoBoxWriteCursor, box: TrackRunBox): void {
 	const headerSize = 8
 	const fullBoxSize = 4
 	const sampleCountSize = 4
@@ -59,5 +60,5 @@ export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
 		}
 	}
 
-	return writer
+	writeLegacyView(cursor, writer)
 }
