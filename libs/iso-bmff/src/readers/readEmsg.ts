@@ -3,8 +3,13 @@ import type {
 	EventMessageBoxUnrecognizedVersionNumber,
 } from '../boxes/EventMessageBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readWideUint } from '../cursor/readWideUint.ts'
+import { readTerminatedUtf8 } from '../cursor/readTerminatedUtf8.ts'
+import { readBytes } from '../cursor/readBytes.ts'
 
 /**
  * Read the `emsg` box (`EventMessageBox`).
@@ -27,23 +32,21 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): EventMessageBox<V> {
-	const view = new IsoBoxReadView(cursor)
-
-	const { readUint, readUtf8, readData } = view
-	const { version, flags } = view.readFullBox()
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
 
 	if (version === 0) {
 		return {
 			type: 'emsg',
 			version,
 			flags,
-			schemeIdUri: readUtf8(-1),
-			value: readUtf8(-1),
-			timescale: readUint(4),
-			presentationTimeDelta: readUint(4),
-			eventDuration: readUint(4),
-			id: readUint(4),
-			messageData: readData(-1),
+			schemeIdUri: readTerminatedUtf8(cursor),
+			value: readTerminatedUtf8(cursor),
+			timescale: readUint32(cursor),
+			presentationTimeDelta: readUint32(cursor),
+			eventDuration: readUint32(cursor),
+			id: readUint32(cursor),
+			messageData: readBytes(cursor, cursor.end - cursor.pos),
 		}
 	}
 
@@ -52,13 +55,13 @@ export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Event
 			type: 'emsg',
 			version,
 			flags,
-			timescale: readUint(4),
-			presentationTime: view.readWideUint(8),
-			eventDuration: readUint(4),
-			id: readUint(4),
-			schemeIdUri: readUtf8(-1),
-			value: readUtf8(-1),
-			messageData: readData(-1),
+			timescale: readUint32(cursor),
+			presentationTime: readWideUint(cursor, 8),
+			eventDuration: readUint32(cursor),
+			id: readUint32(cursor),
+			schemeIdUri: readTerminatedUtf8(cursor),
+			value: readTerminatedUtf8(cursor),
+			messageData: readBytes(cursor, cursor.end - cursor.pos),
 		}
 	}
 
@@ -73,6 +76,6 @@ export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Event
 		presentationTime: 0,
 		eventDuration: 0,
 		id: 0,
-		messageData: readData(-1),
+		messageData: readBytes(cursor, cursor.end - cursor.pos),
 	}
 }

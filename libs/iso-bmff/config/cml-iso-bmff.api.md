@@ -979,7 +979,7 @@ export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCurs
 // @public
 export type SampleDependencyTypeBox = FullBox & {
     type: "sdtp";
-    sampleDependencyTable: number[];
+    sampleDependencyTable: Uint8Array;
 };
 
 // @public
@@ -1098,7 +1098,6 @@ export type SubSampleInformationSubsample = {
 // @public
 export type SubsegmentIndexBox = FullBox & {
     type: "ssix";
-    subsegmentCount: number;
     subsegments: SubsegmentIndexSubsegment[];
 };
 
@@ -1110,7 +1109,6 @@ export type SubsegmentIndexRange = {
 
 // @public
 export type SubsegmentIndexSubsegment = {
-    rangesCount: number;
     ranges: SubsegmentIndexRange[];
 };
 
@@ -1200,7 +1198,6 @@ export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
 export type TrackFragmentRandomAccessBox<V extends IsoInt64 = number> = FullBox & {
     type: "tfra";
     trackId: number;
-    numberOfEntry: number;
     lengthSizeOfTrafNum: number;
     lengthSizeOfTrunNum: number;
     lengthSizeOfSampleNum: number;
@@ -1240,7 +1237,6 @@ export type TrackReferenceBox<V extends IsoInt64 = number> = {
 // @public
 export type TrackRunBox = FullBox & {
     type: "trun";
-    sampleCount: number;
     dataOffset?: number;
     firstSampleFlags?: number;
     samples: TrackRunSample[];

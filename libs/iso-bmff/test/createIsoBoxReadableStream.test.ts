@@ -117,7 +117,6 @@ describe('createIsoBoxReadableStream', function () {
 								type: 'trun',
 								version: 0,
 								flags: 1793,
-								sampleCount: 1,
 								dataOffset: 160,
 								samples: [
 									{

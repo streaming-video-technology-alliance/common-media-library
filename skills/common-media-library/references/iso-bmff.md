@@ -197,6 +197,8 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `writeIsoBox` returns a view of the input for an `ArrayBufferView` | `writeIsoBox` returns a new array |
 | `createIsoBoxReadableStream` throws an error of the first box | The error rejects the first read |
 | `new IsoBoxReadableStream(boxes, config)` | `createIsoBoxReadableStream(boxes, config)` |
+| `writeSidx` writes the low 16 bits of a reference count above 65535 | `writeSidx` throws a `RangeError` |
+| `writeEmsg` writes the text after a U+0000 in `schemeIdUri` or `value` | The string ends at the first U+0000 |
 
 The stream writes one box for each read and writes no box before the first read.
 
@@ -308,6 +310,10 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `defaultIsEncrypted` of `tenc` | `defaultIsProtected`, with the pattern in `defaultCryptByteBlock` and `defaultSkipByteBlock` |
 | `isGroupLabel` of `labl` | `(box.flags & 0x1) !== 0` |
 | `reference` and `sap` of a `sidx` reference | The decoded fields, such as `referenceType` and `sapType` |
+| `sampleCount` of `trun` | `samples.length`. The writer writes the length of `samples`. |
+| `numberOfEntry` of `tfra` | `entries.length` |
+| `subsegmentCount` of `ssix`, `rangesCount` of a subsegment | `subsegments.length`, `ranges.length` |
+| `sampleDependencyTable: number[]` of `sdtp` | A `Uint8Array`, a view of the input. Wrap a list in `new Uint8Array(...)`. |
 
 ### Changed types
 
@@ -2156,7 +2162,7 @@ export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCurs
 // @public
 export type SampleDependencyTypeBox = FullBox & {
     type: "sdtp";
-    sampleDependencyTable: number[];
+    sampleDependencyTable: Uint8Array;
 };
 
 // @public
@@ -2275,7 +2281,6 @@ export type SubSampleInformationSubsample = {
 // @public
 export type SubsegmentIndexBox = FullBox & {
     type: "ssix";
-    subsegmentCount: number;
     subsegments: SubsegmentIndexSubsegment[];
 };
 
@@ -2287,7 +2292,6 @@ export type SubsegmentIndexRange = {
 
 // @public
 export type SubsegmentIndexSubsegment = {
-    rangesCount: number;
     ranges: SubsegmentIndexRange[];
 };
 
@@ -2377,7 +2381,6 @@ export type TrackFragmentHeaderBox<V extends IsoInt64 = number> = FullBox & {
 export type TrackFragmentRandomAccessBox<V extends IsoInt64 = number> = FullBox & {
     type: "tfra";
     trackId: number;
-    numberOfEntry: number;
     lengthSizeOfTrafNum: number;
     lengthSizeOfTrunNum: number;
     lengthSizeOfSampleNum: number;
@@ -2417,7 +2420,6 @@ export type TrackReferenceBox<V extends IsoInt64 = number> = {
 // @public
 export type TrackRunBox = FullBox & {
     type: "trun";
-    sampleCount: number;
     dataOffset?: number;
     firstSampleFlags?: number;
     samples: TrackRunSample[];

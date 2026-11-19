@@ -44,4 +44,30 @@ describe('writeSidx', function () {
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), sidxBox(2))
 	})
+
+	it('should throw a RangeError for more than 65535 references', function () {
+		const reference = {
+			referenceType: 0,
+			referencedSize: 1,
+			subsegmentDuration: 1,
+			startsWithSap: 0,
+			sapType: 0,
+			sapDeltaTime: 0,
+		}
+
+		assert.throws(
+			() =>
+				writeWith(writeSidx, {
+					type: 'sidx',
+					version: 0,
+					flags: 0,
+					referenceId: 1,
+					timescale: 1,
+					earliestPresentationTime: 0,
+					firstOffset: 0,
+					references: Array.from({ length: 65536 }, () => reference),
+				}),
+			{ name: 'RangeError', message: 'The sidx box has 65536 references, and the limit is 65535' },
+		)
+	})
 })

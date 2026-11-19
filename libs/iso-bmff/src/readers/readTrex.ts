@@ -1,7 +1,9 @@
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
 
 /**
  * Read the `trex` box (`TrackExtendsBox`).
@@ -13,15 +15,14 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readTrex(cursor: IsoBoxReadCursor<IsoInt64>): TrackExtendsBox {
-	const view = new IsoBoxReadView(cursor)
-
 	return {
 		type: 'trex',
-		...view.readFullBox(),
-		trackId: view.readUint(4),
-		defaultSampleDescriptionIndex: view.readUint(4),
-		defaultSampleDuration: view.readUint(4),
-		defaultSampleSize: view.readUint(4),
-		defaultSampleFlags: view.readUint(4),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		trackId: readUint32(cursor),
+		defaultSampleDescriptionIndex: readUint32(cursor),
+		defaultSampleDuration: readUint32(cursor),
+		defaultSampleSize: readUint32(cursor),
+		defaultSampleFlags: readUint32(cursor),
 	}
 }

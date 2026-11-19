@@ -1,6 +1,5 @@
-import { readEmsg, readIsoBoxes, type EventMessageBox } from '@svta/cml-iso-bmff'
+import { isIsoBoxType, readEmsg, readIsoBoxes, type EventMessageBox } from '@svta/cml-iso-bmff'
 
-const EMSG_BOX_TYPE = 'emsg'
 const VSI_SCHEME_URI = 'urn:c2pa:verifiable-segment-info'
 const EMSG_READER_CONFIG = { readers: { emsg: readEmsg } }
 
@@ -18,9 +17,7 @@ const EMSG_READER_CONFIG = { readers: { emsg: readEmsg } }
  */
 export function extractVsiEmsgBox(segmentBytes: Uint8Array): EventMessageBox | null {
 	for (const box of readIsoBoxes(segmentBytes, EMSG_READER_CONFIG)) {
-		if (box.type !== EMSG_BOX_TYPE) continue
-		const emsg = box as EventMessageBox
-		if (emsg.schemeIdUri === VSI_SCHEME_URI) return emsg
+		if (isIsoBoxType('emsg', box) && box.schemeIdUri === VSI_SCHEME_URI) return box
 	}
 	return null
 }

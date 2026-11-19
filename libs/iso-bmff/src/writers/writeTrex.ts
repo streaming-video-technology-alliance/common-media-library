@@ -1,7 +1,8 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackExtendsBox } from '../boxes/TrackExtendsBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `trex` box (`TrackExtendsBox`).
@@ -14,30 +15,12 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeTrex(cursor: IsoBoxWriteCursor, box: TrackExtendsBox): void {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const trackIdSize = 4
-	const defaultSampleDescriptionIndexSize = 4
-	const defaultSampleDurationSize = 4
-	const defaultSampleSizeSize = 4
-	const defaultSampleFlagsSize = 4
-	const totalSize =
-		headerSize +
-		fullBoxSize +
-		trackIdSize +
-		defaultSampleDescriptionIndexSize +
-		defaultSampleDurationSize +
-		defaultSampleSizeSize +
-		defaultSampleFlagsSize
+	const start = beginIsoFullBox(cursor, 'trex', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('trex', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.trackId, 4)
-	writer.writeUint(box.defaultSampleDescriptionIndex, 4)
-	writer.writeUint(box.defaultSampleDuration, 4)
-	writer.writeUint(box.defaultSampleSize, 4)
-	writer.writeUint(box.defaultSampleFlags, 4)
-
-	writeLegacyView(cursor, writer)
+	writeUint32(cursor, box.trackId)
+	writeUint32(cursor, box.defaultSampleDescriptionIndex)
+	writeUint32(cursor, box.defaultSampleDuration)
+	writeUint32(cursor, box.defaultSampleSize)
+	writeUint32(cursor, box.defaultSampleFlags)
+	endIsoBox(cursor, start)
 }

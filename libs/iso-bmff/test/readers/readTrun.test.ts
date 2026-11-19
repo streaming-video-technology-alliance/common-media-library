@@ -5,7 +5,7 @@ describe('readTrun', function () {
 	it('should correctly parse the box from sample data', function () {
 		const box = findBox('mss_moof_tfdt.mp4', 'trun', { readers: { trun: readTrun } })
 
-		assert.strictEqual(box.sampleCount, 93)
+		assert.strictEqual(box.samples.length, 93)
 		assert.strictEqual(box.dataOffset, 856)
 		assert.strictEqual(box.firstSampleFlags, undefined)
 
@@ -30,7 +30,7 @@ describe('readTrun versions', function () {
 
 			assert.ok(isIsoBoxType('trun', box))
 			assert.strictEqual(box.version, version)
-			assert.strictEqual(box.sampleCount, 1)
+			assert.strictEqual(box.samples.length, 1)
 			assert.strictEqual(box.samples[0].sampleCompositionTimeOffset, offset)
 		})
 	}
