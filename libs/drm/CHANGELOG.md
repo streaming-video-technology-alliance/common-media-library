@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- `ensureEncryptedInit` now accepts `schemeType` as a four-character string, such as `'cbcs'`, and `defaultKid` as a `Uint8Array`. The number and `number[]` forms still work, and the output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
 - `ensureEncryptedInit` now reads the boxes with `readIsoBoxes` of `@svta/cml-iso-bmff` 2.0.0. The function skips a sample entry that the package returns as a raw box. This change does not change the public API or the output bytes ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `ensureEncryptedInit` now writes the boxes with `writeIsoBoxes` of `@svta/cml-iso-bmff` 2.0.0. That function returns one array. This change does not change the public API or the output bytes ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - `@svta/cml-drm` now needs `@svta/cml-iso-bmff` 2.0.0 or later ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).

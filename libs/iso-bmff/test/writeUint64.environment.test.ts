@@ -14,7 +14,7 @@ describe('writeUint64 in a runtime without BigInt', () => {
 		delete globalThis.BigInt
 
 		try {
-			const { createIsoBoxWriteCursor, fourCcToUint32, writeUint64, writeWideUint } =
+			const { createIsoBoxWriteCursor, isContainer, writeUint64, writeWideUint } =
 				await import('@svta/cml-iso-bmff')
 
 			const cursor = createIsoBoxWriteCursor()
@@ -24,7 +24,7 @@ describe('writeUint64 in a runtime without BigInt', () => {
 			throws(() => writeUint64(createIsoBoxWriteCursor(), one), ReferenceError)
 
 			// Exports that do not use BigInt remain fully usable
-			strictEqual(fourCcToUint32('ftyp'), 0x66747970)
+			strictEqual(isContainer({ type: 'moov' }), true)
 		} finally {
 			globalThis.BigInt = NativeBigInt
 		}

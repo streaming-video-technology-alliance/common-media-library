@@ -26,7 +26,7 @@ describe('readSchm', function () {
 		assert.ok(isIsoBoxType('schm', schm))
 		assert.strictEqual(schm.version, 0)
 		assert.strictEqual(schm.flags, 1)
-		assert.strictEqual(schm.schemeType, 0x63656e63)
+		assert.strictEqual(schm.schemeType, 'cenc')
 		assert.strictEqual(schm.schemeVersion, 0x00010000)
 		assert.strictEqual(schm.schemeUri, 'é日😀')
 	})
@@ -54,7 +54,7 @@ describe('readSchm', function () {
 
 		assert.ok(schm)
 		assert.ok(isIsoBoxType('schm', schm))
-		assert.strictEqual(schm.schemeType, 0x63656e63)
+		assert.strictEqual(schm.schemeType, 'cenc')
 		assert.strictEqual(schm.schemeVersion, 0x00010000)
 		assert.strictEqual(schm.schemeUri, undefined)
 	})

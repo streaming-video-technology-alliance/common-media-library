@@ -1,8 +1,10 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import { writeFixedBytes } from '../cursor/writeFixedBytes.ts'
 
 /**
  * Write the `tenc` box (`TrackEncryptionBox`).
@@ -19,39 +21,30 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  */
 export function writeTenc(cursor: IsoBoxWriteCursor, box: TrackEncryptionBox): void {
 	const { version, defaultConstantIv } = box
-	const defaultConstantIvSize = box.defaultConstantIvSize ?? defaultConstantIv?.length
-	const headerSize = 8
-	const fullBoxSize = 4
-	const protectionFieldsSize = 3
-	const defaultIvSizeSize = 1
-	const defaultKidSize = 16
-	const constantIvSize = defaultConstantIvSize === undefined ? 0 : 1 + defaultConstantIvSize
-	const totalSize =
-		headerSize +
-		fullBoxSize +
-		protectionFieldsSize +
-		defaultIvSizeSize +
-		defaultKidSize +
-		constantIvSize
 
-	const writer = new IsoBoxWriteView('tenc', totalSize)
-	writer.writeFullBox(version, box.flags)
+	if (defaultConstantIv && defaultConstantIv.length > 0xff) {
+		throw new RangeError(
+			`The tenc box has a constant IV of ${defaultConstantIv.length} bytes, and the limit is 255`,
+		)
+	}
 
-	writer.writeUint(0, 1)
-	writer.writeUint(
+	const start = beginIsoFullBox(cursor, 'tenc', version, box.flags)
+
+	writeUint8(cursor, 0)
+	writeUint8(
+		cursor,
 		version > 0
 			? (((box.defaultCryptByteBlock ?? 0) & 0xf) << 4) | ((box.defaultSkipByteBlock ?? 0) & 0xf)
 			: 0,
-		1,
 	)
-	writer.writeUint(box.defaultIsProtected, 1)
-	writer.writeUint(box.defaultPerSampleIvSize, 1)
-	writer.writeArray(box.defaultKid, UINT, 1, 16)
+	writeUint8(cursor, box.defaultIsProtected)
+	writeUint8(cursor, box.defaultPerSampleIvSize)
+	writeFixedBytes(cursor, box.defaultKid, 16)
 
-	if (defaultConstantIvSize !== undefined) {
-		writer.writeUint(defaultConstantIvSize, 1)
-		writer.writeArray(defaultConstantIv ?? [], UINT, 1, defaultConstantIvSize)
+	if (defaultConstantIv) {
+		writeUint8(cursor, defaultConstantIv.length)
+		writeBytes(cursor, defaultConstantIv)
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

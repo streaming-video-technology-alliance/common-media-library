@@ -1,8 +1,10 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
-import { writeLegacyView } from '../cursor/writeLegacyView.ts'
-import { encodeText } from '@svta/cml-utils'
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeFourCc } from '../cursor/writeFourCc.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `schm` box (`SchemeTypeBox`).
@@ -20,25 +22,14 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * @public
  */
 export function writeSchm(cursor: IsoBoxWriteCursor, box: SchemeTypeBox): void {
-	const schemeUriBytes = box.flags & 0x000001 ? encodeText(box.schemeUri ?? '') : undefined
+	const start = beginIsoFullBox(cursor, 'schm', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const schemeTypeSize = 4
-	const schemeVersionSize = 4
-	const schemeUriSize = schemeUriBytes ? schemeUriBytes.length + 1 : 0 // null-terminated
-	const totalSize = headerSize + fullBoxSize + schemeTypeSize + schemeVersionSize + schemeUriSize
+	writeFourCc(cursor, box.schemeType)
+	writeUint32(cursor, box.schemeVersion)
 
-	const writer = new IsoBoxWriteView('schm', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.schemeType, 4)
-	writer.writeUint(box.schemeVersion, 4)
-
-	if (schemeUriBytes) {
-		writer.writeBytes(schemeUriBytes)
-		writer.writeUint(0, 1)
+	if (box.flags & 0x000001) {
+		writeTerminatedUtf8(cursor, box.schemeUri ?? '')
 	}
 
-	writeLegacyView(cursor, writer)
+	endIsoBox(cursor, start)
 }

@@ -63,13 +63,12 @@ describe('writeTenc', function () {
 				flags: 0,
 				defaultIsProtected: 1,
 				defaultPerSampleIvSize: 0,
-				defaultKid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+				defaultKid: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
 				defaultCryptByteBlock: 1,
 				defaultSkipByteBlock: 9,
-				defaultConstantIvSize: 16,
-				defaultConstantIv: [
+				defaultConstantIv: new Uint8Array([
 					161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176,
-				],
+				]),
 			},
 			{ writers: { tenc: writeTenc } },
 		)
@@ -89,7 +88,7 @@ describe('writeTenc', function () {
 	})
 
 	it('should write the constant IV of a version 0 box', function () {
-		const bytes = write(tenc({ defaultConstantIvSize: 8, defaultConstantIv: IV.slice(0, 8) }))
+		const bytes = write(tenc({ defaultConstantIv: IV.slice(0, 8) }))
 
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 8, ...IV.slice(0, 8)))
 	})
@@ -148,24 +147,17 @@ describe('writeTenc', function () {
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
 	})
 
-	it('should write a 0 for each byte that defaultConstantIv does not have', function () {
-		const missing = write(tenc({ defaultConstantIvSize: 4 }))
-		const short = write(tenc({ defaultConstantIvSize: 4, defaultConstantIv: [161, 162] }))
-
-		assert.deepStrictEqual(missing, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 4, 0, 0, 0, 0))
-		assert.deepStrictEqual(short, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 4, 161, 162, 0, 0))
-	})
-
-	it('should take the size from defaultConstantIv for a box with no defaultConstantIvSize', function () {
+	it('should write the length of defaultConstantIv as default_constant_IV_size', function () {
 		const bytes = write(tenc({ defaultConstantIv: IV }))
 
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 16, ...IV))
 	})
 
-	it('should write defaultConstantIvSize bytes of a longer defaultConstantIv', function () {
-		const bytes = write(tenc({ defaultConstantIvSize: 8, defaultConstantIv: IV }))
-
-		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 0, ...KID, 8, ...IV.slice(0, 8)))
+	it('should throw a RangeError for a constant IV above 255 bytes', function () {
+		assert.throws(() => write(tenc({ defaultConstantIv: new Uint8Array(256) })), {
+			name: 'RangeError',
+			message: 'The tenc box has a constant IV of 256 bytes, and the limit is 255',
+		})
 	})
 
 	it('should write defaultIsProtected', function () {

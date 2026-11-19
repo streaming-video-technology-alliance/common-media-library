@@ -9,7 +9,8 @@ import type { FullBox } from './FullBox.ts'
  */
 export type SchemeTypeBox = FullBox & {
 	type: 'schm'
-	schemeType: number
+	/** The four-character code of the protection scheme, such as `cenc`. */
+	schemeType: string
 	schemeVersion: number
 	schemeUri?: string
 }

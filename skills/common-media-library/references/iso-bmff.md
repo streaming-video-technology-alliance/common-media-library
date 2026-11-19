@@ -204,6 +204,8 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `writeFtyp`, `writeStyp`, and `writeHdlr` write a code that does not have 4 characters | The writers throw a `RangeError` |
 | `writeMdhd` writes 0 or a wrong code for a `language` that is not 3 lower-case letters | `writeMdhd` writes the code of `und` |
 | `writeHdlr` writes the text after a U+0000 in `name` | The name ends at the first U+0000 |
+| `writeSchm` writes the text after a U+0000 in `schemeUri` | The string ends at the first U+0000 |
+| `writeTenc` writes the low 8 bits of a constant IV size above 255 | `writeTenc` throws a `RangeError` |
 
 The stream writes one box for each read and writes no box before the first read.
 
@@ -297,6 +299,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `ParsedBox`, `IsoTypedParsedBox` | `ParsedIsoBox` |
 | `IsoFieldTypeMap`, `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, `IsoBoxFields` | The field functions, such as `readUint32` |
 | `IsoBoxReadableStream` | `createIsoBoxReadableStream` |
+| `fourCcToUint32` | A field with a four-character code is a string. To convert a code, compute `new DataView(new TextEncoder().encode(code).buffer).getUint32(0)`. |
 | `isFullBox` | `isIsoBoxType`, or a test such as `'version' in box && 'flags' in box` |
 | The child types, such as `MovieBoxChild` and `VisualSampleEntryBoxChild` | `ParsedIsoBox` |
 | `TrackReferenceTypeBox` | A raw box. A child of a `tref` box is a raw box. |
@@ -325,6 +328,11 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `sampleCount` of a `stsz` box with a `sampleSize` of 0 | `entrySize.length`. A box with a `sampleSize` above 0 keeps `sampleCount`. |
 | `entryCount` of `co64`, `sampleCount` of `stz2` | `chunkOffset.length`, `entrySize.length` |
 | `entryCount` of `elst` | `entries.length` |
+| `kidCount` and `kid: number[]` of `pssh` | `kid: Uint8Array[]`, one entry for each key ID. The count is `kid.length`. |
+| `dataSize` and `data: number[]` of `pssh` | `data: Uint8Array`. The size is `data.length`. |
+| `systemId: number[]` of `pssh`, `defaultKid: number[]` of `tenc` | A `Uint8Array` of 16 bytes |
+| `defaultConstantIvSize` and `defaultConstantIv: number[]` of `tenc` | `defaultConstantIv: Uint8Array`. The size is `defaultConstantIv.length`. |
+| `dataFormat: number` of `frma`, `schemeType: number` of `schm` | A string, such as `'avc1'` or `'cenc'` |
 | `matrix: number[]` of `mvhd` and `tkhd`, `opColor: number[]` of `vmhd` | Labeled tuples of 9 and 3 numbers. Annotate an array that your code builds, such as `matrix as MovieHeaderBox['matrix']`. |
 
 ### Changed types
@@ -1413,9 +1421,6 @@ export function findIsoBox<T, S extends T>(boxes: Iterable<T>, callback: (box: T
 export function findIsoBox<T>(boxes: Iterable<T>, callback: (box: T) => boolean, config?: TraverseIsoBoxesConfig): T | null;
 
 // @public
-export function fourCcToUint32(str: string): number;
-
-// @public
 export type FreeSpaceBox<T extends "free" | "skip" = "free"> = {
     type: T;
     data: Uint8Array;
@@ -1807,7 +1812,7 @@ export function nextIsoBox(cursor: IsoBoxReadCursor<IsoInt64>): IsoBoxType | nul
 // @public
 export type OriginalFormatBox = {
     type: "frma";
-    dataFormat: number;
+    dataFormat: string;
 };
 
 // @public
@@ -1843,11 +1848,9 @@ export type ProtectionSchemeInfoBox<V extends IsoInt64 = number> = {
 // @public
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
     type: "pssh";
-    systemId: number[];
-    kidCount: number;
-    kid: number[];
-    dataSize: number;
-    data: number[];
+    systemId: Uint8Array;
+    kid: Uint8Array[];
+    data: Uint8Array;
 };
 
 // @public
@@ -2229,7 +2232,7 @@ export type SchemeInformationBox<V extends IsoInt64 = number> = {
 // @public
 export type SchemeTypeBox = FullBox & {
     type: "schm";
-    schemeType: number;
+    schemeType: string;
     schemeVersion: number;
     schemeUri?: string;
 };
@@ -2345,12 +2348,11 @@ export type TrackBox<V extends IsoInt64 = number> = {
 export type TrackEncryptionBox = FullBox & {
     type: "tenc";
     defaultPerSampleIvSize: number;
-    defaultKid: number[];
+    defaultKid: Uint8Array;
     defaultIsProtected: number;
     defaultCryptByteBlock?: number;
     defaultSkipByteBlock?: number;
-    defaultConstantIvSize?: number;
-    defaultConstantIv?: number[];
+    defaultConstantIv?: Uint8Array;
 };
 
 // @public

@@ -86,4 +86,25 @@ describe('ensureEncryptedInit', () => {
 		// Result should be larger than original since it includes both
 		equal(result.length > original.length, true)
 	})
+
+	it('should give the same bytes for a schemeType string and number', () => {
+		const fromString = ensureEncryptedInit(original, { schemeType: 'cbcs', includeOriginal: false })
+		const fromNumber = ensureEncryptedInit(original, {
+			schemeType: 0x63626373,
+			includeOriginal: false,
+		})
+
+		equal(Buffer.compare(fromString, fromNumber), 0)
+	})
+
+	it('should give the same bytes for a defaultKid Uint8Array and number array', () => {
+		const kid = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+		const fromArray = ensureEncryptedInit(original, { defaultKid: kid, includeOriginal: false })
+		const fromBytes = ensureEncryptedInit(original, {
+			defaultKid: new Uint8Array(kid),
+			includeOriginal: false,
+		})
+
+		equal(Buffer.compare(fromArray, fromBytes), 0)
+	})
 })

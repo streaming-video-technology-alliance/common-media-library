@@ -1,8 +1,9 @@
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
-import { IsoBoxReadView } from '../IsoBoxReadView.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readBytes } from '../cursor/readBytes.ts'
 
 /**
  * Read the `tenc` box (`TrackEncryptionBox`).
@@ -19,19 +20,20 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * @public
  */
 export function readTenc(cursor: IsoBoxReadCursor<IsoInt64>): TrackEncryptionBox {
-	const view = new IsoBoxReadView(cursor)
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
 
-	const { version, flags } = view.readFullBox()
-	view.jump(1)
-	const pattern = view.readUint(1)
-	const defaultIsProtected = view.readUint(1)
-	const defaultPerSampleIvSize = view.readUint(1)
+	cursor.pos += 1
+
+	const pattern = readUint8(cursor)
+	const defaultIsProtected = readUint8(cursor)
+	const defaultPerSampleIvSize = readUint8(cursor)
 	const box: TrackEncryptionBox = {
 		type: 'tenc',
 		version,
 		flags,
 		defaultPerSampleIvSize,
-		defaultKid: view.readArray(UINT, 1, 16),
+		defaultKid: readBytes(cursor, 16),
 		defaultIsProtected,
 	}
 
@@ -40,9 +42,8 @@ export function readTenc(cursor: IsoBoxReadCursor<IsoInt64>): TrackEncryptionBox
 		box.defaultSkipByteBlock = pattern & 0xf
 	}
 
-	if (defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && view.bytesRemaining > 0) {
-		box.defaultConstantIvSize = view.readUint(1)
-		box.defaultConstantIv = view.readArray(UINT, 1, box.defaultConstantIvSize)
+	if (defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && cursor.pos < cursor.end) {
+		box.defaultConstantIv = readBytes(cursor, readUint8(cursor))
 	}
 
 	return box

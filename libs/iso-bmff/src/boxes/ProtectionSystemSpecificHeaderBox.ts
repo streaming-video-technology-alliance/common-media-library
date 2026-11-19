@@ -9,15 +9,15 @@ import type { FullBox } from './FullBox.ts'
  */
 export type ProtectionSystemSpecificHeaderBox = FullBox & {
 	type: 'pssh'
-	/** The UUID of the protection system, 16 bytes. */
-	systemId: number[]
+	/** The UUID of the protection system, 16 bytes. The reader returns a view of the input. */
+	systemId: Uint8Array
 
-	/** The number of key IDs in `kid`. The value is 0 for a version 0 box. */
-	kidCount: number
+	/**
+	 * The key IDs, one 16-byte entry for each key ID. A box of version 0 has no key IDs.
+	 * The writer writes the key IDs and their count only for version 1 or above.
+	 */
+	kid: Uint8Array[]
 
-	/** The bytes of the key IDs, one after the other. Each key ID has 16 bytes, so the list has `kidCount * 16` numbers. */
-	kid: number[]
-
-	dataSize: number
-	data: number[]
+	/** The data of the protection system. The reader returns a view of the input. */
+	data: Uint8Array
 }
