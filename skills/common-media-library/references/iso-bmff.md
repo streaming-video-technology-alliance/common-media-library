@@ -1433,6 +1433,9 @@ export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
 };
 
 // @public
+export function nextIsoBox(cursor: IsoBoxReadCursor<IsoInt64>): IsoBoxType | null;
+
+// @public
 export type OriginalFormatBox = {
     type: "frma";
     dataFormat: number;
@@ -1868,6 +1871,12 @@ export type SchemeTypeBox = FullBox & {
     schemeVersion: number;
     schemeUri?: string;
 };
+
+// @public
+export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxReadCursor<V>, path: readonly IsoBoxType[]): IsoBoxReadCursor<V> | null;
+
+// @public
+export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V> | null;
 
 // @public
 export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
