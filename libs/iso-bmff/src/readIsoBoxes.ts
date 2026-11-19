@@ -16,6 +16,10 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  * A box with a reader in the configuration is a box object. A box with no reader and a type in `CONTAINERS` has its child boxes in `boxes`.
  * Any other box with no reader is a raw box: `{ type, bytes, headerSize }`.
  *
+ * The result types of the readers map apply only to the boxes at the top level.
+ * A child in a `boxes` field has the type `ParsedIsoBox`, also for a child with a custom reader.
+ * Cast such a child to the result type of its reader.
+ *
  * The function stops before a box if the data ends inside the header or the body of that box.
  * The function also stops before a box with a size below the size of its header.
  * The function then returns the boxes before that box and does not throw for that box.

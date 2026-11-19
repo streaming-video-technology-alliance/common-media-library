@@ -523,3 +523,7 @@ Decided on 2026-11-17:
 Decided on 2026-11-18:
 
 - **Questions 1 to 8, 10 to 13, and 25 to 27.** [Unresolved questions](#unresolved-questions) states each decision. Version 2.0.0 comes first, with no version 1.1.0. Question 26 differs from its default: the traversal functions keep a type parameter with no constraint.
+
+Amended on 2026-11-18, by the review of phase 2 ([#729](https://github.com/streaming-video-technology-alliance/common-media-library/pull/729)):
+
+- **Result type rule 1.** The result types of a readers map apply only to the top level of the result of `readIsoBoxes`. The element type of every `boxes` field is `ParsedIsoBox<V>`, the built-in box types and `IsoRawBox`. A child with a custom reader has that type too. Code that reads such a child casts it to the result type of its reader. Box types that are generic in the element type of `boxes` would change every box type with child boxes.
