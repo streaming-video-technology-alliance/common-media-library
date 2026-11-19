@@ -204,7 +204,7 @@ The option applies to these fields:
 | `sidx`                 | `earliestPresentationTime`, `firstOffset`       |
 | `tfra`                 | `time` and `moofOffset` of each entry           |
 | `prft`                 | `mediaTime`                                     |
-| `emsg`                 | `presentationTime` of a version 1 box           |
+| `emsg`                 | `presentationTime`                              |
 | `mehd`                 | `fragmentDuration`                              |
 | `mvhd`, `mdhd`, `tkhd` | `creationTime`, `modificationTime`, `duration`  |
 | `elst`                 | `segmentDuration` and `mediaTime` of each entry |

@@ -40,7 +40,7 @@ and this project adheres to
 - `TrackEncryptionBox` has the new field `defaultIsProtected`, the protection state of the track. `readTenc` reads the field, and `writeTenc` writes it ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - `TrackEncryptionBox` has the new optional fields `defaultCryptByteBlock` and `defaultSkipByteBlock`. `readTenc` sets the fields for a `tenc` box of version 1 or above ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - `writeTenc` now writes `defaultCryptByteBlock` and `defaultSkipByteBlock` to a `tenc` box of version 1 or above. With no pattern field, the writer writes 0 ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
-- `EventMessageBoxUnrecognizedVersion` is the new type of an `emsg` box of a version other than 0 or 1. The type has the fields of the versions 0 and 1 ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
+- `EventMessageBoxUnrecognizedVersion` is the new type of an `emsg` box of a version other than 0 or 1. The type has the fields of the versions 0 and 1. `presentationTime` has the type of the `int64` option ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 - `EventMessageBoxUnrecognizedVersionNumber` is the new type of the `version` field of `EventMessageBoxUnrecognizedVersion`. The values are 2 to 255 ([#667](https://github.com/streaming-video-technology-alliance/common-media-library/issues/667)).
 
 ### Changed

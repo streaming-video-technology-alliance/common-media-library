@@ -21,6 +21,7 @@ import { readBytes } from '../cursor/readBytes.ts'
  *
  * For a version other than 0 or 1, `messageData` holds all bytes after the full box fields.
  * The strings of the result are empty and the numbers are 0.
+ * `presentationTime` is the 0 of the type that the `int64` function returns.
  *
  * @param cursor - The read cursor at the first byte after the box header
  *
@@ -73,7 +74,16 @@ export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Event
 		value: '',
 		timescale: 0,
 		presentationTimeDelta: 0,
-		presentationTime: 0,
+		presentationTime: readWideUint(
+			{
+				view: new DataView(new ArrayBuffer(8)),
+				start: 0,
+				pos: 0,
+				end: 8,
+				int64: cursor.int64,
+			} as IsoBoxReadCursor<V>,
+			8,
+		),
 		eventDuration: 0,
 		id: 0,
 		messageData: readBytes(cursor, cursor.end - cursor.pos),

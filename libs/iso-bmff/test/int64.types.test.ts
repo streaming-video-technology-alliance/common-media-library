@@ -848,10 +848,10 @@ describe('int64 option types', function () {
 				expectType<Equal<typeof box.presentationTimeDelta, number>>(true)
 			}
 			if (box.type === 'emsg' && 'version' in box && box.version !== 0 && box.version !== 1) {
-				expectType<Equal<typeof box.presentationTime, number>>(true)
+				expectType<Equal<typeof box.presentationTime, bigint>>(true)
 			}
 			if (box.type === 'emsg' && 'version' in box && box.version !== 0) {
-				expectType<Equal<typeof box.presentationTime, bigint | number>>(true)
+				expectType<Equal<typeof box.presentationTime, bigint>>(true)
 			}
 		}
 

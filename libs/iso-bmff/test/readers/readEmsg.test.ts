@@ -7,6 +7,7 @@ import {
 	isIsoBoxType,
 	it,
 	readEmsg,
+	readInt64AsBigInt,
 	readIsoBoxes,
 } from '../util/box.ts'
 
@@ -182,5 +183,14 @@ describe('readEmsg', function () {
 		assert.strictEqual(box.eventDuration, 0)
 		assert.strictEqual(box.id, 0)
 		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array(fields))
+
+		const [bigintBox] = readIsoBoxes(bytes, {
+			int64: readInt64AsBigInt,
+			readers: { emsg: readEmsg },
+		})
+
+		assert.ok(isIsoBoxType('emsg', bigintBox))
+		assert.ok(bigintBox.version === 2)
+		assert.strictEqual(bigintBox.presentationTime, BigInt(0))
 	})
 })
