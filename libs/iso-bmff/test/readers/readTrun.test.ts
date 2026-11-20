@@ -15,6 +15,19 @@ describe('readTrun', function () {
 		assert.strictEqual(sample.sampleFlags, undefined)
 		assert.strictEqual(sample.sampleCompositionTimeOffset, undefined)
 	})
+
+	it('should give every sample the four keys in the same order', function () {
+		const box = findBox('mss_moof_tfdt.mp4', 'trun', { readers: { trun: readTrun } })
+
+		for (const sample of box.samples) {
+			assert.deepStrictEqual(Object.keys(sample), [
+				'sampleDuration',
+				'sampleSize',
+				'sampleFlags',
+				'sampleCompositionTimeOffset',
+			])
+		}
+	})
 })
 
 describe('readTrun versions', function () {
