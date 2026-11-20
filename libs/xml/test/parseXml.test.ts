@@ -297,16 +297,20 @@ describe('parseXml', () => {
 	})
 
 	describe('long attribute values', () => {
-		it('parses values of 15 to 18 characters and of 300 characters', () => {
-			for (const length of [15, 16, 17, 18, 300]) {
+		it('parses values of 0 to 40 characters and of 300 characters', () => {
+			for (const length of [...Array(41).keys(), 300]) {
 				const value = 'v'.repeat(length)
 				const doc = parseXml(`<a b="${value}" c='${value}' d="e"/>`)
 				deepStrictEqual(doc.childNodes[0].attributes, { b: value, c: value, d: 'e' })
 			}
 		})
 
-		it('parses an empty value', () => {
-			deepStrictEqual(parseXml('<a b="" c="d"/>').childNodes[0].attributes, { b: '', c: 'd' })
+		it('unescapes an entity at the start and at the end of values of 5 to 45 characters', () => {
+			for (let length = 0; length <= 40; length++) {
+				const filler = 'v'.repeat(length)
+				const doc = parseXml(`<a b="&amp;${filler}" c='${filler}&amp;'/>`)
+				deepStrictEqual(doc.childNodes[0].attributes, { b: `&${filler}`, c: `${filler}&` })
+			}
 		})
 
 		it('unescapes an entity at every position of a long value', () => {
@@ -324,9 +328,11 @@ describe('parseXml', () => {
 			deepStrictEqual(doc.childNodes[0].attributes, { b: value, c: 'd' })
 		})
 
-		it('throws when the input ends inside a value of 15 to 18 characters', () => {
-			for (const length of [15, 16, 17, 18, 300]) {
-				throws(() => parseXml(`<a b="${'v'.repeat(length)}`), /Missing closing quote/)
+		it('throws when the input ends inside a value of 0 to 40 characters or of 300 characters', () => {
+			for (const length of [...Array(41).keys(), 300]) {
+				const value = 'v'.repeat(length)
+				throws(() => parseXml(`<a b="${value}`), /Missing closing quote/)
+				throws(() => parseXml(`<a b='${value}`), /Missing closing quote/)
 			}
 		})
 
@@ -390,7 +396,7 @@ describe('parseXml', () => {
 			strictEqual(doc.childNodes[1].nodeValue, '\n')
 		})
 
-		it('keeps text that is only an entity for a space', () => {
+		it('unescapes an entity between whitespace with keepWhitespace', () => {
 			const doc = parseXml('<a>  &#32;  </a>', { keepWhitespace: true })
 			strictEqual(doc.childNodes[0].childNodes[0].nodeValue, '     ')
 		})
