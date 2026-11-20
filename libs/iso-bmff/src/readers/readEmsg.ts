@@ -1,7 +1,4 @@
-import type {
-	EventMessageBox,
-	EventMessageBoxUnrecognizedVersionNumber,
-} from '../boxes/EventMessageBox.ts'
+import type { EventMessageBox } from '../boxes/EventMessageBox.ts'
 import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { readUint8 } from '../cursor/readUint8.ts'
@@ -20,8 +17,7 @@ import { readBytes } from '../cursor/readBytes.ts'
  * ISO/IEC 23009-1:2022 - 5.10.3.3
  *
  * For a version other than 0 or 1, `messageData` holds all bytes after the full box fields.
- * The strings of the result are empty and the numbers are 0.
- * `presentationTime` is the 0 of the type that the `int64` function returns.
+ * The strings of the result are empty, the numbers are 0, and the result has no time field.
  *
  * @param cursor - The read cursor at the first byte after the box header
  *
@@ -68,22 +64,11 @@ export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Event
 
 	return {
 		type: 'emsg',
-		version: version as EventMessageBoxUnrecognizedVersionNumber,
+		version,
 		flags,
 		schemeIdUri: '',
 		value: '',
 		timescale: 0,
-		presentationTimeDelta: 0,
-		presentationTime: readWideUint(
-			{
-				view: new DataView(new ArrayBuffer(8)),
-				start: 0,
-				pos: 0,
-				end: 8,
-				int64: cursor.int64,
-			} as IsoBoxReadCursor<V>,
-			8,
-		),
 		eventDuration: 0,
 		id: 0,
 		messageData: readBytes(cursor, cursor.end - cursor.pos),

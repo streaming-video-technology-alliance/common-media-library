@@ -17,6 +17,7 @@ import { endIsoBox } from '../endIsoBox.ts'
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
  * For a version other than 0 or 1, the writer writes the full box fields and `messageData` only.
+ * If the box has no time field for its version, the writer writes 0.
  *
  * @param cursor - The write cursor
  * @param box - The `EventMessageBox` fields to write
