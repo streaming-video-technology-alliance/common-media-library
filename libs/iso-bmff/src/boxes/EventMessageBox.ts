@@ -7,7 +7,7 @@ import type { FullBox } from './FullBox.ts'
  * ISO/IEC 23009-1:2022 - 5.10.3.3
  *
  * The syntax defines fields for version 0 and version 1 only.
- * For a version other than 0 or 1, the strings are empty, the numbers are 0, and the box has no time field.
+ * For a version other than 0 or 1, the strings are empty, the numbers are 0, and both time fields are `undefined`.
  *
  * @public
  */

@@ -59,12 +59,13 @@ describe('readCtts versions', function () {
 		assert.deepStrictEqual(box.entries, [])
 	})
 
-	it('should have no entryCount for a version 0 or 1 box', function () {
+	it('should set entryCount to undefined for a version 0 or 1 box', function () {
 		for (const version of [0, 1]) {
 			const [box] = readIsoBoxes(cttsBox(version), { readers: { ctts: readCtts } })
 
 			assert.ok(isIsoBoxType('ctts', box))
-			assert.ok(!('entryCount' in box))
+			assert.ok('entryCount' in box)
+			assert.strictEqual(box.entryCount, undefined)
 		}
 	})
 })

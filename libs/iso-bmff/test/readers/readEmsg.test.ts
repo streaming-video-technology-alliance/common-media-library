@@ -151,7 +151,7 @@ describe('readEmsg', function () {
 		assert.strictEqual(time, 1)
 	})
 
-	it('should read a version 2 box as empty fields, no time field, and messageData', function () {
+	it('should read a version 2 box as empty fields, undefined time fields, and messageData', function () {
 		const fields = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 3, 0x61, 0, 0x62, 0, 1]
 		const bytes = new Uint8Array([
 			0,
@@ -177,8 +177,10 @@ describe('readEmsg', function () {
 		assert.strictEqual(box.schemeIdUri, '')
 		assert.strictEqual(box.value, '')
 		assert.strictEqual(box.timescale, 0)
-		assert.ok(!('presentationTimeDelta' in box))
-		assert.ok(!('presentationTime' in box))
+		assert.ok('presentationTimeDelta' in box)
+		assert.strictEqual(box.presentationTimeDelta, undefined)
+		assert.ok('presentationTime' in box)
+		assert.strictEqual(box.presentationTime, undefined)
 		assert.strictEqual(box.eventDuration, 0)
 		assert.strictEqual(box.id, 0)
 		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array(fields))

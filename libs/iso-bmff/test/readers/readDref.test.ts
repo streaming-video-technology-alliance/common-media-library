@@ -29,7 +29,8 @@ describe('readDref', function () {
 		assert.ok(isIsoBoxType('url ', entry))
 		assert.strictEqual(entry.version, 0)
 		assert.strictEqual(entry.flags, 1)
-		assert.ok(!('location' in entry))
+		assert.ok('location' in entry)
+		assert.strictEqual(entry.location, undefined)
 	})
 
 	it('should read no entries for an entry_count of 0', function () {

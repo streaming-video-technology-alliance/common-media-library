@@ -34,6 +34,7 @@ export function readStsz(cursor: IsoBoxReadCursor<IsoInt64>): SampleSizeBox {
 			flags,
 			sampleSize,
 			sampleCount,
+			entrySize: undefined,
 		}
 	}
 
@@ -48,6 +49,7 @@ export function readStsz(cursor: IsoBoxReadCursor<IsoInt64>): SampleSizeBox {
 		version,
 		flags,
 		sampleSize,
+		sampleCount: undefined,
 		entrySize,
 	}
 }

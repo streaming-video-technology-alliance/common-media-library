@@ -369,7 +369,7 @@ A prototype threw for an `stsd` box with an `entry_count` of 2 and one complete 
 3. A four-character code uses `readFourCc` and `writeFourCc` (theme 4). The one-byte `readString` and `writeString` leave the package.
 4. The five WebVTT text readers read to the end of the box. ISO/IEC 14496-30 clause 6.1, as the Unified Streaming validator quotes it, defines `boxstring` as UTF-8 bytes that fill the box with no null terminator. shaka-player and mp4box.js read these boxes the same way. `iden`, `payl`, `sttg`, and `vlab` no longer stop at a null byte (PR 638).
 5. `writeMdhd` writes the code of `und` (0x55C4) for a `language` that is not 3 characters, each from U+0060 to U+007F. A value that `readMdhd` returns therefore writes the same bytes.
-6. `location` of `url ` and `urn ` is optional. The readers omit the key when no bytes remain. This rule closes issue 629.
+6. `location` of `url ` and `urn ` is optional. The readers set the field to `undefined` when no bytes remain. This rule closes issue 629. Issue 749 replaced the first form of this rule, in which the readers omitted the key.
 
 **Migration.**
 

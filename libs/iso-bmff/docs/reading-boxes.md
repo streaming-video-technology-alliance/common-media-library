@@ -51,6 +51,10 @@ const boxes = readIsoBoxes(buffer, {
 });
 ```
 
+## Optional fields
+
+A box object from a built-in reader has every key of its type. A field that the flags, the version, or the size of the box excludes is `undefined`. To check for a field, test its value for `undefined`, or test the flags or the version. Do not test the key with `in` or `Object.keys`. The key is always present.
+
 ## Reading one box
 
 `seekIsoBox` finds a box by its path and returns a read cursor for that box. The function reads no other box. Pass the cursor to the reader of the box:

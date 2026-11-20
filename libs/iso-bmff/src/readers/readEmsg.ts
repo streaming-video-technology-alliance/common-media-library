@@ -17,7 +17,7 @@ import { readBytes } from '../cursor/readBytes.ts'
  * ISO/IEC 23009-1:2022 - 5.10.3.3
  *
  * For a version other than 0 or 1, `messageData` holds all bytes after the full box fields.
- * The strings of the result are empty, the numbers are 0, and the result has no time field.
+ * The strings of the result are empty, the numbers are 0, and both time fields are `undefined`.
  *
  * @param cursor - The read cursor at the first byte after the box header
  *
@@ -41,6 +41,7 @@ export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Event
 			value: readTerminatedUtf8(cursor),
 			timescale: readUint32(cursor),
 			presentationTimeDelta: readUint32(cursor),
+			presentationTime: undefined,
 			eventDuration: readUint32(cursor),
 			id: readUint32(cursor),
 			messageData: readBytes(cursor, cursor.end - cursor.pos),
@@ -53,6 +54,7 @@ export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Event
 			version,
 			flags,
 			timescale: readUint32(cursor),
+			presentationTimeDelta: undefined,
 			presentationTime: readWideUint(cursor, 8),
 			eventDuration: readUint32(cursor),
 			id: readUint32(cursor),
@@ -69,6 +71,8 @@ export function readEmsg<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Event
 		schemeIdUri: '',
 		value: '',
 		timescale: 0,
+		presentationTimeDelta: undefined,
+		presentationTime: undefined,
 		eventDuration: 0,
 		id: 0,
 		messageData: readBytes(cursor, cursor.end - cursor.pos),
