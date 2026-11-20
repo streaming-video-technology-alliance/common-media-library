@@ -24,6 +24,9 @@ const UPPER_Z_CC = 90 // 'Z'
 const LOWER_A_CC = 97 // 'a'
 const LOWER_Z_CC = 122 // 'z'
 
+// The number of characters of an attribute value that a loop reads before `indexOf` finds the closing quote
+const VALUE_LOOP_LENGTH = 16
+
 /**
  * Creates an error that reports the line and column of `pos`
  */
@@ -77,21 +80,18 @@ export function scan<T>(
 		if (cc !== OPEN_BRACKET_CC) {
 			// Text up to the next '<'
 			const textStart = pos
-			let hasAmpersand = false
-			let blank = true
-			do {
-				if (cc !== SPACE_CC && cc !== LF_CC && cc !== CR_CC && cc !== TAB_CC) {
-					blank = false
-					if (cc === AMPERSAND_CC) {
-						hasAmpersand = true
-					}
-				}
+			while (pos < length && (cc === SPACE_CC || cc === LF_CC || cc === CR_CC || cc === TAB_CC)) {
 				cc = ++pos < length ? input.charCodeAt(pos) : 0
-			} while (pos < length && cc !== OPEN_BRACKET_CC)
+			}
+			const blank = pos >= length || cc === OPEN_BRACKET_CC
+			if (!blank) {
+				const textEnd = input.indexOf('<', pos)
+				pos = textEnd === -1 ? length : textEnd
+			}
 
 			if (appendText !== undefined && (keepWhitespace || !blank)) {
 				let text = input.slice(textStart, pos)
-				if (hasAmpersand) {
+				if (!blank) {
 					text = unescapeHtml(text)
 				}
 				if (!keepWhitespace) {
@@ -271,16 +271,21 @@ export function scan<T>(
 
 				const quote = cc
 				const valueStart = ++pos
+				const loopEnd = pos + VALUE_LOOP_LENGTH
 				let hasAmpersand = false
 				cc = pos < length ? input.charCodeAt(pos) : 0
-				while (pos < length && cc !== quote) {
+				while (cc !== quote && pos < loopEnd) {
 					if (cc === AMPERSAND_CC) {
 						hasAmpersand = true
 					}
 					cc = ++pos < length ? input.charCodeAt(pos) : 0
 				}
-				if (pos >= length) {
-					throw new Error('Missing closing quote')
+				if (cc !== quote) {
+					pos = input.indexOf(quote === DOUBLE_QUOTE_CC ? '"' : "'", pos)
+					if (pos === -1) {
+						throw new Error('Missing closing quote')
+					}
+					hasAmpersand = true
 				}
 				const value = input.slice(valueStart, pos)
 				attributes[attributeName] = hasAmpersand ? unescapeHtml(value) : value
