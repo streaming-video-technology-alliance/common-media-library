@@ -100,3 +100,43 @@ export function generateMpd(options: GenerateMpdOptions = {}): string {
 
 	return parts.join('')
 }
+
+const FILLER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+
+function filler(length: number): string {
+	return FILLER.repeat(Math.ceil(length / FILLER.length)).slice(0, length)
+}
+
+/**
+ * Generates a document of `elements` elements that each contain a text node of `textLength`
+ * characters, as base64 `cenc:pssh` data or TTML text would be (issue #752).
+ */
+export function generateTextDocument(elements: number, textLength: number): string {
+	const text = filler(textLength)
+	const parts: string[] = ['<?xml version="1.0" encoding="UTF-8"?>\n<root>\n']
+
+	for (let i = 0; i < elements; i++) {
+		parts.push(`  <item id="${i}">${text}</item>\n`)
+	}
+
+	parts.push('</root>\n')
+
+	return parts.join('')
+}
+
+/**
+ * Generates a document of `elements` self-closing elements that each have one attribute value of
+ * `valueLength` characters, as a long URL would be (issue #752).
+ */
+export function generateAttributeDocument(elements: number, valueLength: number): string {
+	const value = filler(valueLength)
+	const parts: string[] = ['<?xml version="1.0" encoding="UTF-8"?>\n<root>\n']
+
+	for (let i = 0; i < elements; i++) {
+		parts.push(`  <item id="${i}" value="${value}" />\n`)
+	}
+
+	parts.push('</root>\n')
+
+	return parts.join('')
+}

@@ -16,6 +16,7 @@ and this project adheres to
 ### Fixed
 
 - The published package includes `NOTICE.md`.
+- `parseXml` is faster on long text nodes and on long attribute values. Versions 1.2.0 to 1.2.2 are slower than 1.1.6 on these inputs (#752).
 
 ## [1.2.2] - 2026-10-18
 

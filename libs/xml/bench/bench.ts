@@ -17,7 +17,7 @@ import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { generateMpd } from './generate.ts'
+import { generateAttributeDocument, generateMpd, generateTextDocument } from './generate.ts'
 
 type ParseFunction = (input: string) => unknown
 
@@ -100,6 +100,26 @@ const inputs: Input[] = [
 		name: 'bbb_30fps.mpd',
 		make: () => readFileSync(resolve(FIXTURES, 'bbb_30fps.mpd'), 'utf8'),
 		iterations: 3000,
+	},
+	{
+		name: 'text nodes, 5000 of 100 chars',
+		make: () => generateTextDocument(5000, 100),
+		iterations: 300,
+	},
+	{
+		name: 'text nodes, 500 of 1000 chars',
+		make: () => generateTextDocument(500, 1000),
+		iterations: 300,
+	},
+	{
+		name: 'text nodes, 20 of 100k chars',
+		make: () => generateTextDocument(20, 100_000),
+		iterations: 300,
+	},
+	{
+		name: 'attribute values, 5000 of 300 chars',
+		make: () => generateAttributeDocument(5000, 300),
+		iterations: 300,
 	},
 ].filter(input => only === undefined || input.name.includes(only))
 
