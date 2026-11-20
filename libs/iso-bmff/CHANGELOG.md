@@ -179,8 +179,8 @@ Renames of version 2.0.0:
 | `SubsampleInformationBox` | `SubSampleInformationBox` |
 | `SubTrackBox` | `SubTrack` |
 | `SampleEntryBox`, `AudioSampleEntryBox`, `VisualSampleEntryBox` | `SampleEntry`, `AudioSampleEntry`, `VisualSampleEntry` |
-| `readAudioSampleEntryBox`, `writeAudioSampleEntryBox` | `readAudioSampleEntry`, `writeAudioSampleEntry` |
-| `readVisualSampleEntryBox`, `writeVisualSampleEntryBox` | `readVisualSampleEntry`, `writeVisualSampleEntry` |
+| `writeAudioSampleEntryBox` | `writeAudioSampleEntry` |
+| `writeVisualSampleEntryBox` | `writeVisualSampleEntry` |
 | `DecodingTimeSample` | `TimeToSampleEntry` |
 | `CompositionTimeToSampleEntry` | `CompositionOffsetEntry` |
 | `SubsampleEntry`, `Subsample` | `SubSampleInformationEntry`, `SubSampleInformationSubsample` |
@@ -213,6 +213,7 @@ A field rename also changes the keys of a box that `readIsoBoxes` returns. Code 
 - The box types no longer have the `reserved` fields of the specification. Remove `reserved1`, `reserved2`, and `reserved3` from `mvhd`, `tkhd`, and the sample entries. Remove `reserved` from `smhd`, `sidx`, and `tfra` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `TrackEncryptionBox` no longer has `defaultIsEncrypted`. Replace `defaultIsEncrypted: 1` with `defaultIsProtected: 1`, and set the pattern with `defaultCryptByteBlock` and `defaultSkipByteBlock` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 - `LabelBox` no longer has `isGroupLabel`. Replace `box.isGroupLabel` with `(box.flags & 0x1) !== 0` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
+- `readAudioSampleEntryBox` and `readVisualSampleEntryBox` are removed. Replace `readAudioSampleEntryBox(type, view)` with `createAudioSampleEntryReader(type)`, and put the result in the `readers` map or call it with the cursor ([#743](https://github.com/streaming-video-technology-alliance/common-media-library/issues/743)).
 - `EventMessageBoxBase`, `EventMessageBoxV0`, and `EventMessageBoxV1` are removed. Use `EventMessageBox` ([#751](https://github.com/streaming-video-technology-alliance/common-media-library/pull/751)).
 - `SegmentIndexReference` no longer has the packed fields `reference` and `sap`. Use the decoded fields, such as `referenceType` and `sapType` ([#715](https://github.com/streaming-video-technology-alliance/common-media-library/pull/715)).
 

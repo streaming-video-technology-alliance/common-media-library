@@ -14,7 +14,7 @@ import { readChildBoxes } from '../readChildBoxes.ts'
  *
  * @returns A parsed `AudioSampleEntry`
  *
- * @public
+ * @internal
  */
 export function readAudioSampleEntry<T extends IsoBoxType, V extends IsoInt64>(
 	type: T,

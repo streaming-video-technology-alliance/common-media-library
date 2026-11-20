@@ -629,9 +629,6 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 export function readArdi(cursor: IsoBoxReadCursor<IsoInt64>): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntry<T extends IsoBoxType, V extends IsoInt64>(type: T, cursor: IsoBoxReadCursor<V>): AudioSampleEntry<T, V>;
-
-// @public
 export function readAvc1<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"avc1", V>;
 
 // @public
@@ -923,9 +920,6 @@ export function readUrn(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrnBox;
 
 // @public
 export function readUtf8(cursor: IsoBoxReadCursor<IsoInt64>, length: number): string;
-
-// @public
-export function readVisualSampleEntry<T extends IsoBoxType, V extends IsoInt64>(type: T, cursor: IsoBoxReadCursor<V>): VisualSampleEntry<T, V>;
 
 // @public
 export function readVlab(cursor: IsoBoxReadCursor<IsoInt64>): WebVttSourceLabelBox;

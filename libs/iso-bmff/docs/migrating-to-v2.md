@@ -206,8 +206,8 @@ The names of the box types, entry types, and fields follow the names of the spec
 | `SubsampleInformationBox` | `SubSampleInformationBox` |
 | `SubTrackBox` | `SubTrack` |
 | `SampleEntryBox`, `AudioSampleEntryBox`, `VisualSampleEntryBox` | `SampleEntry`, `AudioSampleEntry`, `VisualSampleEntry` |
-| `readAudioSampleEntryBox`, `writeAudioSampleEntryBox` | `readAudioSampleEntry`, `writeAudioSampleEntry` |
-| `readVisualSampleEntryBox`, `writeVisualSampleEntryBox` | `readVisualSampleEntry`, `writeVisualSampleEntry` |
+| `writeAudioSampleEntryBox` | `writeAudioSampleEntry` |
+| `writeVisualSampleEntryBox` | `writeVisualSampleEntry` |
 | `DecodingTimeSample` | `TimeToSampleEntry` |
 | `CompositionTimeToSampleEntry` | `CompositionOffsetEntry` |
 | `SubsampleEntry`, `Subsample` | `SubSampleInformationEntry`, `SubSampleInformationSubsample` |
@@ -230,6 +230,8 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `IsoFieldTypeMap`, `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, `IsoBoxFields` | The field functions, such as `readUint32` |
 | `IsoBoxReadableStream` | `createIsoBoxReadableStream` |
 | `fourCcToUint32` | A field with a four-character code is a string. To convert a code, compute `new DataView(Uint8Array.from(code, char => char.charCodeAt(0)).buffer).getUint32(0)`. |
+| `readAudioSampleEntryBox(type, view)`, `readVisualSampleEntryBox(type, view)` | `createAudioSampleEntryReader(type)` and `createVisualSampleEntryReader(type)`. Put the result in the `readers` map, or call it with the cursor. |
+| `EventMessageBoxBase`, `EventMessageBoxV0`, `EventMessageBoxV1` | `EventMessageBox`. Read the field of the version, such as `box.presentationTimeDelta ?? box.presentationTime`. |
 | `isFullBox` | `isIsoBoxType`, or a test such as `'version' in box && 'flags' in box` |
 | The child types, such as `MovieBoxChild` and `VisualSampleEntryBoxChild` | `ParsedIsoBox` |
 | `TrackReferenceTypeBox` | A raw box. A child of a `tref` box is a raw box. |
