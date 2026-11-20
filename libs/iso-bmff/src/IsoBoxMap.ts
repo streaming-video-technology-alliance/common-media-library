@@ -9,6 +9,9 @@ import type { DataEntryUrlBox } from './boxes/DataEntryUrlBox.ts'
 import type { DataEntryUrnBox } from './boxes/DataEntryUrnBox.ts'
 import type { DataInformationBox } from './boxes/DataInformationBox.ts'
 import type { DataReferenceBox } from './boxes/DataReferenceBox.ts'
+import type { LoudnessBox } from './boxes/LoudnessBox.ts'
+import type { RestrictedSchemeInfoBox } from './boxes/RestrictedSchemeInfoBox.ts'
+import type { SubTrackDefinition } from './boxes/SubTrackDefinition.ts'
 import type { TimeToSampleBox } from './boxes/TimeToSampleBox.ts'
 import type { EditBox } from './boxes/EditBox.ts'
 import type { EditListBox } from './boxes/EditListBox.ts'
@@ -60,6 +63,7 @@ import type { TrackFragmentBaseMediaDecodeTimeBox } from './boxes/TrackFragmentB
 import type { TrackFragmentBox } from './boxes/TrackFragmentBox.ts'
 import type { TrackFragmentHeaderBox } from './boxes/TrackFragmentHeaderBox.ts'
 import type { TrackFragmentRandomAccessBox } from './boxes/TrackFragmentRandomAccessBox.ts'
+import type { TrackGroupBox } from './boxes/TrackGroupBox.ts'
 import type { TrackHeaderBox } from './boxes/TrackHeaderBox.ts'
 import type { KindBox } from './boxes/KindBox.ts'
 import type { TrackReferenceBox } from './boxes/TrackReferenceBox.ts'
@@ -108,6 +112,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	imda: IdentifiedMediaDataBox
 	kind: KindBox
 	labl: LabelBox
+	ludt: LoudnessBox<V>
 	mdat: MediaDataBox
 	mdhd: MediaHeaderBox<V>
 	mdia: MediaBox<V>
@@ -127,6 +132,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	prft: ProducerReferenceTimeBox<V>
 	prsl: PreselectionGroupBox<V>
 	pssh: ProtectionSystemSpecificHeaderBox
+	rinf: RestrictedSchemeInfoBox<V>
 	schi: SchemeInformationBox<V>
 	schm: SchemeTypeBox
 	sdtp: SampleDependencyTypeBox
@@ -138,6 +144,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	stbl: SampleTableBox<V>
 	stco: ChunkOffsetBox
 	sthd: SubtitleMediaHeaderBox
+	strd: SubTrackDefinition<V>
 	strk: SubTrack<V>
 	stsc: SampleToChunkBox
 	stsd: SampleDescriptionBox<V>
@@ -157,6 +164,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	trak: TrackBox<V>
 	tref: TrackReferenceBox<V>
 	trex: TrackExtendsBox
+	trgr: TrackGroupBox<V>
 	trun: TrackRunBox
 	udta: UserDataBox<V>
 	'url ': DataEntryUrlBox

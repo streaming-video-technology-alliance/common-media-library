@@ -13,6 +13,7 @@ import {
 	readGrpl,
 	readInt64AsBigInt,
 	readIsoBoxes,
+	readLudt,
 	readMdia,
 	readMeco,
 	readMfhd,
@@ -22,14 +23,17 @@ import {
 	readMoov,
 	readMvex,
 	readMvhd,
+	readRinf,
 	readSchi,
 	readSinf,
 	readStbl,
+	readStrd,
 	readStrk,
 	readTfdt,
 	readTraf,
 	readTrak,
 	readTref,
+	readTrgr,
 	readUdta,
 	readVttc,
 	type IsoBoxContainerMap,
@@ -53,6 +57,7 @@ const CONTAINER_READERS = {
 	dinf: readDinf,
 	edts: readEdts,
 	grpl: readGrpl,
+	ludt: readLudt,
 	mdia: readMdia,
 	meco: readMeco,
 	mfra: readMfra,
@@ -60,13 +65,16 @@ const CONTAINER_READERS = {
 	moof: readMoof,
 	moov: readMoov,
 	mvex: readMvex,
+	rinf: readRinf,
 	schi: readSchi,
 	sinf: readSinf,
 	stbl: readStbl,
+	strd: readStrd,
 	strk: readStrk,
 	traf: readTraf,
 	trak: readTrak,
 	tref: readTref,
+	trgr: readTrgr,
 	udta: readUdta,
 	vttc: readVttc,
 } satisfies ContainerReaders<number> & ContainerReaders<bigint>
@@ -87,6 +95,11 @@ const EXACT = BigInt('9007199254740993')
 describe('container readers', function () {
 	it('should have a reader for every box type in CONTAINERS', function () {
 		deepStrictEqual(TYPES, CONTAINERS)
+	})
+
+	it('should not allow a change of CONTAINERS', function () {
+		expectType<Equal<typeof CONTAINERS, readonly string[]>>(true)
+		assert.ok(CONTAINERS.length > 0)
 	})
 
 	it('should have no entry in the default configuration', function () {

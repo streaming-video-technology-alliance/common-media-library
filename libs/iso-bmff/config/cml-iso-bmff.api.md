@@ -73,7 +73,7 @@ export type CompositionOffsetEntry = {
 };
 
 // @public
-export const CONTAINERS: string[];
+export const CONTAINERS: readonly string[];
 
 // @public
 export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => AudioSampleEntry<T, V>;
@@ -261,6 +261,7 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
     dinf: DataInformationBox<V>;
     edts: EditBox<V>;
     grpl: GroupsListBox<V>;
+    ludt: LoudnessBox<V>;
     mdia: MediaBox<V>;
     meco: AdditionalMetadataContainerBox<V>;
     mfra: MovieFragmentRandomAccessBox<V>;
@@ -268,13 +269,16 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
     moof: MovieFragmentBox<V>;
     moov: MovieBox<V>;
     mvex: MovieExtendsBox<V>;
+    rinf: RestrictedSchemeInfoBox<V>;
     schi: SchemeInformationBox<V>;
     sinf: ProtectionSchemeInfoBox<V>;
     stbl: SampleTableBox<V>;
+    strd: SubTrackDefinition<V>;
     strk: SubTrack<V>;
     traf: TrackFragmentBox<V>;
     trak: TrackBox<V>;
     tref: TrackReferenceBox<V>;
+    trgr: TrackGroupBox<V>;
     udta: UserDataBox<V>;
     vttc: WebVttCueBox<V>;
 };
@@ -310,6 +314,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     imda: IdentifiedMediaDataBox;
     kind: KindBox;
     labl: LabelBox;
+    ludt: LoudnessBox<V>;
     mdat: MediaDataBox;
     mdhd: MediaHeaderBox<V>;
     mdia: MediaBox<V>;
@@ -329,6 +334,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     prft: ProducerReferenceTimeBox<V>;
     prsl: PreselectionGroupBox<V>;
     pssh: ProtectionSystemSpecificHeaderBox;
+    rinf: RestrictedSchemeInfoBox<V>;
     schi: SchemeInformationBox<V>;
     schm: SchemeTypeBox;
     sdtp: SampleDependencyTypeBox;
@@ -340,6 +346,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     stbl: SampleTableBox<V>;
     stco: ChunkOffsetBox;
     sthd: SubtitleMediaHeaderBox;
+    strd: SubTrackDefinition<V>;
     strk: SubTrack<V>;
     stsc: SampleToChunkBox;
     stsd: SampleDescriptionBox<V>;
@@ -359,6 +366,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     trak: TrackBox<V>;
     tref: TrackReferenceBox<V>;
     trex: TrackExtendsBox;
+    trgr: TrackGroupBox<V>;
     trun: TrackRunBox;
     udta: UserDataBox<V>;
     "url ": DataEntryUrlBox;
@@ -486,6 +494,12 @@ export type LabelBox = FullBox & {
     labelId: number;
     language: string;
     label: string;
+};
+
+// @public
+export type LoudnessBox<V extends IsoInt64 = number> = {
+    type: "ludt";
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
@@ -736,6 +750,9 @@ export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
 export function readLabl(cursor: IsoBoxReadCursor<IsoInt64>): LabelBox;
 
 // @public
+export function readLudt<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): LoudnessBox<V>;
+
+// @public
 export function readMdat(cursor: IsoBoxReadCursor<IsoInt64>): MediaDataBox;
 
 // @public
@@ -793,6 +810,9 @@ export function readPrsl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Prese
 export function readPssh(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSystemSpecificHeaderBox;
 
 // @public
+export function readRinf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): RestrictedSchemeInfoBox<V>;
+
+// @public
 export function readSchi<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SchemeInformationBox<V>;
 
 // @public
@@ -824,6 +844,9 @@ export function readStco(cursor: IsoBoxReadCursor<IsoInt64>): ChunkOffsetBox;
 
 // @public
 export function readSthd(cursor: IsoBoxReadCursor<IsoInt64>): SubtitleMediaHeaderBox;
+
+// @public
+export function readStrd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SubTrackDefinition<V>;
 
 // @public
 export function readStrk<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SubTrack<V>;
@@ -892,6 +915,9 @@ export function readTref<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Track
 export function readTrex(cursor: IsoBoxReadCursor<IsoInt64>): TrackExtendsBox;
 
 // @public
+export function readTrgr<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackGroupBox<V>;
+
+// @public
 export function readTrun(cursor: IsoBoxReadCursor<IsoInt64>): TrackRunBox;
 
 // @public
@@ -941,6 +967,12 @@ export function readWideInt<V extends IsoInt64 = number>(cursor: IsoBoxReadCurso
 
 // @public
 export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, size: 4 | 8): V;
+
+// @public
+export type RestrictedSchemeInfoBox<V extends IsoInt64 = number> = {
+    type: "rinf";
+    boxes: ParsedIsoBox<V>[];
+};
 
 // @public
 export type SampleDependencyTypeBox = FullBox & {
@@ -1086,6 +1118,12 @@ export type SubTrack<V extends IsoInt64 = number> = {
 };
 
 // @public
+export type SubTrackDefinition<V extends IsoInt64 = number> = {
+    type: "strd";
+    boxes: ParsedIsoBox<V>[];
+};
+
+// @public
 export type SyncSampleBox = FullBox & {
     type: "stss";
     sampleNumber: number[];
@@ -1170,6 +1208,12 @@ export type TrackFragmentRandomAccessEntry<V extends IsoInt64 = number> = {
     trafNumber: number;
     trunNumber: number;
     sampleNumber: number;
+};
+
+// @public
+export type TrackGroupBox<V extends IsoInt64 = number> = {
+    type: "trgr";
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
@@ -1404,6 +1448,9 @@ export function writeKind(cursor: IsoBoxWriteCursor, box: KindBox): void;
 export function writeLabl(cursor: IsoBoxWriteCursor, box: LabelBox): void;
 
 // @public
+export function writeLudt(cursor: IsoBoxWriteCursor, box: LoudnessBox<IsoInt64>): void;
+
+// @public
 export function writeMdat(cursor: IsoBoxWriteCursor, box: MediaDataBox): void;
 
 // @public
@@ -1461,6 +1508,9 @@ export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox<I
 export function writePssh(cursor: IsoBoxWriteCursor, box: ProtectionSystemSpecificHeaderBox): void;
 
 // @public
+export function writeRinf(cursor: IsoBoxWriteCursor, box: RestrictedSchemeInfoBox<IsoInt64>): void;
+
+// @public
 export function writeSchi(cursor: IsoBoxWriteCursor, box: SchemeInformationBox<IsoInt64>): void;
 
 // @public
@@ -1492,6 +1542,9 @@ export function writeStco(cursor: IsoBoxWriteCursor, box: ChunkOffsetBox): void;
 
 // @public
 export function writeSthd(cursor: IsoBoxWriteCursor, box: SubtitleMediaHeaderBox): void;
+
+// @public
+export function writeStrd(cursor: IsoBoxWriteCursor, box: SubTrackDefinition<IsoInt64>): void;
 
 // @public
 export function writeStrk(cursor: IsoBoxWriteCursor, box: SubTrack<IsoInt64>): void;
@@ -1558,6 +1611,9 @@ export function writeTref(cursor: IsoBoxWriteCursor, box: TrackReferenceBox<IsoI
 
 // @public
 export function writeTrex(cursor: IsoBoxWriteCursor, box: TrackExtendsBox): void;
+
+// @public
+export function writeTrgr(cursor: IsoBoxWriteCursor, box: TrackGroupBox<IsoInt64>): void;
 
 // @public
 export function writeTrun(cursor: IsoBoxWriteCursor, box: TrackRunBox): void;
