@@ -1,0 +1,225 @@
+---
+title: Results and Error Codes
+description: Interpret validation results, error codes, and manifest data
+---
+
+# Results and Error Codes
+
+All validation functions in `@svta/cml-c2pa` return structured results with an `isValid` boolean and an `errorCodes` array. This guide explains the results, the error codes, and the manifest data.
+
+## Checking Validation Results
+
+Every result follows the same pattern:
+
+```typescript
+if (!result.isValid) {
+  for (const code of result.errorCodes) {
+    console.error(`Validation failure: ${code}`)
+  }
+}
+```
+
+The `errorCodes` array may contain several codes when several checks fail. When `isValid` is `true`, the array is empty.
+
+## Signer Trust
+
+`isValid` is `true` when the manifest is well formed and the claim signature verifies. Every store assertion must be referenced by the claim and match its hash. The manifest must have exactly one hard binding. The signature is verified with the end-entity certificate that the manifest carries in its `x5chain` header. The library does not check that certificate against a trust list. Any party with a certificate can produce a manifest that validates.
+
+Before you present content as authentic, compare the signer with your own trust anchors. `InitSegmentValidation.certificate` and `ManifestBoxValidationResult.certificate` hold the DER-encoded end-entity certificate from the claim signature. The value is `null` when the signature is absent or carries no certificate.
+
+A manifest without a `c2pa.signature` box, or with a claim `signature` URI that does not resolve to that box, fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. A signature that carries no certificate, or that does not verify over the claim, fails with `C2paStatusCode.CLAIM_SIGNATURE_MISMATCH`.
+
+A claim box whose CBOR does not decode fails with `C2paStatusCode.CLAIM_CBOR_INVALID`. A claim box whose CBOR is not a map, for example a map inside a CBOR tag, fails with `C2paStatusCode.CLAIM_MALFORMED`. The library does not check the fields of the claim.
+
+An assertion whose CBOR does not decode fails with `C2paStatusCode.ASSERTION_CBOR_INVALID` (C2PA section 15.10.3.1). An assertion whose JSON is not UTF-8 or does not parse fails with `C2paStatusCode.ASSERTION_JSON_INVALID`. These checks apply to every assertion, whatever the label. CBOR that is not deterministic still passes, for example a map with unsorted keys.
+
+The CBOR decoder also rejects some CBOR that is well-formed. An assertion with such CBOR reports `ASSERTION_CBOR_INVALID`, and a claim with such CBOR reports `CLAIM_CBOR_INVALID`. The rejected forms are:
+
+- a map key that is an array, a map, a byte string, or a tag
+- a map with a duplicate key, where keys with the same name as a string count as duplicates, for example `1` and `"1"`
+- an unassigned simple value
+- a tag number above 2^53
+- nesting deeper than 128 levels
+
+## Live Video Error Codes
+
+The `LiveVideoStatusCode` constants are the live video validation failures that C2PA specification section 19.7 defines.
+
+```typescript
+import { LiveVideoStatusCode } from '@svta/cml-c2pa'
+```
+
+| Constant | Value | Meaning |
+|----------|-------|---------|
+| `INIT_INVALID` | `livevideo.init.invalid` | Init segment contains an `mdat` box. Init manifest without a `c2pa.hash.bmff.v3` assertion. Init content hash that does not include the `moov` box, or that does not match (with `ASSERTION_BMFFHASH_MISMATCH`). |
+| `MANIFEST_INVALID` | `livevideo.manifest.invalid` | C2PA Manifest Box failed standard validation |
+| `SEGMENT_INVALID` | `livevideo.segment.invalid` | Signature, hash, or key failure. Key outside the validity period. Manifest box segment without a `c2pa.hash.bmff.v3` assertion. VSI sequence number not moving forward or below the key minimum. Broken `c2pa.manifestId` chain. Manifest box claim `signature` URI that does not name the manifest label. Failed custom continuity validator. |
+| `ASSERTION_INVALID` | `livevideo.assertion.invalid` | Manifest box segment: sequenceNumber or streamId mismatch |
+| `CONTINUITY_METHOD_INVALID` | `livevideo.continuityMethod.invalid` | `continuityMethod` absent, unsupported, or required companion fields missing |
+| `CONTINUITY_METHOD_UNSUPPORTED` | `livevideo.continuityMethod.unsupported` | Custom continuity method with no registered validator (always alongside `continuityMethod.invalid`) |
+| `SESSIONKEY_INVALID` | `livevideo.sessionkey.invalid` | A session key in the init segment is invalid, or the `c2pa.session-keys` assertion has no session key or does not decode |
+
+Versions 1.3.0 and earlier report `SESSIONKEY_INVALID` from `validateC2paSegment` for a session key that expired after init segment validation. That code does not match C2PA section 19.7.3. To check the validity period of a session key, see [Session Key Lifecycle](https://cml.svta.org/llms/c2pa/docs/vsi-validation.md#session-key-lifecycle).
+
+Example of handling specific error codes:
+
+```typescript
+import { LiveVideoStatusCode } from '@svta/cml-c2pa'
+
+for (const code of result.errorCodes) {
+  switch (code) {
+    case LiveVideoStatusCode.SEGMENT_INVALID:
+      // Signature, hash, key, or VSI sequence failure
+      break
+    case LiveVideoStatusCode.SESSIONKEY_INVALID:
+      // Init segment has an invalid session key
+      break
+    case LiveVideoStatusCode.ASSERTION_INVALID:
+      // Sequence number or stream ID problem (manifest box method)
+      break
+    case LiveVideoStatusCode.CONTINUITY_METHOD_INVALID:
+      // Manifest ID chain is broken
+      break
+    case LiveVideoStatusCode.INIT_INVALID:
+      // Init segment structure is invalid
+      break
+    case LiveVideoStatusCode.MANIFEST_INVALID:
+      // Embedded manifest failed validation
+      break
+  }
+}
+```
+
+### Invalid Session Keys
+
+`validateC2paInitSegment` reports `SESSIONKEY_INVALID` if it finds an invalid session key in the `c2pa.session-keys` assertion (C2PA section 19.7.3). A session key is invalid if it does not conform to section 18.25.2, or if its signer binding fails verification. The library does not check every rule of section 18.25.2. `sessionKeys` contains only the session keys that pass these checks.
+
+The COSE key must include a `kid` (label 2). `minSequenceNumber` and `validityPeriod` must be unsigned integers up to `Number.MAX_SAFE_INTEGER` (2^53 - 1). `createdAt` must be CBOR tag 0 with an RFC 3339 date-time string (RFC 8949 section 3.4.1). The letters `T` and `Z` must be uppercase. The date must exist, so `2025-02-30T00:00:00Z` is invalid. A leap second (second 60) is also invalid, because a JavaScript `Date` cannot represent it.
+
+An expired session key does not count as invalid. `sessionKeys` excludes the expired key, and the result has no error code for that key.
+
+The assertion must contain at least one session key (section 18.25.2). `validateC2paInitSegment` reports `SESSIONKEY_INVALID` if the assertion has no session key, or if its CBOR does not decode. This rule also applies in VOD Merkle mode. If the CBOR does not decode, the result also includes `C2paStatusCode.ASSERTION_CBOR_INVALID`.
+
+Versions 1.3.0 and earlier report no error code for an invalid session key if another session key is valid. These versions also accept a `kid` outside the COSE key. They throw an error if the library cannot verify a session key, for example a key type that it does not support. They also throw an error if the CBOR of the `c2pa.session-keys` assertion does not decode. If your code catches these errors, check `errorCodes` instead.
+
+## C2PA Status Codes
+
+The `C2paStatusCode` constants represent manifest integrity failures defined in C2PA specification sections 15 and 18.
+
+```typescript
+import { C2paStatusCode } from '@svta/cml-c2pa'
+```
+
+| Constant | Value | Meaning |
+|----------|-------|---------|
+| `ASSERTION_HASHEDURI_MISMATCH` | `assertion.hashedURI.mismatch` | Assertion hash does not match the claim reference |
+| `ASSERTION_MISSING` | `assertion.missing` | The store has no box for a claim reference, or more than one box for its label |
+| `ASSERTION_MULTIPLE_HARD_BINDINGS` | `assertion.multipleHardBindings` | The manifest has more than one hard binding assertion |
+| `ASSERTION_UNDECLARED` | `assertion.undeclared` | The assertion store holds an assertion that the claim does not reference |
+| `ASSERTION_CBOR_INVALID` | `assertion.cbor.invalid` | An assertion box holds CBOR that does not decode |
+| `ASSERTION_JSON_INVALID` | `assertion.json.invalid` | An assertion box holds JSON that is not UTF-8 or does not parse |
+| `ASSERTION_ACTION_INGREDIENT_MISMATCH` | `assertion.action.ingredientMismatch` | Action requires an ingredient reference but none is present |
+| `CLAIM_SIGNATURE_MISMATCH` | `claimSignature.mismatch` | Claim signature verification failed, or the signature carries no certificate |
+| `CLAIM_SIGNATURE_MISSING` | `claimSignature.missing` | The manifest has no `c2pa.signature` box, or the claim `signature` URI does not resolve to it |
+| `CLAIM_MISSING` | `claim.missing` | The manifest has no claim box |
+| `CLAIM_CBOR_INVALID` | `claim.cbor.invalid` | The claim box holds CBOR that does not decode |
+| `CLAIM_MALFORMED` | `claim.malformed` | The claim box holds CBOR that is not a map |
+| `CLAIM_MULTIPLE` | `claim.multiple` | The manifest has more than one claim box |
+| `CLAIM_HARD_BINDINGS_MISSING` | `claim.hardBindings.missing` | The manifest has no hard binding assertion |
+| `ASSERTION_BMFFHASH_MALFORMED` | `assertion.bmffHash.malformed` | BMFF hash assertion or Merkle structure is malformed |
+| `ASSERTION_BMFFHASH_MISMATCH` | `assertion.bmffHash.mismatch` | BMFF content hash does not match the committed value |
+
+Versions 1.2.0 and earlier report `claim.signature.mismatch` for `CLAIM_SIGNATURE_MISMATCH`. That value does not match the C2PA specification. Compare codes with the `C2paStatusCode` constants, not with string literals.
+
+> [!NOTE]
+> `C2paStatusCode` values appear in `InitSegmentValidation.errorCodes` and `ManifestBoxValidationResult.errorCodes`, which check manifest integrity. They do not appear in `SegmentValidationResult.errorCodes`: the VSI/EMSG segment validation (Verifiable Segment Info, in event message boxes) uses only `LiveVideoStatusCode`.
+>
+> For VOD Merkle streams, `InitSegmentValidation` extracts `merkleMaps` from the `c2pa.hash.bmff.v3` assertion and validates the `initHash` binding of each entry. VOD Merkle segments do not use session keys. An invalid session key still causes `SESSIONKEY_INVALID`. See [Invalid Session Keys](#invalid-session-keys).
+
+## Working with Manifest Data
+
+The `C2paManifest` type represents a parsed C2PA manifest. It is available through `InitSegmentValidation.manifest` (VSI method) and `ManifestBoxValidationResult.manifest` (Manifest Box method).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `label` | `string` | Manifest label (identifier within the manifest store) |
+| `instanceId` | `string \| null` | Unique instance ID |
+| `claimGenerator` | `string \| null` | Tool that generated the claim |
+| `signatureInfo` | `C2paSignatureInfo` | Signature metadata |
+| `assertions` | `readonly C2paAssertion[]` | All assertions in the assertion store. Read them only when `isValid` is `true`. |
+
+The `signatureInfo` object contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `issuer` | `string \| null` | Certificate issuer (Common Name or Organization) |
+| `certNotBefore` | `string \| null` | Certificate validity start (ISO 8601) |
+
+```typescript
+const { isValid, manifest } = init // or result for the Manifest Box method
+
+// The assertions list is the raw assertion store, so read it only when isValid is true.
+if (isValid && manifest) {
+  console.log('Label:', manifest.label)
+  console.log('Instance ID:', manifest.instanceId)
+  console.log('Claim generator:', manifest.claimGenerator)
+  console.log('Issuer:', manifest.signatureInfo.issuer)
+  console.log('Cert not before:', manifest.signatureInfo.certNotBefore)
+
+  for (const assertion of manifest.assertions) {
+    console.log(`Assertion [${assertion.label}]:`, assertion.data)
+  }
+}
+```
+
+`data` is the decoded content of the assertion. For a CBOR assertion, a map is a plain object with string keys, a byte string is a `Uint8Array`, and an unsigned integer up to `Number.MAX_SAFE_INTEGER` (2^53 - 1) is a number. A larger integer is a BigInt. CBOR tag 0 and tag 1 are a `Date`. Every other tag is a `{ tag, value }` object. For a JSON assertion, `data` is the parsed JSON. For other content, `data` is the raw bytes of the content box. `data` is also the raw bytes for CBOR that does not decode or JSON that does not parse.
+
+## Sequence Validation Reasons
+
+With the [VSI/EMSG method](https://cml.svta.org/llms/c2pa/docs/vsi-validation.md), each `SegmentValidationResult` includes a `sequenceResult` field: a discriminated union on `reason` with `SequenceValidationReason` constants:
+
+```typescript
+import { SequenceValidationReason } from '@svta/cml-c2pa'
+```
+
+| Constant | Value | Valid | Additional Fields | Description |
+|----------|-------|-------|-------------------|-------------|
+| `VALID` | `valid` | `true` | none | Sequence number is the next expected value |
+| `DUPLICATE` | `duplicate` | `false` | none | Sequence number was already seen |
+| `GAP_DETECTED` | `gap_detected` | `false` | `missingFrom`, `missingTo` | One or more sequence numbers were skipped. The segment is not invalid for this reason. |
+| `OUT_OF_ORDER` | `out_of_order` | `false` | none | Sequence number is less than the last seen |
+| `SEQUENCE_NUMBER_BELOW_MINIMUM` | `sequence_number_below_minimum` | `false` | none | Below the session key's `minSequenceNumber` |
+
+Narrow the type to access the `GAP_DETECTED` fields:
+
+```typescript
+import { SequenceValidationReason } from '@svta/cml-c2pa'
+
+if (result.sequenceResult.reason === SequenceValidationReason.GAP_DETECTED) {
+  console.warn(
+    `Missing segments ${result.sequenceResult.missingFrom}` +
+    ` through ${result.sequenceResult.missingTo}`,
+  )
+}
+```
+
+## Choosing a Validation Method
+
+The two validation methods serve different use cases:
+
+| Aspect | VSI/EMSG (section 19.4) | Manifest Box (section 19.3) |
+|--------|-------------------------|---------------------------|
+| Init segment required | Yes | No |
+| Per-segment overhead | Low (EMSG box only) | High (full manifest per segment) |
+| Session keys | Yes | No |
+| Manifest access | Init segment only | Every segment |
+| Continuity mechanism | Sequence numbers | Manifest ID chaining |
+| Functions | `validateC2paInitSegment` + `validateC2paSegment` | `validateC2paManifestBoxSegment` |
+
+The VSI/EMSG method suits low-overhead real-time streaming where bandwidth matters. The Manifest Box method gives self-contained segments that are verifiable without earlier context.
+
+## References
+
+- [C2PA Specification v2.3](https://c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html)
+- [C2PA Live Video Validation (section 19.7)](https://c2pa.org/specifications/specifications/2.3/specs/C2PA_Specification.html#_live_video_validation_process)
+- [COSE, RFC 9052](https://www.rfc-editor.org/rfc/rfc9052)

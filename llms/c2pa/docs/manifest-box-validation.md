@@ -1,0 +1,194 @@
+---
+title: Manifest Box Validation
+description: Validate live streams using per-segment C2PA Manifest Boxes (C2PA section 19.3)
+---
+
+# Manifest Box Validation
+
+The Manifest Box method embeds a full C2PA manifest in each media segment, as section 19.3 of the C2PA specification defines. Each segment is self-contained, with its own COSE signature, so it needs no init segment and no session keys.
+
+Manifest ID chaining verifies the continuity between segments. See Manifest ID Chaining below.
+
+## Overview
+
+Unlike the [VSI/EMSG method](https://cml.svta.org/llms/c2pa/docs/vsi-validation.md), the Manifest Box method needs no separate init segment validation step. If you validate the init segment of a section 19.3 stream with `validateC2paInitSegment`, the function accepts it without a `c2pa.session-keys` assertion. One function, `validateC2paManifestBoxSegment`, does everything: manifest parsing, signature verification, BMFF hash validation, and continuity checks.
+
+Two pieces of state pass from one call to the next:
+
+- `lastManifestId`: the manifest ID from the last segment that updated the state, used for the continuity check
+- `state`: a `ManifestBoxValidationState` object that tracks `lastStreamId` and `lastSequenceNumber`
+
+## Validating Segments
+
+```typescript
+import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
+import type { ManifestBoxValidationState } from '@svta/cml-c2pa'
+
+let lastManifestId: string | null = null
+let state: ManifestBoxValidationState | undefined
+
+for (const segmentUrl of segmentUrls) {
+  const response = await fetch(segmentUrl)
+  const bytes = new Uint8Array(await response.arrayBuffer())
+
+  const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
+    bytes,
+    lastManifestId,
+    state,
+  )
+  lastManifestId = nextManifestId
+  state = nextState
+
+  if (result.isValid) {
+    console.log(`Segment ${result.sequenceNumber}: valid`)
+  } else {
+    console.error(`Segment ${result.sequenceNumber}: failed`, result.errorCodes)
+  }
+}
+```
+
+The function returns an object with:
+
+- `result`: a `ManifestBoxValidationResult` with the validation outcome
+- `nextManifestId`: the manifest ID to pass into the next call
+- `nextState`: the state to pass into the next call
+
+> [!NOTE]
+> For the first segment, pass `null` as `lastManifestId`, and `undefined` or nothing for `state`. When `lastManifestId` is `null`, the validator skips the chain comparison with the previous segment. It still checks that the segment declares a valid `continuityMethod` and a non-empty `previousManifestId`.
+
+## Complete Example
+
+```typescript
+import { validateC2paManifestBoxSegment, LiveVideoStatusCode } from '@svta/cml-c2pa'
+import type { ManifestBoxValidationState } from '@svta/cml-c2pa'
+
+async function validateStream(segmentUrls: string[]) {
+  let lastManifestId: string | null = null
+  let state: ManifestBoxValidationState | undefined
+
+  for (const segmentUrl of segmentUrls) {
+    const response = await fetch(segmentUrl)
+    const bytes = new Uint8Array(await response.arrayBuffer())
+
+    const { result, nextManifestId, nextState } = await validateC2paManifestBoxSegment(
+      bytes,
+      lastManifestId,
+      state,
+    )
+    lastManifestId = nextManifestId
+    state = nextState
+
+    if (result.isValid) {
+      console.log(
+        `Segment ${result.sequenceNumber}: valid` +
+        ` (stream: ${result.streamId}, issuer: ${result.issuer})`,
+      )
+    } else {
+      for (const code of result.errorCodes) {
+        switch (code) {
+          case LiveVideoStatusCode.CONTINUITY_METHOD_INVALID:
+            console.error('Continuity chain broken')
+            break
+          case LiveVideoStatusCode.ASSERTION_INVALID:
+            console.error('Assertion field mismatch (sequenceNumber or streamId)')
+            break
+          default:
+            console.error('Validation failure:', code)
+        }
+      }
+    }
+
+    // Access the full manifest when needed. Its assertions list is the raw store, so check isValid first.
+    if (result.isValid && result.manifest) {
+      console.log('Claim generator:', result.manifest.claimGenerator)
+      console.log('Assertions:', result.manifest.assertions.length)
+    }
+  }
+}
+```
+
+## State Management
+
+The `ManifestBoxValidationState` object contains the state between segments for the continuity checks:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `lastStreamId` | `string \| null` | Stream ID from the last segment that updated the state |
+| `lastSequenceNumber` | `number \| null` | Sequence number from the last segment that updated the state |
+
+The function is pure. It does not mutate any external state. The caller must keep `nextManifestId` and `nextState` between calls. A segment with an integrity error, a malformed or mismatched content hash, or no live video assertion does not change `nextManifestId` or `nextState`. The same applies to a segment on another stream or with a sequence number that does not move forward. A segment that fails only the continuity check still updates both values. After a seek, an encoder restart, or a new stream ID, pass `null` as `lastManifestId` and `undefined` as `state` to start a new state. If your application rejects the signer of a segment, discard the `nextManifestId` and `nextState` of that call.
+
+When `state` is omitted or `undefined`, the function skips the checks for a consistent stream ID and for increasing sequence numbers.
+
+## Manifest ID Chaining
+
+The `c2pa.livevideo.segment` assertion of each segment includes a `previousManifestId` field. That field must match the manifest ID of the previous segment, which creates a verifiable chain:
+
+```
+Segment 1: manifestId = "urn:c2pa:1b3b...", previousManifestId = "urn:c2pa:f916..."
+Segment 2: manifestId = "urn:c2pa:2e52...", previousManifestId = "urn:c2pa:1b3b..."  // must match segment 1
+Segment 3: manifestId = "urn:c2pa:3000...", previousManifestId = "urn:c2pa:2e52..."  // must match segment 2
+```
+
+The manifest ID is the manifest identifier of C2PA, a `urn:c2pa:` URN. The manifest stores it as the JUMBF label of the manifest box. The claim `instanceID` is a different value and does not take part in the chain. The validator compares the two manifest IDs exactly, without normalization.
+
+The JUMBF label is outside the signed claim. The claim `signature` field is a JUMBF URI of the signature box (C2PA section 8.4.2.1). The validator uses the label as the manifest ID only if this signed URI names it:
+
+- An absolute URI, such as `self#jumbf=/c2pa/urn:c2pa:1b3b.../c2pa.signature`, names the label. Only a URI that starts with a slash names it.
+- A URI relative to the manifest, `self#jumbf=c2pa.signature`, resolves to the signature box but does not name the label. The validator cannot verify the manifest ID chain, so the segment fails with `LiveVideoStatusCode.SEGMENT_INVALID`, whatever `lastManifestId` you pass. The rule applies to every continuity method, including a custom one. The segment does not update `nextManifestId` or `nextState`.
+- A URI that does not resolve to the signature box of the same manifest fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The segment does not update the state.
+
+> [!NOTE]
+> Every segment must declare a `previousManifestId`, including the first one. The first segment usually references the initial static manifest.
+
+The `continuityMethod` field states how continuity is verified. The only built-in method is `c2pa.manifestId`, which the specification defines (C2PA §19.3.2).
+
+When the chain is broken, because `previousManifestId` does not match the manifest ID of the previous segment, the result includes `LiveVideoStatusCode.SEGMENT_INVALID`.
+
+### Custom continuity methods
+
+The specification allows implementers to define their own continuity methods (§19.3.2), identified by a custom label such as `com.example.anchor-chain`. Their semantics are implementation-specific, so this library cannot validate them by default. Segments that declare an unrecognized method fail with `LiveVideoStatusCode.CONTINUITY_METHOD_INVALID`, as §19.7.2 requires. They also get `LiveVideoStatusCode.CONTINUITY_METHOD_UNSUPPORTED`, which lets consumers tell an unverifiable method from a broken chain.
+
+To validate a custom method, register a validator for its label in the `options` parameter. A stream uses one continuity method, so one validator is registered at a time:
+
+```ts
+import { validateC2paManifestBoxSegment } from '@svta/cml-c2pa'
+
+const { result } = await validateC2paManifestBoxSegment(bytes, lastManifestId, state, {
+  continuityValidator: {
+    method: 'com.example.anchor-chain',
+    validate: (liveVideoAssertion, manifest) => {
+      // method-specific fields are available on liveVideoAssertion
+      return verifyAnchorChain(liveVideoAssertion['anchorToken'], manifest.instanceId)
+    },
+  },
+})
+```
+
+The validator receives the full decoded `c2pa.livevideo.segment` assertion, including method-specific fields, and the parsed manifest of the segment. Anything else the method needs, such as `lastManifestId`, which the caller already has, can be captured in the closure of the callback. Returning `false` or throwing reports `LiveVideoStatusCode.SEGMENT_INVALID`. The built-in `c2pa.manifestId` method cannot be overridden.
+
+## Result Fields
+
+The `ManifestBoxValidationResult` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `manifest` | `C2paManifest \| null` | Parsed manifest, or `null` on parse failure |
+| `issuer` | `string \| null` | Certificate issuer from the signature |
+| `certificate` | `Uint8Array \| null` | DER-encoded end-entity certificate from the claim signature, or `null` when the signature is absent or carries no certificate |
+| `sequenceNumber` | `number \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the value is not an unsigned integer up to `Number.MAX_SAFE_INTEGER` or the claim does not verify the assertion |
+| `previousManifestId` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `streamId` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `continuityMethod` | `string \| null` | From the `c2pa.livevideo.segment` assertion, or `null` if the claim does not verify it |
+| `bmffHashHex` | `string \| null` | Hex-encoded hash from the `c2pa.hash.bmff.v3` assertion, or `null` if the claim does not verify it |
+| `isValid` | `boolean` | All checks passed |
+| `errorCodes` | `readonly (LiveVideoStatusCode \| C2paStatusCode)[]` | Failure codes (empty when valid) |
+
+> [!NOTE]
+> Unlike the VSI method, the Manifest Box method can produce both `LiveVideoStatusCode` and `C2paStatusCode` error codes. Each segment contains a full manifest. The library runs these integrity checks on it: assertion references and hashes, undeclared assertions, the hard binding count, duplicate manifest boxes, and claim signature verification. The segment fields above come only from assertions whose hash matches a claim reference. Check `isValid` before you use any field. A `ManifestBoxContinuityValidator` receives the parsed manifest, whose `assertions` list is the raw assertion store.
+>
+> A segment without a `c2pa.signature` box fails with `C2paStatusCode.CLAIM_SIGNATURE_MISSING`. The claim signature is verified with the certificate inside the segment. The library does not check that certificate against a trust list. See [Signer Trust](https://cml.svta.org/llms/c2pa/docs/results-and-error-codes.md#signer-trust).
+>
+> C2PA section 19.3 requires a `c2pa.hash.bmff.v3` assertion in the manifest of each segment. A segment without that assertion fails with `LiveVideoStatusCode.SEGMENT_INVALID`. If the manifest also has no other hard binding assertion, the result also includes `C2paStatusCode.CLAIM_HARD_BINDINGS_MISSING`. The library adds that code only for a claim that decodes. A manifest with a claim code such as `C2paStatusCode.CLAIM_MISSING` does not also report `CLAIM_HARD_BINDINGS_MISSING`.
+>
+> A `c2pa.hash.bmff.v3` assertion that is not a map, has no `hash`, or has a `hash` that is not a byte string fails with `C2paStatusCode.ASSERTION_BMFFHASH_MALFORMED`. The validator does not read a `value` field in place of `hash`. An assertion with an exclusion that does not conform to C2PA section 18.6 fails with the same code. Each `data` constraint of an exclusion needs an unsigned integer `offset` and a byte string `value`. The `xpath` of an exclusion must follow the grammar of section 18.6.2. Each node is a `/`, a four-character box type, and an optional index such as `[2]`. The validator also checks the `length`, `subset`, `version`, `flags`, and `exact` fields against the CDDL of section 18.6.2.

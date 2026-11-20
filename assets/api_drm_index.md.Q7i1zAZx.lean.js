@@ -1,0 +1,1 @@
+import{_t as e,it as t,n,rt as r}from"./chunks/framework.CzJE1L4g.js";var i=JSON.parse(`{"title":"drm","description":"","frontmatter":{},"headers":[],"relativePath":"api/drm/index.md","filePath":"api/drm/index.md"}`),a={name:`api/drm/index.md`};function o(n,i,a,o,s,c){return e(),r(`div`,null,[...i[0]||=[t("",8)]])}var s=n(a,[[`render`,o]]);export{i as __pageData,s as default};

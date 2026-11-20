@@ -1,0 +1,1 @@
+import{_t as e,it as t,n,rt as r}from"./chunks/framework.CzJE1L4g.js";var i=JSON.parse(`{"title":"xml","description":"","frontmatter":{},"headers":[],"relativePath":"api/xml/index.md","filePath":"api/xml/index.md"}`),a={name:`api/xml/index.md`};function o(n,i,a,o,s,c){return e(),r(`div`,null,[...i[0]||=[t("",6)]])}var s=n(a,[[`render`,o]]);export{i as __pageData,s as default};
