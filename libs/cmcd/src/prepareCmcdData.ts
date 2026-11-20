@@ -10,6 +10,7 @@ import type { CmcdKeySpec } from './CmcdKeySpec.ts'
 import { CMCD_EVENT_MODE, CMCD_REQUEST_MODE, type CmcdReportingMode } from './CmcdReportingMode.ts'
 import type { CmcdValue } from './CmcdValue.ts'
 import type { CmcdVersion } from './CmcdVersion.ts'
+import { copyCmcdValue } from './copyCmcdValue.ts'
 import { downConvertToV1 } from './downConvertToV1.ts'
 import { getKeySpec } from './getKeySpec.ts'
 import { isValid } from './isValid.ts'
@@ -100,15 +101,17 @@ function prepareValue(
 		}
 
 		if (formatted instanceof SfItem && typeof formatted.value === 'string') {
-			return new SfItem(new SfToken(formatted.value), formatted.params)
+			return new SfItem(new SfToken(formatted.value), formatted.params && { ...formatted.params })
 		}
 	}
 
-	return formatted
+	return copyCmcdValue(formatted)
 }
 
 /**
  * Convert a generic object to CMCD data.
+ *
+ * The result shares no list, `SfItem`, or parameter object with `obj`. A later change to those values in `obj` does not change the result.
  *
  * @param obj - The CMCD object to process.
  * @param options - Options for encoding.

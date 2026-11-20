@@ -39,7 +39,7 @@ function formatEntry(
 	if (entry instanceof SfItem) {
 		const path = formatPath(entry.value, base, version)
 
-		return path === undefined ? undefined : new SfItem(path, entry.params)
+		return path === undefined ? undefined : new SfItem(path, entry.params && { ...entry.params })
 	}
 
 	return formatPath(entry, base, version)
@@ -89,7 +89,7 @@ export function formatNor(
 	if (value instanceof SfItem && Array.isArray(value.value)) {
 		const list = formatEntries(value.value, base, version)
 
-		return list && new SfItem(list, value.params)
+		return list && new SfItem(list, value.params && { ...value.params })
 	}
 
 	const entry = formatEntry(value, base, version)

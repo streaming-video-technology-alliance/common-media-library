@@ -39,6 +39,9 @@ import type { DeepReadonly, HttpRequest } from '@svta/cml-utils'
  * @typeParam C - The type of the player's `customData`. Defaults to
  *                `Record<string, unknown>`.
  *
+ * @deprecated This type serves `transform` of `CmcdReporter`. A session has no transform. A {@link CmcdReportFilter} drops reports, and the data of each call changes them.
+ * The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member to the session API. Version 3.0.0 removes this type.
+ *
  * @public
  */
 export type CmcdTransformRequest<C = Record<string, unknown>> = Readonly<

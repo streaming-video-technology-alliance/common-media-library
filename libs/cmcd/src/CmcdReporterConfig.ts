@@ -9,6 +9,9 @@ import type { CmcdRequestReportConfig } from './CmcdRequestReportConfig.ts'
  *                of the configuration infers the type. Defaults to
  *                `Record<string, unknown>`.
  *
+ * @deprecated Use {@link CmcdSessionConfig} with {@link createCmcdSession} instead. The {@link https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/cmcd/docs/migration-guide.md | migration guide} maps each member to the session API.
+ * Version 3.0.0 removes this type.
+ *
  * @public
  */
 export type CmcdReporterConfig<C = Record<string, unknown>> = CmcdRequestReportConfig<C> & {
