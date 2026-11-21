@@ -12,7 +12,7 @@
  *                                          than the threshold on any input; requires --baseline
  *   npm run bench -- --only=<text>         only inputs whose name contains the text
  *
- * The regression check against the latest release is `npm run bench -- --baseline=npm --threshold=15`.
+ * The regression check against the latest release is `npm run bench -- --baseline=npm --threshold=20`.
  *
  * A <build> is one of:
  *
