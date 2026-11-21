@@ -13,6 +13,8 @@ and this project adheres to
 ### Added
 
 - `decodeUtf8` converts UTF-8 bytes in a `DataView` or a `Uint8Array` to a string. Its bundle is smaller than the bundle of `decodeText`.
+- `fetchRequester` sends an `HttpRequest` with `fetch` and resolves with an `HttpResponse`. The response has the response text as `data` and every response header in `headers`
+- `HttpRequester`, the type of a function that sends an `HttpRequest` and resolves with an `HttpResponse`
 
 ### Fixed
 
