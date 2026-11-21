@@ -16,7 +16,7 @@ If you provide box objects, also provide a configuration object that names the w
 A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.
 
 > [!NOTE]
-> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
+> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists the container box types that the function writes automatically. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
 >
 > The function does not write a box of another type as a container, even if the box has a `boxes` field. Examples are `meta` and the sample entries. A raw box of such a type keeps its bytes. For any other box of such a type with no writer, the function throws `No writer found for box type`.
 

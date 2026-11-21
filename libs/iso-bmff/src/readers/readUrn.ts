@@ -18,16 +18,11 @@ import { readTerminatedUtf8 } from '../cursor/readTerminatedUtf8.ts'
  * @public
  */
 export function readUrn(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrnBox {
-	const box: DataEntryUrnBox = {
+	return {
 		type: 'urn ',
 		version: readUint8(cursor),
 		flags: readUint24(cursor),
 		name: readTerminatedUtf8(cursor),
+		location: cursor.pos < cursor.end ? readTerminatedUtf8(cursor) : undefined,
 	}
-
-	if (cursor.pos < cursor.end) {
-		box.location = readTerminatedUtf8(cursor)
-	}
-
-	return box
 }

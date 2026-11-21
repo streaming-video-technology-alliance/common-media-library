@@ -12,7 +12,7 @@ export type CompositionOffsetBox = FullBox & {
 	type: 'ctts'
 	/**
 	 * The entry count of a box of version 2 or above. These versions have no entries.
-	 * For version 0 or 1, the reader omits the field, and the count is the length of `entries`.
+	 * For version 0 or 1, the field is `undefined`, and the count is the length of `entries`.
 	 */
 	entryCount?: number
 	entries: CompositionOffsetEntry[]

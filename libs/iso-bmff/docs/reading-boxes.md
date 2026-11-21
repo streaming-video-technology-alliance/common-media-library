@@ -13,7 +13,7 @@ The `readIsoBoxes` function reads boxes from a buffer and returns an array of bo
 The bytes of a raw box share memory with the input. A raw box can have any type, so a test of `box.type` does not exclude a raw box. Narrow a box with `isIsoBoxType`, which returns `false` for a raw box.
 
 > [!NOTE]
-> The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
+> The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists the container box types that the function reads automatically. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
 
 ## Using default config
 
@@ -50,6 +50,10 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 ```
+
+## Optional fields
+
+A box object from a built-in reader has every key of its type. A field that the flags, the version, or the size of the box excludes is `undefined`. To check for a field, test its value for `undefined`, or test the flags or the version. Do not test the key with `in` or `Object.keys`. The key is always present.
 
 ## Reading one box
 
@@ -142,6 +146,8 @@ A byte field such as `messageData` is a view over the input data. The field shar
 
 ## Writing a custom reader
 
+The package parses no codec configuration box, such as `avcC`, `hvcC`, or `esds`. The `boxes` field of a sample entry, such as `avc1`, holds such a box as a raw box with its bytes. To read the fields of the box, write a custom reader for its box type.
+
 A reader takes a read cursor and the box type, and returns the box object with its `type` field. A field function reads one field at `cursor.pos` and moves the position past the field, such as `readUint32` or `readFourCc`:
 
 ```typescript
@@ -182,6 +188,23 @@ The cursor follows these rules:
 
 A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw for an incomplete box.
 
+`readIsoBoxes` returns no position. To continue a read with more data, read with a cursor. After `readChildBoxes` or `nextIsoBox` stops before an incomplete box, the position of the cursor is the first byte of that box. Keep the bytes from that position, add the new bytes, and read again:
+
+```typescript
+import { createIsoBoxReadCursor, readChildBoxes } from "@svta/cml-iso-bmff";
+
+const cursor = createIsoBoxReadCursor(buffer);
+const boxes = readChildBoxes(cursor);
+
+// The first incomplete box starts at the first byte of `rest`.
+const rest = buffer.slice(cursor.pos);
+```
+
+The position has two limits:
+
+- The position applies to the boxes of one level. If a child box of a complete box is incomplete, the reader of the parent box stops before the child box. The read then continues after the parent box, and the position does not show the child box.
+- The position does not separate an incomplete box from a box with a bad size. A wrong `size` value above the remaining data stops the read at the same position. More data then does not complete the box.
+
 A box with a reader in the configuration and a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. A box that is deeper than 128 levels also throws a `RangeError`. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
 
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
@@ -204,7 +227,7 @@ The option applies to these fields:
 | `sidx`                 | `earliestPresentationTime`, `firstOffset`       |
 | `tfra`                 | `time` and `moofOffset` of each entry           |
 | `prft`                 | `mediaTime`                                     |
-| `emsg`                 | `presentationTime` of a version 1 box           |
+| `emsg`                 | `presentationTime`                              |
 | `mehd`                 | `fragmentDuration`                              |
 | `mvhd`, `mdhd`, `tkhd` | `creationTime`, `modificationTime`, `duration`  |
 | `elst`                 | `segmentDuration` and `mediaTime` of each entry |

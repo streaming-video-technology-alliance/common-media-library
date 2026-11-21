@@ -17,7 +17,7 @@ import { readCompressorName } from '../cursor/readCompressorName.ts'
  *
  * @returns A parsed `VisualSampleEntry`
  *
- * @public
+ * @internal
  */
 export function readVisualSampleEntry<T extends IsoBoxType, V extends IsoInt64>(
 	type: T,

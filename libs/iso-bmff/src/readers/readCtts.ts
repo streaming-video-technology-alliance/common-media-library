@@ -49,6 +49,7 @@ export function readCtts(cursor: IsoBoxReadCursor<IsoInt64>): CompositionOffsetB
 		type: 'ctts',
 		version,
 		flags,
+		entryCount: undefined,
 		entries,
 	}
 }

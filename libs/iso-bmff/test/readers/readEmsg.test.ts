@@ -142,7 +142,7 @@ describe('readEmsg', function () {
 		const box = findIsoBox(boxes, box => isIsoBoxType('emsg', box))
 
 		// A version 0 box has a presentation time delta, and a version 1 box has a presentation time.
-		const time = box?.version === 0 ? box.presentationTimeDelta : box?.presentationTime
+		const time = box?.presentationTimeDelta ?? box?.presentationTime
 		// #endregion example
 
 		assert.ok(box)
@@ -151,7 +151,7 @@ describe('readEmsg', function () {
 		assert.strictEqual(time, 1)
 	})
 
-	it('should read a version 2 box as empty fields and messageData', function () {
+	it('should read a version 2 box as empty fields, undefined time fields, and messageData', function () {
 		const fields = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 3, 0x61, 0, 0x62, 0, 1]
 		const bytes = new Uint8Array([
 			0,
@@ -177,8 +177,10 @@ describe('readEmsg', function () {
 		assert.strictEqual(box.schemeIdUri, '')
 		assert.strictEqual(box.value, '')
 		assert.strictEqual(box.timescale, 0)
-		assert.strictEqual(box.presentationTimeDelta, 0)
-		assert.strictEqual(box.presentationTime, 0)
+		assert.ok('presentationTimeDelta' in box)
+		assert.strictEqual(box.presentationTimeDelta, undefined)
+		assert.ok('presentationTime' in box)
+		assert.strictEqual(box.presentationTime, undefined)
 		assert.strictEqual(box.eventDuration, 0)
 		assert.strictEqual(box.id, 0)
 		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array(fields))

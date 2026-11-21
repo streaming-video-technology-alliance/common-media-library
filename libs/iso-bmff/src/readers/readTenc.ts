@@ -28,23 +28,18 @@ export function readTenc(cursor: IsoBoxReadCursor<IsoInt64>): TrackEncryptionBox
 	const pattern = readUint8(cursor)
 	const defaultIsProtected = readUint8(cursor)
 	const defaultPerSampleIvSize = readUint8(cursor)
-	const box: TrackEncryptionBox = {
+	return {
 		type: 'tenc',
 		version,
 		flags,
 		defaultPerSampleIvSize,
 		defaultKid: readBytes(cursor, 16),
 		defaultIsProtected,
+		defaultCryptByteBlock: version > 0 ? pattern >> 4 : undefined,
+		defaultSkipByteBlock: version > 0 ? pattern & 0xf : undefined,
+		defaultConstantIv:
+			defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && cursor.pos < cursor.end
+				? readBytes(cursor, readUint8(cursor))
+				: undefined,
 	}
-
-	if (version > 0) {
-		box.defaultCryptByteBlock = pattern >> 4
-		box.defaultSkipByteBlock = pattern & 0xf
-	}
-
-	if (defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && cursor.pos < cursor.end) {
-		box.defaultConstantIv = readBytes(cursor, readUint8(cursor))
-	}
-
-	return box
 }

@@ -1,0 +1,26 @@
+import type { TrackGroupBox } from '../boxes/TrackGroupBox.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+
+/**
+ * Read the `trgr` box (`TrackGroupBox`).
+ *
+ * The `readers` map does not need an entry for the `trgr` box type.
+ * `readIsoBoxes` returns the same box with this reader and without this reader.
+ *
+ * The 64-bit integer fields of the child boxes have the type that the `int64` function of the cursor returns.
+ * With no option, they are numbers.
+ *
+ * @param cursor - The read cursor at the first byte after the box header
+ *
+ * @returns A parsed `TrackGroupBox`
+ *
+ * @public
+ */
+export function readTrgr<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackGroupBox<V> {
+	return {
+		type: 'trgr',
+		boxes: readChildBoxes(cursor),
+	}
+}

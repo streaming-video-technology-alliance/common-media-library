@@ -13,7 +13,8 @@ import { readInt32 } from '../cursor/readInt32.ts'
  * ISO/IEC 14496-12:2015 - 8.8.8
  *
  * The reader creates one object for each sample of `sample_count`. The reader sets no limit on that count.
- * If the box sets none of the flags 0x100 to 0x800, each object is empty and uses no bytes of the box.
+ * Each object has the four sample fields in the same order. A field that the flags exclude is `undefined`.
+ * If the box sets none of the flags 0x100 to 0x800, the objects use no bytes of the box.
  *
  * @param cursor - The read cursor at the first byte after the box header
  *
@@ -27,25 +28,20 @@ export function readTrun(cursor: IsoBoxReadCursor<IsoInt64>): TrackRunBox {
 	const sampleCount = readUint32(cursor)
 	const dataOffset = flags & 0x1 ? readInt32(cursor) : undefined
 	const firstSampleFlags = flags & 0x4 ? readUint32(cursor) : undefined
-	const samples: TrackRunSample[] = []
+	const hasDuration = (flags & 0x100) !== 0
+	const hasSize = (flags & 0x200) !== 0
+	const hasFlags = (flags & 0x400) !== 0
+	const hasOffset = (flags & 0x800) !== 0
+	const readOffset = version === 0 ? readUint32 : readInt32
+	const samples: TrackRunSample[] = new Array<TrackRunSample>(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {
-		const sample: TrackRunSample = {}
-
-		if (flags & 0x100) {
-			sample.sampleDuration = readUint32(cursor)
+		samples[i] = {
+			sampleDuration: hasDuration ? readUint32(cursor) : undefined,
+			sampleSize: hasSize ? readUint32(cursor) : undefined,
+			sampleFlags: hasFlags ? readUint32(cursor) : undefined,
+			sampleCompositionTimeOffset: hasOffset ? readOffset(cursor) : undefined,
 		}
-		if (flags & 0x200) {
-			sample.sampleSize = readUint32(cursor)
-		}
-		if (flags & 0x400) {
-			sample.sampleFlags = readUint32(cursor)
-		}
-		if (flags & 0x800) {
-			sample.sampleCompositionTimeOffset = version === 0 ? readUint32(cursor) : readInt32(cursor)
-		}
-
-		samples.push(sample)
 	}
 
 	return {

@@ -126,13 +126,14 @@ describe('readStsz', function () {
 		assert.ok(count > 0)
 	})
 
-	it('should have no sampleCount when the box has entry sizes', function () {
+	it('should set sampleCount to undefined when the box has entry sizes', function () {
 		const [box] = readIsoBoxes(boxBytes('stsz', [0, 1], [0, 3], [0, 4], [1, 4], [512, 4]), {
 			readers: { stsz: readStsz },
 		})
 
 		assert.ok(isIsoBoxType('stsz', box))
-		assert.ok(!('sampleCount' in box))
+		assert.ok('sampleCount' in box)
+		assert.strictEqual(box.sampleCount, undefined)
 		assert.deepStrictEqual(box.entrySize, [512])
 	})
 })

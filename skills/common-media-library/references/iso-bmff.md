@@ -8,7 +8,7 @@ Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/is
 ## When to use
 
 - Read the boxes of an init or media segment, with full content for the box types that you need: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`
-- Read the track timescale, codec, or default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTrex`, `readTfhd`, `readTrun`
+- Read the track timescale, the sample entry type (such as `avc1`), or the default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTrex`, `readTfhd`, `readTrun`
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read a 64-bit field, such as a tfdt time at a 10 MHz timescale, exactly or with an overflow report: `readInt64AsBigInt`, `createInt64OverflowReader`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`
@@ -279,8 +279,8 @@ The names of the box types, entry types, and fields follow the names of the spec
 | `SubsampleInformationBox` | `SubSampleInformationBox` |
 | `SubTrackBox` | `SubTrack` |
 | `SampleEntryBox`, `AudioSampleEntryBox`, `VisualSampleEntryBox` | `SampleEntry`, `AudioSampleEntry`, `VisualSampleEntry` |
-| `readAudioSampleEntryBox`, `writeAudioSampleEntryBox` | `readAudioSampleEntry`, `writeAudioSampleEntry` |
-| `readVisualSampleEntryBox`, `writeVisualSampleEntryBox` | `readVisualSampleEntry`, `writeVisualSampleEntry` |
+| `writeAudioSampleEntryBox` | `writeAudioSampleEntry` |
+| `writeVisualSampleEntryBox` | `writeVisualSampleEntry` |
 | `DecodingTimeSample` | `TimeToSampleEntry` |
 | `CompositionTimeToSampleEntry` | `CompositionOffsetEntry` |
 | `SubsampleEntry`, `Subsample` | `SubSampleInformationEntry`, `SubSampleInformationSubsample` |
@@ -303,6 +303,8 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `IsoFieldTypeMap`, `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, `IsoBoxFields` | The field functions, such as `readUint32` |
 | `IsoBoxReadableStream` | `createIsoBoxReadableStream` |
 | `fourCcToUint32` | A field with a four-character code is a string. To convert a code, compute `new DataView(Uint8Array.from(code, char => char.charCodeAt(0)).buffer).getUint32(0)`. |
+| `readAudioSampleEntryBox(type, view)`, `readVisualSampleEntryBox(type, view)` | `createAudioSampleEntryReader(type)` and `createVisualSampleEntryReader(type)`. Put the result in the `readers` map, or call it with the cursor. |
+| `EventMessageBoxBase`, `EventMessageBoxV0`, `EventMessageBoxV1` | `EventMessageBox`. Read the field of the version, such as `box.presentationTimeDelta ?? box.presentationTime`. |
 | `isFullBox` | `isIsoBoxType`, or a test such as `'version' in box && 'flags' in box` |
 | The child types, such as `MovieBoxChild` and `VisualSampleEntryBoxChild` | `ParsedIsoBox` |
 | `TrackReferenceTypeBox` | A raw box. A child of a `tref` box is a raw box. |
@@ -371,7 +373,7 @@ The `readIsoBoxes` function reads boxes from a buffer and returns an array of bo
 The bytes of a raw box share memory with the input. A raw box can have any type, so a test of `box.type` does not exclude a raw box. Narrow a box with `isIsoBoxType`, which returns `false` for a raw box.
 
 > [!NOTE]
-> The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists all known container types. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
+> The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists the container box types that the function reads automatically. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
 
 ## Using default config
 
@@ -408,6 +410,10 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 ```
+
+## Optional fields
+
+A box object from a built-in reader has every key of its type. A field that the flags, the version, or the size of the box excludes is `undefined`. To check for a field, test its value for `undefined`, or test the flags or the version. Do not test the key with `in` or `Object.keys`. The key is always present.
 
 ## Reading one box
 
@@ -500,6 +506,8 @@ A byte field such as `messageData` is a view over the input data. The field shar
 
 ## Writing a custom reader
 
+The package parses no codec configuration box, such as `avcC`, `hvcC`, or `esds`. The `boxes` field of a sample entry, such as `avc1`, holds such a box as a raw box with its bytes. To read the fields of the box, write a custom reader for its box type.
+
 A reader takes a read cursor and the box type, and returns the box object with its `type` field. A field function reads one field at `cursor.pos` and moves the position past the field, such as `readUint32` or `readFourCc`:
 
 ```typescript
@@ -540,6 +548,23 @@ The cursor follows these rules:
 
 A box is incomplete when the data ends inside the header or inside the body of the box. A box is also incomplete when its size is below the size of its header. `readIsoBoxes` stops before the first incomplete box and returns the boxes before that box. The function does not throw for an incomplete box.
 
+`readIsoBoxes` returns no position. To continue a read with more data, read with a cursor. After `readChildBoxes` or `nextIsoBox` stops before an incomplete box, the position of the cursor is the first byte of that box. Keep the bytes from that position, add the new bytes, and read again:
+
+```typescript
+import { createIsoBoxReadCursor, readChildBoxes } from "@svta/cml-iso-bmff";
+
+const cursor = createIsoBoxReadCursor(buffer);
+const boxes = readChildBoxes(cursor);
+
+// The first incomplete box starts at the first byte of `rest`.
+const rest = buffer.slice(cursor.pos);
+```
+
+The position has two limits:
+
+- The position applies to the boxes of one level. If a child box of a complete box is incomplete, the reader of the parent box stops before the child box. The read then continues after the parent box, and the position does not show the child box.
+- The position does not separate an incomplete box from a box with a bad size. A wrong `size` value above the remaining data stops the read at the same position. More data then does not complete the box.
+
 A box with a reader in the configuration and a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. A box that is deeper than 128 levels also throws a `RangeError`. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
 
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
@@ -562,7 +587,7 @@ The option applies to these fields:
 | `sidx`                 | `earliestPresentationTime`, `firstOffset`       |
 | `tfra`                 | `time` and `moofOffset` of each entry           |
 | `prft`                 | `mediaTime`                                     |
-| `emsg`                 | `presentationTime` of a version 1 box           |
+| `emsg`                 | `presentationTime`                              |
 | `mehd`                 | `fragmentDuration`                              |
 | `mvhd`, `mdhd`, `tkhd` | `creationTime`, `modificationTime`, `duration`  |
 | `elst`                 | `segmentDuration` and `mediaTime` of each entry |
@@ -893,7 +918,7 @@ If you provide box objects, also provide a configuration object that names the w
 A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.
 
 > [!NOTE]
-> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists all known container types. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
+> The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists the container box types that the function writes automatically. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
 >
 > The function does not write a box of another type as a container, even if the box has a `boxes` field. Examples are `meta` and the sample entries. A raw box of such a type keeps its bytes. For any other box of such a type with no writer, the function throws `No writer found for box type`.
 
@@ -1282,7 +1307,7 @@ export type CompositionOffsetEntry = {
 };
 
 // @public
-export const CONTAINERS: string[];
+export const CONTAINERS: readonly string[];
 
 // @public
 export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => AudioSampleEntry<T, V>;
@@ -1369,39 +1394,16 @@ export type EditListEntry<V extends IsoInt64 = number> = {
 export function endIsoBox(cursor: IsoBoxWriteCursor, start: number): void;
 
 // @public
-export type EventMessageBox<V extends IsoInt64 = number> = EventMessageBoxV0 | EventMessageBoxV1<V> | EventMessageBoxUnrecognizedVersion;
-
-// @public
-export type EventMessageBoxBase = FullBox & {
+export type EventMessageBox<V extends IsoInt64 = number> = FullBox & {
     type: "emsg";
     schemeIdUri: string;
     value: string;
     timescale: number;
+    presentationTimeDelta?: number;
+    presentationTime?: V;
     eventDuration: number;
     id: number;
     messageData: Uint8Array;
-};
-
-// @public
-export type EventMessageBoxUnrecognizedVersion = EventMessageBoxBase & {
-    version: EventMessageBoxUnrecognizedVersionNumber;
-    presentationTimeDelta: number;
-    presentationTime: number;
-};
-
-// @public
-export type EventMessageBoxUnrecognizedVersionNumber<A extends number[] = [0, 1]> = A["length"] extends 256 ? Exclude<A[number], 0 | 1> : EventMessageBoxUnrecognizedVersionNumber<[...A, A["length"]]>;
-
-// @public
-export type EventMessageBoxV0 = EventMessageBoxBase & {
-    version: 0;
-    presentationTimeDelta: number;
-};
-
-// @public
-export type EventMessageBoxV1<V extends IsoInt64 = number> = EventMessageBoxBase & {
-    version: 1;
-    presentationTime: V;
 };
 
 // @public
@@ -1493,6 +1495,7 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
     dinf: DataInformationBox<V>;
     edts: EditBox<V>;
     grpl: GroupsListBox<V>;
+    ludt: LoudnessBox<V>;
     mdia: MediaBox<V>;
     meco: AdditionalMetadataContainerBox<V>;
     mfra: MovieFragmentRandomAccessBox<V>;
@@ -1500,13 +1503,16 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
     moof: MovieFragmentBox<V>;
     moov: MovieBox<V>;
     mvex: MovieExtendsBox<V>;
+    rinf: RestrictedSchemeInfoBox<V>;
     schi: SchemeInformationBox<V>;
     sinf: ProtectionSchemeInfoBox<V>;
     stbl: SampleTableBox<V>;
+    strd: SubTrackDefinition<V>;
     strk: SubTrack<V>;
     traf: TrackFragmentBox<V>;
     trak: TrackBox<V>;
     tref: TrackReferenceBox<V>;
+    trgr: TrackGroupBox<V>;
     udta: UserDataBox<V>;
     vttc: WebVttCueBox<V>;
 };
@@ -1542,6 +1548,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     imda: IdentifiedMediaDataBox;
     kind: KindBox;
     labl: LabelBox;
+    ludt: LoudnessBox<V>;
     mdat: MediaDataBox;
     mdhd: MediaHeaderBox<V>;
     mdia: MediaBox<V>;
@@ -1561,6 +1568,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     prft: ProducerReferenceTimeBox<V>;
     prsl: PreselectionGroupBox<V>;
     pssh: ProtectionSystemSpecificHeaderBox;
+    rinf: RestrictedSchemeInfoBox<V>;
     schi: SchemeInformationBox<V>;
     schm: SchemeTypeBox;
     sdtp: SampleDependencyTypeBox;
@@ -1572,6 +1580,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     stbl: SampleTableBox<V>;
     stco: ChunkOffsetBox;
     sthd: SubtitleMediaHeaderBox;
+    strd: SubTrackDefinition<V>;
     strk: SubTrack<V>;
     stsc: SampleToChunkBox;
     stsd: SampleDescriptionBox<V>;
@@ -1591,6 +1600,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     trak: TrackBox<V>;
     tref: TrackReferenceBox<V>;
     trex: TrackExtendsBox;
+    trgr: TrackGroupBox<V>;
     trun: TrackRunBox;
     udta: UserDataBox<V>;
     "url ": DataEntryUrlBox;
@@ -1718,6 +1728,12 @@ export type LabelBox = FullBox & {
     labelId: number;
     language: string;
     label: string;
+};
+
+// @public
+export type LoudnessBox<V extends IsoInt64 = number> = {
+    type: "ludt";
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
@@ -1861,9 +1877,6 @@ export type ProtectionSystemSpecificHeaderBox = FullBox & {
 export function readArdi(cursor: IsoBoxReadCursor<IsoInt64>): AudioRenderingIndicationBox;
 
 // @public
-export function readAudioSampleEntry<T extends IsoBoxType, V extends IsoInt64>(type: T, cursor: IsoBoxReadCursor<V>): AudioSampleEntry<T, V>;
-
-// @public
 export function readAvc1<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): VisualSampleEntry<"avc1", V>;
 
 // @public
@@ -1971,6 +1984,9 @@ export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
 export function readLabl(cursor: IsoBoxReadCursor<IsoInt64>): LabelBox;
 
 // @public
+export function readLudt<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): LoudnessBox<V>;
+
+// @public
 export function readMdat(cursor: IsoBoxReadCursor<IsoInt64>): MediaDataBox;
 
 // @public
@@ -2028,6 +2044,9 @@ export function readPrsl<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Prese
 export function readPssh(cursor: IsoBoxReadCursor<IsoInt64>): ProtectionSystemSpecificHeaderBox;
 
 // @public
+export function readRinf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): RestrictedSchemeInfoBox<V>;
+
+// @public
 export function readSchi<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SchemeInformationBox<V>;
 
 // @public
@@ -2059,6 +2078,9 @@ export function readStco(cursor: IsoBoxReadCursor<IsoInt64>): ChunkOffsetBox;
 
 // @public
 export function readSthd(cursor: IsoBoxReadCursor<IsoInt64>): SubtitleMediaHeaderBox;
+
+// @public
+export function readStrd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SubTrackDefinition<V>;
 
 // @public
 export function readStrk<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SubTrack<V>;
@@ -2127,6 +2149,9 @@ export function readTref<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Track
 export function readTrex(cursor: IsoBoxReadCursor<IsoInt64>): TrackExtendsBox;
 
 // @public
+export function readTrgr<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): TrackGroupBox<V>;
+
+// @public
 export function readTrun(cursor: IsoBoxReadCursor<IsoInt64>): TrackRunBox;
 
 // @public
@@ -2157,9 +2182,6 @@ export function readUrn(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrnBox;
 export function readUtf8(cursor: IsoBoxReadCursor<IsoInt64>, length: number): string;
 
 // @public
-export function readVisualSampleEntry<T extends IsoBoxType, V extends IsoInt64>(type: T, cursor: IsoBoxReadCursor<V>): VisualSampleEntry<T, V>;
-
-// @public
 export function readVlab(cursor: IsoBoxReadCursor<IsoInt64>): WebVttSourceLabelBox;
 
 // @public
@@ -2179,6 +2201,12 @@ export function readWideInt<V extends IsoInt64 = number>(cursor: IsoBoxReadCurso
 
 // @public
 export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, size: 4 | 8): V;
+
+// @public
+export type RestrictedSchemeInfoBox<V extends IsoInt64 = number> = {
+    type: "rinf";
+    boxes: ParsedIsoBox<V>[];
+};
 
 // @public
 export type SampleDependencyTypeBox = FullBox & {
@@ -2324,6 +2352,12 @@ export type SubTrack<V extends IsoInt64 = number> = {
 };
 
 // @public
+export type SubTrackDefinition<V extends IsoInt64 = number> = {
+    type: "strd";
+    boxes: ParsedIsoBox<V>[];
+};
+
+// @public
 export type SyncSampleBox = FullBox & {
     type: "stss";
     sampleNumber: number[];
@@ -2408,6 +2442,12 @@ export type TrackFragmentRandomAccessEntry<V extends IsoInt64 = number> = {
     trafNumber: number;
     trunNumber: number;
     sampleNumber: number;
+};
+
+// @public
+export type TrackGroupBox<V extends IsoInt64 = number> = {
+    type: "trgr";
+    boxes: ParsedIsoBox<V>[];
 };
 
 // @public
@@ -2642,6 +2682,9 @@ export function writeKind(cursor: IsoBoxWriteCursor, box: KindBox): void;
 export function writeLabl(cursor: IsoBoxWriteCursor, box: LabelBox): void;
 
 // @public
+export function writeLudt(cursor: IsoBoxWriteCursor, box: LoudnessBox<IsoInt64>): void;
+
+// @public
 export function writeMdat(cursor: IsoBoxWriteCursor, box: MediaDataBox): void;
 
 // @public
@@ -2699,6 +2742,9 @@ export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox<I
 export function writePssh(cursor: IsoBoxWriteCursor, box: ProtectionSystemSpecificHeaderBox): void;
 
 // @public
+export function writeRinf(cursor: IsoBoxWriteCursor, box: RestrictedSchemeInfoBox<IsoInt64>): void;
+
+// @public
 export function writeSchi(cursor: IsoBoxWriteCursor, box: SchemeInformationBox<IsoInt64>): void;
 
 // @public
@@ -2730,6 +2776,9 @@ export function writeStco(cursor: IsoBoxWriteCursor, box: ChunkOffsetBox): void;
 
 // @public
 export function writeSthd(cursor: IsoBoxWriteCursor, box: SubtitleMediaHeaderBox): void;
+
+// @public
+export function writeStrd(cursor: IsoBoxWriteCursor, box: SubTrackDefinition<IsoInt64>): void;
 
 // @public
 export function writeStrk(cursor: IsoBoxWriteCursor, box: SubTrack<IsoInt64>): void;
@@ -2796,6 +2845,9 @@ export function writeTref(cursor: IsoBoxWriteCursor, box: TrackReferenceBox<IsoI
 
 // @public
 export function writeTrex(cursor: IsoBoxWriteCursor, box: TrackExtendsBox): void;
+
+// @public
+export function writeTrgr(cursor: IsoBoxWriteCursor, box: TrackGroupBox<IsoInt64>): void;
 
 // @public
 export function writeTrun(cursor: IsoBoxWriteCursor, box: TrackRunBox): void;

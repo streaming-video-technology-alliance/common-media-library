@@ -16,6 +16,10 @@ and this project adheres to
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/c2pa](https://cml.svta.org/packages/c2pa/).
 
+### Fixed
+
+- `validateC2paInitSegment` now rejects an init segment with an `mdat` box after a `uuid` box of fewer than 24 bytes. The `mdat` check now reads the same root boxes as the content hash. The check still rejects an `mdat` box inside another box ([#701](https://github.com/streaming-video-technology-alliance/common-media-library/issues/701)).
+
 ## [1.7.0] - 2026-10-22
 
 ### Fixed

@@ -117,7 +117,8 @@ describe('writeUrn', function () {
 		const [box] = readIsoBoxes(input, { readers: { 'urn ': readUrn } })
 
 		assert.ok(isIsoBoxType('urn ', box))
-		assert.ok(!('location' in box))
+		assert.ok('location' in box)
+		assert.strictEqual(box.location, undefined)
 		assert.deepStrictEqual(writeWith(writeUrn, box), input)
 	})
 })
