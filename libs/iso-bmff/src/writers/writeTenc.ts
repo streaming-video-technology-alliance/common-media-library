@@ -14,6 +14,8 @@ import { writeFixedBytes } from '../cursor/writeFixedBytes.ts'
  * @param cursor - The write cursor
  * @param box - The `TrackEncryptionBox` fields to write
  *
+ * @throws RangeError if `defaultConstantIv` has more than 255 bytes.
+ *
  * @example
  * {@includeCode ../../test/writers/writeTenc.test.ts#example}
  *

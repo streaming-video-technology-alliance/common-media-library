@@ -14,6 +14,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SubSampleInformationBox` fields to write
  *
+ * @throws RangeError if an entry has more than 65535 subsamples.
+ *
  * @public
  */
 export function writeSubs(cursor: IsoBoxWriteCursor, box: SubSampleInformationBox): void {

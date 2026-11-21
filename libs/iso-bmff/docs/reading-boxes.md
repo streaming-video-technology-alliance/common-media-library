@@ -232,6 +232,7 @@ The option applies to these fields:
 | `mvhd`, `mdhd`, `tkhd` | `creationTime`, `modificationTime`, `duration`  |
 | `elst`                 | `segmentDuration` and `mediaTime` of each entry |
 | `tfhd`                 | `baseDataOffset`                                |
+| `co64`                 | each entry of `chunkOffset`                     |
 
 ### Exact values as `bigint`
 

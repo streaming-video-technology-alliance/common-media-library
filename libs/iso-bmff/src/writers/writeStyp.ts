@@ -13,6 +13,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SegmentTypeBox` fields to write
  *
+ * @throws RangeError if `majorBrand` or a compatible brand does not have 4 characters.
+ *
  * @public
  */
 export function writeStyp(cursor: IsoBoxWriteCursor, box: SegmentTypeBox): void {

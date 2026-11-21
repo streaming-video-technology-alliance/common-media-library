@@ -21,6 +21,10 @@ import { writeContainerBox } from './utils/writeContainerBox.ts'
  * @param boxes - The boxes to write.
  *
  * @throws Error if a box has no writer, no `bytes` field, and a type outside `CONTAINERS`. The message starts with "No writer found for box type".
+ * @throws RangeError if a `bigint` field does not fit its size.
+ * @throws RangeError if a four-character code of a box does not have 4 characters.
+ * @throws RangeError if `writeSidx`, `writeSubs`, or `writeTenc` gets more items than the count field of the box can state.
+ * @throws RangeError if a box has more than 2^32 - 1 bytes.
  *
  * @example
  * {@includeCode ../test/writeChildBoxes.test.ts#example}
