@@ -1,9 +1,12 @@
+import { writeWith } from '../util/writeWith.ts'
 import { readFile } from 'node:fs/promises'
+import { rawBytes } from '../util/rawBytes.ts'
 import {
 	assert,
 	describe,
 	filterBoxes,
 	findIsoBox,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readStsc,
@@ -21,11 +24,11 @@ describe('readStsc', function () {
 			},
 		})
 
-		const stsc = findIsoBox(boxes, box => box.type === 'stsc')
+		const stsc = findIsoBox(boxes, box => isIsoBoxType('stsc', box))
 
 		assert.ok(stsc)
-		assert.strictEqual(stsc.type, 'stsc')
-		assert.strictEqual(stsc.entryCount, 3)
+		assert.ok(isIsoBoxType('stsc', stsc))
+		assert.strictEqual(stsc.entries.length, 3)
 		assert.deepStrictEqual(stsc.entries[0], {
 			firstChunk: 1,
 			samplesPerChunk: 2,
@@ -39,17 +42,17 @@ describe('readStsc', function () {
 
 		assert.strictEqual(boxes.length, 2)
 
-		assert.strictEqual(boxes[0].type, 'stsc')
+		assert.ok(isIsoBoxType('stsc', boxes[0]))
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].flags, 0)
-		assert.strictEqual(boxes[0].entryCount, 2)
+		assert.strictEqual(boxes[0].entries.length, 2)
 		assert.deepStrictEqual(boxes[0].entries, [
 			{ firstChunk: 1, samplesPerChunk: 2, sampleDescriptionIndex: 1 },
 			{ firstChunk: 2, samplesPerChunk: 1, sampleDescriptionIndex: 1 },
 		])
 
-		assert.strictEqual(boxes[1].type, 'stsc')
-		assert.strictEqual(boxes[1].entryCount, 3)
+		assert.ok(isIsoBoxType('stsc', boxes[1]))
+		assert.strictEqual(boxes[1].entries.length, 3)
 		assert.deepStrictEqual(boxes[1].entries, [
 			{ firstChunk: 1, samplesPerChunk: 1, sampleDescriptionIndex: 1 },
 			{ firstChunk: 2, samplesPerChunk: 2, sampleDescriptionIndex: 1 },
@@ -63,8 +66,8 @@ describe('readStsc', function () {
 
 		assert.strictEqual(boxes.length, 1)
 
-		assert.strictEqual(box.type, 'stsc')
-		assert.strictEqual(box.entryCount, 0)
+		assert.ok(isIsoBoxType('stsc', box))
+		assert.strictEqual(box.entries.length, 0)
 		assert.deepStrictEqual(box.entries, [])
 	})
 
@@ -72,10 +75,13 @@ describe('readStsc', function () {
 		let count = 0
 
 		for (const file of fixtureFiles()) {
-			for (const box of filterBoxes(file, 'stsc', { readers: { stsc: readStsc } })) {
-				const { view } = box
-				const original = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
-				const written = writeStsc(box)
+			const originals = rawBytes(file, 'stsc')
+
+			for (const [index, box] of filterBoxes(file, 'stsc', {
+				readers: { stsc: readStsc },
+			}).entries()) {
+				const original = originals[index]
+				const written = writeWith(writeStsc, box)
 
 				assert.deepStrictEqual(
 					new Uint8Array(written.buffer, written.byteOffset, written.byteLength),

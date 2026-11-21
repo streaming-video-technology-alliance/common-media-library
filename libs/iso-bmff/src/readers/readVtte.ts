@@ -1,20 +1,20 @@
 import type { WebVttEmptySampleBox } from '../boxes/WebVttEmptySampleBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `vtte` box (`WebVttEmptySampleBox`).
  *
- * The box has no fields, so the function reads no bytes from the view.
+ * The box has no fields, so the function reads no bytes from the cursor.
  *
- * @param _view - The view to read from
+ * @param _cursor - The read cursor
  *
  * @returns A parsed `WebVttEmptySampleBox`
  *
  * @public
  */
 // oxlint-disable-next-line no-unused-vars
-export function readVtte(_view: IsoBoxReadView<IsoInt64>): WebVttEmptySampleBox {
+export function readVtte(_cursor: IsoBoxReadCursor<IsoInt64>): WebVttEmptySampleBox {
 	return {
 		type: 'vtte',
 	}

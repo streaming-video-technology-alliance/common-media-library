@@ -1,16 +1,18 @@
 import type { AdditionalMetadataContainerBox } from './boxes/AdditionalMetadataContainerBox.ts'
 import type { AudioRenderingIndicationBox } from './boxes/AudioRenderingIndicationBox.ts'
-import type { AudioSampleEntryBox } from './boxes/AudioSampleEntryBox.ts'
+import type { AudioSampleEntry } from './boxes/AudioSampleEntry.ts'
 import type { ChunkLargeOffsetBox } from './boxes/ChunkLargeOffsetBox.ts'
 import type { ChunkOffsetBox } from './boxes/ChunkOffsetBox.ts'
 import type { CompactSampleSizeBox } from './boxes/CompactSampleSizeBox.ts'
-import type { CompositionTimeToSampleBox } from './boxes/CompositionTimeToSampleBox.ts'
+import type { CompositionOffsetBox } from './boxes/CompositionOffsetBox.ts'
 import type { DataEntryUrlBox } from './boxes/DataEntryUrlBox.ts'
 import type { DataEntryUrnBox } from './boxes/DataEntryUrnBox.ts'
 import type { DataInformationBox } from './boxes/DataInformationBox.ts'
 import type { DataReferenceBox } from './boxes/DataReferenceBox.ts'
-import type { DecodingTimeToSampleBox } from './boxes/DecodingTimeToSampleBox.ts'
-import type { DegradationPriorityBox } from './boxes/DegradationPriorityBox.ts'
+import type { LoudnessBox } from './boxes/LoudnessBox.ts'
+import type { RestrictedSchemeInfoBox } from './boxes/RestrictedSchemeInfoBox.ts'
+import type { SubTrackDefinition } from './boxes/SubTrackDefinition.ts'
+import type { TimeToSampleBox } from './boxes/TimeToSampleBox.ts'
 import type { EditBox } from './boxes/EditBox.ts'
 import type { EditListBox } from './boxes/EditListBox.ts'
 import type { EventMessageBox } from './boxes/EventMessageBox.ts'
@@ -18,15 +20,8 @@ import type { ExtendedLanguageBox } from './boxes/ExtendedLanguageBox.ts'
 import type { FileTypeBox } from './boxes/FileTypeBox.ts'
 import type { FreeSpaceBox } from './boxes/FreeSpaceBox.ts'
 import type { GroupsListBox } from './boxes/GroupsListBox.ts'
-import type { HandlerReferenceBox } from './boxes/HandlerReferenceBox.ts'
-import type { HintMediaHeaderBox } from './boxes/HintMediaHeaderBox.ts'
+import type { HandlerBox } from './boxes/HandlerBox.ts'
 import type { IdentifiedMediaDataBox } from './boxes/IdentifiedMediaDataBox.ts'
-import type { IpmpInfoBox } from './boxes/IpmpInfoBox.ts'
-import type { ItemInfoBox } from './boxes/ItemInfoBox.ts'
-import type { ItemInfoEntry } from './boxes/ItemInfoEntry.ts'
-import type { ItemLocationBox } from './boxes/ItemLocationBox.ts'
-import type { ItemProtectionBox } from './boxes/ItemProtectionBox.ts'
-import type { ItemReferenceBox } from './boxes/ItemReferenceBox.ts'
 import type { LabelBox } from './boxes/LabelBox.ts'
 import type { MediaBox } from './boxes/MediaBox.ts'
 import type { MediaDataBox } from './boxes/MediaDataBox.ts'
@@ -41,33 +36,25 @@ import type { MovieFragmentHeaderBox } from './boxes/MovieFragmentHeaderBox.ts'
 import type { MovieFragmentRandomAccessBox } from './boxes/MovieFragmentRandomAccessBox.ts'
 import type { MovieFragmentRandomAccessOffsetBox } from './boxes/MovieFragmentRandomAccessOffsetBox.ts'
 import type { MovieHeaderBox } from './boxes/MovieHeaderBox.ts'
-import type { NullMediaHeaderBox } from './boxes/NullMediaHeaderBox.ts'
 import type { OriginalFormatBox } from './boxes/OriginalFormatBox.ts'
 import type { PreselectionGroupBox } from './boxes/PreselectionGroupBox.ts'
-import type { PrimaryItemBox } from './boxes/PrimaryItemBox.ts'
 import type { ProducerReferenceTimeBox } from './boxes/ProducerReferenceTimeBox.ts'
-import type { ProtectionSchemeInformationBox } from './boxes/ProtectionSchemeInformationBox.ts'
+import type { ProtectionSchemeInfoBox } from './boxes/ProtectionSchemeInfoBox.ts'
 import type { ProtectionSystemSpecificHeaderBox } from './boxes/ProtectionSystemSpecificHeaderBox.ts'
-import type { SampleAuxiliaryInformationOffsetsBox } from './boxes/SampleAuxiliaryInformationOffsetsBox.ts'
-import type { SampleAuxiliaryInformationSizesBox } from './boxes/SampleAuxiliaryInformationSizesBox.ts'
 import type { SampleDependencyTypeBox } from './boxes/SampleDependencyTypeBox.ts'
 import type { SampleDescriptionBox } from './boxes/SampleDescriptionBox.ts'
-import type { SampleEncryptionBox } from './boxes/SampleEncryptionBox.ts'
-import type { SampleGroupDescriptionBox } from './boxes/SampleGroupDescriptionBox.ts'
 import type { SampleSizeBox } from './boxes/SampleSizeBox.ts'
 import type { SampleTableBox } from './boxes/SampleTableBox.ts'
 import type { SampleToChunkBox } from './boxes/SampleToChunkBox.ts'
-import type { SampleToGroupBox } from './boxes/SampleToGroupBox.ts'
 import type { SchemeInformationBox } from './boxes/SchemeInformationBox.ts'
 import type { SchemeTypeBox } from './boxes/SchemeTypeBox.ts'
 import type { SegmentIndexBox } from './boxes/SegmentIndexBox.ts'
 import type { SegmentTypeBox } from './boxes/SegmentTypeBox.ts'
-import type { ShadowSyncSampleBox } from './boxes/ShadowSyncSampleBox.ts'
 import type { SoundMediaHeaderBox } from './boxes/SoundMediaHeaderBox.ts'
-import type { SubsampleInformationBox } from './boxes/SubsampleInformationBox.ts'
+import type { SubSampleInformationBox } from './boxes/SubSampleInformationBox.ts'
 import type { SubsegmentIndexBox } from './boxes/SubsegmentIndexBox.ts'
 import type { SubtitleMediaHeaderBox } from './boxes/SubtitleMediaHeaderBox.ts'
-import type { SubTrackBox } from './boxes/SubTrackBox.ts'
+import type { SubTrack } from './boxes/SubTrack.ts'
 import type { SyncSampleBox } from './boxes/SyncSampleBox.ts'
 import type { TrackBox } from './boxes/TrackBox.ts'
 import type { TrackEncryptionBox } from './boxes/TrackEncryptionBox.ts'
@@ -76,13 +63,14 @@ import type { TrackFragmentBaseMediaDecodeTimeBox } from './boxes/TrackFragmentB
 import type { TrackFragmentBox } from './boxes/TrackFragmentBox.ts'
 import type { TrackFragmentHeaderBox } from './boxes/TrackFragmentHeaderBox.ts'
 import type { TrackFragmentRandomAccessBox } from './boxes/TrackFragmentRandomAccessBox.ts'
+import type { TrackGroupBox } from './boxes/TrackGroupBox.ts'
 import type { TrackHeaderBox } from './boxes/TrackHeaderBox.ts'
-import type { TrackKindBox } from './boxes/TrackKindBox.ts'
+import type { KindBox } from './boxes/KindBox.ts'
 import type { TrackReferenceBox } from './boxes/TrackReferenceBox.ts'
 import type { TrackRunBox } from './boxes/TrackRunBox.ts'
 import type { UserDataBox } from './boxes/UserDataBox.ts'
 import type { VideoMediaHeaderBox } from './boxes/VideoMediaHeaderBox.ts'
-import type { VisualSampleEntryBox } from './boxes/VisualSampleEntryBox.ts'
+import type { VisualSampleEntry } from './boxes/VisualSampleEntry.ts'
 import type { WebVttConfigurationBox } from './boxes/WebVttConfigurationBox.ts'
 import type { WebVttCueBox } from './boxes/WebVttCueBox.ts'
 import type { WebVttCueIdBox } from './boxes/WebVttCueIdBox.ts'
@@ -99,38 +87,32 @@ import type { IsoInt64 } from './IsoInt64.ts'
  */
 export type IsoBoxMap<V extends IsoInt64 = number> = {
 	ardi: AudioRenderingIndicationBox
-	avc1: VisualSampleEntryBox<'avc1'>
-	avc2: VisualSampleEntryBox<'avc2'>
-	avc3: VisualSampleEntryBox<'avc3'>
-	avc4: VisualSampleEntryBox<'avc4'>
-	co64: ChunkLargeOffsetBox
-	ctts: CompositionTimeToSampleBox
-	dinf: DataInformationBox
-	dref: DataReferenceBox
+	avc1: VisualSampleEntry<'avc1', V>
+	avc2: VisualSampleEntry<'avc2', V>
+	avc3: VisualSampleEntry<'avc3', V>
+	avc4: VisualSampleEntry<'avc4', V>
+	co64: ChunkLargeOffsetBox<V>
+	ctts: CompositionOffsetBox
+	dinf: DataInformationBox<V>
+	dref: DataReferenceBox<V>
 	edts: EditBox<V>
 	elng: ExtendedLanguageBox
 	elst: EditListBox<V>
 	emsg: EventMessageBox<V>
-	enca: AudioSampleEntryBox<'enca'>
-	encv: VisualSampleEntryBox<'encv'>
+	enca: AudioSampleEntry<'enca', V>
+	encv: VisualSampleEntry<'encv', V>
 	free: FreeSpaceBox<'free'>
 	frma: OriginalFormatBox
 	ftyp: FileTypeBox
 	grpl: GroupsListBox<V>
-	hdlr: HandlerReferenceBox
-	hev1: VisualSampleEntryBox<'hev1'>
-	hmhd: HintMediaHeaderBox
-	hvc1: VisualSampleEntryBox<'hvc1'>
+	hdlr: HandlerBox
+	hev1: VisualSampleEntry<'hev1', V>
+	hvc1: VisualSampleEntry<'hvc1', V>
 	iden: WebVttCueIdBox
-	iinf: ItemInfoBox
-	iloc: ItemLocationBox
 	imda: IdentifiedMediaDataBox
-	imif: IpmpInfoBox
-	infe: ItemInfoEntry
-	ipro: ItemProtectionBox
-	iref: ItemReferenceBox
-	kind: TrackKindBox
+	kind: KindBox
 	labl: LabelBox
+	ludt: LoudnessBox<V>
 	mdat: MediaDataBox
 	mdhd: MediaHeaderBox<V>
 	mdia: MediaBox<V>
@@ -140,45 +122,38 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	mfhd: MovieFragmentHeaderBox
 	mfra: MovieFragmentRandomAccessBox<V>
 	mfro: MovieFragmentRandomAccessOffsetBox
-	minf: MediaInformationBox
+	minf: MediaInformationBox<V>
 	moof: MovieFragmentBox<V>
 	moov: MovieBox<V>
-	mp4a: AudioSampleEntryBox<'mp4a'>
+	mp4a: AudioSampleEntry<'mp4a', V>
 	mvex: MovieExtendsBox<V>
 	mvhd: MovieHeaderBox<V>
-	nmhd: NullMediaHeaderBox
 	payl: WebVttCuePayloadBox
-	pitm: PrimaryItemBox
 	prft: ProducerReferenceTimeBox<V>
-	prsl: PreselectionGroupBox
+	prsl: PreselectionGroupBox<V>
 	pssh: ProtectionSystemSpecificHeaderBox
-	saio: SampleAuxiliaryInformationOffsetsBox
-	saiz: SampleAuxiliaryInformationSizesBox
-	sbgp: SampleToGroupBox
-	schi: SchemeInformationBox
+	rinf: RestrictedSchemeInfoBox<V>
+	schi: SchemeInformationBox<V>
 	schm: SchemeTypeBox
 	sdtp: SampleDependencyTypeBox
-	senc: SampleEncryptionBox
-	sgpd: SampleGroupDescriptionBox
 	sidx: SegmentIndexBox<V>
-	sinf: ProtectionSchemeInformationBox
+	sinf: ProtectionSchemeInfoBox<V>
 	skip: FreeSpaceBox<'skip'>
 	smhd: SoundMediaHeaderBox
 	ssix: SubsegmentIndexBox
-	stbl: SampleTableBox
+	stbl: SampleTableBox<V>
 	stco: ChunkOffsetBox
-	stdp: DegradationPriorityBox
 	sthd: SubtitleMediaHeaderBox
-	strk: SubTrackBox<V>
+	strd: SubTrackDefinition<V>
+	strk: SubTrack<V>
 	stsc: SampleToChunkBox
-	stsd: SampleDescriptionBox
-	stsh: ShadowSyncSampleBox
+	stsd: SampleDescriptionBox<V>
 	stss: SyncSampleBox
 	stsz: SampleSizeBox
 	sttg: WebVttSettingsBox
-	stts: DecodingTimeToSampleBox
+	stts: TimeToSampleBox
 	styp: SegmentTypeBox
-	subs: SubsampleInformationBox
+	subs: SubSampleInformationBox
 	stz2: CompactSampleSizeBox
 	tenc: TrackEncryptionBox
 	tfdt: TrackFragmentBaseMediaDecodeTimeBox<V>
@@ -187,15 +162,16 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	tkhd: TrackHeaderBox<V>
 	traf: TrackFragmentBox<V>
 	trak: TrackBox<V>
-	tref: TrackReferenceBox
+	tref: TrackReferenceBox<V>
 	trex: TrackExtendsBox
+	trgr: TrackGroupBox<V>
 	trun: TrackRunBox
 	udta: UserDataBox<V>
 	'url ': DataEntryUrlBox
 	'urn ': DataEntryUrnBox
 	vlab: WebVttSourceLabelBox
 	vmhd: VideoMediaHeaderBox
-	vttc: WebVttCueBox
+	vttc: WebVttCueBox<V>
 	vttC: WebVttConfigurationBox
 	vtte: WebVttEmptySampleBox
 }

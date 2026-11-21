@@ -1,5 +1,8 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `mfro` box (`MovieFragmentRandomAccessOffsetBox`).
@@ -8,21 +11,17 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * The writer writes the stored `mfraSize`. Set `mfraSize` after a change to the children of the `mfra` box.
  *
+ * @param cursor - The write cursor
  * @param box - The `MovieFragmentRandomAccessOffsetBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeMfro(box: MovieFragmentRandomAccessOffsetBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const mfraSizeSize = 4
-	const totalSize = headerSize + fullBoxSize + mfraSizeSize
+export function writeMfro(
+	cursor: IsoBoxWriteCursor,
+	box: MovieFragmentRandomAccessOffsetBox,
+): void {
+	const start = beginIsoFullBox(cursor, 'mfro', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('mfro', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-	writer.writeUint(box.mfraSize, 4)
-
-	return writer
+	writeUint32(cursor, box.mfraSize)
+	endIsoBox(cursor, start)
 }

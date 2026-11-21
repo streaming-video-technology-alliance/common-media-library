@@ -1,19 +1,20 @@
 import type { WebVttCueIdBox } from '../boxes/WebVttCueIdBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUtf8 } from '../cursor/readUtf8.ts'
 
 /**
  * Read the `iden` box (`WebVttCueIdBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `WebVttCueIdBox`
  *
  * @public
  */
-export function readIden(view: IsoBoxReadView<IsoInt64>): WebVttCueIdBox {
+export function readIden(cursor: IsoBoxReadCursor<IsoInt64>): WebVttCueIdBox {
 	return {
 		type: 'iden',
-		cueId: view.readUtf8(-1),
+		cueId: readUtf8(cursor, cursor.end - cursor.pos),
 	}
 }

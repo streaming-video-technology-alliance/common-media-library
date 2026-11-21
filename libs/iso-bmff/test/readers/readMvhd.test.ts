@@ -1,4 +1,13 @@
-import { assert, describe, it, readIsoBoxes, readMvhd, writeMvhd } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	describe,
+	isIsoBoxType,
+	it,
+	readIsoBoxes,
+	readMvhd,
+	writeMvhd,
+} from '../util/box.ts'
 import { IDENTITY, LIMITS, PROJECTION, ROTATION } from '../util/matrices.ts'
 
 // An mvhd box. The arguments are the stored integers of the fixed-point fields.
@@ -28,7 +37,7 @@ function read(bytes: Uint8Array) {
 	const [box] = readIsoBoxes(bytes, { readers: { mvhd: readMvhd } })
 
 	assert.ok(box)
-	assert.strictEqual(box.type, 'mvhd')
+	assert.ok(isIsoBoxType('mvhd', box))
 
 	return box
 }
@@ -100,7 +109,7 @@ describe('readMvhd', function () {
 		]
 
 		for (const bytes of boxes) {
-			const writer = writeMvhd(read(bytes))
+			const writer = writeWith(writeMvhd, read(bytes))
 
 			assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)
 		}

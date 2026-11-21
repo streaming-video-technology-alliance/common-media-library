@@ -1,11 +1,5 @@
-import type { TrackEncryptionBox } from './TrackEncryptionBox.ts'
-
-/**
- * Child boxes of Scheme Information Box
- *
- * @public
- */
-export type SchemeInformationBoxChild = TrackEncryptionBox
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { ParsedIsoBox } from '../ParsedIsoBox.ts'
 
 /**
  * Scheme Information Box (`schi`).
@@ -14,7 +8,7 @@ export type SchemeInformationBoxChild = TrackEncryptionBox
  *
  * @public
  */
-export type SchemeInformationBox = {
+export type SchemeInformationBox<V extends IsoInt64 = number> = {
 	type: 'schi'
-	boxes: SchemeInformationBoxChild[]
+	boxes: ParsedIsoBox<V>[]
 }

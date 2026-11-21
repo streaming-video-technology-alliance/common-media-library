@@ -1,4 +1,13 @@
-import { assert, describe, it, readElst, readIsoBoxes, writeElst } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	readElst,
+	readIsoBoxes,
+	writeElst,
+} from '../util/box.ts'
 import { ELST_V1 } from '../util/ELST_V1.ts'
 
 describe('writeElst', function () {
@@ -6,9 +15,9 @@ describe('writeElst', function () {
 		const [box] = readIsoBoxes(ELST_V1, { readers: { elst: readElst } })
 
 		assert.ok(box)
-		assert.strictEqual(box.type, 'elst')
+		assert.ok(isIsoBoxType('elst', box))
 
-		const writer = writeElst(box)
+		const writer = writeWith(writeElst, box)
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), ELST_V1)
 	})

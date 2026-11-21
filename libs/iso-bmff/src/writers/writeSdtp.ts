@@ -1,29 +1,22 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SampleDependencyTypeBox } from '../boxes/SampleDependencyTypeBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `sdtp` box (`SampleDependencyTypeBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.6.4
  *
+ * @param cursor - The write cursor
  * @param box - The `SampleDependencyTypeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeSdtp(box: SampleDependencyTypeBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const sampleDependencyTableSize = box.sampleDependencyTable.length
-	const totalSize = headerSize + fullBoxSize + sampleDependencyTableSize
+export function writeSdtp(cursor: IsoBoxWriteCursor, box: SampleDependencyTypeBox): void {
+	const start = beginIsoFullBox(cursor, 'sdtp', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('sdtp', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	for (const entry of box.sampleDependencyTable) {
-		writer.writeUint(entry, 1)
-	}
-
-	return writer
+	writeBytes(cursor, box.sampleDependencyTable)
+	endIsoBox(cursor, start)
 }

@@ -1,7 +1,8 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterIsoBoxes,
 	findBox,
@@ -11,6 +12,7 @@ import {
 	writePayl,
 	type WebVttCuePayloadBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 describe('writePayl', function () {
 	it('should write a WebVttCuePayloadBox correctly', function () {
@@ -20,7 +22,7 @@ describe('writePayl', function () {
 			cueText: 'Hello world',
 		}
 
-		const writer = writePayl(box)
+		const writer = writeIsoBox(box, { writers: { payl: writePayl } })
 		// #endregion example
 
 		// size (19), type (payl), cueText
@@ -33,7 +35,7 @@ describe('writePayl', function () {
 	})
 
 	it('should write the UTF-8 bytes of a cueText that is not ASCII', function () {
-		const writer = writePayl({ type: 'payl', cueText: 'é日😀' })
+		const writer = writeWith(writePayl, { type: 'payl', cueText: 'é日😀' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -42,7 +44,7 @@ describe('writePayl', function () {
 	})
 
 	it('should write only the box header for an empty cueText', function () {
-		const writer = writePayl({ type: 'payl', cueText: '' })
+		const writer = writeWith(writePayl, { type: 'payl', cueText: '' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -55,19 +57,14 @@ describe('writePayl', function () {
 		['webvtt.m4s', 3],
 	] as const) {
 		it(`should write the input bytes of every payl box in ${file}`, function () {
-			const config = defaultReaderConfig()
+			const config = record(createDefaultReaderConfig())
 			const { data } = findBox(file, 'mdat', config)
 			const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'payl')
 
 			assert.strictEqual(boxes.length, count)
 
 			for (const box of boxes) {
-				const { view } = box
-
-				assert.deepStrictEqual(
-					writeIsoBox(box, defaultWriterConfig()),
-					new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
-				)
+				assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), sourceOf(box).bytes)
 			}
 		})
 	}

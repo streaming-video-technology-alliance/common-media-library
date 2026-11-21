@@ -10,9 +10,15 @@ and this project adheres to
 
 ### Changed
 
+- The search for the Verifiable Segment Info `emsg` box now narrows each box with `isIsoBoxType` of `@svta/cml-iso-bmff`, with no type cast. The public API and the results do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- The package now reads the `uuid` boxes and the JUMBF boxes as raw boxes of `@svta/cml-iso-bmff` 2.0.0. The package then requires `@svta/cml-iso-bmff` 2.0.0. This change does not change the public API or the results ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/c2pa](https://cml.svta.org/packages/c2pa/).
+
+### Fixed
+
+- `validateC2paInitSegment` now rejects an init segment with an `mdat` box after a `uuid` box of fewer than 24 bytes. The `mdat` check now reads the same root boxes as the content hash. The check still rejects an `mdat` box inside another box ([#701](https://github.com/streaming-video-technology-alliance/common-media-library/issues/701)).
 
 ## [1.7.0] - 2026-10-22
 

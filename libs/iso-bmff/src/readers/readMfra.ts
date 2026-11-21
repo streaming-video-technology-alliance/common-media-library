@@ -1,8 +1,6 @@
-import type {
-	MovieFragmentRandomAccessBox,
-	MovieFragmentRandomAccessBoxChild,
-} from '../boxes/MovieFragmentRandomAccessBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { MovieFragmentRandomAccessBox } from '../boxes/MovieFragmentRandomAccessBox.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -11,20 +9,20 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * The `readers` map does not need an entry for the `mfra` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
  *
- * The 64-bit integer fields of the child boxes have the type that the `int64` option of the view returns.
+ * The 64-bit integer fields of the child boxes have the type that the `int64` function of the cursor returns.
  * With no option, they are numbers.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `MovieFragmentRandomAccessBox`
  *
  * @public
  */
 export function readMfra<V extends IsoInt64>(
-	view: IsoBoxReadView<V>,
+	cursor: IsoBoxReadCursor<V>,
 ): MovieFragmentRandomAccessBox<V> {
 	return {
 		type: 'mfra',
-		boxes: view.readBoxes<MovieFragmentRandomAccessBoxChild<V>>(),
+		boxes: readChildBoxes(cursor),
 	}
 }

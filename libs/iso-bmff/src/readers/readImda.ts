@@ -1,20 +1,22 @@
 import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { readBytes } from '../cursor/readBytes.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Read the `imda` box (`IdentifiedMediaDataBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `IdentifiedMediaDataBox`
  *
  * @public
  */
-export function readImda(view: IsoBoxReadView<IsoInt64>): IdentifiedMediaDataBox {
+export function readImda(cursor: IsoBoxReadCursor<IsoInt64>): IdentifiedMediaDataBox {
 	return {
 		type: 'imda',
-		imdaIdentifier: view.readUint(4),
-		data: view.readData(-1),
+		imdaIdentifier: readUint32(cursor),
+		data: readBytes(cursor, cursor.end - cursor.pos),
 	}
 }

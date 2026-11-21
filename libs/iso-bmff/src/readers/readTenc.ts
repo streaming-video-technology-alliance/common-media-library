@@ -1,14 +1,16 @@
 import type { TrackEncryptionBox } from '../boxes/TrackEncryptionBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readBytes } from '../cursor/readBytes.ts'
 
 /**
  * Read the `tenc` box (`TrackEncryptionBox`).
  *
  * ISO/IEC 23001-7:2016 - 8.2
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `TrackEncryptionBox`
  *
@@ -17,30 +19,27 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readTenc(view: IsoBoxReadView<IsoInt64>): TrackEncryptionBox {
-	const { version, flags } = view.readFullBox()
-	const defaultIsEncrypted = view.readUint(3)
-	const defaultIvSize = view.readUint(1)
-	const defaultIsProtected = defaultIsEncrypted & 0xff
-	const box: TrackEncryptionBox = {
+export function readTenc(cursor: IsoBoxReadCursor<IsoInt64>): TrackEncryptionBox {
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+
+	cursor.pos += 1
+
+	const pattern = readUint8(cursor)
+	const defaultIsProtected = readUint8(cursor)
+	const defaultPerSampleIvSize = readUint8(cursor)
+	return {
 		type: 'tenc',
 		version,
 		flags,
-		defaultIsEncrypted,
-		defaultIvSize,
-		defaultKid: view.readArray(UINT, 1, 16),
+		defaultPerSampleIvSize,
+		defaultKid: readBytes(cursor, 16),
 		defaultIsProtected,
+		defaultCryptByteBlock: version > 0 ? pattern >> 4 : undefined,
+		defaultSkipByteBlock: version > 0 ? pattern & 0xf : undefined,
+		defaultConstantIv:
+			defaultIsProtected === 1 && defaultPerSampleIvSize === 0 && cursor.pos < cursor.end
+				? readBytes(cursor, readUint8(cursor))
+				: undefined,
 	}
-
-	if (version > 0) {
-		box.defaultCryptByteBlock = (defaultIsEncrypted >> 12) & 0xf
-		box.defaultSkipByteBlock = (defaultIsEncrypted >> 8) & 0xf
-	}
-
-	if (defaultIsProtected === 1 && defaultIvSize === 0 && !view.done) {
-		box.defaultConstantIvSize = view.readUint(1)
-		box.defaultConstantIv = view.readArray(UINT, 1, box.defaultConstantIvSize)
-	}
-
-	return box
 }

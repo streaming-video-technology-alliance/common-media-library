@@ -1,0 +1,16 @@
+import type { TimeToSampleEntry } from './TimeToSampleEntry.ts'
+import type { FullBox } from './FullBox.ts'
+
+/**
+ * Decoding Time To Sample Box (`stts`).
+ *
+ * ISO/IEC 14496-12:2015 - 8.6.1.2
+ *
+ * @public
+ */
+export type TimeToSampleBox = FullBox & {
+	type: 'stts'
+
+	/** An array of decoding time-to-sample entries. */
+	entries: TimeToSampleEntry[]
+}

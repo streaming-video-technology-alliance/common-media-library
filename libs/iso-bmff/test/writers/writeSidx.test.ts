@@ -1,4 +1,13 @@
-import { assert, describe, it, readIsoBoxes, readSidx, writeSidx } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	isIsoBoxType,
+	describe,
+	it,
+	readIsoBoxes,
+	readSidx,
+	writeSidx,
+} from '../util/box.ts'
 import { sidxBox } from '../util/versionBoxes.ts'
 
 describe('writeSidx', function () {
@@ -7,13 +16,13 @@ describe('writeSidx', function () {
 			const source = sidxBox(version)
 			const [box] = readIsoBoxes(source, { readers: { sidx: readSidx } })
 
-			assert.strictEqual(box.type, 'sidx')
-			assert.deepStrictEqual(new Uint8Array(writeSidx(box).buffer), source)
+			assert.ok(isIsoBoxType('sidx', box))
+			assert.deepStrictEqual(new Uint8Array(writeWith(writeSidx, box).buffer), source)
 		})
 	}
 
 	it('should write 64-bit fields for a version 2 box', function () {
-		const writer = writeSidx({
+		const writer = writeWith(writeSidx, {
 			type: 'sidx',
 			version: 2,
 			flags: 0,
@@ -21,12 +30,9 @@ describe('writeSidx', function () {
 			timescale: 2,
 			earliestPresentationTime: 3,
 			firstOffset: 4,
-			reserved: 0,
 			references: [
 				{
-					reference: 100,
 					subsegmentDuration: 5,
-					sap: 0x90000000,
 					referenceType: 0,
 					referencedSize: 100,
 					startsWithSap: 1,
@@ -37,5 +43,31 @@ describe('writeSidx', function () {
 		})
 
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), sidxBox(2))
+	})
+
+	it('should throw a RangeError for more than 65535 references', function () {
+		const reference = {
+			referenceType: 0,
+			referencedSize: 1,
+			subsegmentDuration: 1,
+			startsWithSap: 0,
+			sapType: 0,
+			sapDeltaTime: 0,
+		}
+
+		assert.throws(
+			() =>
+				writeWith(writeSidx, {
+					type: 'sidx',
+					version: 0,
+					flags: 0,
+					referenceId: 1,
+					timescale: 1,
+					earliestPresentationTime: 0,
+					firstOffset: 0,
+					references: Array.from({ length: 65536 }, () => reference),
+				}),
+			{ name: 'RangeError', message: 'The sidx box has 65536 references, and the limit is 65535' },
+		)
 	})
 })

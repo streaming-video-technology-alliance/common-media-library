@@ -1,9 +1,10 @@
-import { assert, describe, it, writeKind, type TrackKindBox } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import { assert, describe, it, writeIsoBox, writeKind, type KindBox } from '../util/box.ts'
 
 describe('writeKind', function () {
-	it('should write a TrackKindBox correctly', function () {
+	it('should write a KindBox correctly', function () {
 		// #region example
-		const box: TrackKindBox = {
+		const box: KindBox = {
 			type: 'kind',
 			version: 0,
 			flags: 0,
@@ -11,7 +12,7 @@ describe('writeKind', function () {
 			value: 'main',
 		}
 
-		const writer = writeKind(box)
+		const writer = writeIsoBox(box, { writers: { kind: writeKind } })
 		// #endregion example
 
 		// size (41), type (kind), version and flags, then each string and a null terminator
@@ -25,7 +26,7 @@ describe('writeKind', function () {
 	})
 
 	it('should write the UTF-8 bytes of strings that are not ASCII', function () {
-		const writer = writeKind({
+		const writer = writeWith(writeKind, {
 			type: 'kind',
 			version: 0,
 			flags: 0,
@@ -43,7 +44,13 @@ describe('writeKind', function () {
 	})
 
 	it('should write the null terminator of each empty string', function () {
-		const writer = writeKind({ type: 'kind', version: 0, flags: 0, schemeUri: '', value: '' })
+		const writer = writeWith(writeKind, {
+			type: 'kind',
+			version: 0,
+			flags: 0,
+			schemeUri: '',
+			value: '',
+		})
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -52,7 +59,13 @@ describe('writeKind', function () {
 	})
 
 	it('should write an empty schemeUri before a value that is not empty', function () {
-		const writer = writeKind({ type: 'kind', version: 0, flags: 0, schemeUri: '', value: 'a' })
+		const writer = writeWith(writeKind, {
+			type: 'kind',
+			version: 0,
+			flags: 0,
+			schemeUri: '',
+			value: 'a',
+		})
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),

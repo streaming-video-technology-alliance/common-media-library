@@ -1,5 +1,6 @@
-import type { MediaInformationBox, MediaInformationBoxChild } from '../boxes/MediaInformationBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { MediaInformationBox } from '../boxes/MediaInformationBox.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -8,15 +9,15 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * The `readers` map does not need an entry for the `minf` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `MediaInformationBox`
  *
  * @public
  */
-export function readMinf(view: IsoBoxReadView<IsoInt64>): MediaInformationBox {
+export function readMinf<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): MediaInformationBox<V> {
 	return {
 		type: 'minf',
-		boxes: view.readBoxes<MediaInformationBoxChild>(),
+		boxes: readChildBoxes(cursor),
 	}
 }

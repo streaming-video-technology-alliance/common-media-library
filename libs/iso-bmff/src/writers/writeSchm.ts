@@ -1,6 +1,10 @@
-import { encodeText } from '@svta/cml-utils'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SchemeTypeBox } from '../boxes/SchemeTypeBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeFourCc } from '../cursor/writeFourCc.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `schm` box (`SchemeTypeBox`).
@@ -9,35 +13,23 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.12.5
  *
+ * @param cursor - The write cursor
  * @param box - The `SchemeTypeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeSchm.test.ts#example}
  *
  * @public
  */
-export function writeSchm(box: SchemeTypeBox): IsoBoxWriteView {
-	const schemeUriBytes = box.flags & 0x000001 ? encodeText(box.schemeUri ?? '') : undefined
+export function writeSchm(cursor: IsoBoxWriteCursor, box: SchemeTypeBox): void {
+	const start = beginIsoFullBox(cursor, 'schm', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const schemeTypeSize = 4
-	const schemeVersionSize = 4
-	const schemeUriSize = schemeUriBytes ? schemeUriBytes.length + 1 : 0 // null-terminated
-	const totalSize = headerSize + fullBoxSize + schemeTypeSize + schemeVersionSize + schemeUriSize
+	writeFourCc(cursor, box.schemeType)
+	writeUint32(cursor, box.schemeVersion)
 
-	const writer = new IsoBoxWriteView('schm', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.schemeType, 4)
-	writer.writeUint(box.schemeVersion, 4)
-
-	if (schemeUriBytes) {
-		writer.writeBytes(schemeUriBytes)
-		writer.writeUint(0, 1)
+	if (box.flags & 0x000001) {
+		writeTerminatedUtf8(cursor, box.schemeUri ?? '')
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

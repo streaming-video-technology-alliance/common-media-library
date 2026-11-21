@@ -1,42 +1,35 @@
-import { encodeText } from '@svta/cml-utils'
-import type { HandlerReferenceBox } from '../boxes/HandlerReferenceBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import type { HandlerBox } from '../boxes/HandlerBox.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeFourCc } from '../cursor/writeFourCc.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
- * Write the `hdlr` box (`HandlerReferenceBox`).
+ * Write the `hdlr` box (`HandlerBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.4.3
  *
- * @param box - The `HandlerReferenceBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @param cursor - The write cursor
+ * @param box - The `HandlerBox` fields to write
  *
  * @example
  * {@includeCode ../../test/writers/writeHdlr.test.ts#example}
  *
  * @public
  */
-export function writeHdlr(box: HandlerReferenceBox): IsoBoxWriteView {
-	const nameBytes = encodeText(box.name)
+export function writeHdlr(cursor: IsoBoxWriteCursor, box: HandlerBox): void {
+	const reserved = box.reserved ?? []
+	const start = beginIsoFullBox(cursor, 'hdlr', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const preDefinedSize = 4
-	const handlerTypeSize = 4
-	const reservedSize = 12 // 3 x 4 bytes
-	const nameSize = nameBytes.length + 1 // null-terminated string
-	const totalSize =
-		headerSize + fullBoxSize + preDefinedSize + handlerTypeSize + reservedSize + nameSize
+	writeUint32(cursor, box.preDefined ?? 0)
+	writeFourCc(cursor, box.handlerType)
 
-	const writer = new IsoBoxWriteView('hdlr', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+	for (let i = 0; i < 3; i++) {
+		writeUint32(cursor, reserved[i] ?? 0)
+	}
 
-	writer.writeUint(box.preDefined, 4)
-	writer.writeString(box.handlerType)
-	writer.writeArray(box.reserved, UINT, 4, 3)
-	writer.writeBytes(nameBytes)
-	writer.writeUint(0, 1)
-
-	return writer
+	writeTerminatedUtf8(cursor, box.name)
+	endIsoBox(cursor, start)
 }

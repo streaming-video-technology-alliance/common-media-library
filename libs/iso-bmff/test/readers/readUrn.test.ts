@@ -1,4 +1,4 @@
-import { assert, describe, it, readIsoBoxes, readUrn } from '../util/box.ts'
+import { assert, describe, isIsoBoxType, it, readIsoBoxes, readUrn } from '../util/box.ts'
 
 const TEXT_BYTES = [0xc3, 0xa9, 0xe6, 0x97, 0xa5, 0xf0, 0x9f, 0x98, 0x80] // 'é日😀'
 const A_MP4 = [97, 46, 109, 112, 52] // 'a.mp4'
@@ -21,7 +21,7 @@ describe('readUrn', function () {
 		// #endregion example
 
 		assert.ok(urn)
-		assert.strictEqual(urn.type, 'urn ')
+		assert.ok(isIsoBoxType('urn ', urn))
 		assert.strictEqual(urn.version, 0)
 		assert.strictEqual(urn.flags, 0)
 		assert.strictEqual(urn.name, 'é日😀')
@@ -34,7 +34,7 @@ describe('readUrn', function () {
 		})
 
 		assert.ok(urn)
-		assert.strictEqual(urn.type, 'urn ')
+		assert.ok(isIsoBoxType('urn ', urn))
 		assert.strictEqual(urn.name, 'é日😀')
 		assert.strictEqual(urn.location, 'é日😀')
 	})
@@ -45,7 +45,7 @@ describe('readUrn', function () {
 		})
 
 		assert.ok(urn)
-		assert.strictEqual(urn.type, 'urn ')
+		assert.ok(isIsoBoxType('urn ', urn))
 		assert.strictEqual(urn.name, 'urn:a')
 		assert.strictEqual(urn.location, 'a.mp4')
 	})
@@ -54,7 +54,7 @@ describe('readUrn', function () {
 		const [urn] = readIsoBoxes(urnBox([0, 0]), { readers: { 'urn ': readUrn } })
 
 		assert.ok(urn)
-		assert.strictEqual(urn.type, 'urn ')
+		assert.ok(isIsoBoxType('urn ', urn))
 		assert.strictEqual(urn.name, '')
 		assert.strictEqual(urn.location, '')
 	})
@@ -63,7 +63,7 @@ describe('readUrn', function () {
 		const [urn] = readIsoBoxes(urnBox([0, ...A_MP4, 0]), { readers: { 'urn ': readUrn } })
 
 		assert.ok(urn)
-		assert.strictEqual(urn.type, 'urn ')
+		assert.ok(isIsoBoxType('urn ', urn))
 		assert.strictEqual(urn.name, '')
 		assert.strictEqual(urn.location, 'a.mp4')
 	})

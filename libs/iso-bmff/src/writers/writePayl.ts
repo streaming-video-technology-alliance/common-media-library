@@ -1,28 +1,23 @@
-import { encodeText } from '@svta/cml-utils'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { WebVttCuePayloadBox } from '../boxes/WebVttCuePayloadBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeUtf8 } from '../cursor/writeUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `payl` box (`WebVttCuePayloadBox`).
  *
+ * @param cursor - The write cursor
  * @param box - The `WebVttCuePayloadBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writePayl.test.ts#example}
  *
  * @public
  */
-export function writePayl(box: WebVttCuePayloadBox): IsoBoxWriteView {
-	const cueTextBytes = encodeText(box.cueText)
+export function writePayl(cursor: IsoBoxWriteCursor, box: WebVttCuePayloadBox): void {
+	const start = beginIsoBox(cursor, 'payl')
 
-	const headerSize = 8
-	const cueTextSize = cueTextBytes.length
-	const totalSize = headerSize + cueTextSize
-
-	const writer = new IsoBoxWriteView('payl', totalSize)
-	writer.writeBytes(cueTextBytes)
-
-	return writer
+	writeUtf8(cursor, box.cueText)
+	endIsoBox(cursor, start)
 }

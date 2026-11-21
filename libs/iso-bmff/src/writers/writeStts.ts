@@ -1,33 +1,28 @@
-import type { DecodingTimeToSampleBox } from '../boxes/DecodingTimeToSampleBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import type { TimeToSampleBox } from '../boxes/TimeToSampleBox.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
- * Write the `stts` box (`DecodingTimeToSampleBox`).
+ * Write the `stts` box (`TimeToSampleBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.6.1.2
  *
- * @param box - The `DecodingTimeToSampleBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @param cursor - The write cursor
+ * @param box - The `TimeToSampleBox` fields to write
  *
  * @public
  */
-export function writeStts(box: DecodingTimeToSampleBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entriesSize = box.entryCount * 8 // 4 bytes sampleCount + 4 bytes sampleDelta
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+export function writeStts(cursor: IsoBoxWriteCursor, box: TimeToSampleBox): void {
+	const start = beginIsoFullBox(cursor, 'stts', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stts', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.entryCount, 4)
+	writeUint32(cursor, box.entries.length)
 
 	for (const entry of box.entries) {
-		writer.writeUint(entry.sampleCount, 4)
-		writer.writeUint(entry.sampleDelta, 4)
+		writeUint32(cursor, entry.sampleCount)
+		writeUint32(cursor, entry.sampleDelta)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

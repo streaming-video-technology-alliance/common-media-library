@@ -1,21 +1,19 @@
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
-import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
-import { writeVisualSampleEntryBox } from './writeVisualSampleEntryBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
+import { writeVisualSampleEntry } from './writeVisualSampleEntry.ts'
 
 /**
- * Write the `hvc1` box (`VisualSampleEntryBox`).
+ * Write the `hvc1` box (`VisualSampleEntry`).
  *
- * @param box - The `VisualSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @param cursor - The write cursor
+ * @param box - The `VisualSampleEntry` fields to write
  *
  * @public
  */
 export function writeHvc1(
-	box: VisualSampleEntryBox<'hvc1'>,
-	config: IsoBoxWriteViewConfig,
-): IsoBoxWriteView {
-	return writeVisualSampleEntryBox(box, config)
+	cursor: IsoBoxWriteCursor,
+	box: VisualSampleEntry<'hvc1', IsoInt64>,
+): void {
+	writeVisualSampleEntry(cursor, box)
 }

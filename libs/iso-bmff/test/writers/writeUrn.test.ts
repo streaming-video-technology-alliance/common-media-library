@@ -1,7 +1,10 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
+	isIsoBoxType,
 	assert,
 	describe,
 	it,
+	writeIsoBox,
 	readIsoBoxes,
 	readUrn,
 	writeUrn,
@@ -25,13 +28,16 @@ function urn(name: string, location: string): DataEntryUrnBox {
 describe('writeUrn', function () {
 	it('should write the name and the location, each with a null terminator', function () {
 		// #region example
-		const writer = writeUrn({
-			type: 'urn ',
-			version: 0,
-			flags: 0,
-			name: 'urn:a',
-			location: 'a.mp4',
-		})
+		const writer = writeIsoBox(
+			{
+				type: 'urn ',
+				version: 0,
+				flags: 0,
+				name: 'urn:a',
+				location: 'a.mp4',
+			},
+			{ writers: { urn: writeUrn } },
+		)
 		// #endregion example
 
 		// size (24), type (urn ), version and flags, then the name (urn:a) and
@@ -46,7 +52,7 @@ describe('writeUrn', function () {
 	})
 
 	it('should write the UTF-8 bytes of a name that is not ASCII before an ASCII location', function () {
-		const writer = writeUrn(urn(`urn:${TEXT}`, 'a.mp4'))
+		const writer = writeWith(writeUrn, urn(`urn:${TEXT}`, 'a.mp4'))
 
 		// size: 12 + 13 name bytes + 1 + 5 location bytes + 1 = 32
 		assert.deepStrictEqual(
@@ -56,7 +62,7 @@ describe('writeUrn', function () {
 	})
 
 	it('should write the UTF-8 bytes of a name and a location that are not ASCII', function () {
-		const writer = writeUrn(urn(TEXT, TEXT))
+		const writer = writeWith(writeUrn, urn(TEXT, TEXT))
 
 		// size: 12 + 9 name bytes + 1 + 9 location bytes + 1 = 32
 		assert.deepStrictEqual(
@@ -66,7 +72,7 @@ describe('writeUrn', function () {
 	})
 
 	it('should write the null terminator of each empty string', function () {
-		const writer = writeUrn(urn('', ''))
+		const writer = writeWith(writeUrn, urn('', ''))
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -84,12 +90,12 @@ describe('writeUrn', function () {
 	for (const [name, location] of strings) {
 		it(`should write a box that readUrn reads with the name '${name}' and the location '${location}'`, function () {
 			const box = urn(name, location)
-			const [parsed] = readIsoBoxes(new Uint8Array(writeUrn(box).buffer), {
+			const [parsed] = readIsoBoxes(new Uint8Array(writeWith(writeUrn, box).buffer), {
 				readers: { 'urn ': readUrn },
 			})
 
 			assert.ok(parsed)
-			assert.strictEqual(parsed.type, 'urn ')
+			assert.ok(isIsoBoxType('urn ', parsed))
 
 			const { type, version, flags } = parsed
 
@@ -99,4 +105,20 @@ describe('writeUrn', function () {
 			)
 		})
 	}
+
+	it('should write no string for a box with the flag 0x000001', function () {
+		const bytes = writeWith(writeUrn, { type: 'urn ', version: 0, flags: 1, name: 'a' })
+
+		assert.strictEqual(bytes.length, 12)
+	})
+
+	it('should keep the size of a box with a name and no location', function () {
+		const input = new Uint8Array([0, 0, 0, 14, 0x75, 0x72, 0x6e, 0x20, 0, 0, 0, 0, 0x61, 0])
+		const [box] = readIsoBoxes(input, { readers: { 'urn ': readUrn } })
+
+		assert.ok(isIsoBoxType('urn ', box))
+		assert.ok('location' in box)
+		assert.strictEqual(box.location, undefined)
+		assert.deepStrictEqual(writeWith(writeUrn, box), input)
+	})
 })

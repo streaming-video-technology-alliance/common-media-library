@@ -1,37 +1,32 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SampleToChunkBox } from '../boxes/SampleToChunkBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `stsc` box (`SampleToChunkBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.7.4
  *
+ * @param cursor - The write cursor
  * @param box - The `SampleToChunkBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writeStsc.test.ts#example}
  *
  * @public
  */
-export function writeStsc(box: SampleToChunkBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entriesSize = box.entryCount * 12 // 4 bytes firstChunk + 4 bytes samplesPerChunk + 4 bytes sampleDescriptionIndex
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+export function writeStsc(cursor: IsoBoxWriteCursor, box: SampleToChunkBox): void {
+	const start = beginIsoFullBox(cursor, 'stsc', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stsc', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.entryCount, 4)
+	writeUint32(cursor, box.entries.length)
 
 	for (const entry of box.entries) {
-		writer.writeUint(entry.firstChunk, 4)
-		writer.writeUint(entry.samplesPerChunk, 4)
-		writer.writeUint(entry.sampleDescriptionIndex, 4)
+		writeUint32(cursor, entry.firstChunk)
+		writeUint32(cursor, entry.samplesPerChunk)
+		writeUint32(cursor, entry.sampleDescriptionIndex)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

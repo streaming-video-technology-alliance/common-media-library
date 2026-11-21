@@ -1,23 +1,26 @@
 import type { FileTypeBox } from '../boxes/FileTypeBox.ts'
-import { STRING } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
+import { readFourCc } from '../cursor/readFourCc.ts'
 
 /**
  * Read the `ftyp` box (`FileTypeBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `FileTypeBox`
  *
  * @public
  */
-export function readFtyp(view: IsoBoxReadView<IsoInt64>): FileTypeBox {
-	const size = 4
-	const majorBrand = view.readString(4)
-	const minorVersion = view.readUint(4)
-	const length = view.bytesRemaining / size
-	const compatibleBrands = view.readArray(STRING, size, length)
+export function readFtyp(cursor: IsoBoxReadCursor<IsoInt64>): FileTypeBox {
+	const majorBrand = readFourCc(cursor)
+	const minorVersion = readUint32(cursor)
+	const compatibleBrands: string[] = []
+
+	while (cursor.pos < cursor.end) {
+		compatibleBrands.push(readFourCc(cursor))
+	}
 
 	return {
 		type: 'ftyp',

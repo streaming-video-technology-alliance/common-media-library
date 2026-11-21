@@ -22,15 +22,24 @@ export type MovieHeaderBox<V extends IsoInt64 = number> = FullBox & {
 	rate: number
 	/** The preferred playback volume. The box stores a signed 8.8 value, and the reader returns the decoded number, such as 1. */
 	volume: number
-	reserved1: number
-	reserved2: number[]
 	/**
 	 * The transformation matrix in the order a, b, u, c, d, v, x, y, w.
 	 * The identity matrix is `[1, 0, 0, 0, 1, 0, 0, 0, 1]`.
 	 * The box stores u, v, and w as 2.30 values, and the other entries as 16.16 values.
 	 */
-	matrix: number[]
-	preDefined: number[]
+	matrix: [
+		a: number,
+		b: number,
+		u: number,
+		c: number,
+		d: number,
+		v: number,
+		x: number,
+		y: number,
+		w: number,
+	]
+	/** The `pre_defined` field. `writeMvhd` writes 0 for a missing value. */
+	preDefined?: number[]
 	/** The track ID for the next track that a writer adds to the presentation. */
 	nextTrackId: number
 }

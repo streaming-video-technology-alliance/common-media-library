@@ -41,18 +41,15 @@ const VISUAL_FIELDS: BoxField[] = [
 ]
 
 const VISUAL = {
-	reserved1: [0, 0, 0, 0, 0, 0],
 	dataReferenceIndex: 1,
 	preDefined1: 0,
-	reserved2: 0,
 	preDefined2: [0, 0, 0],
 	width: 640,
 	height: 360,
-	horizresolution: 72,
-	vertresolution: 72,
-	reserved3: 0,
+	horizResolution: 72,
+	vertResolution: 72,
 	frameCount: 1,
-	compressorName: NAME,
+	compressorName: 'test',
 	depth: 0x18,
 	preDefined3: -1,
 	boxes: [],
@@ -70,14 +67,12 @@ const AUDIO_FIELDS: BoxField[] = [
 ]
 
 const AUDIO = {
-	reserved1: [0, 0, 0, 0, 0, 0],
 	dataReferenceIndex: 1,
-	reserved2: [0, 0],
-	channelcount: 2,
-	samplesize: 16,
+	entryVersion: 0,
+	channelCount: 2,
+	sampleSize: 16,
 	preDefined: 0,
-	reserved3: 0,
-	samplerate: 48000,
+	sampleRate: 48000,
 	boxes: [],
 }
 

@@ -1,24 +1,21 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
 
 /**
  * Write the `imda` box (`IdentifiedMediaDataBox`).
  *
+ * @param cursor - The write cursor
  * @param box - The `IdentifiedMediaDataBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeImda(box: IdentifiedMediaDataBox): IsoBoxWriteView {
-	const headerSize = 8
-	const imdaIdentifierSize = 4
-	const dataSize = box.data.length
-	const totalSize = headerSize + imdaIdentifierSize + dataSize
-
-	const writer = new IsoBoxWriteView('imda', totalSize)
-	writer.writeUint(box.imdaIdentifier, 4)
-	writer.writeBytes(box.data)
-
-	return writer
+export function writeImda(cursor: IsoBoxWriteCursor, box: IdentifiedMediaDataBox): void {
+	const start = beginIsoBox(cursor, 'imda')
+	writeUint32(cursor, box.imdaIdentifier)
+	writeBytes(cursor, box.data)
+	endIsoBox(cursor, start)
 }

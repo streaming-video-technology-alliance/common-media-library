@@ -2,45 +2,35 @@ import {
 	assert,
 	describe,
 	filterBoxes,
+	isIsoBoxType,
 	it,
 	readAvc1,
 	readIsoBoxes,
 	readStsd,
-	type VisualSampleEntryBox,
+	writeAvc1,
+	writeIsoBox,
 } from '../util/box.ts'
-
-type Avc1Box = VisualSampleEntryBox<'avc1'>
 
 describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
 		const container = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', {
-			readers: { stsd: readStsd<Avc1Box>, avc1: readAvc1 },
+			readers: { stsd: readStsd, avc1: readAvc1 },
 		})
 
-		assert.strictEqual(container[0].type, 'stsd')
+		assert.ok(isIsoBoxType('stsd', container[0]))
 
-		const box = container[0].entries[0] as Avc1Box
-		assert.strictEqual(box.type, 'avc1')
+		const box = container[0].boxes[0]
+		assert.ok(isIsoBoxType('avc1', box))
 
-		assert.deepStrictEqual(box.reserved1, [0, 0, 0, 0, 0, 0])
 		assert.strictEqual(box.dataReferenceIndex, 1)
 		assert.strictEqual(box.preDefined1, 0)
-		assert.strictEqual(box.reserved2, 0)
 		assert.deepStrictEqual(box.preDefined2, [0, 0, 0])
 		assert.strictEqual(box.width, 1280)
 		assert.strictEqual(box.height, 720)
-		assert.strictEqual(box.horizresolution, 72)
-		assert.strictEqual(box.vertresolution, 72)
-		assert.strictEqual(box.reserved3, 0)
+		assert.strictEqual(box.horizResolution, 72)
+		assert.strictEqual(box.vertResolution, 72)
 		assert.strictEqual(box.frameCount, 1)
-		assert.deepStrictEqual(
-			box.compressorName,
-			[
-				0x11, 0x47, 0x6f, 0x50, 0x72, 0x6f, 0x20, 0x41, 0x56, 0x43, 0x20, 0x65, 0x6e, 0x63, 0x6f,
-				0x64, 0x65, 0x72, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-				0x00, 0x00,
-			],
-		) // length + 'GoPro AVC encoder'
+		assert.strictEqual(box.compressorName, 'GoPro AVC encoder')
 		assert.strictEqual(box.depth, 24)
 		assert.strictEqual(box.preDefined3, -1)
 		assert.strictEqual(box.boxes.length, 2)
@@ -52,14 +42,51 @@ describe('readAvc1', function () {
 
 		view.setUint32(0, bytes.length)
 		view.setUint32(4, 0x61766331) // 'avc1'
-		view.setUint32(36, 0x00488000) // horizresolution
-		view.setUint32(40, 0x012c4000) // vertresolution
+		view.setUint32(36, 0x00488000) // horizResolution
+		view.setUint32(40, 0x012c4000) // vertResolution
 
 		const [box] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
 
 		assert.ok(box)
-		assert.strictEqual(box.type, 'avc1')
-		assert.strictEqual(box.horizresolution, 72.5)
-		assert.strictEqual(box.vertresolution, 300.25)
+		assert.ok(isIsoBoxType('avc1', box))
+		assert.strictEqual(box.horizResolution, 72.5)
+		assert.strictEqual(box.vertResolution, 300.25)
+	})
+
+	it('should cut a long compressor name at a character boundary and read it back', function () {
+		const box = {
+			type: 'avc1' as const,
+			dataReferenceIndex: 1,
+			width: 640,
+			height: 360,
+			horizResolution: 72,
+			vertResolution: 72,
+			frameCount: 1,
+			compressorName: 'é'.repeat(16),
+			depth: 0x18,
+			boxes: [],
+		}
+		const bytes = writeIsoBox(box, { writers: { avc1: writeAvc1 } })
+		const [read] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
+
+		assert.strictEqual(bytes[50], 30)
+		assert.deepStrictEqual(bytes.subarray(81, 82), new Uint8Array(1))
+		assert.ok(isIsoBoxType('avc1', read))
+		assert.strictEqual(read.compressorName, 'é'.repeat(15))
+	})
+
+	it('should read at most 31 bytes for a length byte above 31', function () {
+		const bytes = new Uint8Array(86)
+		const view = new DataView(bytes.buffer)
+
+		view.setUint32(0, 86)
+		bytes.set([0x61, 0x76, 0x63, 0x31], 4)
+		bytes[50] = 0xff
+		bytes.fill(0x61, 51, 82)
+
+		const [box] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
+
+		assert.ok(isIsoBoxType('avc1', box))
+		assert.strictEqual(box.compressorName, 'a'.repeat(31))
 	})
 })

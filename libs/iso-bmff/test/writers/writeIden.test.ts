@@ -1,7 +1,8 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterIsoBoxes,
 	findBox,
@@ -11,6 +12,7 @@ import {
 	writeIsoBox,
 	type WebVttCueIdBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 describe('writeIden', function () {
 	it('should write a WebVttCueIdBox correctly', function () {
@@ -20,7 +22,7 @@ describe('writeIden', function () {
 			cueId: 'cue-1',
 		}
 
-		const writer = writeIden(box)
+		const writer = writeIsoBox(box, { writers: { iden: writeIden } })
 		// #endregion example
 
 		// size (13), type (iden), cueId
@@ -31,7 +33,7 @@ describe('writeIden', function () {
 	})
 
 	it('should write the UTF-8 bytes of a cueId that is not ASCII', function () {
-		const writer = writeIden({ type: 'iden', cueId: 'é日😀' })
+		const writer = writeWith(writeIden, { type: 'iden', cueId: 'é日😀' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -42,7 +44,7 @@ describe('writeIden', function () {
 	})
 
 	it('should write only the box header for an empty cueId', function () {
-		const writer = writeIden({ type: 'iden', cueId: '' })
+		const writer = writeWith(writeIden, { type: 'iden', cueId: '' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -51,19 +53,14 @@ describe('writeIden', function () {
 	})
 
 	it('should write the input bytes of every iden box in vttc.mp4', function () {
-		const config = defaultReaderConfig()
+		const config = record(createDefaultReaderConfig())
 		const { data } = findBox('vttc.mp4', 'mdat', config)
 		const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'iden')
 
 		assert.strictEqual(boxes.length, 2)
 
 		for (const box of boxes) {
-			const { view } = box
-
-			assert.deepStrictEqual(
-				writeIsoBox(box, defaultWriterConfig()),
-				new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
-			)
+			assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), sourceOf(box).bytes)
 		}
 	})
 })

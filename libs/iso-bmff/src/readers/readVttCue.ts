@@ -1,5 +1,6 @@
-import type { WebVttCueBox, WebVttCueChild } from '../boxes/WebVttCueBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { WebVttCueBox } from '../boxes/WebVttCueBox.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
+import { readChildBoxes } from '../readChildBoxes.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
@@ -8,15 +9,15 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * The `readers` map does not need an entry for the `vttc` box type.
  * `readIsoBoxes` returns the same box with this reader and without this reader.
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `WebVttCueBox`
  *
  * @public
  */
-export function readVttc(view: IsoBoxReadView<IsoInt64>): WebVttCueBox {
+export function readVttc<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): WebVttCueBox<V> {
 	return {
 		type: 'vttc',
-		boxes: view.readBoxes<WebVttCueChild>(),
+		boxes: readChildBoxes(cursor),
 	}
 }

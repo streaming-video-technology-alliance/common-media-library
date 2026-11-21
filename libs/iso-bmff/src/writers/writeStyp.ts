@@ -1,31 +1,29 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SegmentTypeBox } from '../boxes/SegmentTypeBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeFourCc } from '../cursor/writeFourCc.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `styp` box (`SegmentTypeBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.16.2
  *
+ * @param cursor - The write cursor
  * @param box - The `SegmentTypeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeStyp(box: SegmentTypeBox): IsoBoxWriteView {
-	const headerSize = 8
-	const majorBrandSize = 4
-	const minorVersionSize = 4
-	const compatibleBrandsSize = box.compatibleBrands.length * 4
-	const totalSize = headerSize + majorBrandSize + minorVersionSize + compatibleBrandsSize
+export function writeStyp(cursor: IsoBoxWriteCursor, box: SegmentTypeBox): void {
+	const start = beginIsoBox(cursor, 'styp')
 
-	const writer = new IsoBoxWriteView('styp', totalSize)
-	writer.writeString(box.majorBrand)
-	writer.writeUint(box.minorVersion, 4)
+	writeFourCc(cursor, box.majorBrand)
+	writeUint32(cursor, box.minorVersion)
 
 	for (const brand of box.compatibleBrands) {
-		writer.writeString(brand)
+		writeFourCc(cursor, brand)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

@@ -1,6 +1,9 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { TrackFragmentBaseMediaDecodeTimeBox } from '../boxes/TrackFragmentBaseMediaDecodeTimeBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `tfdt` box (`TrackFragmentBaseMediaDecodeTimeBox`).
@@ -10,22 +13,17 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackFragmentBaseMediaDecodeTimeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeTfdt(box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>): IsoBoxWriteView {
-	const size = box.version === 1 ? 8 : 4
-	const headerSize = 8
-	const fullBoxSize = 4
-	const baseMediaDecodeTimeSize = size
-	const totalSize = headerSize + fullBoxSize + baseMediaDecodeTimeSize
+export function writeTfdt(
+	cursor: IsoBoxWriteCursor,
+	box: TrackFragmentBaseMediaDecodeTimeBox<IsoInt64>,
+): void {
+	const start = beginIsoFullBox(cursor, 'tfdt', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('tfdt', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-	writer.writeWideUint(box.baseMediaDecodeTime, size)
-
-	return writer
+	writeWideUint(cursor, box.baseMediaDecodeTime, box.version === 1 ? 8 : 4)
+	endIsoBox(cursor, start)
 }

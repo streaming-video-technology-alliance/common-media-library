@@ -1,4 +1,5 @@
-import { assert, describe, it, writeMvhd, type MovieHeaderBox } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import { assert, describe, it, writeIsoBox, writeMvhd, type MovieHeaderBox } from '../util/box.ts'
 import { ROTATION } from '../util/matrices.ts'
 
 function createBox(matrix: number[]): MovieHeaderBox {
@@ -12,9 +13,7 @@ function createBox(matrix: number[]): MovieHeaderBox {
 		duration: 0,
 		rate: 1,
 		volume: 1,
-		reserved1: 0,
-		reserved2: [0, 0],
-		matrix,
+		matrix: matrix as MovieHeaderBox['matrix'],
 		preDefined: [0, 0, 0, 0, 0, 0],
 		nextTrackId: 2,
 	}
@@ -30,22 +29,23 @@ function storedMatrix(buffer: ArrayBufferLike): number[] {
 describe('writeMvhd', function () {
 	it('should write the identity matrix', function () {
 		// #region example
-		const writer = writeMvhd({
-			type: 'mvhd',
-			version: 0,
-			flags: 0,
-			creationTime: 0,
-			modificationTime: 0,
-			timescale: 1000,
-			duration: 0,
-			rate: 1,
-			volume: 1,
-			reserved1: 0,
-			reserved2: [0, 0],
-			matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
-			preDefined: [0, 0, 0, 0, 0, 0],
-			nextTrackId: 2,
-		})
+		const writer = writeIsoBox(
+			{
+				type: 'mvhd',
+				version: 0,
+				flags: 0,
+				creationTime: 0,
+				modificationTime: 0,
+				timescale: 1000,
+				duration: 0,
+				rate: 1,
+				volume: 1,
+				matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
+				preDefined: [0, 0, 0, 0, 0, 0],
+				nextTrackId: 2,
+			},
+			{ writers: { mvhd: writeMvhd } },
+		)
 		// #endregion example
 
 		assert.strictEqual(writer.byteLength, 108)
@@ -56,13 +56,13 @@ describe('writeMvhd', function () {
 	})
 
 	it('should write a negative matrix entry', function () {
-		const writer = writeMvhd(createBox([0, 1, 0, -1, 0, 0, 1080, 0, 1]))
+		const writer = writeWith(writeMvhd, createBox([0, 1, 0, -1, 0, 0, 1080, 0, 1]))
 
 		assert.deepStrictEqual(storedMatrix(writer.buffer), ROTATION)
 	})
 
 	it('should write u, v, and w as 2.30 values', function () {
-		const writer = writeMvhd(createBox([1, 0, -0.5, 0, 1, 1.5, 0, 0, 1]))
+		const writer = writeWith(writeMvhd, createBox([1, 0, -0.5, 0, 1, 1.5, 0, 0, 1]))
 
 		assert.deepStrictEqual(
 			storedMatrix(writer.buffer),
@@ -71,7 +71,7 @@ describe('writeMvhd', function () {
 	})
 
 	it('should write 0 for a missing matrix entry', function () {
-		const writer = writeMvhd(createBox([1, 0, 0, 0, 1]))
+		const writer = writeWith(writeMvhd, createBox([1, 0, 0, 0, 1]))
 
 		assert.deepStrictEqual(storedMatrix(writer.buffer), [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0])
 	})

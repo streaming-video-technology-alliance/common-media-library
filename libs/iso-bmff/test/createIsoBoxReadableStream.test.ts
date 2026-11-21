@@ -1,8 +1,8 @@
-import { deepStrictEqual, strictEqual } from 'node:assert'
+import { deepStrictEqual, rejects, strictEqual } from 'node:assert'
 import { readFile } from 'node:fs/promises'
 import {
 	createIsoBoxReadableStream,
-	defaultWriterConfig,
+	createDefaultWriterConfig,
 	describe,
 	it,
 	readFtyp,
@@ -85,11 +85,9 @@ describe('createIsoBoxReadableStream', function () {
 								type: 'subs',
 								version: 1,
 								flags: 0,
-								entryCount: 1,
 								entries: [
 									{
 										sampleDelta: 1,
-										subsampleCount: 3,
 										subsamples: [
 											{
 												subsampleSize: 5,
@@ -117,7 +115,6 @@ describe('createIsoBoxReadableStream', function () {
 								type: 'trun',
 								version: 0,
 								flags: 1793,
-								sampleCount: 1,
 								dataOffset: 160,
 								samples: [
 									{
@@ -157,8 +154,16 @@ describe('createIsoBoxReadableStream', function () {
 		strictEqual(Buffer.compare(isoFile, written), 0)
 	})
 
+	it('should write the boxes of a read with no configuration', async function () {
+		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
+		const stream = createIsoBoxReadableStream(readIsoBoxes(isoFile))
+		const written = new Uint8Array(await new Response(stream).arrayBuffer())
+
+		strictEqual(Buffer.compare(isoFile, written), 0)
+	})
+
 	it('should exit if boxes are empty', async function () {
-		const stream = createIsoBoxReadableStream([], defaultWriterConfig())
+		const stream = createIsoBoxReadableStream([], createDefaultWriterConfig())
 		const buffers = []
 
 		for await (const data of stream) {
@@ -207,5 +212,63 @@ describe('createIsoBoxReadableStream', function () {
 		}
 
 		deepStrictEqual(chunks, [0, 1, 2])
+	})
+
+	it('should keep the bytes of a large chunk after the next read', async function () {
+		const large = new Uint8Array(4096).fill(0xaa)
+		const small = new Uint8Array([0, 0, 0, 9, 0x66, 0x72, 0x65, 0x65, 0xbb])
+		const chunks: Uint8Array[] = []
+
+		for await (const data of createIsoBoxReadableStream([large, small])) {
+			chunks.push(data)
+		}
+
+		strictEqual(chunks[0].length, 4096)
+		strictEqual(
+			chunks[0].every(byte => byte === 0xaa),
+			true,
+		)
+		deepStrictEqual(Array.from(chunks[1]), Array.from(small))
+	})
+
+	it('should reject the first read for a first box with no writer', async function () {
+		const box: IsoBoxStreamable = { type: 'meta', version: 0, flags: 0, boxes: [] }
+		const reader = createIsoBoxReadableStream([box], { writers: {} }).getReader()
+
+		await rejects(reader.read(), { message: 'No writer found for box type: meta' })
+	})
+
+	it('should write no box before the first read', async function () {
+		let count = 0
+
+		function* source(): Generator<IsoBoxStreamable> {
+			for (let i = 0; i < 3; i++) {
+				count++
+				yield { type: 'free', data: new Uint8Array([i]) }
+			}
+		}
+
+		const reader = createIsoBoxReadableStream(source(), {
+			writers: { free: writeFree },
+		}).getReader()
+
+		await new Promise(resolve => setTimeout(resolve, 0))
+		strictEqual(count, 0)
+
+		await reader.read()
+		await new Promise(resolve => setTimeout(resolve, 0))
+		strictEqual(count, 1)
+	})
+
+	it('should error the stream for a later box with no writer', async function () {
+		const boxes: IsoBoxStreamable[] = [
+			{ type: 'free', data: new Uint8Array([1]) },
+			{ type: 'meta', version: 0, flags: 0, boxes: [] },
+		]
+		const reader = createIsoBoxReadableStream(boxes, { writers: { free: writeFree } }).getReader()
+		const first = await reader.read()
+
+		deepStrictEqual(first.value, new Uint8Array([0, 0, 0, 9, 102, 114, 101, 101, 1]))
+		await rejects(reader.read(), { message: 'No writer found for box type: meta' })
 	})
 })

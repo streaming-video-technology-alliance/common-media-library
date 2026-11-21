@@ -1,4 +1,4 @@
-import { assert, describe, it, writeMp4a, writeStsd } from '../util/box.ts'
+import { assert, describe, it, writeIsoBox, writeMp4a, writeStsd } from '../util/box.ts'
 
 describe('writeStsd', function () {
 	it('should write a SampleDescriptionBox correctly', function () {
@@ -8,17 +8,14 @@ describe('writeStsd', function () {
 			version: 0,
 			flags: 0,
 			entryCount: 1,
-			entries: [
+			boxes: [
 				{
 					type: 'mp4a' as const,
-					channelcount: 2,
+					channelCount: 2,
 					dataReferenceIndex: 1,
 					preDefined: 65534,
-					reserved1: [0, 0, 0, 0, 0, 0],
-					reserved2: [0, 0],
-					reserved3: 0,
-					samplerate: 48000,
-					samplesize: 16,
+					sampleRate: 48000,
+					sampleSize: 16,
 					boxes: [
 						new Uint8Array([
 							0, 0, 0, 50, 101, 115, 100, 115, 0, 0, 0, 0, 3, 128, 128, 34, 0, 0, 0, 4, 128, 128,
@@ -31,7 +28,7 @@ describe('writeStsd', function () {
 			],
 		}
 
-		const writer = writeStsd(box, {
+		const writer = writeIsoBox(box, {
 			writers: {
 				mp4a: writeMp4a,
 				stsd: writeStsd,
@@ -86,9 +83,9 @@ describe('writeStsd', function () {
 					0,
 					0, // reserved2 (last 4 bytes)
 					0,
-					2, // channelcount
+					2, // channelCount
 					0,
-					16, // samplesize
+					16, // sampleSize
 					255,
 					254, // preDefined
 					0,
@@ -96,7 +93,7 @@ describe('writeStsd', function () {
 					187,
 					128,
 					0,
-					0, // samplerate
+					0, // sampleRate
 
 					0,
 					0,

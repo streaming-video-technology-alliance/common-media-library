@@ -1,7 +1,12 @@
-import type { AudioSampleEntryBox } from './AudioSampleEntryBox.ts'
+import type { IsoBoxType } from '../IsoBoxType.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { AudioSampleEntryType } from './AudioSampleEntryType.ts'
+import type { VisualSampleEntryType } from './VisualSampleEntryType.ts'
+import type { AudioSampleEntry } from './AudioSampleEntry.ts'
 import type { FullBox } from './FullBox.ts'
-import type { SampleEntryBox } from './SampleEntryBox.ts'
-import type { VisualSampleEntryBox } from './VisualSampleEntryBox.ts'
+import type { IsoRawBox } from '../IsoRawBox.ts'
+import type { SampleEntry } from './SampleEntry.ts'
+import type { VisualSampleEntry } from './VisualSampleEntry.ts'
 
 /**
  * Sample Description Box (`stsd`).
@@ -11,9 +16,12 @@ import type { VisualSampleEntryBox } from './VisualSampleEntryBox.ts'
  * @public
  */
 export type SampleDescriptionBox<
-	E extends SampleEntryBox = AudioSampleEntryBox | VisualSampleEntryBox,
+	V extends IsoInt64 = number,
+	E extends SampleEntry<IsoBoxType, V> | IsoRawBox =
+		| AudioSampleEntry<AudioSampleEntryType, V>
+		| VisualSampleEntry<VisualSampleEntryType, V>
+		| IsoRawBox,
 > = FullBox & {
 	type: 'stsd'
-	entryCount: number
-	entries: E[]
+	boxes: E[]
 }

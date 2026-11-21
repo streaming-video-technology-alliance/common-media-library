@@ -10,10 +10,6 @@ import type { FullBox } from './FullBox.ts'
 export type DataEntryUrnBox = FullBox & {
 	type: 'urn '
 	name: string
-	location: string
+	/** The optional location of the data. The field is `undefined` when the box has no bytes after `name`. */
+	location?: string
 }
-
-/**
- * @public
- */
-export type urn = DataEntryUrnBox

@@ -1,6 +1,10 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { ProducerReferenceTimeBox } from '../boxes/ProducerReferenceTimeBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `prft` box (`ProducerReferenceTimeBox`).
@@ -10,34 +14,20 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `ProducerReferenceTimeBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writePrft(box: ProducerReferenceTimeBox<IsoInt64>): IsoBoxWriteView {
-	const mediaTimeSize = box.version === 0 ? 4 : 8
-	const headerSize = 8
-	const fullBoxSize = 4
-	const referenceTrackIdSize = 4
-	const ntpTimestampSecSize = 4
-	const ntpTimestampFracSize = 4
-	const totalSize =
-		headerSize +
-		fullBoxSize +
-		referenceTrackIdSize +
-		ntpTimestampSecSize +
-		ntpTimestampFracSize +
-		mediaTimeSize
+export function writePrft(
+	cursor: IsoBoxWriteCursor,
+	box: ProducerReferenceTimeBox<IsoInt64>,
+): void {
+	const start = beginIsoFullBox(cursor, 'prft', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('prft', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.referenceTrackId, 4)
-	writer.writeUint(box.ntpTimestampSec, 4)
-	writer.writeUint(box.ntpTimestampFrac, 4)
-	writer.writeWideUint(box.mediaTime, mediaTimeSize)
-
-	return writer
+	writeUint32(cursor, box.referenceTrackId)
+	writeUint32(cursor, box.ntpTimestampSec)
+	writeUint32(cursor, box.ntpTimestampFrac)
+	writeWideUint(cursor, box.mediaTime, box.version === 0 ? 4 : 8)
+	endIsoBox(cursor, start)
 }

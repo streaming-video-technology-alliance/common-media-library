@@ -2,21 +2,21 @@ import {
 	createAudioSampleEntryReader,
 	createVisualSampleEntryReader,
 	findIsoBox,
-	fourCcToUint32,
+	isIsoBoxType,
 	readIsoBoxes,
 	readStsd,
-	writeAudioSampleEntryBox,
+	writeAudioSampleEntry,
 	writeFrma,
 	writeIsoBoxes,
 	writeSchm,
 	writeStsd,
 	writeTenc,
-	writeVisualSampleEntryBox,
-	type AudioSampleEntryBox,
+	writeVisualSampleEntry,
+	type AudioSampleEntry,
 	type IsoBoxReaderMap,
 	type IsoBoxType,
 	type IsoBoxWriterMap,
-	type VisualSampleEntryBox,
+	type VisualSampleEntry,
 } from '@svta/cml-iso-bmff'
 
 const audioTypes: IsoBoxType[] = ['mp4a', 'ac-3', 'ec-3', 'ac-4', 'fLaC', 'Opus']
@@ -50,12 +50,12 @@ const writers = /* @__PURE__ */ (() => {
 		frma: writeFrma,
 		schm: writeSchm,
 		tenc: writeTenc,
-		encv: writeVisualSampleEntryBox,
-		enca: writeAudioSampleEntryBox,
+		encv: writeVisualSampleEntry,
+		enca: writeAudioSampleEntry,
 	}
 	const dynamic: IsoBoxWriterMap = map
-	audioTypes.forEach(type => (dynamic[type] = writeAudioSampleEntryBox))
-	videoTypes.forEach(type => (dynamic[type] = writeVisualSampleEntryBox))
+	audioTypes.forEach(type => (dynamic[type] = writeAudioSampleEntry))
+	videoTypes.forEach(type => (dynamic[type] = writeVisualSampleEntry))
 	return map
 })()
 
@@ -80,18 +80,19 @@ export type EnsureEncryptedInitOptions = {
 	includeOriginal: boolean
 
 	/**
-	 * The scheme type to use for the encryption. Defaults to `cenc`.
+	 * The scheme type to use for the encryption, as a four-character code such as `cbcs`.
+	 * A number is the code as a 32-bit integer, such as `0x63626373` for `cbcs`.
 	 *
-	 * @defaultValue `1667591779`
+	 * @defaultValue `'cenc'`
 	 */
-	schemeType: number
+	schemeType: string | number
 
 	/**
-	 * The default KID to use for the encryption.
+	 * The default KID to use for the encryption, 16 bytes.
 	 *
-	 * @defaultValue `[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]`
+	 * @defaultValue 16 bytes of 0
 	 */
-	defaultKid: number[]
+	defaultKid: Uint8Array | number[]
 }
 
 /**
@@ -115,37 +116,38 @@ export function ensureEncryptedInit(
 	const {
 		prepend = true,
 		includeOriginal = true,
-		schemeType = 1667591779,
-		defaultKid = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		schemeType = 'cenc',
+		defaultKid = new Uint8Array(16),
 	} = options ?? {}
 	const boxes = readIsoBoxes(init, { readers })
-	const stsd = findIsoBox(boxes, box => box.type === 'stsd')
+	const stsd = findIsoBox(boxes, box => isIsoBoxType('stsd', box))
 
 	// No stsd box found, return original init
-	if (stsd?.type !== 'stsd') {
+	if (!stsd) {
 		return init
 	}
 
 	// If the stsd box already contains enca or encv entries, return original init
-	if (stsd.entries.find(({ type }) => type === 'enca' || type === 'encv')) {
+	if (stsd.boxes.find(({ type }) => type === 'enca' || type === 'encv')) {
 		return init
 	}
 
-	const entries = stsd.entries.filter(
-		({ type }) => videoTypes.includes(type) || audioTypes.includes(type),
+	const entries = stsd.boxes.filter(
+		(entry): entry is AudioSampleEntry | VisualSampleEntry =>
+			!('bytes' in entry) && (videoTypes.includes(entry.type) || audioTypes.includes(entry.type)),
 	)
 
 	// Add sinf to each sample entry box
 	for (const entry of entries) {
 		const type = videoTypes.includes(entry.type) ? 'encv' : 'enca'
 		const box = { ...entry, boxes: entry.boxes.slice(), type } as
-			| AudioSampleEntryBox
-			| VisualSampleEntryBox
+			| AudioSampleEntry
+			| VisualSampleEntry
 
 		if (prepend) {
-			stsd.entries.unshift(box)
+			stsd.boxes.unshift(box)
 		} else {
-			stsd.entries.push(box)
+			stsd.boxes.push(box)
 		}
 
 		box.boxes.push({
@@ -153,13 +155,21 @@ export function ensureEncryptedInit(
 			boxes: [
 				{
 					type: 'frma',
-					dataFormat: fourCcToUint32(entry.type),
+					dataFormat: entry.type,
 				},
 				{
 					type: 'schm',
 					version: 0,
 					flags: 0,
-					schemeType,
+					schemeType:
+						typeof schemeType === 'number'
+							? String.fromCharCode(
+									schemeType >>> 24,
+									(schemeType >>> 16) & 0xff,
+									(schemeType >>> 8) & 0xff,
+									schemeType & 0xff,
+								)
+							: schemeType,
 					schemeVersion: 65536,
 				},
 				{
@@ -169,9 +179,9 @@ export function ensureEncryptedInit(
 							type: 'tenc',
 							version: 0,
 							flags: 0,
-							defaultIsEncrypted: 1,
-							defaultIvSize: 8,
-							defaultKid,
+							defaultIsProtected: 1,
+							defaultPerSampleIvSize: 8,
+							defaultKid: Uint8Array.from(defaultKid),
 						},
 					],
 				},
@@ -179,21 +189,5 @@ export function ensureEncryptedInit(
 		})
 	}
 
-	// Write the boxes to a new Uint8Array
-	const chunks = writeIsoBoxes(boxes, { writers })
-	const size = chunks.reduce((acc, chunk) => acc + chunk.byteLength, 0)
-	const length = includeOriginal ? init.length + size : size
-	const result = new Uint8Array(length)
-	let offset = 0
-
-	for (const box of chunks) {
-		result.set(box, offset)
-		offset += box.byteLength
-	}
-
-	if (includeOriginal) {
-		result.set(init, offset)
-	}
-
-	return result
+	return writeIsoBoxes(includeOriginal ? [...boxes, init] : boxes, { writers })
 }

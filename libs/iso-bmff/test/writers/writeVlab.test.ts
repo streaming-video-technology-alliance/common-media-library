@@ -1,4 +1,12 @@
-import { assert, describe, it, writeVlab, type WebVttSourceLabelBox } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	describe,
+	it,
+	writeIsoBox,
+	writeVlab,
+	type WebVttSourceLabelBox,
+} from '../util/box.ts'
 
 describe('writeVlab', function () {
 	it('should write a WebVttSourceLabelBox correctly', function () {
@@ -8,7 +16,7 @@ describe('writeVlab', function () {
 			sourceLabel: 'source',
 		}
 
-		const writer = writeVlab(box)
+		const writer = writeIsoBox(box, { writers: { vlab: writeVlab } })
 		// #endregion example
 
 		// size (14), type (vlab), sourceLabel
@@ -19,7 +27,7 @@ describe('writeVlab', function () {
 	})
 
 	it('should write the UTF-8 bytes of a sourceLabel that is not ASCII', function () {
-		const writer = writeVlab({ type: 'vlab', sourceLabel: 'é日😀' })
+		const writer = writeWith(writeVlab, { type: 'vlab', sourceLabel: 'é日😀' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -28,7 +36,7 @@ describe('writeVlab', function () {
 	})
 
 	it('should write only the box header for an empty sourceLabel', function () {
-		const writer = writeVlab({ type: 'vlab', sourceLabel: '' })
+		const writer = writeWith(writeVlab, { type: 'vlab', sourceLabel: '' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),

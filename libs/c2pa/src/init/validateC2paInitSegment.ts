@@ -241,7 +241,11 @@ async function validateSessionKeys(
  */
 export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSegmentValidation> {
 	const boxes = readIsoBoxes(bytes)
-	if (findIsoBox(boxes, box => box.type === 'mdat')) {
+	// The mdat check must see the same root boxes as computeBmffHash.
+	if (
+		readRootBoxes(bytes).some(box => box.type === 'mdat') ||
+		findIsoBox(boxes, box => box.type === 'mdat')
+	) {
 		return {
 			manifest: null,
 			certificate: null,

@@ -1,44 +1,38 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { ProtectionSystemSpecificHeaderBox } from '../boxes/ProtectionSystemSpecificHeaderBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeBytes } from '../cursor/writeBytes.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import { writeFixedBytes } from '../cursor/writeFixedBytes.ts'
 
 /**
  * Write the `pssh` box (`ProtectionSystemSpecificHeaderBox`).
  *
  * ISO/IEC 23001-7:2016 - 8.1
  *
+ * @param cursor - The write cursor
  * @param box - The `ProtectionSystemSpecificHeaderBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @example
  * {@includeCode ../../test/writers/writePssh.test.ts#example}
  *
  * @public
  */
-export function writePssh(box: ProtectionSystemSpecificHeaderBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const systemIdSize = 16
-	const kidCountSize = box.version > 0 ? 4 : 0
-	const kidSize = box.version > 0 ? box.kidCount * 16 : 0
-	const dataSizeField = 4
-	const dataSize = box.dataSize
-	const totalSize =
-		headerSize + fullBoxSize + systemIdSize + kidCountSize + kidSize + dataSizeField + dataSize
+export function writePssh(cursor: IsoBoxWriteCursor, box: ProtectionSystemSpecificHeaderBox): void {
+	const start = beginIsoFullBox(cursor, 'pssh', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('pssh', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeArray(box.systemId, UINT, 1, 16)
+	writeFixedBytes(cursor, box.systemId, 16)
 
 	if (box.version > 0) {
-		writer.writeUint(box.kidCount, 4)
-		writer.writeArray(box.kid, UINT, 1, kidSize)
+		writeUint32(cursor, box.kid.length)
+
+		for (const kid of box.kid) {
+			writeFixedBytes(cursor, kid, 16)
+		}
 	}
 
-	writer.writeUint(box.dataSize, 4)
-	writer.writeArray(box.data, UINT, 1, box.dataSize)
-
-	return writer
+	writeUint32(cursor, box.data.length)
+	writeBytes(cursor, box.data)
+	endIsoBox(cursor, start)
 }

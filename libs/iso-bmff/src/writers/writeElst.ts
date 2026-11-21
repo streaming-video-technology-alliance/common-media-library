@@ -1,6 +1,12 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { EditListBox } from '../boxes/EditListBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeInt16 } from '../cursor/writeInt16.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { writeWideInt } from '../cursor/writeWideInt.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `elst` box (`EditListBox`).
@@ -10,33 +16,23 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `EditListBox` fields to write
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeElst(box: EditListBox<IsoInt64>): IsoBoxWriteView {
-	const v1 = box.version === 1
-	const size = v1 ? 8 : 4
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entrySize = size + size + 2 + 2 // segmentDuration + mediaTime + mediaRateInteger + mediaRateFraction
-	const entriesSize = box.entryCount * entrySize
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+export function writeElst(cursor: IsoBoxWriteCursor, box: EditListBox<IsoInt64>): void {
+	const size = box.version === 1 ? 8 : 4
+	const start = beginIsoFullBox(cursor, 'elst', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('elst', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.entryCount, 4)
+	writeUint32(cursor, box.entries.length)
 
 	for (const entry of box.entries) {
-		writer.writeWideUint(entry.segmentDuration, size)
-		writer.writeWideInt(entry.mediaTime, size)
-		writer.writeInt(entry.mediaRateInteger, 2)
-		writer.writeInt(entry.mediaRateFraction, 2)
+		writeWideUint(cursor, entry.segmentDuration, size)
+		writeWideInt(cursor, entry.mediaTime, size)
+		writeInt16(cursor, entry.mediaRateInteger)
+		writeInt16(cursor, entry.mediaRateFraction)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

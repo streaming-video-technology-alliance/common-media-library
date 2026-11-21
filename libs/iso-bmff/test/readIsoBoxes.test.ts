@@ -3,19 +3,27 @@ import {
 	assert,
 	createAudioSampleEntryReader,
 	describe,
+	isIsoBoxType,
 	it,
 	readFtyp,
 	readIsoBoxes,
 	readStsd,
+	readTfdt,
+	readUint24,
+	readUint32,
+	readUint64,
+	readUint8,
 	readUrl,
-	type IsoBoxReadView,
+	type IsoBoxReadCursor,
+	type IsoRawBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
 
 /** A tfdt reader that keeps the 64-bit field exact. */
-const readTfdt64 = (view: IsoBoxReadView) => {
-	const { version, flags } = view.readFullBox()
-	const baseMediaDecodeTime = version === 1 ? view.readUint64() : BigInt(view.readUint(4))
+const readTfdt64 = (cursor: IsoBoxReadCursor) => {
+	const version = readUint8(cursor)
+	const flags = readUint24(cursor)
+	const baseMediaDecodeTime = version === 1 ? readUint64(cursor) : BigInt(readUint32(cursor))
 	return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime, exact: true }
 }
 
@@ -32,8 +40,7 @@ describe('readIsoBoxes', function () {
 		assert.strictEqual(boxes.length, 1)
 
 		const box = boxes[0]
-		assert.strictEqual(box.type, 'ftyp')
-		assert.strictEqual(box.size, 20)
+		assert.ok(isIsoBoxType('ftyp', box))
 		assert.strictEqual(box.majorBrand, 'isom')
 		assert.strictEqual(box.minorVersion, 1)
 		assert.deepStrictEqual(box.compatibleBrands, ['isom'])
@@ -43,8 +50,12 @@ describe('readIsoBoxes', function () {
 	it('should exit if garbage is zero', function () {
 		const zero = new Uint8Array(1500)
 		const boxes = readIsoBoxes(zero.buffer)
+		const [box] = boxes
+
+		// A size of 0 extends the box to the end of the data.
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].size, 0)
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.bytes.length, 1500)
 	})
 
 	it('should allow custom box readers', function () {
@@ -54,13 +65,14 @@ describe('readIsoBoxes', function () {
 
 		const boxes = readIsoBoxes(bytes.buffer, {
 			readers: {
-				test: (view: IsoBoxReadView) => ({ type: 'test', value: view.readUint(4) }),
+				test: (cursor: IsoBoxReadCursor) => ({ type: 'test', value: readUint32(cursor) }),
 				'ac-4': createAudioSampleEntryReader('ac-4'),
 			},
 		})
 
 		const box = boxes[0]
 		assert.strictEqual(box.type, 'test')
+		assert.ok('value' in box)
 		assert.strictEqual(box.value, 0xffffffff)
 	})
 
@@ -73,7 +85,7 @@ describe('readIsoBoxes', function () {
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { tfdt: readTfdt64 } })
 
 		assert.ok(box)
-		if (box.type === 'tfdt') {
+		if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 			// The built-in tfdt type is not part of the union, so the field is a bigint,
 			// not `number | bigint`, and the extra field of the custom reader is visible.
 			expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
@@ -91,19 +103,20 @@ describe('readIsoBoxes', function () {
 			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x01,
 		])
-		const name: string = 'ftyp'
+		const name: string = 'tfdt'
 		// The key is not a literal, so `keyof` the map is `string` and no built-in type is excluded.
-		const [box] = readIsoBoxes(bytes.buffer, { readers: { [name]: readFtyp } })
+		const [box] = readIsoBoxes(bytes.buffer, { readers: { [name]: readTfdt } })
 
 		assert.ok(box)
-		if (box.type === 'tfdt') {
+		if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+			assert.strictEqual(box.baseMediaDecodeTime, 1)
 		} else {
 			assert.fail('expected a tfdt box')
 		}
 	})
 
-	it('should keep the built-in box type when its reader is optional', function () {
+	it('should give a raw box when an optional reader is absent', function () {
 		// A version 0 tfdt box with baseMediaDecodeTime = 1.
 		const bytes = new Uint8Array([
 			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -116,19 +129,20 @@ describe('readIsoBoxes', function () {
 
 		// An absent reader does not add `undefined` to the union.
 		expectType<Equal<undefined extends (typeof boxes)[number] ? true : false, false>>(true)
-		assert.ok(box)
-		// The reader may be absent, so the union has the built-in tfdt type next to the custom type.
-		if (box.type === 'tfdt') {
-			expectType<Equal<typeof box.baseMediaDecodeTime, number | bigint>>(true)
-		} else {
-			assert.fail('expected a tfdt box')
-		}
+		// A box with no reader is a raw box, so the union has the raw box next to the custom type.
+		expectType<Equal<IsoRawBox extends (typeof boxes)[number] ? true : false, true>>(true)
+		expectType<
+			Equal<Extract<(typeof boxes)[number], { type: 'tfdt' }>['baseMediaDecodeTime'], bigint>
+		>(true)
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'tfdt')
+		assert.strictEqual(box.bytes.length, 16)
 
 		readers.tfdt = readTfdt64
 		const [exact] = readIsoBoxes(bytes.buffer, { readers })
 
 		assert.ok(exact)
-		if (exact.type === 'tfdt') {
+		if (exact.type === 'tfdt' && 'baseMediaDecodeTime' in exact) {
 			assert.strictEqual(exact.baseMediaDecodeTime, BigInt(1))
 		} else {
 			assert.fail('expected a tfdt box')
@@ -140,16 +154,16 @@ describe('readIsoBoxes', function () {
 		const bytes = new Uint8Array([
 			0x00, 0x00, 0x00, 0x0c, 0x75, 0x72, 0x6c, 0x20, 0x00, 0x00, 0x00, 0x01,
 		])
-		const readUrlCustom = (view: IsoBoxReadView) => ({
-			...readUrl(view),
+		const readUrlCustom = (cursor: IsoBoxReadCursor) => ({
+			...readUrl(cursor),
 			custom: true,
 		})
 
-		// The view also finds a reader by the trimmed type, so `url` replaces `'url '`.
+		// The read also finds a reader by the trimmed type, so `url` replaces `'url '`.
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { url: readUrlCustom } })
 
 		assert.ok(box)
-		if (box.type === 'url ') {
+		if (box.type === 'url ' && 'custom' in box) {
 			expectType<Equal<typeof box.custom, boolean>>(true)
 			assert.strictEqual(box.custom, true)
 		} else {
@@ -162,18 +176,23 @@ describe('readIsoBoxes', function () {
 			'new Uint8Array([0, 0, 0, 8, 102, 114, 101, 101]).buffer',
 		) as ArrayBuffer
 		const boxes = readIsoBoxes(buffer)
+		const [box] = boxes
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'free')
-		assert.strictEqual(boxes[0].size, 8)
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'free')
+		assert.strictEqual(box.bytes.length, 8)
 	})
 
 	it('should read a DataView that starts at a byte offset', function () {
 		const bytes = new Uint8Array([0xff, 0xff, 0xff, 0xff, 0, 0, 0, 8, 102, 114, 101, 101])
 		const boxes = readIsoBoxes(new DataView(bytes.buffer, 4, 8))
+		const [box] = boxes
 
 		assert.strictEqual(boxes.length, 1)
-		assert.strictEqual(boxes[0].type, 'free')
-		assert.strictEqual(boxes[0].size, 8)
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'free')
+		assert.strictEqual(box.bytes.length, 8)
+		assert.strictEqual(box.bytes.byteOffset, 4)
 	})
 })
