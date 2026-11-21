@@ -12,6 +12,8 @@ import { readEntryBoxes } from '../cursor/readEntryBoxes.ts'
  *
  * @returns A parsed `DataReferenceBox`
  *
+ * @throws RangeError if the box has fewer complete child boxes than `entry_count`.
+ *
  * @public
  */
 export function readDref<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): DataReferenceBox<V> {

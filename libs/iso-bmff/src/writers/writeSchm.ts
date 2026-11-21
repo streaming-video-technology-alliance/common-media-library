@@ -16,6 +16,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SchemeTypeBox` fields to write
  *
+ * @throws RangeError if `schemeType` does not have 4 characters.
+ *
  * @example
  * {@includeCode ../../test/writers/writeSchm.test.ts#example}
  *

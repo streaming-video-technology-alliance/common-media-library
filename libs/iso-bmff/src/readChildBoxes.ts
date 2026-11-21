@@ -7,6 +7,8 @@ import type { IsoRawBox } from './IsoRawBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
 import { CONTAINERS } from './utils/CONTAINERS.ts'
 
+const CONTAINER_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CONTAINERS)
+
 /**
  * Reads the boxes from the position of a cursor to its end.
  *
@@ -73,7 +75,7 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 
 			if (reader) {
 				box = reader(state, type) as ParsedIsoBox<V>
-			} else if (CONTAINERS.includes(type)) {
+			} else if (CONTAINER_SET.has(type)) {
 				box = { type, boxes: readChildBoxes(state) } as ParsedIsoBox<V>
 			} else {
 				const bytes = new Uint8Array(view.buffer, view.byteOffset + boxStart, size)

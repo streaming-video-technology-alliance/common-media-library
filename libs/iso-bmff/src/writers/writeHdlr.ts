@@ -14,6 +14,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `HandlerBox` fields to write
  *
+ * @throws RangeError if `handlerType` does not have 4 characters.
+ *
  * @example
  * {@includeCode ../../test/writers/writeHdlr.test.ts#example}
  *

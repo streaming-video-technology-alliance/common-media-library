@@ -155,6 +155,16 @@ describe('seekIsoBox', function () {
 		assert.strictEqual(readUint8(cursor), 0xaa)
 	})
 
+	it('should find a box whose type has a byte above 0x7f', function () {
+		// The type bytes are a9 74 6f 6f, the QuickTime type '©too'.
+		const tool = new Uint8Array([0, 0, 0, 9, 0xa9, 0x74, 0x6f, 0x6f, 0x07])
+		const cursor = seekIsoBox(reduceUint8Arrays([boxBytes('free'), tool]), ['©too'])
+
+		assert.ok(cursor)
+		assert.strictEqual(cursor.start, 8)
+		assert.strictEqual(readUint8(cursor), 0x07)
+	})
+
 	it('should return a cursor at the position of the input for an empty path', function () {
 		const cursor = seekIsoBox(boxBytes('free'), [])
 

@@ -111,6 +111,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `box.view` | Omit the reader of the box, and use `box.bytes` of the raw box |
 | `box.size` | `box.bytes.length` of a raw box |
 | `box.largesize` | `box.bytes.length` of a raw box |
+| `box.view` or `box.size` of a box with a type in `CONTAINERS`, such as `moof` | A custom reader for the box. The bytes of the box are from `cursor.start` to `cursor.end`. `seekIsoBox` returns a cursor with the same range. |
 | `box.usertype` of a parsed `uuid` box | `box.usertype` of a raw `uuid` box, or `readBytes(cursor, 16)` in a reader |
 | `if (box.type === "tfdt")` before a field read | `if (isIsoBoxType("tfdt", box))` |
 | `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
@@ -154,6 +155,7 @@ The table shows the replacement for each member of `IsoBoxReadView`. A method wi
 | `view.readUint(1)`, `view.readUint(2)`, `view.readUint(3)`, `view.readUint(4)` | `readUint8(cursor)`, `readUint16(cursor)`, `readUint24(cursor)`, `readUint32(cursor)` |
 | `view.readUint(8)` | `readWideUint(cursor, 8)` |
 | `view.readInt(1)`, `view.readInt(2)`, `view.readInt(4)` | `readInt8(cursor)`, `readInt16(cursor)`, `readInt32(cursor)` |
+| `view.readInt(8)` | `readWideInt(cursor, 8)` |
 | `view.readUint64()` | `readUint64(cursor)` |
 | `view.readWideUint(size)`, `view.readWideInt(size)` | `readWideUint(cursor, size)`, `readWideInt(cursor, size)` |
 | `view.readTemplate(2)`, `view.readTemplate(4)` | `readTemplate16(cursor)`, `readTemplate32(cursor)` |
@@ -176,11 +178,11 @@ The table shows the replacement for each member of `IsoBoxReadView`. A method wi
 | `view.done` | `cursor.pos >= cursor.end`. Before a truncated box, `nextIsoBox(cursor)` returns `null`. |
 | `view.cursor` | `cursor.pos - cursor.start` |
 | `view.slice(offset, size)` | `readBytes`, then `createIsoBoxReadCursor` |
-| `view.buffer`, `view.byteOffset`, `view.byteLength` | `cursor.view.buffer`, `cursor.view.byteOffset`, `cursor.view.byteLength` |
+| `view.buffer`, `view.byteOffset`, `view.byteLength` | `cursor.view.buffer`, `cursor.view.byteOffset + cursor.start`, `cursor.end - cursor.start`. `cursor.view` covers the complete input, not one box. |
 
 A read past `cursor.end` throws a `RangeError`, so a reader cannot read the bytes of the next box. A length below 0 throws a `RangeError` too. No length value has a special meaning.
 
-The function of the `int64` option takes a read cursor in place of a view. `readInt64AsBigInt` and `createInt64OverflowReader` take the cursor.
+The `int64` option of the configuration is new in version 2.0.0. The function of the option takes a read cursor. The package exports `readInt64AsBigInt` and `createInt64OverflowReader` for the option. See [Reading 64-bit fields](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#reading-64-bit-fields).
 
 ## Writing boxes
 
@@ -208,7 +210,6 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `writeHdlr` writes the text after a U+0000 in `name` | The name ends at the first U+0000 |
 | `writeSchm` writes the text after a U+0000 in `schemeUri` | The string ends at the first U+0000 |
 | `writePrsl`, `writeLabl`, `writeKind`, and `writeElng` write the text after a U+0000 | Each string ends at the first U+0000 |
-| `writeTenc` writes the low 8 bits of a constant IV size above 255 | `writeTenc` throws a `RangeError` |
 
 The stream writes one box for each read and writes no box before the first read.
 
@@ -248,6 +249,7 @@ The table shows the replacement for each member of `IsoBoxWriteView`:
 | `writer.writeUint(value, 1)`, `2`, `3`, `4` | `writeUint8`, `writeUint16`, `writeUint24`, `writeUint32` |
 | `writer.writeUint(value, 8)` | `writeWideUint(cursor, value, 8)` |
 | `writer.writeInt(value, 1)`, `2`, `4` | `writeInt8`, `writeInt16`, `writeInt32` |
+| `writer.writeInt(value, 8)` | `writeWideInt(cursor, value, 8)` |
 | `writer.writeUint64(value)` | `writeUint64(cursor, value)` |
 | `writer.writeWideUint(value, size)`, `writer.writeWideInt(value, size)` | `writeWideUint(cursor, value, size)`, `writeWideInt(cursor, value, size)` |
 | `writer.writeTemplate(value, 2)`, `writer.writeTemplate(value, 4)` | `writeTemplate16(cursor, value)`, `writeTemplate32(cursor, value)` |
@@ -342,6 +344,18 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `systemId: number[]` of `pssh`, `defaultKid: number[]` of `tenc` | A `Uint8Array` of 16 bytes |
 | `dataFormat: number` of `frma`, `schemeType: number` of `schm` | A string, such as `'avc1'` or `'cenc'` |
 | `matrix: number[]` of `mvhd` and `tkhd`, `opColor: number[]` of `vmhd` | Labeled tuples of 9 and 3 numbers. Annotate an array that your code builds, such as `matrix as MovieHeaderBox['matrix']`. |
+
+### Changed values
+
+The compiler does not report these changes.
+
+| Version 1 | Version 2.0.0 |
+|---|---|
+| The `matrix` entries u, v, and w (indexes 2, 5, and 8) of `mvhd` and `tkhd` are 16.16 values. The entry w of the identity matrix is 16384. | The entries are 2.30 values, and w of the identity matrix is 1. Pass 1 for w. The value 16384 writes 0. |
+| `balance` of `smhd` is 256 for full right and 65280 for full left | 1 for full right and -1 for full left. The value 256 writes 0. |
+| A `rate`, `volume`, `layer`, `alternateGroup`, or `matrix` entry of -1 reads as 65535 | The value reads as -1 |
+| A fixed-point field with a fraction reads a wrong value, such as 8193 for 1.5 | The field reads 1.5 |
+| A reader omits the key of a field that the box does not have, such as `sampleDuration` of a `trun` sample or `presentationTime` of `emsg` | Every key is present, with `undefined` for an absent field. `"presentationTime" in box` is always `true`, so test the value for `undefined`. A spread of the box over default values sets each absent field to `undefined`. |
 
 ### Changed types
 
@@ -592,6 +606,7 @@ The option applies to these fields:
 | `mvhd`, `mdhd`, `tkhd` | `creationTime`, `modificationTime`, `duration`  |
 | `elst`                 | `segmentDuration` and `mediaTime` of each entry |
 | `tfhd`                 | `baseDataOffset`                                |
+| `co64`                 | each entry of `chunkOffset`                     |
 
 ### Exact values as `bigint`
 
@@ -916,6 +931,12 @@ The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable it
 If you provide box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space. The keys `url` and `urn` also find the writers of those boxes.
 
 A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.
+
+Three writers throw a `RangeError` when the box has more items than its count field can state:
+
+- `writeSidx`: more than 65535 references
+- `writeSubs`: more than 65535 subsamples in one entry
+- `writeTenc`: more than 255 bytes in `defaultConstantIv`
 
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists the container box types that the function writes automatically. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
