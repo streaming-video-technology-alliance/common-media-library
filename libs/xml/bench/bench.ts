@@ -6,18 +6,18 @@
  *   npm run bench -- --baseline=<build>    also measure the parseXml exported by another build and report this
  *                                          build against it
  *   npm run bench -- --build=<build>       measure another build in place of this build
- *   npm run bench -- --runs=<count>        processes per variant and input (default 1, or 5 with --threshold);
- *                                          the table shows the process with the lowest mean
+ *   npm run bench -- --runs=<count>        processes per variant and input (default 1, or 5 with --threshold).
+ *                                          The table shows the process with the lowest mean.
  *   npm run bench -- --threshold=<percent> exit with code 1 if the build is slower than the baseline by more
- *                                          than the threshold on any input; requires --baseline
+ *                                          than the threshold on any input. Requires --baseline.
  *   npm run bench -- --only=<text>         only inputs whose name contains the text
  *
  * The regression check against the latest release is `npm run bench -- --baseline=npm --threshold=20`.
  *
  * A <build> is one of:
  *
- *   <path>           path to a dist/index.js; a copy of main's dist folder at libs/xml/temp/dist (ignored by
- *                    git and lint) can still resolve its @svta/cml-utils import
+ *   <path>           path to a dist/index.js. A copy of main's dist folder at libs/xml/temp/dist (ignored by
+ *                    git and lint) can still resolve its @svta/cml-utils import.
  *   npm              the latest @svta/cml-xml on npm
  *   npm:<version>    a published version of @svta/cml-xml
  *
@@ -73,24 +73,55 @@ const MEAN_SHARE = 0.9
 const CHECK_RUNS = 5
 const FIXTURES = resolve(import.meta.dirname, '../test/fixtures')
 const PACKAGE = '@svta/cml-xml'
+const VALUE_OPTIONS = ['baseline', 'build', 'only', 'runs', 'threshold', 'worker']
 
 const args = process.argv.slice(2)
+
+for (const arg of args) {
+	if (arg !== '--gc' && !VALUE_OPTIONS.some(name => arg.startsWith(`--${name}=`))) {
+		throw new Error(
+			`Unknown argument "${arg}". Expected --gc, --baseline=<build>, --build=<build>, --only=<text>, --runs=<count>, or --threshold=<percent>`,
+		)
+	}
+}
 
 function option(name: string): string | undefined {
 	const prefix = `--${name}=`
 	return args.find(arg => arg.startsWith(prefix))?.slice(prefix.length)
 }
 
-function numberOption(name: string, fallback: number | undefined, min: number): number | undefined {
+function numberOption(
+	name: string,
+	fallback: number | undefined,
+	min: number,
+	integer: boolean,
+): number | undefined {
 	const value = option(name)
 	if (value === undefined) {
 		return fallback
 	}
 	const parsed = Number(value)
-	if (value === '' || Number.isNaN(parsed) || parsed < min) {
-		throw new Error(`--${name} expects a number of ${min} or more, received "${value}"`)
+	if (
+		value === '' ||
+		!Number.isFinite(parsed) ||
+		parsed < min ||
+		(integer && !Number.isInteger(parsed))
+	) {
+		throw new Error(
+			`--${name} expects ${integer ? 'an integer' : 'a finite number'} of ${min} or more, received "${value}"`,
+		)
 	}
 	return parsed
+}
+
+/**
+ * Describes why a child process did not exit with code 0.
+ */
+function exitReason(proc: ReturnType<typeof spawnSync>): string {
+	if (proc.error !== undefined) {
+		return proc.error.message
+	}
+	return proc.signal !== null ? `signal ${proc.signal}` : `exit code ${proc.status}`
 }
 
 const forceGc = args.includes('--gc')
@@ -98,8 +129,8 @@ const baseline = option('baseline')
 const build = option('build')
 const only = option('only')
 const worker = option('worker')
-const threshold = numberOption('threshold', undefined, 0)
-const runs = numberOption('runs', threshold === undefined ? 1 : CHECK_RUNS, 1) as number
+const threshold = numberOption('threshold', undefined, 0, false)
+const runs = numberOption('runs', threshold === undefined ? 1 : CHECK_RUNS, 1, true) as number
 
 if (threshold !== undefined && baseline === undefined) {
 	throw new Error('--threshold requires --baseline')
@@ -158,6 +189,10 @@ const inputs: Input[] = [
 	},
 ].filter(input => only === undefined || input.name.includes(only))
 
+if (inputs.length === 0) {
+	throw new Error(`--only="${only}" matches no input`)
+}
+
 let sink: unknown = null
 
 function stats(times: number[]): Stats {
@@ -204,7 +239,9 @@ function installFromNpm(version: string): string {
 	]
 	const proc = spawnSync('npm', npmArgs, { encoding: 'utf8' })
 	if (proc.status !== 0) {
-		throw new Error(`npm install ${PACKAGE}@${version} failed:\n${proc.stderr}`)
+		throw new Error(
+			`npm install ${PACKAGE}@${version} failed with ${exitReason(proc)}:\n${proc.stderr ?? ''}`,
+		)
 	}
 
 	return join(folder, 'node_modules', PACKAGE)
@@ -270,7 +307,9 @@ function spawnWorker(variant: Variant, inputIndex: number): WorkerResult {
 	]
 	const proc = spawnSync(process.execPath, nodeArgs, { encoding: 'utf8' })
 	if (proc.status !== 0) {
-		throw new Error(proc.stderr)
+		throw new Error(
+			`${variant.name} failed on "${inputs[inputIndex].name}" with ${exitReason(proc)}:\n${proc.stderr ?? ''}`,
+		)
 	}
 	const lines = proc.stdout.trim().split('\n')
 	return JSON.parse(lines[lines.length - 1]) as WorkerResult
