@@ -144,6 +144,15 @@ describe('write field functions', function () {
 			])
 		})
 
+		it('should write a positive number of 2^33 or more as a signed field of 8 bytes', function () {
+			const cursor = createIsoBoxWriteCursor()
+
+			// 2^40 + 7 has the high word 0x00000100 and the low word 7.
+			writeWideInt(cursor, 2 ** 40 + 7, 8)
+
+			assert.deepStrictEqual(written(cursor), [0, 0, 1, 0, 0, 0, 0, 7])
+		})
+
 		it('should throw a RangeError for a bigint that does not fit a signed field', function () {
 			assert.throws(
 				() => writeWideInt(createIsoBoxWriteCursor(), BigInt('0x80000000'), 4),

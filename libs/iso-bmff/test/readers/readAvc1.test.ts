@@ -9,7 +9,9 @@ import {
 	readStsd,
 	writeAvc1,
 	writeIsoBox,
+	type VisualSampleEntry,
 } from '../util/box.ts'
+import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('readAvc1', function () {
 	it('should correctly parse the box', function () {
@@ -88,5 +90,47 @@ describe('readAvc1', function () {
 
 		assert.ok(isIsoBoxType('avc1', box))
 		assert.strictEqual(box.compressorName, 'a'.repeat(31))
+	})
+
+	it('should read the values of the pre_defined fields and write the same bytes', function () {
+		// A QuickTime file has data in the pre_defined fields.
+		// Each value has the top bit set, so a signed read gives a negative number.
+		const bytes = boxBytes(
+			'avc1',
+			new Uint8Array(6),
+			[1, 2],
+			[0x8001, 2],
+			[0, 2],
+			[0x80000002, 4],
+			[0x80000003, 4],
+			[0x80000004, 4],
+			[640, 2],
+			[360, 2],
+			[0x480000, 4],
+			[0x480000, 4],
+			[0, 4],
+			[1, 2],
+			new Uint8Array(32),
+			[0x18, 2],
+			[0xffff, 2],
+		)
+		const box: VisualSampleEntry<'avc1'> = {
+			type: 'avc1',
+			dataReferenceIndex: 1,
+			preDefined1: 0x8001,
+			preDefined2: [0x80000002, 0x80000003, 0x80000004],
+			width: 640,
+			height: 360,
+			horizResolution: 72,
+			vertResolution: 72,
+			frameCount: 1,
+			compressorName: '',
+			depth: 0x18,
+			preDefined3: -1,
+			boxes: [],
+		}
+
+		assert.deepStrictEqual(readIsoBoxes(bytes, { readers: { avc1: readAvc1 } }), [box])
+		assert.deepStrictEqual(writeIsoBox(box, { writers: { avc1: writeAvc1 } }), bytes)
 	})
 })

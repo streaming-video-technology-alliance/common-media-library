@@ -33,6 +33,12 @@ describe('readStz2', function () {
 		assert.deepStrictEqual(box.entrySize, [1, 2, 3])
 	})
 
+	it('should read an even number of entries of 4 bits', function () {
+		const box = read(boxBytes('stz2', [0, 1], [0, 3], [0, 3], [4, 1], [4, 4], [0x12, 1], [0x34, 1]))
+
+		assert.deepStrictEqual(box.entrySize, [1, 2, 3, 4])
+	})
+
 	it('should return no entries for a field size that is not 4, 8, or 16', function () {
 		const box = read(boxBytes('stz2', [0, 1], [0, 3], [0, 3], [5, 1], [2, 4], [0xff, 1], [0xff, 1]))
 

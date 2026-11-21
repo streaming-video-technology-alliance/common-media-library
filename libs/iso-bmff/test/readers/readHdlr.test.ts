@@ -1,4 +1,15 @@
-import { assert, describe, findBox, isIsoBoxType, it, readHdlr, readIsoBoxes } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	findBox,
+	isIsoBoxType,
+	it,
+	readHdlr,
+	readIsoBoxes,
+	writeHdlr,
+	writeIsoBox,
+	type HandlerBox,
+} from '../util/box.ts'
 
 describe('readHdlr', function () {
 	it('should correctly parse the box', function () {
@@ -48,5 +59,28 @@ describe('readHdlr', function () {
 		assert.ok(isIsoBoxType('hdlr', hdlr))
 		assert.strictEqual(hdlr.handlerType, 'vide')
 		assert.strictEqual(hdlr.name, '')
+	})
+
+	it('should read the values of pre_defined and reserved and write the same bytes', function () {
+		// A QuickTime file has data in pre_defined and reserved.
+		// Each value has the top bit set, so a signed read gives a negative number.
+		// size (34), type, version and flags, pre_defined, handler_type (vide), reserved (3 values),
+		// the name 'a' and its terminator
+		const bytes = new Uint8Array([
+			0, 0, 0, 34, 104, 100, 108, 114, 0, 0, 0, 0, 0x80, 0, 0, 1, 118, 105, 100, 101, 0x80, 0, 0, 2,
+			0x80, 0, 0, 3, 0x80, 0, 0, 4, 0x61, 0,
+		])
+		const box: HandlerBox = {
+			type: 'hdlr',
+			version: 0,
+			flags: 0,
+			preDefined: 0x80000001,
+			handlerType: 'vide',
+			reserved: [0x80000002, 0x80000003, 0x80000004],
+			name: 'a',
+		}
+
+		assert.deepStrictEqual(readIsoBoxes(bytes, { readers: { hdlr: readHdlr } }), [box])
+		assert.deepStrictEqual(writeIsoBox(box, { writers: { hdlr: writeHdlr } }), bytes)
 	})
 })

@@ -251,6 +251,20 @@ describe('readChildBoxes', function () {
 		assert.strictEqual(readChildBoxes(cursor, 0).length, 0)
 	})
 
+	it('should not add to the nesting depth from one call to the next on one cursor', function () {
+		const boxes = Array.from({ length: 300 }, () => MFHD)
+		const cursor = createIsoBoxReadCursor(reduceUint8Arrays(boxes))
+		let count = 0
+
+		// 300 calls are more than the limit of 128 levels.
+		while (readChildBoxes(cursor, 1).length === 1) {
+			count++
+		}
+
+		assert.strictEqual(count, 300)
+		assert.strictEqual(cursor.pos, cursor.end)
+	})
+
 	it('should throw a RangeError for a negative count or NaN', function () {
 		assert.throws(() => readChildBoxes(createIsoBoxReadCursor(MFHD), -1), RangeError)
 		assert.throws(() => readChildBoxes(createIsoBoxReadCursor(MFHD), NaN), /NaN/)

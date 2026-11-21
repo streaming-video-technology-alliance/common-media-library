@@ -24,6 +24,32 @@ describe('writeSubs', function () {
 		)
 	})
 
+	it('should write a distinct value in each field of a version 1 box', function () {
+		const bytes = writeWith(writeSubs, {
+			type: 'subs',
+			version: 1,
+			flags: 0,
+			entries: [
+				{
+					sampleDelta: 2,
+					subsamples: [
+						{
+							subsampleSize: 70000,
+							subsamplePriority: 3,
+							discardable: 4,
+							codecSpecificParameters: 5,
+						},
+					],
+				},
+			],
+		})
+
+		assert.deepStrictEqual(
+			bytes,
+			boxBytes('subs', [1, 1], [0, 3], [1, 4], [2, 4], [1, 2], [70000, 4], [3, 1], [4, 1], [5, 4]),
+		)
+	})
+
 	it('should throw a RangeError for more than 65535 subsamples in one entry', function () {
 		const subsample = {
 			subsampleSize: 1,

@@ -391,4 +391,52 @@ describe('writeEmsg', function () {
 		assert.strictEqual(box.timescale, 1000)
 		assert.strictEqual(box.id, 7)
 	})
+
+	it('should write 0 for a missing presentationTimeDelta of a version 0 box', function () {
+		const bytes = writeWith(writeEmsg, {
+			type: 'emsg',
+			version: 0,
+			flags: 0,
+			schemeIdUri: 'a',
+			value: '',
+			timescale: 1,
+			eventDuration: 2,
+			id: 3,
+			messageData: new Uint8Array(),
+		})
+
+		// size (31), type, version and flags, 'a' and its terminator, the terminator of the empty
+		// value, timescale, presentation_time_delta, event_duration, id
+		assert.deepStrictEqual(
+			Array.from(bytes),
+			[
+				0, 0, 0, 31, 0x65, 0x6d, 0x73, 0x67, 0, 0, 0, 0, 0x61, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+				0, 2, 0, 0, 0, 3,
+			],
+		)
+	})
+
+	it('should write 0 for a missing presentationTime of a version 1 box', function () {
+		const bytes = writeWith(writeEmsg, {
+			type: 'emsg',
+			version: 1,
+			flags: 0,
+			schemeIdUri: 'a',
+			value: '',
+			timescale: 1,
+			eventDuration: 2,
+			id: 3,
+			messageData: new Uint8Array(),
+		})
+
+		// size (35), type, version and flags, timescale, presentation_time (8 bytes), event_duration,
+		// id, 'a' and its terminator, the terminator of the empty value
+		assert.deepStrictEqual(
+			Array.from(bytes),
+			[
+				0, 0, 0, 35, 0x65, 0x6d, 0x73, 0x67, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 2, 0, 0, 0, 3, 0x61, 0, 0,
+			],
+		)
+	})
 })
