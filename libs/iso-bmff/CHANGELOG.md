@@ -153,6 +153,7 @@ and this project adheres to
 - The summary of each reader and writer names the four-character type of its box. The summary of each box type uses one form and cites ISO/IEC 14496-12:2015 where that edition defines the box.
 - The documentation of the `mvhd`, `tkhd`, `mdhd`, `mehd`, `elst`, `mfro`, `tfhd`, and `tfra` fields states the units, the 1904 epoch, and the flags. Byte fields state that they are a view over the input.
 - 25 readers and writers and 7 other exports now link a test example. Each linked example declares its input, except the example of `writeIsoBoxes`.
+- `readIsoBoxes` and `readChildBoxes` are faster for a box with no reader, such as a container box or a raw box. The result does not change.
 - `traverseIsoBoxes` is faster. The largest gain is in breadth-first order over many sibling containers. The order of the boxes does not change ([#706](https://github.com/streaming-video-technology-alliance/common-media-library/pull/706)).
 - `writeCtts` and `writeTrun` now write the signed offset fields as signed integers, as `readCtts` and `readTrun` read them. The written bytes do not change.
 - `IsoBoxType` is now declared as `string`. The type accepts the same values as before. The documentation states that TypeScript does not check the length of a box type.
