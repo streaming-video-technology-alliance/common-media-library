@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-11-20
+
 ### Changed
 
 - The README now has a When to use section. The section names the tasks that the package covers and the entry point of each task.
@@ -16,6 +18,7 @@ and this project adheres to
 ### Fixed
 
 - The published package includes `NOTICE.md`.
+- `parseXml` is faster on long text nodes and on long attribute values. Versions 1.2.0 to 1.2.2 are slower than 1.1.6 on these inputs (#752).
 
 ## [1.2.2] - 2026-10-18
 
@@ -114,7 +117,8 @@ and this project adheres to
 - Convert to mono-repo ([#238](https://github.com/streaming-video-technology-alliance/common-media-library/issues/238))
 - Produce single bundled export for each package ([#260](https://github.com/streaming-video-technology-alliance/common-media-library/issues/260))
 
-[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.2...HEAD
+[Unreleased]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.3...HEAD
+[1.2.3]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.2...xml-v1.2.3
 [1.2.2]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.1...xml-v1.2.2
 [1.2.1]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.2.0...xml-v1.2.1
 [1.2.0]: https://github.com/streaming-video-technology-alliance/common-media-library/compare/xml-v1.1.6...xml-v1.2.0
