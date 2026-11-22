@@ -18,7 +18,7 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  *
  * The result types of the readers map apply only to the boxes at the top level.
  * A child in a `boxes` field has the type `ParsedIsoBox`, also for a child with a custom reader.
- * Cast such a child to the result type of its reader.
+ * Narrow such a child with `isIsoBoxType` and the result type of its reader as the type argument.
  *
  * The function stops before a box if the data ends inside the header or the body of that box.
  * The function also stops before a box with a size below the size of its header.

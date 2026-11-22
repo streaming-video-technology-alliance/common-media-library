@@ -10,6 +10,8 @@ import type { IsoRawBox } from './IsoRawBox.ts'
  * The union has the return type of each reader in the map, the container types, and `IsoRawBox`.
  * A built-in box type with no reader in the map is not in the union, because such a box is a raw box.
  * A container type whose reader the map replaces is not in the union either.
+ * A reader with a declared result of only the `type` of a built-in box adds the built-in box type.
+ * A spread of the readers of `createDefaultReaderConfig` gives such readers.
  * A `url` or `urn` key also replaces `'url '` or `'urn '`.
  * When a key is not a literal, such as `string` from a computed key, the union has every built-in box type.
  * A reader result with a `type` field that is not a literal, such as `string`, adds no member to the union.
@@ -33,7 +35,9 @@ export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> =
 								? [IsoBoxMap<IsoInt64>[N]] extends [B]
 									? IsoBoxMap<V>[N]
 									: B
-								: B
+								: [{ type: N }] extends [B]
+									? IsoBoxMap<V>[N]
+									: B
 							: [B] extends [{ type: infer N extends string }]
 								? string extends N
 									? never

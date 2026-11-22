@@ -528,3 +528,9 @@ Amended on 2026-11-18, by the review of phase 2 ([#729](https://github.com/strea
 
 - **Result type rule 1.** The result types of a readers map apply only to the top level of the result of `readIsoBoxes`. The element type of every `boxes` field is `ParsedIsoBox<V>`, the built-in box types and `IsoRawBox`. A child with a custom reader has that type too. Code that reads such a child casts it to the result type of its reader. Box types that are generic in the element type of `boxes` would change every box type with child boxes.
 - **Changes to accepted RFCs.** The table has no row for the container readers. A container reader of the [container RFC](iso-bmff-container-readers-writers.md) takes a read cursor in place of an `IsoBoxReadView`. The amendment of that RFC states the change.
+
+Amended on 2026-11-22, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
+
+- **Result type rule 1.** A cast of a child to the result type of its reader does not compile, because no member of `ParsedIsoBox<V>` overlaps a custom type. `isIsoBoxType` has a third signature that takes a box type as the type argument, such as `isIsoBoxType<AvcCBox>('avcC', child)`. Code that reads a child with a custom reader narrows the child with that signature. A call with no type argument does not compile.
+- **Result type rule 2.** The first signature of `isIsoBoxType` does not change. It narrows the result of a custom reader under a built-in key to the built-in box type. The third signature narrows that result to the type of the custom reader.
+- **Result type rule 1.** A reader with a declared result of only the `type` of a built-in box adds the built-in box type to the result type. A readers map that spreads the readers of `createDefaultReaderConfig` therefore keeps the built-in box types.

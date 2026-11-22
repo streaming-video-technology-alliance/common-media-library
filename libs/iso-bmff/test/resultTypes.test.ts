@@ -2,6 +2,7 @@ import { expectType, type Equal } from './util/expectType.ts'
 import { load } from './util/load.ts'
 import {
 	assert,
+	createDefaultReaderConfig,
 	createIsoBoxReadCursor,
 	createIsoBoxWriteCursor,
 	describe,
@@ -14,14 +15,19 @@ import {
 	readMfhd,
 	readStsd,
 	readTref,
+	readUint24,
 	readUint32,
+	readUint64,
+	readUint8,
 	writeIsoBoxes,
 	writeMfhd,
 	type AudioSampleEntry,
+	type FileTypeBox,
 	type IsoBoxMap,
 	type IsoBoxReadCursor,
 	type IsoBoxReaderMap,
 	type IsoBoxWriterMap,
+	type IsoInt64,
 	type IsoRawBox,
 	type MetaBox,
 	type MovieBox,
@@ -96,6 +102,96 @@ describe('result types', function () {
 		type Reference = import('@svta/cml-iso-bmff').TrackReferenceTypeBox
 
 		expectType<[NoArgument, Child, Reference] | null>(null)
+	})
+
+	it('should keep the built-in box types for a spread of the default readers', function () {
+		const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
+			type: 'abcd' as const,
+			count: readUint32(cursor),
+		})
+		const boxes = readIsoBoxes(load('captions.mp4'), {
+			readers: { ...createDefaultReaderConfig().readers, abcd: readAbcd },
+		})
+
+		expectType<Equal<(typeof boxes)[number], ParsedIsoBox | { type: 'abcd'; count: number }>>(true)
+
+		let brand = ''
+		for (const box of boxes) {
+			if (box.type === 'ftyp' && !('bytes' in box)) {
+				expectType<Equal<typeof box, FileTypeBox>>(true)
+				brand = box.majorBrand
+			}
+
+			if (isContainer(box) && box.type === 'meta') {
+				expectType<Equal<typeof box, MetaBox>>(true)
+			}
+		}
+
+		assert.strictEqual(brand.length, 4)
+	})
+
+	it('should narrow a value to the type argument of isIsoBoxType', function () {
+		type AbcdBox = { type: 'abcd'; count: number }
+		const child: ParsedIsoBox | undefined = {
+			type: 'abcd',
+			bytes: new Uint8Array(8),
+			headerSize: 8,
+		}
+		const value: unknown = child
+
+		if (isIsoBoxType<AbcdBox>('abcd', child)) {
+			expectType<number>(child.count)
+		}
+
+		if (isIsoBoxType<AbcdBox>('abcd', value)) {
+			expectType<Equal<typeof value, AbcdBox>>(true)
+		}
+
+		assert.strictEqual(isIsoBoxType<AbcdBox>('abcd', child), false)
+	})
+
+	it('should narrow the result of a custom reader under a built-in key to the type argument', function () {
+		const readTfdt64 = (cursor: IsoBoxReadCursor) => {
+			const version = readUint8(cursor)
+			const flags = readUint24(cursor)
+			const baseMediaDecodeTime = version === 1 ? readUint64(cursor) : BigInt(readUint32(cursor))
+			return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime }
+		}
+		type Tfdt64 = ReturnType<typeof readTfdt64>
+
+		// A tfdt box of version 0 with the time 9
+		const data = new Uint8Array([0, 0, 0, 16, 0x74, 0x66, 0x64, 0x74, 0, 0, 0, 0, 0, 0, 0, 9])
+		const [box] = readIsoBoxes(data, { readers: { tfdt: readTfdt64 } })
+
+		let time = BigInt(0)
+		if (isIsoBoxType<Tfdt64>('tfdt', box)) {
+			expectType<Equal<typeof box, Tfdt64>>(true)
+			time = box.baseMediaDecodeTime
+		}
+
+		assert.strictEqual(time, BigInt(9))
+	})
+
+	it('should reject a wrong call of isIsoBoxType', function () {
+		type AbcdBox = { type: 'abcd'; count: number }
+		const child: ParsedIsoBox | undefined = {
+			type: 'abcd',
+			bytes: new Uint8Array(8),
+			headerSize: 8,
+		}
+
+		const results = [
+			// @ts-expect-error The package does not name the type, and the call has no type argument.
+			isIsoBoxType('tfdd', child),
+			// @ts-expect-error A custom type needs the type argument.
+			isIsoBoxType('abcd', child),
+			// @ts-expect-error The type does not match the type argument.
+			isIsoBoxType<AbcdBox>('abce', child),
+			// @ts-expect-error The type argument has no type field.
+			isIsoBoxType<{ count: number }>('abcd', child),
+		]
+
+		assert.deepStrictEqual(results, [false, false, false, false])
 	})
 
 	it('should reject a reader or a writer under the key of another box type', function () {

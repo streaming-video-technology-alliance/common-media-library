@@ -251,6 +251,11 @@ export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = num
 export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T];
 
 // @public
+export function isIsoBoxType<B extends {
+    type: IsoBoxType;
+} = never>(type: B["type"], box: unknown): box is B;
+
+// @public
 export type IsoBox<V extends IsoInt64 = number> = IsoBoxMap<V>[keyof IsoBoxMap<V>];
 
 // @public
@@ -430,7 +435,9 @@ export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxM
 // @public
 export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? 0 extends 1 & B ? B : [B] extends [{
         type: infer N extends keyof IsoBoxMap;
-    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : [B] extends [{
+    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : [{
+        type: N;
+    }] extends [B] ? IsoBoxMap<V>[N] : B : [B] extends [{
         type: infer N extends string;
     }] ? string extends N ? never : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
     type: R;

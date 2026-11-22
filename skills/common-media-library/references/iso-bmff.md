@@ -94,7 +94,7 @@ The compiler reports most changes. The tables in this guide list each change and
 - A box with no reader and a type outside `CONTAINERS` is a raw box. `bytes` is the complete box, with its header. The body is `box.bytes.subarray(box.headerSize)`. The bytes share memory with the input.
 - A box object has only `type` and its fields. The fields `view`, `size`, `largesize`, and `usertype` do not exist.
 - A test of `box.type` does not exclude a raw box, because a raw box can have any type. Narrow a box with `isIsoBoxType`.
-- The result types of a custom readers map apply only to the boxes at the top level. A child in a `boxes` field has the type `ParsedIsoBox`. Cast a child with a custom reader to the result type of that reader.
+- The result types of a custom readers map apply only to the boxes at the top level. A child in a `boxes` field has the type `ParsedIsoBox`. Narrow a child with a custom reader with `isIsoBoxType` and the result type of that reader as the type argument, such as `isIsoBoxType<AvcCBox>("avcC", child)`.
 
 ```typescript
 import { findIsoBox, isIsoBoxType, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
@@ -556,6 +556,46 @@ The cursor follows these rules:
 
 `readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
 
+### A custom reader for a child box
+
+A child in a `boxes` field has the type `ParsedIsoBox`, also for a child with a custom reader. `isIsoBoxType` takes the result type of the reader as a type argument and narrows the child to that type. The function returns `false` for a raw box, so the fields exist when the function returns `true`:
+
+```typescript
+import {
+	findIsoBox,
+	isIsoBoxType,
+	readAvc1,
+	readBytes,
+	readIsoBoxes,
+	readStsd,
+	readUint8,
+	type IsoBoxReadCursor,
+	type IsoInt64,
+} from "@svta/cml-iso-bmff";
+
+// The first fields of the AVC configuration, ISO/IEC 14496-15.
+const readAvcC = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
+	type: "avcC" as const,
+	configurationVersion: readUint8(cursor),
+	profileIndication: readUint8(cursor),
+	profileCompatibility: readUint8(cursor),
+	levelIndication: readUint8(cursor),
+	parameterSets: readBytes(cursor, cursor.end - cursor.pos),
+});
+type AvcCBox = ReturnType<typeof readAvcC>;
+
+const boxes = readIsoBoxes(buffer, {
+	readers: { stsd: readStsd, avc1: readAvc1, avcC: readAvcC },
+});
+
+const avc1 = findIsoBox(boxes, (box) => isIsoBoxType("avc1", box));
+const avcC = avc1?.boxes.find((box) => isIsoBoxType<AvcCBox>("avcC", box));
+
+console.log(avcC?.profileIndication);
+```
+
+A call with a type that the package does not name and with no type argument is a compile error.
+
 `readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
 
 ## Incomplete boxes
@@ -782,6 +822,7 @@ If your code needs the exact value of one field only, a custom reader can call `
 
 ```typescript
 import {
+	isIsoBoxType,
 	readIsoBoxes,
 	readUint24,
 	readUint32,
@@ -803,7 +844,17 @@ const boxes = readIsoBoxes(buffer, {
 		tfdt: readTfdt64,
 	},
 });
+
+type Tfdt64 = ReturnType<typeof readTfdt64>;
+
+for (const box of boxes) {
+	if (isIsoBoxType<Tfdt64>("tfdt", box)) {
+		console.log(box.baseMediaDecodeTime); // a bigint
+	}
+}
 ```
+
+The reader replaces a built-in reader, so the guard needs the type argument. Without it, `isIsoBoxType("tfdt", box)` narrows to the built-in box type, and TypeScript then reads the field as a `number`.
 
 The built-in writers write a `bigint` field with the exact value. See [Writing 64-bit fields](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md#writing-64-bit-fields).
 
@@ -1506,6 +1557,11 @@ export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = num
 export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T];
 
 // @public
+export function isIsoBoxType<B extends {
+    type: IsoBoxType;
+} = never>(type: B["type"], box: unknown): box is B;
+
+// @public
 export type IsoBox<V extends IsoInt64 = number> = IsoBoxMap<V>[keyof IsoBoxMap<V>];
 
 // @public
@@ -1685,7 +1741,9 @@ export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxM
 // @public
 export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? 0 extends 1 & B ? B : [B] extends [{
         type: infer N extends keyof IsoBoxMap;
-    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : [B] extends [{
+    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : [{
+        type: N;
+    }] extends [B] ? IsoBoxMap<V>[N] : B : [B] extends [{
         type: infer N extends string;
     }] ? string extends N ? never : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
     type: R;
