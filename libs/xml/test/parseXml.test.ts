@@ -296,6 +296,112 @@ describe('parseXml', () => {
 		})
 	})
 
+	describe('long attribute values', () => {
+		it('parses values of 0 to 40 characters and of 300 characters', () => {
+			for (const length of [...Array(41).keys(), 300]) {
+				const value = 'v'.repeat(length)
+				const doc = parseXml(`<a b="${value}" c='${value}' d="e"/>`)
+				deepStrictEqual(doc.childNodes[0].attributes, { b: value, c: value, d: 'e' })
+			}
+		})
+
+		it('unescapes an entity at the start and at the end of values of 5 to 45 characters', () => {
+			for (let length = 0; length <= 40; length++) {
+				const filler = 'v'.repeat(length)
+				const doc = parseXml(`<a b="&amp;${filler}" c='${filler}&amp;'/>`)
+				deepStrictEqual(doc.childNodes[0].attributes, { b: `&${filler}`, c: `${filler}&` })
+			}
+		})
+
+		it('unescapes an entity at every position of a long value', () => {
+			for (let index = 0; index <= 40; index++) {
+				const before = 'v'.repeat(index)
+				const after = 'w'.repeat(40 - index)
+				const doc = parseXml(`<a b="${before}&amp;${after}"/>`)
+				strictEqual(doc.childNodes[0].attributes['b'], `${before}&${after}`)
+			}
+		})
+
+		it('keeps the other quote character inside a long value', () => {
+			const value = 'v'.repeat(20) + '"' + 'w'.repeat(20)
+			const doc = parseXml(`<a b='${value}' c="d"/>`)
+			deepStrictEqual(doc.childNodes[0].attributes, { b: value, c: 'd' })
+		})
+
+		it('throws when the input ends inside a value of 0 to 40 characters or of 300 characters', () => {
+			for (const length of [...Array(41).keys(), 300]) {
+				const value = 'v'.repeat(length)
+				throws(() => parseXml(`<a b="${value}`), /Missing closing quote/)
+				throws(() => parseXml(`<a b='${value}`), /Missing closing quote/)
+			}
+		})
+
+		it('parses the element that follows a long value', () => {
+			const value = 'v'.repeat(300)
+			const doc = parseXml(`<a b="${value}"><c d="${value}"/>text</a>`)
+			const a = doc.childNodes[0]
+
+			strictEqual(a.attributes['b'], value)
+			strictEqual(a.childNodes[0].attributes['d'], value)
+			strictEqual(a.childNodes[1].nodeValue, 'text')
+		})
+	})
+
+	describe('long text', () => {
+		const text = 't'.repeat(300)
+
+		it('parses long text between elements', () => {
+			const doc = parseXml(`<a><b>${text}</b><c>${text}</c></a>`)
+			const a = doc.childNodes[0]
+
+			strictEqual(a.childNodes[0].childNodes[0].nodeValue, text)
+			strictEqual(a.childNodes[1].childNodes[0].nodeValue, text)
+		})
+
+		it('trims the whitespace around long text', () => {
+			const doc = parseXml(`<a>\n\t  ${text}  \r\n</a>`)
+			strictEqual(doc.childNodes[0].childNodes[0].nodeValue, text)
+		})
+
+		it('keeps the whitespace around long text with keepWhitespace', () => {
+			const doc = parseXml(`<a>\n\t  ${text}  \r\n</a>`, { keepWhitespace: true })
+			strictEqual(doc.childNodes[0].childNodes[0].nodeValue, `\n\t  ${text}  \r\n`)
+		})
+
+		it('unescapes an entity after leading whitespace and long text', () => {
+			const doc = parseXml(`<a>  ${text}&lt;${text}&amp;</a>`)
+			strictEqual(doc.childNodes[0].childNodes[0].nodeValue, `${text}<${text}&`)
+		})
+
+		it('keeps long text at the end of the input', () => {
+			const doc = parseXml(`<a>  ${text}`)
+			strictEqual(doc.childNodes[0].childNodes[0].nodeValue, text)
+		})
+
+		it('drops whitespace between elements and at the end of the input', () => {
+			const doc = parseXml('<a>\n  <b/>\n  <c/>\n</a>\n  ')
+			deepStrictEqual(
+				doc.childNodes[0].childNodes.map(node => node.nodeName),
+				['b', 'c'],
+			)
+			strictEqual(doc.childNodes.length, 1)
+		})
+
+		it('keeps whitespace between elements with keepWhitespace', () => {
+			const doc = parseXml('<a>\n  <b/> </a>\n', { keepWhitespace: true })
+			deepStrictEqual(
+				doc.childNodes[0].childNodes.map(node => node.nodeValue),
+				['\n  ', null, ' '],
+			)
+			strictEqual(doc.childNodes[1].nodeValue, '\n')
+		})
+
+		it('unescapes an entity between whitespace with keepWhitespace', () => {
+			const doc = parseXml('<a>  &#32;  </a>', { keepWhitespace: true })
+			strictEqual(doc.childNodes[0].childNodes[0].nodeValue, '     ')
+		})
+	})
+
 	describe('truncated input', () => {
 		it('parses a complete XML declaration followed by markup', async () => {
 			const doc = await parseXmlGuarded(

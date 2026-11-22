@@ -1,0 +1,35 @@
+name: XML Benchmark
+
+on:
+  pull_request:
+    paths:
+      - 'libs/xml/src/**'
+      - 'libs/xml/bench/**'
+      - '.github/workflows/xml-bench.pr.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  xml_bench:
+    concurrency:
+      group: xml-bench-${{ github.ref }}
+      cancel-in-progress: true
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build -w libs/utils -w libs/xml
+
+      - name: parseXml is not slower than the latest release
+        run: npm run bench -w libs/xml -- --baseline=npm --threshold=20
