@@ -12,6 +12,8 @@ import type { FreeSpaceBox } from '../boxes/FreeSpaceBox.ts'
  * @param cursor - The write cursor
  * @param box - The `FreeSpaceBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeFree(cursor: IsoBoxWriteCursor, box: FreeSpaceBox<'free'>): void {

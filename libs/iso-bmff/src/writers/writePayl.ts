@@ -10,6 +10,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `WebVttCuePayloadBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @example
  * {@includeCode ../../test/writers/writePayl.test.ts#example}
  *

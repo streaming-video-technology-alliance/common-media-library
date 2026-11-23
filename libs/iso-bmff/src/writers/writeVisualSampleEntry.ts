@@ -2,6 +2,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { beginIsoBox } from '../beginIsoBox.ts'
 import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
 import type { VisualSampleEntryType } from '../boxes/VisualSampleEntryType.ts'
+import { writeInt16 } from '../cursor/writeInt16.ts'
 import { writeTemplate32 } from '../cursor/writeTemplate32.ts'
 import { writeUint16 } from '../cursor/writeUint16.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
@@ -19,6 +20,8 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  *
  * @param cursor - The write cursor
  * @param box - The `VisualSampleEntry` fields to write
+ *
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
@@ -48,7 +51,7 @@ export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualS
 	writeCompressorName(cursor, box.compressorName)
 
 	writeUint16(cursor, box.depth)
-	writeUint16(cursor, (box.preDefined3 ?? -1) & 0xffff)
+	writeInt16(cursor, box.preDefined3 ?? -1)
 	writeChildBoxes(cursor, box.boxes)
 	endIsoBox(cursor, start)
 }

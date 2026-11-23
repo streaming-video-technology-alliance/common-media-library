@@ -132,6 +132,16 @@ describe('read field functions', function () {
 		it('should throw a RangeError for a length past the end', function () {
 			assert.throws(() => readBytes(cursorOf([0x01, 0x02]), 3), RangeError)
 		})
+
+		it('should throw a RangeError for a length that is not an integer and keep the position', function () {
+			const cursor = cursorOf([1, 2, 3, 4, 5, 6, 7, 8])
+
+			assert.throws(() => readBytes(cursor, 2.5), {
+				name: 'RangeError',
+				message: 'Cannot read 2.5 bytes at position 0: the box ends at 8',
+			})
+			assert.strictEqual(cursor.pos, 0)
+		})
 	})
 
 	describe('readUtf8', function () {
@@ -155,6 +165,16 @@ describe('read field functions', function () {
 
 		it('should throw a RangeError for a negative length', function () {
 			assert.throws(() => readUtf8(cursorOf([0x61]), -1), RangeError)
+		})
+
+		it('should throw a RangeError for a length that is not an integer and keep the position', function () {
+			const cursor = cursorOf([0x61, 0x62, 0x63])
+
+			assert.throws(() => readUtf8(cursor, 1.5), {
+				name: 'RangeError',
+				message: 'Cannot read 1.5 bytes at position 0: the box ends at 3',
+			})
+			assert.strictEqual(cursor.pos, 0)
 		})
 	})
 

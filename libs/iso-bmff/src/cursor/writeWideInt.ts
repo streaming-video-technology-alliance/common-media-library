@@ -1,5 +1,7 @@
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import { checkInteger } from './checkInteger.ts'
 import { reserve } from './reserve.ts'
+import { writeInt32 } from './writeInt32.ts'
 import { writeUint32 } from './writeUint32.ts'
 
 /**
@@ -14,6 +16,7 @@ import { writeUint32 } from './writeUint32.ts'
  * @param size - The size of the field in bytes.
  *
  * @throws RangeError if `value` is a `bigint` that does not fit in `size` bytes. The cursor does not move.
+ * @throws RangeError if `value` is a `number` that is not an integer of the field range. The cursor does not move.
  *
  * @example
  * {@includeCode ../../test/writeFields.test.ts#example}
@@ -28,18 +31,19 @@ export function writeWideInt(cursor: IsoBoxWriteCursor, value: number | bigint, 
 
 		if (size === 8) {
 			const pos = reserve(cursor, 8)
-
 			cursor.view.setBigInt64(pos, value)
 			return
 		}
 
 		value = Number(value)
 	} else if (size === 8) {
-		const high = Math.floor(value / 0x100000000)
+		checkInteger('writeWideInt: value', value, -(2 ** 63), 2 ** 63 - 1024)
 
-		writeUint32(cursor, high)
-		value -= high * 0x100000000
+		const high = Math.floor(value / 0x100000000)
+		writeInt32(cursor, high)
+		writeUint32(cursor, value - high * 0x100000000)
+		return
 	}
 
-	writeUint32(cursor, value)
+	writeInt32(cursor, value)
 }

@@ -528,3 +528,9 @@ Amended on 2026-11-18, by the review of phase 2 ([#729](https://github.com/strea
 
 - **Result type rule 1.** The result types of a readers map apply only to the top level of the result of `readIsoBoxes`. The element type of every `boxes` field is `ParsedIsoBox<V>`, the built-in box types and `IsoRawBox`. A child with a custom reader has that type too. Code that reads such a child casts it to the result type of its reader. Box types that are generic in the element type of `boxes` would change every box type with child boxes.
 - **Changes to accepted RFCs.** The table has no row for the container readers. A container reader of the [container RFC](iso-bmff-container-readers-writers.md) takes a read cursor in place of an `IsoBoxReadView`. The amendment of that RFC states the change.
+
+Amended on 2026-11-22, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
+
+- **Count fields, rule 2, and the flags rule.** A field that a flag or the version selects must have a value. The writer throws a `RangeError` for a missing value and does not write 0. Examples are `sampleDuration` of `trun` with the flag 0x100, and `entryCount` of `ctts` of version 2 or above. A field with a default in the specification, such as `pre_defined`, stays optional.
+- **Read cursor.** A length is an integer of 0 or more. A length that is not an integer throws the `RangeError` of a read past `cursor.end`, and the cursor does not move. A read with such a length left a position that is not an integer, and every later read in the process was slower.
+- **Write field functions.** Each function throws a `RangeError` for a value that its field cannot hold, and the cursor does not move. The [box types RFC](iso-bmff-v2-box-types.md) states the rules.

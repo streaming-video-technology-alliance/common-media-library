@@ -55,7 +55,35 @@ describe('readAvc1', function () {
 		assert.strictEqual(box.vertResolution, 300.25)
 	})
 
-	it('should cut a long compressor name at a character boundary and read it back', function () {
+	it('should write a compressor name of 31 bytes in UTF-8 and read it back', function () {
+		// 15 characters of 2 bytes, then 1 character of 1 byte.
+		const box = {
+			type: 'avc1' as const,
+			dataReferenceIndex: 1,
+			width: 640,
+			height: 360,
+			horizResolution: 72,
+			vertResolution: 72,
+			frameCount: 1,
+			compressorName: 'é'.repeat(15) + 'a',
+			depth: 0x18,
+			boxes: [],
+		}
+		const bytes = writeIsoBox(box, { writers: { avc1: writeAvc1 } })
+		const [read] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
+
+		// The length byte is at the offset 50, and the 31 bytes of the name follow it.
+		assert.strictEqual(bytes[50], 31)
+		assert.deepStrictEqual(Array.from(bytes.subarray(51, 82)), [
+			...new Array<number[]>(15).fill([0xc3, 0xa9]).flat(),
+			0x61,
+		])
+		assert.ok(isIsoBoxType('avc1', read))
+		assert.strictEqual(read.compressorName, 'é'.repeat(15) + 'a')
+	})
+
+	it('should throw a RangeError for a compressor name of 32 bytes in UTF-8', function () {
+		// 16 characters of 2 bytes.
 		const box = {
 			type: 'avc1' as const,
 			dataReferenceIndex: 1,
@@ -68,13 +96,31 @@ describe('readAvc1', function () {
 			depth: 0x18,
 			boxes: [],
 		}
-		const bytes = writeIsoBox(box, { writers: { avc1: writeAvc1 } })
-		const [read] = readIsoBoxes(bytes, { readers: { avc1: readAvc1 } })
 
-		assert.strictEqual(bytes[50], 30)
-		assert.deepStrictEqual(bytes.subarray(81, 82), new Uint8Array(1))
-		assert.ok(isIsoBoxType('avc1', read))
-		assert.strictEqual(read.compressorName, 'é'.repeat(15))
+		assert.throws(
+			() => writeIsoBox(box, { writers: { avc1: writeAvc1 } }),
+			/^RangeError: .*compressorName.* received éééééééééééééééé$/,
+		)
+	})
+
+	it('should throw a RangeError for a compressor name that is not a string', function () {
+		const box = {
+			type: 'avc1' as const,
+			dataReferenceIndex: 1,
+			width: 640,
+			height: 360,
+			horizResolution: 72,
+			vertResolution: 72,
+			frameCount: 1,
+			compressorName: undefined as never,
+			depth: 0x18,
+			boxes: [],
+		}
+
+		assert.throws(
+			() => writeIsoBox(box, { writers: { avc1: writeAvc1 } }),
+			/^RangeError: .*compressorName.* received undefined$/,
+		)
 	})
 
 	it('should read at most 31 bytes for a length byte above 31', function () {

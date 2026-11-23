@@ -11,7 +11,6 @@ import {
 	type ProtectionSystemSpecificHeaderBox,
 } from '../util/box.ts'
 import { KID_A, KID_B, psshBox, SYSTEM_ID } from '../util/psshBoxes.ts'
-import { boxBytes } from '../util/wideBoxes.ts'
 
 function pssh(version: number, kid: number[][]): ProtectionSystemSpecificHeaderBox {
 	return {
@@ -94,29 +93,33 @@ describe('writePssh', function () {
 		})
 	}
 
-	it('should write 16 bytes for a short or a long systemId and key ID', function () {
-		const short = new Uint8Array(SYSTEM_ID.slice(0, 15))
-		const long = new Uint8Array([...KID_A, 0xff])
-		const writer = writeWith(writePssh, {
-			type: 'pssh',
-			version: 1,
-			flags: 0,
-			systemId: short,
-			kid: [long],
-			data: new Uint8Array(),
-		})
+	it('should throw a RangeError for a systemId of 15 bytes', function () {
+		const box = { ...pssh(1, [KID_A]), systemId: new Uint8Array(15).fill(0xaa) }
 
-		assert.deepStrictEqual(
-			new Uint8Array(writer.buffer),
-			boxBytes(
-				'pssh',
-				[1, 1],
-				[0, 3],
-				new Uint8Array([...SYSTEM_ID.slice(0, 15), 0]),
-				[1, 4],
-				new Uint8Array(KID_A),
-				[0, 4],
-			),
+		assert.throws(
+			() => writeWith(writePssh, box),
+			/^RangeError: .*systemId.* received 170(,170){14}$/,
 		)
+	})
+
+	it('should throw a RangeError for a systemId of 17 bytes', function () {
+		const box = { ...pssh(1, [KID_A]), systemId: new Uint8Array(17).fill(0xaa) }
+
+		assert.throws(
+			() => writeWith(writePssh, box),
+			/^RangeError: .*systemId.* received 170(,170){16}$/,
+		)
+	})
+
+	it('should throw a RangeError for a key ID of 15 bytes', function () {
+		const box = pssh(1, [KID_A, KID_A.slice(0, 15)])
+
+		assert.throws(() => writeWith(writePssh, box), /^RangeError: .*kid.* received 17(,17){14}$/)
+	})
+
+	it('should throw a RangeError for a key ID of 17 bytes', function () {
+		const box = pssh(1, [[...KID_A, 0xff]])
+
+		assert.throws(() => writeWith(writePssh, box), /^RangeError: .*kid.* received 17(,17){15},255$/)
 	})
 })
