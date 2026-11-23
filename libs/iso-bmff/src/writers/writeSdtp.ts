@@ -12,6 +12,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SampleDependencyTypeBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeSdtp(cursor: IsoBoxWriteCursor, box: SampleDependencyTypeBox): void {

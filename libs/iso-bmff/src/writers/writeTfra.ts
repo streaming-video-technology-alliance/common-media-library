@@ -8,6 +8,7 @@ import { writeUint24 } from '../cursor/writeUint24.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
 import { writeWideUint } from '../cursor/writeWideUint.ts'
 import { endIsoBox } from '../endIsoBox.ts'
+import { checkUint } from '../cursor/checkUint.ts'
 
 /**
  * Write the `tfra` box (`TrackFragmentRandomAccessBox`).
@@ -20,15 +21,17 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `TrackFragmentRandomAccessBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeTfra(
 	cursor: IsoBoxWriteCursor,
 	box: TrackFragmentRandomAccessBox<IsoInt64>,
 ): void {
-	const traf = box.lengthSizeOfTrafNum & 0x3
-	const trun = box.lengthSizeOfTrunNum & 0x3
-	const sample = box.lengthSizeOfSampleNum & 0x3
+	const traf = checkUint('lengthSizeOfTrafNum', box.lengthSizeOfTrafNum, 3)
+	const trun = checkUint('lengthSizeOfTrunNum', box.lengthSizeOfTrunNum, 3)
+	const sample = checkUint('lengthSizeOfSampleNum', box.lengthSizeOfSampleNum, 3)
 	const size = box.version === 1 ? 8 : 4
 	const start = beginIsoFullBox(cursor, 'tfra', box.version, box.flags)
 

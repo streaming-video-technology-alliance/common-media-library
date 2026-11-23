@@ -1,4 +1,4 @@
-import { writeIsoBox, writeTfhd } from '@svta/cml-iso-bmff'
+import { writeIsoBox, writeTfhd, type TrackFragmentHeaderBox } from '@svta/cml-iso-bmff'
 import assert from 'node:assert'
 import { describe, it } from 'vite-plus/test'
 import { boxBytes } from '../util/wideBoxes.ts'
@@ -76,14 +76,34 @@ describe('writeTfhd', function () {
 		)
 	})
 
-	it('should write 0 for each field that the flags name and the box does not have', function () {
-		const bytes = writeWith(writeTfhd, { type: 'tfhd', version: 0, flags: 0x3b, trackId: 1 })
+	// Each line: a field that the flags 0x00003b name, and the field function that writes it.
+	for (const [field, name] of [
+		['baseDataOffset', 'writeWideUint'],
+		['sampleDescriptionIndex', 'writeUint32'],
+		['defaultSampleDuration', 'writeUint32'],
+		['defaultSampleSize', 'writeUint32'],
+		['defaultSampleFlags', 'writeUint32'],
+	] as const) {
+		it(`should throw a RangeError when the flags name ${field} and the box has no value`, function () {
+			const box: TrackFragmentHeaderBox = {
+				type: 'tfhd',
+				version: 0,
+				flags: 0x3b,
+				trackId: 1,
+				baseDataOffset: 2,
+				sampleDescriptionIndex: 3,
+				defaultSampleDuration: 4,
+				defaultSampleSize: 5,
+				defaultSampleFlags: 6,
+				[field]: undefined,
+			}
 
-		assert.deepStrictEqual(
-			bytes,
-			boxBytes('tfhd', [0, 1], [0x3b, 3], [1, 4], [0, 8], [0, 4], [0, 4], [0, 4], [0, 4]),
-		)
-	})
+			assert.throws(
+				() => writeWith(writeTfhd, box),
+				new RegExp(`^RangeError: .*${name}.* received undefined$`),
+			)
+		})
+	}
 
 	it('should not write a field that the flags do not name', function () {
 		const bytes = writeWith(writeTfhd, {

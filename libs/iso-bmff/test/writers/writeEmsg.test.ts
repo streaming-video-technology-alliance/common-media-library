@@ -370,73 +370,61 @@ describe('writeEmsg', function () {
 		})
 	}
 
-	it('should end a string at the first U+0000', function () {
-		const bytes = writeWith(writeEmsg, {
-			type: 'emsg',
-			version: 0,
-			flags: 0,
-			schemeIdUri: 'a\0b',
-			value: '',
-			timescale: 1000,
-			presentationTimeDelta: 0,
-			eventDuration: 0,
-			id: 7,
-			messageData: new Uint8Array(),
-		})
-		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
-
-		assert.deepStrictEqual(Array.from(bytes.subarray(12, 15)), [0x61, 0, 0])
-		assert.ok(isIsoBoxType('emsg', box))
-		assert.strictEqual(box.schemeIdUri, 'a')
-		assert.strictEqual(box.timescale, 1000)
-		assert.strictEqual(box.id, 7)
-	})
-
-	it('should write 0 for a missing presentationTimeDelta of a version 0 box', function () {
-		const bytes = writeWith(writeEmsg, {
-			type: 'emsg',
-			version: 0,
-			flags: 0,
-			schemeIdUri: 'a',
-			value: '',
-			timescale: 1,
-			eventDuration: 2,
-			id: 3,
-			messageData: new Uint8Array(),
-		})
-
-		// size (31), type, version and flags, 'a' and its terminator, the terminator of the empty
-		// value, timescale, presentation_time_delta, event_duration, id
-		assert.deepStrictEqual(
-			Array.from(bytes),
-			[
-				0, 0, 0, 31, 0x65, 0x6d, 0x73, 0x67, 0, 0, 0, 0, 0x61, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
-				0, 2, 0, 0, 0, 3,
-			],
+	it('should throw a RangeError for a schemeIdUri with U+0000', function () {
+		assert.throws(
+			() =>
+				writeWith(writeEmsg, {
+					type: 'emsg',
+					version: 0,
+					flags: 0,
+					schemeIdUri: 'a\0b',
+					value: '',
+					timescale: 1000,
+					presentationTimeDelta: 0,
+					eventDuration: 0,
+					id: 7,
+					messageData: new Uint8Array(),
+				}),
+			(error: unknown) =>
+				error instanceof RangeError &&
+				error.message.includes('writeTerminatedUtf8') &&
+				error.message.endsWith(' received a\0b'),
 		)
 	})
 
-	it('should write 0 for a missing presentationTime of a version 1 box', function () {
-		const bytes = writeWith(writeEmsg, {
-			type: 'emsg',
-			version: 1,
-			flags: 0,
-			schemeIdUri: 'a',
-			value: '',
-			timescale: 1,
-			eventDuration: 2,
-			id: 3,
-			messageData: new Uint8Array(),
-		})
+	it('should throw a RangeError for a version 0 box with no presentationTimeDelta', function () {
+		assert.throws(
+			() =>
+				writeWith(writeEmsg, {
+					type: 'emsg',
+					version: 0,
+					flags: 0,
+					schemeIdUri: 'a',
+					value: '',
+					timescale: 1,
+					eventDuration: 2,
+					id: 3,
+					messageData: new Uint8Array(),
+				}),
+			/^RangeError: .*writeUint32.* received undefined$/,
+		)
+	})
 
-		// size (35), type, version and flags, timescale, presentation_time (8 bytes), event_duration,
-		// id, 'a' and its terminator, the terminator of the empty value
-		assert.deepStrictEqual(
-			Array.from(bytes),
-			[
-				0, 0, 0, 35, 0x65, 0x6d, 0x73, 0x67, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-				0, 2, 0, 0, 0, 3, 0x61, 0, 0,
-			],
+	it('should throw a RangeError for a version 1 box with no presentationTime', function () {
+		assert.throws(
+			() =>
+				writeWith(writeEmsg, {
+					type: 'emsg',
+					version: 1,
+					flags: 0,
+					schemeIdUri: 'a',
+					value: '',
+					timescale: 1,
+					eventDuration: 2,
+					id: 3,
+					messageData: new Uint8Array(),
+				}),
+			/^RangeError: .*writeWideUint.* received undefined$/,
 		)
 	})
 })

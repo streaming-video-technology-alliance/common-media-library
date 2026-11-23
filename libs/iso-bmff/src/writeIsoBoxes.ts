@@ -15,9 +15,7 @@ import { writeChildBoxes } from './writeChildBoxes.ts'
  * @returns The bytes of every box, in a new array with the exact size.
  *
  * @throws Error if a box has no writer, no `bytes` field, and a type outside `CONTAINERS`. The message starts with "No writer found for box type".
- * @throws RangeError if a `bigint` field does not fit its size.
- * @throws RangeError if a four-character code of a box does not have 4 characters.
- * @throws RangeError if `writeSidx`, `writeSubs`, or `writeTenc` gets more items than the count field of the box can state.
+ * @throws RangeError if a value of a box does not fit its field. Examples are a number outside the range, a missing value of a field that the flags select, and a list that is longer than its count field can state.
  * @throws RangeError if a box has more than 2^32 - 1 bytes.
  *
  * @example

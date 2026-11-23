@@ -11,6 +11,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SubtitleMediaHeaderBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeSthd(cursor: IsoBoxWriteCursor, box: SubtitleMediaHeaderBox): void {

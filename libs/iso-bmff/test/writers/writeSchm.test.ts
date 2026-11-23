@@ -70,18 +70,17 @@ describe('writeSchm', function () {
 		)
 	})
 
-	it('should write an empty schemeUri when flag 0x000001 is set and the box has no schemeUri', function () {
-		const writer = writeWith(writeSchm, {
-			type: 'schm',
-			version: 0,
-			flags: 1,
-			schemeType: 'cenc',
-			schemeVersion: 0x00010000,
-		})
-
-		assert.deepStrictEqual(
-			new Uint8Array(writer.buffer),
-			new Uint8Array([0, 0, 0, 21, 115, 99, 104, 109, 0, 0, 0, 1, 99, 101, 110, 99, 0, 1, 0, 0, 0]),
+	it('should throw a RangeError when flag 0x000001 is set and the box has no schemeUri', function () {
+		assert.throws(
+			() =>
+				writeWith(writeSchm, {
+					type: 'schm',
+					version: 0,
+					flags: 1,
+					schemeType: 'cenc',
+					schemeVersion: 0x00010000,
+				}),
+			/^RangeError: .*writeTerminatedUtf8.* received undefined$/,
 		)
 	})
 

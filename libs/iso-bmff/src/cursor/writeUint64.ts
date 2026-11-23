@@ -9,7 +9,7 @@ import { reserve } from './reserve.ts'
  * @param cursor - The cursor to write to. The function moves the cursor past the field.
  * @param value - The value to write, from 0 to 2^64 - 1.
  *
- * @throws RangeError if `value` is negative or greater than 2^64 - 1. The cursor does not move.
+ * @throws RangeError if `value` is not a `bigint` from 0 to 2^64 - 1. The cursor does not move.
  *
  * @example
  * {@includeCode ../../test/writeFields.test.ts#example}
@@ -17,8 +17,10 @@ import { reserve } from './reserve.ts'
  * @public
  */
 export function writeUint64(cursor: IsoBoxWriteCursor, value: bigint): void {
-	if (BigInt.asUintN(64, value) !== value) {
-		throw new RangeError(`writeUint64: value must be in the range 0 to 2^64 - 1, received ${value}`)
+	if (typeof value !== 'bigint' || BigInt.asUintN(64, value) !== value) {
+		throw new RangeError(
+			`writeUint64: value must be in the range 0 to 2^64 - 1, received ${String(value)}`,
+		)
 	}
 
 	const pos = reserve(cursor, 8)

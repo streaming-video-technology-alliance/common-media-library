@@ -15,13 +15,21 @@ The write functions check a box object against its box type. A box object has th
 
 If you provide box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space. The keys `url` and `urn` also find the writers of those boxes.
 
-A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.
+A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A field that the flags or the version select must have a value.
 
-Three writers throw a `RangeError` when the box has more items than its count field can state:
+A writer throws a `RangeError` for a value that its field cannot hold. A writer never writes other bytes in place of the value. The message has the function or the box field, the values that the field takes, and the received value. The rules:
 
-- `writeSidx`: more than 65535 references
-- `writeSubs`: more than 65535 subsamples in one entry
-- `writeTenc`: more than 255 bytes in `defaultConstantIv`
+- A number field takes an integer of its range. A fraction, `NaN`, a string, and `undefined` throw. `version` and `flags` follow the same rule.
+- A fixed-point field, such as `width` of `tkhd`, rounds the value to the nearest value of the field. The rounded value must fit the field.
+- A 64-bit field takes a `number` or a `bigint` of its range. [Writing 64-bit fields](#writing-64-bit-fields) states one exception.
+- A four-character code has 4 characters, each at most U+00FF.
+- A string field takes a string. A terminated string has no U+0000. `language` of `mdhd` has 3 characters from U+0060 to U+007F. `compressorName` has at most 31 bytes in UTF-8.
+- A byte field takes a `Uint8Array` or an array of integers from 0 to 255. `systemId` and each `kid` of `pssh`, and `defaultKid` of `tenc`, have 16 bytes.
+- Each part of a packed field fits its bits, such as `referencedSize` of a `sidx` reference with 31 bits.
+- `fieldSize` of `stz2` is 4, 8, or 16.
+- A list fits its count field. The limits are 65535 references in `sidx`, 65535 subsamples in one `subs` entry, and 255 bytes in `defaultConstantIv` of `tenc`.
+
+A field with a default in the specification, such as `pre_defined`, is optional and writes that default. Two cases throw a `TypeError` of the JavaScript engine: a missing list field, such as `samples` of a `trun` box, and a `bigint` in a fixed-point field.
 
 > [!NOTE]
 > The function writes container boxes automatically, so they do not need a writer function. The `CONTAINERS` constant lists the container box types that the function writes automatically. Each container type also has a named writer, such as `writeMoov` and `writeMoof`. A container writer in the `writers` map is optional and does not change the written bytes.
@@ -171,7 +179,7 @@ const bytes = writeIsoBox(box, { writers: { abcd: writeAbcd } });
 
 A writer of a box with child boxes writes them with `writeChildBoxes(cursor, box.boxes)`. The writers of the cursor then apply to the child boxes. A writer of a `uuid` box calls `beginIsoBox(cursor, "uuid")`, then writes the 16 bytes of `usertype` with `writeBytes`.
 
-`writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a code that does not have 4 characters. `endIsoBox` throws a `RangeError` for a box above 2^32 - 1 bytes.
+`writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a code that does not have 4 characters of 1 byte each. `endIsoBox` throws a `RangeError` for a box above 2^32 - 1 bytes.
 
 ## Writing with a cursor
 
@@ -257,7 +265,7 @@ const bytes = writeIsoBox(
 
 A writer throws a `RangeError` for a `bigint` that does not fit the field. One example is a value above 2^32 - 1 in a version 0 box.
 
-A writer does not check the range of a `number`. In an unsigned 64-bit field, a `number` of 2^64 or more writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. See [Reporting a rounded value](reading-boxes.md#reporting-a-rounded-value) for the read of that value.
+A writer also throws a `RangeError` for a `number` that is not an integer of the field range. One value is an exception: in an unsigned 64-bit field, the `number` 2^64 writes all bits set. The default reader returns 2^64 for a field with all bits set, so a read and then a write keep that field. ISO/IEC 14496-12 uses that value for a duration that cannot be determined. See [Reporting a rounded value](reading-boxes.md#reporting-a-rounded-value) for the read of that value.
 
 A custom writer takes a write cursor and a box. The writer calls the field functions `writeWideUint` or `writeWideInt`. Both functions take the cursor, a `number` or a `bigint`, and the size of the field in bytes, 4 or 8:
 

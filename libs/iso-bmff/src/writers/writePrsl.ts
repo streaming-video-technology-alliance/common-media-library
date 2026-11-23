@@ -12,10 +12,12 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  * Write the `prsl` box (`PreselectionGroupBox`).
  *
  * The writer writes `preselectionTag` when flag `0x1000` is set and `interleavingTag` when flag `0x4000` is set.
- * The writer writes an empty string for a missing tag. The writer writes the child boxes with the writers of the cursor.
+ * The writer writes the child boxes with the writers of the cursor.
  *
  * @param cursor - The write cursor
  * @param box - The `PreselectionGroupBox` fields to write
+ *
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @example
  * {@includeCode ../../test/writers/writePrsl.test.ts#example}
@@ -34,15 +36,15 @@ export function writePrsl(cursor: IsoBoxWriteCursor, box: PreselectionGroupBox<I
 	}
 
 	if (flags & 0x1000) {
-		writeTerminatedUtf8(cursor, box.preselectionTag ?? '')
+		writeTerminatedUtf8(cursor, box.preselectionTag as string)
 	}
 
 	if (flags & 0x2000) {
-		writeUint8(cursor, box.selectionPriority ?? 0)
+		writeUint8(cursor, box.selectionPriority as number)
 	}
 
 	if (flags & 0x4000) {
-		writeTerminatedUtf8(cursor, box.interleavingTag ?? '')
+		writeTerminatedUtf8(cursor, box.interleavingTag as string)
 	}
 
 	writeChildBoxes(cursor, box.boxes)

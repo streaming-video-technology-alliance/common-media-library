@@ -17,10 +17,11 @@ import { endIsoBox } from '../endIsoBox.ts'
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
  * For a version other than 0 or 1, the writer writes the full box fields and `messageData` only.
- * If the time field of the version is `undefined`, the writer writes 0.
  *
  * @param cursor - The write cursor
  * @param box - The `EventMessageBox` fields to write
+ *
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
@@ -31,12 +32,12 @@ export function writeEmsg(cursor: IsoBoxWriteCursor, box: EventMessageBox<IsoInt
 		writeTerminatedUtf8(cursor, box.schemeIdUri)
 		writeTerminatedUtf8(cursor, box.value)
 		writeUint32(cursor, box.timescale)
-		writeUint32(cursor, box.presentationTimeDelta ?? 0)
+		writeUint32(cursor, box.presentationTimeDelta as number)
 		writeUint32(cursor, box.eventDuration)
 		writeUint32(cursor, box.id)
 	} else if (box.version === 1) {
 		writeUint32(cursor, box.timescale)
-		writeWideUint(cursor, box.presentationTime ?? 0, 8)
+		writeWideUint(cursor, box.presentationTime as IsoInt64, 8)
 		writeUint32(cursor, box.eventDuration)
 		writeUint32(cursor, box.id)
 		writeTerminatedUtf8(cursor, box.schemeIdUri)

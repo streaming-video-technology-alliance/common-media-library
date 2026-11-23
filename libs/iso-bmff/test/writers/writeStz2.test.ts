@@ -62,15 +62,74 @@ describe('writeStz2', function () {
 		)
 	})
 
-	it('should write no entries for a field size that is not 4, 8, or 16', function () {
+	it('should throw a RangeError for a field size that is not 4, 8, or 16', function () {
+		assert.throws(
+			() =>
+				writeWith(writeStz2, {
+					type: 'stz2',
+					version: 0,
+					flags: 0,
+					fieldSize: 5,
+					entrySize: [1, 2],
+				}),
+			/^RangeError: .*fieldSize.* received 5$/,
+		)
+	})
+
+	it('should write the largest entry of 4 bits', function () {
 		const bytes = writeWith(writeStz2, {
 			type: 'stz2',
 			version: 0,
 			flags: 0,
-			fieldSize: 5,
-			entrySize: [1, 2],
+			fieldSize: 4,
+			entrySize: [15, 15],
 		})
 
-		assert.deepStrictEqual(bytes, boxBytes('stz2', [0, 1], [0, 3], [0, 3], [5, 1], [0, 4]))
+		assert.deepStrictEqual(
+			bytes,
+			boxBytes('stz2', [0, 1], [0, 3], [0, 3], [4, 1], [2, 4], [0xff, 1]),
+		)
+	})
+
+	it('should throw a RangeError for an entry above 4 bits in the high half of a byte', function () {
+		assert.throws(
+			() =>
+				writeWith(writeStz2, {
+					type: 'stz2',
+					version: 0,
+					flags: 0,
+					fieldSize: 4,
+					entrySize: [16, 1],
+				}),
+			/^RangeError: .*entrySize.* received 16$/,
+		)
+	})
+
+	it('should throw a RangeError for an entry above 4 bits in the low half of a byte', function () {
+		assert.throws(
+			() =>
+				writeWith(writeStz2, {
+					type: 'stz2',
+					version: 0,
+					flags: 0,
+					fieldSize: 4,
+					entrySize: [1, 16],
+				}),
+			/^RangeError: .*entrySize.* received 16$/,
+		)
+	})
+
+	it('should throw a RangeError for an entry above 8 bits with the field size 8', function () {
+		assert.throws(
+			() =>
+				writeWith(writeStz2, {
+					type: 'stz2',
+					version: 0,
+					flags: 0,
+					fieldSize: 8,
+					entrySize: [256],
+				}),
+			/^RangeError: .*writeUint8.* received 256$/,
+		)
 	})
 })
