@@ -47,6 +47,21 @@ describe('writeStz2', function () {
 		)
 	})
 
+	it('should write an even number of entries of 4 bits with no padding byte', function () {
+		const bytes = writeWith(writeStz2, {
+			type: 'stz2',
+			version: 0,
+			flags: 0,
+			fieldSize: 4,
+			entrySize: [1, 2, 3, 4],
+		})
+
+		assert.deepStrictEqual(
+			bytes,
+			boxBytes('stz2', [0, 1], [0, 3], [0, 3], [4, 1], [4, 4], [0x12, 1], [0x34, 1]),
+		)
+	})
+
 	it('should write no entries for a field size that is not 4, 8, or 16', function () {
 		const bytes = writeWith(writeStz2, {
 			type: 'stz2',

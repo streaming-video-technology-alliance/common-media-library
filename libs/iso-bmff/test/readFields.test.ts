@@ -74,6 +74,10 @@ describe('read field functions', function () {
 		assert.strictEqual(readTemplate32(cursorOf([0xff, 0xff, 0x00, 0x00])), 65535)
 	})
 
+	it('should read an 8.8 value with the top bit set as an unsigned value', function () {
+		assert.strictEqual(readTemplate16(cursorOf([0xff, 0x80])), 255.5)
+	})
+
 	it('should read a four-character code', function () {
 		const cursor = cursorOf([0x75, 0x72, 0x6c, 0x20])
 

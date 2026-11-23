@@ -66,4 +66,29 @@ describe('writeTrun', function () {
 
 		assert.deepStrictEqual(bytes, boxBytes('trun', [0, 1], [0x100, 3], [2, 4], [1, 4], [2, 4]))
 	})
+
+	it('should write 0 for each field that the flags name and the box does not have', function () {
+		// The flags name data_offset, first_sample_flags, and the four sample fields.
+		const bytes = writeWith(writeTrun, { type: 'trun', version: 0, flags: 0xf05, samples: [{}] })
+
+		assert.deepStrictEqual(
+			bytes,
+			boxBytes('trun', [0, 1], [0xf05, 3], [1, 4], [0, 4], [0, 4], [0, 4], [0, 4], [0, 4], [0, 4]),
+		)
+	})
+
+	it('should not write a field that the flags do not name', function () {
+		const bytes = writeWith(writeTrun, {
+			type: 'trun',
+			version: 0,
+			flags: 0,
+			dataOffset: 1,
+			firstSampleFlags: 2,
+			samples: [
+				{ sampleDuration: 3, sampleSize: 4, sampleFlags: 5, sampleCompositionTimeOffset: 6 },
+			],
+		})
+
+		assert.deepStrictEqual(bytes, boxBytes('trun', [0, 1], [0, 3], [1, 4]))
+	})
 })
