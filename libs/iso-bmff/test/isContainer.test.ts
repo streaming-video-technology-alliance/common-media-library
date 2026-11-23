@@ -9,10 +9,12 @@ import {
 	readInt64AsBigInt,
 	readIsoBoxes,
 	readUint8,
+	writeIsoBoxes,
 	type AdditionalMetadataContainerBox,
 	type GroupsListBox,
 	type IsoBoxReadCursor,
 	type IsoBoxReader,
+	type IsoRawBox,
 	type ParsedIsoBox,
 	type SubTrack,
 	type TrackFragmentBox,
@@ -243,5 +245,19 @@ describe('isContainer', function () {
 		}
 
 		assert.strictEqual(count, 1)
+	})
+
+	it('returns false for a raw box with a type in CONTAINERS', function () {
+		const raw: IsoRawBox = { boxType: 'moov', bytes: new Uint8Array(MOOV) }
+
+		assert.strictEqual(isContainer(raw), false)
+		assert.deepStrictEqual([...writeIsoBoxes([raw])], MOOV)
+	})
+
+	it('returns true for each box of a type in CONTAINERS from a read with no reader', function () {
+		assert.deepStrictEqual(
+			readIsoBoxes(buffer).map(box => isContainer(box)),
+			[true, true],
+		)
 	})
 })
