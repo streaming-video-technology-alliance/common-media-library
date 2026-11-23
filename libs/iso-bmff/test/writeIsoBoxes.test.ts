@@ -293,7 +293,10 @@ describe('writeIsoBoxes', function () {
 		})
 
 		it('should write a container that code builds as a container', function () {
-			const box = { type: 'udta', boxes: [new Uint8Array(FREE)] } as IsoBoxStreamable
+			const box: { type: string; boxes: Uint8Array[] } = {
+				type: 'udta',
+				boxes: [new Uint8Array(FREE)],
+			}
 
 			const bytes = writeIsoBoxes([box], { writers: {} })
 

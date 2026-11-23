@@ -92,7 +92,7 @@ describe('readIsoBoxes on the read cursor', function () {
 		const [box] = readIsoBoxes(uuid, { readers })
 
 		assert.deepStrictEqual(
-			Array.from(box?.type === 'uuid' && 'value' in box ? box.usertype : []),
+			Array.from((box?.type === 'uuid' && 'value' in box && box.usertype) || []),
 			Array.from(USERTYPE),
 		)
 		assert.strictEqual(box && 'value' in box ? box.value : 0, 0xcc)

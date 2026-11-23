@@ -1,6 +1,7 @@
+import type { IsoBoxMap } from './IsoBoxMap.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
+import type { IsoBoxType } from './IsoBoxType.ts'
 import type { IsoBoxWriteConfig } from './IsoBoxWriteConfig.ts'
-import type { IsoInt64 } from './IsoInt64.ts'
 import { createIsoBoxWriteCursor } from './createIsoBoxWriteCursor.ts'
 import { writeChildBoxes } from './writeChildBoxes.ts'
 
@@ -23,8 +24,14 @@ import { writeChildBoxes } from './writeChildBoxes.ts'
  *
  * @public
  */
+export function createIsoBoxReadableStream<
+	B extends { type: keyof IsoBoxMap | (string & Record<never, never>) } | ArrayBufferView,
+>(
+	boxes: Iterable<IsoBoxStreamable<B>>,
+	config?: IsoBoxWriteConfig,
+): ReadableStream<Uint8Array<ArrayBuffer>>
 export function createIsoBoxReadableStream(
-	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
+	boxes: Iterable<IsoBoxStreamable | { type: IsoBoxType }>,
 	config: IsoBoxWriteConfig = {},
 ): ReadableStream<Uint8Array<ArrayBuffer>> {
 	if (typeof ReadableStream === 'undefined') {

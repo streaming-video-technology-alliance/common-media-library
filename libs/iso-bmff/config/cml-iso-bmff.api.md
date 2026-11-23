@@ -79,16 +79,9 @@ export const CONTAINERS: readonly string[];
 export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => AudioSampleEntry<T, V>;
 
 // @public
-export function createDefaultReaderConfig<V extends IsoInt64 = number>(...options: [V] extends [bigint] ? [options: {
-    int64: IsoInt64Reader<V>;
-}] : [options?: {
+export function createDefaultReaderConfig<V extends IsoInt64 = number>(options?: {
     int64?: IsoInt64Reader<V>;
-}]): IsoBoxReadConfig<V>;
-
-// @public
-export function createDefaultReaderConfig(options?: {
-    int64?: IsoInt64Reader;
-}): IsoBoxReadConfig;
+}): IsoBoxReadConfig<V>;
 
 // @public
 export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig>;
@@ -97,10 +90,12 @@ export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig>;
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
+export function createIsoBoxReadableStream<B extends {
+    type: keyof IsoBoxMap | (string & Record<never, never>);
+} | ArrayBufferView>(boxes: Iterable<IsoBoxStreamable<B>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
 
 // @public
-export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V>;
+export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V>;
 
 // @public
 export function createIsoBoxWriteCursor(config?: {
@@ -428,18 +423,11 @@ export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxM
 }["r"]>;
 
 // @public
-export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? 0 extends 1 & B ? B : [B] extends [{
-        type: infer N extends keyof IsoBoxMap;
-    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : [B] extends [{
-        type: infer N extends string;
-    }] ? string extends N ? never : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
-    type: R;
-}> : never) | IsoRawBox;
-
-// @public
-export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | {
+export type IsoBoxStreamable<B extends {
     type: IsoBoxType;
-} | ArrayBufferView;
+} | ArrayBufferView = IsoBox<IsoInt64> | IsoRawBox | ArrayBufferView> = B extends {
+    type: infer T extends keyof IsoBoxMap;
+} ? B extends IsoRawBox | Omit<IsoBoxMap<IsoInt64>[T], "type"> ? B : IsoBoxMap<IsoInt64>[T] : B;
 
 // @public
 export type IsoBoxType = string;
@@ -733,15 +721,7 @@ export function readInt64AsBigInt(cursor: IsoBoxReadCursor<IsoInt64>, size: 4 | 
 export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoInt64 = number>(raw: IsoBoxData, config: IsoBoxReadConfig<V> & {
-    readers: R;
-}): IsoBoxReaderReturn<R, V>[];
-
-// @public
-export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): ParsedIsoBox<V>[];
-
-// @public
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadConfig): ParsedIsoBox[];
+export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadConfig<V>): ParsedIsoBox<V>[];
 
 // @public
 export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
@@ -1038,7 +1018,7 @@ export type SchemeTypeBox = FullBox & {
 export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxReadCursor<V>, path: readonly IsoBoxType[]): IsoBoxReadCursor<V> | null;
 
 // @public
-export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V> | null;
+export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V> | null;
 
 // @public
 export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
@@ -1364,7 +1344,9 @@ export function writeAvc4(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc
 export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): void;
 
 // @public
-export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<IsoInt64>>): void;
+export function writeChildBoxes<B extends {
+    type: keyof IsoBoxMap | (string & Record<never, never>);
+} | ArrayBufferView>(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<B>>): void;
 
 // @public
 export function writeCo64(cursor: IsoBoxWriteCursor, box: ChunkLargeOffsetBox<IsoInt64>): void;
@@ -1436,10 +1418,14 @@ export function writeInt32(cursor: IsoBoxWriteCursor, value: number): void;
 export function writeInt8(cursor: IsoBoxWriteCursor, value: number): void;
 
 // @public
-export function writeIsoBox(box: IsoBoxStreamable<IsoInt64>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBox<B extends {
+    type: keyof IsoBoxMap | (string & Record<never, never>);
+} | ArrayBufferView>(box: IsoBoxStreamable<B>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBoxes<B extends {
+    type: keyof IsoBoxMap | (string & Record<never, never>);
+} | ArrayBufferView>(boxes: Iterable<IsoBoxStreamable<B>>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
 
 // @public
 export function writeKind(cursor: IsoBoxWriteCursor, box: KindBox): void;

@@ -229,9 +229,10 @@ describe('isContainer', function () {
 
 		for (const box of readIsoBoxes(buffer, { readers })) {
 			if (isContainer(box) && box.type === 'traf') {
-				// @ts-expect-error the custom traf result has no boxes field
-				assert.strictEqual(box.boxes, undefined)
-				assert.strictEqual(box.note, 1)
+				// The result type does not follow the readers map, so the type has the built-in `boxes` field.
+				const custom = box as unknown as { boxes?: unknown; note: number }
+				assert.strictEqual(custom.boxes, undefined)
+				assert.strictEqual(custom.note, 1)
 				count++
 			}
 		}

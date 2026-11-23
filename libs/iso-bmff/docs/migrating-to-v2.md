@@ -21,7 +21,7 @@ The compiler reports most changes. The tables in this guide list each change and
 - A box with no reader and a type outside `CONTAINERS` is a raw box. `bytes` is the complete box, with its header. The body is `box.bytes.subarray(box.headerSize)`. The bytes share memory with the input.
 - A box object has only `type` and its fields. The fields `view`, `size`, `largesize`, and `usertype` do not exist.
 - A test of `box.type` does not exclude a raw box, because a raw box can have any type. Narrow a box with `isIsoBoxType`.
-- The result types of a custom readers map apply only to the boxes at the top level. A child in a `boxes` field has the type `ParsedIsoBox`. Cast a child with a custom reader to the result type of that reader.
+- The result type does not follow the readers map. Every box has the type `ParsedIsoBox`, also a child in a `boxes` field. Cast the result of a custom reader to the result type of that reader.
 
 ```typescript
 import { findIsoBox, isIsoBoxType, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
@@ -227,6 +227,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 |---|---|
 | `IsoBoxReadView`, `IsoBoxWriteView` | The read cursor and the write cursor. See [Custom readers](#custom-readers) and [Custom writers](#custom-writers). |
 | `ParsedBox`, `IsoTypedParsedBox` | `ParsedIsoBox` |
+| `IsoBoxReaderReturn` | `ParsedIsoBox`. The result type of `readIsoBoxes` does not follow the readers map. |
 | `IsoFieldTypeMap`, `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, `IsoBoxFields` | The field functions, such as `readUint32` |
 | `IsoBoxReadableStream` | `createIsoBoxReadableStream` |
 | `fourCcToUint32` | A field with a four-character code is a string. To convert a code, compute `new DataView(Uint8Array.from(code, char => char.charCodeAt(0)).buffer).getUint32(0)`. |
@@ -279,7 +280,8 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `SampleEntry<T, C>` | `SampleEntry<T, V>` |
 | `SampleDescriptionBox<E>` | `SampleDescriptionBox<V, E>` |
 | `Box` with no type argument | `Box<"abcd">` for one box type, or `IsoBox` |
-| A reader result with `type: string` adds a member to the result type | Give the `type` field a literal type, such as `"abcd" as const` |
+| The result type of `readIsoBoxes` has the return type of each reader | The result type is `ParsedIsoBox<V>[]`. Cast the result of a custom reader, or narrow that result with a type guard. |
+| `IsoBoxStreamable` has `ParsedBox` and accepts a box object with missing fields | `IsoBoxStreamable` is the union of the built-in box types, `IsoRawBox`, and `ArrayBufferView`. The write functions check a box object against its box type. |
 | `IsoBoxReader<B, T, V>`, with the box type `T` as the second parameter | `IsoBoxReader<B, V>`, with the type `V` of the 64-bit fields as the second parameter. Replace `IsoBoxReader<MyBox, 'abcd', bigint>` with `IsoBoxReader<MyBox, bigint>`. `B` has a `type` field. |
 | `IsoBoxWriter<B>` returns an `ArrayBufferView` | `IsoBoxWriter<B>` takes the cursor and the box, and returns nothing |
 | `IsoBoxReaderMap` and `IsoBoxWriterMap` accept a function under any key | A reader or a writer under the key of another known box type is a compile error |

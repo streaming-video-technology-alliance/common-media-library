@@ -11,6 +11,8 @@ The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable it
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
 - Boxes that `readIsoBoxes` returns. A box with no reader and a type outside `CONTAINERS` is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
 
+The write functions check a box object against its box type. A box with the `type` of a built-in box type needs every required field of that type. A box of any other type is a custom box and needs a writer in the `writers` map. The `boxes` field of a built-in box type takes box objects and raw boxes. To put the bytes of a box in a `boxes` field, use a raw box, such as `{ type: "esds", bytes }`.
+
 If you provide box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space. The keys `url` and `urn` also find the writers of those boxes.
 
 A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A writer does not throw for a missing numeric field that the flags select, and writes 0. A missing list field, such as `samples` of a `trun` box, throws a `TypeError`.

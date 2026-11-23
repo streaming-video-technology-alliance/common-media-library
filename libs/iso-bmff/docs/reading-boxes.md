@@ -104,13 +104,14 @@ The function returns `null` at the end of the cursor and before a truncated box.
 
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. A test of `box.type` does not exclude a raw box, so the loop also tests for the `frames` field.
+A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` does not follow the readers map, so the box has the built-in type. The loop narrows the box with `isIsoBoxType`, then casts the box to the result type of the reader.
 
 HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
 ```typescript
 import { ID3_SCHEME_ID_URI, getId3Frames, type Id3Frame } from "@svta/cml-id3";
 import {
+	isIsoBoxType,
 	readEmsg,
 	readIsoBoxes,
 	type IsoBoxReadCursor,
@@ -135,9 +136,11 @@ const boxes = readIsoBoxes(segment, {
 	},
 });
 
+type EmsgWithId3 = ReturnType<typeof readEmsgWithId3>;
+
 for (const box of boxes) {
-	if (box.type === "emsg" && "frames" in box) {
-		console.log(box.frames);
+	if (isIsoBoxType("emsg", box)) {
+		console.log((box as EmsgWithId3).frames);
 	}
 }
 ```
@@ -152,6 +155,7 @@ A reader takes a read cursor and the box type, and returns the box object with i
 
 ```typescript
 import {
+	findIsoBox,
 	readFourCc,
 	readIsoBoxes,
 	readUint16,
@@ -169,6 +173,13 @@ const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
 });
 
 const boxes = readIsoBoxes(buffer, { readers: { abcd: readAbcd } });
+
+// A type guard for the result type of the reader.
+type AbcdBox = ReturnType<typeof readAbcd>;
+const isAbcd = (box: { type: string }): box is AbcdBox =>
+	box.type === "abcd" && !("bytes" in box);
+
+console.log(findIsoBox(boxes, isAbcd)?.brand);
 ```
 
 The cursor follows these rules:
@@ -178,11 +189,11 @@ The cursor follows these rules:
 - The bytes that remain are `cursor.end - cursor.pos`. To skip bytes, add to `cursor.pos`.
 - A reader of a box with child boxes reads them with `readChildBoxes(cursor)`. The readers of the configuration then apply to the child boxes.
 - `readIsoBoxes` uses one cursor for every box. A reader must not keep the cursor after it returns. A reader that needs bytes later keeps the result of `readBytes`.
-- The `type` field of the result needs a literal type, such as `"abcd" as const`. A result with `type: string` adds no member to the result type of `readIsoBoxes`.
+- The result type of `readIsoBoxes` does not follow the readers map. To read the fields of a custom box, narrow the box with a type guard for the result type of its reader. The guard also tests for the absence of `bytes`, because a box with no reader is a raw box.
 
 `readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
 
-`readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
+`readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space.
 
 ## Incomplete boxes
 
@@ -360,12 +371,16 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 
-// A readers map in a variable needs a type argument for a generic custom reader.
-const readers = { tfdt: readTfdtWide<bigint> };
+// A readers map in a variable works the same way.
+const readers = { tfdt: readTfdtWide };
 const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
 ```
 
-A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`. A custom reader whose result equals the built-in box type gets the fields of the configuration without a type argument.
+The result type follows the `int64` option, not the readers map. With `isIsoBoxType("tfdt", box)`, the box has the built-in type with `bigint` fields. To read the `source` field, cast the box to `ReturnType<typeof readTfdtWide<bigint>>`.
+
+TypeScript reads the type of the `int64` function to select the type of the fields. Pass a named function, such as `readInt64AsBigInt`. For a function that you write inside the configuration object, give the `cursor` parameter the type `IsoBoxReadCursor<IsoInt64>`. Without that type, a function after a `readers` map with a generic reader can fail to compile.
+
+The type of the fields also follows a type that your code writes, such as `readIsoBoxes<bigint>(buffer)` or a variable of the type `ParsedIsoBox<bigint>[]`. TypeScript does not check such a type against the `int64` option. Let TypeScript infer the type from the option.
 
 ### A function that forwards the option
 

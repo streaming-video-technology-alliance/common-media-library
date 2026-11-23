@@ -76,7 +76,7 @@ describe('readIsoBoxes', function () {
 		assert.strictEqual(box.value, 0xffffffff)
 	})
 
-	it('should narrow a custom reader of a built-in box to the return type of that reader', function () {
+	it('should give the result of a custom reader of a built-in box the built-in box type', function () {
 		// A version 1 tfdt box with baseMediaDecodeTime = 2^53 + 1.
 		const bytes = new Uint8Array([
 			0x00, 0x00, 0x00, 0x14, 0x74, 0x66, 0x64, 0x74, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00,
@@ -86,25 +86,23 @@ describe('readIsoBoxes', function () {
 
 		assert.ok(box)
 		if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-			// The built-in tfdt type is not part of the union, so the field is a bigint,
-			// not `number | bigint`, and the extra field of the custom reader is visible.
-			expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
-			expectType<Equal<typeof box.exact, boolean>>(true)
-			assert.strictEqual(box.baseMediaDecodeTime, BigInt('9007199254740993'))
-			assert.strictEqual(box.exact, true)
+			// The result type does not follow the readers map. A cast gives the result type of the reader.
+			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+			const custom = box as unknown as ReturnType<typeof readTfdt64>
+			assert.strictEqual(custom.baseMediaDecodeTime, BigInt('9007199254740993'))
+			assert.strictEqual(custom.exact, true)
 		} else {
 			assert.fail('expected a tfdt box')
 		}
 	})
 
-	it('should keep the built-in box types when the reader map has no literal keys', function () {
+	it('should accept a reader map with a computed key', function () {
 		// A version 0 tfdt box with baseMediaDecodeTime = 1.
 		const bytes = new Uint8Array([
 			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x01,
 		])
 		const name: string = 'tfdt'
-		// The key is not a literal, so `keyof` the map is `string` and no built-in type is excluded.
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { [name]: readTfdt } })
 
 		assert.ok(box)
@@ -129,11 +127,8 @@ describe('readIsoBoxes', function () {
 
 		// An absent reader does not add `undefined` to the union.
 		expectType<Equal<undefined extends (typeof boxes)[number] ? true : false, false>>(true)
-		// A box with no reader is a raw box, so the union has the raw box next to the custom type.
+		// A box with no reader is a raw box.
 		expectType<Equal<IsoRawBox extends (typeof boxes)[number] ? true : false, true>>(true)
-		expectType<
-			Equal<Extract<(typeof boxes)[number], { type: 'tfdt' }>['baseMediaDecodeTime'], bigint>
-		>(true)
 		assert.ok(box && 'bytes' in box)
 		assert.strictEqual(box.type, 'tfdt')
 		assert.strictEqual(box.bytes.length, 16)
@@ -149,7 +144,7 @@ describe('readIsoBoxes', function () {
 		}
 	})
 
-	it('should exclude the built-in url box type for a trimmed url key', function () {
+	it('should find a reader by a trimmed url key', function () {
 		// A 'url ' box with the self-contained flag set and no location.
 		const bytes = new Uint8Array([
 			0x00, 0x00, 0x00, 0x0c, 0x75, 0x72, 0x6c, 0x20, 0x00, 0x00, 0x00, 0x01,
@@ -159,12 +154,11 @@ describe('readIsoBoxes', function () {
 			custom: true,
 		})
 
-		// The read also finds a reader by the trimmed type, so `url` replaces `'url '`.
+		// The read also finds a reader by the trimmed type.
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { url: readUrlCustom } })
 
 		assert.ok(box)
 		if (box.type === 'url ' && 'custom' in box) {
-			expectType<Equal<typeof box.custom, boolean>>(true)
 			assert.strictEqual(box.custom, true)
 		} else {
 			assert.fail('expected a url box')
