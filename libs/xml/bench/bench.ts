@@ -29,6 +29,11 @@
  * then times each measured call with performance.now() and reports the mean, the median, and p95. Every
  * result is kept in a variable so nothing is eliminated as dead code.
  *
+ * Each process also reports the time of its first call, which is the first warm-up call. At that point
+ * the JavaScript engine has not compiled the parser with its optimizing compiler. A player that parses
+ * one manifest at startup pays this time, and the mean does not show it. With --runs, the table shows
+ * the lowest first call of the processes. The threshold applies to the first call and to the mean.
+ *
  * The mean covers the fastest 90 percent of the measured calls. The comparison with the baseline uses
  * the mean, because the median is not stable. Garbage collection makes the call times of one process
  * alternate between two groups. The median is in one group or the other, and the group differs between
@@ -65,6 +70,8 @@ type Stats = {
 
 type WorkerResult = {
 	length: number
+	/** Time of the first call in the process, before any warm-up */
+	first: number
 	stats: Stats
 }
 
@@ -277,6 +284,7 @@ async function measure(specifier: string, input: Input): Promise<void> {
 	const { parseXml: parse } = (await import(specifier)) as { parseXml: ParseFunction }
 	const text = input.make()
 	const times: number[] = []
+	let first = 0
 
 	for (let round = 0; round < WARM_UP_CALLS + input.iterations; round++) {
 		if (collect !== undefined) {
@@ -285,12 +293,15 @@ async function measure(specifier: string, input: Input): Promise<void> {
 		const start = performance.now()
 		sink = parse(text)
 		const elapsed = performance.now() - start
+		if (round === 0) {
+			first = elapsed
+		}
 		if (round >= WARM_UP_CALLS) {
 			times.push(elapsed)
 		}
 	}
 
-	const result: WorkerResult = { length: text.length, stats: stats(times) }
+	const result: WorkerResult = { length: text.length, first, stats: stats(times) }
 	console.log(JSON.stringify(result))
 }
 
@@ -330,11 +341,12 @@ function drive(): void {
 	const failures: string[] = []
 
 	console.log(
-		`Node ${process.version}, ${process.arch}, ${forceGc ? 'full GC before each call' : 'natural GC'}, ${runs === 1 ? 'one process' : `lowest mean of ${runs} processes`} per variant and input, ${WARM_UP_CALLS} warm-up calls\n`,
+		`Node ${process.version}, ${process.arch}, ${forceGc ? 'full GC before each call' : 'natural GC'}, ${runs === 1 ? 'one process' : `lowest mean and lowest first call of ${runs} processes`} per variant and input, ${WARM_UP_CALLS} warm-up calls\n`,
 	)
 
 	inputs.forEach((input, inputIndex) => {
 		const results: WorkerResult[] = []
+		const firsts: number[] = []
 		for (let round = 0; round < runs; round++) {
 			variants.forEach((variant, variantIndex) => {
 				const result = spawnWorker(variant, inputIndex)
@@ -342,28 +354,36 @@ function drive(): void {
 				if (best === undefined || result.stats.mean < best.stats.mean) {
 					results[variantIndex] = result
 				}
+				firsts[variantIndex] = Math.min(firsts[variantIndex] ?? Infinity, result.first)
 			})
 		}
 
 		console.log(
 			`### ${input.name} (${results[0].length.toLocaleString('en-US')} chars, ${input.iterations} iterations)\n`,
 		)
-		console.log('| Variant | Mean | Median | p95 | Mean vs baseline |')
-		console.log('| --- | ---: | ---: | ---: | ---: |')
+		console.log(
+			'| Variant | First call | Mean | Median | p95 | First call vs baseline | Mean vs baseline |',
+		)
+		console.log('| --- | ---: | ---: | ---: | ---: | ---: | ---: |')
 		results.forEach((result, variantIndex) => {
 			console.log(
-				`| ${variants[variantIndex].name} | ${formatMs(result.stats.mean)} | ${formatMs(result.stats.median)} | ${formatMs(result.stats.p95)} | ${formatDelta(result.stats.mean, results[0].stats.mean)} |`,
+				`| ${variants[variantIndex].name} | ${formatMs(firsts[variantIndex])} | ${formatMs(result.stats.mean)} | ${formatMs(result.stats.median)} | ${formatMs(result.stats.p95)} | ${formatDelta(firsts[variantIndex], firsts[0])} | ${formatDelta(result.stats.mean, results[0].stats.mean)} |`,
 			)
 		})
 		console.log('')
 
 		if (threshold !== undefined) {
-			const base = results[0].stats.mean
-			const value = results[results.length - 1].stats.mean
-			if (((value - base) / base) * 100 > threshold) {
-				failures.push(
-					`${input.name}: ${formatMs(base)} to ${formatMs(value)}, ${formatDelta(value, base)}`,
-				)
+			const last = results.length - 1
+			const measures: [string, number, number][] = [
+				['mean', results[0].stats.mean, results[last].stats.mean],
+				['first call', firsts[0], firsts[last]],
+			]
+			for (const [label, base, value] of measures) {
+				if (((value - base) / base) * 100 > threshold) {
+					failures.push(
+						`${input.name}, ${label}: ${formatMs(base)} to ${formatMs(value)}, ${formatDelta(value, base)}`,
+					)
+				}
 			}
 		}
 	})
@@ -371,10 +391,12 @@ function drive(): void {
 	if (threshold !== undefined) {
 		const names = `${variants[1].name} against ${variants[0].name}`
 		if (failures.length === 0) {
-			console.log(`PASS: ${names}, no input is slower by more than ${threshold}%`)
+			console.log(
+				`PASS: ${names}, no input is slower by more than ${threshold}% on the mean or on the first call`,
+			)
 		} else {
 			console.log(
-				`FAIL: ${names}, ${failures.length} of ${inputs.length} inputs are slower by more than ${threshold}%\n`,
+				`FAIL: ${names}, ${failures.length} measurements are slower by more than ${threshold}%\n`,
 			)
 			failures.forEach(failure => console.log(`- ${failure}`))
 			process.exitCode = 1

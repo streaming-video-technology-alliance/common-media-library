@@ -14,7 +14,6 @@ const OPEN_CORNER_BRACKET_CC = 91 // '['
 const CLOSE_CORNER_BRACKET_CC = 93 // ']'
 const AMPERSAND_CC = 38 // '&'
 const EQUALS_CC = 61 // '='
-const COLON_CC = 58 // ':'
 const SPACE_CC = 32 // ' '
 const TAB_CC = 9 // '\t'
 const CR_CC = 13 // '\r'
@@ -41,6 +40,109 @@ function syntaxError(input: string, pos: number, message: string): Error {
 			'\nChar: ' +
 			(pos < input.length ? input[pos] : 'end of input'),
 	)
+}
+
+// `scan` runs once for a document. A JavaScript engine compiles a function with its optimizing
+// compiler only after the function has run for some time, so the first call of `scan` runs in the
+// interpreter. `scanName` and `scanAttributes` run once for every tag. The engine compiles them early
+// in the first call, which makes the first parse of a manifest faster.
+
+/**
+ * Returns the index of the first character after the name that starts at `pos`
+ */
+function scanName(input: string, pos: number, length: number): number {
+	let cc = pos < length ? input.charCodeAt(pos) : 0
+	while (
+		pos < length &&
+		cc !== SPACE_CC &&
+		cc !== CLOSE_BRACKET_CC &&
+		cc !== SLASH_CC &&
+		cc !== EQUALS_CC &&
+		cc !== LF_CC &&
+		cc !== CR_CC &&
+		cc !== TAB_CC
+	) {
+		cc = ++pos < length ? input.charCodeAt(pos) : 0
+	}
+	return pos
+}
+
+/**
+ * Reads the attributes of a start tag into `attributes`, starting at `pos`. Returns the index of the
+ * `>` that ends the tag, or `length` if the input ends first.
+ *
+ * Attribute ::= Name Eq AttValue, Eq ::= S? '=' S? (XML 1.0 §3.1, §2.3)
+ */
+function scanAttributes(
+	input: string,
+	pos: number,
+	length: number,
+	attributes: Record<string, string>,
+): number {
+	let cc = pos < length ? input.charCodeAt(pos) : 0
+
+	while (pos < length && cc !== CLOSE_BRACKET_CC) {
+		// An attribute name starts with an ASCII letter; any other character is skipped
+		if ((cc >= UPPER_A_CC && cc <= UPPER_Z_CC) || (cc >= LOWER_A_CC && cc <= LOWER_Z_CC)) {
+			const attributeStart = pos
+			pos = scanName(input, pos + 1, length)
+			cc = pos < length ? input.charCodeAt(pos) : 0
+			const attributeName = input.slice(attributeStart, pos)
+
+			if (cc !== EQUALS_CC) {
+				while (cc === SPACE_CC || cc === TAB_CC || cc === CR_CC || cc === LF_CC) {
+					cc = ++pos < length ? input.charCodeAt(pos) : 0
+				}
+				if (cc !== EQUALS_CC) {
+					throw syntaxError(
+						input,
+						pos,
+						'Malformed attribute "' + attributeName + '": expected "=" after name',
+					)
+				}
+			}
+
+			cc = ++pos < length ? input.charCodeAt(pos) : 0
+			if (cc !== SINGLE_QUOTE_CC && cc !== DOUBLE_QUOTE_CC) {
+				while (cc === SPACE_CC || cc === TAB_CC || cc === CR_CC || cc === LF_CC) {
+					cc = ++pos < length ? input.charCodeAt(pos) : 0
+				}
+				if (cc !== SINGLE_QUOTE_CC && cc !== DOUBLE_QUOTE_CC) {
+					throw syntaxError(
+						input,
+						pos,
+						'Malformed attribute "' + attributeName + '": expected quoted value after "="',
+					)
+				}
+			}
+
+			const quote = cc
+			const valueStart = ++pos
+			const loopEnd = pos + VALUE_LOOP_LENGTH
+			let hasAmpersand = false
+			cc = pos < length ? input.charCodeAt(pos) : 0
+			while (cc !== quote && pos < loopEnd) {
+				if (cc === AMPERSAND_CC) {
+					hasAmpersand = true
+				}
+				cc = ++pos < length ? input.charCodeAt(pos) : 0
+			}
+			if (cc !== quote) {
+				pos = input.indexOf(quote === DOUBLE_QUOTE_CC ? '"' : "'", pos)
+				if (pos === -1) {
+					throw new Error('Missing closing quote')
+				}
+				hasAmpersand = true
+			}
+			const value = input.slice(valueStart, pos)
+			attributes[attributeName] = hasAmpersand ? unescapeHtml(value) : value
+			cc = ++pos < length ? input.charCodeAt(pos) : 0
+			continue
+		}
+		cc = ++pos < length ? input.charCodeAt(pos) : 0
+	}
+
+	return pos
 }
 
 /**
@@ -202,98 +304,11 @@ export function scan<T>(
 
 		// STag ::= '<' Name (S Attribute)* S? '>', EmptyElemTag ::= '<' Name (S Attribute)* S? '/>' (XML 1.0 §3.1)
 		const nameStart = ++pos
-		let colon = -1
-		cc = pos < length ? input.charCodeAt(pos) : 0
-		while (
-			pos < length &&
-			cc !== SPACE_CC &&
-			cc !== CLOSE_BRACKET_CC &&
-			cc !== SLASH_CC &&
-			cc !== EQUALS_CC &&
-			cc !== LF_CC &&
-			cc !== CR_CC &&
-			cc !== TAB_CC
-		) {
-			if (cc === COLON_CC && colon === -1) {
-				colon = pos
-			}
-			cc = ++pos < length ? input.charCodeAt(pos) : 0
-		}
+		pos = scanName(input, pos, length)
 		const name = input.slice(nameStart, pos)
+		const colon = name.indexOf(':')
 		const attributes: Record<string, string> = {}
-
-		// Attribute ::= Name Eq AttValue, Eq ::= S? '=' S? (XML 1.0 §3.1, §2.3)
-		while (pos < length && cc !== CLOSE_BRACKET_CC) {
-			// An attribute name starts with an ASCII letter; any other character is skipped
-			if ((cc >= UPPER_A_CC && cc <= UPPER_Z_CC) || (cc >= LOWER_A_CC && cc <= LOWER_Z_CC)) {
-				const attributeStart = pos
-				cc = ++pos < length ? input.charCodeAt(pos) : 0
-				while (
-					pos < length &&
-					cc !== SPACE_CC &&
-					cc !== CLOSE_BRACKET_CC &&
-					cc !== SLASH_CC &&
-					cc !== EQUALS_CC &&
-					cc !== LF_CC &&
-					cc !== CR_CC &&
-					cc !== TAB_CC
-				) {
-					cc = ++pos < length ? input.charCodeAt(pos) : 0
-				}
-				const attributeName = input.slice(attributeStart, pos)
-
-				if (cc !== EQUALS_CC) {
-					while (cc === SPACE_CC || cc === TAB_CC || cc === CR_CC || cc === LF_CC) {
-						cc = ++pos < length ? input.charCodeAt(pos) : 0
-					}
-					if (cc !== EQUALS_CC) {
-						throw syntaxError(
-							input,
-							pos,
-							'Malformed attribute "' + attributeName + '": expected "=" after name',
-						)
-					}
-				}
-
-				cc = ++pos < length ? input.charCodeAt(pos) : 0
-				if (cc !== SINGLE_QUOTE_CC && cc !== DOUBLE_QUOTE_CC) {
-					while (cc === SPACE_CC || cc === TAB_CC || cc === CR_CC || cc === LF_CC) {
-						cc = ++pos < length ? input.charCodeAt(pos) : 0
-					}
-					if (cc !== SINGLE_QUOTE_CC && cc !== DOUBLE_QUOTE_CC) {
-						throw syntaxError(
-							input,
-							pos,
-							'Malformed attribute "' + attributeName + '": expected quoted value after "="',
-						)
-					}
-				}
-
-				const quote = cc
-				const valueStart = ++pos
-				const loopEnd = pos + VALUE_LOOP_LENGTH
-				let hasAmpersand = false
-				cc = pos < length ? input.charCodeAt(pos) : 0
-				while (cc !== quote && pos < loopEnd) {
-					if (cc === AMPERSAND_CC) {
-						hasAmpersand = true
-					}
-					cc = ++pos < length ? input.charCodeAt(pos) : 0
-				}
-				if (cc !== quote) {
-					pos = input.indexOf(quote === DOUBLE_QUOTE_CC ? '"' : "'", pos)
-					if (pos === -1) {
-						throw new Error('Missing closing quote')
-					}
-					hasAmpersand = true
-				}
-				const value = input.slice(valueStart, pos)
-				attributes[attributeName] = hasAmpersand ? unescapeHtml(value) : value
-				cc = ++pos < length ? input.charCodeAt(pos) : 0
-				continue
-			}
-			cc = ++pos < length ? input.charCodeAt(pos) : 0
-		}
+		pos = scanAttributes(input, pos, length, attributes)
 
 		const selfClosing = input.charCodeAt(pos - 1) === SLASH_CC
 		pos++
@@ -302,8 +317,8 @@ export function scan<T>(
 			current,
 			name,
 			attributes,
-			colon === -1 ? name : name.slice(colon - nameStart + 1),
-			colon === -1 ? null : name.slice(0, colon - nameStart),
+			colon === -1 ? name : name.slice(colon + 1),
+			colon === -1 ? null : name.slice(0, colon),
 		)
 
 		if (selfClosing) {
