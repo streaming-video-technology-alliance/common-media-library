@@ -12,6 +12,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `ChunkOffsetBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @example
  * {@includeCode ../../test/writers/writeStco.test.ts#example}
  *

@@ -12,6 +12,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `VideoMediaHeaderBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeVmhd(cursor: IsoBoxWriteCursor, box: VideoMediaHeaderBox): void {
@@ -20,7 +22,7 @@ export function writeVmhd(cursor: IsoBoxWriteCursor, box: VideoMediaHeaderBox): 
 	writeUint16(cursor, box.graphicsMode)
 
 	for (let i = 0; i < 3; i++) {
-		writeUint16(cursor, box.opColor[i] ?? 0)
+		writeUint16(cursor, box.opColor[i])
 	}
 
 	endIsoBox(cursor, start)

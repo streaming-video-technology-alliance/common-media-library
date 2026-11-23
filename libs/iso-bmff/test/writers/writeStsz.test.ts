@@ -101,11 +101,29 @@ describe('writeStsz', function () {
 		)
 	})
 
-	it('should write a count of 0 for a box with no count and no entrySize', function () {
-		const uniform = writeWith(writeStsz, { type: 'stsz', version: 0, flags: 0, sampleSize: 512 })
-		const empty = writeWith(writeStsz, { type: 'stsz', version: 0, flags: 0, sampleSize: 0 })
+	it('should throw a RangeError for a sampleSize other than 0 and no sampleCount', function () {
+		assert.throws(
+			() => writeWith(writeStsz, { type: 'stsz', version: 0, flags: 0, sampleSize: 512 }),
+			/^RangeError: .*writeUint32.* received undefined$/,
+		)
+	})
 
-		assert.deepStrictEqual(uniform, boxBytes('stsz', [0, 1], [0, 3], [512, 4], [0, 4]))
-		assert.deepStrictEqual(empty, boxBytes('stsz', [0, 1], [0, 3], [0, 4], [0, 4]))
+	it('should throw a RangeError for a sampleSize of 0 and no entrySize', function () {
+		assert.throws(
+			() => writeWith(writeStsz, { type: 'stsz', version: 0, flags: 0, sampleSize: 0 }),
+			/^RangeError: .*entrySize.* received undefined$/,
+		)
+	})
+
+	it('should write a count of 0 for an empty entrySize', function () {
+		const bytes = writeWith(writeStsz, {
+			type: 'stsz',
+			version: 0,
+			flags: 0,
+			sampleSize: 0,
+			entrySize: [],
+		})
+
+		assert.deepStrictEqual(bytes, boxBytes('stsz', [0, 1], [0, 3], [0, 4], [0, 4]))
 	})
 })

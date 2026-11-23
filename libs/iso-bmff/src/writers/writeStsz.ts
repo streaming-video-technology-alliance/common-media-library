@@ -3,6 +3,7 @@ import type { SampleSizeBox } from '../boxes/SampleSizeBox.ts'
 import { beginIsoFullBox } from '../beginIsoFullBox.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
 import { endIsoBox } from '../endIsoBox.ts'
+import { failRange } from '../cursor/failRange.ts'
 
 /**
  * Write the `stsz` box (`SampleSizeBox`).
@@ -11,6 +12,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  *
  * @param cursor - The write cursor
  * @param box - The `SampleSizeBox` fields to write
+ *
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @example
  * {@includeCode ../../test/writers/writeStsz.test.ts#example}
@@ -23,9 +26,13 @@ export function writeStsz(cursor: IsoBoxWriteCursor, box: SampleSizeBox): void {
 	writeUint32(cursor, box.sampleSize)
 
 	if (box.sampleSize !== 0) {
-		writeUint32(cursor, box.sampleCount ?? 0)
+		writeUint32(cursor, box.sampleCount as number)
 	} else {
-		const entrySize = box.entrySize ?? []
+		const { entrySize } = box
+
+		if (!entrySize) {
+			failRange('entrySize', 'an array', entrySize)
+		}
 
 		writeUint32(cursor, entrySize.length)
 

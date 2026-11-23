@@ -59,6 +59,28 @@ describe('beginIsoBox, beginIsoFullBox, and endIsoBox', function () {
 		assert.throws(() => beginIsoFullBox(createIsoBoxWriteCursor(), 'mvhd2', 0, 0), RangeError)
 	})
 
+	it('should throw a RangeError for a type with a character above U+00FF', function () {
+		// 'Ā' is U+0100.
+		assert.throws(
+			() => beginIsoBox(createIsoBoxWriteCursor(), 'abĀd'),
+			/^RangeError: .*four-character code.* received "abĀd"$/,
+		)
+	})
+
+	it('should throw a RangeError for a version above 255', function () {
+		assert.throws(
+			() => beginIsoFullBox(createIsoBoxWriteCursor(), 'mvhd', 256, 0),
+			/^RangeError: .*writeUint8.* received 256$/,
+		)
+	})
+
+	it('should throw a RangeError for flags above 24 bits', function () {
+		assert.throws(
+			() => beginIsoFullBox(createIsoBoxWriteCursor(), 'mvhd', 0, 0x1000000),
+			/^RangeError: .*writeUint24.* received 16777216$/,
+		)
+	})
+
 	it('should write a size of exactly 2^32 - 1 bytes', function () {
 		const cursor = createIsoBoxWriteCursor()
 		const start = beginIsoBox(cursor, 'mdat')

@@ -11,6 +11,8 @@ import type { IdentifiedMediaDataBox } from '../boxes/IdentifiedMediaDataBox.ts'
  * @param cursor - The write cursor
  * @param box - The `IdentifiedMediaDataBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeImda(cursor: IsoBoxWriteCursor, box: IdentifiedMediaDataBox): void {

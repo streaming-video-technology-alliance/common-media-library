@@ -17,6 +17,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `TrackFragmentHeaderBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeTfhd(cursor: IsoBoxWriteCursor, box: TrackFragmentHeaderBox<IsoInt64>): void {
@@ -26,23 +28,23 @@ export function writeTfhd(cursor: IsoBoxWriteCursor, box: TrackFragmentHeaderBox
 	writeUint32(cursor, box.trackId)
 
 	if (flags & 0x01) {
-		writeWideUint(cursor, box.baseDataOffset ?? 0, 8)
+		writeWideUint(cursor, box.baseDataOffset as IsoInt64, 8)
 	}
 
 	if (flags & 0x02) {
-		writeUint32(cursor, box.sampleDescriptionIndex ?? 0)
+		writeUint32(cursor, box.sampleDescriptionIndex as number)
 	}
 
 	if (flags & 0x08) {
-		writeUint32(cursor, box.defaultSampleDuration ?? 0)
+		writeUint32(cursor, box.defaultSampleDuration as number)
 	}
 
 	if (flags & 0x10) {
-		writeUint32(cursor, box.defaultSampleSize ?? 0)
+		writeUint32(cursor, box.defaultSampleSize as number)
 	}
 
 	if (flags & 0x20) {
-		writeUint32(cursor, box.defaultSampleFlags ?? 0)
+		writeUint32(cursor, box.defaultSampleFlags as number)
 	}
 
 	endIsoBox(cursor, start)

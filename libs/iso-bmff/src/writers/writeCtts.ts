@@ -15,13 +15,15 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `CompositionOffsetBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeCtts(cursor: IsoBoxWriteCursor, box: CompositionOffsetBox): void {
 	const start = beginIsoFullBox(cursor, 'ctts', box.version, box.flags)
 
 	if (box.version > 1) {
-		writeUint32(cursor, box.entryCount ?? 0)
+		writeUint32(cursor, box.entryCount as number)
 	} else {
 		const writeOffset = box.version ? writeInt32 : writeUint32
 

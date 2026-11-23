@@ -44,10 +44,24 @@ describe('writeCtts', function () {
 		assert.deepStrictEqual(new Uint8Array(writer.buffer), boxBytes('ctts', [2, 1], [0, 3], [1, 4]))
 	})
 
-	it('should write an entry_count of 0 for a version 2 box with no entryCount', function () {
-		const bytes = writeWith(writeCtts, { type: 'ctts', version: 2, flags: 0, entries: [] })
+	it('should throw a RangeError for a version 2 box with no entryCount', function () {
+		assert.throws(
+			() => writeWith(writeCtts, { type: 'ctts', version: 2, flags: 0, entries: [] }),
+			/^RangeError: .*writeUint32.* received undefined$/,
+		)
+	})
 
-		assert.deepStrictEqual(bytes, boxBytes('ctts', [2, 1], [0, 3], [0, 4]))
+	it('should throw a RangeError for a negative sample offset of a version 0 box', function () {
+		assert.throws(
+			() =>
+				writeWith(writeCtts, {
+					type: 'ctts',
+					version: 0,
+					flags: 0,
+					entries: [{ sampleCount: 1, sampleOffset: -1 }],
+				}),
+			/^RangeError: .*writeUint32.* received -1$/,
+		)
 	})
 
 	it('should write a negative sample offset of a version 1 box as a signed field', function () {

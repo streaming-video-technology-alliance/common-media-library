@@ -88,7 +88,8 @@ export type EnsureEncryptedInitOptions = {
 	schemeType: string | number
 
 	/**
-	 * The default KID to use for the encryption, 16 bytes.
+	 * The default KID to use for the encryption: 16 bytes, each from 0 to 255.
+	 * Another value throws a `RangeError`.
 	 *
 	 * @defaultValue 16 bytes of 0
 	 */
@@ -181,7 +182,7 @@ export function ensureEncryptedInit(
 							flags: 0,
 							defaultIsProtected: 1,
 							defaultPerSampleIvSize: 8,
-							defaultKid: Uint8Array.from(defaultKid),
+							defaultKid: defaultKid as Uint8Array,
 						},
 					],
 				},

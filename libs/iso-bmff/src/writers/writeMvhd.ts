@@ -4,8 +4,8 @@ import type { IsoInt64 } from '../IsoInt64.ts'
 import { beginIsoFullBox } from '../beginIsoFullBox.ts'
 import { writeUint16 } from '../cursor/writeUint16.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
-import { writeTemplate16 } from '../cursor/writeTemplate16.ts'
-import { writeTemplate32 } from '../cursor/writeTemplate32.ts'
+import { writeInt16 } from '../cursor/writeInt16.ts'
+import { writeInt32 } from '../cursor/writeInt32.ts'
 import { writeWideUint } from '../cursor/writeWideUint.ts'
 import { endIsoBox } from '../endIsoBox.ts'
 import { writeMatrix } from '../cursor/writeMatrix.ts'
@@ -21,6 +21,8 @@ import { writeMatrix } from '../cursor/writeMatrix.ts'
  * @param cursor - The write cursor
  * @param box - The `MovieHeaderBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @example
  * {@includeCode ../../test/writers/writeMvhd.test.ts#example}
  *
@@ -35,8 +37,8 @@ export function writeMvhd(cursor: IsoBoxWriteCursor, box: MovieHeaderBox<IsoInt6
 	writeWideUint(cursor, box.modificationTime, size)
 	writeUint32(cursor, box.timescale)
 	writeWideUint(cursor, box.duration, size)
-	writeTemplate32(cursor, box.rate)
-	writeTemplate16(cursor, box.volume)
+	writeInt32(cursor, Math.round(box.rate * 0x10000))
+	writeInt16(cursor, Math.round(box.volume * 0x100))
 	writeUint16(cursor, 0)
 	writeUint32(cursor, 0)
 	writeUint32(cursor, 0)

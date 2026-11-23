@@ -96,18 +96,20 @@ describe('writeHdlr', function () {
 		})
 	}
 
-	it('should end the name at the first U+0000', function () {
-		const bytes = writeWith(writeHdlr, {
-			type: 'hdlr',
-			version: 0,
-			flags: 0,
-			handlerType: 'vide',
-			name: 'a\0b',
-		})
-		const [box] = readIsoBoxes(bytes, { readers: { hdlr: readHdlr } })
-
-		assert.deepStrictEqual(Array.from(bytes.subarray(32)), [0x61, 0])
-		assert.ok(isIsoBoxType('hdlr', box))
-		assert.strictEqual(box.name, 'a')
+	it('should throw a RangeError for a name with U+0000', function () {
+		assert.throws(
+			() =>
+				writeWith(writeHdlr, {
+					type: 'hdlr',
+					version: 0,
+					flags: 0,
+					handlerType: 'vide',
+					name: 'a\0b',
+				}),
+			(error: unknown) =>
+				error instanceof RangeError &&
+				error.message.includes('writeTerminatedUtf8') &&
+				error.message.endsWith(' received a\0b'),
+		)
 	})
 })

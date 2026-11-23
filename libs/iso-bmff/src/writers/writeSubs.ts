@@ -14,6 +14,7 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SubSampleInformationBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
  * @throws RangeError if an entry has more than 65535 subsamples.
  *
  * @public
