@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The first `parseXml` call in a page or a process is faster. Versions 1.2.0 to 1.2.3 make this call slower than version 1.1.6 does. A player makes this call when it parses the manifest of a VOD stream.
+
 ## [1.2.3] - 2026-11-20
 
 ### Changed
