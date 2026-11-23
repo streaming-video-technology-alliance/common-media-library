@@ -10,7 +10,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * The cursor shares memory with the input.
  *
  * @param data - The data to read.
- * @param config - The readers map and the `int64` option. The configuration is required when `V` is `bigint`.
+ * @param config - The readers map and the `int64` option.
  * @returns A cursor at the first byte of the data.
  *
  * @example
@@ -20,7 +20,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
  */
 export function createIsoBoxReadCursor<V extends IsoInt64 = number>(
 	data: IsoBoxData,
-	...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]
+	config?: IsoBoxReadConfig<V>,
 ): IsoBoxReadCursor<V>
 export function createIsoBoxReadCursor(
 	data: IsoBoxData,

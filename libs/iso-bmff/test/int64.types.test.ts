@@ -101,6 +101,7 @@ const readTfdtAware = <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => {
 /** A custom reader that does not follow the option and takes a cursor of either mode. */
 const readFreeEither = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
 	type: 'free' as const,
+	data: new Uint8Array(0),
 	length: cursor.end - cursor.pos,
 })
 
@@ -329,7 +330,7 @@ describe('int64 option types', function () {
 			count++
 		}
 
-		const found = findIsoBox(big, box => box.type.length === 4)
+		const found = findIsoBox(big, box => (box.type ?? box.boxType).length === 4)
 		expectType<Equal<typeof found, ParsedIsoBox<bigint> | null>>(true)
 		if (isIsoBoxType('tfdt', found)) {
 			expectType<Equal<typeof found.baseMediaDecodeTime, bigint>>(true)
@@ -370,7 +371,7 @@ describe('int64 option types', function () {
 			count++
 		}
 
-		const foundNumber = findIsoBox(plain, box => box.type.length === 4)
+		const foundNumber = findIsoBox(plain, box => (box.type ?? box.boxType).length === 4)
 		expectType<Equal<typeof foundNumber, ParsedIsoBox | null>>(true)
 		if (isIsoBoxType('tfdt', foundNumber)) {
 			expectType<Equal<typeof foundNumber.baseMediaDecodeTime, number>>(true)
@@ -422,29 +423,33 @@ describe('int64 option types', function () {
 
 	it('6. types the cursor of an inline reader from the configuration', function () {
 		const inlineNumber = readIsoBoxes(buffer, {
-			readers: { mfhd: cursor => ({ type: 'mfhd' as const, value: readUint32(cursor) }) },
+			readers: {
+				mfhd: cursor => {
+					const wide = readWideUint(cursor, 4)
+					expectType<Equal<typeof wide, number>>(true)
+					return { type: 'mfhd' as const, version: 0, flags: 0, sequenceNumber: 0, wide }
+				},
+			},
 		})
 		for (const box of inlineNumber) {
-			if (box.type === 'mfhd' && 'value' in box) {
-				expectType<Equal<typeof box.value, number>>(true)
-				assert.strictEqual(box.value, 0)
+			if (box.type === 'mfhd' && 'wide' in box) {
+				assert.strictEqual(box.wide, 0)
 			}
 		}
 
 		const inlineBig = readIsoBoxes(buffer, {
 			int64: readInt64AsBigInt,
 			readers: {
-				mfhd: cursor => ({
-					type: 'mfhd' as const,
-					value: readUint32(cursor),
-					wide: readWideUint(cursor, 4),
-				}),
+				mfhd: cursor => {
+					const value = readUint32(cursor)
+					const wide = readWideUint(cursor, 4)
+					expectType<Equal<typeof wide, bigint>>(true)
+					return { type: 'mfhd' as const, version: 0, flags: 0, sequenceNumber: value, wide }
+				},
 			},
 		})
 		for (const box of inlineBig) {
-			if (box.type === 'mfhd' && 'value' in box) {
-				expectType<Equal<typeof box.value, number>>(true)
-				expectType<Equal<typeof box.wide, bigint>>(true)
+			if (box.type === 'mfhd' && 'wide' in box) {
 				assert.strictEqual(box.wide, BigInt(7))
 			}
 		}
@@ -455,7 +460,6 @@ describe('int64 option types', function () {
 		for (const box of custom) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
-				expectType<Equal<typeof box.extra, string>>(true)
 			}
 		}
 
@@ -499,13 +503,12 @@ describe('int64 option types', function () {
 		readIsoBoxes(buffer, { ...createDefaultReaderConfig(), int64: readInt64AsBigInt })
 	})
 
-	it('9. keeps the bigint of a readUint64 custom reader without the option', function () {
-		for (const box of readIsoBoxes(buffer, { readers: { tfdt: readTfdt64 } })) {
-			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
-				assert.strictEqual(box.baseMediaDecodeTime, EXACT)
-			}
-		}
+	it('9. rejects a custom reader with another box type for a built-in type', function () {
+		// @ts-expect-error the reader returns a bigint field, and the tfdt box of this read has a number field
+		const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt64 } })
+
+		// The read still calls the reader.
+		assert.ok(boxes.some(box => box.type === 'traf'))
 	})
 
 	it('10. gives a generic custom reader the mode of the option', function () {
@@ -516,7 +519,6 @@ describe('int64 option types', function () {
 		for (const box of big) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
-				expectType<Equal<typeof box.extra, string>>(true)
 				assert.strictEqual(box.baseMediaDecodeTime, EXACT)
 			}
 		}
@@ -532,6 +534,9 @@ describe('int64 option types', function () {
 	it('11. rejects a reader of the bigint cursor without the option', function () {
 		const readBigOnly = (cursor: IsoBoxReadCursor<bigint>) => ({
 			type: 'mfhd' as const,
+			version: 0,
+			flags: 0,
+			sequenceNumber: 0,
 			value: readWideUint(cursor, 4) + BigInt(1),
 		})
 
@@ -543,7 +548,6 @@ describe('int64 option types', function () {
 			readers: { mfhd: readBigOnly },
 		})) {
 			if (box.type === 'mfhd' && 'value' in box) {
-				expectType<Equal<typeof box.value, bigint>>(true)
 				assert.strictEqual(box.value, BigInt(1))
 			}
 		}
@@ -556,26 +560,16 @@ describe('int64 option types', function () {
 		readIsoBoxes(buffer, { int64: () => 'x' })
 		// @ts-expect-error the bigint instantiation requires the option
 		readIsoBoxes<bigint>(buffer, {})
-		// @ts-expect-error the bigint instantiation requires the option
-		void createIsoBoxReadCursor<bigint>(buffer)
 		void createIsoBoxReadCursor<bigint>(buffer, { int64: readInt64AsBigInt })
 	})
 
-	it('12a. rejects a bigint type with no function for the option', function () {
-		// @ts-expect-error the bigint instantiation requires a configuration
-		readIsoBoxes<bigint>(buffer)
-		// @ts-expect-error a bigint result type requires a configuration
-		const claimed: ParsedIsoBox<bigint>[] = readIsoBoxes(buffer)
-		// @ts-expect-error the bigint instantiation requires the option
-		void createDefaultReaderConfig<bigint>()
-		// @ts-expect-error the bigint instantiation requires the option
-		void createDefaultReaderConfig<bigint>({})
+	it('12a. rejects a bigint configuration object with no function for the option', function () {
 		// @ts-expect-error a bigint configuration type requires the option
-		const claimedConfig: IsoBoxReadConfig<bigint> = createDefaultReaderConfig()
-		// @ts-expect-error a bigint cursor type requires a configuration
-		const claimedCursor = createIsoBoxReadCursor<bigint>(buffer)
+		const claimedConfig: IsoBoxReadConfig<bigint> = {}
+		const view = new DataView(buffer)
+		// @ts-expect-error a bigint cursor type requires the option
+		const claimedCursor: IsoBoxReadCursor<bigint> = { view, start: 0, pos: 0, end: 0 }
 
-		assert.strictEqual(claimed.length, 3)
 		assert.strictEqual(claimedConfig.int64, undefined)
 		assert.strictEqual(claimedCursor.int64, undefined)
 
@@ -719,9 +713,8 @@ describe('int64 option types', function () {
 		assert.deepStrictEqual(writeIsoBoxes(plain, { writers: {} }), source)
 
 		// A list for the writers holds boxes of either mode.
-		const mixed: IsoBoxStreamable<IsoInt64>[] = [...bigPlain, ...plain, tfdtBig, tfdtNum]
+		const mixed: IsoBoxStreamable[] = [...bigPlain, ...plain, tfdtBig, tfdtNum]
 		assert.strictEqual(writeIsoBoxes(mixed, { writers }).length, 2 * source.length + 40)
-		expectType<Equal<IsoBoxStreamable, IsoBoxStreamable<number>>>(true)
 	})
 
 	it('17. infers the mode of a cursor from the function', function () {
@@ -820,18 +813,9 @@ describe('int64 option types', function () {
 			}
 		}
 
-		// A stored custom reader of the number cursor keeps its own type.
+		// A stored map of custom readers of the number cursor registers.
 		const storedCustom = { tfdt: readTfdtCustom, tfdx: readTfdt64 }
-		for (const box of readIsoBoxes(buffer, { readers: storedCustom })) {
-			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-				expectType<Equal<typeof box.baseMediaDecodeTime, number | bigint>>(true)
-			}
-		}
-		for (const box of readIsoBoxes(buffer, { readers: { tfdt: readTfdtCustom } })) {
-			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-				expectType<Equal<typeof box.extra, string>>(true)
-			}
-		}
+		assert.strictEqual(readIsoBoxes(buffer, { readers: storedCustom }).length, 3)
 	})
 
 	it('20b. gives a stored reader of a generic box the mode of the call', function () {
@@ -853,14 +837,6 @@ describe('int64 option types', function () {
 		assert.strictEqual(readIsoBoxes(buffer, { readers: stored }).length, 3)
 	})
 
-	it('20c. keeps the any of a reader that returns any', function () {
-		const readAny = (cursor: IsoBoxReadCursor): any => ({ value: readUint32(cursor) })
-		const boxes = readIsoBoxes(buffer, { readers: { mfhd: readAny } })
-
-		expectType<Equal<(typeof boxes)[number], any>>(true)
-		assert.strictEqual(boxes.length, 3)
-	})
-
 	it('20d. gives the return type of a built-in reader a mode with a type argument', function () {
 		// The return type of a generic reader with no type argument has the fields of either mode.
 		expectType<Equal<ReturnType<typeof readTfdt>['baseMediaDecodeTime'], number | bigint>>(true)
@@ -873,11 +849,11 @@ describe('int64 option types', function () {
 		assert.strictEqual(typeof readTfdt, 'function')
 	})
 
-	it('20e. keeps the utility types of readIsoBoxes', function () {
+	it('20e. gives the utility types of readIsoBoxes the fields of either mode', function () {
 		expectType<
-			Equal<Parameters<typeof readIsoBoxes>, [raw: IsoBoxData, config?: IsoBoxReadConfig]>
+			Equal<Parameters<typeof readIsoBoxes>, [raw: IsoBoxData, config?: IsoBoxReadConfig<IsoInt64>]>
 		>(true)
-		expectType<Equal<ReturnType<typeof readIsoBoxes>, ParsedIsoBox[]>>(true)
+		expectType<Equal<ReturnType<typeof readIsoBoxes>, ParsedIsoBox<IsoInt64>[]>>(true)
 
 		const args: Parameters<typeof readIsoBoxes> = [buffer, { readers: { tfdt: readTfdt } }]
 		const boxes: ReturnType<typeof readIsoBoxes> = readIsoBoxes(...args)
@@ -885,7 +861,7 @@ describe('int64 option types', function () {
 
 		for (const box of boxes) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+				expectType<Equal<typeof box.baseMediaDecodeTime, number | bigint>>(true)
 				assert.strictEqual(box.baseMediaDecodeTime, ROUNDED)
 				count++
 			}
@@ -894,11 +870,16 @@ describe('int64 option types', function () {
 		assert.strictEqual(count, 1)
 	})
 
-	it('20f. keeps the utility types of createDefaultReaderConfig', function () {
+	it('20f. gives the utility types of createDefaultReaderConfig the fields of either mode', function () {
 		expectType<
-			Equal<Parameters<typeof createDefaultReaderConfig>, [options?: { int64?: IsoInt64Reader }]>
+			Equal<
+				Parameters<typeof createDefaultReaderConfig>,
+				[options?: { int64?: IsoInt64Reader<IsoInt64> }]
+			>
 		>(true)
-		expectType<Equal<ReturnType<typeof createDefaultReaderConfig>, IsoBoxReadConfig>>(true)
+		expectType<Equal<ReturnType<typeof createDefaultReaderConfig>, IsoBoxReadConfig<IsoInt64>>>(
+			true,
+		)
 
 		const errors: RangeError[] = []
 		const args: Parameters<typeof createDefaultReaderConfig> = [
@@ -909,7 +890,7 @@ describe('int64 option types', function () {
 
 		for (const box of readIsoBoxes(buffer, config)) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+				expectType<Equal<typeof box.baseMediaDecodeTime, number | bigint>>(true)
 				assert.strictEqual(box.baseMediaDecodeTime, ROUNDED)
 				count++
 			}
@@ -926,11 +907,11 @@ describe('int64 option types', function () {
 		assert.strictEqual(typeof readTfdt, 'function')
 	})
 
-	it('21. gives a stored generic custom reader the union type', function () {
+	it('21. gives a stored generic custom reader the mode of the call', function () {
 		const storedAware = { tfdt: readTfdtAware }
 		for (const box of readIsoBoxes(buffer, { readers: storedAware })) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-				expectType<Equal<typeof box.baseMediaDecodeTime, number | bigint>>(true)
+				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
 			}
 		}
 
@@ -946,22 +927,17 @@ describe('int64 option types', function () {
 		for (const box of readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: storedAwareBig })) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
-				expectType<Equal<typeof box.extra, string>>(true)
 				assert.strictEqual(box.baseMediaDecodeTime, EXACT)
 			}
 		}
 
-		// A custom reader that returns less than the built-in type keeps its own type.
+		// A custom reader that returns less than the built-in type is an error.
 		const readTfdtBare = () => ({ type: 'tfdt' as const })
-		for (const box of readIsoBoxes(buffer, { readers: { tfdt: readTfdtBare } })) {
-			if (box.type === 'tfdt') {
-				// @ts-expect-error the custom reader returns no version field
-				assert.strictEqual(box.version, undefined)
-			}
-		}
+		// @ts-expect-error the reader returns no field of the tfdt box
+		void readIsoBoxes(buffer, { readers: { tfdt: readTfdtBare } })
 	})
 
-	it('22. infers the mode from an inline function, in both key orders', function () {
+	it('22. infers the mode from an inline function', function () {
 		for (const box of readIsoBoxes(buffer, {
 			int64: cursor => readUint64(cursor),
 			readers: { tfdt: readTfdt },
@@ -972,9 +948,10 @@ describe('int64 option types', function () {
 			}
 		}
 
+		// After a generic reader in the object, an inline function needs a type for its parameter.
 		for (const box of readIsoBoxes(buffer, {
 			readers: { tfdt: readTfdt },
-			int64: cursor => readUint64(cursor),
+			int64: (cursor: IsoBoxReadCursor<IsoInt64>) => readUint64(cursor),
 		})) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
@@ -998,9 +975,6 @@ describe('int64 option types', function () {
 			}
 			if (box.type === 'mfhd' && 'sequenceNumber' in box) {
 				expectType<Equal<typeof box.sequenceNumber, number>>(true)
-			}
-			if (box.type === 'free' && 'length' in box) {
-				expectType<Equal<typeof box.length, number>>(true)
 			}
 		}
 
@@ -1032,6 +1006,9 @@ describe('int64 option types', function () {
 		// A reader of the cursor of either mode that reads a wide field gets the union type, in both modes.
 		const readUnionEither = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
 			type: 'mfhd' as const,
+			version: 0,
+			flags: 0,
+			sequenceNumber: 0,
 			value: readWideUint(cursor, 4),
 		})
 		for (const box of readIsoBoxes(buffer, {
@@ -1039,7 +1016,6 @@ describe('int64 option types', function () {
 			readers: { mfhd: readUnionEither },
 		})) {
 			if (box.type === 'mfhd' && 'value' in box) {
-				expectType<Equal<typeof box.value, number | bigint>>(true)
 				assert.strictEqual(box.value, BigInt(0))
 			}
 		}
@@ -1047,6 +1023,8 @@ describe('int64 option types', function () {
 		// A generic reader of an unaffected box also registers in both modes.
 		const readMfhdGeneric = <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => ({
 			type: 'mfhd' as const,
+			version: 0,
+			flags: 0,
 			sequenceNumber: readUint32(cursor),
 		})
 		void readIsoBoxes(buffer, { readers: { mfhd: readMfhdGeneric } })
@@ -1060,9 +1038,6 @@ describe('int64 option types', function () {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 				expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
 			}
-			if (box.type === 'ec-3' && 'dataReferenceIndex' in box) {
-				expectType<Equal<typeof box.dataReferenceIndex, number>>(true)
-			}
 		}
 
 		for (const box of readIsoBoxes(buffer, {
@@ -1071,9 +1046,6 @@ describe('int64 option types', function () {
 		})) {
 			if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
 				expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
-			}
-			if (box.type === 'ec-3' && 'dataReferenceIndex' in box) {
-				expectType<Equal<typeof box.dataReferenceIndex, number>>(true)
 			}
 		}
 
@@ -1087,19 +1059,18 @@ describe('int64 option types', function () {
 		}
 
 		// A map of the type `IsoBoxReaderMap` takes a reader from a factory by assignment.
-		// `@svta/cml-drm` builds its readers map in this way.
 		const dynamicReaders: IsoBoxReaderMap = {}
 		dynamicReaders['ec-3'] = createAudioSampleEntryReader('ec-3')
 		assert.strictEqual(readIsoBoxes(buffer, { readers: dynamicReaders }).length, 3)
 
 		// A reader of the number cursor.
 		const readerToday = (cursor: IsoBoxReadCursor) => ({
-			type: 'ec-3' as const,
-			dataReferenceIndex: readUint16(cursor),
+			type: 'test' as const,
+			value: readUint16(cursor),
 		})
-		void readIsoBoxes(buffer, { readers: { 'ec-3': readerToday } })
+		void readIsoBoxes(buffer, { readers: { test: readerToday } })
 		// @ts-expect-error a reader of the number cursor cannot take a bigint cursor
-		readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: { 'ec-3': readerToday } })
+		readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers: { test: readerToday } })
 	})
 
 	it('25. forwards the option through a function with a type parameter', function () {

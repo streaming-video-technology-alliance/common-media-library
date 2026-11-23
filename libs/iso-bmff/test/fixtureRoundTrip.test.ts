@@ -196,6 +196,12 @@ describe('fixture round trip', function () {
 
 				for (const box of [...tree, ...walkSamples(tree, read)]) {
 					const { type } = box
+
+					// A raw box has no reader and no writer in the default configs.
+					if (!type) {
+						continue
+					}
+
 					const { bytes: original, remaining } = sourceOf(box)
 					const writer = writers[type]
 
@@ -251,7 +257,7 @@ describe('fixture round trip', function () {
 
 					for (const offset of offsets) {
 						if (!same(output.subarray(offset, offset + 16), source.subarray(offset, offset + 16))) {
-							fail(box.type, 'offsets')
+							fail(box.type ?? box.boxType, 'offsets')
 						}
 					}
 				}

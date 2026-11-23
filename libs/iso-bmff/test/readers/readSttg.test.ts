@@ -17,7 +17,7 @@ describe('readSttg', function () {
 		const boxes = readIsoBoxes(data, { readers: { sttg: readSttg } })
 		assert(isIsoBoxType('vttc', boxes[1]))
 		assert(isContainer(boxes[1]))
-		const sttg: { type: string } = boxes[1].boxes[1]
+		const sttg = boxes[1].boxes[1]
 		assert(isIsoBoxType('sttg', sttg))
 		assert.strictEqual(sttg.settings, 'align:left line:89% position:25% size:65%')
 	})

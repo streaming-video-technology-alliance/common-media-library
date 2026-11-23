@@ -8,11 +8,9 @@ import {
 	readIsoBoxes,
 	readStsd,
 	writeIsoBox,
-	type AudioSampleEntry,
 	type SampleDescriptionBox,
-	type VisualSampleEntry,
-	type VisualSampleEntryType,
 } from '../util/box.ts'
+import { typeOf } from '../util/typeOf.ts'
 import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('readStsd', function () {
@@ -20,9 +18,11 @@ describe('readStsd', function () {
 		const boxes = filterBoxes('240fps_go_pro_hero_4.mp4', 'stsd', { readers: { stsd: readStsd } })
 
 		assert.strictEqual(boxes.length, 3)
-		assert.strictEqual((boxes[0].boxes[0] as VisualSampleEntry<'avc1'>).type, 'avc1')
-		assert.strictEqual((boxes[1].boxes[0] as AudioSampleEntry<'mp4a'>).type, 'mp4a')
-		assert.strictEqual((boxes[2].boxes[0] as VisualSampleEntry<VisualSampleEntryType>).type, 'fdsc')
+		// The read has no reader for the entries, so each entry is a raw box.
+		assert.deepStrictEqual(
+			boxes.map(box => typeOf(box.boxes[0])),
+			['avc1', 'mp4a', 'fdsc'],
+		)
 	})
 
 	it('should read no entries for an entry_count of 0', function () {

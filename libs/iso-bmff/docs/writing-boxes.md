@@ -11,6 +11,8 @@ The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable it
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
 - Boxes that `readIsoBoxes` returns. A box with no reader and a type outside `CONTAINERS` is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
 
+The write functions check a box object against its box type. A box object has the `type` of a box type of `IsoBoxMap` and every required field of that type. To write a box type that the package does not name, add the type to `IsoCustomBoxMap`. See [Writing a custom box](#writing-a-custom-box). The `boxes` field of a box type takes box objects and raw boxes. To put the bytes of a box in a `boxes` field, use a raw box, such as `{ boxType: "esds", bytes }`.
+
 If you provide box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space. The keys `url` and `urn` also find the writers of those boxes.
 
 A writer follows the `flags` and the `version` of the box. The writer writes a field only when the flags or the version select that field. A field that the flags or the version select must have a value.
@@ -138,6 +140,8 @@ readableStream.pipeTo(stream.writable);
 
 ## Writing a custom box
 
+The `writers` map takes a writer under a key of `IsoBoxMap`. For a box type that the package does not name, add the type to `IsoCustomBoxMap` first. The write functions then check a box of that type, and `readIsoBoxes` has that box type too.
+
 A writer takes a write cursor and a box object, and returns nothing. The writer writes the header with `beginIsoBox` or `beginIsoFullBox`, then the fields with the write field functions, then the size with `endIsoBox`. A writer does not compute the size of its box:
 
 ```typescript
@@ -153,6 +157,13 @@ import {
 
 // A box type that the package does not name.
 type AbcdBox = { type: "abcd"; brand: string; count: number; flags: number };
+
+// Add the box type to the map of custom box types.
+declare module "@svta/cml-iso-bmff" {
+	interface IsoCustomBoxMap {
+		abcd: AbcdBox;
+	}
+}
 
 const writeAbcd = (cursor: IsoBoxWriteCursor, box: AbcdBox) => {
 	const start = beginIsoBox(cursor, box.type);

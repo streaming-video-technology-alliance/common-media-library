@@ -30,11 +30,13 @@ import {
 } from './util/box.ts'
 
 describe('result types', function () {
-	it('should accept a test for any box type on a child of a container', function () {
+	it('should reject a test for a box type outside IsoBoxMap on a child of a container', function () {
 		const moov: MovieBox = { type: 'moov', boxes: [] }
 		const child = moov.boxes[0]
 
 		expectType<Equal<MovieBox['boxes'][number], ParsedIsoBox>>(true)
+		assert.strictEqual(child?.type === 'trak', false)
+		// @ts-expect-error `hvcC` is not a box type of `IsoBoxMap`.
 		assert.strictEqual(child?.type === 'hvcC', false)
 	})
 
@@ -63,12 +65,12 @@ describe('result types', function () {
 		assert.ok(boxes.length > 0)
 	})
 
-	it('should add no member for a reader result with a type that is not a literal', function () {
+	it('should reject a reader result with a type that is not a literal', function () {
 		const boxes = readIsoBoxes(new Uint8Array(0), {
-			readers: { abcd: () => ({ type: 'abcd' as string, extra: 1 }) },
+			// @ts-expect-error The reader of `abcd` returns a box with the type `abcd`.
+			readers: { abcd: () => ({ type: 'abcd' as string, x: 1 }) },
 		})
 
-		expectType<Equal<Extract<(typeof boxes)[number], { extra: number }>, never>>(true)
 		assert.strictEqual(boxes.length, 0)
 	})
 
@@ -84,7 +86,7 @@ describe('result types', function () {
 
 		assert.ok(child && 'bytes' in child)
 		expectType<Equal<Extract<typeof child, { bytes: Uint8Array }>, IsoRawBox>>(true)
-		assert.ok(findIsoBox(box.boxes, b => b.type === 'hint'))
+		assert.ok(findIsoBox(box.boxes, b => !b.type && b.boxType === 'hint'))
 	})
 
 	it('should remove the default type argument of Box and the child types', function () {

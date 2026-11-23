@@ -534,3 +534,15 @@ Amended on 2026-11-22, by the review of [#756](https://github.com/streaming-vide
 - **Count fields, rule 2, and the flags rule.** A field that a flag or the version selects must have a value. The writer throws a `RangeError` for a missing value and does not write 0. Examples are `sampleDuration` of `trun` with the flag 0x100, and `entryCount` of `ctts` of version 2 or above. A field with a default in the specification, such as `pre_defined`, stays optional.
 - **Read cursor.** A length is an integer of 0 or more. A length that is not an integer throws the `RangeError` of a read past `cursor.end`, and the cursor does not move. A read with such a length left a position that is not an integer, and every later read in the process was slower.
 - **Write field functions.** Each function throws a `RangeError` for a value that its field cannot hold, and the cursor does not move. The [box types RFC](iso-bmff-v2-box-types.md) states the rules.
+
+Amended on 2026-11-23, by the review of the box types ([#759](https://github.com/streaming-video-technology-alliance/common-media-library/pull/759)):
+
+- **Raw box.** A raw box is `{ boxType, bytes, headerSize, usertype }`. `boxType` has the four-character code, and a raw box has no `type` field. The name follows `boxtype` of ISO/IEC 14496-12:2015 clause 4.2.
+- **Result type, rule 1.** The result type of `readIsoBoxes` is `ParsedIsoBox<V>[]` for every readers map. `ParsedIsoBox<V>` is the box types of `IsoBoxMap` and `IsoRawBox`. The result type does not follow the readers map, and `IsoBoxReaderReturn` leaves the package.
+- **Result type, rule 2.** The test `box.type === 'tfdt'` narrows a box to that box type. The test `!box.type` narrows a box to `IsoRawBox`. The four-character code of any box is `box.type ?? box.boxType`.
+- **`isIsoBoxType`.** The function stays. It takes a value that can be `null`, `undefined`, or of an unknown type. The first signature takes `IsoBox<V> | { type?: string } | null | undefined`.
+- **Result type, rule 3.** A reader result with a `type` field that is not a literal is a compile error.
+- **Cost of the result type.** The version 1 test `box.type === 'tfdt'` compiles again, so the migration to `isIsoBoxType` is not necessary. The new cost is a test that compiles and never matches. A box with no reader is a raw box, and a test of `type` never matches a raw box.
+- **Map types.** The two maps take a key of `IsoBoxMap` only. A custom key needs a declaration in `IsoCustomBoxMap`. The [box types RFC](iso-bmff-v2-box-types.md) states the rules.
+- **`isContainer`.** The function returns `false` for a raw box.
+- **Raw boxes in `writeIsoBoxes`.** The order does not change. The example of a raw box is now `{ boxType: 'esds', bytes }`.

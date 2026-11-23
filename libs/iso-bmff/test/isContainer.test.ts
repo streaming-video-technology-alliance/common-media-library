@@ -9,11 +9,15 @@ import {
 	readInt64AsBigInt,
 	readIsoBoxes,
 	readUint8,
+	writeIsoBoxes,
 	type AdditionalMetadataContainerBox,
 	type GroupsListBox,
 	type IsoBoxReadCursor,
+	type IsoBoxReader,
+	type IsoRawBox,
 	type ParsedIsoBox,
 	type SubTrack,
+	type TrackFragmentBox,
 	type UserDataBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
@@ -224,18 +228,36 @@ describe('isContainer', function () {
 	})
 
 	it('keeps a custom result with a container type and no boxes field', function () {
-		const readers = { traf: () => ({ type: 'traf' as const, note: 1 }) }
+		// A reader with another box type for a built-in type needs a cast.
+		const readers = {
+			traf: (() => ({ type: 'traf', note: 1 })) as unknown as IsoBoxReader<TrackFragmentBox>,
+		}
 		let count = 0
 
 		for (const box of readIsoBoxes(buffer, { readers })) {
 			if (isContainer(box) && box.type === 'traf') {
-				// @ts-expect-error the custom traf result has no boxes field
-				assert.strictEqual(box.boxes, undefined)
-				assert.strictEqual(box.note, 1)
+				// The type has the built-in `boxes` field.
+				const custom = box as unknown as { boxes?: unknown; note: number }
+				assert.strictEqual(custom.boxes, undefined)
+				assert.strictEqual(custom.note, 1)
 				count++
 			}
 		}
 
 		assert.strictEqual(count, 1)
+	})
+
+	it('returns false for a raw box with a type in CONTAINERS', function () {
+		const raw: IsoRawBox = { boxType: 'moov', bytes: new Uint8Array(MOOV) }
+
+		assert.strictEqual(isContainer(raw), false)
+		assert.deepStrictEqual([...writeIsoBoxes([raw])], MOOV)
+	})
+
+	it('returns true for each box of a type in CONTAINERS from a read with no reader', function () {
+		assert.deepStrictEqual(
+			readIsoBoxes(buffer).map(box => isContainer(box)),
+			[true, true],
+		)
 	})
 })

@@ -75,7 +75,7 @@ import { readVtte } from './readVtte.ts'
  * The readers of the configuration have the types of that option.
  * Pass the option here and do not add it to the configuration afterward.
  *
- * @param options - The options for the configuration. The `int64` option is required when `V` is `bigint`.
+ * @param options - The options for the configuration.
  * @returns An `IsoBoxReadConfig` with all available readers pre-configured, except the container readers
  *
  * @example
@@ -83,42 +83,12 @@ import { readVtte } from './readVtte.ts'
  *
  * @public
  */
-export function createDefaultReaderConfig<V extends IsoInt64 = number>(
-	...options: [V] extends [bigint]
-		? [
-				options: {
-					/**
-					 * The function that reads every 64-bit integer field of the built-in readers.
-					 */
-					int64: IsoInt64Reader<V>
-				},
-			]
-		: [
-				options?: {
-					/**
-					 * The function that reads every 64-bit integer field of the built-in readers.
-					 */
-					int64?: IsoInt64Reader<V>
-				},
-			]
-): IsoBoxReadConfig<V>
-
-/**
- * Create a default reader configuration with `number` fields.
- *
- * `Parameters<typeof createDefaultReaderConfig>` and `ReturnType<typeof createDefaultReaderConfig>` resolve to this signature.
- *
- * @param options - The options for the configuration
- * @returns An `IsoBoxReadConfig` with all available readers pre-configured, except the container readers
- *
- * @public
- */
-export function createDefaultReaderConfig(options?: {
+export function createDefaultReaderConfig<V extends IsoInt64 = number>(options?: {
 	/**
 	 * The function that reads every 64-bit integer field of the built-in readers.
 	 */
-	int64?: IsoInt64Reader
-}): IsoBoxReadConfig
+	int64?: IsoInt64Reader<V>
+}): IsoBoxReadConfig<V>
 export function createDefaultReaderConfig(options?: { int64?: IsoInt64Reader }): IsoBoxReadConfig {
 	return {
 		...options,

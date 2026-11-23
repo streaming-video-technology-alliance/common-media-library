@@ -122,13 +122,6 @@ describe('seekIsoBox', function () {
 		assert.strictEqual(cursor.pos, 0)
 	})
 
-	it('should require the configuration for a bigint result', function () {
-		// @ts-expect-error: the int64 option is required when V is bigint
-		const cursor = seekIsoBox<bigint>(load('mss_moof_tfdt.mp4'), TFDT_PATH)
-
-		assert.ok(cursor)
-	})
-
 	it('should return a cursor at the first byte of usertype for a uuid box', function () {
 		const usertype = new Uint8Array(16).fill(7)
 		const cursor = seekIsoBox(boxBytes('uuid', usertype, new Uint8Array([0xcc])), ['uuid'])

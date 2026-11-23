@@ -24,10 +24,10 @@ import { CONTAINERS } from './CONTAINERS.ts'
  *
  * @public
  */
-export function isContainer<T extends { type: IsoBoxType }>(
+export function isContainer<T extends { type?: IsoBoxType }>(
 	box: T,
 ): box is [Extract<T, { boxes: unknown } | { type: keyof IsoBoxContainerMap }>] extends [never]
 	? T & Extract<IsoBox<IsoInt64>, { boxes: unknown }>
 	: Extract<T, { boxes: unknown } | { type: keyof IsoBoxContainerMap }> {
-	return 'boxes' in box || CONTAINERS.includes(box.type)
+	return 'boxes' in box || (box.type !== undefined && CONTAINERS.includes(box.type))
 }

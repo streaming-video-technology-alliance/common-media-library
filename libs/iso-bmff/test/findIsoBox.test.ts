@@ -120,13 +120,13 @@ describe('findIsoBox', function () {
 	})
 
 	it('should work with complex callback conditions', function () {
-		const box1: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(100) }
-		const box2: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(200) }
-		const box3: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(300) }
+		const box1: ParsedIsoBox = { boxType: 'trak', bytes: new Uint8Array(100) }
+		const box2: ParsedIsoBox = { boxType: 'trak', bytes: new Uint8Array(200) }
+		const box3: ParsedIsoBox = { boxType: 'trak', bytes: new Uint8Array(300) }
 
 		const result = findIsoBox(
 			[box1, box2, box3],
-			box => box.type === 'trak' && 'bytes' in box && box.bytes.length > 150,
+			box => !box.type && box.boxType === 'trak' && box.bytes.length > 150,
 		)
 		assert.strictEqual(result, box2)
 	})
@@ -146,7 +146,7 @@ describe('findIsoBox', function () {
 		const boxes = readIsoBoxes(isoFile, createDefaultReaderConfig())
 
 		assert.strictEqual(findIsoBox(boxes, box => box.type === 'hvc1')?.type, 'hvc1')
-		assert.ok(findIsoBox(boxes, (box: { type: string }) => box.type === 'hvcC'))
+		assert.ok(findIsoBox(boxes, box => !box.type && box.boxType === 'hvcC'))
 		assert.strictEqual(findIsoBox(boxes, box => box.type === 'url ')?.type, 'url ')
 	})
 })

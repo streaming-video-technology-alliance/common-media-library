@@ -13,9 +13,7 @@ import {
 	writeTenc,
 	writeVisualSampleEntry,
 	type AudioSampleEntry,
-	type IsoBoxReaderMap,
 	type IsoBoxType,
-	type IsoBoxWriterMap,
 	type VisualSampleEntry,
 } from '@svta/cml-iso-bmff'
 
@@ -38,7 +36,7 @@ const readers = /* @__PURE__ */ (() => {
 	const map = {
 		stsd: readStsd,
 	}
-	const dynamic: IsoBoxReaderMap = map
+	const dynamic = map as Record<string, unknown>
 	audioTypes.forEach(type => (dynamic[type] = createAudioSampleEntryReader(type)))
 	videoTypes.forEach(type => (dynamic[type] = createVisualSampleEntryReader(type)))
 	return map
@@ -53,7 +51,7 @@ const writers = /* @__PURE__ */ (() => {
 		encv: writeVisualSampleEntry,
 		enca: writeAudioSampleEntry,
 	}
-	const dynamic: IsoBoxWriterMap = map
+	const dynamic = map as Record<string, unknown>
 	audioTypes.forEach(type => (dynamic[type] = writeAudioSampleEntry))
 	videoTypes.forEach(type => (dynamic[type] = writeVisualSampleEntry))
 	return map

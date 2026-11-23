@@ -124,7 +124,7 @@ export function rawBoxBody(box: IsoRawBox): Uint8Array {
 export function findC2paUuidBox(boxes: ParsedIsoBox[]): IsoRawBox | undefined {
 	return boxes.find(
 		(box): box is IsoRawBox =>
-			box.type === 'uuid' && 'bytes' in box && isC2paUuid(box.usertype ?? []),
+			!box.type && box.boxType === 'uuid' && isC2paUuid(box.usertype ?? []),
 	)
 }
 

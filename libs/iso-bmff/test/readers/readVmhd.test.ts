@@ -48,7 +48,8 @@ describe('readVmhd', function () {
 		const box = { type: 'vmhd', version: 0, flags: 1, graphicsMode: 0, opColor: [1, 2] }
 
 		assert.throws(
-			() => writeIsoBox(box, { writers: { vmhd: writeVmhd } }),
+			// A box with a `type` of the type `string` needs a cast.
+			() => writeIsoBox(box as never, { writers: { vmhd: writeVmhd } }),
 			/^RangeError: .*writeUint16.* received undefined$/,
 		)
 	})

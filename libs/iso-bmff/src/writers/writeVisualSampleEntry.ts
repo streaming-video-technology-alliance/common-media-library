@@ -8,6 +8,7 @@ import { writeUint16 } from '../cursor/writeUint16.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
 import { writeCompressorName } from '../cursor/writeCompressorName.ts'
 import { endIsoBox } from '../endIsoBox.ts'
+import type { IsoBoxType } from '../IsoBoxType.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import { writeChildBoxes } from '../writeChildBoxes.ts'
 
@@ -25,7 +26,7 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  *
  * @public
  */
-export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(
+export function writeVisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType>(
 	cursor: IsoBoxWriteCursor,
 	box: VisualSampleEntry<T, IsoInt64>,
 ): void {

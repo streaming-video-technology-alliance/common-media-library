@@ -606,3 +606,29 @@ The table shows the cost of the writer errors in bytes, after minification with 
 | An import with no names                                               | 77 B   | 77 B   |
 
 A bundle that only reads boxes grows by at most 8 B. The write of a `moof` box with 120 `trun` samples takes 2.95 to 3.09 µs. Before, that write took 2.76 to 2.88 µs. The read time does not change.
+
+Amended on 2026-11-23, by the review of the box types ([#759](https://github.com/streaming-video-technology-alliance/common-media-library/pull/759)):
+
+- **Theme 4, rule 4.** The two maps take a key of `IsoBoxMap` only, and no map has an index part. The amendment of 2026-11-18 on the index part no longer applies. The types are now:
+
+```ts
+interface IsoCustomBoxMap {}
+
+type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCustomBoxMap
+
+type IsoBoxReaderMap<V extends IsoInt64 = number> = {
+	[K in keyof IsoBoxMap]?: IsoBoxReader<IsoBoxMap<V>[K], V>
+} & { url?: IsoBoxReader<IsoBoxMap<V>['url '], V>; urn?: IsoBoxReader<IsoBoxMap<V>['urn '], V> }
+
+type IsoBoxWriterMap = {
+	[K in keyof IsoBoxMap]?: IsoBoxWriter<IsoBoxMap<IsoInt64>[K]>
+} & { url?: IsoBoxWriter<IsoBoxMap<IsoInt64>['url ']>; urn?: IsoBoxWriter<IsoBoxMap<IsoInt64>['urn ']> }
+```
+
+- **Custom box types.** `IsoCustomBoxMap` is an empty interface. A `declare module '@svta/cml-iso-bmff'` block adds a box type to `IsoBoxMap`. The declaration applies to every file of the program, and two declarations of one box type need the same type.
+- **No type parameter.** `IsoCustomBoxMap` has no type parameter in 2.0.0. A custom box declares a 64-bit field as `number`, `bigint`, or `IsoInt64`. A later release can add a parameter with a default and break no declaration. TypeScript 5.7.3 and 6.0.3 both accept a declaration that omits such a parameter.
+- **Readers.** A reader under a key returns the box type of that key, and the reader can add fields. A reader with another result type is a compile error and needs a cast. A declaration in `IsoCustomBoxMap` does not replace a built-in box type.
+- **`IsoBoxStreamable`.** The type has no type parameter. It is the union of the box types of `IsoBoxMap`, `IsoRawBox`, and `ArrayBufferView`. A box object with a `type` outside `IsoBoxMap`, or with a `type` of the type `string`, is a compile error.
+- **Sample entry types.** `IsoBoxMap`, `AudioSampleEntryType`, and `VisualSampleEntryType` name 12 more types: `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`. The list has the codes that both hls.js and shaka-player name. The default configurations have no reader and no writer for these types.
+- **Sample entry writers.** `writeAudioSampleEntry` and `writeVisualSampleEntry` take a sample entry of any box type.
+- **Lint.** `IsoCustomBoxMap` is the one `interface` of the package, because only an interface merges with a declaration of an adopter. The lint rule of the repo has an exception for that line.

@@ -29,14 +29,14 @@ npm i @svta/cml-iso-bmff
 Read the boxes of a media segment, and find the `tfdt` box inside `moof` and `traf`:
 
 ```typescript
-import { findIsoBox, isIsoBoxType, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+import { findIsoBox, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
 
 const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
 	r.arrayBuffer(),
 );
 
 const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
-const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
 
 console.log(tfdt?.baseMediaDecodeTime);
 ```
@@ -83,7 +83,7 @@ Version 2.0.0 replaces the classes `IsoBoxReadView` and `IsoBoxWriteView` with t
 The guide uses two terms:
 
 - A **box object** is an object with a `type` field and the fields of the box, such as the result of `readTfdt`.
-- A **raw box** is the result of `readIsoBoxes` for a box with no reader and a type outside `CONTAINERS`: `{ type, bytes, headerSize }`.
+- A **raw box** is the result of `readIsoBoxes` for a box with no reader and a type outside `CONTAINERS`: `{ boxType, bytes, headerSize }`.
 
 The compiler reports most changes. The tables in this guide list each change and its replacement.
 
@@ -93,15 +93,15 @@ The compiler reports most changes. The tables in this guide list each change and
 
 - A box with no reader and a type outside `CONTAINERS` is a raw box. `bytes` is the complete box, with its header. The body is `box.bytes.subarray(box.headerSize)`. The bytes share memory with the input.
 - A box object has only `type` and its fields. The fields `view`, `size`, `largesize`, and `usertype` do not exist.
-- A test of `box.type` does not exclude a raw box, because a raw box can have any type. Narrow a box with `isIsoBoxType`.
-- The result types of a custom readers map apply only to the boxes at the top level. A child in a `boxes` field has the type `ParsedIsoBox`. Cast a child with a custom reader to the result type of that reader.
+- A raw box has no `type` field. Its four-character code is `box.boxType`. A test such as `box.type === "mdat"` matches a box object only, so it never matches a box with no reader.
+- The result type does not follow the readers map. Every box has the type `ParsedIsoBox`, also a child in a `boxes` field. A test of `box.type` narrows a box to its box type.
 
 ```typescript
-import { findIsoBox, isIsoBoxType, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+import { findIsoBox, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
 
-const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
 
 console.log(tfdt?.baseMediaDecodeTime);
 ```
@@ -113,8 +113,8 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `box.largesize` | `box.bytes.length` of a raw box |
 | `box.view` or `box.size` of a box with a type in `CONTAINERS`, such as `moof` | A custom reader for the box. The bytes of the box are from `cursor.start` to `cursor.end`. `seekIsoBox` returns a cursor with the same range. |
 | `box.usertype` of a parsed `uuid` box | `box.usertype` of a raw `uuid` box, or `readBytes(cursor, 16)` in a reader |
-| `if (box.type === "tfdt")` before a field read | `if (isIsoBoxType("tfdt", box))` |
-| `readStsd<Avc1Box>` | `readStsd`, then `isIsoBoxType` for each entry |
+| `box.type` of a box with no reader | `box.boxType`. The four-character code of any box is `box.type ?? box.boxType`. |
+| `readStsd<Avc1Box>` | `readStsd`, then a test of `entry.type` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
 | A malformed `stsd` or `dref` box returns fewer entries | The read throws a `RangeError` |
 | `readVlab`, `readPayl`, `readIden`, and `readSttg` stop at a null byte | The readers read to the end of the box. A box from release 1.0.7 or earlier gives a trailing U+0000. |
@@ -146,6 +146,8 @@ const readMfhd = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
 
 const boxes = readIsoBoxes(buffer, { readers: { mfhd: readMfhd } });
 ```
+
+The `readers` map takes a reader under a key of `IsoBoxMap`, and the reader returns the box type of that key. For a box type that the package does not name, add the type to `IsoCustomBoxMap`. See [Writing a custom reader](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/reading-boxes.md#writing-a-custom-reader).
 
 The table shows the replacement for each member of `IsoBoxReadView`. A method with a `size` parameter becomes one function for each size.
 
@@ -306,6 +308,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 |---|---|
 | `IsoBoxReadView`, `IsoBoxWriteView` | The read cursor and the write cursor. See [Custom readers](#custom-readers) and [Custom writers](#custom-writers). |
 | `ParsedBox`, `IsoTypedParsedBox` | `ParsedIsoBox` |
+| `IsoBoxReaderReturn` | `ParsedIsoBox`. The result type of `readIsoBoxes` does not follow the readers map. |
 | `IsoFieldTypeMap`, `UINT`, `INT`, `TEMPLATE`, `STRING`, `UTF8`, `DATA`, `IsoBoxFields` | The field functions, such as `readUint32` |
 | `IsoBoxReadableStream` | `createIsoBoxReadableStream` |
 | `fourCcToUint32` | A field with a four-character code is a string. To convert a code, compute `new DataView(Uint8Array.from(code, char => char.charCodeAt(0)).buffer).getUint32(0)`. |
@@ -316,7 +319,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `TrackReferenceTypeBox` | A raw box. A child of a `tref` box is a raw box. |
 | The aliases `co64`, `stz2`, `url`, and `urn` | `ChunkLargeOffsetBox`, `CompactSampleSizeBox`, `DataEntryUrlBox`, `DataEntryUrnBox`, or a key of `IsoBoxMap` such as `IsoBoxMap['co64']` |
 | `SyncSample`, `Entity` | A `number` in `sampleNumber` and `entityId` |
-| The types of 16 boxes with no reader and no writer: `hmhd`, `iinf`, `iloc`, `imif`, `infe`, `ipro`, `iref`, `nmhd`, `pitm`, `saio`, `saiz`, `sbgp`, `senc`, `sgpd`, `stdp`, and `stsh` | A type that your code declares, with a custom reader |
+| The types of 16 boxes with no reader and no writer: `hmhd`, `iinf`, `iloc`, `imif`, `infe`, `ipro`, `iref`, `nmhd`, `pitm`, `saio`, `saiz`, `sbgp`, `senc`, `sgpd`, `stdp`, and `stsh` | A type that your code declares and adds to `IsoCustomBoxMap`, with a custom reader |
 
 ### Changed fields
 
@@ -365,15 +368,16 @@ The compiler does not report these changes.
 
 | Version 1 | Version 2.0.0 |
 |---|---|
-| The `boxes` field of a container has a list of child types | The `boxes` field of every box type is `ParsedIsoBox<V>[]`. Narrow a child with `isIsoBoxType`. |
-| A child of a sample entry can be a `Uint8Array` | A child is a box object or a raw box, such as `{ type: "esds", bytes }` |
+| The `boxes` field of a container has a list of child types | The `boxes` field of every box type is `ParsedIsoBox<V>[]`. Narrow a child with a test of `child.type`. |
+| A child of a sample entry can be a `Uint8Array` | A child is a box object or a raw box, such as `{ boxType: "esds", bytes }` |
 | `SampleEntry<T, C>` | `SampleEntry<T, V>` |
 | `SampleDescriptionBox<E>` | `SampleDescriptionBox<V, E>` |
 | `Box` with no type argument | `Box<"abcd">` for one box type, or `IsoBox` |
-| A reader result with `type: string` adds a member to the result type | Give the `type` field a literal type, such as `"abcd" as const` |
+| The result type of `readIsoBoxes` has the return type of each reader | The result type is `ParsedIsoBox<V>[]`. A test of `box.type` narrows a box. Add the box type of a custom reader to `IsoCustomBoxMap`. |
+| `IsoBoxStreamable` has `ParsedBox` and accepts a box object with missing fields | `IsoBoxStreamable` is the union of the box types of `IsoBoxMap`, `IsoRawBox`, and `ArrayBufferView`. The write functions check a box object against its box type. |
 | `IsoBoxReader<B, T, V>`, with the box type `T` as the second parameter | `IsoBoxReader<B, V>`, with the type `V` of the 64-bit fields as the second parameter. Replace `IsoBoxReader<MyBox, 'abcd', bigint>` with `IsoBoxReader<MyBox, bigint>`. `B` has a `type` field. |
 | `IsoBoxWriter<B>` returns an `ArrayBufferView` | `IsoBoxWriter<B>` takes the cursor and the box, and returns nothing |
-| `IsoBoxReaderMap` and `IsoBoxWriterMap` accept a function under any key | A reader or a writer under the key of another known box type is a compile error |
+| `IsoBoxReaderMap` and `IsoBoxWriterMap` accept a function under any key | The maps take a key of `IsoBoxMap` only. A reader returns the box type of that key, and a writer takes that box type. Add another box type to `IsoCustomBoxMap`. |
 
 <!-- libs/iso-bmff/docs/reading-boxes.md -->
 ---
@@ -386,9 +390,11 @@ description: Read ISO BMFF boxes from a buffer
 The `readIsoBoxes` function reads boxes from a buffer and returns an array of boxes. To read the fields of a box, provide a reader function for that box type. The result has two kinds of boxes:
 
 - A **box object** has a `type` field and the fields of the box. A reader returns a box object.
-- A **raw box** is a box with no reader: `{ type, bytes, headerSize }`. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `usertype`.
+- A **raw box** is a box with no reader: `{ boxType, bytes, headerSize }`. `boxType` is the four-character code of the box. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `usertype`.
 
-The bytes of a raw box share memory with the input. A raw box can have any type, so a test of `box.type` does not exclude a raw box. Narrow a box with `isIsoBoxType`, which returns `false` for a raw box.
+The bytes of a raw box share memory with the input.
+
+A raw box has no `type` field. A test such as `box.type === "tfdt"` narrows a box to that box type, and never matches a raw box. A box with no reader is a raw box, so add the reader of a box type before you test for that type. The four-character code of any box is `box.type ?? box.boxType`.
 
 > [!NOTE]
 > The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists the container box types that the function reads automatically. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
@@ -482,7 +488,7 @@ The function returns `null` at the end of the cursor and before a truncated box.
 
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. A test of `box.type` does not exclude a raw box, so the loop also tests for the `frames` field.
+A custom reader can call a built-in reader and add fields to the result. In the result of `readIsoBoxes`, the box has the built-in type. The loop tests `box.type`, then casts the box to the result type of the reader.
 
 HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
@@ -513,9 +519,11 @@ const boxes = readIsoBoxes(segment, {
 	},
 });
 
+type EmsgWithId3 = ReturnType<typeof readEmsgWithId3>;
+
 for (const box of boxes) {
-	if (box.type === "emsg" && "frames" in box) {
-		console.log(box.frames);
+	if (box.type === "emsg") {
+		console.log((box as EmsgWithId3).frames);
 	}
 }
 ```
@@ -526,10 +534,13 @@ A byte field such as `messageData` is a view over the input data. The field shar
 
 The package parses no codec configuration box, such as `avcC`, `hvcC`, or `esds`. The `boxes` field of a sample entry, such as `avc1`, holds such a box as a raw box with its bytes. To read the fields of the box, write a custom reader for its box type.
 
+The `readers` map takes a reader under a key of `IsoBoxMap`. For a box type that the package does not name, add the type to `IsoCustomBoxMap` first. `readIsoBoxes` and the write functions then have that box type.
+
 A reader takes a read cursor and the box type, and returns the box object with its `type` field. A field function reads one field at `cursor.pos` and moves the position past the field, such as `readUint32` or `readFourCc`:
 
 ```typescript
 import {
+	findIsoBox,
 	readFourCc,
 	readIsoBoxes,
 	readUint16,
@@ -539,14 +550,26 @@ import {
 } from "@svta/cml-iso-bmff";
 
 // A box type that the package does not name.
-const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
-	type: "abcd" as const,
+type AbcdBox = { type: "abcd"; brand: string; count: number; flags: number };
+
+// Add the box type to the map of custom box types.
+declare module "@svta/cml-iso-bmff" {
+	interface IsoCustomBoxMap {
+		abcd: AbcdBox;
+	}
+}
+
+const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>): AbcdBox => ({
+	type: "abcd",
 	brand: readFourCc(cursor),
 	count: readUint32(cursor),
 	flags: readUint16(cursor),
 });
 
 const boxes = readIsoBoxes(buffer, { readers: { abcd: readAbcd } });
+
+// The test narrows the box to `AbcdBox`.
+console.log(findIsoBox(boxes, (box) => box.type === "abcd")?.brand);
 ```
 
 The cursor follows these rules:
@@ -557,11 +580,14 @@ The cursor follows these rules:
 - The bytes that remain are `cursor.end - cursor.pos`. To skip bytes, add to `cursor.pos`.
 - A reader of a box with child boxes reads them with `readChildBoxes(cursor)`. The readers of the configuration then apply to the child boxes.
 - `readIsoBoxes` uses one cursor for every box. A reader must not keep the cursor after it returns. A reader that needs bytes later keeps the result of `readBytes`.
-- The `type` field of the result needs a literal type, such as `"abcd" as const`. A result with `type: string` adds no member to the result type of `readIsoBoxes`.
+- The declaration of `IsoCustomBoxMap` applies to every file of the program. Two declarations of one box type need the same type.
+- A reader under a key returns the box type of that key. The reader can add fields. A reader with another result type is a compile error.
 
 `readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
 
-`readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
+`readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space.
+
+`IsoBoxMap` names the sample entry types of these codecs: `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`. The default configuration has no reader for these types. Create a reader with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`, such as `{ "ec-3": createAudioSampleEntryReader("ec-3") }`.
 
 ## Incomplete boxes
 
@@ -740,12 +766,16 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 
-// A readers map in a variable needs a type argument for a generic custom reader.
-const readers = { tfdt: readTfdtWide<bigint> };
+// A readers map in a variable works the same way.
+const readers = { tfdt: readTfdtWide };
 const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
 ```
 
-A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`. A custom reader whose result equals the built-in box type gets the fields of the configuration without a type argument.
+The result type follows the `int64` option, not the readers map. With `isIsoBoxType("tfdt", box)`, the box has the built-in type with `bigint` fields. To read the `source` field, cast the box to `ReturnType<typeof readTfdtWide<bigint>>`.
+
+TypeScript reads the type of the `int64` function to select the type of the fields. Pass a named function, such as `readInt64AsBigInt`. For a function that you write inside the configuration object, give the `cursor` parameter the type `IsoBoxReadCursor<IsoInt64>`. Without that type, a function after a `readers` map with a generic reader can fail to compile.
+
+The type of the fields also follows a type that your code writes, such as `readIsoBoxes<bigint>(buffer)` or a variable of the type `ParsedIsoBox<bigint>[]`. TypeScript does not check such a type against the `int64` option. Let TypeScript infer the type from the option.
 
 ### A function that forwards the option
 
@@ -783,7 +813,7 @@ Do not type the parameter as `IsoBoxReadConfig<IsoInt64>`. That type does not ac
 
 ### A custom reader for one field
 
-If your code needs the exact value of one field only, a custom reader can call `readUint64`. The function returns a `bigint` and needs no option:
+If your code needs the exact value of one field only, a custom reader can call `readUint64`. The function returns a `bigint` and needs no option. A reader under the key `tfdt` returns the `tfdt` box type, so the reader adds the exact value as a new field:
 
 ```typescript
 import {
@@ -795,19 +825,33 @@ import {
 	type IsoBoxReadCursor,
 } from "@svta/cml-iso-bmff";
 
-const readTfdt64 = (cursor: IsoBoxReadCursor) => {
+const readTfdtExact = (cursor: IsoBoxReadCursor) => {
 	const version = readUint8(cursor);
 	const flags = readUint24(cursor);
-	const baseMediaDecodeTime =
+	const exactTime =
 		version === 1 ? readUint64(cursor) : BigInt(readUint32(cursor));
-	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+	return {
+		type: "tfdt" as const,
+		version,
+		flags,
+		baseMediaDecodeTime: Number(exactTime),
+		exactTime,
+	};
 };
 
 const boxes = readIsoBoxes(buffer, {
 	readers: {
-		tfdt: readTfdt64,
+		tfdt: readTfdtExact,
 	},
 });
+
+type TfdtExact = ReturnType<typeof readTfdtExact>;
+
+for (const box of boxes) {
+	if (box.type === "tfdt") {
+		console.log((box as TfdtExact).exactTime);
+	}
+}
 ```
 
 The built-in writers write a `bigint` field with the exact value. See [Writing 64-bit fields](https://github.com/streaming-video-technology-alliance/common-media-library/blob/main/libs/iso-bmff/docs/writing-boxes.md#writing-64-bit-fields).
@@ -826,13 +870,15 @@ In the examples, `buffer` holds the bytes of a segment.
 
 The `traverseIsoBoxes` function traverses box iterators and returns a generator of boxes. It takes an iterable of boxes and one optional configuration with two options. `depthFirst` selects a depth-first or a breadth-first traversal, and the default is `true`. `maxDepth` is the maximum depth, and the default is `Infinity`. A maximum depth of 0 traverses only the root boxes.
 
+The read in these examples has no reader, so each box outside `CONTAINERS` is a raw box. A raw box has its four-character code in `boxType`.
+
 ```typescript
 import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(buffer);
 
 for (const box of traverseIsoBoxes(boxes)) {
-	console.log(box.type);
+	console.log(box.type ?? box.boxType);
 }
 ```
 
@@ -844,26 +890,25 @@ import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
 const boxes = readIsoBoxes(buffer);
 
 for (const box of traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 })) {
-	console.log(box.type);
+	console.log(box.type ?? box.boxType);
 }
 ```
 
 ## Finding boxes
 
-`findIsoBox` returns the first box that matches a callback, or `null`. `filterIsoBoxes` returns every box that matches. Both functions traverse the boxes as `traverseIsoBoxes` does and take the same configuration. A callback that calls `isIsoBoxType` narrows the result to that box type. A callback that tests `box.type` also matches a raw box of that type.
+`findIsoBox` returns the first box that matches a callback, or `null`. `filterIsoBoxes` returns every box that matches. Both functions traverse the boxes as `traverseIsoBoxes` does and take the same configuration. A callback that tests `box.type` narrows the result to that box type. That callback does not match a raw box. To match a raw box, test `box.boxType`.
 
 ```typescript
 import {
 	createDefaultReaderConfig,
 	filterIsoBoxes,
 	findIsoBox,
-	isIsoBoxType,
 	readIsoBoxes,
 } from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(buffer, createDefaultReaderConfig());
 
-const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
 const trafs = filterIsoBoxes(boxes, (box) => box.type === "traf");
 
 console.log(tfdt?.baseMediaDecodeTime, trafs.length);
@@ -871,7 +916,7 @@ console.log(tfdt?.baseMediaDecodeTime, trafs.length);
 
 The traversal follows the `boxes` field. If the `readers` map has `readStsd`, the search also reaches the sample entries. If the map has `readDref`, the search also reaches the data entries.
 
-`isIsoBoxType` checks the type of one box and narrows the box to that type:
+`isIsoBoxType` checks the type of one box and narrows the box to that type. The function also takes `null`, `undefined`, and a value of an unknown type. For a box from `readIsoBoxes`, a test of `box.type` gives the same result:
 
 ```typescript
 import {
@@ -903,15 +948,15 @@ const box: IsoBox = { type: "moov", boxes: [] };
 const container = isContainer(box);
 ```
 
-After `isContainer` returns `true`, each element of `box.boxes` is a box or a raw box. Test a child with `isIsoBoxType` before you read a field of that child.
+After `isContainer` returns `true`, each element of `box.boxes` is a box or a raw box. Test the `type` of a child before you read a field of that child.
 
 ```typescript
-import { createDefaultReaderConfig, isContainer, isIsoBoxType, readIsoBoxes } from "@svta/cml-iso-bmff";
+import { createDefaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bmff";
 
 for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 	if (isContainer(box)) {
 		for (const child of box.boxes) {
-			if (isIsoBoxType("mfhd", child)) {
+			if (child.type === "mfhd") {
 				console.log(child.sequenceNumber);
 			}
 		}
@@ -932,6 +977,8 @@ The `writeIsoBoxes` function writes boxes. It takes an iterable of streamable it
 - Box objects, such as `{ type: 'ftyp', majorBrand: 'isom', minorVersion: 1, compatibleBrands: ['isom'] }`
 - `ArrayBufferView`s such as `Uint8Array` and `DataView`.
 - Boxes that `readIsoBoxes` returns. A box with no reader and a type outside `CONTAINERS` is a raw box with a `bytes` field. The function copies those bytes, even if the `writers` map has a writer for the type. To change a raw box, build a box object with the fields and no `bytes` field. A box that a reader returns needs a writer in the `writers` map.
+
+The write functions check a box object against its box type. A box object has the `type` of a box type of `IsoBoxMap` and every required field of that type. To write a box type that the package does not name, add the type to `IsoCustomBoxMap`. See [Writing a custom box](#writing-a-custom-box). The `boxes` field of a box type takes box objects and raw boxes. To put the bytes of a box in a `boxes` field, use a raw box, such as `{ boxType: "esds", bytes }`.
 
 If you provide box objects, also provide a configuration object that names the writers for those box types. The key of the `writers` map is the exact four-character type. The keys `'url '` and `'urn '` have a trailing space. The keys `url` and `urn` also find the writers of those boxes.
 
@@ -1060,6 +1107,8 @@ readableStream.pipeTo(stream.writable);
 
 ## Writing a custom box
 
+The `writers` map takes a writer under a key of `IsoBoxMap`. For a box type that the package does not name, add the type to `IsoCustomBoxMap` first. The write functions then check a box of that type, and `readIsoBoxes` has that box type too.
+
 A writer takes a write cursor and a box object, and returns nothing. The writer writes the header with `beginIsoBox` or `beginIsoFullBox`, then the fields with the write field functions, then the size with `endIsoBox`. A writer does not compute the size of its box:
 
 ```typescript
@@ -1075,6 +1124,13 @@ import {
 
 // A box type that the package does not name.
 type AbcdBox = { type: "abcd"; brand: string; count: number; flags: number };
+
+// Add the box type to the map of custom box types.
+declare module "@svta/cml-iso-bmff" {
+	interface IsoCustomBoxMap {
+		abcd: AbcdBox;
+	}
+}
 
 const writeAbcd = (cursor: IsoBoxWriteCursor, box: AbcdBox) => {
 	const start = beginIsoBox(cursor, box.type);
@@ -1295,7 +1351,7 @@ export type AudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType, V exte
 };
 
 // @public
-export type AudioSampleEntryType = "mp4a" | "enca";
+export type AudioSampleEntryType = "mp4a" | "enca" | "ac-3" | "ac-4" | "ec-3" | "fLaC" | "Opus";
 
 // @public
 export function beginIsoBox(cursor: IsoBoxWriteCursor, type: string): number;
@@ -1347,16 +1403,9 @@ export const CONTAINERS: readonly string[];
 export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => AudioSampleEntry<T, V>;
 
 // @public
-export function createDefaultReaderConfig<V extends IsoInt64 = number>(...options: [V] extends [bigint] ? [options: {
-    int64: IsoInt64Reader<V>;
-}] : [options?: {
+export function createDefaultReaderConfig<V extends IsoInt64 = number>(options?: {
     int64?: IsoInt64Reader<V>;
-}]): IsoBoxReadConfig<V>;
-
-// @public
-export function createDefaultReaderConfig(options?: {
-    int64?: IsoInt64Reader;
-}): IsoBoxReadConfig;
+}): IsoBoxReadConfig<V>;
 
 // @public
 export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig>;
@@ -1365,10 +1414,10 @@ export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig>;
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
 
 // @public
-export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V>;
+export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V>;
 
 // @public
 export function createIsoBoxWriteCursor(config?: {
@@ -1497,7 +1546,7 @@ export type IdentifiedMediaDataBox = {
 
 // @public
 export function isContainer<T extends {
-    type: IsoBoxType;
+    type?: IsoBoxType;
 }>(box: T): box is [Extract<T, {
     boxes: unknown;
 } | {
@@ -1512,7 +1561,7 @@ export function isContainer<T extends {
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
-    type: string;
+    type?: string;
 } | null | undefined): box is IsoBoxMap<V>[T];
 
 // @public
@@ -1555,8 +1604,81 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
 export type IsoBoxData = ArrayBufferLike | ArrayBufferView;
 
 // @public
-export type IsoBoxMap<V extends IsoInt64 = number> = {
+export type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCustomBoxMap;
+
+// @public
+export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
+    readers?: NoInfer<IsoBoxReaderMap<V>>;
+} & ([V] extends [bigint] ? {
+    int64: IsoInt64Reader<V>;
+} : {
+    int64?: IsoInt64Reader<V>;
+});
+
+// @public
+export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
+    readonly view: DataView;
+    readonly start: number;
+    pos: number;
+    readonly end: number;
+    readonly readers?: Record<IsoBoxType, {
+        r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): {
+            type: IsoBoxType;
+        };
+    }["r"]>;
+} & ([V] extends [bigint] ? {
+    readonly int64: IsoInt64Reader<V>;
+} : {
+    readonly int64?: IsoInt64Reader<V>;
+});
+
+// @public
+export type IsoBoxReader<B extends {
+    type: IsoBoxType;
+} = {
+    type: IsoBoxType;
+}, V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<V>, type: B["type"]) => B;
+
+// @public
+export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxMap]?: IsoBoxReader<IsoBoxMap<V>[K], V>; } & {
+    url?: IsoBoxReader<IsoBoxMap<V>["url "], V>;
+    urn?: IsoBoxReader<IsoBoxMap<V>["urn "], V>;
+};
+
+// @public
+export type IsoBoxStreamable = IsoBox<IsoInt64> | IsoRawBox | ArrayBufferView;
+
+// @public
+export type IsoBoxType = string;
+
+// @public
+export type IsoBoxWriteConfig = {
+    writers?: IsoBoxWriterMap;
+};
+
+// @public
+export type IsoBoxWriteCursor = {
+    readonly view: DataView;
+    readonly bytes: Uint8Array<ArrayBuffer>;
+    pos: number;
+    readonly writers?: IsoBoxWriterMap;
+};
+
+// @public
+export type IsoBoxWriter<B> = (cursor: IsoBoxWriteCursor, box: B) => void;
+
+// @public
+export type IsoBoxWriterMap = { [K in keyof IsoBoxMap]?: IsoBoxWriter<IsoBoxMap<IsoInt64>[K]>; } & {
+    url?: IsoBoxWriter<IsoBoxMap<IsoInt64>["url "]>;
+    urn?: IsoBoxWriter<IsoBoxMap<IsoInt64>["urn "]>;
+};
+
+// @public
+export type IsoBuiltInBoxMap<V extends IsoInt64 = number> = {
+    "ac-3": AudioSampleEntry<"ac-3", V>;
+    "ac-4": AudioSampleEntry<"ac-4", V>;
     ardi: AudioRenderingIndicationBox;
+    av01: VisualSampleEntry<"av01", V>;
     avc1: VisualSampleEntry<"avc1", V>;
     avc2: VisualSampleEntry<"avc2", V>;
     avc3: VisualSampleEntry<"avc3", V>;
@@ -1566,11 +1688,18 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     dinf: DataInformationBox<V>;
     dref: DataReferenceBox<V>;
     edts: EditBox<V>;
+    dav1: VisualSampleEntry<"dav1", V>;
+    dva1: VisualSampleEntry<"dva1", V>;
+    dvav: VisualSampleEntry<"dvav", V>;
+    dvh1: VisualSampleEntry<"dvh1", V>;
+    dvhe: VisualSampleEntry<"dvhe", V>;
+    "ec-3": AudioSampleEntry<"ec-3", V>;
     elng: ExtendedLanguageBox;
     elst: EditListBox<V>;
     emsg: EventMessageBox<V>;
     enca: AudioSampleEntry<"enca", V>;
     encv: VisualSampleEntry<"encv", V>;
+    fLaC: AudioSampleEntry<"fLaC", V>;
     free: FreeSpaceBox<"free">;
     frma: OriginalFormatBox;
     ftyp: FileTypeBox;
@@ -1598,6 +1727,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     mp4a: AudioSampleEntry<"mp4a", V>;
     mvex: MovieExtendsBox<V>;
     mvhd: MovieHeaderBox<V>;
+    Opus: AudioSampleEntry<"Opus", V>;
     payl: WebVttCuePayloadBox;
     prft: ProducerReferenceTimeBox<V>;
     prsl: PreselectionGroupBox<V>;
@@ -1641,98 +1771,14 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     "urn ": DataEntryUrnBox;
     vlab: WebVttSourceLabelBox;
     vmhd: VideoMediaHeaderBox;
+    vp09: VisualSampleEntry<"vp09", V>;
     vttc: WebVttCueBox<V>;
     vttC: WebVttConfigurationBox;
     vtte: WebVttEmptySampleBox;
 };
 
 // @public
-export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
-    readers?: NoInfer<IsoBoxReaderMap<V>>;
-} & ([V] extends [bigint] ? {
-    int64: IsoInt64Reader<V>;
-} : {
-    int64?: IsoInt64Reader<V>;
-});
-
-// @public
-export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
-    readonly view: DataView;
-    readonly start: number;
-    pos: number;
-    readonly end: number;
-    readonly readers?: Record<IsoBoxType, {
-        r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): {
-            type: IsoBoxType;
-        };
-    }["r"]>;
-} & ([V] extends [bigint] ? {
-    readonly int64: IsoInt64Reader<V>;
-} : {
-    readonly int64?: IsoInt64Reader<V>;
-});
-
-// @public
-export type IsoBoxReader<B extends {
-    type: IsoBoxType;
-} = {
-    type: IsoBoxType;
-}, V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<V>, type: B["type"]) => B;
-
-// @public
-export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxMap]?: IsoBoxReader<{
-        type: K;
-    }, V>; } & {
-    url?: IsoBoxReader<{
-        type: "url ";
-    }, V>;
-    urn?: IsoBoxReader<{
-        type: "urn ";
-    }, V>;
-} & Record<IsoBoxType, {
-    r(cursor: IsoBoxReadCursor<V>, type: never): {
-        type: IsoBoxType;
-    };
-}["r"]>;
-
-// @public
-export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? 0 extends 1 & B ? B : [B] extends [{
-        type: infer N extends keyof IsoBoxMap;
-    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : [B] extends [{
-        type: infer N extends string;
-    }] ? string extends N ? never : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
-    type: R;
-}> : never) | IsoRawBox;
-
-// @public
-export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | {
-    type: IsoBoxType;
-} | ArrayBufferView;
-
-// @public
-export type IsoBoxType = string;
-
-// @public
-export type IsoBoxWriteConfig = {
-    writers?: IsoBoxWriterMap;
-};
-
-// @public
-export type IsoBoxWriteCursor = {
-    readonly view: DataView;
-    readonly bytes: Uint8Array<ArrayBuffer>;
-    pos: number;
-    readonly writers?: IsoBoxWriterMap;
-};
-
-// @public
-export type IsoBoxWriter<B> = (cursor: IsoBoxWriteCursor, box: B) => void;
-
-// @public
-export type IsoBoxWriterMap = { [K in keyof IsoBoxMap]?: IsoBoxWriter<IsoBoxMap<IsoInt64>[K]>; } & {
-    url?: IsoBoxWriter<IsoBoxMap<IsoInt64>["url "]>;
-    urn?: IsoBoxWriter<IsoBoxMap<IsoInt64>["urn "]>;
-} & Record<IsoBoxType, IsoBoxWriter<never>>;
+export interface IsoCustomBoxMap {}
 
 // @public
 export type IsoInt64 = number | bigint;
@@ -1742,7 +1788,8 @@ export type IsoInt64Reader<V extends IsoInt64 = number> = (cursor: IsoBoxReadCur
 
 // @public
 export type IsoRawBox = {
-    type: IsoBoxType;
+    type?: undefined;
+    boxType: IsoBoxType;
     bytes: Uint8Array;
     headerSize?: number;
     usertype?: Uint8Array;
@@ -2001,15 +2048,7 @@ export function readInt64AsBigInt(cursor: IsoBoxReadCursor<IsoInt64>, size: 4 | 
 export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoInt64 = number>(raw: IsoBoxData, config: IsoBoxReadConfig<V> & {
-    readers: R;
-}): IsoBoxReaderReturn<R, V>[];
-
-// @public
-export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): ParsedIsoBox<V>[];
-
-// @public
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadConfig): ParsedIsoBox[];
+export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadConfig<V>): ParsedIsoBox<V>[];
 
 // @public
 export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
@@ -2306,7 +2345,7 @@ export type SchemeTypeBox = FullBox & {
 export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxReadCursor<V>, path: readonly IsoBoxType[]): IsoBoxReadCursor<V> | null;
 
 // @public
-export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V> | null;
+export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V> | null;
 
 // @public
 export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
@@ -2567,7 +2606,7 @@ export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType, V ex
 };
 
 // @public
-export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv";
+export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" | "av01" | "dav1" | "dva1" | "dvav" | "dvh1" | "dvhe" | "vp09";
 
 // @public
 export type WebVttConfigurationBox = {
@@ -2614,7 +2653,7 @@ export type WebVttSourceLabelBox = {
 export function writeArdi(cursor: IsoBoxWriteCursor, box: AudioRenderingIndicationBox): void;
 
 // @public
-export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<T, IsoInt64>): void;
+export function writeAudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType>(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<T, IsoInt64>): void;
 
 // @public
 export function writeAvc1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc1", IsoInt64>): void;
@@ -2632,7 +2671,7 @@ export function writeAvc4(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc
 export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): void;
 
 // @public
-export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<IsoInt64>>): void;
+export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable>): void;
 
 // @public
 export function writeCo64(cursor: IsoBoxWriteCursor, box: ChunkLargeOffsetBox<IsoInt64>): void;
@@ -2704,10 +2743,10 @@ export function writeInt32(cursor: IsoBoxWriteCursor, value: number): void;
 export function writeInt8(cursor: IsoBoxWriteCursor, value: number): void;
 
 // @public
-export function writeIsoBox(box: IsoBoxStreamable<IsoInt64>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
 
 // @public
 export function writeKind(cursor: IsoBoxWriteCursor, box: KindBox): void;
@@ -2914,7 +2953,7 @@ export function writeUrn(cursor: IsoBoxWriteCursor, box: DataEntryUrnBox): void;
 export function writeUtf8(cursor: IsoBoxWriteCursor, value: string): void;
 
 // @public
-export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<T, IsoInt64>): void;
+export function writeVisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType>(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<T, IsoInt64>): void;
 
 // @public
 export function writeVlab(cursor: IsoBoxWriteCursor, box: WebVttSourceLabelBox): void;

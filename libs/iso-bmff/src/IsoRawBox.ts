@@ -10,9 +10,14 @@ import type { IsoBoxType } from './IsoBoxType.ts'
  */
 export type IsoRawBox = {
 	/**
+	 * A raw box has no `type` field, so a test of `box.type` selects a box object.
+	 */
+	type?: undefined
+
+	/**
 	 * The four-character code of the box.
 	 */
-	type: IsoBoxType
+	boxType: IsoBoxType
 
 	/**
 	 * The complete box, with its header. A raw box from `readIsoBoxes` shares memory with the input.

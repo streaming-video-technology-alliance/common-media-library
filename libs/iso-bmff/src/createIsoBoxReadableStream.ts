@@ -1,6 +1,5 @@
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
 import type { IsoBoxWriteConfig } from './IsoBoxWriteConfig.ts'
-import type { IsoInt64 } from './IsoInt64.ts'
 import { createIsoBoxWriteCursor } from './createIsoBoxWriteCursor.ts'
 import { writeChildBoxes } from './writeChildBoxes.ts'
 
@@ -24,7 +23,7 @@ import { writeChildBoxes } from './writeChildBoxes.ts'
  * @public
  */
 export function createIsoBoxReadableStream(
-	boxes: Iterable<IsoBoxStreamable<IsoInt64>>,
+	boxes: Iterable<IsoBoxStreamable>,
 	config: IsoBoxWriteConfig = {},
 ): ReadableStream<Uint8Array<ArrayBuffer>> {
 	if (typeof ReadableStream === 'undefined') {

@@ -19,12 +19,15 @@ import {
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
 
-/** A tfdt reader that keeps the 64-bit field exact. */
+/** A tfdt reader that adds a field to the built-in box type. */
+const readTfdtExact = (cursor: IsoBoxReadCursor) => ({ ...readTfdt(cursor), exact: true })
+
+/** A tfdt reader with a 64-bit field of another type than the built-in box type. */
 const readTfdt64 = (cursor: IsoBoxReadCursor) => {
 	const version = readUint8(cursor)
 	const flags = readUint24(cursor)
 	const baseMediaDecodeTime = version === 1 ? readUint64(cursor) : BigInt(readUint32(cursor))
-	return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime, exact: true }
+	return { type: 'tfdt' as const, version, flags, baseMediaDecodeTime }
 }
 
 describe('readIsoBoxes', function () {
@@ -76,35 +79,49 @@ describe('readIsoBoxes', function () {
 		assert.strictEqual(box.value, 0xffffffff)
 	})
 
-	it('should narrow a custom reader of a built-in box to the return type of that reader', function () {
-		// A version 1 tfdt box with baseMediaDecodeTime = 2^53 + 1.
+	it('should accept a custom reader that adds a field to a built-in box type', function () {
+		// A version 0 tfdt box with baseMediaDecodeTime = 1.
 		const bytes = new Uint8Array([
-			0x00, 0x00, 0x00, 0x14, 0x74, 0x66, 0x64, 0x74, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00,
-			0x00, 0x00, 0x00, 0x00, 0x01,
+			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x01,
 		])
-		const [box] = readIsoBoxes(bytes.buffer, { readers: { tfdt: readTfdt64 } })
+		const [box] = readIsoBoxes(bytes.buffer, { readers: { tfdt: readTfdtExact } })
 
 		assert.ok(box)
-		if (box.type === 'tfdt' && 'baseMediaDecodeTime' in box) {
-			// The built-in tfdt type is not part of the union, so the field is a bigint,
-			// not `number | bigint`, and the extra field of the custom reader is visible.
-			expectType<Equal<typeof box.baseMediaDecodeTime, bigint>>(true)
-			expectType<Equal<typeof box.exact, boolean>>(true)
-			assert.strictEqual(box.baseMediaDecodeTime, BigInt('9007199254740993'))
-			assert.strictEqual(box.exact, true)
+		if (box.type === 'tfdt') {
+			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
+			assert.strictEqual(box.baseMediaDecodeTime, 1)
+			assert.strictEqual('exact' in box && box.exact, true)
 		} else {
 			assert.fail('expected a tfdt box')
 		}
 	})
 
-	it('should keep the built-in box types when the reader map has no literal keys', function () {
+	it('should reject a custom reader with another box type for a built-in box type', function () {
+		// A version 1 tfdt box with baseMediaDecodeTime = 2^53 + 1.
+		const bytes = new Uint8Array([
+			0x00, 0x00, 0x00, 0x14, 0x74, 0x66, 0x64, 0x74, 0x01, 0x00, 0x00, 0x00, 0x00, 0x20, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x01,
+		])
+		// @ts-expect-error The reader returns a bigint field. The tfdt box of this read has a number field.
+		const [box] = readIsoBoxes(bytes.buffer, { readers: { tfdt: readTfdt64 } })
+
+		// The read still calls the reader.
+		assert.deepStrictEqual(box, {
+			type: 'tfdt',
+			version: 1,
+			flags: 0,
+			baseMediaDecodeTime: BigInt('9007199254740993'),
+		})
+	})
+
+	it('should accept a reader map with a computed key', function () {
 		// A version 0 tfdt box with baseMediaDecodeTime = 1.
 		const bytes = new Uint8Array([
 			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x01,
 		])
 		const name: string = 'tfdt'
-		// The key is not a literal, so `keyof` the map is `string` and no built-in type is excluded.
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { [name]: readTfdt } })
 
 		assert.ok(box)
@@ -122,34 +139,31 @@ describe('readIsoBoxes', function () {
 			0x00, 0x00, 0x00, 0x10, 0x74, 0x66, 0x64, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x01,
 		])
-		const readers: { tfdt?: typeof readTfdt64 } = {}
+		const readers: { tfdt?: typeof readTfdtExact } = {}
 
 		const boxes = readIsoBoxes(bytes.buffer, { readers })
 		const [box] = boxes
 
 		// An absent reader does not add `undefined` to the union.
 		expectType<Equal<undefined extends (typeof boxes)[number] ? true : false, false>>(true)
-		// A box with no reader is a raw box, so the union has the raw box next to the custom type.
+		// A box with no reader is a raw box.
 		expectType<Equal<IsoRawBox extends (typeof boxes)[number] ? true : false, true>>(true)
-		expectType<
-			Equal<Extract<(typeof boxes)[number], { type: 'tfdt' }>['baseMediaDecodeTime'], bigint>
-		>(true)
-		assert.ok(box && 'bytes' in box)
-		assert.strictEqual(box.type, 'tfdt')
+		assert.ok(box && !box.type)
+		assert.strictEqual(box.boxType, 'tfdt')
 		assert.strictEqual(box.bytes.length, 16)
 
-		readers.tfdt = readTfdt64
+		readers.tfdt = readTfdtExact
 		const [exact] = readIsoBoxes(bytes.buffer, { readers })
 
 		assert.ok(exact)
-		if (exact.type === 'tfdt' && 'baseMediaDecodeTime' in exact) {
-			assert.strictEqual(exact.baseMediaDecodeTime, BigInt(1))
+		if (exact.type === 'tfdt') {
+			assert.strictEqual(exact.baseMediaDecodeTime, 1)
 		} else {
 			assert.fail('expected a tfdt box')
 		}
 	})
 
-	it('should exclude the built-in url box type for a trimmed url key', function () {
+	it('should find a reader by a trimmed url key', function () {
 		// A 'url ' box with the self-contained flag set and no location.
 		const bytes = new Uint8Array([
 			0x00, 0x00, 0x00, 0x0c, 0x75, 0x72, 0x6c, 0x20, 0x00, 0x00, 0x00, 0x01,
@@ -159,12 +173,11 @@ describe('readIsoBoxes', function () {
 			custom: true,
 		})
 
-		// The read also finds a reader by the trimmed type, so `url` replaces `'url '`.
+		// The read also finds a reader by the trimmed type.
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { url: readUrlCustom } })
 
 		assert.ok(box)
 		if (box.type === 'url ' && 'custom' in box) {
-			expectType<Equal<typeof box.custom, boolean>>(true)
 			assert.strictEqual(box.custom, true)
 		} else {
 			assert.fail('expected a url box')
@@ -179,8 +192,8 @@ describe('readIsoBoxes', function () {
 		const [box] = boxes
 
 		assert.strictEqual(boxes.length, 1)
-		assert.ok(box && 'bytes' in box)
-		assert.strictEqual(box.type, 'free')
+		assert.ok(box && !box.type)
+		assert.strictEqual(box.boxType, 'free')
 		assert.strictEqual(box.bytes.length, 8)
 	})
 
@@ -190,8 +203,8 @@ describe('readIsoBoxes', function () {
 		const [box] = boxes
 
 		assert.strictEqual(boxes.length, 1)
-		assert.ok(box && 'bytes' in box)
-		assert.strictEqual(box.type, 'free')
+		assert.ok(box && !box.type)
+		assert.strictEqual(box.boxType, 'free')
 		assert.strictEqual(box.bytes.length, 8)
 		assert.strictEqual(box.bytes.byteOffset, 4)
 	})

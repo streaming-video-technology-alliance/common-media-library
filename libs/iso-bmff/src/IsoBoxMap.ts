@@ -78,15 +78,31 @@ import type { WebVttCuePayloadBox } from './boxes/WebVttCuePayloadBox.ts'
 import type { WebVttEmptySampleBox } from './boxes/WebVttEmptySampleBox.ts'
 import type { WebVttSettingsBox } from './boxes/WebVttSettingsBox.ts'
 import type { WebVttSourceLabelBox } from './boxes/WebVttSourceLabelBox.ts'
+import type { IsoCustomBoxMap } from './IsoCustomBoxMap.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
+
+/**
+ * Map of each box type to the type of that box: the built-in box types and the box types of `IsoCustomBoxMap`.
+ *
+ * @public
+ */
+export type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCustomBoxMap
 
 /**
  * Map of each box type that the package names to the type of that box.
  *
+ * The default configuration has no reader and no writer for these sample entry types:
+ * `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`.
+ * Create a reader for one of these types with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`.
+ * Write one of these types with `writeAudioSampleEntry` or `writeVisualSampleEntry`.
+ *
  * @public
  */
-export type IsoBoxMap<V extends IsoInt64 = number> = {
+export type IsoBuiltInBoxMap<V extends IsoInt64 = number> = {
+	'ac-3': AudioSampleEntry<'ac-3', V>
+	'ac-4': AudioSampleEntry<'ac-4', V>
 	ardi: AudioRenderingIndicationBox
+	av01: VisualSampleEntry<'av01', V>
 	avc1: VisualSampleEntry<'avc1', V>
 	avc2: VisualSampleEntry<'avc2', V>
 	avc3: VisualSampleEntry<'avc3', V>
@@ -96,11 +112,18 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	dinf: DataInformationBox<V>
 	dref: DataReferenceBox<V>
 	edts: EditBox<V>
+	dav1: VisualSampleEntry<'dav1', V>
+	dva1: VisualSampleEntry<'dva1', V>
+	dvav: VisualSampleEntry<'dvav', V>
+	dvh1: VisualSampleEntry<'dvh1', V>
+	dvhe: VisualSampleEntry<'dvhe', V>
+	'ec-3': AudioSampleEntry<'ec-3', V>
 	elng: ExtendedLanguageBox
 	elst: EditListBox<V>
 	emsg: EventMessageBox<V>
 	enca: AudioSampleEntry<'enca', V>
 	encv: VisualSampleEntry<'encv', V>
+	fLaC: AudioSampleEntry<'fLaC', V>
 	free: FreeSpaceBox<'free'>
 	frma: OriginalFormatBox
 	ftyp: FileTypeBox
@@ -128,6 +151,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	mp4a: AudioSampleEntry<'mp4a', V>
 	mvex: MovieExtendsBox<V>
 	mvhd: MovieHeaderBox<V>
+	Opus: AudioSampleEntry<'Opus', V>
 	payl: WebVttCuePayloadBox
 	prft: ProducerReferenceTimeBox<V>
 	prsl: PreselectionGroupBox<V>
@@ -171,6 +195,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
 	'urn ': DataEntryUrnBox
 	vlab: WebVttSourceLabelBox
 	vmhd: VideoMediaHeaderBox
+	vp09: VisualSampleEntry<'vp09', V>
 	vttc: WebVttCueBox<V>
 	vttC: WebVttConfigurationBox
 	vtte: WebVttEmptySampleBox

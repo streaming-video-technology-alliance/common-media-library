@@ -27,7 +27,7 @@ export type AudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType, V exte
 };
 
 // @public
-export type AudioSampleEntryType = "mp4a" | "enca";
+export type AudioSampleEntryType = "mp4a" | "enca" | "ac-3" | "ac-4" | "ec-3" | "fLaC" | "Opus";
 
 // @public
 export function beginIsoBox(cursor: IsoBoxWriteCursor, type: string): number;
@@ -79,16 +79,9 @@ export const CONTAINERS: readonly string[];
 export function createAudioSampleEntryReader<T extends IsoBoxType>(type: T): <V extends IsoInt64>(cursor: IsoBoxReadCursor<V>) => AudioSampleEntry<T, V>;
 
 // @public
-export function createDefaultReaderConfig<V extends IsoInt64 = number>(...options: [V] extends [bigint] ? [options: {
-    int64: IsoInt64Reader<V>;
-}] : [options?: {
+export function createDefaultReaderConfig<V extends IsoInt64 = number>(options?: {
     int64?: IsoInt64Reader<V>;
-}]): IsoBoxReadConfig<V>;
-
-// @public
-export function createDefaultReaderConfig(options?: {
-    int64?: IsoInt64Reader;
-}): IsoBoxReadConfig;
+}): IsoBoxReadConfig<V>;
 
 // @public
 export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig>;
@@ -97,10 +90,10 @@ export function createDefaultWriterConfig(): Required<IsoBoxWriteConfig>;
 export function createInt64OverflowReader(onOverflow: (error: RangeError) => void): IsoInt64Reader;
 
 // @public
-export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
+export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
 
 // @public
-export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V>;
+export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V>;
 
 // @public
 export function createIsoBoxWriteCursor(config?: {
@@ -229,7 +222,7 @@ export type IdentifiedMediaDataBox = {
 
 // @public
 export function isContainer<T extends {
-    type: IsoBoxType;
+    type?: IsoBoxType;
 }>(box: T): box is [Extract<T, {
     boxes: unknown;
 } | {
@@ -244,7 +237,7 @@ export function isContainer<T extends {
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
-    type: string;
+    type?: string;
 } | null | undefined): box is IsoBoxMap<V>[T];
 
 // @public
@@ -287,8 +280,81 @@ export type IsoBoxContainerMap<V extends IsoInt64 = number> = {
 export type IsoBoxData = ArrayBufferLike | ArrayBufferView;
 
 // @public
-export type IsoBoxMap<V extends IsoInt64 = number> = {
+export type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCustomBoxMap;
+
+// @public
+export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
+    readers?: NoInfer<IsoBoxReaderMap<V>>;
+} & ([V] extends [bigint] ? {
+    int64: IsoInt64Reader<V>;
+} : {
+    int64?: IsoInt64Reader<V>;
+});
+
+// @public
+export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
+    readonly view: DataView;
+    readonly start: number;
+    pos: number;
+    readonly end: number;
+    readonly readers?: Record<IsoBoxType, {
+        r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): {
+            type: IsoBoxType;
+        };
+    }["r"]>;
+} & ([V] extends [bigint] ? {
+    readonly int64: IsoInt64Reader<V>;
+} : {
+    readonly int64?: IsoInt64Reader<V>;
+});
+
+// @public
+export type IsoBoxReader<B extends {
+    type: IsoBoxType;
+} = {
+    type: IsoBoxType;
+}, V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<V>, type: B["type"]) => B;
+
+// @public
+export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxMap]?: IsoBoxReader<IsoBoxMap<V>[K], V>; } & {
+    url?: IsoBoxReader<IsoBoxMap<V>["url "], V>;
+    urn?: IsoBoxReader<IsoBoxMap<V>["urn "], V>;
+};
+
+// @public
+export type IsoBoxStreamable = IsoBox<IsoInt64> | IsoRawBox | ArrayBufferView;
+
+// @public
+export type IsoBoxType = string;
+
+// @public
+export type IsoBoxWriteConfig = {
+    writers?: IsoBoxWriterMap;
+};
+
+// @public
+export type IsoBoxWriteCursor = {
+    readonly view: DataView;
+    readonly bytes: Uint8Array<ArrayBuffer>;
+    pos: number;
+    readonly writers?: IsoBoxWriterMap;
+};
+
+// @public
+export type IsoBoxWriter<B> = (cursor: IsoBoxWriteCursor, box: B) => void;
+
+// @public
+export type IsoBoxWriterMap = { [K in keyof IsoBoxMap]?: IsoBoxWriter<IsoBoxMap<IsoInt64>[K]>; } & {
+    url?: IsoBoxWriter<IsoBoxMap<IsoInt64>["url "]>;
+    urn?: IsoBoxWriter<IsoBoxMap<IsoInt64>["urn "]>;
+};
+
+// @public
+export type IsoBuiltInBoxMap<V extends IsoInt64 = number> = {
+    "ac-3": AudioSampleEntry<"ac-3", V>;
+    "ac-4": AudioSampleEntry<"ac-4", V>;
     ardi: AudioRenderingIndicationBox;
+    av01: VisualSampleEntry<"av01", V>;
     avc1: VisualSampleEntry<"avc1", V>;
     avc2: VisualSampleEntry<"avc2", V>;
     avc3: VisualSampleEntry<"avc3", V>;
@@ -298,11 +364,18 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     dinf: DataInformationBox<V>;
     dref: DataReferenceBox<V>;
     edts: EditBox<V>;
+    dav1: VisualSampleEntry<"dav1", V>;
+    dva1: VisualSampleEntry<"dva1", V>;
+    dvav: VisualSampleEntry<"dvav", V>;
+    dvh1: VisualSampleEntry<"dvh1", V>;
+    dvhe: VisualSampleEntry<"dvhe", V>;
+    "ec-3": AudioSampleEntry<"ec-3", V>;
     elng: ExtendedLanguageBox;
     elst: EditListBox<V>;
     emsg: EventMessageBox<V>;
     enca: AudioSampleEntry<"enca", V>;
     encv: VisualSampleEntry<"encv", V>;
+    fLaC: AudioSampleEntry<"fLaC", V>;
     free: FreeSpaceBox<"free">;
     frma: OriginalFormatBox;
     ftyp: FileTypeBox;
@@ -330,6 +403,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     mp4a: AudioSampleEntry<"mp4a", V>;
     mvex: MovieExtendsBox<V>;
     mvhd: MovieHeaderBox<V>;
+    Opus: AudioSampleEntry<"Opus", V>;
     payl: WebVttCuePayloadBox;
     prft: ProducerReferenceTimeBox<V>;
     prsl: PreselectionGroupBox<V>;
@@ -373,98 +447,14 @@ export type IsoBoxMap<V extends IsoInt64 = number> = {
     "urn ": DataEntryUrnBox;
     vlab: WebVttSourceLabelBox;
     vmhd: VideoMediaHeaderBox;
+    vp09: VisualSampleEntry<"vp09", V>;
     vttc: WebVttCueBox<V>;
     vttC: WebVttConfigurationBox;
     vtte: WebVttEmptySampleBox;
 };
 
 // @public
-export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
-    readers?: NoInfer<IsoBoxReaderMap<V>>;
-} & ([V] extends [bigint] ? {
-    int64: IsoInt64Reader<V>;
-} : {
-    int64?: IsoInt64Reader<V>;
-});
-
-// @public
-export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
-    readonly view: DataView;
-    readonly start: number;
-    pos: number;
-    readonly end: number;
-    readonly readers?: Record<IsoBoxType, {
-        r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): {
-            type: IsoBoxType;
-        };
-    }["r"]>;
-} & ([V] extends [bigint] ? {
-    readonly int64: IsoInt64Reader<V>;
-} : {
-    readonly int64?: IsoInt64Reader<V>;
-});
-
-// @public
-export type IsoBoxReader<B extends {
-    type: IsoBoxType;
-} = {
-    type: IsoBoxType;
-}, V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<V>, type: B["type"]) => B;
-
-// @public
-export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in keyof IsoBoxMap]?: IsoBoxReader<{
-        type: K;
-    }, V>; } & {
-    url?: IsoBoxReader<{
-        type: "url ";
-    }, V>;
-    urn?: IsoBoxReader<{
-        type: "urn ";
-    }, V>;
-} & Record<IsoBoxType, {
-    r(cursor: IsoBoxReadCursor<V>, type: never): {
-        type: IsoBoxType;
-    };
-}["r"]>;
-
-// @public
-export type IsoBoxReaderReturn<T, V extends IsoInt64 = number> = NonNullable<{ [K in keyof T]: NonNullable<T[K]> extends ((...args: never[]) => infer B) ? 0 extends 1 & B ? B : [B] extends [{
-        type: infer N extends keyof IsoBoxMap;
-    }] ? [B] extends [IsoBoxMap<IsoInt64>[N]] ? [IsoBoxMap<IsoInt64>[N]] extends [B] ? IsoBoxMap<V>[N] : B : B : [B] extends [{
-        type: infer N extends string;
-    }] ? string extends N ? never : B : B : never; }[keyof T]> | (NonNullable<{ [K in keyof T]: T[K] extends ((...args: never[]) => unknown) ? K extends "url" | "urn" ? K | `${K} ` : K : never; }[keyof T]> extends (infer R) ? [string] extends [R] ? IsoBox<V> : Exclude<IsoBoxContainer<V>, {
-    type: R;
-}> : never) | IsoRawBox;
-
-// @public
-export type IsoBoxStreamable<V extends IsoInt64 = number> = IsoBox<V> | ParsedIsoBox<V> | {
-    type: IsoBoxType;
-} | ArrayBufferView;
-
-// @public
-export type IsoBoxType = string;
-
-// @public
-export type IsoBoxWriteConfig = {
-    writers?: IsoBoxWriterMap;
-};
-
-// @public
-export type IsoBoxWriteCursor = {
-    readonly view: DataView;
-    readonly bytes: Uint8Array<ArrayBuffer>;
-    pos: number;
-    readonly writers?: IsoBoxWriterMap;
-};
-
-// @public
-export type IsoBoxWriter<B> = (cursor: IsoBoxWriteCursor, box: B) => void;
-
-// @public
-export type IsoBoxWriterMap = { [K in keyof IsoBoxMap]?: IsoBoxWriter<IsoBoxMap<IsoInt64>[K]>; } & {
-    url?: IsoBoxWriter<IsoBoxMap<IsoInt64>["url "]>;
-    urn?: IsoBoxWriter<IsoBoxMap<IsoInt64>["urn "]>;
-} & Record<IsoBoxType, IsoBoxWriter<never>>;
+export interface IsoCustomBoxMap {}
 
 // @public
 export type IsoInt64 = number | bigint;
@@ -474,7 +464,8 @@ export type IsoInt64Reader<V extends IsoInt64 = number> = (cursor: IsoBoxReadCur
 
 // @public
 export type IsoRawBox = {
-    type: IsoBoxType;
+    type?: undefined;
+    boxType: IsoBoxType;
     bytes: Uint8Array;
     headerSize?: number;
     usertype?: Uint8Array;
@@ -733,15 +724,7 @@ export function readInt64AsBigInt(cursor: IsoBoxReadCursor<IsoInt64>, size: 4 | 
 export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readIsoBoxes<const R extends IsoBoxReaderMap<V>, V extends IsoInt64 = number>(raw: IsoBoxData, config: IsoBoxReadConfig<V> & {
-    readers: R;
-}): IsoBoxReaderReturn<R, V>[];
-
-// @public
-export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): ParsedIsoBox<V>[];
-
-// @public
-export function readIsoBoxes(raw: IsoBoxData, config?: IsoBoxReadConfig): ParsedIsoBox[];
+export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadConfig<V>): ParsedIsoBox<V>[];
 
 // @public
 export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
@@ -1038,7 +1021,7 @@ export type SchemeTypeBox = FullBox & {
 export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxReadCursor<V>, path: readonly IsoBoxType[]): IsoBoxReadCursor<V> | null;
 
 // @public
-export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], ...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]): IsoBoxReadCursor<V> | null;
+export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V> | null;
 
 // @public
 export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {
@@ -1299,7 +1282,7 @@ export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType, V ex
 };
 
 // @public
-export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv";
+export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" | "av01" | "dav1" | "dva1" | "dvav" | "dvh1" | "dvhe" | "vp09";
 
 // @public
 export type WebVttConfigurationBox = {
@@ -1346,7 +1329,7 @@ export type WebVttSourceLabelBox = {
 export function writeArdi(cursor: IsoBoxWriteCursor, box: AudioRenderingIndicationBox): void;
 
 // @public
-export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<T, IsoInt64>): void;
+export function writeAudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType>(cursor: IsoBoxWriteCursor, box: AudioSampleEntry<T, IsoInt64>): void;
 
 // @public
 export function writeAvc1(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc1", IsoInt64>): void;
@@ -1364,7 +1347,7 @@ export function writeAvc4(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<"avc
 export function writeBytes(cursor: IsoBoxWriteCursor, data: ArrayLike<number>): void;
 
 // @public
-export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<IsoInt64>>): void;
+export function writeChildBoxes(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable>): void;
 
 // @public
 export function writeCo64(cursor: IsoBoxWriteCursor, box: ChunkLargeOffsetBox<IsoInt64>): void;
@@ -1436,10 +1419,10 @@ export function writeInt32(cursor: IsoBoxWriteCursor, value: number): void;
 export function writeInt8(cursor: IsoBoxWriteCursor, value: number): void;
 
 // @public
-export function writeIsoBox(box: IsoBoxStreamable<IsoInt64>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBox(box: IsoBoxStreamable, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
 
 // @public
-export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable<IsoInt64>>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
+export function writeIsoBoxes(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>;
 
 // @public
 export function writeKind(cursor: IsoBoxWriteCursor, box: KindBox): void;
@@ -1646,7 +1629,7 @@ export function writeUrn(cursor: IsoBoxWriteCursor, box: DataEntryUrnBox): void;
 export function writeUtf8(cursor: IsoBoxWriteCursor, value: string): void;
 
 // @public
-export function writeVisualSampleEntry<T extends VisualSampleEntryType = VisualSampleEntryType>(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<T, IsoInt64>): void;
+export function writeVisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType>(cursor: IsoBoxWriteCursor, box: VisualSampleEntry<T, IsoInt64>): void;
 
 // @public
 export function writeVlab(cursor: IsoBoxWriteCursor, box: WebVttSourceLabelBox): void;

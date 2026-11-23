@@ -40,7 +40,7 @@ export function seekIsoBox<V extends IsoInt64 = number>(
  *
  * @param data - The data.
  * @param path - The type of each box, from the outer box to the box to find.
- * @param config - The readers map and the `int64` option of the result. The configuration is required when `V` is `bigint`.
+ * @param config - The readers map and the `int64` option of the result.
  * @returns A new read cursor for the first box at the path, or `null` for a missing box and for a truncated box.
  *
  * @public
@@ -48,7 +48,7 @@ export function seekIsoBox<V extends IsoInt64 = number>(
 export function seekIsoBox<V extends IsoInt64 = number>(
 	data: IsoBoxData,
 	path: readonly IsoBoxType[],
-	...config: [V] extends [bigint] ? [config: IsoBoxReadConfig<V>] : [config?: IsoBoxReadConfig<V>]
+	config?: IsoBoxReadConfig<V>,
 ): IsoBoxReadCursor<V> | null
 export function seekIsoBox(
 	data: IsoBoxData | IsoBoxReadCursor<IsoInt64>,

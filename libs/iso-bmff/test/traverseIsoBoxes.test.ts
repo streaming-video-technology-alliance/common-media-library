@@ -19,12 +19,13 @@ describe('traverseIsoBoxes', function () {
 		const boxes = readIsoBoxes(isoFile)
 
 		// Depth-first: each box, then its children.
-		const types = Array.from(traverseIsoBoxes(boxes), box => box.type)
+		// A box with no reader is a raw box. A raw box has its code in `boxType`.
+		const types = Array.from(traverseIsoBoxes(boxes), box => box.type ?? box.boxType)
 
 		// Breadth-first, with the root boxes and their children only.
 		const levels = Array.from(
 			traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 }),
-			box => box.type,
+			box => box.type ?? box.boxType,
 		)
 		// #endregion example
 
@@ -224,7 +225,7 @@ describe('traverseIsoBoxes order', function () {
 				for (const maxDepth of maxDepths) {
 					const types = Array.from(
 						traverseIsoBoxes(boxes, { depthFirst, maxDepth }),
-						box => box.type,
+						box => box.type ?? box.boxType,
 					)
 					assert.strictEqual(
 						types.join(','),

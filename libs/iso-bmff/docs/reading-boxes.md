@@ -8,9 +8,11 @@ description: Read ISO BMFF boxes from a buffer
 The `readIsoBoxes` function reads boxes from a buffer and returns an array of boxes. To read the fields of a box, provide a reader function for that box type. The result has two kinds of boxes:
 
 - A **box object** has a `type` field and the fields of the box. A reader returns a box object.
-- A **raw box** is a box with no reader: `{ type, bytes, headerSize }`. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `usertype`.
+- A **raw box** is a box with no reader: `{ boxType, bytes, headerSize }`. `boxType` is the four-character code of the box. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `usertype`.
 
-The bytes of a raw box share memory with the input. A raw box can have any type, so a test of `box.type` does not exclude a raw box. Narrow a box with `isIsoBoxType`, which returns `false` for a raw box.
+The bytes of a raw box share memory with the input.
+
+A raw box has no `type` field. A test such as `box.type === "tfdt"` narrows a box to that box type, and never matches a raw box. A box with no reader is a raw box, so add the reader of a box type before you test for that type. The four-character code of any box is `box.type ?? box.boxType`.
 
 > [!NOTE]
 > The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists the container box types that the function reads automatically. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
@@ -104,7 +106,7 @@ The function returns `null` at the end of the cursor and before a truncated box.
 
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to the result. The result type of `readIsoBoxes` follows the custom reader. A key in the reader map replaces the built-in type of that box in the result type. A test of `box.type` does not exclude a raw box, so the loop also tests for the `frames` field.
+A custom reader can call a built-in reader and add fields to the result. In the result of `readIsoBoxes`, the box has the built-in type. The loop tests `box.type`, then casts the box to the result type of the reader.
 
 HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
@@ -135,9 +137,11 @@ const boxes = readIsoBoxes(segment, {
 	},
 });
 
+type EmsgWithId3 = ReturnType<typeof readEmsgWithId3>;
+
 for (const box of boxes) {
-	if (box.type === "emsg" && "frames" in box) {
-		console.log(box.frames);
+	if (box.type === "emsg") {
+		console.log((box as EmsgWithId3).frames);
 	}
 }
 ```
@@ -148,10 +152,13 @@ A byte field such as `messageData` is a view over the input data. The field shar
 
 The package parses no codec configuration box, such as `avcC`, `hvcC`, or `esds`. The `boxes` field of a sample entry, such as `avc1`, holds such a box as a raw box with its bytes. To read the fields of the box, write a custom reader for its box type.
 
+The `readers` map takes a reader under a key of `IsoBoxMap`. For a box type that the package does not name, add the type to `IsoCustomBoxMap` first. `readIsoBoxes` and the write functions then have that box type.
+
 A reader takes a read cursor and the box type, and returns the box object with its `type` field. A field function reads one field at `cursor.pos` and moves the position past the field, such as `readUint32` or `readFourCc`:
 
 ```typescript
 import {
+	findIsoBox,
 	readFourCc,
 	readIsoBoxes,
 	readUint16,
@@ -161,14 +168,26 @@ import {
 } from "@svta/cml-iso-bmff";
 
 // A box type that the package does not name.
-const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>) => ({
-	type: "abcd" as const,
+type AbcdBox = { type: "abcd"; brand: string; count: number; flags: number };
+
+// Add the box type to the map of custom box types.
+declare module "@svta/cml-iso-bmff" {
+	interface IsoCustomBoxMap {
+		abcd: AbcdBox;
+	}
+}
+
+const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>): AbcdBox => ({
+	type: "abcd",
 	brand: readFourCc(cursor),
 	count: readUint32(cursor),
 	flags: readUint16(cursor),
 });
 
 const boxes = readIsoBoxes(buffer, { readers: { abcd: readAbcd } });
+
+// The test narrows the box to `AbcdBox`.
+console.log(findIsoBox(boxes, (box) => box.type === "abcd")?.brand);
 ```
 
 The cursor follows these rules:
@@ -179,11 +198,14 @@ The cursor follows these rules:
 - The bytes that remain are `cursor.end - cursor.pos`. To skip bytes, add to `cursor.pos`.
 - A reader of a box with child boxes reads them with `readChildBoxes(cursor)`. The readers of the configuration then apply to the child boxes.
 - `readIsoBoxes` uses one cursor for every box. A reader must not keep the cursor after it returns. A reader that needs bytes later keeps the result of `readBytes`.
-- The `type` field of the result needs a literal type, such as `"abcd" as const`. A result with `type: string` adds no member to the result type of `readIsoBoxes`.
+- The declaration of `IsoCustomBoxMap` applies to every file of the program. Two declarations of one box type need the same type.
+- A reader under a key returns the box type of that key. The reader can add fields. A reader with another result type is a compile error.
 
 `readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
 
-`readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space. The result type then replaces the built-in `"url "` type with the return type of that reader.
+`readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space.
+
+`IsoBoxMap` names the sample entry types of these codecs: `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`. The default configuration has no reader for these types. Create a reader with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`, such as `{ "ec-3": createAudioSampleEntryReader("ec-3") }`.
 
 ## Incomplete boxes
 
@@ -362,12 +384,16 @@ const boxes = readIsoBoxes(buffer, {
 	},
 });
 
-// A readers map in a variable needs a type argument for a generic custom reader.
-const readers = { tfdt: readTfdtWide<bigint> };
+// A readers map in a variable works the same way.
+const readers = { tfdt: readTfdtWide };
 const stored = readIsoBoxes(buffer, { int64: readInt64AsBigInt, readers });
 ```
 
-A readers map in a variable gives the same types as an inline map for the built-in readers. TypeScript does not select the type of a generic custom reader in a variable. Without the type argument, the fields of that reader have the type `number | bigint`. A custom reader whose result equals the built-in box type gets the fields of the configuration without a type argument.
+The result type follows the `int64` option, not the readers map. With `isIsoBoxType("tfdt", box)`, the box has the built-in type with `bigint` fields. To read the `source` field, cast the box to `ReturnType<typeof readTfdtWide<bigint>>`.
+
+TypeScript reads the type of the `int64` function to select the type of the fields. Pass a named function, such as `readInt64AsBigInt`. For a function that you write inside the configuration object, give the `cursor` parameter the type `IsoBoxReadCursor<IsoInt64>`. Without that type, a function after a `readers` map with a generic reader can fail to compile.
+
+The type of the fields also follows a type that your code writes, such as `readIsoBoxes<bigint>(buffer)` or a variable of the type `ParsedIsoBox<bigint>[]`. TypeScript does not check such a type against the `int64` option. Let TypeScript infer the type from the option.
 
 ### A function that forwards the option
 
@@ -405,7 +431,7 @@ Do not type the parameter as `IsoBoxReadConfig<IsoInt64>`. That type does not ac
 
 ### A custom reader for one field
 
-If your code needs the exact value of one field only, a custom reader can call `readUint64`. The function returns a `bigint` and needs no option:
+If your code needs the exact value of one field only, a custom reader can call `readUint64`. The function returns a `bigint` and needs no option. A reader under the key `tfdt` returns the `tfdt` box type, so the reader adds the exact value as a new field:
 
 ```typescript
 import {
@@ -417,19 +443,33 @@ import {
 	type IsoBoxReadCursor,
 } from "@svta/cml-iso-bmff";
 
-const readTfdt64 = (cursor: IsoBoxReadCursor) => {
+const readTfdtExact = (cursor: IsoBoxReadCursor) => {
 	const version = readUint8(cursor);
 	const flags = readUint24(cursor);
-	const baseMediaDecodeTime =
+	const exactTime =
 		version === 1 ? readUint64(cursor) : BigInt(readUint32(cursor));
-	return { type: "tfdt" as const, version, flags, baseMediaDecodeTime };
+	return {
+		type: "tfdt" as const,
+		version,
+		flags,
+		baseMediaDecodeTime: Number(exactTime),
+		exactTime,
+	};
 };
 
 const boxes = readIsoBoxes(buffer, {
 	readers: {
-		tfdt: readTfdt64,
+		tfdt: readTfdtExact,
 	},
 });
+
+type TfdtExact = ReturnType<typeof readTfdtExact>;
+
+for (const box of boxes) {
+	if (box.type === "tfdt") {
+		console.log((box as TfdtExact).exactTime);
+	}
+}
 ```
 
 The built-in writers write a `bigint` field with the exact value. See [Writing 64-bit fields](writing-boxes.md#writing-64-bit-fields).
