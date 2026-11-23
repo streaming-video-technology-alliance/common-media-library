@@ -140,9 +140,60 @@ describe('int64 option', function () {
 				assert.deepStrictEqual(writeIsoBox(parsed, createDefaultWriterConfig()), source)
 			})
 
+			it('should read 8-byte fields with all bits set', function () {
+				const source = box.bytes(
+					paths.map(() => BigInt('0xffffffffffffffff')),
+					8,
+				)
+				const [big] = readIsoBoxes(source, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
+				const [plain] = readIsoBoxes(source, createDefaultReaderConfig())
+
+				for (const [i, path] of paths.entries()) {
+					const signed = box.signed?.includes(i)
+
+					// An unsigned field is 2^64 - 1, and a number rounds that value to 2^64. A signed field is -1.
+					assert.strictEqual(
+						valueAt(big, path),
+						signed ? BigInt(-1) : BigInt('18446744073709551615'),
+					)
+					assert.strictEqual(valueAt(plain, path), signed ? -1 : 2 ** 64)
+				}
+			})
+
+			it('should write 8-byte bigint fields with all bits set back to the same bytes', function () {
+				const source = box.bytes(
+					paths.map(() => BigInt('0xffffffffffffffff')),
+					8,
+				)
+				const [parsed] = readIsoBoxes(
+					source,
+					createDefaultReaderConfig({ int64: readInt64AsBigInt }),
+				)
+
+				assert.ok(parsed)
+				assert.deepStrictEqual(writeIsoBox(parsed, createDefaultWriterConfig()), source)
+			})
+
 			if (box.fixed) {
 				return
 			}
+
+			it('should read 4-byte fields with all bits set', function () {
+				const source = box.bytes(
+					paths.map(() => 0xffffffff),
+					4,
+				)
+				const [big] = readIsoBoxes(source, createDefaultReaderConfig({ int64: readInt64AsBigInt }))
+				const [plain] = readIsoBoxes(source, createDefaultReaderConfig())
+
+				for (const [i, path] of paths.entries()) {
+					const signed = box.signed?.includes(i)
+
+					// An unsigned field is 2^32 - 1. A signed field is -1.
+					assert.strictEqual(valueAt(big, path), signed ? BigInt(-1) : BigInt(4294967295))
+					assert.strictEqual(valueAt(plain, path), signed ? -1 : 4294967295)
+				}
+			})
 
 			it('should write a version 0 box with bigint fields back to the same bytes', function () {
 				const source = box.bytes(low, 4)

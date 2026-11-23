@@ -12,6 +12,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `OriginalFormatBox` fields to write
  *
+ * @throws RangeError if `dataFormat` does not have 4 characters.
+ *
  * @public
  */
 export function writeFrma(cursor: IsoBoxWriteCursor, box: OriginalFormatBox): void {

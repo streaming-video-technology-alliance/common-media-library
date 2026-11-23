@@ -18,6 +18,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SegmentIndexBox` fields to write
  *
+ * @throws RangeError if the box has more than 65535 references.
+ *
  * @public
  */
 export function writeSidx(cursor: IsoBoxWriteCursor, box: SegmentIndexBox<IsoInt64>): void {

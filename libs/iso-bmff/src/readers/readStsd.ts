@@ -12,6 +12,8 @@ import { readEntryBoxes } from '../cursor/readEntryBoxes.ts'
  *
  * @returns A parsed `SampleDescriptionBox`
  *
+ * @throws RangeError if the box has fewer complete child boxes than `entry_count`.
+ *
  * @public
  */
 export function readStsd<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): SampleDescriptionBox<V> {

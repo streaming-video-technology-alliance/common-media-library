@@ -13,6 +13,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `FileTypeBox` fields to write
  *
+ * @throws RangeError if `majorBrand` or a compatible brand does not have 4 characters.
+ *
  * @example
  * {@includeCode ../../test/writers/writeFtyp.test.ts#example}
  *
