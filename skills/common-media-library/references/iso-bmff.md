@@ -587,7 +587,7 @@ The cursor follows these rules:
 
 `readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space.
 
-`IsoBoxMap` names the sample entry types of these codecs: `ac-3`, `ac-4`, `av01`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`. The default configuration has no reader for these types. Create a reader with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`, such as `{ "ec-3": createAudioSampleEntryReader("ec-3") }`.
+`IsoBoxMap` names the sample entry types of these codecs: `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`. The default configuration has no reader for these types. Create a reader with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`, such as `{ "ec-3": createAudioSampleEntryReader("ec-3") }`.
 
 ## Incomplete boxes
 
@@ -1688,6 +1688,7 @@ export type IsoBuiltInBoxMap<V extends IsoInt64 = number> = {
     dinf: DataInformationBox<V>;
     dref: DataReferenceBox<V>;
     edts: EditBox<V>;
+    dav1: VisualSampleEntry<"dav1", V>;
     dva1: VisualSampleEntry<"dva1", V>;
     dvav: VisualSampleEntry<"dvav", V>;
     dvh1: VisualSampleEntry<"dvh1", V>;
@@ -2605,7 +2606,7 @@ export type VisualSampleEntry<T extends IsoBoxType = VisualSampleEntryType, V ex
 };
 
 // @public
-export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" | "av01" | "dva1" | "dvav" | "dvh1" | "dvhe" | "vp09";
+export type VisualSampleEntryType = "avc1" | "avc2" | "avc3" | "avc4" | "hev1" | "hvc1" | "encv" | "av01" | "dav1" | "dva1" | "dvav" | "dvh1" | "dvhe" | "vp09";
 
 // @public
 export type WebVttConfigurationBox = {

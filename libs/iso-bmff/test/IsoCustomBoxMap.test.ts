@@ -1,6 +1,8 @@
 import {
 	assert,
 	beginIsoBox,
+	createAudioSampleEntryReader,
+	createVisualSampleEntryReader,
 	describe,
 	endIsoBox,
 	filterIsoBoxes,
@@ -15,6 +17,7 @@ import {
 	writeUint32,
 	type IsoBoxMap,
 	type IsoBoxReadCursor,
+	type IsoBoxReaderMap,
 	type IsoBoxWriteCursor,
 	type IsoRawBox,
 	type ParsedIsoBox,
@@ -161,6 +164,25 @@ describe('IsoCustomBoxMap', function () {
 		const copy = writeIsoBoxes([{ type: 'mdat', bytes: MDAT }], { writers: {} })
 
 		assert.deepStrictEqual([...copy], [...MDAT])
+	})
+
+	it('should take a reader for each codec sample entry type with no declaration', function () {
+		const readers: IsoBoxReaderMap = {
+			'ac-3': createAudioSampleEntryReader('ac-3'),
+			'ac-4': createAudioSampleEntryReader('ac-4'),
+			av01: createVisualSampleEntryReader('av01'),
+			dav1: createVisualSampleEntryReader('dav1'),
+			dva1: createVisualSampleEntryReader('dva1'),
+			dvav: createVisualSampleEntryReader('dvav'),
+			dvh1: createVisualSampleEntryReader('dvh1'),
+			dvhe: createVisualSampleEntryReader('dvhe'),
+			'ec-3': createAudioSampleEntryReader('ec-3'),
+			fLaC: createAudioSampleEntryReader('fLaC'),
+			Opus: createAudioSampleEntryReader('Opus'),
+			vp09: createVisualSampleEntryReader('vp09'),
+		}
+
+		assert.strictEqual(Object.keys(readers).length, 12)
 	})
 
 	it('should check the readers map and the writers map', function () {

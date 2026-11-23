@@ -92,7 +92,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCu
  * Map of each box type that the package names to the type of that box.
  *
  * The default configuration has no reader and no writer for these sample entry types:
- * `ac-3`, `ac-4`, `av01`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`.
+ * `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`.
  * Create a reader for one of these types with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`.
  * Write one of these types with `writeAudioSampleEntry` or `writeVisualSampleEntry`.
  *
@@ -112,6 +112,7 @@ export type IsoBuiltInBoxMap<V extends IsoInt64 = number> = {
 	dinf: DataInformationBox<V>
 	dref: DataReferenceBox<V>
 	edts: EditBox<V>
+	dav1: VisualSampleEntry<'dav1', V>
 	dva1: VisualSampleEntry<'dva1', V>
 	dvav: VisualSampleEntry<'dvav', V>
 	dvh1: VisualSampleEntry<'dvh1', V>
