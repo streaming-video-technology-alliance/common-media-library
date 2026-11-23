@@ -9,13 +9,14 @@ import { endIsoBox } from '../endIsoBox.ts'
 /**
  * Write the `schm` box (`SchemeTypeBox`).
  *
- * When flag `0x000001` is set, the writer writes `schemeUri`, or an empty string for a missing `schemeUri`.
+ * When flag `0x000001` is set, the writer writes `schemeUri`.
  *
  * ISO/IEC 14496-12:2015 - 8.12.5
  *
  * @param cursor - The write cursor
  * @param box - The `SchemeTypeBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
  * @throws RangeError if `schemeType` does not have 4 characters.
  *
  * @example
@@ -30,7 +31,7 @@ export function writeSchm(cursor: IsoBoxWriteCursor, box: SchemeTypeBox): void {
 	writeUint32(cursor, box.schemeVersion)
 
 	if (box.flags & 0x000001) {
-		writeTerminatedUtf8(cursor, box.schemeUri ?? '')
+		writeTerminatedUtf8(cursor, box.schemeUri as string)
 	}
 
 	endIsoBox(cursor, start)

@@ -11,7 +11,7 @@ import type { IsoBoxWriteCursor } from './IsoBoxWriteCursor.ts'
  * @param type - The four-character code of the box.
  * @returns The position of the first byte of the box. Pass it to `endIsoBox`.
  *
- * @throws RangeError if `type` does not have 4 characters.
+ * @throws RangeError if `type` does not have 4 characters of 1 byte each.
  *
  * @example
  * {@includeCode ../test/beginIsoBox.test.ts#example}

@@ -14,6 +14,8 @@ import { writeFixedBytes } from '../cursor/writeFixedBytes.ts'
  * @param cursor - The write cursor
  * @param box - The `ProtectionSystemSpecificHeaderBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @example
  * {@includeCode ../../test/writers/writePssh.test.ts#example}
  *
@@ -22,13 +24,13 @@ import { writeFixedBytes } from '../cursor/writeFixedBytes.ts'
 export function writePssh(cursor: IsoBoxWriteCursor, box: ProtectionSystemSpecificHeaderBox): void {
 	const start = beginIsoFullBox(cursor, 'pssh', box.version, box.flags)
 
-	writeFixedBytes(cursor, box.systemId, 16)
+	writeFixedBytes(cursor, box.systemId, 16, 'systemId')
 
 	if (box.version > 0) {
 		writeUint32(cursor, box.kid.length)
 
 		for (const kid of box.kid) {
-			writeFixedBytes(cursor, kid, 16)
+			writeFixedBytes(cursor, kid, 16, 'kid')
 		}
 	}
 

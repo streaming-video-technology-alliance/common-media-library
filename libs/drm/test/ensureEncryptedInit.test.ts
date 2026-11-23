@@ -1,6 +1,6 @@
 import { ensureEncryptedInit } from '@svta/cml-drm'
 import { hexToArrayBuffer } from '@svta/cml-utils'
-import { equal } from 'assert'
+import { equal, throws } from 'assert'
 import { describe, it } from 'vite-plus/test'
 
 const original = new Uint8Array(
@@ -106,6 +106,27 @@ describe('ensureEncryptedInit', () => {
 		})
 
 		equal(Buffer.compare(fromArray, fromBytes), 0)
+	})
+
+	it('should throw a RangeError for a defaultKid that does not have 16 bytes', () => {
+		throws(
+			() => ensureEncryptedInit(original, { defaultKid: [1, 2, 3] }),
+			/^RangeError: .*defaultKid.* received 1,2,3$/,
+		)
+		throws(
+			() => ensureEncryptedInit(original, { defaultKid: new Uint8Array(17) }),
+			/^RangeError: .*defaultKid.* received 0(,0){16}$/,
+		)
+	})
+
+	it('should throw a RangeError for a defaultKid item that is not a byte', () => {
+		throws(
+			() =>
+				ensureEncryptedInit(original, {
+					defaultKid: [256, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+				}),
+			/^RangeError: .* received 256$/,
+		)
 	})
 
 	it('should add an encv entry for a video sample entry', () => {

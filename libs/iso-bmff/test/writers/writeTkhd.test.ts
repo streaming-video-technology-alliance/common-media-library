@@ -72,9 +72,33 @@ describe('writeTkhd', function () {
 		)
 	})
 
-	it('should write 0 for a missing matrix entry', function () {
-		const writer = writeWith(writeTkhd, createBox([1, 0, 0, 0, 1]))
+	it('should throw a RangeError for a missing matrix entry', function () {
+		assert.throws(
+			() => writeWith(writeTkhd, createBox([1, 0, 0, 0, 1])),
+			/^RangeError: .*writeInt32.* received NaN$/,
+		)
+	})
 
-		assert.deepStrictEqual(storedMatrix(writer.buffer), [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0])
+	it('should write a negative volume as a signed field', function () {
+		const bytes = writeWith(writeTkhd, { ...createBox([1, 0, 0, 0, 1, 0, 0, 0, 1]), volume: -0.5 })
+
+		// volume is a signed 8.8 field at the offset 44.
+		assert.deepStrictEqual(Array.from(bytes.subarray(44, 46)), [0xff, 0x80])
+	})
+
+	it('should throw a RangeError for a volume above the signed 8.8 range', function () {
+		// 128 in an 8.8 field is 0x8000.
+		assert.throws(
+			() => writeWith(writeTkhd, { ...createBox([1, 0, 0, 0, 1, 0, 0, 0, 1]), volume: 128 }),
+			/^RangeError: .*writeInt16.* received 32768$/,
+		)
+	})
+
+	it('should throw a RangeError for a negative width', function () {
+		// width is an unsigned 16.16 field, and -1 is -65536 in units of the field.
+		assert.throws(
+			() => writeWith(writeTkhd, { ...createBox([1, 0, 0, 0, 1, 0, 0, 0, 1]), width: -1 }),
+			/^RangeError: .*writeUint32.* received -65536$/,
+		)
 	})
 })

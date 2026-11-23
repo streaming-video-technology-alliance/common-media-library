@@ -63,6 +63,16 @@ describe('readWideUint', function () {
 		assert.throws(() => readWideInt(cursor, 8), RangeError)
 		assert.strictEqual(cursor.pos, 0)
 	})
+
+	it('should throw a RangeError for a size that is not an integer and keep the position', function () {
+		const cursor = createIsoBoxReadCursor(new Uint8Array(8))
+
+		assert.throws(() => readWideUint(cursor, 2.5 as 4), {
+			name: 'RangeError',
+			message: 'Cannot read 2.5 bytes at position 0: the box ends at 8',
+		})
+		assert.strictEqual(cursor.pos, 0)
+	})
 })
 
 describe('readWideInt', function () {

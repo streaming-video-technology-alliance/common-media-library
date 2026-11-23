@@ -87,6 +87,87 @@ describe('writeSidx', function () {
 		)
 	})
 
+	it('should write the largest value of each part of a reference', function () {
+		const bytes = writeWith(writeSidx, {
+			type: 'sidx',
+			version: 0,
+			flags: 0,
+			referenceId: 1,
+			timescale: 2,
+			earliestPresentationTime: 3,
+			firstOffset: 4,
+			references: [
+				{
+					subsegmentDuration: 5,
+					referenceType: 1,
+					referencedSize: 0x7fffffff,
+					startsWithSap: 1,
+					sapType: 7,
+					sapDeltaTime: 0x0fffffff,
+				},
+			],
+		})
+
+		// Each part has all its bits set, so the first word and the last word are ff ff ff ff.
+		assert.deepStrictEqual(
+			bytes,
+			boxBytes(
+				'sidx',
+				[0, 1],
+				[0, 3],
+				[1, 4],
+				[2, 4],
+				[3, 4],
+				[4, 4],
+				[0, 2],
+				[1, 2],
+				[0xffffffff, 4],
+				[5, 4],
+				[0xffffffff, 4],
+			),
+		)
+	})
+
+	// Each line: a part of a reference and a value that the part cannot hold.
+	// The first five values are the first value above the bits of the part.
+	for (const [field, value] of [
+		['referenceType', 2],
+		['referencedSize', 0x80000000],
+		['startsWithSap', 2],
+		['sapType', 8],
+		['sapDeltaTime', 0x10000000],
+		['sapType', -1],
+		['referencedSize', 1.5],
+		['sapDeltaTime', NaN],
+	] as const) {
+		it(`should throw a RangeError for a ${field} of ${value}`, function () {
+			const reference = {
+				subsegmentDuration: 5,
+				referenceType: 0,
+				referencedSize: 100,
+				startsWithSap: 0,
+				sapType: 0,
+				sapDeltaTime: 0,
+				[field]: value,
+			}
+
+			assert.throws(
+				() =>
+					writeWith(writeSidx, {
+						type: 'sidx',
+						version: 0,
+						flags: 0,
+						referenceId: 1,
+						timescale: 2,
+						earliestPresentationTime: 3,
+						firstOffset: 4,
+						references: [reference],
+					}),
+				new RegExp(`^RangeError: .*${field}.* received ${value}$`),
+			)
+		})
+	}
+
 	it('should throw a RangeError for more than 65535 references', function () {
 		const reference = {
 			referenceType: 0,

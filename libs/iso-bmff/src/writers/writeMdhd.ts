@@ -6,6 +6,7 @@ import { writeUint16 } from '../cursor/writeUint16.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
 import { writeWideUint } from '../cursor/writeWideUint.ts'
 import { endIsoBox } from '../endIsoBox.ts'
+import { failRange } from '../cursor/failRange.ts'
 
 /**
  * Write the `mdhd` box (`MediaHeaderBox`).
@@ -18,25 +19,31 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `MediaHeaderBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeMdhd(cursor: IsoBoxWriteCursor, box: MediaHeaderBox<IsoInt64>): void {
 	const { language } = box
 	const size = box.version === 1 ? 8 : 4
 	const start = beginIsoFullBox(cursor, 'mdhd', box.version, box.flags)
-	let lang = language.length === 3 ? 0 : -1
+	let lang = typeof language === 'string' && language.length === 3 ? 0 : -1
 
 	for (let i = 0; lang >= 0 && i < 3; i++) {
 		const code = language.charCodeAt(i) - 0x60
 
-		lang = code >= 0 && code < 0x20 ? (lang << 5) | code : -1
+		lang = code < 0x20 ? (lang << 5) | code : -1
+	}
+
+	if (lang < 0) {
+		failRange('language', '3 characters from U+0060 to U+007F', language)
 	}
 
 	writeWideUint(cursor, box.creationTime, size)
 	writeWideUint(cursor, box.modificationTime, size)
 	writeUint32(cursor, box.timescale)
 	writeWideUint(cursor, box.duration, size)
-	writeUint16(cursor, lang < 0 ? 0x55c4 : lang)
+	writeUint16(cursor, lang)
 	writeUint16(cursor, box.preDefined ?? 0)
 	endIsoBox(cursor, start)
 }

@@ -175,6 +175,7 @@ The cursor follows these rules:
 
 - `cursor.start` is the first byte of the box header, and `cursor.end` is the first byte after the box. The cursor of a reader starts at the first byte after the header. For a `uuid` box, the cursor starts at the first byte of `usertype`. Read it with `readBytes(cursor, 16)`.
 - A read past `cursor.end` throws a `RangeError`, so a reader cannot read the bytes of the next box. A reader can stop before the end of its box.
+- A length is an integer of 0 or more. Another length throws a `RangeError`.
 - The bytes that remain are `cursor.end - cursor.pos`. To skip bytes, add to `cursor.pos`.
 - A reader of a box with child boxes reads them with `readChildBoxes(cursor)`. The readers of the configuration then apply to the child boxes.
 - `readIsoBoxes` uses one cursor for every box. A reader must not keep the cursor after it returns. A reader that needs bytes later keeps the result of `readBytes`.

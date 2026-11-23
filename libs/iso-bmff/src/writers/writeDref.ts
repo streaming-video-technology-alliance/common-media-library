@@ -14,6 +14,8 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  * @param cursor - The write cursor
  * @param box - The `DataReferenceBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeDref(cursor: IsoBoxWriteCursor, box: DataReferenceBox<IsoInt64>): void {

@@ -6,6 +6,7 @@ import { writeUint16 } from '../cursor/writeUint16.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
 import { writeWideUint } from '../cursor/writeWideUint.ts'
 import { endIsoBox } from '../endIsoBox.ts'
+import { checkUint } from '../cursor/checkUint.ts'
 
 /**
  * Write the `sidx` box (`SegmentIndexBox`).
@@ -18,6 +19,7 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `SegmentIndexBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
  * @throws RangeError if the box has more than 65535 references.
  *
  * @public
@@ -40,13 +42,19 @@ export function writeSidx(cursor: IsoBoxWriteCursor, box: SegmentIndexBox<IsoInt
 	writeUint16(cursor, references.length)
 
 	for (const ref of references) {
-		writeUint32(cursor, ((ref.referenceType & 0x1) << 31) | (ref.referencedSize & 0x7fffffff))
+		writeUint32(
+			cursor,
+			((checkUint('referenceType', ref.referenceType, 1) << 31) |
+				checkUint('referencedSize', ref.referencedSize, 0x7fffffff)) >>>
+				0,
+		)
 		writeUint32(cursor, ref.subsegmentDuration)
 		writeUint32(
 			cursor,
-			((ref.startsWithSap & 0x1) << 31) |
-				((ref.sapType & 0x7) << 28) |
-				(ref.sapDeltaTime & 0x0fffffff),
+			((checkUint('startsWithSap', ref.startsWithSap, 1) << 31) |
+				(checkUint('sapType', ref.sapType, 7) << 28) |
+				checkUint('sapDeltaTime', ref.sapDeltaTime, 0x0fffffff)) >>>
+				0,
 		)
 	}
 

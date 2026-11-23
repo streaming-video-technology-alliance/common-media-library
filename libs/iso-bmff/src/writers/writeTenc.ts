@@ -5,6 +5,7 @@ import { writeUint8 } from '../cursor/writeUint8.ts'
 import { writeBytes } from '../cursor/writeBytes.ts'
 import { endIsoBox } from '../endIsoBox.ts'
 import { writeFixedBytes } from '../cursor/writeFixedBytes.ts'
+import { checkUint } from '../cursor/checkUint.ts'
 
 /**
  * Write the `tenc` box (`TrackEncryptionBox`).
@@ -14,6 +15,7 @@ import { writeFixedBytes } from '../cursor/writeFixedBytes.ts'
  * @param cursor - The write cursor
  * @param box - The `TrackEncryptionBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
  * @throws RangeError if `defaultConstantIv` has more than 255 bytes.
  *
  * @example
@@ -36,12 +38,13 @@ export function writeTenc(cursor: IsoBoxWriteCursor, box: TrackEncryptionBox): v
 	writeUint8(
 		cursor,
 		version > 0
-			? (((box.defaultCryptByteBlock ?? 0) & 0xf) << 4) | ((box.defaultSkipByteBlock ?? 0) & 0xf)
+			? (checkUint('defaultCryptByteBlock', box.defaultCryptByteBlock, 15) << 4) |
+					checkUint('defaultSkipByteBlock', box.defaultSkipByteBlock, 15)
 			: 0,
 	)
 	writeUint8(cursor, box.defaultIsProtected)
 	writeUint8(cursor, box.defaultPerSampleIvSize)
-	writeFixedBytes(cursor, box.defaultKid, 16)
+	writeFixedBytes(cursor, box.defaultKid, 16, 'defaultKid')
 
 	if (defaultConstantIv) {
 		writeUint8(cursor, defaultConstantIv.length)

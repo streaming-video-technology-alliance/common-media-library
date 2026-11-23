@@ -70,9 +70,45 @@ describe('writeMvhd', function () {
 		)
 	})
 
-	it('should write 0 for a missing matrix entry', function () {
-		const writer = writeWith(writeMvhd, createBox([1, 0, 0, 0, 1]))
+	it('should throw a RangeError for a missing matrix entry', function () {
+		assert.throws(
+			() => writeWith(writeMvhd, createBox([1, 0, 0, 0, 1])),
+			/^RangeError: .*writeInt32.* received NaN$/,
+		)
+	})
 
-		assert.deepStrictEqual(storedMatrix(writer.buffer), [0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0])
+	it('should throw a RangeError for a matrix entry above the 2.30 range', function () {
+		// 2 in a 2.30 field is 0x80000000, one above the largest signed value.
+		assert.throws(
+			() => writeWith(writeMvhd, createBox([1, 0, 0, 0, 1, 0, 0, 0, 2])),
+			/^RangeError: .*writeInt32.* received 2147483648$/,
+		)
+	})
+
+	it('should write a negative rate and a negative volume as signed fields', function () {
+		const bytes = writeWith(writeMvhd, {
+			...createBox([1, 0, 0, 0, 1, 0, 0, 0, 1]),
+			rate: -0.5,
+			volume: -0.5,
+		})
+
+		// rate is a signed 16.16 field at the offset 28. volume is a signed 8.8 field at the offset 32.
+		assert.deepStrictEqual(Array.from(bytes.subarray(28, 34)), [0xff, 0xff, 0x80, 0x00, 0xff, 0x80])
+	})
+
+	it('should throw a RangeError for a rate above the signed 16.16 range', function () {
+		// 32768 in a 16.16 field is 0x80000000.
+		assert.throws(
+			() => writeWith(writeMvhd, { ...createBox([1, 0, 0, 0, 1, 0, 0, 0, 1]), rate: 32768 }),
+			/^RangeError: .*writeInt32.* received 2147483648$/,
+		)
+	})
+
+	it('should throw a RangeError for a volume above the signed 8.8 range', function () {
+		// 128 in an 8.8 field is 0x8000.
+		assert.throws(
+			() => writeWith(writeMvhd, { ...createBox([1, 0, 0, 0, 1, 0, 0, 0, 1]), volume: 128 }),
+			/^RangeError: .*writeInt16.* received 32768$/,
+		)
 	})
 })

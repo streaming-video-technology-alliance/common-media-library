@@ -84,25 +84,22 @@ describe('writePrsl', function () {
 		)
 	})
 
-	it('should write an empty tag for each flag when the box has no tag values', function () {
-		const writer = writeWith(
-			writePrsl,
-			{
-				type: 'prsl',
-				version: 0,
-				flags: 0x5000,
-				groupId: 1,
-				entityId: [],
-				boxes: [],
-			},
-			{ writers: {} },
-		)
-
-		assert.deepStrictEqual(
-			new Uint8Array(writer.buffer),
-			new Uint8Array([0, 0, 0, 22, 112, 114, 115, 108, 0, 0, 80, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]),
-		)
-	})
+	for (const [flags, tag] of [
+		[0x1000, 'preselectionTag'],
+		[0x4000, 'interleavingTag'],
+	] as const) {
+		it(`should throw a RangeError when the flags name ${tag} and the box has no value`, function () {
+			assert.throws(
+				() =>
+					writeWith(
+						writePrsl,
+						{ type: 'prsl', version: 0, flags, groupId: 1, entityId: [], boxes: [] },
+						{ writers: {} },
+					),
+				/^RangeError: .*writeTerminatedUtf8.* received undefined$/,
+			)
+		})
+	}
 
 	it('should write an empty tag before a tag that is not empty', function () {
 		const writer = writeWith(
@@ -128,23 +125,15 @@ describe('writePrsl', function () {
 		)
 	})
 
-	it('should write a selection priority of 0 when flag 0x2000 is set and the box has no value', function () {
-		const writer = writeWith(
-			writePrsl,
-			{
-				type: 'prsl',
-				version: 0,
-				flags: 0x2000,
-				groupId: 1,
-				entityId: [],
-				boxes: [],
-			},
-			{ writers: {} },
-		)
-
-		assert.deepStrictEqual(
-			new Uint8Array(writer.buffer),
-			new Uint8Array([0, 0, 0, 21, 112, 114, 115, 108, 0, 0, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]),
+	it('should throw a RangeError when the flags name selectionPriority and the box has no value', function () {
+		assert.throws(
+			() =>
+				writeWith(
+					writePrsl,
+					{ type: 'prsl', version: 0, flags: 0x2000, groupId: 1, entityId: [], boxes: [] },
+					{ writers: {} },
+				),
+			/^RangeError: .*writeUint8.* received undefined$/,
 		)
 	})
 
@@ -262,7 +251,7 @@ describe('writePrsl', function () {
 		}
 	})
 
-	it('should write the length of entityId and end each tag at the first U+0000', function () {
+	it('should write the length of entityId as the count', function () {
 		const bytes = writeIsoBox(
 			{
 				type: 'prsl',
@@ -270,7 +259,7 @@ describe('writePrsl', function () {
 				flags: 0x5000,
 				groupId: 1,
 				entityId: [7, 8],
-				preselectionTag: 'a\0b',
+				preselectionTag: 'a',
 				interleavingTag: 'c',
 				boxes: [],
 			},
@@ -283,5 +272,27 @@ describe('writePrsl', function () {
 		assert.ok(isIsoBoxType('prsl', box))
 		assert.strictEqual(box.preselectionTag, 'a')
 		assert.strictEqual(box.interleavingTag, 'c')
+	})
+
+	it('should throw a RangeError for a tag with U+0000', function () {
+		assert.throws(
+			() =>
+				writeIsoBox(
+					{
+						type: 'prsl',
+						version: 0,
+						flags: 0x1000,
+						groupId: 1,
+						entityId: [],
+						preselectionTag: 'a\0b',
+						boxes: [],
+					},
+					{ writers: { prsl: writePrsl } },
+				),
+			(error: unknown) =>
+				error instanceof RangeError &&
+				error.message.includes('writeTerminatedUtf8') &&
+				error.message.endsWith(' received a\0b'),
+		)
 	})
 })

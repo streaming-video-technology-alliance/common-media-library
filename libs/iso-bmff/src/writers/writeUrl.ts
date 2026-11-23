@@ -14,6 +14,8 @@ import { endIsoBox } from '../endIsoBox.ts'
  * @param cursor - The write cursor
  * @param box - The `DataEntryUrlBox` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @example
  * {@includeCode ../../test/writers/writeUrl.test.ts#example}
  *
@@ -23,7 +25,7 @@ export function writeUrl(cursor: IsoBoxWriteCursor, box: DataEntryUrlBox): void 
 	const start = beginIsoFullBox(cursor, 'url ', box.version, box.flags)
 
 	if (!(box.flags & 0x000001)) {
-		writeTerminatedUtf8(cursor, box.location ?? '')
+		writeTerminatedUtf8(cursor, box.location as string)
 	}
 
 	endIsoBox(cursor, start)

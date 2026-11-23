@@ -578,3 +578,31 @@ Decided on 2026-11-17:
 Amended on 2026-11-18, by phase 2 of the build order ([#724](https://github.com/streaming-video-technology-alliance/common-media-library/pull/724) and [#726](https://github.com/streaming-video-technology-alliance/common-media-library/pull/726)):
 
 - **Map types.** The index part of `IsoBoxReaderMap` declares the reader with a method signature. The `type` parameter of that reader has the type `never`. With the form of [theme 4](#theme-4-four-character-codes), a spread of `createDefaultReaderConfig().readers` with one custom key does not compile. The index part of `IsoBoxWriterMap` is `Record<IsoBoxType, IsoBoxWriter<never>>`. That type equals the index signature of theme 4. The lint rule `consistent-indexed-object-style` requires the `Record` form. The known keys keep the types of theme 4, so a reader or a writer under the key of another known box type is still a compile error. The text of theme 4 and the Types section of the cursor RFC keep the form of the proposal.
+
+Amended on 2026-11-22, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
+
+- **Writer errors.** A writer throws a `RangeError` for a value that its field cannot hold. No writer writes other bytes in place of the value. The message has the function or the box field, the values that the field takes, and the received value. The rule replaces each rule below that wrote other bytes.
+- **Numbers.** A number field takes an integer of its range, and `version` and `flags` follow the same rule. This replaces the rule that a writer does not check the range of a `number`. A fixed-point field rounds the value to the nearest value of the field, and the rounded value must fit.
+- **64-bit fields.** A `number` in a 64-bit field is an integer of the range of the field. One exception stays: the `number` 2^64 in an unsigned field writes all bits set, because a read of a field with all bits set returns that `number`. The specification uses that value for a duration that cannot be determined.
+- **Theme 3, rule 3.** `compressorName` has at most 31 bytes in UTF-8. The writer throws for a longer name and does not cut the name.
+- **Theme 3, rule 5.** A field with a fixed size, such as `systemId` and `defaultKid`, takes exactly that number of bytes. The writer adds no byte and removes no byte. A byte field takes a `Uint8Array` or an array of integers from 0 to 255.
+- **Theme 3, rule 7.** A missing entry of `matrix` or `opColor` throws.
+- **Theme 4.** A four-character code has 4 characters, each at most U+00FF.
+- **Theme 6.** `writeStz2` throws for a field size other than 4, 8, or 16. The reader rule does not change.
+- **Theme 8, rule 2.** `writeTerminatedUtf8` throws for text with U+0000. The reader rule does not change.
+- **Theme 8, rule 5 and question 18.** `writeMdhd` throws for a `language` that is not 3 characters from U+0060 to U+007F. The writer does not write `und`.
+- **Packed fields.** Each part of a packed field fits its bits: the five parts of a `sidx` reference, the two blocks of `tenc`, the 4-bit entries of `stz2`, and the three length sizes of `tfra`. The writers do not mask a part.
+- **Errors, rule 1.** The package still throws `RangeError` and `Error` only. A missing list field, and a `bigint` in a fixed-point field, throw a `TypeError` of the JavaScript engine.
+
+The table shows the cost of the writer errors in bytes, after minification with esbuild and gzip. `@svta/cml-utils` is external.
+
+| Bundle                                                                | Before | After  |
+| --------------------------------------------------------------------- | ------ | ------ |
+| `writeIsoBoxes`                                                       | 838 B  | 1088 B |
+| `writeIsoBoxes`, `writeTfdt`                                          | 1123 B | 1439 B |
+| `writeIsoBoxes`, `writeMfhd`, `writeTfhd`, `writeTfdt`, `writeTrun`   | 1362 B | 1694 B |
+| `writeIsoBoxes`, `createDefaultWriterConfig`                          | 4294 B | 4823 B |
+| `readIsoBoxes`, `writeIsoBoxes`, both default configuration functions | 7775 B | 8306 B |
+| An import with no names                                               | 77 B   | 77 B   |
+
+A bundle that only reads boxes grows by at most 8 B. The write of a `moof` box with 120 `trun` samples takes 2.95 to 3.09 µs. Before, that write took 2.76 to 2.88 µs. The read time does not change.

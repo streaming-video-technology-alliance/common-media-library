@@ -2,10 +2,13 @@ import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import { writeUint16 } from './writeUint16.ts'
 
 /**
- * Writes a fixed-point value of 2 bytes (8.8): 1 byte for the integer part and 1 byte for the fraction. A negative value is stored as a two's complement number.
+ * Writes a fixed-point value of 2 bytes (8.8): 1 byte for the integer part and 1 byte for the fraction. The field is unsigned.
+ * The function rounds the value to the nearest value of the field.
  *
  * @param cursor - The cursor to write to. The function moves the cursor past the field.
  * @param value - The value to write.
+ *
+ * @throws RangeError if the rounded value does not fit the field. The error is the error of `writeUint16`, with the value in units of the field. The cursor does not move.
  *
  * @example
  * {@includeCode ../../test/writeFields.test.ts#example}

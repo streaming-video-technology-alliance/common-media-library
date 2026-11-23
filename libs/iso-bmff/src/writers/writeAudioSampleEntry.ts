@@ -19,6 +19,8 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  * @param cursor - The write cursor
  * @param box - The `AudioSampleEntry` fields to write
  *
+ * @throws RangeError if a value of the box does not fit its field.
+ *
  * @public
  */
 export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(

@@ -99,10 +99,18 @@ describe('writeTenc', function () {
 		assert.deepStrictEqual(bytes, tencBox(0, 0, 0, 0, 0, 0, 1, 8, ...KID))
 	})
 
-	it('should write a pattern of 0:0 for a version 1 box with no pattern field', function () {
-		const bytes = write(tenc({ version: 1, defaultPerSampleIvSize: 8 }))
+	it('should throw a RangeError for a version 1 box with no defaultCryptByteBlock', function () {
+		assert.throws(
+			() => write(tenc({ version: 1, defaultPerSampleIvSize: 8, defaultSkipByteBlock: 10 })),
+			/^RangeError: .*defaultCryptByteBlock.* received undefined$/,
+		)
+	})
 
-		assert.deepStrictEqual(bytes, tencBox(1, 0, 0, 0, 0, 0, 1, 8, ...KID))
+	it('should throw a RangeError for a version 1 box with no defaultSkipByteBlock', function () {
+		assert.throws(
+			() => write(tenc({ version: 1, defaultPerSampleIvSize: 8, defaultCryptByteBlock: 5 })),
+			/^RangeError: .*defaultSkipByteBlock.* received undefined$/,
+		)
 	})
 
 	it('should write the pattern fields of a version 1 box', function () {
@@ -118,12 +126,61 @@ describe('writeTenc', function () {
 		assert.deepStrictEqual(bytes, tencBox(1, 0, 0, 0, 0, 0x5a, 1, 8, ...KID))
 	})
 
-	it('should write 0 for a pattern field that the box does not have', function () {
-		const crypt = write(tenc({ version: 1, defaultPerSampleIvSize: 8, defaultCryptByteBlock: 5 }))
-		const skip = write(tenc({ version: 1, defaultPerSampleIvSize: 8, defaultSkipByteBlock: 10 }))
+	it('should write the largest pattern of a version 1 box', function () {
+		const bytes = write(
+			tenc({
+				version: 1,
+				defaultPerSampleIvSize: 8,
+				defaultCryptByteBlock: 15,
+				defaultSkipByteBlock: 15,
+			}),
+		)
 
-		assert.deepStrictEqual(crypt, tencBox(1, 0, 0, 0, 0, 0x50, 1, 8, ...KID))
-		assert.deepStrictEqual(skip, tencBox(1, 0, 0, 0, 0, 0x0a, 1, 8, ...KID))
+		assert.deepStrictEqual(bytes, tencBox(1, 0, 0, 0, 0, 0xff, 1, 8, ...KID))
+	})
+
+	it('should throw a RangeError for a defaultCryptByteBlock above 4 bits', function () {
+		assert.throws(
+			() =>
+				write(
+					tenc({
+						version: 1,
+						defaultPerSampleIvSize: 8,
+						defaultCryptByteBlock: 16,
+						defaultSkipByteBlock: 0,
+					}),
+				),
+			/^RangeError: .*defaultCryptByteBlock.* received 16$/,
+		)
+	})
+
+	it('should throw a RangeError for a defaultSkipByteBlock above 4 bits', function () {
+		assert.throws(
+			() =>
+				write(
+					tenc({
+						version: 1,
+						defaultPerSampleIvSize: 8,
+						defaultCryptByteBlock: 0,
+						defaultSkipByteBlock: 16,
+					}),
+				),
+			/^RangeError: .*defaultSkipByteBlock.* received 16$/,
+		)
+	})
+
+	it('should throw a RangeError for a defaultKid of 15 bytes', function () {
+		assert.throws(
+			() => write(tenc({ defaultKid: KID.slice(0, 15) })),
+			/^RangeError: .*defaultKid.* received 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15$/,
+		)
+	})
+
+	it('should throw a RangeError for a defaultKid of 17 bytes', function () {
+		assert.throws(
+			() => write(tenc({ defaultKid: new Uint8Array([...KID, 17]) })),
+			/^RangeError: .*defaultKid.* received 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17$/,
+		)
 	})
 
 	it('should write a pattern of 0:0 from pattern fields of 0', function () {

@@ -107,7 +107,7 @@ The table shows the replacement for each member of `IsoBoxReadView`. A method wi
 | `view.slice(offset, size)` | `readBytes`, then `createIsoBoxReadCursor` |
 | `view.buffer`, `view.byteOffset`, `view.byteLength` | `cursor.view.buffer`, `cursor.view.byteOffset + cursor.start`, `cursor.end - cursor.start`. `cursor.view` covers the complete input, not one box. |
 
-A read past `cursor.end` throws a `RangeError`, so a reader cannot read the bytes of the next box. A length below 0 throws a `RangeError` too. No length value has a special meaning.
+A read past `cursor.end` throws a `RangeError`, so a reader cannot read the bytes of the next box. A length below 0 and a length that is not an integer throw a `RangeError` too. No length value has a special meaning.
 
 The `int64` option of the configuration is new in version 2.0.0. The function of the option takes a read cursor. The package exports `readInt64AsBigInt` and `createInt64OverflowReader` for the option. See [Reading 64-bit fields](reading-boxes.md#reading-64-bit-fields).
 
@@ -130,13 +130,17 @@ const bytes = writeIsoBoxes(readIsoBoxes(buffer), createDefaultWriterConfig());
 | `createIsoBoxReadableStream` throws an error of the first box | The error rejects the first read |
 | `new IsoBoxReadableStream(boxes, config)` | `createIsoBoxReadableStream(boxes, config)` |
 | `writeSidx` writes the low 16 bits of a reference count above 65535 | `writeSidx` throws a `RangeError` |
-| `writeEmsg` writes the text after a U+0000 in `schemeIdUri` or `value` | The string ends at the first U+0000 |
+| `writeEmsg` writes the text after a U+0000 in `schemeIdUri` or `value` | `writeEmsg` throws a `RangeError` for a string with U+0000 |
 | `writeSubs` writes the low 16 bits of a subsample count above 65535 | `writeSubs` throws a `RangeError` |
-| `writeFtyp`, `writeStyp`, and `writeHdlr` write a code that does not have 4 characters | The writers throw a `RangeError` |
-| `writeMdhd` writes 0 or a wrong code for a `language` that is not 3 characters from U+0060 to U+007F | `writeMdhd` writes the code of `und` |
-| `writeHdlr` writes the text after a U+0000 in `name` | The name ends at the first U+0000 |
-| `writeSchm` writes the text after a U+0000 in `schemeUri` | The string ends at the first U+0000 |
-| `writePrsl`, `writeLabl`, `writeKind`, and `writeElng` write the text after a U+0000 | Each string ends at the first U+0000 |
+| `writeFtyp`, `writeStyp`, and `writeHdlr` write a code that does not have 4 characters | The writers throw a `RangeError`. A character above U+00FF throws too. |
+| `writeMdhd` writes 0 or a wrong code for a `language` that is not 3 characters from U+0060 to U+007F | `writeMdhd` throws a `RangeError` |
+| `writeHdlr` writes the text after a U+0000 in `name` | `writeHdlr` throws a `RangeError` |
+| `writeSchm` writes the text after a U+0000 in `schemeUri` | `writeSchm` throws a `RangeError` |
+| `writePrsl`, `writeLabl`, `writeKind`, and `writeElng` write the text after a U+0000 | Each writer throws a `RangeError` |
+| A writer writes the low bits of a number that does not fit its field, and 0 for `NaN` | The writer throws a `RangeError`. `version` and `flags` follow the same rule. |
+| A writer writes 0 for a field that a flag selects when the box has no value for it, such as `sampleDuration` of `trun` | The writer throws a `RangeError` |
+| `writePssh` and `writeTenc` write 16 bytes for a `systemId` or a `defaultKid` of another length | The writers throw a `RangeError` |
+| A byte field takes any value | A byte field takes a `Uint8Array` or an array of integers from 0 to 255. An `ArrayBuffer` throws a `RangeError`. |
 
 The stream writes one box for each read and writes no box before the first read.
 
@@ -188,7 +192,7 @@ The table shows the replacement for each member of `IsoBoxWriteView`:
 | `writer.writeArray(...)` | A loop in the writer |
 | `writer.buffer`, `writer.byteOffset`, `writer.byteLength` | `cursor.bytes.subarray(0, cursor.pos)` |
 
-A writer does not compute the size of its box. `endIsoBox` writes the size, and throws a `RangeError` for a box above 2^32 - 1 bytes. `writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a code that does not have 4 characters.
+A writer does not compute the size of its box. `endIsoBox` writes the size, and throws a `RangeError` for a box above 2^32 - 1 bytes. `writeFourCc`, `beginIsoBox`, and `beginIsoFullBox` throw a `RangeError` for a code that does not have 4 characters of 1 byte each.
 
 The writers of the boxes with child boxes, such as `writeStsd` and `writeMoov`, have no `config` parameter. They write the child boxes with the writers of the cursor. To call a writer directly, create the cursor with `createIsoBoxWriteCursor({ writers })`.
 
@@ -264,7 +268,7 @@ A field rename changes the keys of a reader result. The compiler does not report
 | `entryCount` of `elst` | `entries.length` |
 | `entryCount` of `stsd` and `dref` | `boxes.length` |
 | `numEntitiesInGroup` of `prsl` | `entityId.length` |
-| `compressorName: number[]` of a visual sample entry | `compressorName: string`. The writer writes the length byte and the padding. |
+| `compressorName: number[]` of a visual sample entry | `compressorName: string`. The writer writes the length byte and the padding. A name above 31 bytes in UTF-8 throws a `RangeError`. |
 | `location: string` of `url ` and `urn ` | `location?: string`. A box with no bytes after the flags or after `name` has no `location`. |
 | `kidCount` and `kid: number[]` of `pssh` | `kid: Uint8Array[]`, one entry for each key ID. The count is `kid.length`. |
 | `dataSize` and `data: number[]` of `pssh` | `data: Uint8Array`. The size is `data.length`. |
@@ -278,8 +282,8 @@ The compiler does not report these changes.
 
 | Version 1 | Version 2.0.0 |
 |---|---|
-| The `matrix` entries u, v, and w (indexes 2, 5, and 8) of `mvhd` and `tkhd` are 16.16 values. The entry w of the identity matrix is 16384. | The entries are 2.30 values, and w of the identity matrix is 1. Pass 1 for w. The value 16384 writes 0. |
-| `balance` of `smhd` is 256 for full right and 65280 for full left | 1 for full right and -1 for full left. The value 256 writes 0. |
+| The `matrix` entries u, v, and w (indexes 2, 5, and 8) of `mvhd` and `tkhd` are 16.16 values. The entry w of the identity matrix is 16384. | The entries are 2.30 values, and w of the identity matrix is 1. Pass 1 for w. The value 16384 throws a `RangeError`. |
+| `balance` of `smhd` is 256 for full right and 65280 for full left | 1 for full right and -1 for full left. The value 256 throws a `RangeError`. |
 | A `rate`, `volume`, `layer`, `alternateGroup`, or `matrix` entry of -1 reads as 65535 | The value reads as -1 |
 | A fixed-point field with a fraction reads a wrong value, such as 8193 for 1.5 | The field reads 1.5 |
 | A reader omits the key of a field that the box does not have, such as `sampleDuration` of a `trun` sample or `presentationTime` of `emsg` | Every key is present, with `undefined` for an absent field. `"presentationTime" in box` is always `true`, so test the value for `undefined`. A spread of the box over default values sets each absent field to `undefined`. |

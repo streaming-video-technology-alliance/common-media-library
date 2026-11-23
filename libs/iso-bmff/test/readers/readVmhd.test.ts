@@ -43,4 +43,13 @@ describe('readVmhd', function () {
 		assert.deepStrictEqual(readIsoBoxes(bytes, { readers: { vmhd: readVmhd } }), [box])
 		assert.deepStrictEqual(writeIsoBox(box, { writers: { vmhd: writeVmhd } }), bytes)
 	})
+
+	it('should throw a RangeError for a write with a missing opColor entry', function () {
+		const box = { type: 'vmhd', version: 0, flags: 1, graphicsMode: 0, opColor: [1, 2] }
+
+		assert.throws(
+			() => writeIsoBox(box, { writers: { vmhd: writeVmhd } }),
+			/^RangeError: .*writeUint16.* received undefined$/,
+		)
+	})
 })
