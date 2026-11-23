@@ -78,6 +78,16 @@ describe('validateC2paInitSegment', () => {
 		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
 	})
 
+	it('returns INIT_INVALID for an mdat box inside a moov box', async () => {
+		const ftyp = buildBox('ftyp', new Uint8Array([0x69, 0x73, 0x6f, 0x6d]))
+		const segment = concatBytes(ftyp, buildBox('moov', buildBox('mdat')))
+
+		const result = await validateC2paInitSegment(segment)
+		strictEqual(result.isValid, false)
+		strictEqual(result.manifest, null)
+		deepStrictEqual(result.errorCodes, [LiveVideoStatusCode.INIT_INVALID])
+	})
+
 	describe('session keys (§18.25)', () => {
 		let init: Uint8Array
 		let key001: TestSessionKey

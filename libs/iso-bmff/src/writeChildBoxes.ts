@@ -1,8 +1,7 @@
 import { writeBytes } from './cursor/writeBytes.ts'
 import type { IsoBoxContainer } from './IsoBoxContainer.ts'
-import type { IsoBoxMap } from './IsoBoxMap.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
-import type { IsoBoxType } from './IsoBoxType.ts'
+import type { IsoBoxWriter } from './IsoBoxWriter.ts'
 import type { IsoBoxWriteCursor } from './IsoBoxWriteCursor.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import { CONTAINERS } from './utils/CONTAINERS.ts'
@@ -29,14 +28,11 @@ import { writeContainerBox } from './utils/writeContainerBox.ts'
  *
  * @public
  */
-export function writeChildBoxes<
-	B extends { type: keyof IsoBoxMap | (string & Record<never, never>) } | ArrayBufferView,
->(cursor: IsoBoxWriteCursor, boxes: Iterable<IsoBoxStreamable<B>>): void
 export function writeChildBoxes(
 	cursor: IsoBoxWriteCursor,
-	boxes: Iterable<IsoBoxStreamable | { type: IsoBoxType }>,
+	boxes: Iterable<IsoBoxStreamable>,
 ): void {
-	const { writers } = cursor
+	const map = cursor.writers as Record<string, IsoBoxWriter<never>> | undefined
 
 	for (const box of boxes) {
 		if (ArrayBuffer.isView(box)) {
@@ -44,14 +40,13 @@ export function writeChildBoxes(
 			continue
 		}
 
-		const { type } = box
-
 		if ('bytes' in box) {
 			writeBytes(cursor, box.bytes)
 			continue
 		}
 
-		const writer = writers?.[type] || writers?.[type.trim()] // url and urn boxes have a trailing space in their type field
+		const type: string = box.type
+		const writer = map?.[type] || map?.[type.trim()] // url and urn boxes have a trailing space in their type field
 
 		if (writer) {
 			writer(cursor, box as never)

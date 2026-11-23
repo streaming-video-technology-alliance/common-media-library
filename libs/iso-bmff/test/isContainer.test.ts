@@ -12,8 +12,10 @@ import {
 	type AdditionalMetadataContainerBox,
 	type GroupsListBox,
 	type IsoBoxReadCursor,
+	type IsoBoxReader,
 	type ParsedIsoBox,
 	type SubTrack,
+	type TrackFragmentBox,
 	type UserDataBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
@@ -224,12 +226,15 @@ describe('isContainer', function () {
 	})
 
 	it('keeps a custom result with a container type and no boxes field', function () {
-		const readers = { traf: () => ({ type: 'traf' as const, note: 1 }) }
+		// A reader with another box type for a built-in type needs a cast.
+		const readers = {
+			traf: (() => ({ type: 'traf', note: 1 })) as unknown as IsoBoxReader<TrackFragmentBox>,
+		}
 		let count = 0
 
 		for (const box of readIsoBoxes(buffer, { readers })) {
 			if (isContainer(box) && box.type === 'traf') {
-				// The result type does not follow the readers map, so the type has the built-in `boxes` field.
+				// The type has the built-in `boxes` field.
 				const custom = box as unknown as { boxes?: unknown; note: number }
 				assert.strictEqual(custom.boxes, undefined)
 				assert.strictEqual(custom.note, 1)

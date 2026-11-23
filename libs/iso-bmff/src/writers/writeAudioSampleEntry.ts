@@ -6,6 +6,7 @@ import { writeTemplate32 } from '../cursor/writeTemplate32.ts'
 import { writeUint16 } from '../cursor/writeUint16.ts'
 import { writeUint32 } from '../cursor/writeUint32.ts'
 import { endIsoBox } from '../endIsoBox.ts'
+import type { IsoBoxType } from '../IsoBoxType.ts'
 import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import { writeChildBoxes } from '../writeChildBoxes.ts'
 
@@ -21,7 +22,7 @@ import { writeChildBoxes } from '../writeChildBoxes.ts'
  *
  * @public
  */
-export function writeAudioSampleEntry<T extends AudioSampleEntryType = AudioSampleEntryType>(
+export function writeAudioSampleEntry<T extends IsoBoxType = AudioSampleEntryType>(
 	cursor: IsoBoxWriteCursor,
 	box: AudioSampleEntry<T, IsoInt64>,
 ): void {

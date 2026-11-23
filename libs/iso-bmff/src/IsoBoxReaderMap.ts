@@ -1,21 +1,19 @@
 import type { IsoBoxMap } from './IsoBoxMap.ts'
-import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoBoxReader } from './IsoBoxReader.ts'
-import type { IsoBoxType } from './IsoBoxType.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 
 /**
  * Map of each box type to the reader of that box.
  *
- * The map lists the known box types for completion. A reader under the key of another known box type is a compile error.
- * A custom key takes any reader. The index signature declares the reader with a method signature and takes the type argument as `never`.
- * A spread of a map of known readers stays assignable to the map type. The keys `url` and `urn` find the readers of `'url '` and `'urn '`.
+ * The map takes a key of `IsoBoxMap` only. A reader under a key returns the box type of that key, and can add fields.
+ * To use a reader of a box type that the package does not name, add the box type to `IsoCustomBoxMap`.
+ * The keys `url` and `urn` find the readers of `'url '` and `'urn '`.
  *
  * @public
  */
 export type IsoBoxReaderMap<V extends IsoInt64 = number> = {
-	[K in keyof IsoBoxMap]?: IsoBoxReader<{ type: K }, V>
+	[K in keyof IsoBoxMap]?: IsoBoxReader<IsoBoxMap<V>[K], V>
 } & {
-	url?: IsoBoxReader<{ type: 'url ' }, V>
-	urn?: IsoBoxReader<{ type: 'urn ' }, V>
-} & Record<IsoBoxType, { r(cursor: IsoBoxReadCursor<V>, type: never): { type: IsoBoxType } }['r']>
+	url?: IsoBoxReader<IsoBoxMap<V>['url '], V>
+	urn?: IsoBoxReader<IsoBoxMap<V>['urn '], V>
+}

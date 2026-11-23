@@ -12,16 +12,17 @@ import {
 } from './util/box.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { record, sourceOf } from './util/sources.ts'
+import { typeOf } from './util/typeOf.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
 // The fields of a parsed box that the tests compare.
-type Tree = { type: string; boxes?: Tree[] }
+type Tree = { type?: string; boxType?: string; boxes?: Tree[] }
 
 const ascii = (text: string): Uint8Array => new TextEncoder().encode(text)
 const read = (bytes: Uint8Array): Tree[] =>
 	readIsoBoxes(bytes, record(createDefaultReaderConfig<IsoInt64>()))
 const size = (box: Tree | undefined): number | undefined => box && sourceOf(box).bytes.length
-const types = (boxes: Tree[] = []): string[] => boxes.map(box => box.type)
+const types = (boxes: Tree[] = []): (string | undefined)[] => boxes.map(typeOf)
 
 const FTYP = boxBytes('ftyp', ascii('isom'), [0, 4])
 const FREE = boxBytes('free', new Uint8Array([1, 2, 3, 4]))
@@ -249,10 +250,7 @@ describe('box size below the header size', function () {
 		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig())
 		const [uuid] = boxes
 
-		assert.deepStrictEqual(
-			boxes.map(box => box.type),
-			['uuid', 'free'],
-		)
+		assert.deepStrictEqual(boxes.map(typeOf), ['uuid', 'free'])
 		assert.ok(uuid && 'bytes' in uuid)
 		assert.deepStrictEqual(uuid.usertype, usertype)
 		assert.strictEqual(uuid.headerSize, 24)
@@ -266,10 +264,7 @@ describe('box size below the header size', function () {
 		const boxes = readIsoBoxes(bytes, createDefaultReaderConfig())
 		const [uuid] = boxes
 
-		assert.deepStrictEqual(
-			boxes.map(box => box.type),
-			['uuid', 'free'],
-		)
+		assert.deepStrictEqual(boxes.map(typeOf), ['uuid', 'free'])
 		assert.ok(uuid && 'bytes' in uuid)
 		assert.deepStrictEqual(uuid.usertype, usertype)
 		assert.strictEqual(uuid.headerSize, 32)

@@ -18,7 +18,7 @@ import type { JumbfBox } from './JumbfBox.ts'
  */
 export function parseJumbfBoxes(bytes: Uint8Array): JumbfBox[] {
 	return readIsoBoxes(bytes).map(box => ({
-		type: box.type,
-		data: 'bytes' in box ? rawBoxBody(box) : new Uint8Array(0),
+		type: box.type ?? box.boxType,
+		data: box.type ? new Uint8Array(0) : rawBoxBody(box),
 	}))
 }

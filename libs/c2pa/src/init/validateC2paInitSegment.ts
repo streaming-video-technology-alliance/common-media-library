@@ -244,7 +244,7 @@ export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSe
 	// The mdat check must see the same root boxes as computeBmffHash.
 	if (
 		readRootBoxes(bytes).some(box => box.type === 'mdat') ||
-		findIsoBox(boxes, box => box.type === 'mdat')
+		findIsoBox(boxes, box => (box.type ?? box.boxType) === 'mdat')
 	) {
 		return {
 			manifest: null,

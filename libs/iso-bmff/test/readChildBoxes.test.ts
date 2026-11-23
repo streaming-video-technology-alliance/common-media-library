@@ -13,9 +13,13 @@ import {
 	readUint32,
 	readUint8,
 	type IsoBoxReadCursor,
+	type IsoBoxReader,
 	type IsoRawBox,
+	type MovieFragmentHeaderBox,
+	type TrackFragmentBox,
 } from './util/box.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
+import { typeOf } from './util/typeOf.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
 const USERTYPE = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
@@ -40,7 +44,8 @@ describe('readIsoBoxes on the read cursor', function () {
 		const body = mdat?.bytes.subarray(mdat.headerSize) // aa bb
 		// #endregion raw
 
-		assert.strictEqual(mdat?.type, 'mdat')
+		assert.strictEqual(mdat?.type, undefined)
+		assert.strictEqual(mdat?.boxType, 'mdat')
 		assert.strictEqual(mdat?.headerSize, 8)
 		assert.deepStrictEqual(Array.from(mdat?.bytes ?? []), Array.from(MDAT))
 		assert.strictEqual(mdat?.bytes.buffer, MDAT.buffer)
@@ -92,10 +97,10 @@ describe('readIsoBoxes on the read cursor', function () {
 		const [box] = readIsoBoxes(uuid, { readers })
 
 		assert.deepStrictEqual(
-			Array.from((box?.type === 'uuid' && 'value' in box && box.usertype) || []),
+			Array.from((box?.type === 'uuid' && box.usertype) || []),
 			Array.from(USERTYPE),
 		)
-		assert.strictEqual(box && 'value' in box ? box.value : 0, 0xcc)
+		assert.strictEqual(box?.type === 'uuid' ? box.value : 0, 0xcc)
 	})
 
 	it('should use the result of a reader with no merge', function () {
@@ -108,10 +113,7 @@ describe('readIsoBoxes on the read cursor', function () {
 		const [moof] = readIsoBoxes(boxBytes('moof', MFHD, MDAT), { readers: { mfhd: readMfhd } })
 
 		assert.strictEqual(moof?.type, 'moof')
-		assert.deepStrictEqual(moof && 'boxes' in moof ? moof.boxes.map(box => box.type) : [], [
-			'mfhd',
-			'mdat',
-		])
+		assert.deepStrictEqual(moof && 'boxes' in moof ? moof.boxes.map(typeOf) : [], ['mfhd', 'mdat'])
 	})
 
 	it('should throw a RangeError for a reader that reads past its box', function () {
@@ -145,10 +147,7 @@ describe('readIsoBoxes on the read cursor', function () {
 		assert.strictEqual(cursor.pos, MDAT.length)
 		assert.strictEqual(cursor.end, bytes.length)
 		assert.strictEqual(nextIsoBox(cursor), 'mfhd')
-		assert.deepStrictEqual(
-			readChildBoxes(cursor).map(box => box.type),
-			['free'],
-		)
+		assert.deepStrictEqual(readChildBoxes(cursor).map(typeOf), ['free'])
 	})
 
 	it('should restore the cursor to the first byte of the box after the depth error', function () {
@@ -162,19 +161,22 @@ describe('readIsoBoxes on the read cursor', function () {
 	})
 
 	it('should set the position to the end of the box after a reader', function () {
+		// A reader with another box type for a built-in type needs a cast.
 		const readers = {
-			mfhd: (cursor: IsoBoxReadCursor) => ({ type: 'mfhd' as const, first: readUint8(cursor) }),
+			mfhd: ((cursor: IsoBoxReadCursor) => ({
+				type: 'mfhd',
+				first: readUint8(cursor),
+			})) as unknown as IsoBoxReader<MovieFragmentHeaderBox>,
 		}
 		const boxes = readIsoBoxes(reduceUint8Arrays([MFHD, MDAT]), { readers })
 
-		assert.deepStrictEqual(
-			boxes.map(box => box.type),
-			['mfhd', 'mdat'],
-		)
+		assert.deepStrictEqual(boxes.map(typeOf), ['mfhd', 'mdat'])
 	})
 
 	it('should use the reader of a container type in place of the child boxes', function () {
-		const readers = { traf: () => ({ type: 'traf' as const, custom: true }) }
+		const readers = {
+			traf: (() => ({ type: 'traf', custom: true })) as unknown as IsoBoxReader<TrackFragmentBox>,
+		}
 		const [traf] = readIsoBoxes(boxBytes('traf', MFHD), { readers })
 
 		assert.deepStrictEqual(traf, { type: 'traf', custom: true })
@@ -210,16 +212,13 @@ describe('readIsoBoxes on the read cursor', function () {
 
 		const boxes = readIsoBoxes(reduceUint8Arrays([MDAT, large]))
 
-		assert.deepStrictEqual(
-			boxes.map(box => box.type),
-			['mdat'],
-		)
+		assert.deepStrictEqual(boxes.map(typeOf), ['mdat'])
 	})
 
 	it('should return false from isIsoBoxType for a raw box', function () {
 		const [mfhd] = readIsoBoxes(MFHD)
 
-		assert.strictEqual(mfhd?.type, 'mfhd')
+		assert.strictEqual(mfhd && !mfhd.type && mfhd.boxType, 'mfhd')
 		assert.strictEqual(isIsoBoxType('mfhd', mfhd), false)
 	})
 })
@@ -233,20 +232,14 @@ describe('readChildBoxes', function () {
 		const boxes = readChildBoxes(cursor) // a raw mfhd box and a raw mdat box
 		// #endregion example
 
-		assert.deepStrictEqual(
-			boxes.map(box => box.type),
-			['mfhd', 'mdat'],
-		)
+		assert.deepStrictEqual(boxes.map(typeOf), ['mfhd', 'mdat'])
 		assert.strictEqual(cursor.pos, cursor.end)
 	})
 
 	it('should read at most count boxes', function () {
 		const cursor = createIsoBoxReadCursor(reduceUint8Arrays([MFHD, MDAT]))
 
-		assert.deepStrictEqual(
-			readChildBoxes(cursor, 1).map(box => box.type),
-			['mfhd'],
-		)
+		assert.deepStrictEqual(readChildBoxes(cursor, 1).map(typeOf), ['mfhd'])
 		assert.strictEqual(cursor.pos, MFHD.length)
 		assert.strictEqual(readChildBoxes(cursor, 0).length, 0)
 	})

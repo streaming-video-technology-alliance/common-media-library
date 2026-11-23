@@ -77,7 +77,7 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 				box = { type, boxes: readChildBoxes(state) } as ParsedIsoBox<V>
 			} else {
 				const bytes = new Uint8Array(view.buffer, view.byteOffset + boxStart, size)
-				const raw: IsoRawBox = { type, bytes, headerSize: header }
+				const raw: IsoRawBox = { boxType: type, bytes, headerSize: header }
 
 				if (type === 'uuid') {
 					raw.headerSize = header + 16

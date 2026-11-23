@@ -28,7 +28,9 @@ import { parseFile } from './util/parseFile.ts'
 import { sourceOf } from './util/sources.ts'
 
 function boxBytes(boxes: ParsedIsoBox[], types: string[]): Uint8Array[] {
-	return filterIsoBoxes(boxes, box => types.includes(box.type)).map(box => sourceOf(box).bytes)
+	return filterIsoBoxes(boxes, box => types.includes(box.type ?? box.boxType)).map(
+		box => sourceOf(box).bytes,
+	)
 }
 
 function sampleTableBytes(boxes: ParsedIsoBox[]): Uint8Array[] {
@@ -298,7 +300,8 @@ describe('writeIsoBoxes', function () {
 				boxes: [new Uint8Array(FREE)],
 			}
 
-			const bytes = writeIsoBoxes([box], { writers: {} })
+			// A box with a `type` of the type `string` needs a cast.
+			const bytes = writeIsoBoxes([box as never], { writers: {} })
 
 			deepStrictEqual([...bytes], [0x00, 0x00, 0x00, 0x11, 0x75, 0x64, 0x74, 0x61, ...FREE])
 		})

@@ -11,13 +11,15 @@ In the examples, `buffer` holds the bytes of a segment.
 
 The `traverseIsoBoxes` function traverses box iterators and returns a generator of boxes. It takes an iterable of boxes and one optional configuration with two options. `depthFirst` selects a depth-first or a breadth-first traversal, and the default is `true`. `maxDepth` is the maximum depth, and the default is `Infinity`. A maximum depth of 0 traverses only the root boxes.
 
+The read in these examples has no reader, so each box outside `CONTAINERS` is a raw box. A raw box has its four-character code in `boxType`.
+
 ```typescript
 import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(buffer);
 
 for (const box of traverseIsoBoxes(boxes)) {
-	console.log(box.type);
+	console.log(box.type ?? box.boxType);
 }
 ```
 
@@ -29,26 +31,25 @@ import { readIsoBoxes, traverseIsoBoxes } from "@svta/cml-iso-bmff";
 const boxes = readIsoBoxes(buffer);
 
 for (const box of traverseIsoBoxes(boxes, { depthFirst: false, maxDepth: 1 })) {
-	console.log(box.type);
+	console.log(box.type ?? box.boxType);
 }
 ```
 
 ## Finding boxes
 
-`findIsoBox` returns the first box that matches a callback, or `null`. `filterIsoBoxes` returns every box that matches. Both functions traverse the boxes as `traverseIsoBoxes` does and take the same configuration. A callback that calls `isIsoBoxType` narrows the result to that box type. A callback that tests `box.type` also matches a raw box of that type.
+`findIsoBox` returns the first box that matches a callback, or `null`. `filterIsoBoxes` returns every box that matches. Both functions traverse the boxes as `traverseIsoBoxes` does and take the same configuration. A callback that tests `box.type` narrows the result to that box type. That callback does not match a raw box. To match a raw box, test `box.boxType`.
 
 ```typescript
 import {
 	createDefaultReaderConfig,
 	filterIsoBoxes,
 	findIsoBox,
-	isIsoBoxType,
 	readIsoBoxes,
 } from "@svta/cml-iso-bmff";
 
 const boxes = readIsoBoxes(buffer, createDefaultReaderConfig());
 
-const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
+const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
 const trafs = filterIsoBoxes(boxes, (box) => box.type === "traf");
 
 console.log(tfdt?.baseMediaDecodeTime, trafs.length);
@@ -56,7 +57,7 @@ console.log(tfdt?.baseMediaDecodeTime, trafs.length);
 
 The traversal follows the `boxes` field. If the `readers` map has `readStsd`, the search also reaches the sample entries. If the map has `readDref`, the search also reaches the data entries.
 
-`isIsoBoxType` checks the type of one box and narrows the box to that type:
+`isIsoBoxType` checks the type of one box and narrows the box to that type. The function also takes `null`, `undefined`, and a value of an unknown type. For a box from `readIsoBoxes`, a test of `box.type` gives the same result:
 
 ```typescript
 import {
@@ -88,15 +89,15 @@ const box: IsoBox = { type: "moov", boxes: [] };
 const container = isContainer(box);
 ```
 
-After `isContainer` returns `true`, each element of `box.boxes` is a box or a raw box. Test a child with `isIsoBoxType` before you read a field of that child.
+After `isContainer` returns `true`, each element of `box.boxes` is a box or a raw box. Test the `type` of a child before you read a field of that child.
 
 ```typescript
-import { createDefaultReaderConfig, isContainer, isIsoBoxType, readIsoBoxes } from "@svta/cml-iso-bmff";
+import { createDefaultReaderConfig, isContainer, readIsoBoxes } from "@svta/cml-iso-bmff";
 
 for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 	if (isContainer(box)) {
 		for (const child of box.boxes) {
-			if (isIsoBoxType("mfhd", child)) {
+			if (child.type === "mfhd") {
 				console.log(child.sequenceNumber);
 			}
 		}

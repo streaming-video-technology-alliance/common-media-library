@@ -5,7 +5,9 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
 import { readAudioSampleEntry } from './readAudioSampleEntry.ts'
 
 /**
- * Create a reader for an audio sample entry box of a type that `AudioSampleEntryType` does not list, such as `ac-3` or `ec-3`.
+ * Create a reader for an audio sample entry box of a type with no default reader, such as `ac-3` or `ec-3`.
+ *
+ * The readers map takes the reader under a key of `IsoBoxMap`. Add another type to `IsoCustomBoxMap` first.
  *
  * @param type - The 4-character box type
  *

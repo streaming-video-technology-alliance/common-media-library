@@ -1,7 +1,5 @@
 import { createIsoBoxWriteCursor } from './createIsoBoxWriteCursor.ts'
-import type { IsoBoxMap } from './IsoBoxMap.ts'
 import type { IsoBoxStreamable } from './IsoBoxStreamable.ts'
-import type { IsoBoxType } from './IsoBoxType.ts'
 import type { IsoBoxWriteConfig } from './IsoBoxWriteConfig.ts'
 import { writeChildBoxes } from './writeChildBoxes.ts'
 
@@ -24,11 +22,8 @@ import { writeChildBoxes } from './writeChildBoxes.ts'
  *
  * @public
  */
-export function writeIsoBoxes<
-	B extends { type: keyof IsoBoxMap | (string & Record<never, never>) } | ArrayBufferView,
->(boxes: Iterable<IsoBoxStreamable<B>>, config?: IsoBoxWriteConfig): Uint8Array<ArrayBuffer>
 export function writeIsoBoxes(
-	boxes: Iterable<IsoBoxStreamable | { type: IsoBoxType }>,
+	boxes: Iterable<IsoBoxStreamable>,
 	config: IsoBoxWriteConfig = {},
 ): Uint8Array<ArrayBuffer> {
 	const cursor = createIsoBoxWriteCursor(config)

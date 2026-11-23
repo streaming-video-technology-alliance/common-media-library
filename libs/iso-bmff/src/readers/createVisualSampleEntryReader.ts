@@ -5,7 +5,9 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
 import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
 
 /**
- * Create a reader for a visual sample entry box of a type that `VisualSampleEntryType` does not list, such as `av01` or `vp09`.
+ * Create a reader for a visual sample entry box of a type with no default reader, such as `av01` or `vp09`.
+ *
+ * The readers map takes the reader under a key of `IsoBoxMap`. Add another type to `IsoCustomBoxMap` first.
  *
  * @param type - The 4-character box type
  *
