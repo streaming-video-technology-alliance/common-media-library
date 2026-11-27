@@ -1,5 +1,5 @@
 import { encodeCbor } from '../cborTestUtils.ts'
-import { JUMBF_UUID } from '../../src/utils.ts'
+import { JUMBF_UUID } from '../jumbfUuid.ts'
 import type { TestSigner } from '../testSigner.ts'
 
 const TEXT_ENCODER = new TextEncoder()

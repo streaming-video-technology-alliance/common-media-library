@@ -636,3 +636,10 @@ type IsoBoxWriterMap = {
 Amended on 2026-11-27, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
 
 - **Theme 5, rule 3.** The rule also applies to the fields of `IsoRawBox`. The field `usertype` becomes `userType`, as `boxtype` of the specification became `boxType`. Text about the 16 bytes in a `uuid` box keeps the specification name `usertype`.
+
+Amended on 2026-11-27, by issue [#694](https://github.com/streaming-video-technology-alliance/common-media-library/issues/694):
+
+- **`uuid` in `IsoBuiltInBoxMap`.** The key `uuid` has the type `IsoUuidBox`. That type is the union of the box types of the new interface `IsoCustomUuidBoxMap`. A key of that interface is a user type, as a UUID string in lowercase hexadecimal digits with hyphens. A box type has `type: 'uuid'` and the key as its `userType` field. With no declaration, `IsoUuidBox` is `never`.
+- **Reason for the key.** Two packages cannot each declare `uuid` in `IsoCustomBoxMap` with a different type. Two packages can each declare their own user types, because a UUID is unique. After 2.0.0, a new built-in `uuid` key would break the declaration of `uuid` in `IsoCustomBoxMap` of an adopter.
+- **Map types.** The readers map takes a reader of `uuid` that can return `undefined`. The writers map takes a writer of `IsoUuidBox` under `uuid`, as for any other key.
+- **Lint.** `IsoCustomUuidBoxMap` is the second `interface` of the package, for the same reason as `IsoCustomBoxMap`. The lint rule of the repo has an exception for that line too.

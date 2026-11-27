@@ -550,3 +550,21 @@ Amended on 2026-11-23, by the review of the box types ([#759](https://github.com
 Amended on 2026-11-27, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
 
 - **Raw box.** The user type of a raw `uuid` box is the field `userType`. The specification names the field `usertype`. Rule 3 of theme 5 of the [box types RFC](iso-bmff-v2-box-types.md) splits a field name at each English word. The Types section and the earlier amendments keep the name `usertype`.
+
+Amended on 2026-11-27, by issue [#694](https://github.com/streaming-video-technology-alliance/common-media-library/issues/694):
+
+- **Reader of a `uuid` box.** The package has a factory for the reader of a `uuid` box. `createUuidReader(readers)` takes a map of user types to readers. A user type is a UUID in lowercase hexadecimal digits with hyphens. The reader compares the 16 bytes of `usertype` with each key. It then calls the reader of that key with the cursor after `usertype` and the key string.
+- **Writer of a `uuid` box.** `createUuidWriter(writers)` takes a map of user types to writers. It selects a writer by the `userType` field of the box. It writes the header and the 16 bytes of `usertype`, then calls the writer, then writes the size.
+- **Reader result `undefined`.** The reader of the `uuid` key can return `undefined`. `readChildBoxes` then returns a raw box. The reader from `createUuidReader` returns `undefined` for a user type with no reader. `IsoBoxReaderMap` allows `undefined` only for the `uuid` key. The type of `cursor.readers` allows `undefined` for every key. If a reader of a container box type returns `undefined`, `readChildBoxes` also returns a raw box and reads no child boxes.
+- **Empty map of user types.** If `IsoCustomUuidBoxMap` is empty, the map types of the two factories take any string key. The value of a key is a reader or a writer of a box with `type: 'uuid'` and a `userType` string.
+- **Contract of a `uuid` reader.** The cursor of a reader of the `uuid` key still starts at `usertype`. The cursor of a reader from the map of `createUuidReader` starts after `usertype`.
+- **Cost.** The table shows the growth of each bundle. Only an adopter who imports a factory has its cost.
+
+  | Change                                                 | Minified  | After gzip |
+  | ------------------------------------------------------ | --------- | ---------- |
+  | The `undefined` check in `readIsoBoxes`                | 3 bytes   | 5 bytes    |
+  | `createUuidReader` in a bundle of `readIsoBoxes`       | 757 bytes | 358 bytes  |
+  | `createUuidWriter` in a bundle of `writeIsoBoxes`      | 648 bytes | 293 bytes  |
+  | `@svta/cml-c2pa` in a bundle with `@svta/cml-iso-bmff` | 803 bytes | 281 bytes  |
+
+- **`@svta/cml-c2pa`.** The package reads its two user types with `createUuidReader`. The table of the cost item shows the growth of the bundle. The public API of the package does not change. The package does not declare its user types in `IsoCustomUuidBoxMap`. The API reference compiles the source of every package in one program, so a declaration in a package of the repository adds members to the interface on the page of `@svta/cml-iso-bmff`.

@@ -1,4 +1,5 @@
 export * from './createDefaultWriterConfig.ts'
+export * from './createUuidWriter.ts'
 export * from './writeArdi.ts'
 export * from './writeAudioSampleEntry.ts'
 export * from './writeAvc1.ts'

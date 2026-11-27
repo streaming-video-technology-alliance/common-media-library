@@ -39,7 +39,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `box.size` | `box.bytes.length` of a raw box |
 | `box.largesize` | `box.bytes.length` of a raw box |
 | `box.view` or `box.size` of a box with a type in `CONTAINERS`, such as `moof` | A custom reader for the box. The bytes of the box are from `cursor.start` to `cursor.end`. `seekIsoBox` returns a cursor with the same range. |
-| `box.usertype` of a parsed `uuid` box | `box.userType` of a raw `uuid` box, or `readBytes(cursor, 16)` in a reader |
+| `box.usertype` of a parsed `uuid` box | `box.userType` of a parsed `uuid` box, as a UUID string. Declare the user type in `IsoCustomUuidBoxMap` and read the box with `createUuidReader`. A raw `uuid` box has `box.userType` as 16 bytes. |
 | `box.type` of a box with no reader | `box.boxType`. The four-character code of any box is `box.type ?? box.boxType`. |
 | `readStsd<Avc1Box>` | `readStsd`, then a test of `entry.type` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |

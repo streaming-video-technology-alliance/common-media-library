@@ -1,4 +1,5 @@
 import { findIsoBox, readIsoBoxes } from '@svta/cml-iso-bmff'
+import { C2PA_UUID_READ_CONFIG } from '../c2paUuidBox.ts'
 import { CborTag, decodeCbor } from '../cbor/readCborItem.ts'
 import type { C2paAssertion } from '../C2paAssertion.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
@@ -240,7 +241,7 @@ async function validateSessionKeys(
  * @public
  */
 export async function validateC2paInitSegment(bytes: Uint8Array): Promise<InitSegmentValidation> {
-	const boxes = readIsoBoxes(bytes)
+	const boxes = readIsoBoxes(bytes, C2PA_UUID_READ_CONFIG)
 	// The mdat check must see the same root boxes as computeBmffHash.
 	if (
 		readRootBoxes(bytes).some(box => box.type === 'mdat') ||

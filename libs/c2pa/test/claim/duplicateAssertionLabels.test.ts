@@ -8,7 +8,7 @@ import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { beforeAll as before, describe, it } from 'vite-plus/test'
 import { Tag } from 'cbor-x'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
-import { JUMBF_UUID } from '../../src/utils.ts'
+import { JUMBF_UUID } from '../jumbfUuid.ts'
 import { encodeCbor } from '../cborTestUtils.ts'
 import {
 	buildBox,

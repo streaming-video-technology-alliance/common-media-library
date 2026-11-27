@@ -3,7 +3,8 @@ import { Tag } from 'cbor-x'
 import { Encoder } from 'cbor-x/encode'
 import { computeBmffHash } from '../../src/bmff/computeBmffHash.ts'
 import { buildSigStructure } from '../../src/cose/buildSigStructure.ts'
-import { bytesToHex, JUMBF_UUID } from '../../src/utils.ts'
+import { bytesToHex } from '../../src/utils.ts'
+import { JUMBF_UUID } from '../jumbfUuid.ts'
 import {
 	buildBox,
 	buildInitMediaBoxes,

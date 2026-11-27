@@ -1,4 +1,5 @@
 export * from './createAudioSampleEntryReader.ts'
+export * from './createUuidReader.ts'
 export * from './createVisualSampleEntryReader.ts'
 export * from './createDefaultReaderConfig.ts'
 export * from './readArdi.ts'

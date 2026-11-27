@@ -16,6 +16,7 @@ const CONTAINER_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CONTAINERS)
  * For a `uuid` box, the position is the first byte of `usertype`.
  * After the reader, the function moves the cursor to the end of the box, so a reader can stop before the end of its box.
  * A box with no reader and a type in `CONTAINERS` gets its child boxes in `boxes`. Any other box with no reader is a raw box.
+ * A `uuid` box is also a raw box if its reader returns `undefined`.
  *
  * The function stops before a truncated box: the data ends inside the box, or the size is below the header size.
  * The position of the cursor is then the first byte of that box.
@@ -73,11 +74,12 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 			state.end = boxEnd
 			state.depth = depth + 1
 
-			if (reader) {
-				box = reader(state, type) as ParsedIsoBox<V>
-			} else if (CONTAINER_SET.has(type)) {
+			// A uuid reader returns undefined for a user type with no reader.
+			box = reader?.(state, type) as ParsedIsoBox<V>
+
+			if (!reader && CONTAINER_SET.has(type)) {
 				box = { type, boxes: readChildBoxes(state) } as ParsedIsoBox<V>
-			} else {
+			} else if (!box) {
 				const bytes = new Uint8Array(view.buffer, view.byteOffset + boxStart, size)
 				const raw: IsoRawBox = { boxType: type, bytes, headerSize: header }
 

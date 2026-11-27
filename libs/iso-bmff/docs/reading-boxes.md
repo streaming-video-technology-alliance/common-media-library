@@ -192,13 +192,14 @@ console.log(findIsoBox(boxes, (box) => box.type === "abcd")?.brand);
 
 The cursor follows these rules:
 
-- `cursor.start` is the first byte of the box header, and `cursor.end` is the first byte after the box. The cursor of a reader starts at the first byte after the header. For a `uuid` box, the cursor starts at the first byte of `usertype`. Read it with `readBytes(cursor, 16)`.
+- `cursor.start` is the first byte of the box header, and `cursor.end` is the first byte after the box. The cursor of a reader starts at the first byte after the header. For a `uuid` box, the cursor starts at the first byte of `usertype`. [Reading `uuid` boxes](#reading-uuid-boxes) shows the reader of that box.
 - A read past `cursor.end` throws a `RangeError`, so a reader cannot read the bytes of the next box. A reader can stop before the end of its box.
 - A length is an integer of 0 or more. Another length throws a `RangeError`.
 - The bytes that remain are `cursor.end - cursor.pos`. To skip bytes, add to `cursor.pos`.
 - A reader of a box with child boxes reads them with `readChildBoxes(cursor)`. The readers of the configuration then apply to the child boxes.
 - `readIsoBoxes` uses one cursor for every box. A reader must not keep the cursor after it returns. A reader that needs bytes later keeps the result of `readBytes`.
 - The declaration of `IsoCustomBoxMap` applies to every file of the program. Two declarations of one box type need the same type.
+- Do not declare `uuid` in `IsoCustomBoxMap`. Declare the box types of `uuid` in `IsoCustomUuidBoxMap`.
 - A reader under a key returns the box type of that key. The reader can add fields. A reader with another result type is a compile error.
 
 `readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
@@ -206,6 +207,76 @@ The cursor follows these rules:
 `readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space.
 
 `IsoBoxMap` names the sample entry types of these codecs: `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`. The default configuration has no reader for these types. Create a reader with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`, such as `{ "ec-3": createAudioSampleEntryReader("ec-3") }`.
+
+## Reading `uuid` boxes
+
+Every `uuid` box has the box type `uuid`. The 16 bytes of `usertype` select the format of the body. The `readers` map has one key for all `uuid` boxes. `createUuidReader` creates the reader of that key from a map of user types.
+
+Declare each user type in `IsoCustomUuidBoxMap`. A key is a UUID in lowercase hexadecimal digits with hyphens. The box type has `type: "uuid"` and the key as its `userType` field. The reader of a user type starts after the 16 bytes of `usertype`:
+
+```typescript
+import {
+	createUuidReader,
+	readIsoBoxes,
+	readTfdt,
+	readUint24,
+	readUint8,
+	readWideUint,
+	type IsoBoxReadCursor,
+} from "@svta/cml-iso-bmff";
+
+// The tfxd box of Smooth Streaming.
+const TFXD = "6d1d9b05-42d5-44e6-80e2-141daff757b2";
+
+type TfxdBox = {
+	type: "uuid";
+	userType: typeof TFXD;
+	version: number;
+	flags: number;
+	fragmentAbsoluteTime: number;
+	fragmentDuration: number;
+};
+
+// Add the user type to the map of uuid box types.
+declare module "@svta/cml-iso-bmff" {
+	interface IsoCustomUuidBoxMap {
+		[TFXD]: TfxdBox;
+	}
+}
+
+const readTfxd = (cursor: IsoBoxReadCursor, userType: typeof TFXD): TfxdBox => {
+	const version = readUint8(cursor);
+	const flags = readUint24(cursor);
+	const size = version === 1 ? 8 : 4;
+
+	return {
+		type: "uuid",
+		userType,
+		version,
+		flags,
+		fragmentAbsoluteTime: readWideUint(cursor, size),
+		fragmentDuration: readWideUint(cursor, size),
+	};
+};
+
+const boxes = readIsoBoxes(buffer, {
+	readers: { tfdt: readTfdt, uuid: createUuidReader({ [TFXD]: readTfxd }) },
+});
+
+for (const box of boxes) {
+	// The test of `userType` narrows the box to `TfxdBox`.
+	if (box.type === "uuid" && box.userType === TFXD) {
+		console.log(box.fragmentDuration);
+	}
+}
+```
+
+The reader follows these rules:
+
+- For a user type with no reader, the reader returns `undefined`. `readIsoBoxes` then returns a raw box with the `userType` field.
+- `createUuidReader` throws a `RangeError` for a key that is not a UUID in lowercase hexadecimal digits with hyphens.
+- The declaration of `IsoCustomUuidBoxMap` applies to every file of the program. Two declarations of one user type need the same type.
+- A package that reads its own `uuid` boxes can export its map of user types. A caller then joins the maps of several packages in one call, as in `createUuidReader({ ...readersA, ...readersB })`. Do not call `createUuidReader` once for each package. The readers map has one `uuid` key, so one reader replaces the other.
 
 ## Incomplete boxes
 

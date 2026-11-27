@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs'
 import { describe, it } from 'vite-plus/test'
 import { CborTag } from '../src/cbor/readCborItem.ts'
 import { buildBox, buildJumb } from './merkle/merkleTestUtils.ts'
+import { withManifestUserType } from './jumbfUuid.ts'
 import { buildInitSegmentWithManifest } from './vsi/vsiTestUtils.ts'
 
 const TEXT_ENCODER = new TextEncoder()
@@ -24,6 +25,12 @@ describe('readC2paManifest', () => {
 		ok(typeof manifestStore.manifest.label === 'string', 'label should be a string')
 	})
 	// #endregion example
+
+	it('reads a C2PA uuid box with the C2PA manifest user type', () => {
+		const bytes = loadFixture('init_signed_with_session_keys.m4s')
+
+		deepStrictEqual(readC2paManifest(withManifestUserType(bytes)), readC2paManifest(bytes))
+	})
 
 	it('returns assertions array', () => {
 		const bytes = loadFixture('init_signed_with_session_keys.m4s')
