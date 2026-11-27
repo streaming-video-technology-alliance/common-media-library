@@ -550,6 +550,12 @@ Amended on 2026-11-23, by the review of the box types ([#759](https://github.com
 Amended on 2026-11-27, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
 
 - **Raw box.** The user type of a raw `uuid` box is the field `userType`. The specification names the field `usertype`. Rule 3 of theme 5 of the [box types RFC](iso-bmff-v2-box-types.md) splits a field name at each English word. The Types section and the earlier amendments keep the name `usertype`.
+- **Raw box.** A raw box is `{ type, bytes, headerSize, userType }`. `type` has the four-character code, as on a box object. The field `boxType` of the amendment of 2026-11-23 leaves the package.
+- **Result type, rule 2.** A test such as `box.type === 'tfdt'` matches a box object and a raw box, and does not narrow a box. `isIsoBoxType` narrows a box to a box type, also in a callback of `findIsoBox` and `filterIsoBoxes`. The test `'bytes' in box` narrows a box to a raw box.
+- **`isIsoBoxType`.** The function returns `false` for a raw box. The first signature takes `IsoBox<V> | { type: string } | null | undefined`.
+- **Reason.** With two field names, code that handles every box needs `box.type ?? box.boxType`. A test of `box.type` also compiles and never matches a raw box. With one field name, a field read after a test of `box.type` is a compile error.
+- **Cost of the result type.** A test of `box.type` with a wrong box type compiles again. `isIsoBoxType` still rejects a wrong box type. Code that narrows a box imports `isIsoBoxType`.
+- **Raw boxes in `writeIsoBoxes`.** The example of a raw box is `{ type: 'esds', bytes }`. `isContainer` still returns `false` for a raw box.
 
 Amended on 2026-11-27, by issue [#694](https://github.com/streaming-video-technology-alliance/common-media-library/issues/694):
 

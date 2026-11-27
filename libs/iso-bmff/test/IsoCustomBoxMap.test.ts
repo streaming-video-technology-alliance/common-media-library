@@ -52,8 +52,8 @@ const writeCstm = (cursor: IsoBoxWriteCursor, box: CustomBox): void => {
 function readValues(bytes: Uint8Array): number[] {
 	const boxes = readIsoBoxes(bytes, { readers: { cstm: readCstm } })
 
-	// The callback narrows each box to `CustomBox`.
-	return filterIsoBoxes(boxes, box => box.type === 'cstm').map(box => box.value)
+	// The guard narrows each box to `CustomBox`.
+	return filterIsoBoxes(boxes, box => isIsoBoxType('cstm', box)).map(box => box.value)
 }
 
 function writeValue(value: number): Uint8Array {
@@ -76,25 +76,40 @@ describe('IsoCustomBoxMap', function () {
 		expectType<Equal<Extract<ParsedIsoBox, { type: 'cstm' }>, CustomBox>>(true)
 	})
 
-	it('should narrow a box with one test of the type field', function () {
+	it('should narrow a box with isIsoBoxType and not with a test of the type field', function () {
 		const [moof] = readIsoBoxes(boxBytes('moof', CSTM, TFDT), {
 			readers: { cstm: readCstm, tfdt: readTfdt },
 		})
 
-		assert.ok(moof?.type === 'moof')
+		assert.ok(isIsoBoxType('moof', moof))
 
 		const [custom, time] = moof.boxes
 
 		assert.ok(custom && time)
 
+		// A test of `type` also matches a raw box, so the test does not narrow to the box type.
+		assert.deepStrictEqual([custom.type, time.type], ['cstm', 'tfdt'])
+
 		if (custom.type === 'cstm') {
+			expectType<Equal<typeof custom, CustomBox | IsoRawBox>>(true)
+			// @ts-expect-error A raw box has no `value` field.
+			assert.strictEqual(custom.value, 7)
+		}
+
+		if (time.type === 'tfdt') {
+			expectType<Equal<typeof time, TrackFragmentBaseMediaDecodeTimeBox | IsoRawBox>>(true)
+			// @ts-expect-error A raw box has no `baseMediaDecodeTime` field.
+			assert.strictEqual(time.baseMediaDecodeTime, 5)
+		}
+
+		if (isIsoBoxType('cstm', custom)) {
 			expectType<Equal<typeof custom, CustomBox>>(true)
 			assert.strictEqual(custom.value, 7)
 		} else {
 			assert.fail('expected a cstm box')
 		}
 
-		if (time.type === 'tfdt') {
+		if (isIsoBoxType('tfdt', time)) {
 			expectType<Equal<typeof time, TrackFragmentBaseMediaDecodeTimeBox>>(true)
 			assert.strictEqual(time.baseMediaDecodeTime, 5)
 		} else {
@@ -105,7 +120,7 @@ describe('IsoCustomBoxMap', function () {
 	it('should narrow a box in bigint mode', function () {
 		const [box] = readIsoBoxes(TFDT, { int64: readInt64AsBigInt, readers: { tfdt: readTfdt } })
 
-		if (box?.type === 'tfdt') {
+		if (isIsoBoxType('tfdt', box)) {
 			expectType<Equal<typeof box, TrackFragmentBaseMediaDecodeTimeBox<bigint>>>(true)
 			assert.strictEqual(box.baseMediaDecodeTime, BigInt(5))
 		} else {
@@ -113,34 +128,44 @@ describe('IsoCustomBoxMap', function () {
 		}
 	})
 
-	it('should narrow the result of findIsoBox and filterIsoBoxes with a plain callback', function () {
+	it('should narrow the result of findIsoBox and filterIsoBoxes with an isIsoBoxType callback and not with a plain callback', function () {
 		const boxes = readIsoBoxes(boxBytes('moof', CSTM, TFDT), {
 			readers: { cstm: readCstm, tfdt: readTfdt },
 		})
 
-		const time = findIsoBox(boxes, box => box.type === 'tfdt')
+		const time = findIsoBox(boxes, box => isIsoBoxType('tfdt', box))
 		expectType<Equal<typeof time, TrackFragmentBaseMediaDecodeTimeBox | null>>(true)
 		assert.strictEqual(time?.baseMediaDecodeTime, 5)
 
-		const custom = filterIsoBoxes(boxes, box => box.type === 'cstm')
+		const custom = filterIsoBoxes(boxes, box => isIsoBoxType('cstm', box))
 		expectType<Equal<typeof custom, CustomBox[]>>(true)
 		assert.deepStrictEqual(custom, [{ type: 'cstm', value: 7 }])
 
 		assert.ok(isIsoBoxType('cstm', custom[0]))
+
+		// A callback that tests `type` also matches a raw box, so the result keeps the type of the input.
+		const plainTime = findIsoBox(boxes, box => box.type === 'tfdt')
+		expectType<Equal<typeof plainTime, ParsedIsoBox | null>>(true)
+		assert.strictEqual(plainTime, time)
+
+		const plainCustom = filterIsoBoxes(boxes, box => box.type === 'cstm')
+		expectType<Equal<typeof plainCustom, ParsedIsoBox[]>>(true)
+		assert.deepStrictEqual(plainCustom, custom)
 	})
 
-	it('should give a raw box no type field', function () {
+	it('should give a raw box the type of its box', function () {
 		const [box] = readIsoBoxes(MDAT)
 
 		assert.ok(box)
 
-		// A test of `type` does not match a raw box.
-		assert.strictEqual(box.type === 'mdat', false)
-		assert.strictEqual(box.type ?? box.boxType, 'mdat')
+		// A test of `type` matches a raw box. `isIsoBoxType` does not.
+		assert.strictEqual(box.type, 'mdat')
+		assert.strictEqual(box.type === 'mdat', true)
+		assert.strictEqual(isIsoBoxType('mdat', box), false)
 
-		if (!box.type) {
+		if ('bytes' in box) {
 			expectType<Equal<typeof box, IsoRawBox>>(true)
-			assert.strictEqual(box.boxType, 'mdat')
+			assert.strictEqual(box.type, 'mdat')
 			assert.deepStrictEqual([...box.bytes.subarray(box.headerSize)], [0xaa, 0xbb])
 		} else {
 			assert.fail('expected a raw box')
@@ -149,7 +174,7 @@ describe('IsoCustomBoxMap', function () {
 
 	it('should check a box object in a write', function () {
 		const writers = { cstm: writeCstm }
-		const raw: IsoRawBox = { boxType: 'mdat', bytes: MDAT }
+		const raw: IsoRawBox = { type: 'mdat', bytes: MDAT }
 
 		assert.deepStrictEqual(
 			[...writeIsoBoxes([{ type: 'cstm', value: 7 }, raw, MDAT], { writers })],
@@ -160,8 +185,8 @@ describe('IsoCustomBoxMap', function () {
 		assert.throws(() => writeIsoBoxes([{ type: 'cstm' }], { writers: {} }))
 		// @ts-expect-error `none` is not a box type of `IsoBoxMap`.
 		assert.throws(() => writeIsoBoxes([{ type: 'none', value: 7 }], { writers: {} }))
-		// @ts-expect-error A raw box has no `type` field. The write still copies the bytes.
-		const copy = writeIsoBoxes([{ type: 'mdat', bytes: MDAT }], { writers: {} })
+		// @ts-expect-error A raw box has a `type` field. The write still copies the bytes.
+		const copy = writeIsoBoxes([{ bytes: MDAT }], { writers: {} })
 
 		assert.deepStrictEqual([...copy], [...MDAT])
 	})

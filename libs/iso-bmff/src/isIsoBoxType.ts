@@ -5,10 +5,9 @@ import type { IsoInt64 } from './IsoInt64.ts'
 /**
  * Check if a box is of a specific type. This is a type guard function.
  *
- * The function returns `false` for a raw box, because a raw box has no `type` field.
+ * The function returns `false` for a raw box. A raw box has the `type` of its box and a `bytes` field, and it has no other field of the box.
  * A box that `readIsoBoxes` returns narrows to the box type with the 64-bit integer fields of that box.
- * For that box, the test `box.type === type` gives the same result.
- * The function checks the `type` field, not the other fields.
+ * The function checks the `type` field and that the box has no `bytes` field. It does not check the other fields.
  * A value of another type narrows to the box type with `number` fields.
  *
  * @param type - The type to check for
@@ -23,7 +22,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
  */
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(
 	type: T,
-	box: IsoBox<V> | { type?: string } | null | undefined,
+	box: IsoBox<V> | { type: string } | null | undefined,
 ): box is IsoBoxMap<V>[T]
 
 /**
@@ -40,5 +39,11 @@ export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = num
  */
 export function isIsoBoxType<T extends keyof IsoBoxMap>(type: T, box: unknown): box is IsoBoxMap[T]
 export function isIsoBoxType(type: string, box: unknown): boolean {
-	return typeof box === 'object' && box !== null && 'type' in box && box.type === type
+	return (
+		typeof box === 'object' &&
+		box !== null &&
+		'type' in box &&
+		box.type === type &&
+		!('bytes' in box)
+	)
 }

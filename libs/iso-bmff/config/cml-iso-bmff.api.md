@@ -243,7 +243,7 @@ export function isContainer<T extends {
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
-    type?: string;
+    type: string;
 } | null | undefined): box is IsoBoxMap<V>[T];
 
 // @public
@@ -331,7 +331,7 @@ export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in Exclude<keyof
 };
 
 // @public
-export type IsoBoxStreamable = IsoBox<IsoInt64> | IsoRawBox | ArrayBufferView;
+export type IsoBoxStreamable = IsoBox<IsoInt64> | AudioSampleEntry<AudioSampleEntryType, IsoInt64> | VisualSampleEntry<VisualSampleEntryType, IsoInt64> | IsoRawBox | ArrayBufferView;
 
 // @public
 export type IsoBoxType = string;
@@ -477,8 +477,7 @@ export type IsoInt64Reader<V extends IsoInt64 = number> = (cursor: IsoBoxReadCur
 
 // @public
 export type IsoRawBox = {
-    type?: undefined;
-    boxType: IsoBoxType;
+    type: IsoBoxType;
     bytes: Uint8Array;
     headerSize?: number;
     userType?: Uint8Array;

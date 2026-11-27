@@ -88,7 +88,7 @@ describe('readIsoBoxes', function () {
 		const [box] = readIsoBoxes(bytes.buffer, { readers: { tfdt: readTfdtExact } })
 
 		assert.ok(box)
-		if (box.type === 'tfdt') {
+		if (isIsoBoxType('tfdt', box)) {
 			expectType<Equal<typeof box.baseMediaDecodeTime, number>>(true)
 			assert.strictEqual(box.baseMediaDecodeTime, 1)
 			assert.strictEqual('exact' in box && box.exact, true)
@@ -148,15 +148,15 @@ describe('readIsoBoxes', function () {
 		expectType<Equal<undefined extends (typeof boxes)[number] ? true : false, false>>(true)
 		// A box with no reader is a raw box.
 		expectType<Equal<IsoRawBox extends (typeof boxes)[number] ? true : false, true>>(true)
-		assert.ok(box && !box.type)
-		assert.strictEqual(box.boxType, 'tfdt')
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'tfdt')
 		assert.strictEqual(box.bytes.length, 16)
 
 		readers.tfdt = readTfdtExact
 		const [exact] = readIsoBoxes(bytes.buffer, { readers })
 
 		assert.ok(exact)
-		if (exact.type === 'tfdt') {
+		if (isIsoBoxType('tfdt', exact)) {
 			assert.strictEqual(exact.baseMediaDecodeTime, 1)
 		} else {
 			assert.fail('expected a tfdt box')
@@ -192,8 +192,8 @@ describe('readIsoBoxes', function () {
 		const [box] = boxes
 
 		assert.strictEqual(boxes.length, 1)
-		assert.ok(box && !box.type)
-		assert.strictEqual(box.boxType, 'free')
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'free')
 		assert.strictEqual(box.bytes.length, 8)
 	})
 
@@ -203,8 +203,8 @@ describe('readIsoBoxes', function () {
 		const [box] = boxes
 
 		assert.strictEqual(boxes.length, 1)
-		assert.ok(box && !box.type)
-		assert.strictEqual(box.boxType, 'free')
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'free')
 		assert.strictEqual(box.bytes.length, 8)
 		assert.strictEqual(box.bytes.byteOffset, 4)
 	})

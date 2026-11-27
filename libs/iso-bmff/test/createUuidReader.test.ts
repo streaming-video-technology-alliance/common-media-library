@@ -4,6 +4,7 @@ import {
 	createUuidReader,
 	createUuidWriter,
 	describe,
+	isIsoBoxType,
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
@@ -79,8 +80,8 @@ function readFragmentDurations(segment: Uint8Array): number[] {
 	const durations: number[] = []
 
 	for (const box of boxes) {
-		// The test of `userType` narrows the box to `TfxdBox`.
-		if (box.type === 'uuid' && box.userType === TFXD) {
+		// The guard excludes a raw box, and the test of `userType` narrows the box to `TfxdBox`.
+		if (isIsoBoxType('uuid', box) && box.userType === TFXD) {
 			durations.push(box.fragmentDuration)
 		}
 	}
@@ -116,7 +117,7 @@ describe('createUuidReader', function () {
 		const boxes = readIsoBoxes(boxBytes('moof', TFXD_BOX, TFDT, TEST_BOX), { readers: { uuid } })
 		const [moof] = boxes
 
-		assert.ok(moof?.type === 'moof')
+		assert.ok(isIsoBoxType('moof', moof))
 		assert.deepStrictEqual(moof.boxes[0], {
 			type: 'uuid',
 			userType: TFXD,
@@ -140,8 +141,8 @@ describe('createUuidReader', function () {
 			readers: { uuid: createUuidReader({ [TFXD]: readTfxd }) },
 		})
 
-		assert.ok(box && !box.type)
-		assert.strictEqual(box.boxType, 'uuid')
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'uuid')
 		assert.strictEqual(box.headerSize, 24)
 		assert.deepStrictEqual(Array.from(box.userType ?? []), Array.from(OTHER_BYTES))
 		assert.deepStrictEqual(Array.from(box.bytes), Array.from(OTHER_BOX))
@@ -171,7 +172,7 @@ describe('createUuidReader', function () {
 		const uuid = createUuidReader({ [TFXD]: undefined })
 		const [box] = readIsoBoxes(TFXD_BOX, { readers: { uuid } })
 
-		assert.ok(box && !box.type)
+		assert.ok(box && 'bytes' in box)
 	})
 
 	it('should throw a RangeError for a key that is not a lowercase UUID', function () {

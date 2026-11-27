@@ -248,7 +248,7 @@ describe('isContainer', function () {
 	})
 
 	it('returns false for a raw box with a type in CONTAINERS', function () {
-		const raw: IsoRawBox = { boxType: 'moov', bytes: new Uint8Array(MOOV) }
+		const raw: IsoRawBox = { type: 'moov', bytes: new Uint8Array(MOOV) }
 
 		assert.strictEqual(isContainer(raw), false)
 		assert.deepStrictEqual([...writeIsoBoxes([raw])], MOOV)

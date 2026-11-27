@@ -131,14 +131,14 @@ describe('filterIsoBoxes', function () {
 	})
 
 	it('should work with complex callback conditions', function () {
-		const box1: ParsedIsoBox = { boxType: 'trak', bytes: new Uint8Array(100) }
-		const box2: ParsedIsoBox = { boxType: 'trak', bytes: new Uint8Array(200) }
-		const box3: ParsedIsoBox = { boxType: 'trak', bytes: new Uint8Array(300) }
-		const box4: ParsedIsoBox = { boxType: 'mdat', bytes: new Uint8Array(400) }
+		const box1: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(100) }
+		const box2: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(200) }
+		const box3: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(300) }
+		const box4: ParsedIsoBox = { type: 'mdat', bytes: new Uint8Array(400) }
 
 		const result = filterIsoBoxes(
 			[box1, box2, box3, box4],
-			box => !box.type && box.boxType === 'trak' && box.bytes.length > 150,
+			box => 'bytes' in box && box.type === 'trak' && box.bytes.length > 150,
 		)
 		assert.strictEqual(result.length, 2)
 		assert.strictEqual(result[0], box2)

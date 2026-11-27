@@ -28,14 +28,14 @@ npm i @svta/cml-iso-bmff
 Read the boxes of a media segment, and find the `tfdt` box inside `moof` and `traf`:
 
 ```typescript
-import { findIsoBox, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+import { findIsoBox, isIsoBoxType, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
 
 const buffer = await fetch("https://example.com/segment.m4s").then((r) =>
 	r.arrayBuffer(),
 );
 
 const boxes = readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
-const tfdt = findIsoBox(boxes, (box) => box.type === "tfdt");
+const tfdt = findIsoBox(boxes, (box) => isIsoBoxType("tfdt", box));
 
 console.log(tfdt?.baseMediaDecodeTime);
 ```

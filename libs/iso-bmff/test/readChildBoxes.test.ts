@@ -20,7 +20,6 @@ import {
 } from './util/box.ts'
 import { TEST_USER_TYPE } from './util/customBoxTypes.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
-import { typeOf } from './util/typeOf.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
 const USERTYPE = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
@@ -45,8 +44,8 @@ describe('readIsoBoxes on the read cursor', function () {
 		const body = mdat?.bytes.subarray(mdat.headerSize) // aa bb
 		// #endregion raw
 
-		assert.strictEqual(mdat?.type, undefined)
-		assert.strictEqual(mdat?.boxType, 'mdat')
+		assert.strictEqual(mdat?.type, 'mdat')
+		assert.strictEqual('boxType' in (mdat ?? {}), false)
 		assert.strictEqual(mdat?.headerSize, 8)
 		assert.deepStrictEqual(Array.from(mdat?.bytes ?? []), Array.from(MDAT))
 		assert.strictEqual(mdat?.bytes.buffer, MDAT.buffer)
@@ -110,8 +109,8 @@ describe('readIsoBoxes on the read cursor', function () {
 		const uuid = boxBytes('uuid', USERTYPE, new Uint8Array([0xcc]))
 		const [box] = readIsoBoxes(uuid, { readers: { uuid: () => undefined } })
 
-		assert.ok(box && !box.type)
-		assert.strictEqual(box.boxType, 'uuid')
+		assert.ok(box && 'bytes' in box)
+		assert.strictEqual(box.type, 'uuid')
 		assert.strictEqual(box.headerSize, 24)
 		assert.deepStrictEqual(Array.from(box.userType ?? []), Array.from(USERTYPE))
 		assert.strictEqual(box.bytes.length, uuid.length)
@@ -127,7 +126,10 @@ describe('readIsoBoxes on the read cursor', function () {
 		const [moof] = readIsoBoxes(boxBytes('moof', MFHD, MDAT), { readers: { mfhd: readMfhd } })
 
 		assert.strictEqual(moof?.type, 'moof')
-		assert.deepStrictEqual(moof && 'boxes' in moof ? moof.boxes.map(typeOf) : [], ['mfhd', 'mdat'])
+		assert.deepStrictEqual(moof && 'boxes' in moof ? moof.boxes.map(box => box.type) : [], [
+			'mfhd',
+			'mdat',
+		])
 	})
 
 	it('should throw a RangeError for a reader that reads past its box', function () {
@@ -161,7 +163,10 @@ describe('readIsoBoxes on the read cursor', function () {
 		assert.strictEqual(cursor.pos, MDAT.length)
 		assert.strictEqual(cursor.end, bytes.length)
 		assert.strictEqual(nextIsoBox(cursor), 'mfhd')
-		assert.deepStrictEqual(readChildBoxes(cursor).map(typeOf), ['free'])
+		assert.deepStrictEqual(
+			readChildBoxes(cursor).map(box => box.type),
+			['free'],
+		)
 	})
 
 	it('should restore the cursor to the first byte of the box after the depth error', function () {
@@ -184,7 +189,10 @@ describe('readIsoBoxes on the read cursor', function () {
 		}
 		const boxes = readIsoBoxes(reduceUint8Arrays([MFHD, MDAT]), { readers })
 
-		assert.deepStrictEqual(boxes.map(typeOf), ['mfhd', 'mdat'])
+		assert.deepStrictEqual(
+			boxes.map(box => box.type),
+			['mfhd', 'mdat'],
+		)
 	})
 
 	it('should use the reader of a container type in place of the child boxes', function () {
@@ -226,13 +234,16 @@ describe('readIsoBoxes on the read cursor', function () {
 
 		const boxes = readIsoBoxes(reduceUint8Arrays([MDAT, large]))
 
-		assert.deepStrictEqual(boxes.map(typeOf), ['mdat'])
+		assert.deepStrictEqual(
+			boxes.map(box => box.type),
+			['mdat'],
+		)
 	})
 
 	it('should return false from isIsoBoxType for a raw box', function () {
 		const [mfhd] = readIsoBoxes(MFHD)
 
-		assert.strictEqual(mfhd && !mfhd.type && mfhd.boxType, 'mfhd')
+		assert.strictEqual(mfhd && 'bytes' in mfhd && mfhd.type, 'mfhd')
 		assert.strictEqual(isIsoBoxType('mfhd', mfhd), false)
 	})
 })
@@ -246,14 +257,20 @@ describe('readChildBoxes', function () {
 		const boxes = readChildBoxes(cursor) // a raw mfhd box and a raw mdat box
 		// #endregion example
 
-		assert.deepStrictEqual(boxes.map(typeOf), ['mfhd', 'mdat'])
+		assert.deepStrictEqual(
+			boxes.map(box => box.type),
+			['mfhd', 'mdat'],
+		)
 		assert.strictEqual(cursor.pos, cursor.end)
 	})
 
 	it('should read at most count boxes', function () {
 		const cursor = createIsoBoxReadCursor(reduceUint8Arrays([MFHD, MDAT]))
 
-		assert.deepStrictEqual(readChildBoxes(cursor, 1).map(typeOf), ['mfhd'])
+		assert.deepStrictEqual(
+			readChildBoxes(cursor, 1).map(box => box.type),
+			['mfhd'],
+		)
 		assert.strictEqual(cursor.pos, MFHD.length)
 		assert.strictEqual(readChildBoxes(cursor, 0).length, 0)
 	})

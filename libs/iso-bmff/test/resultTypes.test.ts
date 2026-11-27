@@ -30,14 +30,17 @@ import {
 } from './util/box.ts'
 
 describe('result types', function () {
-	it('should reject a test for a box type outside IsoBoxMap on a child of a container', function () {
+	it('should reject isIsoBoxType for a box type outside IsoBoxMap on a child of a container', function () {
 		const moov: MovieBox = { type: 'moov', boxes: [] }
 		const child = moov.boxes[0]
 
 		expectType<Equal<MovieBox['boxes'][number], ParsedIsoBox>>(true)
 		assert.strictEqual(child?.type === 'trak', false)
-		// @ts-expect-error `hvcC` is not a box type of `IsoBoxMap`.
+		assert.strictEqual(isIsoBoxType('trak', child), false)
+		// A test of `type` compiles for any code, because the `type` of a raw box is a `string`.
 		assert.strictEqual(child?.type === 'hvcC', false)
+		// @ts-expect-error `hvcC` is not a box type of `IsoBoxMap`.
+		assert.strictEqual(isIsoBoxType('hvcC', child), false)
 	})
 
 	it('should give the child boxes the mode of the 64-bit fields', function () {
@@ -86,7 +89,7 @@ describe('result types', function () {
 
 		assert.ok(child && 'bytes' in child)
 		expectType<Equal<Extract<typeof child, { bytes: Uint8Array }>, IsoRawBox>>(true)
-		assert.ok(findIsoBox(box.boxes, b => !b.type && b.boxType === 'hint'))
+		assert.ok(findIsoBox(box.boxes, b => 'bytes' in b && b.type === 'hint'))
 	})
 
 	it('should remove the default type argument of Box and the child types', function () {

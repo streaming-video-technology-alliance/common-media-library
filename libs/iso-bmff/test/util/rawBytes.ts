@@ -10,7 +10,7 @@ import { load } from './load.ts'
  * @returns The bytes of each box, with the header.
  */
 export function rawBytes(file: string, type: string): Uint8Array[] {
-	return filterIsoBoxes(readIsoBoxes(load(file)), box => !box.type && box.boxType === type).map(
-		box => (box.type ? new Uint8Array() : box.bytes),
+	return filterIsoBoxes(readIsoBoxes(load(file)), box => 'bytes' in box && box.type === type).map(
+		box => ('bytes' in box ? box.bytes : new Uint8Array()),
 	)
 }
