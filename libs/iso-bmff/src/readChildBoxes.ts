@@ -83,7 +83,7 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 
 				if (type === 'uuid') {
 					raw.headerSize = header + 16
-					raw.usertype = bytes.subarray(header, header + 16)
+					raw.userType = bytes.subarray(header, header + 16)
 				}
 
 				box = raw

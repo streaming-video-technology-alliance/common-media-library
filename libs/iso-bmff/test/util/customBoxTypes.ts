@@ -4,7 +4,7 @@ declare module '@svta/cml-iso-bmff' {
 	interface IsoCustomBoxMap {
 		abcd: { type: 'abcd'; x: number }
 		test: { type: 'test'; value: number }
-		uuid: { type: 'uuid'; usertype: Uint8Array; value: number }
+		uuid: { type: 'uuid'; userType: Uint8Array; value: number }
 	}
 }
 

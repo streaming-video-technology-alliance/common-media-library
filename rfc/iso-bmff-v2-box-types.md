@@ -632,3 +632,7 @@ type IsoBoxWriterMap = {
 - **Sample entry types.** `IsoBoxMap`, `AudioSampleEntryType`, and `VisualSampleEntryType` name 12 more types: `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`. The list has the codes that both hls.js and shaka-player name. The default configurations have no reader and no writer for these types.
 - **Sample entry writers.** `writeAudioSampleEntry` and `writeVisualSampleEntry` take a sample entry of any box type.
 - **Lint.** `IsoCustomBoxMap` is the one `interface` of the package, because only an interface merges with a declaration of an adopter. The lint rule of the repo has an exception for that line.
+
+Amended on 2026-11-27, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
+
+- **Theme 5, rule 3.** The rule also applies to the fields of `IsoRawBox`. The field `usertype` becomes `userType`, as `boxtype` of the specification became `boxType`. Text about the 16 bytes in a `uuid` box keeps the specification name `usertype`.

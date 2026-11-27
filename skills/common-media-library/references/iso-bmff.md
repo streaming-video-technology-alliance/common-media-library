@@ -112,7 +112,7 @@ console.log(tfdt?.baseMediaDecodeTime);
 | `box.size` | `box.bytes.length` of a raw box |
 | `box.largesize` | `box.bytes.length` of a raw box |
 | `box.view` or `box.size` of a box with a type in `CONTAINERS`, such as `moof` | A custom reader for the box. The bytes of the box are from `cursor.start` to `cursor.end`. `seekIsoBox` returns a cursor with the same range. |
-| `box.usertype` of a parsed `uuid` box | `box.usertype` of a raw `uuid` box, or `readBytes(cursor, 16)` in a reader |
+| `box.usertype` of a parsed `uuid` box | `box.userType` of a raw `uuid` box, or `readBytes(cursor, 16)` in a reader |
 | `box.type` of a box with no reader | `box.boxType`. The four-character code of any box is `box.type ?? box.boxType`. |
 | `readStsd<Avc1Box>` | `readStsd`, then a test of `entry.type` for each entry |
 | `stsd.entries`, `dref.entries` | `stsd.boxes`, `dref.boxes` |
@@ -390,7 +390,7 @@ description: Read ISO BMFF boxes from a buffer
 The `readIsoBoxes` function reads boxes from a buffer and returns an array of boxes. To read the fields of a box, provide a reader function for that box type. The result has two kinds of boxes:
 
 - A **box object** has a `type` field and the fields of the box. A reader returns a box object.
-- A **raw box** is a box with no reader: `{ boxType, bytes, headerSize }`. `boxType` is the four-character code of the box. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `usertype`.
+- A **raw box** is a box with no reader: `{ boxType, bytes, headerSize }`. `boxType` is the four-character code of the box. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `userType`, the 16 bytes of the `usertype` field. No other raw box has that field.
 
 The bytes of a raw box share memory with the input.
 
@@ -1792,7 +1792,7 @@ export type IsoRawBox = {
     boxType: IsoBoxType;
     bytes: Uint8Array;
     headerSize?: number;
-    usertype?: Uint8Array;
+    userType?: Uint8Array;
 };
 
 // @public

@@ -50,7 +50,7 @@ describe('readIsoBoxes on the read cursor', function () {
 		assert.deepStrictEqual(Array.from(mdat?.bytes ?? []), Array.from(MDAT))
 		assert.strictEqual(mdat?.bytes.buffer, MDAT.buffer)
 		assert.deepStrictEqual(Array.from(body ?? []), [0xaa, 0xbb])
-		assert.strictEqual('usertype' in (mdat ?? {}), false)
+		assert.strictEqual('userType' in (mdat ?? {}), false)
 	})
 
 	it('should add the byte offset of a subarray input to a raw box', function () {
@@ -75,13 +75,14 @@ describe('readIsoBoxes on the read cursor', function () {
 		assert.strictEqual(mdat?.bytes.length, 18)
 	})
 
-	it('should set headerSize and usertype on a raw uuid box', function () {
+	it('should set headerSize and userType on a raw uuid box', function () {
 		const uuid = boxBytes('uuid', USERTYPE, new Uint8Array([0xcc]))
 		const [box] = readIsoBoxes(uuid) as IsoRawBox[]
 
 		assert.strictEqual(box?.headerSize, 24)
-		assert.deepStrictEqual(Array.from(box?.usertype ?? []), Array.from(USERTYPE))
-		assert.strictEqual(box?.usertype?.buffer, uuid.buffer)
+		assert.deepStrictEqual(Array.from(box?.userType ?? []), Array.from(USERTYPE))
+		assert.strictEqual(box?.userType?.buffer, uuid.buffer)
+		assert.strictEqual('usertype' in (box ?? {}), false)
 	})
 
 	it('should start the cursor of a uuid reader at usertype', function () {
@@ -89,7 +90,7 @@ describe('readIsoBoxes on the read cursor', function () {
 		const readers = {
 			uuid: (cursor: IsoBoxReadCursor) => ({
 				type: 'uuid' as const,
-				usertype: readBytes(cursor, 16),
+				userType: readBytes(cursor, 16),
 				value: readUint8(cursor),
 			}),
 		}
@@ -97,7 +98,7 @@ describe('readIsoBoxes on the read cursor', function () {
 		const [box] = readIsoBoxes(uuid, { readers })
 
 		assert.deepStrictEqual(
-			Array.from((box?.type === 'uuid' && box.usertype) || []),
+			Array.from((box?.type === 'uuid' && box.userType) || []),
 			Array.from(USERTYPE),
 		)
 		assert.strictEqual(box?.type === 'uuid' ? box.value : 0, 0xcc)

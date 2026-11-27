@@ -31,7 +31,8 @@ export type IsoRawBox = {
 	headerSize?: number
 
 	/**
-	 * The 16-byte user type of a `uuid` box, as a view of `bytes`. `writeIsoBoxes` ignores it.
+	 * The 16-byte user type of a `uuid` box, as a view of `bytes`. The specification names the field `usertype`.
+	 * `readIsoBoxes` sets the field only on a `uuid` box. `writeIsoBoxes` ignores it.
 	 */
-	usertype?: Uint8Array
+	userType?: Uint8Array
 }

@@ -468,7 +468,7 @@ export type IsoRawBox = {
     boxType: IsoBoxType;
     bytes: Uint8Array;
     headerSize?: number;
-    usertype?: Uint8Array;
+    userType?: Uint8Array;
 };
 
 // @public
