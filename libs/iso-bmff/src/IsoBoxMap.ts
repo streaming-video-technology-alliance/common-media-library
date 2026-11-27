@@ -97,7 +97,7 @@ export type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCu
  * Create a reader for one of these types with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`.
  * Write one of these types with `writeAudioSampleEntry` or `writeVisualSampleEntry`.
  *
- * The default configuration has no reader and no writer for `uuid` either. `uuid` is the union of the box types of `IsoCustomUuidBoxMap`.
+ * The default configuration has no reader and no writer for `uuid` either. The type of `uuid` is `IsoUuidBox`, the union of the box types of `IsoCustomUuidBoxMap`.
  * Create the reader and the writer with `createUuidReader` and `createUuidWriter`.
  *
  * @public

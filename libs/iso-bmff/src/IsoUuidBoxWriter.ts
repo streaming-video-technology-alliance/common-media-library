@@ -16,8 +16,14 @@ export type IsoUuidBoxWriter<U extends keyof IsoCustomUuidBoxMap> = (
 /**
  * Map of each user type of `IsoCustomUuidBoxMap` to the writer of that `uuid` box.
  *
+ * If `IsoCustomUuidBoxMap` is empty, a key is any string. A writer then takes a box with `type: 'uuid'` and a `userType` string.
+ *
  * @public
  */
-export type IsoUuidBoxWriterMap = {
-	[U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U>
-}
+export type IsoUuidBoxWriterMap = [keyof IsoCustomUuidBoxMap] extends [never]
+	? Record<
+			string,
+			| { w(cursor: IsoBoxWriteCursor, box: { type: 'uuid'; userType: string }): void }['w']
+			| undefined
+		>
+	: { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U> }

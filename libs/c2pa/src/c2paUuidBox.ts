@@ -33,7 +33,7 @@ const C2PA_UUID_READERS = {
 }
 
 /**
- * The read configuration that parses the C2PA `uuid` boxes. Every other box with no reader stays a raw box.
+ * The read configuration that parses the C2PA `uuid` boxes. The configuration does not change the result for any other box.
  *
  * @internal
  */

@@ -167,6 +167,22 @@ describe('createUuidReader', function () {
 		assert.strictEqual(cursor.pos, 0)
 	})
 
+	it('should read a uuid box with a largesize field', function () {
+		const body = TEST_BOX.subarray(8)
+		const bytes = new Uint8Array(16 + body.length)
+		const view = new DataView(bytes.buffer)
+		view.setUint32(0, 1)
+		bytes.set([0x75, 0x75, 0x69, 0x64], 4)
+		view.setBigUint64(8, BigInt(bytes.length))
+		bytes.set(body, 16)
+
+		const [box] = readIsoBoxes(bytes, {
+			readers: { uuid: createUuidReader({ [TEST_USER_TYPE]: readTest }) },
+		})
+
+		assert.deepStrictEqual(box, { type: 'uuid', userType: TEST_USER_TYPE, value: 7 })
+	})
+
 	it('should skip a key with no reader', function () {
 		const uuid = createUuidReader({ [TFXD]: undefined })
 		const [box] = readIsoBoxes(TFXD_BOX, { readers: { uuid } })
@@ -182,12 +198,12 @@ describe('createUuidReader', function () {
 			'6d1d9b05-42d5-44e6-80e2-141daff757b',
 			'',
 		]) {
-			assert.throws(
-				() => createUuidReader({ [key]: readTest }),
-				new RangeError(
-					`createUuidReader: a user type must be a UUID in lowercase hexadecimal digits with hyphens, received "${key}"`,
-				),
+			const error = new RangeError(
+				`createUuidReader: a user type must be a UUID in lowercase hexadecimal digits with hyphens, received "${key}"`,
 			)
+
+			assert.throws(() => createUuidReader({ [key]: readTest }), error)
+			assert.throws(() => createUuidReader({ [key]: undefined }), error)
 		}
 	})
 
@@ -276,7 +292,7 @@ describe('createUuidWriter', function () {
 				writeIsoBoxes([{ type: 'uuid', userType: TEST_USER_TYPE, value: 7 }], {
 					writers: { uuid },
 				}),
-			new Error(`No writer found for box type: uuid, user type ${TEST_USER_TYPE}`),
+			new Error(`No writer found for box type: uuid, user type "${TEST_USER_TYPE}"`),
 		)
 	})
 

@@ -37,7 +37,7 @@ export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
 
 	/**
 	 * Map of each box type to the reader of that box. `readChildBoxes` uses the map.
-	 * A reader that returns `undefined` leaves a raw box. Only the reader of `uuid` returns `undefined`.
+	 * If a reader returns `undefined`, `readChildBoxes` returns a raw box. `IsoBoxReaderMap` allows `undefined` only for the `uuid` key.
 	 */
 	readonly readers?: Record<
 		IsoBoxType,

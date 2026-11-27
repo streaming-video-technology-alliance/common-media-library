@@ -581,6 +581,7 @@ The cursor follows these rules:
 - A reader of a box with child boxes reads them with `readChildBoxes(cursor)`. The readers of the configuration then apply to the child boxes.
 - `readIsoBoxes` uses one cursor for every box. A reader must not keep the cursor after it returns. A reader that needs bytes later keeps the result of `readBytes`.
 - The declaration of `IsoCustomBoxMap` applies to every file of the program. Two declarations of one box type need the same type.
+- Do not declare `uuid` in `IsoCustomBoxMap`. Declare the box types of `uuid` in `IsoCustomUuidBoxMap`.
 - A reader under a key returns the box type of that key. The reader can add fields. A reader with another result type is a compile error.
 
 `readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
@@ -1937,13 +1938,23 @@ export type IsoUuidBox = IsoCustomUuidBoxMap[keyof IsoCustomUuidBoxMap];
 export type IsoUuidBoxReader<U extends keyof IsoCustomUuidBoxMap, V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<V>, userType: U) => IsoCustomUuidBoxMap[U];
 
 // @public
-export type IsoUuidBoxReaderMap<V extends IsoInt64 = number> = { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxReader<U, V>; };
+export type IsoUuidBoxReaderMap<V extends IsoInt64 = number> = [keyof IsoCustomUuidBoxMap] extends [never] ? Record<string, {
+    r(cursor: IsoBoxReadCursor<V>, userType: string): {
+        type: "uuid";
+        userType: string;
+    };
+}["r"] | undefined> : { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxReader<U, V>; };
 
 // @public
 export type IsoUuidBoxWriter<U extends keyof IsoCustomUuidBoxMap> = (cursor: IsoBoxWriteCursor, box: IsoCustomUuidBoxMap[U]) => void;
 
 // @public
-export type IsoUuidBoxWriterMap = { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U>; };
+export type IsoUuidBoxWriterMap = [keyof IsoCustomUuidBoxMap] extends [never] ? Record<string, {
+    w(cursor: IsoBoxWriteCursor, box: {
+        type: "uuid";
+        userType: string;
+    }): void;
+}["w"] | undefined> : { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U>; };
 
 // @public
 export type KindBox = FullBox & {

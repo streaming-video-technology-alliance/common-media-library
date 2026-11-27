@@ -15,6 +15,7 @@ import {
 	type IsoBoxReadCursor,
 	type IsoBoxReader,
 	type IsoRawBox,
+	type MovieBox,
 	type MovieFragmentHeaderBox,
 	type TrackFragmentBox,
 } from './util/box.ts'
@@ -115,6 +116,18 @@ describe('readIsoBoxes on the read cursor', function () {
 		assert.strictEqual(box.headerSize, 24)
 		assert.deepStrictEqual(Array.from(box.userType ?? []), Array.from(USERTYPE))
 		assert.strictEqual(box.bytes.length, uuid.length)
+	})
+
+	it('should return a raw box for a container box whose reader returns undefined', function () {
+		const moov = boxBytes('moov', boxBytes('free'), MDAT)
+		const reader = ((cursor: IsoBoxReadCursor) => {
+			cursor.pos += 8
+		}) as unknown as IsoBoxReader<MovieBox>
+		const [box] = readIsoBoxes(moov, { readers: { moov: reader } })
+
+		assert.ok(box && !box.type)
+		assert.strictEqual(box.boxType, 'moov')
+		assert.strictEqual(box.bytes.length, moov.length)
 	})
 
 	it('should use the result of a reader with no merge', function () {

@@ -10,9 +10,9 @@ and this project adheres to
 
 ### Changed
 
-- The package now reads its `uuid` boxes with `createUuidReader` of `@svta/cml-iso-bmff`, in place of a byte comparison of each raw box. The public API and the results do not change ([#694](https://github.com/streaming-video-technology-alliance/common-media-library/issues/694)).
+- The package now reads the C2PA `uuid` boxes with `createUuidReader` of `@svta/cml-iso-bmff`. The package no longer reads these boxes as raw boxes. The public API and the results do not change ([#694](https://github.com/streaming-video-technology-alliance/common-media-library/issues/694)).
 - The search for the Verifiable Segment Info `emsg` box now narrows each box with `isIsoBoxType` of `@svta/cml-iso-bmff`, with no type cast. The public API and the results do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
-- The package now reads the `uuid` boxes and the JUMBF boxes as raw boxes of `@svta/cml-iso-bmff` 2.0.0. The package then requires `@svta/cml-iso-bmff` 2.0.0. This change does not change the public API or the results ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
+- The package now reads the JUMBF boxes as raw boxes of `@svta/cml-iso-bmff` 2.0.0. The package then requires `@svta/cml-iso-bmff` 2.0.0. This change does not change the public API or the results ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
 - Every code example in the guides now typechecks ([#565](https://github.com/streaming-video-technology-alliance/common-media-library/issues/565)).
 - The README no longer describes the peer dependencies. The website lists them from `package.json` on the package page.
 - The README and the `homepage` field of `package.json` now link to the package page on the website, [cml.svta.org/packages/c2pa](https://cml.svta.org/packages/c2pa/).
