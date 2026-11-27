@@ -80,6 +80,7 @@ import type { WebVttSettingsBox } from './boxes/WebVttSettingsBox.ts'
 import type { WebVttSourceLabelBox } from './boxes/WebVttSourceLabelBox.ts'
 import type { IsoCustomBoxMap } from './IsoCustomBoxMap.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
+import type { IsoUuidBox } from './IsoUuidBox.ts'
 
 /**
  * Map of each box type to the type of that box: the built-in box types and the box types of `IsoCustomBoxMap`.
@@ -95,6 +96,9 @@ export type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCu
  * `ac-3`, `ac-4`, `av01`, `dav1`, `dva1`, `dvav`, `dvh1`, `dvhe`, `ec-3`, `fLaC`, `Opus`, and `vp09`.
  * Create a reader for one of these types with `createAudioSampleEntryReader` or `createVisualSampleEntryReader`.
  * Write one of these types with `writeAudioSampleEntry` or `writeVisualSampleEntry`.
+ *
+ * The default configuration has no reader and no writer for `uuid` either. `uuid` is the union of the box types of `IsoCustomUuidBoxMap`.
+ * Create the reader and the writer with `createUuidReader` and `createUuidWriter`.
  *
  * @public
  */
@@ -193,6 +197,7 @@ export type IsoBuiltInBoxMap<V extends IsoInt64 = number> = {
 	udta: UserDataBox<V>
 	'url ': DataEntryUrlBox
 	'urn ': DataEntryUrnBox
+	uuid: IsoUuidBox
 	vlab: WebVttSourceLabelBox
 	vmhd: VideoMediaHeaderBox
 	vp09: VisualSampleEntry<'vp09', V>

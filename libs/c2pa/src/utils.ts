@@ -1,4 +1,4 @@
-import type { IsoRawBox, ParsedIsoBox } from '@svta/cml-iso-bmff'
+import type { IsoRawBox } from '@svta/cml-iso-bmff'
 
 const MILLISECONDS_PER_SECOND = 1000
 const SHA_ALGORITHM_PATTERN = /^sha(\d+)$/i
@@ -63,23 +63,6 @@ export function hashesEqual(a: Uint8Array, b: Uint8Array): boolean {
 	return diff === 0
 }
 
-// C2PA manifest store UUID per C2PA specification
-const C2PA_MANIFEST_UUID: readonly number[] = [
-	0xd8, 0xfe, 0xc3, 0xd6, 0x1a, 0x96, 0x4f, 0x32, 0xa0, 0xf6, 0xf3, 0xec, 0xf9, 0x6c, 0x10, 0xea,
-]
-
-// JUMBF UUID per ISO 19566-5 (used by c2pa-rs and other JUMBF-compliant tools)
-/** @internal */
-export const JUMBF_UUID: readonly number[] = [
-	0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0e, 0x48, 0x3c, 0x92, 0x97, 0x58, 0x28, 0x87, 0x7e, 0xc4, 0x81,
-]
-
-// Compares a uuid box usertype against an expected 16-byte extended type.
-/** @internal */
-export function matchesUuid(usertype: ArrayLike<number>, expected: readonly number[]): boolean {
-	return usertype.length === expected.length && expected.every((b, i) => b === usertype[i])
-}
-
 // A CBOR byte string as a Uint8Array, or null for a value of another type.
 /** @internal */
 export function toUint8Array(value: unknown): Uint8Array | null {
@@ -103,29 +86,10 @@ export function asString(value: unknown): string | null {
 	return typeof value === 'string' ? value : null
 }
 
-function isC2paUuid(usertype: ArrayLike<number>): boolean {
-	return matchesUuid(usertype, C2PA_MANIFEST_UUID) || matchesUuid(usertype, JUMBF_UUID)
-}
-
 // The body of a raw box, after the box header and the user type of a uuid box.
 /** @internal */
 export function rawBoxBody(box: IsoRawBox): Uint8Array {
 	return box.bytes.subarray(box.headerSize ?? 8)
-}
-
-/**
- * Finds the C2PA UUID box in a list of parsed ISO BMFF boxes.
- *
- * Matches against both the C2PA manifest store UUID and the JUMBF UUID
- * (ISO 19566-5), as different tools use different UUIDs.
- *
- * @internal
- */
-export function findC2paUuidBox(boxes: ParsedIsoBox[]): IsoRawBox | undefined {
-	return boxes.find(
-		(box): box is IsoRawBox =>
-			!box.type && box.boxType === 'uuid' && isC2paUuid(box.userType ?? []),
-	)
 }
 
 const FULLBOX_HEADER_SIZE = 4

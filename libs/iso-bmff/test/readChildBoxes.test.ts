@@ -18,6 +18,7 @@ import {
 	type MovieFragmentHeaderBox,
 	type TrackFragmentBox,
 } from './util/box.ts'
+import { TEST_USER_TYPE } from './util/customBoxTypes.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { typeOf } from './util/typeOf.ts'
 import { boxBytes } from './util/wideBoxes.ts'
@@ -87,21 +88,33 @@ describe('readIsoBoxes on the read cursor', function () {
 
 	it('should start the cursor of a uuid reader at usertype', function () {
 		const uuid = boxBytes('uuid', USERTYPE, new Uint8Array([0xcc]))
+		let userType: number[] = []
 		const readers = {
-			uuid: (cursor: IsoBoxReadCursor) => ({
-				type: 'uuid' as const,
-				userType: readBytes(cursor, 16),
-				value: readUint8(cursor),
-			}),
+			uuid: (cursor: IsoBoxReadCursor) => {
+				userType = Array.from(readBytes(cursor, 16))
+
+				return { type: 'uuid', userType: TEST_USER_TYPE, value: readUint8(cursor) } as const
+			},
 		}
 
 		const [box] = readIsoBoxes(uuid, { readers })
 
-		assert.deepStrictEqual(
-			Array.from((box?.type === 'uuid' && box.userType) || []),
-			Array.from(USERTYPE),
+		assert.deepStrictEqual(userType, Array.from(USERTYPE))
+		assert.strictEqual(
+			box?.type === 'uuid' && box.userType === TEST_USER_TYPE ? box.value : 0,
+			0xcc,
 		)
-		assert.strictEqual(box?.type === 'uuid' ? box.value : 0, 0xcc)
+	})
+
+	it('should return a raw box for a uuid box whose reader returns undefined', function () {
+		const uuid = boxBytes('uuid', USERTYPE, new Uint8Array([0xcc]))
+		const [box] = readIsoBoxes(uuid, { readers: { uuid: () => undefined } })
+
+		assert.ok(box && !box.type)
+		assert.strictEqual(box.boxType, 'uuid')
+		assert.strictEqual(box.headerSize, 24)
+		assert.deepStrictEqual(Array.from(box.userType ?? []), Array.from(USERTYPE))
+		assert.strictEqual(box.bytes.length, uuid.length)
 	})
 
 	it('should use the result of a reader with no merge', function () {

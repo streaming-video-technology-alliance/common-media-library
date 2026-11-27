@@ -37,10 +37,11 @@ export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
 
 	/**
 	 * Map of each box type to the reader of that box. `readChildBoxes` uses the map.
+	 * A reader that returns `undefined` leaves a raw box. Only the reader of `uuid` returns `undefined`.
 	 */
 	readonly readers?: Record<
 		IsoBoxType,
-		{ r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): { type: IsoBoxType } }['r']
+		{ r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): { type: IsoBoxType } | undefined }['r']
 	>
 } & ([V] extends [bigint]
 	? {
