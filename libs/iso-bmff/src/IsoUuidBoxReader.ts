@@ -18,8 +18,18 @@ export type IsoUuidBoxReader<U extends keyof IsoCustomUuidBoxMap, V extends IsoI
 /**
  * Map of each user type of `IsoCustomUuidBoxMap` to the reader of that `uuid` box.
  *
+ * If `IsoCustomUuidBoxMap` is empty, a key is any string. A reader then returns a box with `type: 'uuid'` and a `userType` string.
+ *
  * @public
  */
-export type IsoUuidBoxReaderMap<V extends IsoInt64 = number> = {
-	[U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxReader<U, V>
-}
+export type IsoUuidBoxReaderMap<V extends IsoInt64 = number> = [keyof IsoCustomUuidBoxMap] extends [
+	never,
+]
+	? Record<
+			string,
+			| {
+					r(cursor: IsoBoxReadCursor<V>, userType: string): { type: 'uuid'; userType: string }
+			  }['r']
+			| undefined
+		>
+	: { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxReader<U, V> }

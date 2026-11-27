@@ -1,7 +1,8 @@
 import { extractManifestCertificate } from '../../src/extractManifestCertificate.ts'
-import { ok, strictEqual } from 'node:assert'
+import { deepStrictEqual, ok, strictEqual } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import { describe, it } from 'vite-plus/test'
+import { withManifestUserType } from '../jumbfUuid.ts'
 
 describe('extractManifestCertificate', () => {
 	// #region example
@@ -27,5 +28,16 @@ describe('extractManifestCertificate', () => {
 			// DER certificates start with SEQUENCE tag 0x30
 			strictEqual(cert[0], 0x30, 'DER certificate must start with SEQUENCE tag')
 		}
+	})
+
+	it('reads a C2PA uuid box with the C2PA manifest user type', () => {
+		const fixture = new Uint8Array(
+			readFileSync(new URL('../fixtures/init_signed_with_session_keys.m4s', import.meta.url)),
+		)
+
+		const cert = extractManifestCertificate(withManifestUserType(fixture))
+
+		ok(cert, 'certificate must be present')
+		deepStrictEqual(cert, extractManifestCertificate(fixture))
 	})
 })

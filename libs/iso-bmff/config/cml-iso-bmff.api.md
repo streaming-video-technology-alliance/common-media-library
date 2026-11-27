@@ -490,13 +490,23 @@ export type IsoUuidBox = IsoCustomUuidBoxMap[keyof IsoCustomUuidBoxMap];
 export type IsoUuidBoxReader<U extends keyof IsoCustomUuidBoxMap, V extends IsoInt64 = number> = (cursor: IsoBoxReadCursor<V>, userType: U) => IsoCustomUuidBoxMap[U];
 
 // @public
-export type IsoUuidBoxReaderMap<V extends IsoInt64 = number> = { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxReader<U, V>; };
+export type IsoUuidBoxReaderMap<V extends IsoInt64 = number> = [keyof IsoCustomUuidBoxMap] extends [never] ? Record<string, {
+    r(cursor: IsoBoxReadCursor<V>, userType: string): {
+        type: "uuid";
+        userType: string;
+    };
+}["r"] | undefined> : { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxReader<U, V>; };
 
 // @public
 export type IsoUuidBoxWriter<U extends keyof IsoCustomUuidBoxMap> = (cursor: IsoBoxWriteCursor, box: IsoCustomUuidBoxMap[U]) => void;
 
 // @public
-export type IsoUuidBoxWriterMap = { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U>; };
+export type IsoUuidBoxWriterMap = [keyof IsoCustomUuidBoxMap] extends [never] ? Record<string, {
+    w(cursor: IsoBoxWriteCursor, box: {
+        type: "uuid";
+        userType: string;
+    }): void;
+}["w"] | undefined> : { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U>; };
 
 // @public
 export type KindBox = FullBox & {

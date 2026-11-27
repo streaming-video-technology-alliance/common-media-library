@@ -35,12 +35,15 @@ export function createUuidReader<V extends IsoInt64 = number>(
 	const values: Uint8Array[] = []
 	const functions: UuidReader<V>[] = []
 
-	for (const key of Object.keys(readers) as (keyof IsoUuidBoxReaderMap<V>)[]) {
-		const reader: UuidReader<V> | undefined = readers[key]
+	const map = readers as Record<string, UuidReader<V> | undefined>
+
+	for (const key of Object.keys(map)) {
+		const value = parseUserType('createUuidReader', key)
+		const reader = map[key]
 
 		if (reader) {
 			keys.push(key)
-			values.push(parseUserType('createUuidReader', key))
+			values.push(value)
 			functions.push(reader)
 		}
 	}

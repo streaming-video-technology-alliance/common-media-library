@@ -355,7 +355,7 @@ describe('validateC2paInitSegment — VOD Merkle', () => {
 describe('validateC2paInitSegment — BMFF hash assertion offset prefix (§18.6.2)', () => {
 	const TEXT_ENCODER = new TextEncoder()
 
-	// JUMBF UUID per ISO 19566-5 (same value as the internal JUMBF_UUID in src/utils.ts)
+	// JUMBF UUID per ISO 19566-5 (same value as JUMBF_UUID in test/jumbfUuid.ts)
 	const JUMBF_UUID = [
 		0xd8, 0xfe, 0xc3, 0xd6, 0x1b, 0x0e, 0x48, 0x3c, 0x92, 0x97, 0x58, 0x28, 0x87, 0x7e, 0xc4, 0x81,
 	] as const

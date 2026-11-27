@@ -212,7 +212,7 @@ function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAss
  * cryptographic signature of the claim.
  *
  * @param bytes - Raw BMFF bytes (e.g. an MP4 init segment or media segment)
- * @param preParsedBoxes - Optional pre-parsed ISO boxes to avoid redundant parsing
+ * @param preParsedBoxes - Optional pre-parsed ISO boxes to avoid redundant parsing. Read them with `readIsoBoxes` and `C2PA_UUID_READ_CONFIG`.
  * @returns The parsed manifest data including claim, assertions, and signature bytes
  * @throws If no C2PA UUID box is found, or the JUMBF structure is invalid
  *

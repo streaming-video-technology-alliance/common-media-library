@@ -77,7 +77,7 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 			// A uuid reader returns undefined for a user type with no reader.
 			box = reader?.(state, type) as ParsedIsoBox<V>
 
-			if (!box && CONTAINER_SET.has(type)) {
+			if (!reader && CONTAINER_SET.has(type)) {
 				box = { type, boxes: readChildBoxes(state) } as ParsedIsoBox<V>
 			} else if (!box) {
 				const bytes = new Uint8Array(view.buffer, view.byteOffset + boxStart, size)

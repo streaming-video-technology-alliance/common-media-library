@@ -19,6 +19,8 @@ type UuidWriter = { w(cursor: IsoBoxWriteCursor, box: IsoUuidBox): void }['w']
  *
  * @throws RangeError if a key of `writers` is not a UUID in lowercase hexadecimal digits with hyphens.
  *
+ * @throws Error if the writer is called with a box whose user type has no writer.
+ *
  * @example
  * {@includeCode ../../test/createUuidReader.test.ts#example}
  *
@@ -27,11 +29,14 @@ type UuidWriter = { w(cursor: IsoBoxWriteCursor, box: IsoUuidBox): void }['w']
 export function createUuidWriter(writers: IsoUuidBoxWriterMap): IsoBoxWriter<IsoUuidBox> {
 	const map = new Map<string, { bytes: Uint8Array; writer: UuidWriter }>()
 
-	for (const key of Object.keys(writers) as (keyof IsoUuidBoxWriterMap)[]) {
-		const writer: UuidWriter | undefined = writers[key]
+	const entries = writers as Record<string, UuidWriter | undefined>
+
+	for (const key of Object.keys(entries)) {
+		const bytes = parseUserType('createUuidWriter', key)
+		const writer = entries[key]
 
 		if (writer) {
-			map.set(key, { bytes: parseUserType('createUuidWriter', key), writer })
+			map.set(key, { bytes, writer })
 		}
 	}
 
@@ -40,7 +45,7 @@ export function createUuidWriter(writers: IsoUuidBoxWriterMap): IsoBoxWriter<Iso
 		const entry = map.get(userType)
 
 		if (!entry) {
-			throw new Error(`No writer found for box type: uuid, user type ${userType}`)
+			throw new Error(`No writer found for box type: uuid, user type "${userType}"`)
 		}
 
 		const start = beginIsoBox(cursor, 'uuid')
