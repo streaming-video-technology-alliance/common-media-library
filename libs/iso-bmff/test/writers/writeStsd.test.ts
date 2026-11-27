@@ -18,7 +18,7 @@ describe('writeStsd', function () {
 					sampleSize: 16,
 					boxes: [
 						{
-							boxType: 'esds',
+							type: 'esds',
 							bytes: new Uint8Array([
 								0, 0, 0, 50, 101, 115, 100, 115, 0, 0, 0, 0, 3, 128, 128, 34, 0, 0, 0, 4, 128, 128,
 								22, 64, 21, 0, 32, 0, 0, 1, 244, 0, 0, 1, 244, 0, 5, 128, 128, 5, 17, 144, 0, 0, 0,

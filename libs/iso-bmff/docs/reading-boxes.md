@@ -8,11 +8,11 @@ description: Read ISO BMFF boxes from a buffer
 The `readIsoBoxes` function reads boxes from a buffer and returns an array of boxes. To read the fields of a box, provide a reader function for that box type. The result has two kinds of boxes:
 
 - A **box object** has a `type` field and the fields of the box. A reader returns a box object.
-- A **raw box** is a box with no reader: `{ boxType, bytes, headerSize }`. `boxType` is the four-character code of the box. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `userType`, the 16 bytes of the `usertype` field. No other raw box has that field.
+- A **raw box** is a box with no reader: `{ type, bytes, headerSize }`. `type` is the four-character code of the box. `bytes` is the complete box, with its header. The body of the box is `box.bytes.subarray(box.headerSize)`. A raw `uuid` box also has `userType`, the 16 bytes of the `usertype` field. No other raw box has that field.
 
 The bytes of a raw box share memory with the input.
 
-A raw box has no `type` field. A test such as `box.type === "tfdt"` narrows a box to that box type, and never matches a raw box. A box with no reader is a raw box, so add the reader of a box type before you test for that type. The four-character code of any box is `box.type ?? box.boxType`.
+Every box has its four-character code in `type`. A test such as `box.type === "tfdt"` matches a box object and a raw box, so the test does not narrow the box. Narrow a box with `isIsoBoxType`, which returns `false` for a raw box. A box with no reader is a raw box, so add the reader of a box type before you narrow to that type. The test `"bytes" in box` narrows a box to a raw box.
 
 > [!NOTE]
 > The function reads container boxes automatically, so they do not need a reader function. The `CONTAINERS` constant lists the container box types that the function reads automatically. Each container type also has a named reader, such as `readMoov` and `readMoof`. A container reader in the `readers` map is optional and does not change the result.
@@ -106,13 +106,14 @@ The function returns `null` at the end of the cursor and before a truncated box.
 
 ## Extending a built-in reader
 
-A custom reader can call a built-in reader and add fields to the result. In the result of `readIsoBoxes`, the box has the built-in type. The loop tests `box.type`, then casts the box to the result type of the reader.
+A custom reader can call a built-in reader and add fields to the result. In the result of `readIsoBoxes`, the box has the built-in type. The loop narrows the box with `isIsoBoxType`, then casts the box to the result type of the reader.
 
 HLS and DASH streams contain ID3 timed metadata in `emsg` boxes with the scheme `https://aomedia.org/emsg/ID3`. The built-in reader returns `messageData` as bytes. This reader decodes the frames once, when the box is read:
 
 ```typescript
 import { ID3_SCHEME_ID_URI, getId3Frames, type Id3Frame } from "@svta/cml-id3";
 import {
+	isIsoBoxType,
 	readEmsg,
 	readIsoBoxes,
 	type IsoBoxReadCursor,
@@ -140,7 +141,7 @@ const boxes = readIsoBoxes(segment, {
 type EmsgWithId3 = ReturnType<typeof readEmsgWithId3>;
 
 for (const box of boxes) {
-	if (box.type === "emsg") {
+	if (isIsoBoxType("emsg", box)) {
 		console.log((box as EmsgWithId3).frames);
 	}
 }
@@ -159,6 +160,7 @@ A reader takes a read cursor and the box type, and returns the box object with i
 ```typescript
 import {
 	findIsoBox,
+	isIsoBoxType,
 	readFourCc,
 	readIsoBoxes,
 	readUint16,
@@ -186,8 +188,8 @@ const readAbcd = (cursor: IsoBoxReadCursor<IsoInt64>): AbcdBox => ({
 
 const boxes = readIsoBoxes(buffer, { readers: { abcd: readAbcd } });
 
-// The test narrows the box to `AbcdBox`.
-console.log(findIsoBox(boxes, (box) => box.type === "abcd")?.brand);
+// The guard narrows the box to `AbcdBox`.
+console.log(findIsoBox(boxes, (box) => isIsoBoxType("abcd", box))?.brand);
 ```
 
 The cursor follows these rules:
@@ -217,6 +219,7 @@ Declare each user type in `IsoCustomUuidBoxMap`. A key is a UUID in lowercase he
 ```typescript
 import {
 	createUuidReader,
+	isIsoBoxType,
 	readIsoBoxes,
 	readTfdt,
 	readUint24,
@@ -264,8 +267,8 @@ const boxes = readIsoBoxes(buffer, {
 });
 
 for (const box of boxes) {
-	// The test of `userType` narrows the box to `TfxdBox`.
-	if (box.type === "uuid" && box.userType === TFXD) {
+	// The guard excludes a raw box, and the test of `userType` narrows the box to `TfxdBox`.
+	if (isIsoBoxType("uuid", box) && box.userType === TFXD) {
 		console.log(box.fragmentDuration);
 	}
 }
@@ -506,6 +509,7 @@ If your code needs the exact value of one field only, a custom reader can call `
 
 ```typescript
 import {
+	isIsoBoxType,
 	readIsoBoxes,
 	readUint24,
 	readUint32,
@@ -537,7 +541,7 @@ const boxes = readIsoBoxes(buffer, {
 type TfdtExact = ReturnType<typeof readTfdtExact>;
 
 for (const box of boxes) {
-	if (box.type === "tfdt") {
+	if (isIsoBoxType("tfdt", box)) {
 		console.log((box as TfdtExact).exactTime);
 	}
 }

@@ -1,3 +1,7 @@
+import type { AudioSampleEntry } from './boxes/AudioSampleEntry.ts'
+import type { AudioSampleEntryType } from './boxes/AudioSampleEntryType.ts'
+import type { VisualSampleEntry } from './boxes/VisualSampleEntry.ts'
+import type { VisualSampleEntryType } from './boxes/VisualSampleEntryType.ts'
 import type { IsoBox } from './IsoBox.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoRawBox } from './IsoRawBox.ts'
@@ -10,4 +14,9 @@ import type { IsoRawBox } from './IsoRawBox.ts'
  *
  * @public
  */
-export type IsoBoxStreamable = IsoBox<IsoInt64> | IsoRawBox | ArrayBufferView
+export type IsoBoxStreamable =
+	| IsoBox<IsoInt64>
+	| AudioSampleEntry<AudioSampleEntryType, IsoInt64>
+	| VisualSampleEntry<VisualSampleEntryType, IsoInt64>
+	| IsoRawBox
+	| ArrayBufferView

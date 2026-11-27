@@ -155,7 +155,7 @@ describe('readTenc', function () {
 		const [tenc, free] = boxes
 
 		assert.strictEqual(boxes.length, 2)
-		assert.strictEqual(!free.type && free.boxType, 'free')
+		assert.strictEqual('bytes' in free && free.type, 'free')
 		assert.ok(isIsoBoxType('tenc', tenc))
 		assert.deepStrictEqual(fields(tenc), {
 			version: 0,

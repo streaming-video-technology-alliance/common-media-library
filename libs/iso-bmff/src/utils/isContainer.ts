@@ -8,6 +8,7 @@ import { CONTAINERS } from './CONTAINERS.ts'
  * Check if a box is a container
  *
  * The function returns `true` for a box with a `boxes` field and for a box with a type in `CONTAINERS`.
+ * The function returns `false` for a raw box.
  *
  * In TypeScript, a `true` result narrows the box to the box types in the type of the box that have a `boxes` field.
  * These types are the container types, `meta`, `stsd`, `dref`, `prsl`, and the sample entries.
@@ -29,5 +30,7 @@ export function isContainer<T extends { type?: IsoBoxType }>(
 ): box is [Extract<T, { boxes: unknown } | { type: keyof IsoBoxContainerMap }>] extends [never]
 	? T & Extract<IsoBox<IsoInt64>, { boxes: unknown }>
 	: Extract<T, { boxes: unknown } | { type: keyof IsoBoxContainerMap }> {
-	return 'boxes' in box || (box.type !== undefined && CONTAINERS.includes(box.type))
+	return (
+		'boxes' in box || (!('bytes' in box) && box.type !== undefined && CONTAINERS.includes(box.type))
+	)
 }

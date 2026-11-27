@@ -330,7 +330,7 @@ describe('int64 option types', function () {
 			count++
 		}
 
-		const found = findIsoBox(big, box => (box.type ?? box.boxType).length === 4)
+		const found = findIsoBox(big, box => box.type.length === 4)
 		expectType<Equal<typeof found, ParsedIsoBox<bigint> | null>>(true)
 		if (isIsoBoxType('tfdt', found)) {
 			expectType<Equal<typeof found.baseMediaDecodeTime, bigint>>(true)
@@ -371,7 +371,7 @@ describe('int64 option types', function () {
 			count++
 		}
 
-		const foundNumber = findIsoBox(plain, box => (box.type ?? box.boxType).length === 4)
+		const foundNumber = findIsoBox(plain, box => box.type.length === 4)
 		expectType<Equal<typeof foundNumber, ParsedIsoBox | null>>(true)
 		if (isIsoBoxType('tfdt', foundNumber)) {
 			expectType<Equal<typeof foundNumber.baseMediaDecodeTime, number>>(true)

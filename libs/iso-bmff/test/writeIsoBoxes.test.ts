@@ -28,9 +28,7 @@ import { parseFile } from './util/parseFile.ts'
 import { sourceOf } from './util/sources.ts'
 
 function boxBytes(boxes: ParsedIsoBox[], types: string[]): Uint8Array[] {
-	return filterIsoBoxes(boxes, box => types.includes(box.type ?? box.boxType)).map(
-		box => sourceOf(box).bytes,
-	)
+	return filterIsoBoxes(boxes, box => types.includes(box.type)).map(box => sourceOf(box).bytes)
 }
 
 function sampleTableBytes(boxes: ParsedIsoBox[]): Uint8Array[] {

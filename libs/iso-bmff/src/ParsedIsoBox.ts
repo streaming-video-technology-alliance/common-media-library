@@ -5,8 +5,9 @@ import type { IsoRawBox } from './IsoRawBox.ts'
 /**
  * A box that `readIsoBoxes` returns: a box object of a box type of `IsoBoxMap`, or a raw box.
  *
- * A test such as `box.type === 'tfdt'` narrows a box to that box type. A raw box has no `type` field, so `!box.type` narrows a box to a raw box.
- * The four-character code of any box is `box.type ?? box.boxType`.
+ * The four-character code of any box is `box.type`.
+ * Use `isIsoBoxType` to narrow a box to a box type. A test of `box.type` does not exclude a raw box.
+ * The test `'bytes' in box` narrows a box to a raw box.
  *
  * @public
  */

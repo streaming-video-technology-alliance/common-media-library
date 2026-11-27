@@ -635,7 +635,9 @@ type IsoBoxWriterMap = {
 
 Amended on 2026-11-27, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
 
-- **Theme 5, rule 3.** The rule also applies to the fields of `IsoRawBox`. The field `usertype` becomes `userType`, as `boxtype` of the specification became `boxType`. Text about the 16 bytes in a `uuid` box keeps the specification name `usertype`.
+- **Theme 5, rule 3.** The rule also applies to the fields of `IsoRawBox`. The field `usertype` becomes `userType`. Text about the 16 bytes in a `uuid` box keeps the specification name `usertype`.
+- **Theme 4 and the raw box.** A raw box has its four-character code in `type`, and the field `boxType` leaves the package. `IsoCustomBoxMap`, the map types, and the sample entry types of the amendment of 2026-11-23 do not change. The [cursor RFC](iso-bmff-cursor-api.md) states the rules for the result type.
+- **`IsoBoxStreamable`.** The type also names `AudioSampleEntry<AudioSampleEntryType, IsoInt64>` and `VisualSampleEntry<VisualSampleEntryType, IsoInt64>`. A raw box has a `type` of the type `string`. A sample entry with a union `type` is then not assignable to the union of the box types.
 
 Amended on 2026-11-27, by issue [#694](https://github.com/streaming-video-technology-alliance/common-media-library/issues/694):
 

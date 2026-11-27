@@ -12,10 +12,10 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  * With `readInt64AsBigInt`, the built-in readers return those fields as a `bigint`.
  *
  * A box with a reader in the configuration is a box object. A box with no reader and a type in `CONTAINERS` has its child boxes in `boxes`.
- * Any other box with no reader is a raw box: `{ boxType, bytes, headerSize }`.
+ * Any other box with no reader is a raw box: `{ type, bytes, headerSize }`.
  *
- * The result type does not follow the readers map. Every box has the type `ParsedIsoBox`.
- * A test such as `box.type === 'tfdt'` narrows a box to that box type. A raw box has no `type` field, so the test never matches a raw box.
+ * The result type does not follow the readers map. Every box has the type `ParsedIsoBox`, and `type` has the four-character code.
+ * Use `isIsoBoxType` to narrow a box to a box type. A test such as `box.type === 'tfdt'` also matches a raw box, and does not narrow.
  *
  * The function stops before a box if the data ends inside the header or the body of that box.
  * The function also stops before a box with a size below the size of its header.

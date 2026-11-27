@@ -10,7 +10,6 @@ import {
 	writeIsoBox,
 	type SampleDescriptionBox,
 } from '../util/box.ts'
-import { typeOf } from '../util/typeOf.ts'
 import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('readStsd', function () {
@@ -20,7 +19,7 @@ describe('readStsd', function () {
 		assert.strictEqual(boxes.length, 3)
 		// The read has no reader for the entries, so each entry is a raw box.
 		assert.deepStrictEqual(
-			boxes.map(box => typeOf(box.boxes[0])),
+			boxes.map(box => box.boxes[0].type),
 			['avc1', 'mp4a', 'fdsc'],
 		)
 	})
