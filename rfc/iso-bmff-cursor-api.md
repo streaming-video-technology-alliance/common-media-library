@@ -546,3 +546,7 @@ Amended on 2026-11-23, by the review of the box types ([#759](https://github.com
 - **Map types.** The two maps take a key of `IsoBoxMap` only. A custom key needs a declaration in `IsoCustomBoxMap`. The [box types RFC](iso-bmff-v2-box-types.md) states the rules.
 - **`isContainer`.** The function returns `false` for a raw box.
 - **Raw boxes in `writeIsoBoxes`.** The order does not change. The example of a raw box is now `{ boxType: 'esds', bytes }`.
+
+Amended on 2026-11-27, by the review of [#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756):
+
+- **Raw box.** The user type of a raw `uuid` box is the field `userType`. The specification names the field `usertype`. Rule 3 of theme 5 of the [box types RFC](iso-bmff-v2-box-types.md) splits a field name at each English word. The Types section and the earlier amendments keep the name `usertype`.

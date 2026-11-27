@@ -40,7 +40,7 @@ function extractMerkleAuxBoxes(segmentBytes: Uint8Array): Uint8Array[] {
 
 	for (const box of readIsoBoxes(segmentBytes)) {
 		if (box.type || box.boxType !== 'uuid') continue
-		if (!matchesUuid(box.usertype ?? [], JUMBF_UUID)) continue
+		if (!matchesUuid(box.userType ?? [], JUMBF_UUID)) continue
 
 		const rawPayload = rawBoxBody(box)
 		const payload = readAuxPayload(rawPayload)

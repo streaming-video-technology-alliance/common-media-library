@@ -252,7 +252,7 @@ describe('box size below the header size', function () {
 
 		assert.deepStrictEqual(boxes.map(typeOf), ['uuid', 'free'])
 		assert.ok(uuid && 'bytes' in uuid)
-		assert.deepStrictEqual(uuid.usertype, usertype)
+		assert.deepStrictEqual(uuid.userType, usertype)
 		assert.strictEqual(uuid.headerSize, 24)
 		assert.strictEqual(uuid.bytes.length, 24)
 	})
@@ -266,7 +266,7 @@ describe('box size below the header size', function () {
 
 		assert.deepStrictEqual(boxes.map(typeOf), ['uuid', 'free'])
 		assert.ok(uuid && 'bytes' in uuid)
-		assert.deepStrictEqual(uuid.usertype, usertype)
+		assert.deepStrictEqual(uuid.userType, usertype)
 		assert.strictEqual(uuid.headerSize, 32)
 		assert.strictEqual(uuid.bytes.length, 32)
 	})
