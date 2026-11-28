@@ -1,3 +1,4 @@
+import { readIsoBoxSize } from '@svta/cml-iso-bmff'
 import { isArrayBufferLike } from '@svta/cml-utils'
 
 /**
@@ -50,29 +51,11 @@ export function parsePsshList(
 	const length = dv.byteLength
 	const pssh: Record<string, ArrayBufferLike | Uint8Array> = {}
 	let offset = 0
+	let size: number
 
-	// Box header rules of ISO/IEC 14496-12, clause 4.2
-	while (length - offset >= 8) {
-		const remaining = length - offset
-		let size = dv.getUint32(offset)
-		let headerSize = 8
-
-		if (size === 1) {
-			headerSize = 16
-
-			if (remaining < headerSize) {
-				break
-			}
-
-			size = dv.getUint32(offset + 8) * 0x100000000 + dv.getUint32(offset + 12)
-		} else if (size === 0) {
-			size = remaining
-		}
-
-		if (size < headerSize || size > remaining) {
-			break
-		}
-
+	// Box header rules of ISO/IEC 14496-12, clause 4.2. A uuid box needs no room for usertype.
+	while ((size = readIsoBoxSize(dv, offset, length, true))) {
+		const headerSize = dv.getUint32(offset) === 1 ? 16 : 8
 		const end = offset + size
 
 		// The full box header, the system ID, and the data size field of ISO/IEC 23001-7, clause 8.1

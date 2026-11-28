@@ -764,6 +764,9 @@ export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadConfig<V>): ParsedIsoBox<V>[];
 
 // @public
+export function readIsoBoxSize(view: DataView, at: number, end: number, ignoreUserType?: boolean): number;
+
+// @public
 export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
 
 // @public

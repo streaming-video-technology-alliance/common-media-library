@@ -1,11 +1,11 @@
 import type { IsoBoxReadCursorState } from './cursor/IsoBoxReadCursorState.ts'
-import { readIsoBoxHeader } from './cursor/readIsoBoxHeader.ts'
 import { createIsoBoxReadCursor } from './createIsoBoxReadCursor.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import type { IsoBoxReadConfig } from './IsoBoxReadConfig.ts'
 import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoBoxType } from './IsoBoxType.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
+import { readIsoBoxSize } from './readIsoBoxSize.ts'
 
 /**
  * Finds a box by its path and returns a read cursor for that box. The function decodes no other box.
@@ -84,7 +84,7 @@ export function seekIsoBox(
 		let at = cursor.pos
 
 		for (;;) {
-			const size = readIsoBoxHeader(cursor, at)
+			const size = readIsoBoxSize(view, at, cursor.end)
 
 			if (!size) {
 				return null

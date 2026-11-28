@@ -1,10 +1,10 @@
 import type { IsoBoxReadCursorState } from './cursor/IsoBoxReadCursorState.ts'
 import { decodeFourCc } from './cursor/decodeFourCc.ts'
-import { readIsoBoxHeader } from './cursor/readIsoBoxHeader.ts'
 import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoRawBox } from './IsoRawBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
+import { readIsoBoxSize } from './readIsoBoxSize.ts'
 import { CONTAINERS } from './utils/CONTAINERS.ts'
 
 const CONTAINER_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CONTAINERS)
@@ -51,7 +51,7 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 
 	while (boxes.length < max) {
 		const boxStart = state.pos
-		const size = readIsoBoxHeader(state, boxStart)
+		const size = readIsoBoxSize(view, boxStart, end)
 
 		if (!size) {
 			break

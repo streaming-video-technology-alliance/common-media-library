@@ -104,6 +104,24 @@ while (type) {
 
 The function returns `null` at the end of the cursor and before a truncated box. The position then stays at the first byte of that box.
 
+`readIsoBoxSize` returns the size of the box at a position of a `DataView`. Use it for a loop that has no read cursor:
+
+```typescript
+import { readIsoBoxSize } from "@svta/cml-iso-bmff";
+
+const view = new DataView(buffer);
+let at = 0;
+let size = readIsoBoxSize(view, at, view.byteLength);
+
+while (size) {
+	console.log(at, size); // the position and the size of each box
+	at += size;
+	size = readIsoBoxSize(view, at, view.byteLength);
+}
+```
+
+The function returns 0 before a truncated box. A `uuid` box with fewer than 16 bytes after its header is truncated, as in `readIsoBoxes`. To get the size of that box, pass `true` as the fourth argument.
+
 ## Extending a built-in reader
 
 A custom reader can call a built-in reader and add fields to the result. In the result of `readIsoBoxes`, the box has the built-in type. The loop narrows the box with `isIsoBoxType`, then casts the box to the result type of the reader.
