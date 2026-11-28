@@ -45,9 +45,9 @@ export function parseSegment(file: Buffer): {
 	const view = new DataView(file.buffer, file.byteOffset, file.byteLength)
 
 	const moof = seekIsoBox(file, ['moof'])
-	ok(moof, 'moof box not found')
+	ok(moof, 'moof box not found or truncated')
 	const trun = seekIsoBox(moof, ['traf', 'trun'])
-	ok(trun, 'trun box not found')
+	ok(trun, 'traf or trun box not found or truncated')
 
 	const dataOffset = view.getInt32(trun.start + 16)
 	const mdatBodyStart = moof.start + dataOffset
