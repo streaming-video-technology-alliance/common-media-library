@@ -13,7 +13,8 @@ import { decodeCoseSign1 } from './cose/decodeCoseSign1.ts'
 import type { JumbfBox } from './jumbf/JumbfBox.ts'
 import { parseJumbfBoxes } from './jumbf/parseJumbfBoxes.ts'
 import { parseJumbfLabel } from './jumbf/parseJumbfLabel.ts'
-import { asString, findC2paUuidBox, stripJumbfUuidPrefix } from './utils.ts'
+import { C2PA_UUID_READ_CONFIG, findC2paUuidBox } from './c2paUuidBox.ts'
+import { asString, stripJumbfUuidPrefix } from './utils.ts'
 import { extractCertificateInfo } from './x509/extractCertificateInfo.ts'
 
 const MAX_JUMBF_NESTING_DEPTH = 20
@@ -211,7 +212,7 @@ function extractClaimAssertionRefs(claimData: Record<string, unknown>): ClaimAss
  * cryptographic signature of the claim.
  *
  * @param bytes - Raw BMFF bytes (e.g. an MP4 init segment or media segment)
- * @param preParsedBoxes - Optional pre-parsed ISO boxes to avoid redundant parsing
+ * @param preParsedBoxes - Optional pre-parsed ISO boxes to avoid redundant parsing. Read them with `readIsoBoxes` and `C2PA_UUID_READ_CONFIG`.
  * @returns The parsed manifest data including claim, assertions, and signature bytes
  * @throws If no C2PA UUID box is found, or the JUMBF structure is invalid
  *
@@ -224,15 +225,14 @@ export function readC2paManifest(
 	bytes: Uint8Array,
 	preParsedBoxes?: ParsedIsoBox[],
 ): InternalManifestData {
-	const boxes = preParsedBoxes ?? readIsoBoxes(bytes)
+	const boxes = preParsedBoxes ?? readIsoBoxes(bytes, C2PA_UUID_READ_CONFIG)
 	const uuidBox = findC2paUuidBox(boxes)
 
 	if (!uuidBox) {
 		throw new Error('No C2PA UUID box found in the provided bytes')
 	}
 
-	const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
-	const jumbfPayload = stripJumbfUuidPrefix(rawPayload)
+	const jumbfPayload = stripJumbfUuidPrefix(uuidBox.data)
 	if (!jumbfPayload) {
 		throw new Error('Invalid JUMBF UUID prefix in C2PA box')
 	}

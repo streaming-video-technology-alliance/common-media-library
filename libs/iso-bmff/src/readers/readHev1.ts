@@ -1,17 +1,19 @@
-import type { VisualSampleEntryBox } from '../boxes/VisualSampleEntryBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { VisualSampleEntry } from '../boxes/VisualSampleEntry.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { readVisualSampleEntryBox } from './readVisualSampleEntryBox.ts'
+import { readVisualSampleEntry } from './readVisualSampleEntry.ts'
 
 /**
- * Read the `hev1` box (`VisualSampleEntryBox`).
+ * Read the `hev1` box (`VisualSampleEntry`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
- * @returns A parsed `VisualSampleEntryBox`
+ * @returns A parsed `VisualSampleEntry`
  *
  * @public
  */
-export function readHev1(view: IsoBoxReadView<IsoInt64>): VisualSampleEntryBox<'hev1'> {
-	return readVisualSampleEntryBox('hev1', view)
+export function readHev1<V extends IsoInt64>(
+	cursor: IsoBoxReadCursor<V>,
+): VisualSampleEntry<'hev1', V> {
+	return readVisualSampleEntry('hev1', cursor)
 }

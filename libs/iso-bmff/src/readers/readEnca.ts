@@ -1,17 +1,19 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { readAudioSampleEntryBox } from './readAudioSampleEntryBox.ts'
+import { readAudioSampleEntry } from './readAudioSampleEntry.ts'
 
 /**
- * Read the `enca` box (`AudioSampleEntryBox`).
+ * Read the `enca` box (`AudioSampleEntry`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
- * @returns A parsed `AudioSampleEntryBox`
+ * @returns A parsed `AudioSampleEntry`
  *
  * @public
  */
-export function readEnca(view: IsoBoxReadView<IsoInt64>): AudioSampleEntryBox<'enca'> {
-	return readAudioSampleEntryBox('enca', view)
+export function readEnca<V extends IsoInt64>(
+	cursor: IsoBoxReadCursor<V>,
+): AudioSampleEntry<'enca', V> {
+	return readAudioSampleEntry('enca', cursor)
 }

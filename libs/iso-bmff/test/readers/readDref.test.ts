@@ -1,9 +1,10 @@
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterBoxes,
+	isIsoBoxType,
 	it,
 	readDref,
 	readIsoBoxes,
@@ -22,32 +23,42 @@ describe('readDref', function () {
 
 		const box = boxes[0]
 		assert.strictEqual(box.type, 'dref')
-		assert.strictEqual(box.entries.length, 1)
+		assert.strictEqual(box.boxes.length, 1)
 
-		const entry = box.entries[0]
-		assert.strictEqual(entry.type, 'url ')
+		const entry = box.boxes[0]
+		assert.ok(isIsoBoxType('url ', entry))
 		assert.strictEqual(entry.version, 0)
 		assert.strictEqual(entry.flags, 1)
-		assert.strictEqual(entry.location, '')
+		assert.ok('location' in entry)
+		assert.strictEqual(entry.location, undefined)
 	})
 
 	it('should read no entries for an entry_count of 0', function () {
 		const url = boxBytes('url ', [0, 1], [1, 3])
 		const bytes = boxBytes('dref', [0, 4], [0, 4], url)
 
-		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as DataReferenceBox[]
+		const [box] = readIsoBoxes(bytes, createDefaultReaderConfig()) as DataReferenceBox[]
 
-		assert.strictEqual(box.entryCount, 0)
-		assert.deepStrictEqual(box.entries, [])
+		assert.deepStrictEqual(box.boxes, [])
 	})
 
 	it('should write an entry_count of 0 after a read', function () {
 		const url = boxBytes('url ', [0, 1], [1, 3])
 		const bytes = boxBytes('dref', [0, 4], [0, 4], url)
 
-		const [box] = readIsoBoxes(bytes, defaultReaderConfig()) as DataReferenceBox[]
-		const written = writeIsoBox(box, defaultWriterConfig())
+		const [box] = readIsoBoxes(bytes, createDefaultReaderConfig()) as DataReferenceBox[]
+		const written = writeIsoBox(box, createDefaultWriterConfig())
 
 		assert.deepStrictEqual(written, boxBytes('dref', [0, 4], [0, 4]))
+	})
+
+	it('should throw a RangeError for fewer complete entries than entry_count', function () {
+		const url = boxBytes('url ', [0, 1], [1, 3])
+		const bytes = boxBytes('dref', [0, 4], [3, 4], url, url)
+
+		assert.throws(() => readIsoBoxes(bytes, createDefaultReaderConfig()), {
+			name: 'RangeError',
+			message: 'The dref box has an entry_count of 3, and the number of complete child boxes is 2',
+		})
 	})
 })

@@ -1,43 +1,36 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SubsegmentIndexBox } from '../boxes/SubsegmentIndexBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { writeUint24 } from '../cursor/writeUint24.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `ssix` box (`SubsegmentIndexBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.16.4
  *
+ * @param cursor - The write cursor
  * @param box - The `SubsegmentIndexBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
-export function writeSsix(box: SubsegmentIndexBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const subsegmentCountSize = 4
+export function writeSsix(cursor: IsoBoxWriteCursor, box: SubsegmentIndexBox): void {
+	const start = beginIsoFullBox(cursor, 'ssix', box.version, box.flags)
 
-	let rangesSize = 0
-	for (const subsegment of box.subsegments) {
-		rangesSize += 4 // rangesCount
-		rangesSize += subsegment.rangesCount * 4 // level (1) + rangeSize (3) per range
-	}
+	writeUint32(cursor, box.subsegments.length)
 
-	const totalSize = headerSize + fullBoxSize + subsegmentCountSize + rangesSize
+	for (const { ranges } of box.subsegments) {
+		writeUint32(cursor, ranges.length)
 
-	const writer = new IsoBoxWriteView('ssix', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.subsegmentCount, 4)
-
-	for (const subsegment of box.subsegments) {
-		writer.writeUint(subsegment.rangesCount, 4)
-
-		for (const range of subsegment.ranges) {
-			writer.writeUint(range.level, 1)
-			writer.writeUint(range.rangeSize, 3)
+		for (const range of ranges) {
+			writeUint8(cursor, range.level)
+			writeUint24(cursor, range.rangeSize)
 		}
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

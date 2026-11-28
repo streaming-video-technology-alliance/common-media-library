@@ -5,6 +5,6 @@ import type { IsoBoxType } from '../IsoBoxType.ts'
  *
  * @public
  */
-export type Box<T extends IsoBoxType = never> = {
+export type Box<T extends IsoBoxType> = {
 	type: T
 }

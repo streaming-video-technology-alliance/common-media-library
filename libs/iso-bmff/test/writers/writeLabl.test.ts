@@ -1,4 +1,5 @@
-import { assert, describe, it, writeLabl, type LabelBox } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import { assert, describe, it, writeIsoBox, writeLabl, type LabelBox } from '../util/box.ts'
 
 describe('writeLabl', function () {
 	it('should write a LabelBox correctly', function () {
@@ -7,13 +8,12 @@ describe('writeLabl', function () {
 			type: 'labl',
 			version: 0,
 			flags: 0,
-			isGroupLabel: false,
 			labelId: 1,
 			language: 'en',
 			label: 'English',
 		}
 
-		const writer = writeLabl(box)
+		const writer = writeIsoBox(box, { writers: { labl: writeLabl } })
 		// #endregion example
 
 		// size (25), type (labl), version and flags, labelId, then each string and a null terminator
@@ -27,11 +27,10 @@ describe('writeLabl', function () {
 	})
 
 	it('should write the UTF-8 bytes of strings that are not ASCII', function () {
-		const writer = writeLabl({
+		const writer = writeWith(writeLabl, {
 			type: 'labl',
 			version: 0,
 			flags: 0,
-			isGroupLabel: false,
 			labelId: 0x0102,
 			language: 'é',
 			label: '日本',
@@ -47,11 +46,10 @@ describe('writeLabl', function () {
 	})
 
 	it('should write the null terminator of each empty string', function () {
-		const writer = writeLabl({
+		const writer = writeWith(writeLabl, {
 			type: 'labl',
 			version: 0,
 			flags: 0,
-			isGroupLabel: false,
 			labelId: 1,
 			language: '',
 			label: '',
@@ -64,11 +62,10 @@ describe('writeLabl', function () {
 	})
 
 	it('should write an empty language before a label that is not empty', function () {
-		const writer = writeLabl({
+		const writer = writeWith(writeLabl, {
 			type: 'labl',
 			version: 0,
 			flags: 0,
-			isGroupLabel: false,
 			labelId: 1,
 			language: '',
 			label: 'a',

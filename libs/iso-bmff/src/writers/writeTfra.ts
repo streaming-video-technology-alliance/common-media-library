@@ -1,6 +1,14 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { TrackFragmentRandomAccessBox } from '../boxes/TrackFragmentRandomAccessBox.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint8 } from '../cursor/writeUint8.ts'
+import { writeUint16 } from '../cursor/writeUint16.ts'
+import { writeUint24 } from '../cursor/writeUint24.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeWideUint } from '../cursor/writeWideUint.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import { checkUint } from '../cursor/checkUint.ts'
 
 /**
  * Write the `tfra` box (`TrackFragmentRandomAccessBox`).
@@ -10,50 +18,43 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  * Each 64-bit integer field of the box is a `number` or a `bigint`.
  * The writer throws a `RangeError` for a `bigint` that does not fit the field.
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackFragmentRandomAccessBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
-export function writeTfra(box: TrackFragmentRandomAccessBox<IsoInt64>): IsoBoxWriteView {
-	const v1 = box.version === 1
-	const timeSize = v1 ? 8 : 4
-	const entrySize =
-		timeSize +
-		timeSize + // time + moofOffset
-		(box.lengthSizeOfTrafNum + 1) +
-		(box.lengthSizeOfTrunNum + 1) +
-		(box.lengthSizeOfSampleNum + 1)
+export function writeTfra(
+	cursor: IsoBoxWriteCursor,
+	box: TrackFragmentRandomAccessBox<IsoInt64>,
+): void {
+	const traf = checkUint('lengthSizeOfTrafNum', box.lengthSizeOfTrafNum, 3)
+	const trun = checkUint('lengthSizeOfTrunNum', box.lengthSizeOfTrunNum, 3)
+	const sample = checkUint('lengthSizeOfSampleNum', box.lengthSizeOfSampleNum, 3)
+	const size = box.version === 1 ? 8 : 4
+	const start = beginIsoFullBox(cursor, 'tfra', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const trackIdSize = 4
-	const reservedSize = 4
-	const numberOfEntrySize = 4
-	const entriesSize = box.numberOfEntry * entrySize
-	const totalSize =
-		headerSize + fullBoxSize + trackIdSize + reservedSize + numberOfEntrySize + entriesSize
+	const writeNumber = (value: number, lengthSize: number): void =>
+		lengthSize === 0
+			? writeUint8(cursor, value)
+			: lengthSize === 1
+				? writeUint16(cursor, value)
+				: lengthSize === 2
+					? writeUint24(cursor, value)
+					: writeUint32(cursor, value)
 
-	const writer = new IsoBoxWriteView('tfra', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.trackId, 4)
-
-	// Pack reserved with length sizes
-	const reserved =
-		(box.lengthSizeOfTrafNum << 4) | (box.lengthSizeOfTrunNum << 2) | box.lengthSizeOfSampleNum
-	writer.writeUint(reserved, 4)
-
-	writer.writeUint(box.numberOfEntry, 4)
+	writeUint32(cursor, box.trackId)
+	writeUint32(cursor, (traf << 4) | (trun << 2) | sample)
+	writeUint32(cursor, box.entries.length)
 
 	for (const entry of box.entries) {
-		writer.writeWideUint(entry.time, timeSize)
-		writer.writeWideUint(entry.moofOffset, timeSize)
-		writer.writeUint(entry.trafNumber, box.lengthSizeOfTrafNum + 1)
-		writer.writeUint(entry.trunNumber, box.lengthSizeOfTrunNum + 1)
-		writer.writeUint(entry.sampleNumber, box.lengthSizeOfSampleNum + 1)
+		writeWideUint(cursor, entry.time, size)
+		writeWideUint(cursor, entry.moofOffset, size)
+		writeNumber(entry.trafNumber, traf)
+		writeNumber(entry.trunNumber, trun)
+		writeNumber(entry.sampleNumber, sample)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

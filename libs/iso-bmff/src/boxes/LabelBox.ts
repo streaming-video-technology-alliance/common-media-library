@@ -9,7 +9,10 @@ import type { FullBox } from './FullBox.ts'
  */
 export type LabelBox = FullBox & {
 	type: 'labl'
-	isGroupLabel: boolean
+	/**
+	 * The flags of the box. The bit `0x1` is set for a group label. Test it with `(box.flags & 0x1) !== 0`.
+	 */
+	flags: number
 	labelId: number
 	language: string
 	label: string

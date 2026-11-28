@@ -1,34 +1,28 @@
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
 import type { MetaBox } from '../boxes/MetaBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
-import { writeChildBoxes } from '../utils/writeChildBoxes.ts'
+import { writeChildBoxes } from '../writeChildBoxes.ts'
 
 /**
  * Write the `meta` box (`MetaBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.11.1
  *
+ * The writer writes the child boxes with the writers of the cursor.
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *
+ * @param cursor - The write cursor
  * @param box - The `MetaBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
-export function writeMeta(box: MetaBox<IsoInt64>, config: IsoBoxWriteViewConfig): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
+export function writeMeta(cursor: IsoBoxWriteCursor, box: MetaBox<IsoInt64>): void {
+	const start = beginIsoFullBox(cursor, 'meta', box.version, box.flags)
 
-	const { bytes, size } = writeChildBoxes(box.boxes, config)
-
-	const totalSize = headerSize + fullBoxSize + size
-
-	const writer = new IsoBoxWriteView('meta', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-	writer.writeBytes(bytes)
-
-	return writer
+	writeChildBoxes(cursor, box.boxes)
+	endIsoBox(cursor, start)
 }

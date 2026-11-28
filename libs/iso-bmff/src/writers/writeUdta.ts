@@ -1,6 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { UserDataBox } from '../boxes/UserDataBox.ts'
-import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
@@ -12,16 +11,11 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *
+ * @param cursor - The write cursor
  * @param box - The `UserDataBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
-export function writeUdta(
-	box: UserDataBox<IsoInt64>,
-	config: IsoBoxWriteViewConfig,
-): IsoBoxWriteView {
-	return writeContainerBox(box, config)
+export function writeUdta(cursor: IsoBoxWriteCursor, box: UserDataBox<IsoInt64>): void {
+	writeContainerBox(cursor, box)
 }

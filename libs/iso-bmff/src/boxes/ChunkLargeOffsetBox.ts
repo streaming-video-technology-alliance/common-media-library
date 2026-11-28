@@ -1,4 +1,5 @@
 import type { FullBox } from './FullBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
 
 /**
  * Chunk Large Offset Box (`co64`).
@@ -7,13 +8,9 @@ import type { FullBox } from './FullBox.ts'
  *
  * @public
  */
-export type ChunkLargeOffsetBox = FullBox & {
+export type ChunkLargeOffsetBox<V extends IsoInt64 = number> = FullBox & {
 	type: 'co64'
-	entryCount: number
-	chunkOffset: number[]
-}
 
-/**
- * @public
- */
-export type co64 = ChunkLargeOffsetBox
+	/** The 64-bit offset of each chunk, from the start of the file. */
+	chunkOffset: V[]
+}

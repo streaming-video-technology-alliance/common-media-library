@@ -1,15 +1,19 @@
+import { writeWith } from '../util/writeWith.ts'
 import { readFile } from 'node:fs/promises'
+import { rawBytes } from '../util/rawBytes.ts'
 import {
 	assert,
 	describe,
 	filterBoxes,
 	findIsoBox,
+	isIsoBoxType,
 	it,
 	readIsoBoxes,
 	readStsz,
 	writeStsz,
 } from '../util/box.ts'
 import { fixtureFiles } from '../util/fixtureFiles.ts'
+import { boxBytes } from '../util/wideBoxes.ts'
 
 describe('readStsz', function () {
 	it('should provide an example', async function () {
@@ -21,12 +25,12 @@ describe('readStsz', function () {
 			},
 		})
 
-		const stsz = findIsoBox(boxes, box => box.type === 'stsz')
+		const stsz = findIsoBox(boxes, box => isIsoBoxType('stsz', box))
 
 		assert.ok(stsz)
-		assert.strictEqual(stsz.type, 'stsz')
+		assert.ok(isIsoBoxType('stsz', stsz))
 		assert.strictEqual(stsz.sampleSize, 0)
-		assert.strictEqual(stsz.sampleCount, 31)
+		assert.strictEqual(stsz.entrySize?.length, 31)
 		assert.strictEqual(stsz.entrySize?.[0], 687)
 		// #endregion example
 	})
@@ -36,16 +40,16 @@ describe('readStsz', function () {
 
 		assert.strictEqual(boxes.length, 2)
 
-		assert.strictEqual(boxes[0].type, 'stsz')
+		assert.ok(isIsoBoxType('stsz', boxes[0]))
 		assert.strictEqual(boxes[0].version, 0)
 		assert.strictEqual(boxes[0].flags, 0)
 		assert.strictEqual(boxes[0].sampleSize, 0)
-		assert.strictEqual(boxes[0].sampleCount, 5)
+		assert.strictEqual(boxes[0].entrySize?.length, 5)
 		assert.deepStrictEqual(boxes[0].entrySize, [11410, 947, 788, 560, 482])
 
-		assert.strictEqual(boxes[1].type, 'stsz')
+		assert.ok(isIsoBoxType('stsz', boxes[1]))
 		assert.strictEqual(boxes[1].sampleSize, 0)
-		assert.strictEqual(boxes[1].sampleCount, 10)
+		assert.strictEqual(boxes[1].entrySize?.length, 10)
 		assert.deepStrictEqual(boxes[1].entrySize, [24, 6, 6, 6, 6, 6, 6, 6, 6, 6])
 	})
 
@@ -55,9 +59,9 @@ describe('readStsz', function () {
 
 		assert.strictEqual(boxes.length, 1)
 
-		assert.strictEqual(box.type, 'stsz')
+		assert.ok(isIsoBoxType('stsz', box))
 		assert.strictEqual(box.sampleSize, 0)
-		assert.strictEqual(box.sampleCount, 0)
+		assert.strictEqual(box.entrySize?.length, 0)
 		assert.deepStrictEqual(box.entrySize, [])
 	})
 
@@ -90,22 +94,25 @@ describe('readStsz', function () {
 
 		assert.strictEqual(boxes.length, 1)
 
-		assert.strictEqual(box.type, 'stsz')
+		assert.ok(isIsoBoxType('stsz', box))
 		assert.strictEqual(box.sampleSize, 512)
 		assert.strictEqual(box.sampleCount, 3)
 		assert.strictEqual(box.entrySize, undefined)
 
-		assert.deepStrictEqual(new Uint8Array(writeStsz(box).buffer), data)
+		assert.deepStrictEqual(new Uint8Array(writeWith(writeStsz, box).buffer), data)
 	})
 
 	it('should return a box that writeStsz writes as the original bytes', function () {
 		let count = 0
 
 		for (const file of fixtureFiles()) {
-			for (const box of filterBoxes(file, 'stsz', { readers: { stsz: readStsz } })) {
-				const { view } = box
-				const original = new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
-				const written = writeStsz(box)
+			const originals = rawBytes(file, 'stsz')
+
+			for (const [index, box] of filterBoxes(file, 'stsz', {
+				readers: { stsz: readStsz },
+			}).entries()) {
+				const original = originals[index]
+				const written = writeWith(writeStsz, box)
 
 				assert.deepStrictEqual(
 					new Uint8Array(written.buffer, written.byteOffset, written.byteLength),
@@ -117,5 +124,16 @@ describe('readStsz', function () {
 		}
 
 		assert.ok(count > 0)
+	})
+
+	it('should set sampleCount to undefined when the box has entry sizes', function () {
+		const [box] = readIsoBoxes(boxBytes('stsz', [0, 1], [0, 3], [0, 4], [1, 4], [512, 4]), {
+			readers: { stsz: readStsz },
+		})
+
+		assert.ok(isIsoBoxType('stsz', box))
+		assert.ok('sampleCount' in box)
+		assert.strictEqual(box.sampleCount, undefined)
+		assert.deepStrictEqual(box.entrySize, [512])
 	})
 })

@@ -1,4 +1,4 @@
-import { filterIsoBoxes, readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
+import { filterIsoBoxes, isIsoBoxType, readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
 import { readFile } from 'fs/promises'
 import { assert, describe, it, readFtyp } from './util/box.ts'
 
@@ -17,7 +17,7 @@ describe('filterIsoBoxes', function () {
 		// #region example
 		const isoFile = await readFile(new URL('./fixtures/captions.mp4', import.meta.url))
 		const boxes = readIsoBoxes(isoFile, { readers: { ftyp: readFtyp } })
-		const filtered = filterIsoBoxes(boxes, box => box.type === 'ftyp')
+		const filtered = filterIsoBoxes(boxes, box => isIsoBoxType('ftyp', box))
 		const ftyp = filtered[0]
 
 		assert.ok(ftyp)
@@ -131,14 +131,14 @@ describe('filterIsoBoxes', function () {
 	})
 
 	it('should work with complex callback conditions', function () {
-		const box1 = { type: 'trak', size: 100 } as ParsedIsoBox
-		const box2 = { type: 'trak', size: 200 } as ParsedIsoBox
-		const box3 = { type: 'trak', size: 300 } as ParsedIsoBox
-		const box4 = { type: 'mdat', size: 400 } as ParsedIsoBox
+		const box1: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(100) }
+		const box2: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(200) }
+		const box3: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(300) }
+		const box4: ParsedIsoBox = { type: 'mdat', bytes: new Uint8Array(400) }
 
 		const result = filterIsoBoxes(
 			[box1, box2, box3, box4],
-			box => box.type === 'trak' && box.size > 150,
+			box => 'bytes' in box && box.type === 'trak' && box.bytes.length > 150,
 		)
 		assert.strictEqual(result.length, 2)
 		assert.strictEqual(result[0], box2)

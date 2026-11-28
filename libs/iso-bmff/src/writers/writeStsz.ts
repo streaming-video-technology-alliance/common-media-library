@@ -1,40 +1,45 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SampleSizeBox } from '../boxes/SampleSizeBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
+import { failRange } from '../cursor/failRange.ts'
 
 /**
  * Write the `stsz` box (`SampleSizeBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.7.3
  *
+ * @param cursor - The write cursor
  * @param box - The `SampleSizeBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @example
  * {@includeCode ../../test/writers/writeStsz.test.ts#example}
  *
  * @public
  */
-export function writeStsz(box: SampleSizeBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const sampleSizeFieldSize = 4
-	const sampleCountFieldSize = 4
-	const entrySizeSize = box.sampleSize === 0 ? box.sampleCount * 4 : 0
-	const totalSize =
-		headerSize + fullBoxSize + sampleSizeFieldSize + sampleCountFieldSize + entrySizeSize
+export function writeStsz(cursor: IsoBoxWriteCursor, box: SampleSizeBox): void {
+	const start = beginIsoFullBox(cursor, 'stsz', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stsz', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+	writeUint32(cursor, box.sampleSize)
 
-	writer.writeUint(box.sampleSize, 4)
-	writer.writeUint(box.sampleCount, 4)
+	if (box.sampleSize !== 0) {
+		writeUint32(cursor, box.sampleCount as number)
+	} else {
+		const { entrySize } = box
 
-	if (box.sampleSize === 0 && box.entrySize) {
-		for (const size of box.entrySize) {
-			writer.writeUint(size, 4)
+		if (!entrySize) {
+			failRange('entrySize', 'an array', entrySize)
+		}
+
+		writeUint32(cursor, entrySize.length)
+
+		for (const size of entrySize) {
+			writeUint32(cursor, size)
 		}
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

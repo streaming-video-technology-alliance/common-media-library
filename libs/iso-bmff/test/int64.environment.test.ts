@@ -30,8 +30,8 @@ describe('int64 option in a runtime without BigInt', () => {
 		try {
 			const {
 				createInt64OverflowReader,
-				defaultReaderConfig,
-				defaultWriterConfig,
+				createDefaultReaderConfig,
+				createDefaultWriterConfig,
 				readInt64AsBigInt,
 				readIsoBoxes,
 				writeIsoBox,
@@ -44,11 +44,11 @@ describe('int64 option in a runtime without BigInt', () => {
 					}
 
 					// With no option, no code path uses BigInt.
-					const [plain] = readIsoBoxes(input.bytes, defaultReaderConfig())
+					const [plain] = readIsoBoxes(input.bytes, createDefaultReaderConfig())
 					let errors = 0
 					const [checked] = readIsoBoxes(
 						input.bytes,
-						defaultReaderConfig({
+						createDefaultReaderConfig({
 							int64: createInt64OverflowReader(error => {
 								ok(error instanceof RangeError)
 								errors++
@@ -67,16 +67,16 @@ describe('int64 option in a runtime without BigInt', () => {
 
 					// The writers take the number fields with no BigInt.
 					if (input !== high) {
-						deepStrictEqual(writeIsoBox(plain, defaultWriterConfig()), input.bytes)
+						deepStrictEqual(writeIsoBox(plain, createDefaultWriterConfig()), input.bytes)
 					} else {
-						strictEqual(writeIsoBox(plain, defaultWriterConfig()).length, input.bytes.length)
+						strictEqual(writeIsoBox(plain, createDefaultWriterConfig()).length, input.bytes.length)
 					}
 				}
 			}
 
 			// readInt64AsBigInt needs BigInt and does not test for it. The read fails with the error of the runtime.
 			throws(
-				() => readIsoBoxes(tfdtV0, defaultReaderConfig({ int64: readInt64AsBigInt })),
+				() => readIsoBoxes(tfdtV0, createDefaultReaderConfig({ int64: readInt64AsBigInt })),
 				ReferenceError,
 			)
 		} finally {

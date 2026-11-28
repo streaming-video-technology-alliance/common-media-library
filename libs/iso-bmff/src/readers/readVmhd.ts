@@ -1,22 +1,25 @@
 import type { VideoMediaHeaderBox } from '../boxes/VideoMediaHeaderBox.ts'
-import { UINT } from '../IsoBoxFields.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint16 } from '../cursor/readUint16.ts'
 
 /**
  * Read the `vmhd` box (`VideoMediaHeaderBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `VideoMediaHeaderBox`
  *
  * @public
  */
-export function readVmhd(view: IsoBoxReadView<IsoInt64>): VideoMediaHeaderBox {
+export function readVmhd(cursor: IsoBoxReadCursor<IsoInt64>): VideoMediaHeaderBox {
 	return {
 		type: 'vmhd',
-		...view.readFullBox(),
-		graphicsmode: view.readUint(2),
-		opcolor: view.readArray(UINT, 2, 3),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		graphicsMode: readUint16(cursor),
+		opColor: [readUint16(cursor), readUint16(cursor), readUint16(cursor)],
 	}
 }

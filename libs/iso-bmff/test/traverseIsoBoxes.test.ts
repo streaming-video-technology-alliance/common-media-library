@@ -19,6 +19,7 @@ describe('traverseIsoBoxes', function () {
 		const boxes = readIsoBoxes(isoFile)
 
 		// Depth-first: each box, then its children.
+		// A box with no reader is a raw box. Every box has its code in `type`.
 		const types = Array.from(traverseIsoBoxes(boxes), box => box.type)
 
 		// Breadth-first, with the root boxes and their children only.

@@ -1,35 +1,32 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { ChunkOffsetBox } from '../boxes/ChunkOffsetBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `stco` box (`ChunkOffsetBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.7.5
  *
+ * @param cursor - The write cursor
  * @param box - The `ChunkOffsetBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @example
  * {@includeCode ../../test/writers/writeStco.test.ts#example}
  *
  * @public
  */
-export function writeStco(box: ChunkOffsetBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entriesSize = box.entryCount * 4
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+export function writeStco(cursor: IsoBoxWriteCursor, box: ChunkOffsetBox): void {
+	const start = beginIsoFullBox(cursor, 'stco', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stco', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.entryCount, 4)
+	writeUint32(cursor, box.chunkOffset.length)
 
 	for (const offset of box.chunkOffset) {
-		writer.writeUint(offset, 4)
+		writeUint32(cursor, offset)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

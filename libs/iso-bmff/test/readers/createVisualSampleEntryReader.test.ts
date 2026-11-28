@@ -19,6 +19,7 @@ describe('createVisualSampleEntryReader', function () {
 
 		assert.ok(entry)
 		assert.strictEqual(entry.type, 'vp09')
+		assert.ok('width' in entry && 'boxes' in entry)
 		assert.strictEqual(entry.width, 0)
 		assert.deepStrictEqual(entry.boxes, [])
 	})

@@ -1,19 +1,20 @@
 import type { OriginalFormatBox } from '../boxes/OriginalFormatBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readFourCc } from '../cursor/readFourCc.ts'
 
 /**
  * Read the `frma` box (`OriginalFormatBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `OriginalFormatBox`
  *
  * @public
  */
-export function readFrma(view: IsoBoxReadView<IsoInt64>): OriginalFormatBox {
+export function readFrma(cursor: IsoBoxReadCursor<IsoInt64>): OriginalFormatBox {
 	return {
 		type: 'frma',
-		dataFormat: view.readUint(4),
+		dataFormat: readFourCc(cursor),
 	}
 }

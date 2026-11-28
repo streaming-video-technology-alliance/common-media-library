@@ -1,5 +1,14 @@
 import { readFile } from 'node:fs/promises'
-import { assert, describe, findBox, findIsoBox, it, readEmsg, readIsoBoxes } from '../util/box.ts'
+import {
+	assert,
+	describe,
+	findBox,
+	findIsoBox,
+	isIsoBoxType,
+	it,
+	readEmsg,
+	readIsoBoxes,
+} from '../util/box.ts'
 
 const SCHEME = [0x75, 0x72, 0x6e, 0x3a, 0xc3, 0xa9] // 'urn:é'
 const VALUE = [0xe6, 0x97, 0xa5, 0xe6, 0x9c, 0xac] // '日本'
@@ -44,7 +53,7 @@ describe('readEmsg', function () {
 
 		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
 
-		assert.strictEqual(box.type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', box))
 		assert.strictEqual(box.version, 0)
 		assert.strictEqual(box.schemeIdUri, 'urn:é')
 		assert.strictEqual(box.value, '日本')
@@ -98,7 +107,7 @@ describe('readEmsg', function () {
 
 		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
 
-		assert.strictEqual(box.type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', box))
 		assert.strictEqual(box.version, 1)
 		assert.strictEqual(box.schemeIdUri, 'urn:é')
 		assert.strictEqual(box.value, '日本')
@@ -112,8 +121,7 @@ describe('readEmsg', function () {
 	it('should correctly parse a version 0 box from sample data', function () {
 		const box = findBox('emsg.m4s', 'emsg', { readers: { emsg: readEmsg } })
 
-		assert.strictEqual(box.type, 'emsg')
-		assert.strictEqual(box.size, 74)
+		assert.ok(isIsoBoxType('emsg', box))
 		assert.strictEqual(box.version, 0)
 		assert.strictEqual(box.schemeIdUri, 'urn:mpeg:dash:event:2012')
 		assert.strictEqual(box.value, '1')
@@ -131,10 +139,10 @@ describe('readEmsg', function () {
 		// #region example
 		const isoFile = await readFile(new URL('../fixtures/emsg.m4s', import.meta.url))
 		const boxes = readIsoBoxes(isoFile, { readers: { emsg: readEmsg } })
-		const box = findIsoBox(boxes, box => box.type === 'emsg')
+		const box = findIsoBox(boxes, box => isIsoBoxType('emsg', box))
 
 		// A version 0 box has a presentation time delta, and a version 1 box has a presentation time.
-		const time = box?.version === 0 ? box.presentationTimeDelta : box?.presentationTime
+		const time = box?.presentationTimeDelta ?? box?.presentationTime
 		// #endregion example
 
 		assert.ok(box)
@@ -143,7 +151,7 @@ describe('readEmsg', function () {
 		assert.strictEqual(time, 1)
 	})
 
-	it('should read a version 2 box as empty fields and messageData', function () {
+	it('should read a version 2 box as empty fields, undefined time fields, and messageData', function () {
 		const fields = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 2, 0, 0, 0, 3, 0x61, 0, 0x62, 0, 1]
 		const bytes = new Uint8Array([
 			0,
@@ -163,14 +171,16 @@ describe('readEmsg', function () {
 
 		const [box] = readIsoBoxes(bytes, { readers: { emsg: readEmsg } })
 
-		assert.strictEqual(box.type, 'emsg')
+		assert.ok(isIsoBoxType('emsg', box))
 		assert.strictEqual(box.version, 2)
 		assert.strictEqual(box.flags, 1)
 		assert.strictEqual(box.schemeIdUri, '')
 		assert.strictEqual(box.value, '')
 		assert.strictEqual(box.timescale, 0)
-		assert.strictEqual(box.presentationTimeDelta, 0)
-		assert.strictEqual(box.presentationTime, 0)
+		assert.ok('presentationTimeDelta' in box)
+		assert.strictEqual(box.presentationTimeDelta, undefined)
+		assert.ok('presentationTime' in box)
+		assert.strictEqual(box.presentationTime, undefined)
 		assert.strictEqual(box.eventDuration, 0)
 		assert.strictEqual(box.id, 0)
 		assert.deepStrictEqual(new Uint8Array(box.messageData), new Uint8Array(fields))

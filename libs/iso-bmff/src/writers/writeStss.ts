@@ -1,32 +1,29 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { SyncSampleBox } from '../boxes/SyncSampleBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `stss` box (`SyncSampleBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.6.2
  *
+ * @param cursor - The write cursor
  * @param box - The `SyncSampleBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
-export function writeStss(box: SyncSampleBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const entryCountSize = 4
-	const entriesSize = box.entryCount * 4
-	const totalSize = headerSize + fullBoxSize + entryCountSize + entriesSize
+export function writeStss(cursor: IsoBoxWriteCursor, box: SyncSampleBox): void {
+	const start = beginIsoFullBox(cursor, 'stss', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('stss', totalSize)
-	writer.writeFullBox(box.version, box.flags)
+	writeUint32(cursor, box.sampleNumber.length)
 
-	writer.writeUint(box.entryCount, 4)
-
-	for (const entry of box.entries) {
-		writer.writeUint(entry.sampleNumber, 4)
+	for (const sampleNumber of box.sampleNumber) {
+		writeUint32(cursor, sampleNumber)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

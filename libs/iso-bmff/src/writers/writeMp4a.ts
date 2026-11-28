@@ -1,23 +1,21 @@
-import type { AudioSampleEntryBox } from '../boxes/AudioSampleEntryBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
-import { writeAudioSampleEntryBox } from './writeAudioSampleEntryBox.ts'
+import type { IsoInt64 } from '../IsoInt64.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import type { AudioSampleEntry } from '../boxes/AudioSampleEntry.ts'
+import { writeAudioSampleEntry } from './writeAudioSampleEntry.ts'
 
 /**
- * Write the `mp4a` box (`AudioSampleEntryBox`).
+ * Write the `mp4a` box (`AudioSampleEntry`).
  *
  * ISO/IEC 14496-12:2015 - 12.2.3
  *
- * @param box - The `AudioSampleEntryBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @param cursor - The write cursor
+ * @param box - The `AudioSampleEntry` fields to write
  *
  * @public
  */
 export function writeMp4a(
-	box: AudioSampleEntryBox<'mp4a'>,
-	config: IsoBoxWriteViewConfig,
-): IsoBoxWriteView {
-	return writeAudioSampleEntryBox(box, config)
+	cursor: IsoBoxWriteCursor,
+	box: AudioSampleEntry<'mp4a', IsoInt64>,
+): void {
+	writeAudioSampleEntry(cursor, box)
 }

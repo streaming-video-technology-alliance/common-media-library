@@ -1,4 +1,4 @@
-import { assert, describe, it, writeStco } from '../util/box.ts'
+import { assert, describe, it, writeIsoBox, writeStco } from '../util/box.ts'
 
 describe('writeStco', function () {
 	it('should write a ChunkOffsetBox correctly', function () {
@@ -7,11 +7,10 @@ describe('writeStco', function () {
 			type: 'stco' as const,
 			version: 0,
 			flags: 0,
-			entryCount: 3,
 			chunkOffset: [1000, 5000, 9000],
 		}
 
-		const writer = writeStco(box)
+		const writer = writeIsoBox(box, { writers: { stco: writeStco } })
 		const buffer = new Uint8Array(writer.buffer)
 		// #endregion example
 

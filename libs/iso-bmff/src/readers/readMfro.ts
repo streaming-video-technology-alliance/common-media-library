@@ -1,20 +1,24 @@
 import type { MovieFragmentRandomAccessOffsetBox } from '../boxes/MovieFragmentRandomAccessOffsetBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readUint32 } from '../cursor/readUint32.ts'
 
 /**
  * Read the `mfro` box (`MovieFragmentRandomAccessOffsetBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `MovieFragmentRandomAccessOffsetBox`
  *
  * @public
  */
-export function readMfro(view: IsoBoxReadView<IsoInt64>): MovieFragmentRandomAccessOffsetBox {
+export function readMfro(cursor: IsoBoxReadCursor<IsoInt64>): MovieFragmentRandomAccessOffsetBox {
 	return {
 		type: 'mfro',
-		...view.readFullBox(),
-		mfraSize: view.readUint(4),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		mfraSize: readUint32(cursor),
 	}
 }

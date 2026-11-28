@@ -1,11 +1,14 @@
 import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
-import type { IsoBoxReadView } from '../IsoBoxReadView.ts'
+import type { IsoBoxReadCursor } from '../IsoBoxReadCursor.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
+import { readUint8 } from '../cursor/readUint8.ts'
+import { readUint24 } from '../cursor/readUint24.ts'
+import { readTerminatedUtf8 } from '../cursor/readTerminatedUtf8.ts'
 
 /**
  * Read the `url ` box (`DataEntryUrlBox`).
  *
- * @param view - The `IsoBoxReadView` to read data from
+ * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `DataEntryUrlBox`
  *
@@ -14,10 +17,11 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  *
  * @public
  */
-export function readUrl(view: IsoBoxReadView<IsoInt64>): DataEntryUrlBox {
+export function readUrl(cursor: IsoBoxReadCursor<IsoInt64>): DataEntryUrlBox {
 	return {
 		type: 'url ',
-		...view.readFullBox(),
-		location: view.readUtf8(-1),
+		version: readUint8(cursor),
+		flags: readUint24(cursor),
+		location: cursor.pos < cursor.end ? readTerminatedUtf8(cursor) : undefined,
 	}
 }

@@ -1,6 +1,5 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { AdditionalMetadataContainerBox } from '../boxes/AdditionalMetadataContainerBox.ts'
-import type { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
-import type { IsoBoxWriteViewConfig } from '../IsoBoxWriteViewConfig.ts'
 import type { IsoInt64 } from '../IsoInt64.ts'
 import { writeContainerBox } from '../utils/writeContainerBox.ts'
 
@@ -12,16 +11,14 @@ import { writeContainerBox } from '../utils/writeContainerBox.ts'
  *
  * Each 64-bit integer field of a child box is a `number` or a `bigint`.
  *
+ * @param cursor - The write cursor
  * @param box - The `AdditionalMetadataContainerBox` fields to write
- * @param config - The `IsoBoxWriteViewConfig` with the writers for the child boxes
- *
- * @returns An `IsoBoxWriteView` containing the written box
  *
  * @public
  */
 export function writeMeco(
+	cursor: IsoBoxWriteCursor,
 	box: AdditionalMetadataContainerBox<IsoInt64>,
-	config: IsoBoxWriteViewConfig,
-): IsoBoxWriteView {
-	return writeContainerBox(box, config)
+): void {
+	writeContainerBox(cursor, box)
 }

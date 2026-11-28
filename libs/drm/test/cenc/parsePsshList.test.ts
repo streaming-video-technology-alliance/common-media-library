@@ -57,6 +57,7 @@ describe('parsePsshList', () => {
 	describe('box sizes', () => {
 		const PSSH = [0x70, 0x73, 0x73, 0x68]
 		const FREE = [0x66, 0x72, 0x65, 0x65]
+		const UUID = [0x75, 0x75, 0x69, 0x64]
 		const SYSTEM_ID_A = '00112233-4455-6677-8899-aabbccddeeff'
 		const SYSTEM_ID_B = 'ffeeddcc-bbaa-9988-7766-554433221100'
 
@@ -164,6 +165,14 @@ describe('parsePsshList', () => {
 					const free = [...uint32(1), ...FREE, ...uint32(0), ...uint32(16)]
 					const pssh = psshBox(SYSTEM_ID_A)
 					const result = parse(new Uint8Array([...free, ...pssh]))
+
+					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
+					deepStrictEqual(result[SYSTEM_ID_A], new Uint8Array(pssh))
+				})
+
+				it('reads a pssh box after a uuid box with no room for usertype', () => {
+					const pssh = psshBox(SYSTEM_ID_A)
+					const result = parse(new Uint8Array([...uint32(8), ...UUID, ...pssh]))
 
 					deepStrictEqual(Object.keys(result), [SYSTEM_ID_A])
 					deepStrictEqual(result[SYSTEM_ID_A], new Uint8Array(pssh))

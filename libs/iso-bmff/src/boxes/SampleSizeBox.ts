@@ -10,6 +10,11 @@ import type { FullBox } from './FullBox.ts'
 export type SampleSizeBox = FullBox & {
 	type: 'stsz'
 	sampleSize: number
-	sampleCount: number
+	/**
+	 * The number of samples of a box with a `sampleSize` above 0.
+	 * With a `sampleSize` of 0, the field is `undefined`, and the number of samples is the length of `entrySize`.
+	 */
+	sampleCount?: number
+	/** The size of each sample, for a box with a `sampleSize` of 0. */
 	entrySize?: number[]
 }

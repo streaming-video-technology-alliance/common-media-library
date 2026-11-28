@@ -1,15 +1,23 @@
 import {
 	assert,
-	defaultReaderConfig,
+	createDefaultReaderConfig,
 	describe,
+	filterIsoBoxes,
 	isContainer,
+	isIsoBoxType,
 	it,
 	readInt64AsBigInt,
 	readIsoBoxes,
+	readUint8,
+	writeIsoBoxes,
 	type AdditionalMetadataContainerBox,
 	type GroupsListBox,
-	type IsoBox,
-	type SubTrackBox,
+	type IsoBoxReadCursor,
+	type IsoBoxReader,
+	type IsoRawBox,
+	type ParsedIsoBox,
+	type SubTrack,
+	type TrackFragmentBox,
 	type UserDataBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
@@ -63,10 +71,10 @@ describe('isContainer', function () {
 		])
 
 		const sequenceNumbers: number[] = []
-		for (const box of readIsoBoxes(bytes, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(bytes, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'mfhd') {
+					if (isIsoBoxType('mfhd', child)) {
 						sequenceNumbers.push(child.sequenceNumber)
 					}
 				}
@@ -80,10 +88,10 @@ describe('isContainer', function () {
 	it('reads a field of a child of a container', function () {
 		const times: number[] = []
 
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', child)) {
 						times.push(child.baseMediaDecodeTime)
 					}
 				}
@@ -95,7 +103,7 @@ describe('isContainer', function () {
 
 	it('gives each child of a container a box type', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
 					// @ts-expect-error a box has no field with this name
@@ -109,10 +117,10 @@ describe('isContainer', function () {
 
 	it('keeps the number fields of a child with no option', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', child)) {
 						expectType<Equal<typeof child.baseMediaDecodeTime, number>>(true)
 						assert.strictEqual(child.baseMediaDecodeTime, ROUNDED)
 						count++
@@ -125,10 +133,13 @@ describe('isContainer', function () {
 
 	it('keeps the bigint fields of a child with readInt64AsBigInt', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))) {
+		for (const box of readIsoBoxes(
+			buffer,
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
+		)) {
 			if (isContainer(box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'tfdt') {
+					if (isIsoBoxType('tfdt', child)) {
 						expectType<Equal<typeof child.baseMediaDecodeTime, bigint>>(true)
 						assert.strictEqual(child.baseMediaDecodeTime, EXACT)
 						count++
@@ -141,14 +152,14 @@ describe('isContainer', function () {
 
 	it('gives each child of a udta box a box type with number fields', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig())) {
-			if (box.type === 'moov') {
+		for (const box of readIsoBoxes(buffer, createDefaultReaderConfig())) {
+			if (isIsoBoxType('moov', box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'udta') {
+					if (isIsoBoxType('udta', child)) {
 						for (const inner of child.boxes) {
 							// @ts-expect-error a box has no field with this name
 							assert.strictEqual(inner.noSuchField, undefined)
-							if (inner.type === 'tfdt') {
+							if (isIsoBoxType('tfdt', inner)) {
 								expectType<Equal<typeof inner.baseMediaDecodeTime, number>>(true)
 								assert.strictEqual(inner.baseMediaDecodeTime, ROUNDED)
 								count++
@@ -163,12 +174,15 @@ describe('isContainer', function () {
 
 	it('gives each child of a udta box bigint fields with readInt64AsBigInt', function () {
 		let count = 0
-		for (const box of readIsoBoxes(buffer, defaultReaderConfig({ int64: readInt64AsBigInt }))) {
-			if (box.type === 'moov') {
+		for (const box of readIsoBoxes(
+			buffer,
+			createDefaultReaderConfig({ int64: readInt64AsBigInt }),
+		)) {
+			if (isIsoBoxType('moov', box)) {
 				for (const child of box.boxes) {
-					if (child.type === 'udta') {
+					if (isIsoBoxType('udta', child)) {
 						for (const inner of child.boxes) {
-							if (inner.type === 'tfdt') {
+							if (isIsoBoxType('tfdt', inner)) {
 								expectType<Equal<typeof inner.baseMediaDecodeTime, bigint>>(true)
 								assert.strictEqual(inner.baseMediaDecodeTime, EXACT)
 								count++
@@ -181,15 +195,69 @@ describe('isContainer', function () {
 		assert.strictEqual(count, 1)
 	})
 
-	it('types each child of the udta, grpl, strk, and meco boxes as IsoBox', function () {
-		expectType<Equal<UserDataBox['boxes'][number], IsoBox>>(true)
-		expectType<Equal<GroupsListBox['boxes'][number], IsoBox>>(true)
-		expectType<Equal<SubTrackBox['boxes'][number], IsoBox>>(true)
-		expectType<Equal<AdditionalMetadataContainerBox['boxes'][number], IsoBox>>(true)
+	it('types each child of the udta, grpl, strk, and meco boxes as ParsedIsoBox', function () {
+		expectType<Equal<UserDataBox['boxes'][number], ParsedIsoBox>>(true)
+		expectType<Equal<GroupsListBox['boxes'][number], ParsedIsoBox>>(true)
+		expectType<Equal<SubTrack['boxes'][number], ParsedIsoBox>>(true)
+		expectType<Equal<AdditionalMetadataContainerBox['boxes'][number], ParsedIsoBox>>(true)
 
-		expectType<Equal<UserDataBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
-		expectType<Equal<GroupsListBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
-		expectType<Equal<SubTrackBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
-		expectType<Equal<AdditionalMetadataContainerBox<bigint>['boxes'][number], IsoBox<bigint>>>(true)
+		expectType<Equal<UserDataBox<bigint>['boxes'][number], ParsedIsoBox<bigint>>>(true)
+		expectType<Equal<GroupsListBox<bigint>['boxes'][number], ParsedIsoBox<bigint>>>(true)
+		expectType<Equal<SubTrack<bigint>['boxes'][number], ParsedIsoBox<bigint>>>(true)
+		expectType<
+			Equal<AdditionalMetadataContainerBox<bigint>['boxes'][number], ParsedIsoBox<bigint>>
+		>(true)
+	})
+
+	it('takes the result of a custom reader', function () {
+		const readers = {
+			abcd: (cursor: IsoBoxReadCursor) => ({ type: 'abcd' as const, x: readUint8(cursor) }),
+		}
+		const boxes = readIsoBoxes(buffer, { readers })
+
+		assert.deepStrictEqual(
+			filterIsoBoxes(boxes, isContainer).map(box => box.type),
+			['traf', 'moov', 'udta'],
+		)
+
+		for (const box of boxes) {
+			if (isContainer(box)) {
+				assert.ok(Array.isArray(box.boxes))
+			}
+		}
+	})
+
+	it('keeps a custom result with a container type and no boxes field', function () {
+		// A reader with another box type for a built-in type needs a cast.
+		const readers = {
+			traf: (() => ({ type: 'traf', note: 1 })) as unknown as IsoBoxReader<TrackFragmentBox>,
+		}
+		let count = 0
+
+		for (const box of readIsoBoxes(buffer, { readers })) {
+			if (isContainer(box) && box.type === 'traf') {
+				// The type has the built-in `boxes` field.
+				const custom = box as unknown as { boxes?: unknown; note: number }
+				assert.strictEqual(custom.boxes, undefined)
+				assert.strictEqual(custom.note, 1)
+				count++
+			}
+		}
+
+		assert.strictEqual(count, 1)
+	})
+
+	it('returns false for a raw box with a type in CONTAINERS', function () {
+		const raw: IsoRawBox = { type: 'moov', bytes: new Uint8Array(MOOV) }
+
+		assert.strictEqual(isContainer(raw), false)
+		assert.deepStrictEqual([...writeIsoBoxes([raw])], MOOV)
+	})
+
+	it('returns true for each box of a type in CONTAINERS from a read with no reader', function () {
+		assert.deepStrictEqual(
+			readIsoBoxes(buffer).map(box => isContainer(box)),
+			[true, true],
+		)
 	})
 })

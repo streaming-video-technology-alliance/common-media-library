@@ -1,4 +1,13 @@
-import { assert, describe, it, readIsoBoxes, readMvhd, writeMvhd } from '../util/box.ts'
+import { writeWith } from '../util/writeWith.ts'
+import {
+	assert,
+	describe,
+	isIsoBoxType,
+	it,
+	readIsoBoxes,
+	readMvhd,
+	writeMvhd,
+} from '../util/box.ts'
 import { IDENTITY, LIMITS, PROJECTION, ROTATION } from '../util/matrices.ts'
 
 // An mvhd box. The arguments are the stored integers of the fixed-point fields.
@@ -28,7 +37,7 @@ function read(bytes: Uint8Array) {
 	const [box] = readIsoBoxes(bytes, { readers: { mvhd: readMvhd } })
 
 	assert.ok(box)
-	assert.strictEqual(box.type, 'mvhd')
+	assert.ok(isIsoBoxType('mvhd', box))
 
 	return box
 }
@@ -100,9 +109,24 @@ describe('readMvhd', function () {
 		]
 
 		for (const bytes of boxes) {
-			const writer = writeMvhd(read(bytes))
+			const writer = writeWith(writeMvhd, read(bytes))
 
 			assert.deepStrictEqual(new Uint8Array(writer.buffer), bytes)
 		}
+	})
+
+	it('should read the six pre_defined values and write the same bytes', function () {
+		// Each value has the top bit set, so a signed read gives a negative number.
+		const preDefined = [0x80000001, 0x80000002, 0x80000003, 0x80000004, 0x80000005, 0x80000006]
+		const bytes = createMvhd(0x10000, 0x0100, IDENTITY)
+		const view = new DataView(bytes.buffer)
+
+		// pre_defined is the 24 bytes after the matrix, at the offset 80.
+		preDefined.forEach((value, i) => view.setUint32(80 + i * 4, value))
+
+		const box = read(bytes)
+
+		assert.deepStrictEqual(box.preDefined, preDefined)
+		assert.deepStrictEqual(writeWith(writeMvhd, box), bytes)
 	})
 })

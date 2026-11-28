@@ -1,28 +1,25 @@
-import { encodeText } from '@svta/cml-utils'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { WebVttSettingsBox } from '../boxes/WebVttSettingsBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoBox } from '../beginIsoBox.ts'
+import { writeUtf8 } from '../cursor/writeUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `sttg` box (`WebVttSettingsBox`).
  *
+ * @param cursor - The write cursor
  * @param box - The `WebVttSettingsBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @example
  * {@includeCode ../../test/writers/writeSttg.test.ts#example}
  *
  * @public
  */
-export function writeSttg(box: WebVttSettingsBox): IsoBoxWriteView {
-	const settingsBytes = encodeText(box.settings)
+export function writeSttg(cursor: IsoBoxWriteCursor, box: WebVttSettingsBox): void {
+	const start = beginIsoBox(cursor, 'sttg')
 
-	const headerSize = 8
-	const settingsSize = settingsBytes.length
-	const totalSize = headerSize + settingsSize
-
-	const writer = new IsoBoxWriteView('sttg', totalSize)
-	writer.writeBytes(settingsBytes)
-
-	return writer
+	writeUtf8(cursor, box.settings)
+	endIsoBox(cursor, start)
 }

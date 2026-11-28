@@ -1,63 +1,51 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { TrackRunBox } from '../boxes/TrackRunBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { writeInt32 } from '../cursor/writeInt32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `trun` box (`TrackRunBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.8.8
  *
+ * @param cursor - The write cursor
  * @param box - The `TrackRunBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
-export function writeTrun(box: TrackRunBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const sampleCountSize = 4
-	const dataOffsetSize = box.flags & 0x1 ? 4 : 0
-	const firstSampleFlagsSize = box.flags & 0x4 ? 4 : 0
+export function writeTrun(cursor: IsoBoxWriteCursor, box: TrackRunBox): void {
+	const { flags } = box
+	const start = beginIsoFullBox(cursor, 'trun', box.version, flags)
+	const writeCompositionTimeOffset = box.version ? writeInt32 : writeUint32
 
-	let sampleSize = 0
-	if (box.flags & 0x100) sampleSize += 4 // sampleDuration
-	if (box.flags & 0x200) sampleSize += 4 // sampleSize
-	if (box.flags & 0x400) sampleSize += 4 // sampleFlags
-	if (box.flags & 0x800) sampleSize += 4 // sampleCompositionTimeOffset
+	writeUint32(cursor, box.samples.length)
 
-	const samplesSize = sampleSize * box.sampleCount
-	const totalSize =
-		headerSize + fullBoxSize + sampleCountSize + dataOffsetSize + firstSampleFlagsSize + samplesSize
-
-	const writer = new IsoBoxWriteView('trun', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeUint(box.sampleCount, 4)
-
-	if (box.flags & 0x1) {
-		writer.writeInt(box.dataOffset ?? 0, 4)
+	if (flags & 0x1) {
+		writeInt32(cursor, box.dataOffset as number)
 	}
 
-	if (box.flags & 0x4) {
-		writer.writeUint(box.firstSampleFlags ?? 0, 4)
+	if (flags & 0x4) {
+		writeUint32(cursor, box.firstSampleFlags as number)
 	}
-
-	const writeCompositionTimeOffset = box.version ? writer.writeInt : writer.writeUint
 
 	for (const sample of box.samples) {
-		if (box.flags & 0x100) {
-			writer.writeUint(sample.sampleDuration ?? 0, 4)
+		if (flags & 0x100) {
+			writeUint32(cursor, sample.sampleDuration as number)
 		}
-		if (box.flags & 0x200) {
-			writer.writeUint(sample.sampleSize ?? 0, 4)
+		if (flags & 0x200) {
+			writeUint32(cursor, sample.sampleSize as number)
 		}
-		if (box.flags & 0x400) {
-			writer.writeUint(sample.sampleFlags ?? 0, 4)
+		if (flags & 0x400) {
+			writeUint32(cursor, sample.sampleFlags as number)
 		}
-		if (box.flags & 0x800) {
-			writeCompositionTimeOffset(sample.sampleCompositionTimeOffset ?? 0, 4)
+		if (flags & 0x800) {
+			writeCompositionTimeOffset(cursor, sample.sampleCompositionTimeOffset as number)
 		}
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

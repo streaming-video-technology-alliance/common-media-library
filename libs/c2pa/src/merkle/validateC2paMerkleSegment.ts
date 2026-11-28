@@ -1,19 +1,17 @@
 import { readIsoBoxes } from '@svta/cml-iso-bmff'
+import { C2PA_UUID_READ_CONFIG, isC2paUuidBox, JUMBF_USER_TYPE } from '../c2paUuidBox.ts'
 import { readCborItem } from '../cbor/readCborItem.ts'
 import { C2paStatusCode } from '../C2paStatusCode.ts'
 import { LiveVideoStatusCode } from '../LiveVideoStatusCode.ts'
 import { computeBmffHash } from '../bmff/computeBmffHash.ts'
 import {
-	JUMBF_UUID,
 	asInteger,
 	bytesToHex,
 	hashesEqual,
-	matchesUuid,
 	normalizeAlgorithmName,
 	readUuidBoxPurpose,
 	toUint8Array,
 } from '../utils.ts'
-import type { UuidParsedBox } from '../utils.ts'
 import type {
 	MerkleMap,
 	MerkleSegmentState,
@@ -38,14 +36,10 @@ function readAuxPayload(rawPayload: Uint8Array): AuxPayload {
 function extractMerkleAuxBoxes(segmentBytes: Uint8Array): Uint8Array[] {
 	const payloads: Uint8Array[] = []
 
-	for (const box of readIsoBoxes(segmentBytes)) {
-		const uuidBox = box as unknown as UuidParsedBox
-		if (uuidBox.type !== 'uuid') continue
-		const usertype = uuidBox.usertype ?? []
-		if (!matchesUuid(usertype, JUMBF_UUID)) continue
+	for (const box of readIsoBoxes(segmentBytes, C2PA_UUID_READ_CONFIG) as unknown[]) {
+		if (!isC2paUuidBox(box) || box.userType !== JUMBF_USER_TYPE) continue
 
-		const rawPayload = uuidBox.view.readData(uuidBox.view.bytesRemaining)
-		const payload = readAuxPayload(rawPayload)
+		const payload = readAuxPayload(box.data)
 		if (payload !== 'other') payloads.push(payload)
 	}
 

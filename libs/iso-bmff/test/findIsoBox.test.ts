@@ -1,4 +1,11 @@
-import { findIsoBox, readFtyp, readIsoBoxes, type ParsedIsoBox } from '@svta/cml-iso-bmff'
+import {
+	createDefaultReaderConfig,
+	findIsoBox,
+	isIsoBoxType,
+	readFtyp,
+	readIsoBoxes,
+	type ParsedIsoBox,
+} from '@svta/cml-iso-bmff'
 import { readFile } from 'fs/promises'
 import { assert, describe, it } from './util/box.ts'
 
@@ -22,7 +29,7 @@ describe('findIsoBox', function () {
 			},
 		})
 
-		const ftyp = findIsoBox(boxes, box => box.type === 'ftyp')
+		const ftyp = findIsoBox(boxes, box => isIsoBoxType('ftyp', box))
 
 		assert.ok(ftyp)
 		assert.strictEqual(ftyp.type, 'ftyp')
@@ -113,11 +120,14 @@ describe('findIsoBox', function () {
 	})
 
 	it('should work with complex callback conditions', function () {
-		const box1 = { type: 'trak', size: 100 } as ParsedIsoBox
-		const box2 = { type: 'trak', size: 200 } as ParsedIsoBox
-		const box3 = { type: 'trak', size: 300 } as ParsedIsoBox
+		const box1: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(100) }
+		const box2: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(200) }
+		const box3: ParsedIsoBox = { type: 'trak', bytes: new Uint8Array(300) }
 
-		const result = findIsoBox([box1, box2, box3], box => box.type === 'trak' && box.size > 150)
+		const result = findIsoBox(
+			[box1, box2, box3],
+			box => 'bytes' in box && box.type === 'trak' && box.bytes.length > 150,
+		)
 		assert.strictEqual(result, box2)
 	})
 
@@ -129,5 +139,14 @@ describe('findIsoBox', function () {
 		const result = findIsoBox(boxSet, box => box.type === 'mdat')
 		assert.notStrictEqual(result, null)
 		assert.strictEqual(result?.type, 'mdat')
+	})
+
+	it('should find the child boxes of stsd and dref', async function () {
+		const isoFile = await readFile(new URL('./fixtures/hvc1_init.mp4', import.meta.url))
+		const boxes = readIsoBoxes(isoFile, createDefaultReaderConfig())
+
+		assert.strictEqual(findIsoBox(boxes, box => box.type === 'hvc1')?.type, 'hvc1')
+		assert.ok(findIsoBox(boxes, box => 'bytes' in box && box.type === 'hvcC'))
+		assert.strictEqual(findIsoBox(boxes, box => box.type === 'url ')?.type, 'url ')
 	})
 })

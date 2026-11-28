@@ -1,6 +1,8 @@
-import { encodeText } from '@svta/cml-utils'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { DataEntryUrlBox } from '../boxes/DataEntryUrlBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `url ` box (`DataEntryUrlBox`).
@@ -9,30 +11,22 @@ import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.7.2
  *
+ * @param cursor - The write cursor
  * @param box - The `DataEntryUrlBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @example
  * {@includeCode ../../test/writers/writeUrl.test.ts#example}
  *
  * @public
  */
-export function writeUrl(box: DataEntryUrlBox): IsoBoxWriteView {
-	const locationBytes = box.flags & 0x000001 ? undefined : encodeText(box.location)
+export function writeUrl(cursor: IsoBoxWriteCursor, box: DataEntryUrlBox): void {
+	const start = beginIsoFullBox(cursor, 'url ', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const locationSize = locationBytes ? locationBytes.length + 1 : 0 // null-terminated
-	const totalSize = headerSize + fullBoxSize + locationSize
-
-	const writer = new IsoBoxWriteView('url ', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	if (locationBytes) {
-		writer.writeBytes(locationBytes)
-		writer.writeUint(0, 1)
+	if (!(box.flags & 0x000001)) {
+		writeTerminatedUtf8(cursor, box.location as string)
 	}
 
-	return writer
+	endIsoBox(cursor, start)
 }

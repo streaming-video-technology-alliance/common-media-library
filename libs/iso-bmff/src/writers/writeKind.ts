@@ -1,36 +1,26 @@
-import { encodeText } from '@svta/cml-utils'
-import type { TrackKindBox } from '../boxes/TrackKindBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
+import type { KindBox } from '../boxes/KindBox.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeTerminatedUtf8 } from '../cursor/writeTerminatedUtf8.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
- * Write the `kind` box (`TrackKindBox`).
+ * Write the `kind` box (`KindBox`).
  *
- * @param box - The `TrackKindBox` fields to write
+ * @param cursor - The write cursor
+ * @param box - The `KindBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @example
  * {@includeCode ../../test/writers/writeKind.test.ts#example}
  *
  * @public
  */
-export function writeKind(box: TrackKindBox): IsoBoxWriteView {
-	const schemeUriBytes = encodeText(box.schemeUri)
-	const valueBytes = encodeText(box.value)
+export function writeKind(cursor: IsoBoxWriteCursor, box: KindBox): void {
+	const start = beginIsoFullBox(cursor, 'kind', box.version, box.flags)
 
-	const headerSize = 8
-	const fullBoxSize = 4
-	const schemeUriSize = schemeUriBytes.length + 1 // null-terminated
-	const valueSize = valueBytes.length + 1 // null-terminated
-	const totalSize = headerSize + fullBoxSize + schemeUriSize + valueSize
-
-	const writer = new IsoBoxWriteView('kind', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-
-	writer.writeBytes(schemeUriBytes)
-	writer.writeUint(0, 1)
-	writer.writeBytes(valueBytes)
-	writer.writeUint(0, 1)
-
-	return writer
+	writeTerminatedUtf8(cursor, box.schemeUri)
+	writeTerminatedUtf8(cursor, box.value)
+	endIsoBox(cursor, start)
 }

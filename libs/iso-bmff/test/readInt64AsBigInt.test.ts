@@ -1,9 +1,10 @@
 import {
 	assert,
+	createIsoBoxReadCursor,
 	describe,
 	findIsoBox,
+	isIsoBoxType,
 	it,
-	IsoBoxReadView,
 	readInt64AsBigInt,
 	readIsoBoxes,
 	readTfdt,
@@ -59,7 +60,7 @@ describe('readInt64AsBigInt', function () {
 		})
 
 		// The field is a bigint with the exact value.
-		const tfdt = findIsoBox(boxes, box => box.type === 'tfdt')
+		const tfdt = findIsoBox(boxes, box => isIsoBoxType('tfdt', box))
 		// #endregion example
 
 		assert.ok(tfdt)
@@ -67,49 +68,53 @@ describe('readInt64AsBigInt', function () {
 	})
 
 	it('should read an unsigned 8-byte field', function () {
-		const view = new IsoBoxReadView(boxBytes('test', [BigInt('0xffffffffffffffff'), 8], [0, 8]))
+		const cursor = createIsoBoxReadCursor(
+			boxBytes('test', [BigInt('0xffffffffffffffff'), 8], [0, 8]),
+		)
 
-		view.jump(8)
-		assert.strictEqual(readInt64AsBigInt(view, 8, false), BigInt('18446744073709551615'))
-		assert.strictEqual(view.cursor, 16)
-		assert.strictEqual(readInt64AsBigInt(view, 8, false), BigInt(0))
-		assert.strictEqual(view.bytesRemaining, 0)
+		cursor.pos = 8
+		assert.strictEqual(readInt64AsBigInt(cursor, 8, false), BigInt('18446744073709551615'))
+		assert.strictEqual(cursor.pos, 16)
+		assert.strictEqual(readInt64AsBigInt(cursor, 8, false), BigInt(0))
+		assert.strictEqual(cursor.end - cursor.pos, 0)
 	})
 
 	it('should read a signed 8-byte field', function () {
 		const min = -(BigInt(2) ** BigInt(63))
 		const max = BigInt(2) ** BigInt(63) - BigInt(1)
-		const view = new IsoBoxReadView(boxBytes('test', [BigInt(-1), 8], [min, 8], [max, 8]))
+		const cursor = createIsoBoxReadCursor(boxBytes('test', [BigInt(-1), 8], [min, 8], [max, 8]))
 
-		view.jump(8)
-		assert.strictEqual(readInt64AsBigInt(view, 8, true), BigInt(-1))
-		assert.strictEqual(readInt64AsBigInt(view, 8, true), min)
-		assert.strictEqual(readInt64AsBigInt(view, 8, true), max)
-		assert.strictEqual(view.bytesRemaining, 0)
+		cursor.pos = 8
+		assert.strictEqual(readInt64AsBigInt(cursor, 8, true), BigInt(-1))
+		assert.strictEqual(readInt64AsBigInt(cursor, 8, true), min)
+		assert.strictEqual(readInt64AsBigInt(cursor, 8, true), max)
+		assert.strictEqual(cursor.end - cursor.pos, 0)
 	})
 
 	it('should read an unsigned 4-byte field', function () {
-		const view = new IsoBoxReadView(boxBytes('test', [0xffffffff, 4], [7, 4]))
+		const cursor = createIsoBoxReadCursor(boxBytes('test', [0xffffffff, 4], [7, 4]))
 
-		view.jump(8)
-		assert.strictEqual(readInt64AsBigInt(view, 4, false), BigInt(4294967295))
-		assert.strictEqual(view.cursor, 12)
-		assert.strictEqual(readInt64AsBigInt(view, 4, false), BigInt(7))
+		cursor.pos = 8
+		assert.strictEqual(readInt64AsBigInt(cursor, 4, false), BigInt(4294967295))
+		assert.strictEqual(cursor.pos, 12)
+		assert.strictEqual(readInt64AsBigInt(cursor, 4, false), BigInt(7))
 	})
 
 	it('should read a signed 4-byte field', function () {
-		const view = new IsoBoxReadView(boxBytes('test', [-1, 4], [-2147483648, 4], [2147483647, 4]))
+		const cursor = createIsoBoxReadCursor(
+			boxBytes('test', [-1, 4], [-2147483648, 4], [2147483647, 4]),
+		)
 
-		view.jump(8)
-		assert.strictEqual(readInt64AsBigInt(view, 4, true), BigInt(-1))
-		assert.strictEqual(readInt64AsBigInt(view, 4, true), BigInt(-2147483648))
-		assert.strictEqual(readInt64AsBigInt(view, 4, true), BigInt(2147483647))
+		cursor.pos = 8
+		assert.strictEqual(readInt64AsBigInt(cursor, 4, true), BigInt(-1))
+		assert.strictEqual(readInt64AsBigInt(cursor, 4, true), BigInt(-2147483648))
+		assert.strictEqual(readInt64AsBigInt(cursor, 4, true), BigInt(2147483647))
 	})
 
-	it('should throw on a view too short for the field', function () {
-		const view = new IsoBoxReadView(boxBytes('test', [1, 4]))
+	it('should throw on a cursor too short for the field', function () {
+		const cursor = createIsoBoxReadCursor(boxBytes('test', [1, 4]))
 
-		view.jump(8)
-		assert.throws(() => readInt64AsBigInt(view, 8, false), RangeError)
+		cursor.pos = 8
+		assert.throws(() => readInt64AsBigInt(cursor, 8, false), RangeError)
 	})
 })

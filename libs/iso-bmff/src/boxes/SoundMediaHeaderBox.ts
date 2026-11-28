@@ -14,5 +14,4 @@ export type SoundMediaHeaderBox = FullBox & {
 	 * and 1 is full right.
 	 */
 	balance: number
-	reserved: number
 }

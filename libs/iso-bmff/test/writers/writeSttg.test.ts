@@ -1,7 +1,8 @@
+import { writeWith } from '../util/writeWith.ts'
 import {
 	assert,
-	defaultReaderConfig,
-	defaultWriterConfig,
+	createDefaultReaderConfig,
+	createDefaultWriterConfig,
 	describe,
 	filterIsoBoxes,
 	findBox,
@@ -11,6 +12,7 @@ import {
 	writeSttg,
 	type WebVttSettingsBox,
 } from '../util/box.ts'
+import { record, sourceOf } from '../util/sources.ts'
 
 describe('writeSttg', function () {
 	it('should write a WebVttSettingsBox correctly', function () {
@@ -20,7 +22,7 @@ describe('writeSttg', function () {
 			settings: 'align:start',
 		}
 
-		const writer = writeSttg(box)
+		const writer = writeIsoBox(box, { writers: { sttg: writeSttg } })
 		// #endregion example
 
 		// size (19), type (sttg), settings
@@ -33,7 +35,7 @@ describe('writeSttg', function () {
 	})
 
 	it('should write the UTF-8 bytes of settings that are not ASCII', function () {
-		const writer = writeSttg({ type: 'sttg', settings: 'é日😀' })
+		const writer = writeWith(writeSttg, { type: 'sttg', settings: 'é日😀' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -44,7 +46,7 @@ describe('writeSttg', function () {
 	})
 
 	it('should write only the box header for empty settings', function () {
-		const writer = writeSttg({ type: 'sttg', settings: '' })
+		const writer = writeWith(writeSttg, { type: 'sttg', settings: '' })
 
 		assert.deepStrictEqual(
 			new Uint8Array(writer.buffer),
@@ -53,19 +55,14 @@ describe('writeSttg', function () {
 	})
 
 	it('should write the input bytes of the sttg box in vttc.mp4', function () {
-		const config = defaultReaderConfig()
+		const config = record(createDefaultReaderConfig())
 		const { data } = findBox('vttc.mp4', 'mdat', config)
 		const boxes = filterIsoBoxes(readIsoBoxes(data, config), box => box.type === 'sttg')
 
 		assert.strictEqual(boxes.length, 1)
 
 		for (const box of boxes) {
-			const { view } = box
-
-			assert.deepStrictEqual(
-				writeIsoBox(box, defaultWriterConfig()),
-				new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
-			)
+			assert.deepStrictEqual(writeIsoBox(box, createDefaultWriterConfig()), sourceOf(box).bytes)
 		}
 	})
 })

@@ -8,6 +8,18 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- `parsePsshList` now reads the size of each box with `readIsoBoxSize` of `@svta/cml-iso-bmff`. The public API and the results do not change ([#696](https://github.com/streaming-video-technology-alliance/common-media-library/issues/696)).
+- `ensureEncryptedInit` now throws a `RangeError` for a `defaultKid` that does not have 16 bytes, or has an item outside 0 to 255. Earlier releases write 0 for each missing byte, omit the extra bytes, and write the low 8 bits of an item ([#756](https://github.com/streaming-video-technology-alliance/common-media-library/pull/756)).
+- `ensureEncryptedInit` now accepts `schemeType` as a four-character string, such as `'cbcs'`, and `defaultKid` as a `Uint8Array`. The number and `number[]` forms still work, and the output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now reads the boxes with `readIsoBoxes` of `@svta/cml-iso-bmff` 2.0.0. The function skips a sample entry that the package returns as a raw box. This change does not change the public API or the output bytes ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
+- `ensureEncryptedInit` now writes the boxes with `writeIsoBoxes` of `@svta/cml-iso-bmff` 2.0.0. That function returns one array. This change does not change the public API or the output bytes ([#682](https://github.com/streaming-video-technology-alliance/common-media-library/pull/682)).
+- `@svta/cml-drm` now needs `@svta/cml-iso-bmff` 2.0.0 or later ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now reads and writes the sample entries in the `boxes` field of the `stsd` box, as `@svta/cml-iso-bmff` 2.0.0 returns them. For a source with 0 in the reserved fields of its sample entries, the output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now writes 0 in the reserved fields of the sample entries that it copies. Earlier releases keep the bytes of the source entry, such as the revision and the vendor of a QuickTime sound description ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+- `ensureEncryptedInit` now builds the `tenc` box with `defaultIsProtected` and `defaultPerSampleIvSize`, as `@svta/cml-iso-bmff` 2.0.0 names the fields. The output bytes do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).
+
 ## [1.1.13] - 2026-11-17
 
 ### Changed

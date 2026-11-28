@@ -1,26 +1,24 @@
+import type { IsoBoxWriteCursor } from '../IsoBoxWriteCursor.ts'
 import type { MovieFragmentHeaderBox } from '../boxes/MovieFragmentHeaderBox.ts'
-import { IsoBoxWriteView } from '../IsoBoxWriteView.ts'
+import { beginIsoFullBox } from '../beginIsoFullBox.ts'
+import { writeUint32 } from '../cursor/writeUint32.ts'
+import { endIsoBox } from '../endIsoBox.ts'
 
 /**
  * Write the `mfhd` box (`MovieFragmentHeaderBox`).
  *
  * ISO/IEC 14496-12:2015 - 8.8.5
  *
+ * @param cursor - The write cursor
  * @param box - The `MovieFragmentHeaderBox` fields to write
  *
- * @returns An `IsoBoxWriteView` containing the written box
+ * @throws RangeError if a value of the box does not fit its field.
  *
  * @public
  */
-export function writeMfhd(box: MovieFragmentHeaderBox): IsoBoxWriteView {
-	const headerSize = 8
-	const fullBoxSize = 4
-	const sequenceNumberSize = 4
-	const totalSize = headerSize + fullBoxSize + sequenceNumberSize
+export function writeMfhd(cursor: IsoBoxWriteCursor, box: MovieFragmentHeaderBox): void {
+	const start = beginIsoFullBox(cursor, 'mfhd', box.version, box.flags)
 
-	const writer = new IsoBoxWriteView('mfhd', totalSize)
-	writer.writeFullBox(box.version, box.flags)
-	writer.writeUint(box.sequenceNumber, 4)
-
-	return writer
+	writeUint32(cursor, box.sequenceNumber)
+	endIsoBox(cursor, start)
 }

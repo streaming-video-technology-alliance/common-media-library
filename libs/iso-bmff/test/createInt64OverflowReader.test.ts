@@ -1,10 +1,11 @@
 import {
 	assert,
+	createIsoBoxReadCursor,
 	createInt64OverflowReader,
 	describe,
 	findIsoBox,
+	isIsoBoxType,
 	it,
-	IsoBoxReadView,
 	readIsoBoxes,
 	readTfdt,
 } from './util/box.ts'
@@ -17,13 +18,13 @@ const MAX = BigInt(Number.MAX_SAFE_INTEGER)
 
 function read(value: number | bigint, size: 4 | 8, signed: boolean): [number, RangeError[]] {
 	const errors: RangeError[] = []
-	const view = new IsoBoxReadView(boxBytes('test', [value, size]))
+	const cursor = createIsoBoxReadCursor(boxBytes('test', [value, size]))
 
-	view.jump(8)
+	cursor.pos = 8
 
-	const result = createInt64OverflowReader(error => void errors.push(error))(view, size, signed)
+	const result = createInt64OverflowReader(error => void errors.push(error))(cursor, size, signed)
 
-	assert.strictEqual(view.bytesRemaining, 0)
+	assert.strictEqual(cursor.end - cursor.pos, 0)
 
 	return [result, errors]
 }
@@ -80,7 +81,7 @@ describe('createInt64OverflowReader', function () {
 		})
 
 		// The field is a number, rounded to 2^53, and errors holds one RangeError.
-		const tfdt = findIsoBox(boxes, box => box.type === 'tfdt')
+		const tfdt = findIsoBox(boxes, box => isIsoBoxType('tfdt', box))
 		// #endregion example
 
 		assert.ok(tfdt)

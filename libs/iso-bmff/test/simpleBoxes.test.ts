@@ -7,12 +7,14 @@ import {
 	readIsoBoxes,
 	readSdtp,
 	readSkip,
+	readStyp,
 	readVttC,
 	writeFrma,
 	writeImda,
 	writeIsoBox,
 	writeSdtp,
 	writeSkip,
+	writeStyp,
 	writeVttC,
 	type IsoBoxReaderMap,
 	type IsoBoxWriterMap,
@@ -33,7 +35,7 @@ const ROWS: Row[] = [
 		readers: { frma: readFrma },
 		writers: { frma: writeFrma },
 		bytes: boxBytes('frma', [0x61766331, 4]),
-		expected: { type: 'frma', dataFormat: 0x61766331 },
+		expected: { type: 'frma', dataFormat: 'avc1' },
 	},
 	{
 		type: 'imda',
@@ -47,7 +49,12 @@ const ROWS: Row[] = [
 		readers: { sdtp: readSdtp },
 		writers: { sdtp: writeSdtp },
 		bytes: boxBytes('sdtp', [0, 1], [0, 3], [0x10, 1], [0x28, 1], [0x04, 1]),
-		expected: { type: 'sdtp', version: 0, flags: 0, sampleDependencyTable: [0x10, 0x28, 0x04] },
+		expected: {
+			type: 'sdtp',
+			version: 0,
+			flags: 0,
+			sampleDependencyTable: new Uint8Array([0x10, 0x28, 0x04]),
+		},
 	},
 	{
 		type: 'skip',
@@ -55,6 +62,19 @@ const ROWS: Row[] = [
 		writers: { skip: writeSkip },
 		bytes: boxBytes('skip', new Uint8Array([1, 2, 3])),
 		expected: { type: 'skip', data: new Uint8Array([1, 2, 3]) },
+	},
+	{
+		// The brands are 'msdh' and 'msix'. minor_version has the top bit set.
+		type: 'styp',
+		readers: { styp: readStyp },
+		writers: { styp: writeStyp },
+		bytes: boxBytes('styp', [0x6d736468, 4], [0x80000002, 4], [0x6d736468, 4], [0x6d736978, 4]),
+		expected: {
+			type: 'styp',
+			majorBrand: 'msdh',
+			minorVersion: 0x80000002,
+			compatibleBrands: ['msdh', 'msix'],
+		},
 	},
 	{
 		type: 'vttC',
