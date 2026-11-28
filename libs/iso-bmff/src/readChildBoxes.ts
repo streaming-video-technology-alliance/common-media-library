@@ -1,6 +1,7 @@
 import type { IsoBoxReadCursorState } from './cursor/IsoBoxReadCursorState.ts'
 import { decodeFourCc } from './cursor/decodeFourCc.ts'
 import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
+import type { IsoBoxReadErrorBox } from './isIsoBoxReadError.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoRawBox } from './IsoRawBox.ts'
 import type { ParsedIsoBox } from './ParsedIsoBox.ts'
@@ -20,15 +21,17 @@ const CONTAINER_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CONTAINERS)
  *
  * The function stops before a truncated box: the data ends inside the box, or the size is below the header size.
  * The position of the cursor is then the first byte of that box.
- * The function does not catch an error of a reader. After an error, the position of the cursor is the first byte of the box that failed,
- * and `start` and `end` do not change.
+ * If a `RangeError` occurs during the read of a box, the function adds the `box` field of `IsoBoxReadError` to that error and throws the same error.
+ * The field has the box type and the position of the box. The function does not catch an error of another class.
+ * After an error, the position of the cursor is the first byte of the box that failed, and `start` and `end` do not change.
  *
  * @param cursor - The cursor at the first byte of the first box.
  * @param count - The maximum number of boxes. With no count, the function reads every box to `cursor.end`.
  * @returns The boxes.
  *
  * @throws RangeError if `count` is negative or `NaN`.
- * @throws RangeError if a box is deeper than 128 levels. The message has the box type and the limit.
+ * @throws RangeError if a reader throws a `RangeError`. The error has the `box` field of `IsoBoxReadError`.
+ * @throws RangeError if a box is deeper than 128 levels. The message has the box type and the limit, and the error has the `box` field.
  *
  * @example
  * {@includeCode ../test/readChildBoxes.test.ts#example}
@@ -90,6 +93,14 @@ export function readChildBoxes<V extends IsoInt64 = number>(
 
 				box = raw
 			}
+		} catch (error) {
+			if (error instanceof RangeError && !('box' in error) && Object.isExtensible(error)) {
+				const box: IsoBoxReadErrorBox = { type, start: boxStart, pos: state.pos }
+
+				;(error as RangeError & { box: IsoBoxReadErrorBox }).box = box
+			}
+
+			throw error
 		} finally {
 			state.pos = boxStart
 			state.start = start

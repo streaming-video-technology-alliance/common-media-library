@@ -12,13 +12,15 @@ import { readInt32 } from '../cursor/readInt32.ts'
  *
  * ISO/IEC 14496-12:2015 - 8.8.8
  *
- * The reader creates one object for each sample of `sample_count`. The reader sets no limit on that count.
+ * The reader creates one object for each sample of `sample_count`.
  * Each object has the four sample fields in the same order. A field that the flags exclude is `undefined`.
- * If the box sets none of the flags 0x100 to 0x800, the objects use no bytes of the box.
+ * If the box sets none of the flags 0x100 to 0x800, the objects use no bytes of the box, and the reader sets no limit on the count.
  *
  * @param cursor - The read cursor at the first byte after the box header
  *
  * @returns A parsed `TrackRunBox`
+ *
+ * @throws RangeError if the sample records of `sample_count` pass the end of the box. The reader checks the count before it creates the objects.
  *
  * @public
  */
@@ -33,6 +35,16 @@ export function readTrun(cursor: IsoBoxReadCursor<IsoInt64>): TrackRunBox {
 	const hasFlags = (flags & 0x400) !== 0
 	const hasOffset = (flags & 0x800) !== 0
 	const readOffset = version === 0 ? readUint32 : readInt32
+	const recordSize =
+		(hasDuration ? 4 : 0) + (hasSize ? 4 : 0) + (hasFlags ? 4 : 0) + (hasOffset ? 4 : 0)
+	const left = cursor.end - cursor.pos
+
+	if (sampleCount * recordSize > left) {
+		throw new RangeError(
+			`readTrun: sample_count must be at most ${Math.floor(left / recordSize)} for the ${left} bytes of sample records in the box, received ${sampleCount}`,
+		)
+	}
+
 	const samples: TrackRunSample[] = new Array<TrackRunSample>(sampleCount)
 
 	for (let i = 0; i < sampleCount; i++) {

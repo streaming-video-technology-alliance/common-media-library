@@ -26,8 +26,8 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  *
  * @returns The parsed boxes
  *
- * @throws RangeError if a reader reads past the end of its box. The function does not catch an error of a reader.
- * @throws RangeError if a box is deeper than 128 levels.
+ * @throws RangeError if a reader throws a `RangeError`, such as for a box that is too short for its fields. The error has the `box` field of `IsoBoxReadError` with the box type and the position of the box. The function does not catch an error of another class.
+ * @throws RangeError if a box is deeper than 128 levels. The error has the `box` field.
  *
  * @example
  * {@includeCode ../test/readIsoBoxes.test.ts#example}

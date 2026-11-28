@@ -122,6 +122,40 @@ while (size) {
 
 The function returns 0 at the end of the data and for a truncated box. By default, the header of a `uuid` box includes the 16 bytes of `usertype`, as in `readIsoBoxes`. A `uuid` box with a size below that header is truncated. To get the size of that box, pass `true` as the fourth argument.
 
+## Reading some boxes of a list
+
+`iterateChildBoxes` yields the type and a read cursor for each box from the position of a cursor to its end. The function reads no field of a box and does not move the input cursor. Each cursor of the result is a new object, with `start` at the box header, `pos` after the header, and `end` after the box. Use the function to read some boxes of a list, or to read the position of a box with its content. The function also reaches a box that `seekIsoBox` does not find, such as the second `traf` box of a `moof` box:
+
+```typescript
+import {
+	iterateChildBoxes,
+	readTfhd,
+	readTrun,
+	seekIsoBox,
+} from "@svta/cml-iso-bmff";
+
+const moof = seekIsoBox(buffer, ["moof"]);
+
+if (moof) {
+	for (const [type, traf] of iterateChildBoxes(moof)) {
+		if (type !== "traf") {
+			continue;
+		}
+
+		for (const [childType, child] of iterateChildBoxes(traf)) {
+			if (childType === "tfhd") {
+				console.log(readTfhd(child).trackId);
+			} else if (childType === "trun") {
+				// The position of the trun box, and its samples.
+				console.log(child.start, child.end, readTrun(child).samples.length);
+			}
+		}
+	}
+}
+```
+
+The iteration stops before a truncated box. The cursors have the readers map and the `int64` option of the input. So `readChildBoxes(child)` reads the child boxes of a container with the same configuration. The function creates a cursor for each box. In a loop that reads no content, `nextIsoBox` steps over the boxes and creates no cursor.
+
 ## Extending a built-in reader
 
 A custom reader can call a built-in reader and add fields to the result. In the result of `readIsoBoxes`, the box has the built-in type. The loop narrows the box with `isIsoBoxType`, then casts the box to the result type of the reader.
@@ -222,7 +256,7 @@ The cursor follows these rules:
 - Do not declare `uuid` in `IsoCustomBoxMap`. Declare the box types of `uuid` in `IsoCustomUuidBoxMap`.
 - A reader under a key returns the box type of that key. The reader can add fields. A reader with another result type is a compile error.
 
-`readIsoBoxes` does not catch an error of a reader. The error reaches the caller.
+An error of a reader reaches the caller of `readIsoBoxes`. If the error is a `RangeError`, the error has the `box` field of `IsoBoxReadError` with the position of the box. See [Incomplete boxes](#incomplete-boxes).
 
 `readIsoBoxes` finds a reader by the exact type and by the trimmed type. A reader under the key `url` reads the `"url "` box. The box type has a trailing space.
 
@@ -322,11 +356,101 @@ The position has two limits:
 
 A box with a reader in the configuration and a body shorter than its fields is not an incomplete box. `readIsoBoxes` then throws a `RangeError` and returns no boxes. A box that is deeper than 128 levels also throws a `RangeError`. If the data comes from the network, call `readIsoBoxes` inside a `try` block.
 
+The error has the position of the box. When a `RangeError` occurs during the read of a box, `readChildBoxes` adds the `box` field to that error and throws the same error. The field has the box type, the first byte of the box header, and the position of the cursor. The error keeps its class and its message. `isIsoBoxReadError` narrows a caught value to `IsoBoxReadError`:
+
+```typescript
+import { isIsoBoxReadError, readIsoBoxes, readTfdt } from "@svta/cml-iso-bmff";
+
+try {
+	readIsoBoxes(buffer, { readers: { tfdt: readTfdt } });
+} catch (error) {
+	if (!isIsoBoxReadError(error)) {
+		throw error;
+	}
+
+	console.warn(`The read of the ${error.box.type} box at byte ${error.box.start} failed: ${error.message}`);
+}
+```
+
+The field names the innermost box, and it does not state the cause. The error of the 128-level limit has the field too. A custom reader that throws a `RangeError` must throw a new error for each failure, because an error that has the field keeps it. `readChildBoxes` adds no field to an error of another class, such as a `TypeError` of a custom reader.
+
 The size of a box includes its header. The header has 8 bytes, or 16 bytes when `size` is 1 and a `largesize` field follows (ISO/IEC 14496-12, clause 4.2). The header of a `uuid` box has 16 more bytes for the `usertype` field. A `size` of 0 is valid and means that the box extends to the end of the data.
 
 The same rule applies to the child boxes of a container and of a sample entry. Some QuickTime files have 4 zero bytes after the last child box of a `udta` box. Other QuickTime files have those bytes at the end of an `avc1` or `hvc1` sample entry. A box header has at least 8 bytes, so the reader stops before those bytes. The box object has the child boxes and no field for those bytes.
 
 A writer builds a container or a sample entry from the child boxes of the box object. A write therefore omits those bytes. The written box is shorter than the source box by those bytes. If the `moov` box precedes the `mdat` box, the chunk offsets of the written file then address other bytes. The `mfraSize` field of an `mfro` box has the same limit. See [Writing a changed `mfra` box](writing-boxes.md#writing-a-changed-mfra-box).
+
+### Reading a box that the data truncates
+
+The read functions stop before a box that passes the end of the data. A player that reads a live segment can hold the start of a `moof` box whose size passes the available bytes. `readIsoBoxSize` returns 0 for that box. `readIsoBoxDeclaredSize` returns the size that the header declares, and does not compare the size with the remaining bytes. To read the complete child boxes of that box, read with a cursor that ends at the available bytes:
+
+```typescript
+import {
+	readChildBoxes,
+	readIsoBoxDeclaredSize,
+	readIsoBoxHeaderSize,
+	readIsoBoxSize,
+	readTfdt,
+	type IsoBoxReadCursor,
+} from "@svta/cml-iso-bmff";
+
+const view = new DataView(buffer);
+const end = view.byteLength;
+
+if (!readIsoBoxSize(view, 0, end) && readIsoBoxDeclaredSize(view, 0, end) > end) {
+	// The box passes the end of the data. Read its complete child boxes.
+	const moof: IsoBoxReadCursor = {
+		view,
+		start: 0,
+		pos: readIsoBoxHeaderSize(view, 0),
+		end,
+		readers: { tfdt: readTfdt },
+	};
+	console.log(readChildBoxes(moof));
+}
+```
+
+When `readIsoBoxSize` returns 0 for a box at `at`, the result of `readIsoBoxDeclaredSize` gives the reason:
+
+| Result of `readIsoBoxDeclaredSize` | Meaning |
+|---|---|
+| 0 | The header is incomplete. More data can complete the header. |
+| Above `end - at` | The data ends inside the box. |
+| Any other value | The size is invalid. More data does not change the result. |
+
+A box with a `size` of 0 extends to the end of the data, so no function reports that box as truncated. `readIsoBoxHeaderSize` returns the size of the header without the `usertype` of a `uuid` box. The result equals `pos - start` of a read cursor for the box.
+
+## Resolving the samples of a `trun` box
+
+The `trun` box omits a sample field that the `tfhd` box or the `trex` box supplies as a default. `resolveTrunSamples` returns one object for each sample with the resolved duration, size, flags, and composition time offset. A field of the `trun` box has priority, then the default of the `tfhd` box, then the default of the `trex` box. `firstSampleFlags` replaces the default flags of the first sample only. A missing composition time offset is 0:
+
+```typescript
+import {
+	findIsoBox,
+	isIsoBoxType,
+	readIsoBoxes,
+	readTfhd,
+	readTrex,
+	readTrun,
+	resolveTrunSamples,
+} from "@svta/cml-iso-bmff";
+
+const readers = { tfhd: readTfhd, trex: readTrex, trun: readTrun };
+const init = readIsoBoxes(initSegment, { readers });
+const segment = readIsoBoxes(buffer, { readers });
+
+const trex = findIsoBox(init, (box) => isIsoBoxType("trex", box));
+const tfhd = findIsoBox(segment, (box) => isIsoBoxType("tfhd", box));
+const trun = findIsoBox(segment, (box) => isIsoBoxType("trun", box));
+
+if (trun && trex) {
+	const samples = resolveTrunSamples(trun, tfhd, trex);
+	const duration = samples.reduce((sum, sample) => sum + sample.sampleDuration, 0);
+	console.log(duration);
+}
+```
+
+The `trex` box is the one of the track of the fragment, with `tfhd.trackId === trex.trackId`. The function does not check the track. With a `trex` box, every field of the result is a number. With no `trex` box, a field is `undefined` when no box has a value for it.
 
 ## Reading 64-bit fields
 

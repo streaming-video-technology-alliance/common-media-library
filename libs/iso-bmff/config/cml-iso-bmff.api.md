@@ -242,6 +242,9 @@ export function isContainer<T extends {
 }>;
 
 // @public
+export function isIsoBoxReadError(error: unknown): error is IsoBoxReadError;
+
+// @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
     type: string;
 } | null | undefined): box is IsoBoxMap<V>[T];
@@ -328,6 +331,18 @@ export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in Exclude<keyof
     uuid?: {
         r(cursor: IsoBoxReadCursor<V>, type: "uuid"): IsoUuidBox | undefined;
     }["r"];
+};
+
+// @public
+export type IsoBoxReadError = RangeError & {
+    readonly box: IsoBoxReadErrorBox;
+};
+
+// @public
+export type IsoBoxReadErrorBox = {
+    readonly type: IsoBoxType;
+    readonly start: number;
+    readonly pos: number;
 };
 
 // @public
@@ -507,6 +522,9 @@ export type IsoUuidBoxWriterMap = [keyof IsoCustomUuidBoxMap] extends [never] ? 
         userType: string;
     }): void;
 }["w"] | undefined> : { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U>; };
+
+// @public
+export function iterateChildBoxes<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>): Generator<readonly [type: IsoBoxType, cursor: IsoBoxReadCursor<V>], void, undefined>;
 
 // @public
 export type KindBox = FullBox & {
@@ -761,7 +779,13 @@ export function readInt64AsBigInt(cursor: IsoBoxReadCursor<IsoInt64>, size: 4 | 
 export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
+export function readIsoBoxDeclaredSize(view: DataView, at: number, end: number): number;
+
+// @public
 export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadConfig<V>): ParsedIsoBox<V>[];
+
+// @public
+export function readIsoBoxHeaderSize(view: DataView, at: number): number;
 
 // @public
 export function readIsoBoxSize(view: DataView, at: number, end: number, ignoreUserType?: boolean): number;
@@ -990,6 +1014,20 @@ export function readWideInt<V extends IsoInt64 = number>(cursor: IsoBoxReadCurso
 
 // @public
 export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, size: 4 | 8): V;
+
+// @public
+export type ResolvedTrackRunSample = {
+    sampleDuration?: number;
+    sampleSize?: number;
+    sampleFlags?: number;
+    sampleCompositionTimeOffset: number;
+};
+
+// @public
+export function resolveTrunSamples(trun: TrackRunBox, tfhd: TrackFragmentHeaderBox<IsoInt64> | null | undefined, trex: TrackExtendsBox): Required<ResolvedTrackRunSample>[];
+
+// @public
+export function resolveTrunSamples(trun: TrackRunBox, tfhd?: TrackFragmentHeaderBox<IsoInt64> | null, trex?: TrackExtendsBox | null): ResolvedTrackRunSample[];
 
 // @public
 export type RestrictedSchemeInfoBox<V extends IsoInt64 = number> = {
