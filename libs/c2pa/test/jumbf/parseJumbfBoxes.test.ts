@@ -64,4 +64,37 @@ describe('parseJumbfBoxes', () => {
 		strictEqual(boxes[0].type, 'jumd')
 		strictEqual(boxes[0].data.length, 0)
 	})
+
+	it('keeps the full payload of a uuid box', () => {
+		const payload = new Uint8Array(20).map((_, i) => i)
+		const bytes = buildBox('uuid', payload)
+		const boxes = parseJumbfBoxes(bytes)
+
+		strictEqual(boxes.length, 1)
+		strictEqual(boxes[0].type, 'uuid')
+		deepStrictEqual(boxes[0].data, payload)
+	})
+
+	it('reads the boxes after a uuid box below 24 bytes', () => {
+		const uuidPayload = new Uint8Array([0x01, 0x02, 0x03, 0x04])
+		const payload = new Uint8Array([0xaa, 0xbb])
+		const bytes = concat(buildBox('uuid', uuidPayload), buildBox('jumd', payload))
+		const boxes = parseJumbfBoxes(bytes)
+
+		strictEqual(boxes.length, 2)
+		strictEqual(boxes[0].type, 'uuid')
+		deepStrictEqual(boxes[0].data, uuidPayload)
+		strictEqual(boxes[1].type, 'jumd')
+		deepStrictEqual(boxes[1].data, payload)
+	})
+
+	it('keeps the payload of a box with an ISO BMFF container type', () => {
+		const payload = new Uint8Array([0x00, 0x00, 0x00, 0x09, 0x6a, 0x75, 0x6d, 0x64, 0xff])
+		const bytes = buildBox('moov', payload)
+		const boxes = parseJumbfBoxes(bytes)
+
+		strictEqual(boxes.length, 1)
+		strictEqual(boxes[0].type, 'moov')
+		deepStrictEqual(boxes[0].data, payload)
+	})
 })

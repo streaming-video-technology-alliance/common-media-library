@@ -1,5 +1,3 @@
-import type { IsoRawBox } from '@svta/cml-iso-bmff'
-
 const MILLISECONDS_PER_SECOND = 1000
 const SHA_ALGORITHM_PATTERN = /^sha(\d+)$/i
 
@@ -84,12 +82,6 @@ export function asUnsignedInteger(value: unknown): number | null {
 /** @internal */
 export function asString(value: unknown): string | null {
 	return typeof value === 'string' ? value : null
-}
-
-// The body of a raw box, after the box header and the user type of a uuid box.
-/** @internal */
-export function rawBoxBody(box: IsoRawBox): Uint8Array {
-	return box.bytes.subarray(box.headerSize ?? 8)
 }
 
 const FULLBOX_HEADER_SIZE = 4
