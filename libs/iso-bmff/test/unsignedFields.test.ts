@@ -96,7 +96,6 @@ const COUNTS: [name: string, bytes: Uint8Array][] = [
 	['stz2', boxBytes('stz2', [0, 4], [8, 4], COUNT)],
 	['subs', boxBytes('subs', [0, 4], COUNT)],
 	['tfra', boxBytes('tfra', [0, 4], [1, 4], [0, 4], COUNT)],
-	['trun', boxBytes('trun', [0, 1], [0x100, 3], COUNT)],
 ]
 
 describe('unsigned 32-bit fields', function () {
@@ -131,6 +130,16 @@ describe('unsigned 32-bit fields', function () {
 			)
 		})
 	}
+
+	it('should state the sample_count 0x80000000 of trun as 2147483648', function () {
+		const bytes = boxBytes('trun', [0, 1], [0x100, 3], COUNT)
+
+		assert.throws(() => readIsoBoxes(bytes, createDefaultReaderConfig()), {
+			name: 'RangeError',
+			message:
+				'readTrun: sample_count must be at most 0 for the 0 bytes of sample records in the box, received 2147483648',
+		})
+	})
 
 	for (const type of ['dref', 'stsd']) {
 		it(`should state the entry_count 0x80000000 of ${type} as 2147483648`, function () {

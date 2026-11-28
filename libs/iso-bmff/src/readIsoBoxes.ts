@@ -3,7 +3,7 @@ import { createIsoBoxReadCursor } from './createIsoBoxReadCursor.ts'
 import { readChildBoxes } from './readChildBoxes.ts'
 import type { IsoBoxReadConfig } from './IsoBoxReadConfig.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
-import type { ParsedIsoBox } from './ParsedIsoBox.ts'
+import type { ParsedIsoBoxList } from './ParsedIsoBox.ts'
 
 /**
  * Reads ISO boxes from a data source.
@@ -21,22 +21,29 @@ import type { ParsedIsoBox } from './ParsedIsoBox.ts'
  * The function also stops before a box with a size below the size of its header.
  * The function then returns the boxes before that box and does not throw for that box.
  *
+ * With the `spans` option, every box of the result has the `start` and `end` fields of `IsoBoxSpan`.
+ * The result type has the fields when the option is the literal `true`.
+ * The child boxes of a container have the fields too. Their type is `ParsedIsoBox<V>`, so narrow a child with `hasIsoBoxSpan` to read them.
+ *
  * @param raw - The raw ISO data
- * @param config - The readers map and the `int64` option.
+ * @param config - The readers map, the `int64` option, and the `spans` option.
  *
  * @returns The parsed boxes
  *
- * @throws RangeError if a reader reads past the end of its box. The function does not catch an error of a reader.
+ * @throws RangeError if a reader throws a `RangeError`, such as for a box that is too short for its fields. The error has the `box` field of `IsoBoxReadError` with the box type and the position of the box. The function does not catch an error of another class.
  * @throws RangeError if a box is deeper than 128 levels.
  *
  * @example
  * {@includeCode ../test/readIsoBoxes.test.ts#example}
  *
+ * @example
+ * {@includeCode ../test/readIsoBoxes.test.ts#spans}
+ *
  * @public
  */
-export function readIsoBoxes<V extends IsoInt64 = number>(
+export function readIsoBoxes<V extends IsoInt64 = number, S extends boolean = boolean>(
 	raw: IsoBoxData,
-	config?: IsoBoxReadConfig<V>,
-): ParsedIsoBox<V>[] {
+	config?: IsoBoxReadConfig<V, S>,
+): ParsedIsoBoxList<V, S> {
 	return readChildBoxes(createIsoBoxReadCursor(raw, config))
 }

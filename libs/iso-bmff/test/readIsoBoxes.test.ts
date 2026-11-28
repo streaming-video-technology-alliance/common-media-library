@@ -14,10 +14,12 @@ import {
 	readUint64,
 	readUint8,
 	readUrl,
+	hasIsoBoxSpan,
 	type IsoBoxReadCursor,
 	type IsoRawBox,
 } from './util/box.ts'
 import { expectType, type Equal } from './util/expectType.ts'
+import { load } from './util/load.ts'
 
 /** A tfdt reader that adds a field to the built-in box type. */
 const readTfdtExact = (cursor: IsoBoxReadCursor) => ({ ...readTfdt(cursor), exact: true })
@@ -48,6 +50,58 @@ describe('readIsoBoxes', function () {
 		assert.strictEqual(box.minorVersion, 1)
 		assert.deepStrictEqual(box.compatibleBrands, ['isom'])
 		// #endregion example
+	})
+
+	it('should set the position of each box with the spans option', function () {
+		// #region spans
+		const segment = load('mss_moof_tfdt.mp4')
+		const boxes = readIsoBoxes(segment, { spans: true, readers: { tfdt: readTfdt } })
+		const [moof, mdat] = boxes
+
+		assert.ok(moof && mdat)
+
+		// The bytes of the moof box, with its header.
+		const moofBytes = new Uint8Array(segment, moof.start, moof.end - moof.start)
+
+		// A child box has the fields too. Its type is ParsedIsoBox, so narrow the child with hasIsoBoxSpan.
+		const traf = isIsoBoxType('moof', moof) ? moof.boxes[1] : undefined
+		const trafBytes = traf && hasIsoBoxSpan(traf) ? moofBytes.subarray(traf.start, traf.end) : null
+		// #endregion spans
+
+		assert.ok(traf && hasIsoBoxSpan(traf) && trafBytes)
+		assert.strictEqual(traf.type, 'traf')
+		assert.strictEqual(trafBytes.length, traf.end - traf.start)
+		expectType<Equal<typeof moof.start, number>>(true)
+		assert.strictEqual(moof.type, 'moof')
+		assert.strictEqual(moof.start, 0)
+		assert.strictEqual(moof.end, new DataView(segment).getUint32(0))
+		assert.strictEqual(moofBytes.length, moof.end)
+		assert.strictEqual(mdat.start, moof.end)
+		assert.strictEqual(mdat.end, segment.byteLength)
+		assert.ok('bytes' in mdat)
+		assert.ok(isIsoBoxType('moof', moof))
+
+		const [mfhd] = moof.boxes
+
+		assert.ok(mfhd && hasIsoBoxSpan(mfhd) && 'bytes' in mfhd)
+		assert.strictEqual(mfhd.start, 8)
+		assert.strictEqual(mfhd.end, 8 + mfhd.bytes.length)
+		assert.strictEqual(traf.start, mfhd.end)
+		assert.ok(traf.end <= moof.end)
+
+		const tfdt = isIsoBoxType('traf', traf) ? traf.boxes[1] : null
+
+		assert.ok(tfdt && isIsoBoxType('tfdt', tfdt) && hasIsoBoxSpan(tfdt))
+		assert.ok(tfdt.start > traf.start)
+	})
+
+	it('should set no position without the spans option', function () {
+		const [moof] = readIsoBoxes(load('mss_moof_tfdt.mp4'))
+
+		assert.ok(moof)
+		assert.strictEqual(hasIsoBoxSpan(moof), false)
+		assert.strictEqual('start' in moof, false)
+		assert.strictEqual('end' in moof, false)
 	})
 
 	it('should exit if garbage is zero', function () {

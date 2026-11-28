@@ -52,6 +52,12 @@ and this project adheres to
 - `TrackEncryptionBox` has the new field `defaultIsProtected`, the protection state of the track. `readTenc` reads the field, and `writeTenc` writes it ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - `TrackEncryptionBox` has the new optional fields `defaultCryptByteBlock` and `defaultSkipByteBlock`. `readTenc` sets the fields for a `tenc` box of version 1 or above ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
 - `writeTenc` now writes `defaultCryptByteBlock` and `defaultSkipByteBlock` to a `tenc` box of version 1 or above. With no pattern field, the writer throws a `RangeError` ([#648](https://github.com/streaming-video-technology-alliance/common-media-library/issues/648)).
+- `iterateChildBoxes` yields the type and a new read cursor for each box from the position of a cursor to its end. The function parses no content and does not move the input cursor. Use the function to read some boxes of a list, such as the second `traf` box of a `moof` box, with the position of each box.
+- `cloneIsoBoxReadCursor` copies a read cursor. A move of the copy does not move the cursor.
+- The `spans` option of `readIsoBoxes` and `createIsoBoxReadCursor` adds the `start` and `end` fields of the new `IsoBoxSpan` type to every box of the result, including raw boxes and child boxes. The fields are the first byte of the box header and the first byte after the box. With `spans: true`, the result type `ParsedIsoBoxList` has the two fields at the first level. The type guard `hasIsoBoxSpan` narrows a child box to a box with the fields. `IsoBoxReadConfig` and `IsoBoxReadCursor` have a second type parameter for the option, with the default `boolean`.
+- `readIsoBoxSize` and `readIsoBoxHeaderSize` read the size of a box and the size of its header at a position, with no move of the cursor and no allocation. `readIsoBoxSize` returns the declared size of a box that the data truncates, so a player can read the complete child boxes of a partial `moof` box.
+- `isIsoBoxReadError` and the `IsoBoxReadError` type: when a reader throws a `RangeError`, `readChildBoxes` adds the `box` field to that error, with the box type, the first byte of the box header, and the position of the failed read. The error keeps its class, its name, and its message.
+- `resolveTrunSamples` returns the duration, the size, the flags, and the composition time offset of each sample of a `trun` box from the defaults of the `tfhd` box and the `trex` box. The result type is `ResolvedTrackRunSample`.
 
 ### Changed
 
@@ -221,6 +227,7 @@ Renames of version 2.0.0:
 | `defaultReaderConfig`, `defaultWriterConfig` | `createDefaultReaderConfig`, `createDefaultWriterConfig` |
 
 A field rename also changes the keys of a box that `readIsoBoxes` returns. Code that reads a field by a string key gets no compile error.
+- `readTrun` now throws a `RangeError` before it creates the sample objects when the sample records of `sample_count` pass the end of the box. The message has the maximum count for the box and the received count. Earlier releases allocate the objects of the count first, so a damaged count of 2^32 - 1 exhausts memory before the read of the records fails.
 
 ### Removed
 

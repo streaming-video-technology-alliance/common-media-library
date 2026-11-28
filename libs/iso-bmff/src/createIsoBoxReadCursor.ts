@@ -10,18 +10,18 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * The cursor shares memory with the input.
  *
  * @param data - The data to read.
- * @param config - The readers map and the `int64` option.
- * @returns A cursor at the first byte of the data.
+ * @param config - The readers map, the `int64` option, and the `spans` option.
+ * @returns A cursor at the first byte of the data. With `spans: true`, `readChildBoxes` on the cursor returns boxes with the `start` and `end` fields.
  *
  * @example
  * {@includeCode ../test/createIsoBoxReadCursor.test.ts#example}
  *
  * @public
  */
-export function createIsoBoxReadCursor<V extends IsoInt64 = number>(
+export function createIsoBoxReadCursor<V extends IsoInt64 = number, S extends boolean = boolean>(
 	data: IsoBoxData,
-	config?: IsoBoxReadConfig<V>,
-): IsoBoxReadCursor<V>
+	config?: IsoBoxReadConfig<V, S>,
+): IsoBoxReadCursor<V, S>
 export function createIsoBoxReadCursor(
 	data: IsoBoxData,
 	config?: IsoBoxReadConfig,
@@ -37,5 +37,6 @@ export function createIsoBoxReadCursor(
 		end: view.byteLength,
 		readers: config?.readers,
 		int64: config?.int64,
+		spans: config?.spans,
 	}
 }

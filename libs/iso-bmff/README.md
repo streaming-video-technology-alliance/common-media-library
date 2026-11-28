@@ -6,8 +6,8 @@ Documentation: [cml.svta.org/packages/iso-bmff](https://cml.svta.org/packages/is
 
 ## When to use
 
-- Read the boxes of an init or media segment, with full content for the box types that you need: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`
-- Read the track timescale, the sample entry type (such as `avc1`), or the default sample duration from moov and moof: `readMdhd`, `readStsd`, `readTrex`, `readTfhd`, `readTrun`
+- Read the boxes of an init or media segment, with full content for the box types that you need, or with the position of each box: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`, `iterateChildBoxes`
+- Read the track timescale, the sample entry type (such as `avc1`), or the duration and size of each sample from moov and moof: `readMdhd`, `readStsd`, `readTrex`, `readTfhd`, `readTrun`, `resolveTrunSamples`
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read a 64-bit field, such as a tfdt time at a 10 MHz timescale, exactly or with an overflow report: `readInt64AsBigInt`, `createInt64OverflowReader`
 - Read pssh and encryption boxes: `readPssh`, `readTenc`, `readSchm`

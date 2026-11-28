@@ -53,6 +53,9 @@ export type ChunkOffsetBox = FullBox & {
 };
 
 // @public
+export function cloneIsoBoxReadCursor<V extends IsoInt64 = number, S extends boolean = boolean>(cursor: IsoBoxReadCursor<V, S>): IsoBoxReadCursor<V, S>;
+
+// @public
 export type CompactSampleSizeBox = FullBox & {
     type: "stz2";
     fieldSize: number;
@@ -93,7 +96,7 @@ export function createInt64OverflowReader(onOverflow: (error: RangeError) => voi
 export function createIsoBoxReadableStream(boxes: Iterable<IsoBoxStreamable>, config?: IsoBoxWriteConfig): ReadableStream<Uint8Array<ArrayBuffer>>;
 
 // @public
-export function createIsoBoxReadCursor<V extends IsoInt64 = number>(data: IsoBoxData, config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V>;
+export function createIsoBoxReadCursor<V extends IsoInt64 = number, S extends boolean = boolean>(data: IsoBoxData, config?: IsoBoxReadConfig<V, S>): IsoBoxReadCursor<V, S>;
 
 // @public
 export function createIsoBoxWriteCursor(config?: {
@@ -220,6 +223,11 @@ export type HandlerBox = FullBox & {
 };
 
 // @public
+export function hasIsoBoxSpan<B extends {
+    type: string;
+}>(box: B): box is B & IsoBoxSpan;
+
+// @public
 export type IdentifiedMediaDataBox = {
     type: "imda";
     imdaIdentifier: number;
@@ -240,6 +248,9 @@ export function isContainer<T extends {
 } | {
     type: keyof IsoBoxContainerMap;
 }>;
+
+// @public
+export function isIsoBoxReadError(error: unknown): error is IsoBoxReadError;
 
 // @public
 export function isIsoBoxType<T extends keyof IsoBoxMap, V extends IsoInt64 = number>(type: T, box: IsoBox<V> | {
@@ -289,8 +300,9 @@ export type IsoBoxData = ArrayBufferLike | ArrayBufferView;
 export type IsoBoxMap<V extends IsoInt64 = number> = IsoBuiltInBoxMap<V> & IsoCustomBoxMap;
 
 // @public
-export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
+export type IsoBoxReadConfig<V extends IsoInt64 = number, S extends boolean = boolean> = {
     readers?: NoInfer<IsoBoxReaderMap<V>>;
+    spans?: S;
 } & ([V] extends [bigint] ? {
     int64: IsoInt64Reader<V>;
 } : {
@@ -298,7 +310,7 @@ export type IsoBoxReadConfig<V extends IsoInt64 = number> = {
 });
 
 // @public
-export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
+export type IsoBoxReadCursor<V extends IsoInt64 = number, S extends boolean = boolean> = {
     readonly view: DataView;
     readonly start: number;
     pos: number;
@@ -308,6 +320,7 @@ export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
             type: IsoBoxType;
         } | undefined;
     }["r"]>;
+    readonly spans?: S;
 } & ([V] extends [bigint] ? {
     readonly int64: IsoInt64Reader<V>;
 } : {
@@ -328,6 +341,24 @@ export type IsoBoxReaderMap<V extends IsoInt64 = number> = { [K in Exclude<keyof
     uuid?: {
         r(cursor: IsoBoxReadCursor<V>, type: "uuid"): IsoUuidBox | undefined;
     }["r"];
+};
+
+// @public
+export type IsoBoxReadError = RangeError & {
+    readonly box: IsoBoxReadErrorBox;
+};
+
+// @public
+export type IsoBoxReadErrorBox = {
+    readonly type: IsoBoxType;
+    readonly start: number;
+    readonly pos: number;
+};
+
+// @public
+export type IsoBoxSpan = {
+    start: number;
+    end: number;
 };
 
 // @public
@@ -509,6 +540,9 @@ export type IsoUuidBoxWriterMap = [keyof IsoCustomUuidBoxMap] extends [never] ? 
 }["w"] | undefined> : { [U in keyof IsoCustomUuidBoxMap]?: IsoUuidBoxWriter<U>; };
 
 // @public
+export function iterateChildBoxes<V extends IsoInt64 = number, S extends boolean = boolean>(cursor: IsoBoxReadCursor<V, S>): Generator<readonly [type: IsoBoxType, cursor: IsoBoxReadCursor<V, S>], void, undefined>;
+
+// @public
 export type KindBox = FullBox & {
     type: "kind";
     schemeUri: string;
@@ -634,6 +668,9 @@ export type OriginalFormatBox = {
 export type ParsedIsoBox<V extends IsoInt64 = number> = IsoBox<V> | IsoRawBox;
 
 // @public
+export type ParsedIsoBoxList<V extends IsoInt64 = number, S extends boolean = boolean> = [S] extends [true] ? (ParsedIsoBox<V> & IsoBoxSpan)[] : ParsedIsoBox<V>[];
+
+// @public
 export type PreselectionGroupBox<V extends IsoInt64 = number> = FullBox & {
     type: "prsl";
     groupId: number;
@@ -686,7 +723,7 @@ export function readAvc4<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): Visua
 export function readBytes(cursor: IsoBoxReadCursor<IsoInt64>, length: number): Uint8Array;
 
 // @public
-export function readChildBoxes<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, count?: number): ParsedIsoBox<V>[];
+export function readChildBoxes<V extends IsoInt64 = number, S extends boolean = boolean>(cursor: IsoBoxReadCursor<V, S>, count?: number): ParsedIsoBoxList<V, S>;
 
 // @public
 export function readCo64<V extends IsoInt64>(cursor: IsoBoxReadCursor<V>): ChunkLargeOffsetBox<V>;
@@ -761,7 +798,13 @@ export function readInt64AsBigInt(cursor: IsoBoxReadCursor<IsoInt64>, size: 4 | 
 export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
-export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadConfig<V>): ParsedIsoBox<V>[];
+export function readIsoBoxes<V extends IsoInt64 = number, S extends boolean = boolean>(raw: IsoBoxData, config?: IsoBoxReadConfig<V, S>): ParsedIsoBoxList<V, S>;
+
+// @public
+export function readIsoBoxHeaderSize(cursor: IsoBoxReadCursor<IsoInt64>, at: number): number;
+
+// @public
+export function readIsoBoxSize(cursor: IsoBoxReadCursor<IsoInt64>, at: number): number;
 
 // @public
 export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
@@ -989,6 +1032,17 @@ export function readWideInt<V extends IsoInt64 = number>(cursor: IsoBoxReadCurso
 export function readWideUint<V extends IsoInt64 = number>(cursor: IsoBoxReadCursor<V>, size: 4 | 8): V;
 
 // @public
+export type ResolvedTrackRunSample = {
+    sampleDuration?: number;
+    sampleSize?: number;
+    sampleFlags?: number;
+    sampleCompositionTimeOffset: number;
+};
+
+// @public
+export function resolveTrunSamples(trun: TrackRunBox, tfhd?: TrackFragmentHeaderBox<IsoInt64>, trex?: TrackExtendsBox): ResolvedTrackRunSample[];
+
+// @public
 export type RestrictedSchemeInfoBox<V extends IsoInt64 = number> = {
     type: "rinf";
     boxes: ParsedIsoBox<V>[];
@@ -1055,10 +1109,10 @@ export type SchemeTypeBox = FullBox & {
 };
 
 // @public
-export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxReadCursor<V>, path: readonly IsoBoxType[]): IsoBoxReadCursor<V> | null;
+export function seekIsoBox<V extends IsoInt64 = number, S extends boolean = boolean>(data: IsoBoxReadCursor<V, S>, path: readonly IsoBoxType[]): IsoBoxReadCursor<V, S> | null;
 
 // @public
-export function seekIsoBox<V extends IsoInt64 = number>(data: IsoBoxData, path: readonly IsoBoxType[], config?: IsoBoxReadConfig<V>): IsoBoxReadCursor<V> | null;
+export function seekIsoBox<V extends IsoInt64 = number, S extends boolean = boolean>(data: IsoBoxData, path: readonly IsoBoxType[], config?: IsoBoxReadConfig<V, S>): IsoBoxReadCursor<V, S> | null;
 
 // @public
 export type SegmentIndexBox<V extends IsoInt64 = number> = FullBox & {

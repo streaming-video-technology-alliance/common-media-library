@@ -20,6 +20,7 @@ import {
 	type TrackFragmentBox,
 } from './util/box.ts'
 import { TEST_USER_TYPE } from './util/customBoxTypes.ts'
+import { expectType, type Equal } from './util/expectType.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 
@@ -36,6 +37,47 @@ function nest(depth: number): Uint8Array {
 
 	return bytes
 }
+
+describe('readChildBoxes with the spans option', function () {
+	it('should set start and end on every box of a cursor with spans', function () {
+		// #region spans
+		const cursor = createIsoBoxReadCursor(reduceUint8Arrays([MFHD, MDAT]), { spans: true })
+		const [mfhd, mdat] = readChildBoxes(cursor)
+
+		const mdatStart = mdat?.start // the first byte of the mdat box header
+		// #endregion spans
+
+		assert.ok(mfhd && mdat)
+		expectType<Equal<typeof mfhd.end, number>>(true)
+		assert.strictEqual(mfhd.start, 0)
+		assert.strictEqual(mfhd.end, MFHD.length)
+		assert.strictEqual(mdatStart, MFHD.length)
+		assert.strictEqual(mdat.end, MFHD.length + MDAT.length)
+	})
+
+	it('should set the position of the box that a reader returns', function () {
+		const cursor = createIsoBoxReadCursor(reduceUint8Arrays([MDAT, MFHD]), {
+			spans: true,
+			readers: { mfhd: readMfhd },
+		})
+		const [, mfhd] = readChildBoxes(cursor)
+
+		assert.ok(mfhd && isIsoBoxType('mfhd', mfhd))
+		assert.strictEqual(mfhd.sequenceNumber, 7)
+		assert.strictEqual(mfhd.start, MDAT.length)
+		assert.strictEqual(mfhd.end, MDAT.length + MFHD.length)
+	})
+
+	it('should count the position from the first byte of the data of the cursor', function () {
+		const bytes = reduceUint8Arrays([MDAT, MFHD])
+		const cursor = createIsoBoxReadCursor(bytes.subarray(MDAT.length), { spans: true })
+		const [mfhd] = readChildBoxes(cursor)
+
+		assert.ok(mfhd)
+		assert.strictEqual(mfhd.start, 0)
+		assert.strictEqual(mfhd.end, MFHD.length)
+	})
+})
 
 describe('readIsoBoxes on the read cursor', function () {
 	it('should return a raw box for a box with no reader', function () {
