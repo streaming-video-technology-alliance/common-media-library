@@ -578,14 +578,14 @@ Amended on 2026-11-27, by issue [#694](https://github.com/streaming-video-techno
 Amended on 2026-11-27, by issue [#696](https://github.com/streaming-video-technology-alliance/common-media-library/issues/696):
 
 - **Size of a box.** `readIsoBoxSize(view, at, end, ignoreUserType?)` returns the size of the box at a position of a `DataView`. The result is 0 for a truncated box. The function allocates nothing and needs no read cursor.
-- **Rule for a `uuid` box.** By default, a `uuid` box with a size below its header plus 16 bytes is truncated, as in `nextIsoBox`. With `ignoreUserType`, the function returns the size of that box.
-- **Callers.** `readChildBoxes`, `seekIsoBox`, and `nextIsoBox` call the function. `parsePsshList` of `@svta/cml-drm` and the reader of root boxes of `@svta/cml-c2pa` call it with `ignoreUserType`. The repository then has one copy of the header rules.
+- **Rule for a `uuid` box.** By default, a `uuid` box with a size below its header plus 16 bytes is truncated, as in `readIsoBoxes`. With `ignoreUserType`, the function returns the size of that box.
+- **Callers.** `readChildBoxes`, `seekIsoBox`, and `nextIsoBox` call the function. `parsePsshList` of `@svta/cml-drm` and the reader of root boxes of `@svta/cml-c2pa` call it with `ignoreUserType`. The repository then has one function that reads the size of a box.
 - **Reason.** The loops of the two packages accept a `uuid` box with no room for `usertype`. The c2pa loop selects the bytes of the content hash. `nextIsoBox` stops before that box, and it returns the type as a string.
 - **Cost.** The package has one more public function. The table shows the change of each bundle. An application that imports only `parsePsshList` gets larger.
 
   | Bundle                                                    | Minified   | After gzip |
   | --------------------------------------------------------- | ---------- | ---------- |
-  | `parsePsshList` of `@svta/cml-drm`                        | +127 bytes | +72 bytes  |
+  | `parsePsshList` of `@svta/cml-drm`                        | +125 bytes | +58 bytes  |
   | `parsePsshList` and `ensureEncryptedInit`                 | -114 bytes | -24 bytes  |
   | `validateC2paSegment` of `@svta/cml-c2pa`                 | -105 bytes | -28 bytes  |
   | `readIsoBoxes`                                            | -7 bytes   | -2 bytes   |

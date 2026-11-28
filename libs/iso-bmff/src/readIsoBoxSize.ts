@@ -9,10 +9,10 @@
  * Use the function in a loop over sibling boxes that has no read cursor. `nextIsoBox` does the same step with a read cursor.
  *
  * @param view - The data.
- * @param at - The position of the first byte of the box.
+ * @param at - The position of the first byte of the box. The position must be an integer of 0 or more.
  * @param end - The position after the last byte that the box can use. The position must not pass the end of `view`.
  * @param ignoreUserType - If `true`, the header of a `uuid` box does not include `usertype`. The function then returns the size of a `uuid` box with fewer than 16 bytes after its header. The default is `false`.
- * @returns The size of the box in bytes. The result is 0 for a truncated box: the data ends inside the box, or the size is below the header size.
+ * @returns The size of the box in bytes. The result is 0 at `end` and for a truncated box. In a truncated box, the data ends inside the box, or the size is below the header size.
  *
  * @example
  * {@includeCode ../test/readIsoBoxSize.test.ts#example}

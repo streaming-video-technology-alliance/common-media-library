@@ -502,7 +502,7 @@ while (size) {
 }
 ```
 
-The function returns 0 before a truncated box. A `uuid` box with fewer than 16 bytes after its header is truncated, as in `readIsoBoxes`. To get the size of that box, pass `true` as the fourth argument.
+The function returns 0 at the end of the data and for a truncated box. By default, the header of a `uuid` box includes the 16 bytes of `usertype`, as in `readIsoBoxes`. A `uuid` box with a size below that header is truncated. To get the size of that box, pass `true` as the fourth argument.
 
 ## Extending a built-in reader
 
