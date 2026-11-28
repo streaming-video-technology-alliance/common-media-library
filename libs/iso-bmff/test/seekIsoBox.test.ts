@@ -131,6 +131,13 @@ describe('seekIsoBox', function () {
 		assert.strictEqual(readUint8(cursor), 7)
 	})
 
+	it('should return null at a uuid box with no room for usertype', function () {
+		const short = boxBytes('uuid', new Uint8Array(15))
+
+		assert.strictEqual(seekIsoBox(boxBytes('uuid'), ['uuid']), null)
+		assert.strictEqual(seekIsoBox(reduceUint8Arrays([short, boxBytes('free')]), ['free']), null)
+	})
+
 	it('should return a cursor after the header of a box with a largesize', function () {
 		const large = new Uint8Array(17)
 		const view = new DataView(large.buffer)

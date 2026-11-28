@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- The reader of root boxes now reads the size of each box with `readIsoBoxSize` of `@svta/cml-iso-bmff`. The public API and the results do not change ([#696](https://github.com/streaming-video-technology-alliance/common-media-library/issues/696)).
 - The package now reads the JUMBF boxes with its own reader of root boxes, and not with `readIsoBoxes` of `@svta/cml-iso-bmff`. The payload of each JUMBF box is now the full content after the header, for every box type. The public API and the results do not change ([#697](https://github.com/streaming-video-technology-alliance/common-media-library/issues/697)).
 - The package now reads the C2PA `uuid` boxes with `createUuidReader` of `@svta/cml-iso-bmff`. The package no longer reads these boxes as raw boxes. The public API and the results do not change ([#694](https://github.com/streaming-video-technology-alliance/common-media-library/issues/694)).
 - The search for the Verifiable Segment Info `emsg` box now narrows each box with `isIsoBoxType` of `@svta/cml-iso-bmff`, with no type cast. The public API and the results do not change ([#698](https://github.com/streaming-video-technology-alliance/common-media-library/issues/698)).

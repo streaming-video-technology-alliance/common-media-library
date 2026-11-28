@@ -378,6 +378,22 @@ describe('computeBmffHash', () => {
 			)
 		})
 
+		it('excludes nothing for a nested xpath to a box that follows the parent box', async () => {
+			const trak = buildBox('trak', buildBox('tkhd', Uint8Array.of(1)))
+			const moov = buildBox('moov', concatBytes(trak, udta))
+			const segment = concatBytes(ftyp, moov)
+
+			const hash = await computeBmffHash(segment, {
+				exclusions: [{ xpath: '/moov/trak/udta' }],
+				offsetPrefixSize: 8,
+			})
+
+			deepStrictEqual(
+				hash,
+				await expectedHash(encodeBoxOffset(0), ftyp, encodeBoxOffset(ftyp.length), moov),
+			)
+		})
+
 		// A uuid box puts a 16-byte usertype before its children (ISO/IEC 14496-12 section 4.2).
 		it('skips the usertype of a uuid container when it descends into the box', async () => {
 			const usertype = Uint8Array.from({ length: 16 }, (_, i) => 0x10 + i)

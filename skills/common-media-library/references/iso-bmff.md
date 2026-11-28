@@ -486,6 +486,24 @@ while (type) {
 
 The function returns `null` at the end of the cursor and before a truncated box. The position then stays at the first byte of that box.
 
+`readIsoBoxSize` returns the size of the box at a position of a `DataView`. Use it for a loop that has no read cursor:
+
+```typescript
+import { readIsoBoxSize } from "@svta/cml-iso-bmff";
+
+const view = new DataView(buffer);
+let at = 0;
+let size = readIsoBoxSize(view, at, view.byteLength);
+
+while (size) {
+	console.log(at, size); // the position and the size of each box
+	at += size;
+	size = readIsoBoxSize(view, at, view.byteLength);
+}
+```
+
+The function returns 0 at the end of the data and for a truncated box. By default, the header of a `uuid` box includes the 16 bytes of `usertype`, as in `readIsoBoxes`. A `uuid` box with a size below that header is truncated. To get the size of that box, pass `true` as the fourth argument.
+
 ## Extending a built-in reader
 
 A custom reader can call a built-in reader and add fields to the result. In the result of `readIsoBoxes`, the box has the built-in type. The loop narrows the box with `isIsoBoxType`, then casts the box to the result type of the reader.
@@ -2219,6 +2237,9 @@ export function readInt8(cursor: IsoBoxReadCursor<IsoInt64>): number;
 
 // @public
 export function readIsoBoxes<V extends IsoInt64 = number>(raw: IsoBoxData, config?: IsoBoxReadConfig<V>): ParsedIsoBox<V>[];
+
+// @public
+export function readIsoBoxSize(view: DataView, at: number, end: number, ignoreUserType?: boolean): number;
 
 // @public
 export function readKind(cursor: IsoBoxReadCursor<IsoInt64>): KindBox;
