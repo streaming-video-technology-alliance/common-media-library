@@ -53,6 +53,23 @@ describe('nextIsoBox', function () {
 		assert.strictEqual(cursor.pos, MFHD.length)
 	})
 
+	it('should return null and not move the position before a uuid box with no room for usertype', function () {
+		const cursor = createIsoBoxReadCursor(
+			reduceUint8Arrays([boxBytes('uuid', new Uint8Array(15)), MDAT]),
+		)
+
+		assert.strictEqual(nextIsoBox(cursor), null)
+		assert.strictEqual(cursor.pos, 0)
+	})
+
+	it('should count the positions from the first byte of a subarray input', function () {
+		const bytes = reduceUint8Arrays([MDAT, MFHD, MDAT])
+		const cursor = createIsoBoxReadCursor(bytes.subarray(MDAT.length))
+
+		assert.strictEqual(nextIsoBox(cursor), 'mfhd')
+		assert.strictEqual(cursor.pos, MFHD.length)
+	})
+
 	it('should return null for a largesize above the data and above 2^53', function () {
 		const large = new Uint8Array(24)
 		const view = new DataView(large.buffer)

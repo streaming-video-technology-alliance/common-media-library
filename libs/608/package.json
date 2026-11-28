@@ -53,6 +53,9 @@
 			"onFail": "error"
 		}
 	},
+	"devDependencies": {
+		"@svta/cml-iso-bmff": "*"
+	},
 	"peerDependencies": {
 		"@svta/cml-utils": "*"
 	}

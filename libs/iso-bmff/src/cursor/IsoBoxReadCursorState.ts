@@ -15,6 +15,5 @@ export type IsoBoxReadCursorState = {
 	end: number
 	readers?: IsoBoxReadCursor<IsoInt64>['readers']
 	int64?: IsoInt64Reader<IsoInt64>
-	spans?: boolean
 	depth?: number
 }

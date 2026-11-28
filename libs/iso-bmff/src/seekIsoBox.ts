@@ -1,12 +1,11 @@
-import { cloneIsoBoxReadCursor } from './cloneIsoBoxReadCursor.ts'
 import type { IsoBoxReadCursorState } from './cursor/IsoBoxReadCursorState.ts'
-import { readIsoBoxHeader } from './cursor/readIsoBoxHeader.ts'
 import { createIsoBoxReadCursor } from './createIsoBoxReadCursor.ts'
 import type { IsoBoxData } from './IsoBoxData.ts'
 import type { IsoBoxReadConfig } from './IsoBoxReadConfig.ts'
 import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoBoxType } from './IsoBoxType.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
+import { readIsoBoxSize } from './readIsoBoxSize.ts'
 
 /**
  * Finds a box by its path and returns a read cursor for that box. The function decodes no other box.
@@ -18,7 +17,7 @@ import type { IsoInt64 } from './IsoInt64.ts'
  * The function knows no box type. A box such as `meta` or `stsd` has fields before its child boxes.
  * For such a box, move `pos` past the fields, then call the function again with that cursor.
  *
- * @param data - The data, or a read cursor. The search starts at the position of a cursor, and the function does not move that cursor. The result keeps the readers map and the options of a cursor.
+ * @param data - The data, or a read cursor. The search starts at the position of a cursor, and the function does not move that cursor. The result keeps the readers map and the `int64` option of a cursor.
  * @param path - The type of each box, from the outer box to the box to find. With an empty path, the result is a cursor at the position of the input.
  * @returns A new read cursor for the first box at the path. The result is `null` for a missing box and for a truncated box.
  *
@@ -32,10 +31,10 @@ import type { IsoInt64 } from './IsoInt64.ts'
  *
  * @public
  */
-export function seekIsoBox<V extends IsoInt64 = number, S extends boolean = boolean>(
-	data: IsoBoxReadCursor<V, S>,
+export function seekIsoBox<V extends IsoInt64 = number>(
+	data: IsoBoxReadCursor<V>,
 	path: readonly IsoBoxType[],
-): IsoBoxReadCursor<V, S> | null
+): IsoBoxReadCursor<V> | null
 /**
  * Finds a box by its path and returns a read cursor for that box. The function decodes no other box.
  *
@@ -46,18 +45,27 @@ export function seekIsoBox<V extends IsoInt64 = number, S extends boolean = bool
  *
  * @public
  */
-export function seekIsoBox<V extends IsoInt64 = number, S extends boolean = boolean>(
+export function seekIsoBox<V extends IsoInt64 = number>(
 	data: IsoBoxData,
 	path: readonly IsoBoxType[],
-	config?: IsoBoxReadConfig<V, S>,
-): IsoBoxReadCursor<V, S> | null
+	config?: IsoBoxReadConfig<V>,
+): IsoBoxReadCursor<V> | null
 export function seekIsoBox(
 	data: IsoBoxData | IsoBoxReadCursor<IsoInt64>,
 	path: readonly IsoBoxType[],
 	config?: IsoBoxReadConfig<IsoInt64>,
 ): IsoBoxReadCursor<IsoInt64> | null {
 	const cursor: IsoBoxReadCursorState =
-		'pos' in data ? cloneIsoBoxReadCursor(data) : createIsoBoxReadCursor(data, config)
+		'pos' in data
+			? {
+					view: data.view,
+					start: data.start,
+					pos: data.pos,
+					end: data.end,
+					readers: data.readers,
+					int64: data.int64,
+				}
+			: createIsoBoxReadCursor(data, config)
 	const { view } = cursor
 
 	for (const type of path) {
@@ -76,7 +84,7 @@ export function seekIsoBox(
 		let at = cursor.pos
 
 		for (;;) {
-			const size = readIsoBoxHeader(cursor, at)
+			const size = readIsoBoxSize(view, at, cursor.end)
 
 			if (!size) {
 				return null

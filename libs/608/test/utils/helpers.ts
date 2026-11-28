@@ -1,3 +1,4 @@
+import { seekIsoBox } from '@svta/cml-iso-bmff'
 import { equal, ok } from 'node:assert'
 
 /**
@@ -34,32 +35,6 @@ export function parseTrunSamples(view: DataView, trunOffset: number): { size: nu
 }
 
 /**
- * Find an ISO BMFF box by type within a DataView.
- */
-export function findBox(
-	view: DataView,
-	type: string,
-	start: number,
-	end: number,
-): { offset: number; size: number } | null {
-	let pos = start
-	while (pos < end - 8) {
-		const size = view.getUint32(pos)
-		const boxType = String.fromCharCode(
-			view.getUint8(pos + 4),
-			view.getUint8(pos + 5),
-			view.getUint8(pos + 6),
-			view.getUint8(pos + 7),
-		)
-		if (boxType === type) {
-			return { offset: pos, size }
-		}
-		pos += size
-	}
-	return null
-}
-
-/**
  * Parse an m4s segment and return the DataView, mdat body start offset, and sample sizes.
  */
 export function parseSegment(file: Buffer): {
@@ -69,16 +44,14 @@ export function parseSegment(file: Buffer): {
 } {
 	const view = new DataView(file.buffer, file.byteOffset, file.byteLength)
 
-	const moof = findBox(view, 'moof', 0, view.byteLength)
-	ok(moof, 'moof box not found')
-	const traf = findBox(view, 'traf', moof.offset + 8, moof.offset + moof.size)
-	ok(traf, 'traf box not found')
-	const trun = findBox(view, 'trun', traf.offset + 8, traf.offset + traf.size)
-	ok(trun, 'trun box not found')
+	const moof = seekIsoBox(file, ['moof'])
+	ok(moof, 'moof box not found or truncated')
+	const trun = seekIsoBox(moof, ['traf', 'trun'])
+	ok(trun, 'traf or trun box not found or truncated')
 
-	const dataOffset = view.getInt32(trun.offset + 16)
-	const mdatBodyStart = moof.offset + dataOffset
-	const samples = parseTrunSamples(view, trun.offset)
+	const dataOffset = view.getInt32(trun.start + 16)
+	const mdatBodyStart = moof.start + dataOffset
+	const samples = parseTrunSamples(view, trun.start)
 
 	return { view, mdatBodyStart, samples }
 }

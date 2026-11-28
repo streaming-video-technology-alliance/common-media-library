@@ -1,12 +1,11 @@
 import type { IsoBoxReadCursorState } from './cursor/IsoBoxReadCursorState.ts'
 import { decodeFourCc } from './cursor/decodeFourCc.ts'
-import { readIsoBoxHeader } from './cursor/readIsoBoxHeader.ts'
 import type { IsoBoxReadCursor } from './IsoBoxReadCursor.ts'
 import type { IsoBoxReadErrorBox } from './isIsoBoxReadError.ts'
-import type { IsoBoxSpan } from './hasIsoBoxSpan.ts'
 import type { IsoInt64 } from './IsoInt64.ts'
 import type { IsoRawBox } from './IsoRawBox.ts'
-import type { ParsedIsoBox, ParsedIsoBoxList } from './ParsedIsoBox.ts'
+import type { ParsedIsoBox } from './ParsedIsoBox.ts'
+import { readIsoBoxSize } from './readIsoBoxSize.ts'
 import { CONTAINERS } from './utils/CONTAINERS.ts'
 
 const CONTAINER_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CONTAINERS)
@@ -22,35 +21,29 @@ const CONTAINER_SET: ReadonlySet<string> = /* @__PURE__ */ new Set(CONTAINERS)
  *
  * The function stops before a truncated box: the data ends inside the box, or the size is below the header size.
  * The position of the cursor is then the first byte of that box.
- * If a reader throws a `RangeError`, the function adds the `box` field of `IsoBoxReadError` to that error, with the box type and the position of the box, and throws the same error.
- * The function does not catch an error of another class. After an error, the position of the cursor is the first byte of the box that failed,
- * and `start` and `end` do not change.
- *
- * If `cursor.spans` is `true`, every box of the result has the `start` and `end` fields of `IsoBoxSpan`.
- * The function sets the fields on the object that the reader returns, so a reader must return a new object for each box.
+ * If a `RangeError` occurs during the read of a box, the function adds the `box` field of `IsoBoxReadError` to that error and throws the same error.
+ * The field has the box type and the position of the box. The function does not catch an error of another class.
+ * After an error, the position of the cursor is the first byte of the box that failed, and `start` and `end` do not change.
  *
  * @param cursor - The cursor at the first byte of the first box.
  * @param count - The maximum number of boxes. With no count, the function reads every box to `cursor.end`.
- * @returns The boxes. With `cursor.spans` of the literal type `true`, each box has the fields of `IsoBoxSpan`.
+ * @returns The boxes.
  *
  * @throws RangeError if `count` is negative or `NaN`.
  * @throws RangeError if a reader throws a `RangeError`. The error has the `box` field of `IsoBoxReadError`.
- * @throws RangeError if a box is deeper than 128 levels. The message has the box type and the limit.
+ * @throws RangeError if a box is deeper than 128 levels. The message has the box type and the limit, and the error has the `box` field.
  *
  * @example
  * {@includeCode ../test/readChildBoxes.test.ts#example}
  *
- * @example
- * {@includeCode ../test/readChildBoxes.test.ts#spans}
- *
  * @public
  */
-export function readChildBoxes<V extends IsoInt64 = number, S extends boolean = boolean>(
-	cursor: IsoBoxReadCursor<V, S>,
+export function readChildBoxes<V extends IsoInt64 = number>(
+	cursor: IsoBoxReadCursor<V>,
 	count?: number,
-): ParsedIsoBoxList<V, S> {
+): ParsedIsoBox<V>[] {
 	const state = cursor as IsoBoxReadCursorState
-	const { view, start, end, readers, spans } = state
+	const { view, start, end, readers } = state
 	const depth = state.depth || 0
 	const max = count ?? Infinity
 	const boxes: ParsedIsoBox<V>[] = []
@@ -61,7 +54,7 @@ export function readChildBoxes<V extends IsoInt64 = number, S extends boolean = 
 
 	while (boxes.length < max) {
 		const boxStart = state.pos
-		const size = readIsoBoxHeader(state, boxStart)
+		const size = readIsoBoxSize(view, boxStart, end)
 
 		if (!size) {
 			break
@@ -100,13 +93,6 @@ export function readChildBoxes<V extends IsoInt64 = number, S extends boolean = 
 
 				box = raw
 			}
-
-			if (spans) {
-				const span = box as ParsedIsoBox<V> & IsoBoxSpan
-
-				span.start = boxStart
-				span.end = boxEnd
-			}
 		} catch (error) {
 			if (error instanceof RangeError && !('box' in error) && Object.isExtensible(error)) {
 				const box: IsoBoxReadErrorBox = { type, start: boxStart, pos: state.pos }
@@ -126,5 +112,5 @@ export function readChildBoxes<V extends IsoInt64 = number, S extends boolean = 
 		boxes.push(box)
 	}
 
-	return boxes as ParsedIsoBoxList<V, S>
+	return boxes
 }

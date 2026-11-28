@@ -1,6 +1,6 @@
 import { assert, describe, findBox, isIsoBoxType, it, readIsoBoxes, readTrun } from '../util/box.ts'
 import { trunBox } from '../util/versionBoxes.ts'
-import { boxBytes } from '../util/wideBoxes.ts'
+import { boxBytes, type BoxField } from '../util/wideBoxes.ts'
 
 describe('readTrun', function () {
 	it('should correctly parse the box from sample data', function () {
@@ -43,13 +43,45 @@ describe('readTrun sample_count', function () {
 		})
 	})
 
-	it('should not allocate the samples of a count of 0xffffffff', function () {
+	it('should state a count of 0xffffffff as 4294967295', function () {
 		const bytes = boxBytes('trun', [0, 1], [0x100, 3], [0xffffffff, 4], [100, 4])
 
 		assert.throws(
 			() => readIsoBoxes(bytes, { readers: { trun: readTrun } }),
 			/received 4294967295$/,
 		)
+	})
+
+	it('should accept a count that fits and reject the next count', function () {
+		// Flags 0xf05: data_offset, first_sample_flags, and four fields of 4 bytes for each sample.
+		// The box has one record of 16 bytes and 4 more bytes.
+		const fields: BoxField[] = [
+			[7, 4],
+			[9, 4],
+			[100, 4],
+			[200, 4],
+			[300, 4],
+			[400, 4],
+			[0, 4],
+		]
+		const fits = boxBytes('trun', [0, 1], [0xf05, 3], [1, 4], ...fields)
+		const passes = boxBytes('trun', [0, 1], [0xf05, 3], [2, 4], ...fields)
+		const [box] = readIsoBoxes(fits, { readers: { trun: readTrun } })
+
+		assert.ok(isIsoBoxType('trun', box))
+		assert.deepStrictEqual(box.samples, [
+			{
+				sampleDuration: 100,
+				sampleSize: 200,
+				sampleFlags: 300,
+				sampleCompositionTimeOffset: 400,
+			},
+		])
+		assert.throws(() => readIsoBoxes(passes, { readers: { trun: readTrun } }), {
+			name: 'RangeError',
+			message:
+				'readTrun: sample_count must be at most 1 for the 20 bytes of sample records in the box, received 2',
+		})
 	})
 
 	it('should read a count with no sample record fields', function () {

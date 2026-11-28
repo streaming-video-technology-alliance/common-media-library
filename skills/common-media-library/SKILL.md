@@ -213,7 +213,7 @@ Reference: references/iso-8601.md
 
 Read and write ISO Base Media File Format (ISO BMFF) boxes
 
-- Read the boxes of an init or media segment, with full content for the box types that you need, or with the position of each box: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`, `iterateChildBoxes`
+- Read the boxes of an init or media segment, with the content or the position of each box: `readIsoBoxes`, `findIsoBox`, `filterIsoBoxes`, `traverseIsoBoxes`, `iterateChildBoxes`
 - Read the track timescale, the sample entry type (such as `avc1`), or the duration and size of each sample from moov and moof: `readMdhd`, `readStsd`, `readTrex`, `readTfhd`, `readTrun`, `resolveTrunSamples`
 - Read the base media decode time, the segment index, or event messages: `readTfdt`, `readSidx`, `readEmsg`
 - Read a 64-bit field, such as a tfdt time at a 10 MHz timescale, exactly or with an overflow report: `readInt64AsBigInt`, `createInt64OverflowReader`

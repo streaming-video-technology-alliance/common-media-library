@@ -7,6 +7,7 @@ import type { IsoInt64 } from '../IsoInt64.ts'
  * One sample of a `trun` box with the values that the `tfhd` and `trex` defaults supply.
  *
  * A field is `undefined` when the `trun` box, the `tfhd` box, and the `trex` box have no value for it.
+ * With a `trex` box, `resolveTrunSamples` returns `Required<ResolvedTrackRunSample>`, and every field is a number.
  *
  * @public
  */
@@ -26,16 +27,16 @@ export type ResolvedTrackRunSample = {
  *
  * ISO/IEC 14496-12:2015 - 8.8.8.1
  *
- * A sample field that the `trun` box has wins. A missing field takes the default of the `tfhd` box, then the default of the `trex` box.
+ * A sample field of the `trun` box has priority. A missing field takes the default of the `tfhd` box, then the default of the `trex` box.
  * `firstSampleFlags` of the `trun` box replaces the default flags of the first sample only.
  * A missing composition time offset is 0.
  *
  * The `trex` box is the one of the track of the fragment: `tfhd.trackId === trex.trackId`. The function does not check the track.
  *
  * @param trun - The `trun` box.
- * @param tfhd - The `tfhd` box of the same `traf` box.
+ * @param tfhd - The `tfhd` box of the same `traf` box, or `null`.
  * @param trex - The `trex` box of the track, from the `moov` box.
- * @returns One object for each sample of the `trun` box, in the order of the box.
+ * @returns One object for each sample of the `trun` box, in the order of the box. Every field is a number.
  *
  * @example
  * {@includeCode ../../test/resolveTrunSamples.test.ts#example}
@@ -44,25 +45,49 @@ export type ResolvedTrackRunSample = {
  */
 export function resolveTrunSamples(
 	trun: TrackRunBox,
-	tfhd?: TrackFragmentHeaderBox<IsoInt64>,
-	trex?: TrackExtendsBox,
+	tfhd: TrackFragmentHeaderBox<IsoInt64> | null | undefined,
+	trex: TrackExtendsBox,
+): Required<ResolvedTrackRunSample>[]
+/**
+ * Resolves the fields of each sample of a `trun` box from the defaults of the `tfhd` box, with no `trex` box.
+ *
+ * ISO/IEC 14496-12:2015 - 8.8.8.1
+ *
+ * A sample field of the `trun` box has priority. A missing field takes the default of the `tfhd` box.
+ * A field with no value in a box is `undefined`. A missing composition time offset is 0.
+ *
+ * @param trun - The `trun` box.
+ * @param tfhd - The `tfhd` box of the same `traf` box. The parameter is optional and accepts `null`.
+ * @param trex - The `trex` box of the track. The parameter is optional and accepts `null`.
+ * @returns One object for each sample of the `trun` box, in the order of the box.
+ *
+ * @public
+ */
+export function resolveTrunSamples(
+	trun: TrackRunBox,
+	tfhd?: TrackFragmentHeaderBox<IsoInt64> | null,
+	trex?: TrackExtendsBox | null,
+): ResolvedTrackRunSample[]
+export function resolveTrunSamples(
+	trun: TrackRunBox,
+	tfhd?: TrackFragmentHeaderBox<IsoInt64> | null,
+	trex?: TrackExtendsBox | null,
 ): ResolvedTrackRunSample[] {
-	const { samples, firstSampleFlags } = trun
 	const duration = tfhd?.defaultSampleDuration ?? trex?.defaultSampleDuration
 	const size = tfhd?.defaultSampleSize ?? trex?.defaultSampleSize
 	const flags = tfhd?.defaultSampleFlags ?? trex?.defaultSampleFlags
-	const result: ResolvedTrackRunSample[] = new Array<ResolvedTrackRunSample>(samples.length)
+	const result: ResolvedTrackRunSample[] = []
+	let first = trun.firstSampleFlags
 
-	samples.forEach((sample, i) => {
-		result[i] = {
+	for (const sample of trun.samples) {
+		result.push({
 			sampleDuration: sample.sampleDuration ?? duration,
 			sampleSize: sample.sampleSize ?? size,
-			sampleFlags:
-				sample.sampleFlags ??
-				(i === 0 && firstSampleFlags !== undefined ? firstSampleFlags : flags),
+			sampleFlags: sample.sampleFlags ?? first ?? flags,
 			sampleCompositionTimeOffset: sample.sampleCompositionTimeOffset ?? 0,
-		}
-	})
+		})
+		first = undefined
+	}
 
 	return result
 }

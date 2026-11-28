@@ -1,7 +1,8 @@
+import { readIsoBoxSize } from '@svta/cml-iso-bmff'
+
 const BOX_HEADER_SIZE = 8 // size(4) + type(4)
 const LARGESIZE_HEADER_SIZE = 16 // size(4) + type(4) + largesize(8)
 const BOX_TYPE_OFFSET = 4
-const LARGESIZE_OFFSET = 8
 
 /**
  * A box of a BMFF byte array.
@@ -44,21 +45,10 @@ export function readBoxes(bytes: Uint8Array, start: number, end: number): BmffBo
 	const boxes: BmffBox[] = []
 	const counts = new Map<string, number>()
 	let offset = start
-	while (offset + BOX_HEADER_SIZE <= end) {
-		let size = view.getUint32(offset, false)
-		let headerSize = BOX_HEADER_SIZE
-		// ISO/IEC 14496-12 section 4.2: size 0 extends the box to the end of the data,
-		// size 1 puts a 64-bit largesize after the type.
-		if (size === 0) {
-			size = end - offset
-		} else if (size === 1) {
-			headerSize = LARGESIZE_HEADER_SIZE
-			if (offset + headerSize > end) break
-			size =
-				view.getUint32(offset + LARGESIZE_OFFSET, false) * 0x100000000 +
-				view.getUint32(offset + LARGESIZE_OFFSET + 4, false)
-		}
-		if (size < headerSize || offset + size > end) break
+	let size: number
+	// Box header rules of ISO/IEC 14496-12, clause 4.2. A uuid box needs no room for usertype.
+	while ((size = readIsoBoxSize(view, offset, end, true))) {
+		const headerSize = view.getUint32(offset) === 1 ? LARGESIZE_HEADER_SIZE : BOX_HEADER_SIZE
 		const type = readBoxType(bytes, offset + BOX_TYPE_OFFSET)
 		const index = (counts.get(type) ?? 0) + 1
 		counts.set(type, index)

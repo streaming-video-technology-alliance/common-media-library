@@ -1,131 +1,173 @@
 import { load } from './util/load.ts'
 import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { boxBytes } from './util/wideBoxes.ts'
-import {
-	assert,
-	createIsoBoxReadCursor,
-	describe,
-	it,
-	nextIsoBox,
-	readChildBoxes,
-	readIsoBoxHeaderSize,
-	readIsoBoxSize,
-	type IsoBoxReadCursor,
-} from './util/box.ts'
+import { assert, describe, it, readIsoBoxSize } from './util/box.ts'
 
-const USERTYPE = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-const MDAT = boxBytes('mdat', new Uint8Array([0xaa, 0xbb]))
+function viewOf(bytes: Uint8Array): DataView {
+	return new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+}
 
-function largeBox(type: string, body: Uint8Array): Uint8Array {
-	const bytes = new Uint8Array(16 + body.length)
-	const view = new DataView(bytes.buffer)
+// A box with a largesize field: size 1, the type, then the size in 8 bytes.
+// `size` is the low word of the largesize field, and `high` is the high word.
+function largeBox(type: string, size: number, length: number = size, high: number = 0): DataView {
+	const bytes = new Uint8Array(length)
+	const view = viewOf(bytes)
 
 	view.setUint32(0, 1)
-	bytes.set(
-		[...type].map(char => char.charCodeAt(0)),
-		4,
-	)
-	view.setUint32(12, bytes.length)
-	bytes.set(body, 16)
+	bytes.set(boxBytes(type).subarray(4, 8), 4)
 
-	return bytes
+	if (length >= 16) {
+		view.setUint32(8, high)
+		view.setUint32(12, size)
+	}
+
+	return view
 }
 
 describe('readIsoBoxSize', function () {
-	it('should read the boxes of a box that the data truncates', function () {
+	it('should return the size of each box', function () {
 		// #region example
-		// The first 100 bytes of a segment: the moof box is not complete.
-		const partial = new Uint8Array(load('mss_moof_tfdt.mp4'), 0, 100)
-		const cursor = createIsoBoxReadCursor(partial)
-		const size = readIsoBoxSize(cursor, 0) // the size of the complete moof box, above 100
-		const truncated = size > cursor.end - cursor.start
+		const view = new DataView(load('mss_moof_tfdt.mp4'))
+		const sizes: number[] = []
+		let at = 0
+		let size = readIsoBoxSize(view, at, view.byteLength)
 
-		// A cursor over the available bytes of the moof box, after its header.
-		const moof: IsoBoxReadCursor = {
-			...cursor,
-			start: 0,
-			pos: readIsoBoxHeaderSize(cursor, 0),
-			end: cursor.end,
+		while (size) {
+			sizes.push(size) // the moof box, then the mdat box
+			at += size
+			size = readIsoBoxSize(view, at, view.byteLength)
 		}
-		const boxes = readChildBoxes(moof) // the complete child boxes: mfhd
 		// #endregion example
 
-		assert.ok(size > 100)
-		assert.strictEqual(truncated, true)
-		assert.strictEqual(nextIsoBox(cursor), null)
-		assert.deepStrictEqual(
-			boxes.map(box => box.type),
-			['mfhd'],
-		)
+		assert.deepStrictEqual(sizes, [848, 23912])
+		assert.strictEqual(at, view.byteLength)
 	})
 
-	it('should return the declared size of a complete box', function () {
-		const data = load('mss_moof_tfdt.mp4')
-		const cursor = createIsoBoxReadCursor(data)
-		const size = readIsoBoxSize(cursor, 0)
+	it('should return the size of a box at a position after 0', function () {
+		const view = viewOf(reduceUint8Arrays([boxBytes('free'), boxBytes('mdat', new Uint8Array(3))]))
 
-		assert.strictEqual(size, new DataView(data).getUint32(0))
-		assert.strictEqual(nextIsoBox(cursor), 'moof')
-		assert.strictEqual(cursor.pos, size)
+		assert.strictEqual(readIsoBoxSize(view, 8, view.byteLength), 11)
 	})
 
-	it('should return the size from largesize', function () {
-		const bytes = largeBox('mdat', new Uint8Array([1, 2, 3]))
-		const cursor = createIsoBoxReadCursor(bytes)
+	it('should count the positions from the first byte of the view', function () {
+		const before = boxBytes('mdat', new Uint8Array(1))
+		const bytes = reduceUint8Arrays([before, boxBytes('free', new Uint8Array(2))])
+		const view = viewOf(bytes.subarray(before.length))
 
-		assert.strictEqual(readIsoBoxSize(cursor, 0), 19)
+		assert.strictEqual(readIsoBoxSize(view, 0, view.byteLength), 10)
 	})
 
-	it('should return the remaining bytes for a size of 0', function () {
-		const bytes = reduceUint8Arrays([MDAT, boxBytes('free', new Uint8Array(10))])
-		const cursor = createIsoBoxReadCursor(bytes)
+	it('should return the bytes to the end for a box with a size of 0', function () {
+		const bytes = boxBytes('mdat', new Uint8Array(4))
+		const view = viewOf(bytes)
 
-		new DataView(bytes.buffer).setUint32(MDAT.length, 0)
+		view.setUint32(0, 0)
 
-		assert.strictEqual(readIsoBoxSize(cursor, MDAT.length), 18)
+		assert.strictEqual(readIsoBoxSize(view, 0, 12), 12)
+		assert.strictEqual(readIsoBoxSize(view, 0, 10), 10)
+	})
+
+	it('should return the bytes to the end for a box with a size of 0 at a position after 0', function () {
+		const view = viewOf(reduceUint8Arrays([boxBytes('free'), boxBytes('mdat', new Uint8Array(4))]))
+
+		view.setUint32(8, 0)
+
+		assert.strictEqual(readIsoBoxSize(view, 8, 20), 12)
+		assert.strictEqual(readIsoBoxSize(view, 8, 18), 10)
+	})
+
+	it('should return the size of a box with a largesize', function () {
+		assert.strictEqual(readIsoBoxSize(largeBox('mdat', 17), 0, 17), 17)
+		assert.strictEqual(readIsoBoxSize(largeBox('mdat', 16), 0, 16), 16)
+	})
+
+	it('should return 0 for a largesize with a high word above 0', function () {
+		// The low word alone is a size inside the data.
+		assert.strictEqual(readIsoBoxSize(largeBox('mdat', 25, 25, 1), 0, 25), 0)
+		assert.strictEqual(readIsoBoxSize(largeBox('mdat', 24, 65560, 1), 0, 65560), 0)
+	})
+
+	it('should return 0 at the end', function () {
+		const view = viewOf(boxBytes('free'))
+
+		assert.strictEqual(readIsoBoxSize(view, 8, 8), 0)
+	})
+
+	it('should return 0 for fewer than 8 bytes', function () {
+		const view = viewOf(boxBytes('free'))
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 7), 0)
+		assert.strictEqual(readIsoBoxSize(view, 1, 8), 0)
+	})
+
+	it('should return 0 for a largesize box with fewer than 16 bytes', function () {
+		assert.strictEqual(readIsoBoxSize(largeBox('mdat', 17, 15), 0, 15), 0)
 	})
 
 	it('should return 0 for a size below the header size', function () {
-		const uuid = boxBytes('uuid', USERTYPE, new Uint8Array(4))
-		const cursor = createIsoBoxReadCursor(reduceUint8Arrays([MDAT, uuid]))
+		const view = viewOf(boxBytes('free'))
 
-		new DataView(uuid.buffer).setUint32(0, 20)
+		view.setUint32(0, 7)
 
-		assert.strictEqual(readIsoBoxSize(createIsoBoxReadCursor(uuid), 0), 0)
-		assert.strictEqual(readIsoBoxSize(cursor, MDAT.length), 28)
-		assert.strictEqual(
-			readIsoBoxSize(createIsoBoxReadCursor(boxBytes('free').subarray(0, 7)), 0),
-			0,
-		)
+		assert.strictEqual(readIsoBoxSize(view, 0, 8), 0)
+		assert.strictEqual(readIsoBoxSize(largeBox('mdat', 15, 16), 0, 16), 0)
 	})
 
-	it('should return 0 for a largesize with fewer than 16 bytes', function () {
-		const bytes = largeBox('mdat', new Uint8Array(4)).subarray(0, 12)
+	it('should return 0 for a box that passes the end', function () {
+		const view = viewOf(boxBytes('free', new Uint8Array(4)))
 
-		assert.strictEqual(readIsoBoxSize(createIsoBoxReadCursor(bytes), 0), 0)
-	})
-})
-
-describe('readIsoBoxHeaderSize', function () {
-	it('should return the size of the header of each box', function () {
-		// #region header
-		const bytes = reduceUint8Arrays([
-			boxBytes('free'),
-			largeBox('mdat', new Uint8Array(2)),
-			boxBytes('uuid', USERTYPE, new Uint8Array(2)),
-		])
-		const cursor = createIsoBoxReadCursor(bytes)
-		const headers: number[] = []
-
-		for (let at = 0; at < cursor.end; at += readIsoBoxSize(cursor, at)) {
-			headers.push(readIsoBoxHeaderSize(cursor, at)) // 8, 16, 24
-		}
-		// #endregion header
-
-		assert.deepStrictEqual(headers, [8, 16, 24])
+		assert.strictEqual(readIsoBoxSize(view, 0, 11), 0)
+		assert.strictEqual(readIsoBoxSize(largeBox('mdat', 18, 17), 0, 17), 0)
 	})
 
-	it('should return 0 with fewer than 8 bytes', function () {
-		assert.strictEqual(readIsoBoxHeaderSize(createIsoBoxReadCursor(new Uint8Array(7)), 0), 0)
+	it('should return 0 for a box at a position after 0 that passes the end', function () {
+		const view = viewOf(reduceUint8Arrays([boxBytes('free'), boxBytes('mdat', new Uint8Array(4))]))
+
+		assert.strictEqual(readIsoBoxSize(view, 8, 19), 0)
+	})
+
+	it('should return 0 for a uuid box with fewer than 16 bytes after its header', function () {
+		const view = viewOf(boxBytes('uuid', new Uint8Array(15)))
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 23), 0)
+		assert.strictEqual(readIsoBoxSize(largeBox('uuid', 31), 0, 31), 0)
+
+		view.setUint32(0, 0)
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 23), 0)
+	})
+
+	it('should return the size of a uuid box with 16 bytes after its header', function () {
+		const view = viewOf(boxBytes('uuid', new Uint8Array(16)))
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 24), 24)
+		assert.strictEqual(readIsoBoxSize(largeBox('uuid', 32), 0, 32), 32)
+
+		view.setUint32(0, 0)
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 24), 24)
+	})
+
+	it('should return the size of a box of 8 bytes with a type near uuid', function () {
+		assert.strictEqual(readIsoBoxSize(viewOf(boxBytes('uuix')), 0, 8), 8)
+		assert.strictEqual(readIsoBoxSize(viewOf(boxBytes('UUID')), 0, 8), 8)
+	})
+
+	it('should return the size of a short uuid box with ignoreUserType', function () {
+		const view = viewOf(boxBytes('uuid'))
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 8, true), 8)
+		assert.strictEqual(readIsoBoxSize(largeBox('uuid', 16), 0, 16, true), 16)
+	})
+
+	it('should return 0 for a truncated uuid box with ignoreUserType', function () {
+		const view = viewOf(boxBytes('uuid'))
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 7, true), 0)
+		assert.strictEqual(readIsoBoxSize(largeBox('uuid', 15, 16), 0, 16, true), 0)
+
+		view.setUint32(0, 7)
+
+		assert.strictEqual(readIsoBoxSize(view, 0, 8, true), 0)
 	})
 })

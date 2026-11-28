@@ -574,3 +574,44 @@ Amended on 2026-11-27, by issue [#694](https://github.com/streaming-video-techno
   | `@svta/cml-c2pa` in a bundle with `@svta/cml-iso-bmff` | 803 bytes | 281 bytes  |
 
 - **`@svta/cml-c2pa`.** The package reads its two user types with `createUuidReader`. The table of the cost item shows the growth of the bundle. The public API of the package does not change. The package does not declare its user types in `IsoCustomUuidBoxMap`. The API reference compiles the source of every package in one program, so a declaration in a package of the repository adds members to the interface on the page of `@svta/cml-iso-bmff`.
+
+Amended on 2026-11-27, by issue [#696](https://github.com/streaming-video-technology-alliance/common-media-library/issues/696):
+
+- **Size of a box.** `readIsoBoxSize(view, at, end, ignoreUserType?)` returns the size of the box at a position of a `DataView`. The result is 0 for a truncated box. The function allocates nothing and needs no read cursor.
+- **Rule for a `uuid` box.** By default, a `uuid` box with a size below its header plus 16 bytes is truncated, as in `readIsoBoxes`. With `ignoreUserType`, the function returns the size of that box.
+- **Callers.** `readChildBoxes`, `seekIsoBox`, and `nextIsoBox` call the function. `parsePsshList` of `@svta/cml-drm` and the reader of root boxes of `@svta/cml-c2pa` call it with `ignoreUserType`. The repository then has one function that reads the size of a box.
+- **Reason.** The loops of the two packages accept a `uuid` box with no room for `usertype`. The c2pa loop selects the bytes of the content hash. `nextIsoBox` stops before that box, and it returns the type as a string.
+- **Cost.** The package has one more public function. The table shows the change of each bundle. An application that imports only `parsePsshList` gets larger.
+
+  | Bundle                                                    | Minified   | After gzip |
+  | --------------------------------------------------------- | ---------- | ---------- |
+  | `parsePsshList` of `@svta/cml-drm`                        | +125 bytes | +58 bytes  |
+  | `parsePsshList` and `ensureEncryptedInit`                 | -114 bytes | -24 bytes  |
+  | `validateC2paSegment` of `@svta/cml-c2pa`                 | -105 bytes | -28 bytes  |
+  | `readIsoBoxes`                                            | -7 bytes   | -2 bytes   |
+  | `nextIsoBox` and `createIsoBoxReadCursor`                 | +2 bytes   | +8 bytes   |
+
+Amended on 2026-11-28, by pull request [#767](https://github.com/streaming-video-technology-alliance/common-media-library/pull/767):
+
+- **Cursor for each child box.** `iterateChildBoxes(cursor)` yields the type and a new read cursor for each box from the position of a cursor to its end. The function parses no content and does not move the input cursor. Each cursor has `start`, `pos`, and `end` of its box, with the readers map and the `int64` option of the input.
+- **Declared size of a box.** `readIsoBoxDeclaredSize(view, at, end)` returns the size that the header declares. The function does not compare the size with the remaining bytes or with the header size. The result is 0 only for an incomplete header.
+- **Reason for a 0 of `readIsoBoxSize`.** A declared size above the remaining bytes means that the data ends inside the box. Any other declared size above 0 means an invalid size.
+- **Size of a box header.** `readIsoBoxHeaderSize(view, at)` returns the size of the header with no `usertype` of a `uuid` box. The result equals `pos - start` of a read cursor for the box.
+- **Box of a read error.** When a `RangeError` occurs during the read of a box, `readChildBoxes` adds the `box` field to that error and throws the same error. The field has the type of the innermost box, the first byte of its header, and the position of the cursor. `isIsoBoxReadError` narrows a caught value to `IsoBoxReadError`.
+- **Sample defaults.** `resolveTrunSamples(trun, tfhd, trex)` returns the duration, the size, the flags, and the composition time offset of each sample. A field of the `trun` box has priority, then the `tfhd` default, then the `trex` default. With a `trex` box, every field of the result is a number.
+- **Check in `readTrun`.** `readTrun` throws a `RangeError` before it creates the sample array when the sample records pass the end of the box. A box with no per-sample fields has no limit on `sample_count`.
+- **Reason.** A player that reads with cursors wrote these functions in its own code. The player code has a loop over child boxes with a cursor for each box, and a size read for a partial `moof` box. The player code also has an error report with a byte offset, and the resolution of the sample defaults.
+- **Alternatives not taken.** A `spans` option that sets `start` and `end` on every box of `readIsoBoxes` had no caller, and a cursor has the same positions. A function that copies a cursor had no caller. A spread copies a cursor, and `seekIsoBox` with an empty path returns a copy.
+- **Cost.** The package has five more public functions and three more public types. The `box` field adds bytes to every bundle of `readIsoBoxes`, and the check adds bytes to `readTrun`. The table shows the change of each bundle, or the size of the bundle of a new function.
+
+  | Bundle                                                             | Minified   | After gzip |
+  | ------------------------------------------------------------------ | ---------- | ---------- |
+  | `readIsoBoxes`                                                     | +115 bytes | +65 bytes  |
+  | `readIsoBoxes` with `readTrun`, `readTfhd`, `readTfdt`, `readMfhd` | +317 bytes | +164 bytes |
+  | `seekIsoBox`                                                       | 0 bytes    | 0 bytes    |
+  | `nextIsoBox` and `createIsoBoxReadCursor`                          | 0 bytes    | 0 bytes    |
+  | `iterateChildBoxes` and `createIsoBoxReadCursor`                   | 864 bytes  | 495 bytes  |
+  | `resolveTrunSamples`                                               | 456 bytes  | 244 bytes  |
+  | `readIsoBoxDeclaredSize`                                           | 197 bytes  | 175 bytes  |
+  | `readIsoBoxHeaderSize`                                             | 106 bytes  | 121 bytes  |
+  | `isIsoBoxReadError`                                                | 138 bytes  | 143 bytes  |

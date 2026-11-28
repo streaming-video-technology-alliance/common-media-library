@@ -1,3 +1,4 @@
+import { reduceUint8Arrays } from './util/reduceUint8Arrays.ts'
 import { boxBytes } from './util/wideBoxes.ts'
 import { assert, describe, isIsoBoxReadError, it, readIsoBoxes, readTfdt } from './util/box.ts'
 
@@ -13,11 +14,13 @@ describe('isIsoBoxReadError', function () {
 		try {
 			readIsoBoxes(MOOF, { readers: { tfdt: readTfdt } })
 		} catch (error) {
-			if (isIsoBoxReadError(error)) {
-				const { type, start, pos } = error.box
-
-				report = `${type} at ${start}: ${error.message} (position ${pos})`
+			if (!isIsoBoxReadError(error)) {
+				throw error
 			}
+
+			const { type, start, pos } = error.box
+
+			report = `${type} at ${start}: ${error.message} (position ${pos})`
 		}
 		// #endregion example
 
@@ -71,6 +74,41 @@ describe('isIsoBoxReadError', function () {
 		assert.throws(
 			() => readIsoBoxes(MOOF, { readers: { tfdt: readTfdtFails } }),
 			(error: unknown) => error === frozen && !isIsoBoxReadError(error),
+		)
+	})
+
+	it('should return false for a RangeError with a box field that is not an object', function () {
+		const error = Object.assign(new RangeError('custom'), { box: 'tfdt' })
+
+		assert.strictEqual(isIsoBoxReadError(error), false)
+	})
+
+	it('should add the field to the error of the depth limit', function () {
+		// 128 moov boxes, each inside the one before, then a free box at level 128.
+		let bytes = boxBytes('free')
+
+		for (let i = 0; i < 128; i++) {
+			bytes = boxBytes('moov', bytes)
+		}
+
+		assert.throws(
+			() => readIsoBoxes(bytes),
+			(error: unknown) =>
+				isIsoBoxReadError(error) &&
+				error.message === 'The box free is deeper than the limit of 128 levels' &&
+				error.box.type === 'free' &&
+				error.box.start === 1024 &&
+				error.box.pos === 1024,
+		)
+	})
+
+	it('should count the position from the first byte of a view with a byte offset', function () {
+		const padded = reduceUint8Arrays([new Uint8Array(5), MOOF])
+
+		assert.throws(
+			() => readIsoBoxes(padded.subarray(5), { readers: { tfdt: readTfdt } }),
+			(error: unknown) =>
+				isIsoBoxReadError(error) && error.box.start === 16 && error.box.pos === 28,
 		)
 	})
 })

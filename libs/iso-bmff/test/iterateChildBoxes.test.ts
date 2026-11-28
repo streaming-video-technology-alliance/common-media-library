@@ -6,10 +6,11 @@ import {
 	assert,
 	createIsoBoxReadCursor,
 	describe,
-	hasIsoBoxSpan,
+	isIsoBoxType,
 	it,
 	iterateChildBoxes,
 	nextIsoBox,
+	readIsoBoxes,
 	readChildBoxes,
 	readInt64AsBigInt,
 	readTfdt,
@@ -17,6 +18,8 @@ import {
 	readTrun,
 	seekIsoBox,
 	type IsoBoxReadCursor,
+	type MovieBox,
+	type ParsedIsoBox,
 } from './util/box.ts'
 
 const USERTYPE = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
@@ -125,13 +128,13 @@ describe('iterateChildBoxes', function () {
 		assert.strictEqual(entry[1].end, uuid.length)
 	})
 
-	it('should keep the readers and the options of the cursor', function () {
+	it('should keep the readers and the int64 option of the cursor', function () {
 		const readers = { tfdt: readTfdt }
 		const cursor = createIsoBoxReadCursor(load('mss_moof_tfdt.mp4'), {
 			readers,
 			int64: readInt64AsBigInt,
-			spans: true,
 		})
+		let times = 0
 
 		for (const [type, moof] of iterateChildBoxes(cursor)) {
 			if (type !== 'moof') {
@@ -140,7 +143,6 @@ describe('iterateChildBoxes', function () {
 
 			assert.strictEqual(moof.readers, readers)
 			assert.strictEqual(moof.int64, readInt64AsBigInt)
-			assert.strictEqual(moof.spans, true)
 
 			const traf = seekIsoBox(moof, ['traf'])
 
@@ -152,18 +154,72 @@ describe('iterateChildBoxes', function () {
 
 					expectType<Equal<typeof time, bigint>>(true)
 					assert.strictEqual(typeof time, 'bigint')
+					times++
 				}
 			}
 
-			const tfdtCursor = seekIsoBox(traf, ['tfdt'])
+			// The readers map of the cursor reads the tfdt box.
+			const tfdt = readChildBoxes(traf).find(box => isIsoBoxType('tfdt', box))
 
-			assert.ok(tfdtCursor)
-
-			const [tfdt] = readChildBoxes({ ...traf, pos: tfdtCursor.start }, 1)
-
-			assert.ok(tfdt && hasIsoBoxSpan(tfdt))
-			assert.strictEqual(tfdt.start, tfdtCursor.start)
-			assert.strictEqual(tfdt.end, tfdtCursor.end)
+			assert.ok(tfdt)
 		}
+
+		assert.strictEqual(times, 1)
+	})
+
+	it('should set pos after the largesize field of a box with a size of 1', function () {
+		const large = new Uint8Array(20)
+		const view = new DataView(large.buffer)
+
+		view.setUint32(0, 1)
+		large.set([0x6d, 0x64, 0x61, 0x74], 4)
+		view.setUint32(12, 20)
+
+		const [entry] = [...iterateChildBoxes(createIsoBoxReadCursor(reduceUint8Arrays([large, MFHD])))]
+
+		assert.ok(entry)
+		assert.strictEqual(entry[0], 'mdat')
+		assert.strictEqual(entry[1].start, 0)
+		assert.strictEqual(entry[1].pos, 16)
+		assert.strictEqual(entry[1].end, 20)
+	})
+
+	it('should read the position of the cursor at the call', function () {
+		const cursor = createIsoBoxReadCursor(reduceUint8Arrays([MFHD, MDAT]))
+		const iterator = iterateChildBoxes(cursor)
+
+		// A move of the input cursor after the call does not change the iteration.
+		readChildBoxes(cursor)
+
+		assert.deepStrictEqual(
+			[...iterator].map(([type]) => type),
+			['mfhd', 'mdat'],
+		)
+	})
+
+	it('should keep the depth limit of readChildBoxes for the cursors of a reader', function () {
+		// 300 moov boxes, each inside the one before.
+		let bytes = boxBytes('free')
+
+		for (let i = 0; i < 300; i++) {
+			bytes = boxBytes('moov', bytes)
+		}
+
+		const readers = {
+			moov: (cursor: IsoBoxReadCursor): MovieBox => {
+				const boxes: ParsedIsoBox[] = []
+
+				for (const [, child] of iterateChildBoxes(cursor)) {
+					boxes.push(...readChildBoxes({ ...child, pos: child.start }))
+				}
+
+				return { type: 'moov', boxes }
+			},
+		}
+
+		assert.throws(() => readIsoBoxes(bytes, { readers }), {
+			name: 'RangeError',
+			message: 'The box moov is deeper than the limit of 128 levels',
+		})
 	})
 })

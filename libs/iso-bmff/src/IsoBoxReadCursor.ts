@@ -11,11 +11,10 @@ import type { IsoInt64Reader } from './IsoInt64Reader.ts'
  *
  * The type parameter `V` is the type of every 64-bit integer field that the built-in readers return.
  * A cursor of either mode is assignable to `IsoBoxReadCursor<IsoInt64>`.
- * The type parameter `S` is the type of the `spans` option. With the literal `true`, `readChildBoxes` returns boxes with the fields of `IsoBoxSpan`.
  *
  * @public
  */
-export type IsoBoxReadCursor<V extends IsoInt64 = number, S extends boolean = boolean> = {
+export type IsoBoxReadCursor<V extends IsoInt64 = number> = {
 	/**
 	 * The bytes to read.
 	 */
@@ -44,11 +43,6 @@ export type IsoBoxReadCursor<V extends IsoInt64 = number, S extends boolean = bo
 		IsoBoxType,
 		{ r(cursor: IsoBoxReadCursor<V>, type: IsoBoxType): { type: IsoBoxType } | undefined }['r']
 	>
-
-	/**
-	 * If `true`, `readChildBoxes` sets the `start` and `end` fields of `IsoBoxSpan` on every box that it returns.
-	 */
-	readonly spans?: S
 } & ([V] extends [bigint]
 	? {
 			/**

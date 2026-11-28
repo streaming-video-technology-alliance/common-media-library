@@ -1,3 +1,4 @@
+import { expectType, type Equal } from './util/expectType.ts'
 import {
 	assert,
 	describe,
@@ -32,7 +33,7 @@ const TFHD: TrackFragmentHeaderBox = {
 	sampleDescriptionIndex: undefined,
 	defaultSampleDuration: 500,
 	defaultSampleSize: undefined,
-	defaultSampleFlags: 0x02000000,
+	defaultSampleFlags: 0x03000000,
 }
 
 const TRUN: TrackRunBox = {
@@ -65,11 +66,17 @@ describe('resolveTrunSamples', function () {
 		const trun = findBox('test_frag.mp4', 'trun', { readers: { trun: readTrun } })
 
 		const samples = resolveTrunSamples(trun, tfhd, trex)
-		const duration = samples.reduce((sum, sample) => sum + (sample.sampleDuration ?? 0), 0)
+		const duration = samples.reduce((sum, sample) => sum + sample.sampleDuration, 0)
 		// #endregion example
 
+		expectType<Equal<typeof duration, number>>(true)
 		assert.strictEqual(samples.length, trun.samples.length)
 		assert.ok(duration > 0)
+		assert.deepStrictEqual(
+			samples.map(sample => sample.sampleCompositionTimeOffset),
+			trun.samples.map(sample => sample.sampleCompositionTimeOffset ?? 0),
+		)
+		assert.ok(samples.some(sample => sample.sampleCompositionTimeOffset !== 0))
 
 		for (const sample of samples) {
 			assert.strictEqual(typeof sample.sampleDuration, 'number')
@@ -92,10 +99,72 @@ describe('resolveTrunSamples', function () {
 			{
 				sampleDuration: 500,
 				sampleSize: 20,
-				sampleFlags: 0x02000000,
+				sampleFlags: 0x03000000,
 				sampleCompositionTimeOffset: 0,
 			},
 		])
+	})
+
+	it('should take the trex default for a field that the trun box and the tfhd box do not have', function () {
+		const trun: TrackRunBox = {
+			...TRUN,
+			samples: [
+				{
+					sampleDuration: undefined,
+					sampleSize: undefined,
+					sampleFlags: undefined,
+					sampleCompositionTimeOffset: -5,
+				},
+			],
+		}
+
+		assert.deepStrictEqual(resolveTrunSamples(trun, TFHD, TREX), [
+			{
+				sampleDuration: 500,
+				sampleSize: 2000,
+				sampleFlags: 0x02000000,
+				sampleCompositionTimeOffset: -5,
+			},
+		])
+	})
+
+	it('should keep a value of 0 over a default', function () {
+		const trun: TrackRunBox = {
+			...TRUN,
+			firstSampleFlags: undefined,
+			samples: [
+				{ sampleDuration: 0, sampleSize: 0, sampleFlags: 0, sampleCompositionTimeOffset: 0 },
+				{
+					sampleDuration: undefined,
+					sampleSize: undefined,
+					sampleFlags: undefined,
+					sampleCompositionTimeOffset: undefined,
+				},
+			],
+		}
+		const tfhd: TrackFragmentHeaderBox = {
+			...TFHD,
+			defaultSampleDuration: 0,
+			defaultSampleSize: 0,
+			defaultSampleFlags: 0,
+		}
+
+		assert.deepStrictEqual(resolveTrunSamples(trun, tfhd, TREX), [
+			{ sampleDuration: 0, sampleSize: 0, sampleFlags: 0, sampleCompositionTimeOffset: 0 },
+			{ sampleDuration: 0, sampleSize: 0, sampleFlags: 0, sampleCompositionTimeOffset: 0 },
+		])
+	})
+
+	it('should accept null for the tfhd box and the trex box', function () {
+		const samples = resolveTrunSamples(TRUN, null, null)
+
+		expectType<Equal<(typeof samples)[number]['sampleDuration'], number | undefined>>(true)
+		assert.deepStrictEqual(samples[1], {
+			sampleDuration: undefined,
+			sampleSize: 20,
+			sampleFlags: undefined,
+			sampleCompositionTimeOffset: 0,
+		})
 	})
 
 	it('should apply firstSampleFlags to the first sample only', function () {
